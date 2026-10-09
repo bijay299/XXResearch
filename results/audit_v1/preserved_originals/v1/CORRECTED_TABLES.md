@@ -34,11 +34,9 @@ Frozen evaluation manifest: 280 records, 280 unique (category, prompt_id, gen_se
 | seed29 / MAC_L2 | 280 | 280 | 0 | 280 | 0 | 0 |
 
 Integrity issues raised: **0**.
-Every checkpoint has exactly 280 rows, 280 distinct (category, prompt_id, gen_seed) identities and 280 distinct image hashes. The design is 7 categories × **10 distinct prompt texts** (70 texts in total) × 4 generation seeds = **280 prompt × generation-seed pairs** per checkpoint, with a 140/140 literal/paraphrase split. The evaluation set is 70 prompts, not 280. **No duplicate rows and no missing rows were found, so no de-duplication or dropping rule was applied to anything.**
+Every checkpoint has exactly 280 rows, 280 distinct (category, prompt_id, gen_seed) identities and 280 distinct image hashes, with 7 categories × 10 prompts × 4 generation seeds and a 140/140 literal/paraphrase split. **No duplicate rows and no missing rows were found, so no de-duplication or dropping rule was applied to anything.**
 
-Images byte-identical across two different table slots: 280, of which **0** are anything other than the known M0 reuse. So the two runs produced genuinely distinct image bytes at every edited checkpoint — no accidental file sharing, and the seed-29 table is not a copy of the seed-17 one.
-
-> **That is a file-level finding, not statistical independence.** The two runs differ only in the training RNG seed. They share the same pretrained M0 backbone, the same byte-identical anchor caches, the same concepts and anchor mappings, the same frozen evaluation prompts and generation seeds, and the same detector. They are two draws from one training pipeline on one base model, so they bound *training-seed* variability only — not variability over models, concepts, prompts or anchors. Distinct bytes do not license treating them as independent replications of anything broader.
+Images byte-identical across two different table slots: 280, of which **0** are anything other than the known M0 reuse. Seed 17 and seed 29 therefore produced genuinely distinct images at every edited checkpoint — the two runs are independent everywhere except the shared M0 set and the shared anchor caches.
 
 ### Cross-check of the committed summaries against raw predictions
 
@@ -51,25 +49,25 @@ Every rate and every headline point estimate in the committed `rates.csv` and `c
 
 ## 2. Direct paired L2-SP versus unregularised contrasts
 
-Resampling unit: prompt text (10 per category; 70 distinct texts across the 7 categories), each carrying its 4 generation seeds -> 280 prompt x generation-seed pairs per checkpoint. one resampled prompt list indexes both arms of every contrast. 10000 draws, 95% percentile interval. Training seeds analysed separately; never pooled, never resampled jointly.
+Resampling unit: prompt (10 per category), carrying its 4 generation seeds. one resampled prompt list indexes both arms of every contrast. 10000 draws, 95% percentile interval. Training seeds analysed separately; never pooled, never resampled jointly.
 
-- **Interval meaning.** sampling uncertainty over the 10 evaluation prompt texts per category within ONE training run (each carrying 4 generation seeds). With 10 clusters of 4 images the attainable resolution is coarse: a 95% interval cannot be narrower than a few percentage points. An interval that includes zero is NOT evidence that the effect is zero, and it does NOT establish equivalence: ruling out an effect of a stated size requires the interval to lie wholly inside a pre-declared equivalence margin, which is a separate claim no interval here was designed to support.
+- **Interval meaning.** sampling uncertainty over the 10 evaluation prompts within ONE training run. With 10 clusters of 4 images the attainable resolution is coarse: a 95% interval cannot be narrower than a few percentage points, and an interval that includes zero is NOT evidence that the effect is zero.
 
 - **Multiplicity.** no multiple-comparison correction is applied; many contrasts are reported, so individual interval-excludes-zero labels must be read as descriptive, not as tests.
 
-- **What the parent cancellation does and does not buy.** L2 contrasts are child-vs-child, so the measured D(MA) term cancels out of the estimator and its sampling noise is not inherited. The children remain TRAINED FROM that parent, so the contrast is not independent of MA in any causal sense, and it answers a different question from recovery relative to MA: how the two arms differ from each other, not how either differs from its parent. Neither estimand substitutes for the other.
+- **Why these are the right contrasts.** L2 contrasts are child-vs-child, so the MA parent term cancels and these estimates do not inherit any D_cat(MA) instability.
 
 `ns` marks an interval that includes zero. A `ns` label is **not** a finding of no effect, and a change of `ns` label between two seeds is **not** a demonstration that the two differ.
 
 ### MAB_L2 − MAB (second request = dog)
 
-Positive = the L2-SP arm left **more** of that category standing. The first block is the **newest-target residual difference** on dog — a statement about how much of the newest request each arm removed, **not** a cat-history result.
+Positive = the L2-SP arm left **more** of that category standing.
 
 | contrast | thr | seed 17 | seed 29 |
 |---|---|---|---|
-| newest-target (dog) residual difference | 0.3 | +40.0 [+22.5, +57.5] | +42.5 [+22.5, +62.5] |
-| newest-target (dog) residual difference | 0.5 | +40.0 [+22.5, +57.5] | +40.0 [+17.5, +62.5] |
-| newest-target (dog) residual difference | 0.7 | +40.0 [+22.5, +57.5] | +45.0 [+25.0, +65.0] |
+| new target (dog) residual | 0.3 | +40.0 [+22.5, +57.5] | +42.5 [+22.5, +62.5] |
+| new target (dog) residual | 0.5 | +40.0 [+22.5, +57.5] | +40.0 [+17.5, +62.5] |
+| new target (dog) residual | 0.7 | +40.0 [+22.5, +57.5] | +45.0 [+25.0, +65.0] |
 | historical cat residual | 0.3 | +5.0 [-5.0, +15.0] ns | +7.5 [+0.0, +15.0] ns |
 | historical cat residual | 0.5 | +5.0 [+0.0, +12.5] ns | +5.0 [+0.0, +12.5] ns |
 | historical cat residual | 0.7 | +2.5 [+0.0, +7.5] ns | +2.5 [+0.0, +7.5] ns |
@@ -88,13 +86,13 @@ Literal versus paraphrase, t=0.5 (point estimates of two separate contrasts; no 
 
 ### MAC_L2 − MAC (second request = sandwich)
 
-Positive = the L2-SP arm left **more** of that category standing. The first block is the **newest-target residual difference** on sandwich — a statement about how much of the newest request each arm removed, **not** a cat-history result.
+Positive = the L2-SP arm left **more** of that category standing.
 
 | contrast | thr | seed 17 | seed 29 |
 |---|---|---|---|
-| newest-target (sandwich) residual difference | 0.3 | +47.5 [+35.0, +60.0] | +47.5 [+25.0, +67.5] |
-| newest-target (sandwich) residual difference | 0.5 | +42.5 [+27.5, +57.5] | +45.0 [+17.5, +65.0] |
-| newest-target (sandwich) residual difference | 0.7 | +40.0 [+25.0, +52.5] | +42.5 [+20.0, +62.5] |
+| new target (sandwich) residual | 0.3 | +47.5 [+35.0, +60.0] | +47.5 [+25.0, +67.5] |
+| new target (sandwich) residual | 0.5 | +42.5 [+27.5, +57.5] | +45.0 [+17.5, +65.0] |
+| new target (sandwich) residual | 0.7 | +40.0 [+25.0, +52.5] | +42.5 [+20.0, +62.5] |
 | historical cat residual | 0.3 | +10.0 [+0.0, +20.0] ns | +0.0 [-10.0, +10.0] ns |
 | historical cat residual | 0.5 | +7.5 [+0.0, +17.5] ns | +2.5 [-7.5, +15.0] ns |
 | historical cat residual | 0.7 | +7.5 [+0.0, +22.5] ns | -2.5 [-7.5, +0.0] ns |
@@ -111,14 +109,9 @@ Literal versus paraphrase, t=0.5 (point estimates of two separate contrasts; no 
 | new target (sandwich) residual, L2 − no-L2 | +55.0 | +30.0 | +65.0 | +25.0 |
 | historical cat residual, L2 − no-L2 | +0.0 | +15.0 | +0.0 | +5.0 |
 
-## 3. Two different estimands, side by side
+## 3. The two estimands side by side
 
-These answer **different questions** and neither substitutes for the other:
-
-- `D_cat(child) − D_cat(MA)` of the **same training seed** — how far the child moved **from its own parent**. This is historical recovery.
-- `D_cat(L2) − D_cat(no-L2)` — how the two arms differ **from each other**. The measured `D(MA)` term cancels from this estimator, so it does not inherit that term's sampling noise. It is **not** a parent-free version of recovery: both children were trained starting from MA and their states still depend on it.
-
-Where the two behave differently across seeds, that locates where the across-seed movement sits — it does not make either estimand the correct one.
+`historical cat recovery` is referenced to the parent, `D_cat(child) − D_cat(MA)` of the **same training seed**. The direct contrast `D_cat(L2) − D_cat(no-L2)` measures the L2 effect with the parent term algebraically cancelled. Where the two disagree across seeds, the disagreement is located in the reference term.
 
 | child | thr | recovery vs own MA, seed 17 | recovery vs own MA, seed 29 |
 |---|---|---|---|
@@ -137,7 +130,7 @@ Where the two behave differently across seeds, that locates where the across-see
 
 ### The reference term itself
 
-`D_cat(MA)` (%) — the measured parent rate that recovery is referenced to, and that cancels out of the child-vs-child estimator:
+`D_cat(MA)` (%), the quantity that cancels in every direct contrast:
 
 | thr | family | seed 17 | seed 29 | gap |
 |---|---|---|---|---|
@@ -151,16 +144,7 @@ Where the two behave differently across seeds, that locates where the across-see
 | 0.7 | literal | 15.0 | 15.0 | +0.0 pp |
 | 0.7 | paraphrase | 20.0 | 35.0 | +15.0 pp |
 
-The **parent's own** across-seed difference sits entirely on paraphrase prompts: literal `D_cat(MA)` is identical in both seeds at all three thresholds, while the paraphrase value differs by 15–20 pp.
-
-That is a fact about the parent only, and it does **not** mean the across-seed change in recovery is mostly a parent effect. Decomposing the sandwich-L2 case at t=0.5, where recovery moves by −20.0 pp between seeds:
-
-| component | seed 17 | seed 29 | contribution to the −20.0 pp change |
-|---|---|---|---|
-| child `D_cat(MAC_L2)` | 32.5% | 22.5% | -10.0 pp |
-| parent `D_cat(MA)` | 17.5% | 27.5% | -10.0 pp |
-
-**Both contribute, and here in equal measure**: the child's cat presence falls 10 pp while the parent's rises 10 pp. Attributing the non-replication mainly to the parent would be wrong.
+The parent difference between the two training runs is **entirely on paraphrase prompts**: literal `D_cat(MA)` is identical in both seeds at all three thresholds, while the paraphrase value differs by 15–20 pp. Any estimand referenced to `D_cat(MA)` inherits that difference; the direct child-vs-child contrasts do not.
 
 ## 4. Deletion effectiveness context
 

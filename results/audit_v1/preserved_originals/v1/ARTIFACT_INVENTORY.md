@@ -50,27 +50,15 @@ binding constraint on the next experiment and is costed in
 
 - `models/seed<N>/<ckpt>/train_report.json` — 10 files. Each carries the full
   effective hyperparameter set, `upstream_argv`, parent verification, the
-  L2-SP reference check, an `l2sp_trace` summary (`steps_recorded`,
-  `raw_first`, `raw_last`, `weighted_last` — see the note below: non-zero only
-  on regularised arms), runtime, peak memory and the GPU UUID. Copied into the repo at `results/seq<N>/train/<ckpt>.json`.
+  L2-SP reference check, an `l2sp_trace` summary (`steps_recorded: 1000`,
+  `raw_first`, `raw_last`, `weighted_last`), runtime, peak memory and the GPU
+  UUID. Copied into the repo at `results/seq<N>/train/<ckpt>.json`.
 - `seq_pilot/logs/` — 4.4 MB of stdout/stderr per stage, including
   `orchestrator.log` and `seed29_orchestrator.log`.
 
 The `l2sp_trace` is a **summary, not a per-step series**: first/last raw value
 and the weighted last value only. A per-step regularisation curve is not
 recoverable from it.
-
-> **Legacy metadata gap, found by AUDIT-01b and reported rather than worked
-> around.** `l2sp_trace` is a *regularisation-loss* trace: it is populated only
-> when `l2sp_weight > 0` and is legitimately `steps_recorded: 0` on all six
-> unregularised runs (MA, MAB, MAC in both seeds). So for an unregularised run
-> **this schema records no direct count of completed optimizer steps** — only
-> `iterations_requested`, which is an input rather than an outcome, and the
-> runtime-implied estimate `train_seconds / seconds_per_optimizer_step`.
-> `validate_stage.py` therefore treats the trace as step evidence only for
-> regularised arms and says so in its output. **Recommendation:** the next
-> trajectory should record an explicit `optimizer_steps_completed` field. No
-> migration of the existing reports was performed.
 
 ## 4. Per-image predictions — complete, 11 distinct evaluations
 
@@ -125,19 +113,6 @@ was ever repeated under a fixed seed, and no determinism flags
 (`torch.use_deterministic_algorithms`, cuDNN determinism) appear in the
 training path.
 
-> **Three distinct claims, not to be conflated** when that check is eventually
-> run. (1) *File hashes equal* — byte-identical serialisation; a mismatch can
-> come from serialisation order or metadata alone and is **not** evidence of a
-> training difference. (2) *Tensors numerically equal* — the weights agree to a
-> stated tolerance; this is what a reproducibility question is about.
-> (3) *Training equivalent* — stronger than either, and established by neither.
-> `scripts/seq/compare_checkpoints.py` answers (1) and (2) on CPU, per tensor
-> (max abs, mean abs, relative Frobenius), and explicitly refuses (3).
->
-> For calibration: the two existing seed-17 and seed-29 `MAB` checkpoints differ
-> by max abs **2.86e-03** and relative Frobenius **2.69e-02** — a measured
-> size for "same configuration, different training seed" on these tensors.
-
 What *is* verified is **inference** determinism: the no-op reload check
 regenerated 8/8 images byte-identically through the real checkpoint-loading
 path. That covers generation, not training.
@@ -162,7 +137,6 @@ substituted from any other quantity.
 | Human annotation | none performed; see §8 |
 | UnlearnCanvas assets, generator, classifiers | blocked; no UA/IRA/CRA, no baseline reproduction |
 | Blinded grids for seed 29 | only seed 17 had grids built (`analysis/seed17/grids/`) |
-| A direct completed-optimizer-step counter for unregularised runs | step completion is inferred from a runtime cross-check only (see §3) |
 | Development prompt split | the pilot's 280-prompt set was the *only* evaluation set and has now informed hypotheses, so it is exploratory from here on |
 
 ## 8. Human-annotation assets
@@ -193,18 +167,5 @@ labelled as such; it is not human review and must not be cited as validation.
 | `/data` free | 1.4 TB of 14 TB |
 
 Committed to the repository: JSON reports, per-image CSVs, rate tables,
-contrasts, figures, the empty annotation sheet, the frozen draft manifests, and
-the checkpoint/generation contracts. **No weights and no image archives are
-committed**, by `.gitignore` and by this audit's own choice.
-
-### Contracts and validation added by AUDIT-01b
-
-| file | purpose |
-|---|---|
-| `configs/checkpoint_contract.json` | the 32 kv-xattn tensor names, shapes and dtypes, 19,169,280 params, expected file size — derived from the 10 saved checkpoints, which all agree |
-| `configs/generation_settings.json` | the evaluation-generation settings every checkpoint of a comparison must share — derived from the 12 pilot image reports, which all agree |
-| `scripts/seq/validate_stage.py` | contract validation for a training or evaluation stage, replacing existence/row-count checks |
-| `scripts/seq/compare_checkpoints.py` | CPU tensor-level checkpoint comparison, keeping hash / tensor / training claims separate |
-
-**All 10 training runs and all 12 evaluation slots were revalidated on CPU
-against these contracts and pass.**
+contrasts, figures and the empty annotation sheet. **No weights and no image
+archives are committed**, by `.gitignore` and by this audit's own choice.

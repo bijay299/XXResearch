@@ -13,28 +13,41 @@ launch scripts, validators, measurements and notes.
 
 ## Current status (2026-10-09)
 
-> **Latest: AUDIT-01** re-derived the two-seed SD-1.5 sequential pilot snapshot
-> `a9de625` from raw per-image predictions. Arithmetic and completeness verified
-> exactly (0 mismatches over 1026 values; 0 duplicate and 0 missing rows); nine
-> **narrative** claims corrected. Start at
-> [`results/audit_v1/AUDIT_REPORT.md`](results/audit_v1/AUDIT_REPORT.md).
+> **Latest: AUDIT-01 / 01b** re-derived the two-seed SD-1.5 sequential pilot
+> snapshot `a9de625` from raw per-image predictions. Arithmetic and completeness
+> verified exactly (0 mismatches over 1026 values; 0 duplicate and 0 missing
+> rows). Nine **narrative** claims were corrected, then eight further
+> overstatements in the audit's **own** write-up. Start at
+> [`results/audit_v1/AUDIT_REPORT.md`](results/audit_v1/AUDIT_REPORT.md), with
+> [`CLAIM_CORRECTIONS_V2.md`](results/audit_v1/CLAIM_CORRECTIONS_V2.md).
 >
 > The headline change: the L2-SP retention comparisons are **confounded by
 > unequal deletion strength**, and **no intermediate checkpoints exist** to
-> resolve that from existing artifacts. A matched-effectiveness diagnostic is
-> proposed at
+> resolve that from existing artifacts. A bounded matched-effectiveness
+> diagnostic is proposed at
 > [`docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md)
-> (≈1.93 GPU-hours) and is **pending central review and the PI's decision — not
-> authorised to run**.
+> (**3.095 GPU-hours** with contingency) and is **pending central review and the
+> PI's decision — not authorised to run**.
+>
+> Stage completion is now decided by contract validation
+> ([`scripts/seq/validate_stage.py`](scripts/seq/validate_stage.py)), not by file
+> existence or row counts: the earlier guards accepted a `delta.bin` holding
+> plain text and a `detections.jsonl` of 280 identical or 280 malformed rows.
+> Three CPU suites cover it — **181 assertions**: 35 regression checks, 78
+> validator checks (including revalidation of all 22 real saved artifacts), and
+> 68 end-to-end orchestration checks over 18 groups — with every GPU command
+> mocked.
 >
 > **No human annotation has been performed** anywhere in this project. A
 > 236-item blinded packet is built and empty; detector validity is unmeasured.
+> See [`ACCESS.md`](results/audit_v1/annotation_packet/ACCESS.md).
 
 | Item | Status |
 |---|---|
 | **SD-1.5 sequential pilot, seeds 17 and 29** | **done — exploratory**; numbers verified by AUDIT-01, narrative corrected |
 | **AUDIT-01 evidence audit and claim corrections** | **done** |
-| **Matched-effectiveness protocol** | **proposed, pending review** |
+| **AUDIT-01b execution checks, contract validation, CPU test suites** | **done** |
+| **Matched-effectiveness protocol (bounded) + frozen draft manifests** | **proposed, pending review — not approved** |
 | **Human evaluator audit** | **packet built, NOT annotated** |
 | Isolated environment, versions pinned to upstream `env.yaml` | **done** |
 | Upstream CUIG pinned, licence + attribution preserved | **done** |

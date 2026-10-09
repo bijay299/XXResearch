@@ -98,19 +98,29 @@ def main() -> int:
     else:
         A("Every checkpoint has exactly 280 rows, 280 distinct "
           "(category, prompt_id, gen_seed) identities and 280 distinct image "
-          "hashes, with 7 categories × 10 prompts × 4 generation seeds and a "
-          "140/140 literal/paraphrase split. **No duplicate rows and no missing "
-          "rows were found, so no de-duplication or dropping rule was applied "
-          "to anything.**")
+          "hashes. The design is 7 categories × **10 distinct prompt texts** "
+          "(70 texts in total) × 4 generation seeds = **280 prompt × "
+          "generation-seed pairs** per checkpoint, with a 140/140 "
+          "literal/paraphrase split. The evaluation set is 70 prompts, not 280. "
+          "**No duplicate rows and no missing rows were found, so no "
+          "de-duplication or dropping rule was applied to anything.**")
     A("")
     cx = integ["cross_checkpoint_identical_images"]
     A(f"Images byte-identical across two different table slots: "
       f"{cx['n_hashes_shared_across_tables']}, of which "
       f"**{cx['n_shared_excluding_M0_reuse']}** are anything other than the "
-      f"known M0 reuse. Seed 17 and seed 29 therefore produced genuinely "
-      f"distinct images at every edited checkpoint — the two runs are "
-      f"independent everywhere except the shared M0 set and the shared anchor "
-      f"caches.\n")
+      f"known M0 reuse. So the two runs produced genuinely distinct image bytes "
+      f"at every edited checkpoint — no accidental file sharing, and the "
+      f"seed-29 table is not a copy of the seed-17 one.\n")
+    A("> **That is a file-level finding, not statistical independence.** The two "
+      "runs differ only in the training RNG seed. They share the same pretrained "
+      "M0 backbone, the same byte-identical anchor caches, the same concepts and "
+      "anchor mappings, the same frozen evaluation prompts and generation seeds, "
+      "and the same detector. They are two draws from one training pipeline on "
+      "one base model, so they bound *training-seed* variability only — not "
+      "variability over models, concepts, prompts or anchors. Distinct bytes do "
+      "not license treating them as independent replications of anything "
+      "broader.\n")
 
     A("### Cross-check of the committed summaries against raw predictions\n")
     A("| seed | rate cells checked | contrast values checked | mismatches |")
@@ -134,7 +144,8 @@ def main() -> int:
       f"Training seeds {des['training_seeds']}.\n")
     A(f"- **Interval meaning.** {des['interval_meaning']}\n")
     A(f"- **Multiplicity.** {des['multiplicity']}\n")
-    A(f"- **Why these are the right contrasts.** {des['parent_cancellation']}\n")
+    A(f"- **What the parent cancellation does and does not buy.** "
+      f"{des['parent_cancellation']}\n")
     A("`ns` marks an interval that includes zero. A `ns` label is **not** a "
       "finding of no effect, and a change of `ns` label between two seeds is "
       "**not** a demonstration that the two differ.\n")
@@ -142,13 +153,16 @@ def main() -> int:
     for no_l2, l2, tgt in PAIRS:
         key = f"{no_l2}_vs_{l2}"
         A(f"### {l2} − {no_l2} (second request = {tgt})\n")
-        A("Positive = the L2-SP arm left **more** of that category standing.\n")
+        A("Positive = the L2-SP arm left **more** of that category standing. The "
+          f"first block is the **newest-target residual difference** on {tgt} — "
+          "a statement about how much of the newest request each arm removed, "
+          "**not** a cat-history result.\n")
         A("| contrast | thr | seed 17 | seed 29 |")
         A("|---|---|---|---|")
         for thr in THRESHOLDS:
             a = direct["per_seed"]["seed17"]["l2_contrasts"][key]["by_threshold"][thr]["all"]
             b = direct["per_seed"]["seed29"]["l2_contrasts"][key]["by_threshold"][thr]["all"]
-            A(f"| new target ({tgt}) residual | {thr} | "
+            A(f"| newest-target ({tgt}) residual difference | {thr} | "
               f"{fmt(a['new_target_residual_l2_minus_nol2'])} | "
               f"{fmt(b['new_target_residual_l2_minus_nol2'])} |")
         for thr in THRESHOLDS:
@@ -186,12 +200,19 @@ def main() -> int:
         A("")
 
     # ====================================================================== 3
-    A("## 3. The two estimands side by side\n")
-    A("`historical cat recovery` is referenced to the parent, "
-      "`D_cat(child) − D_cat(MA)` of the **same training seed**. The direct "
-      "contrast `D_cat(L2) − D_cat(no-L2)` measures the L2 effect with the "
-      "parent term algebraically cancelled. Where the two disagree across "
-      "seeds, the disagreement is located in the reference term.\n")
+    A("## 3. Two different estimands, side by side\n")
+    A("These answer **different questions** and neither substitutes for the "
+      "other:\n\n"
+      "- `D_cat(child) − D_cat(MA)` of the **same training seed** — how far the "
+      "child moved **from its own parent**. This is historical recovery.\n"
+      "- `D_cat(L2) − D_cat(no-L2)` — how the two arms differ **from each "
+      "other**. The measured `D(MA)` term cancels from this estimator, so it "
+      "does not inherit that term's sampling noise. It is **not** a parent-free "
+      "version of recovery: both children were trained starting from MA and "
+      "their states still depend on it.\n\n"
+      "Where the two behave differently across seeds, that locates where the "
+      "across-seed movement sits — it does not make either estimand the "
+      "correct one.\n")
     A("| child | thr | recovery vs own MA, seed 17 | recovery vs own MA, seed 29 |")
     A("|---|---|---|---|")
     for ck in CHILDREN:
@@ -204,7 +225,8 @@ def main() -> int:
             A(f"| {ck} | {thr} | {fmt(a)} | {fmt(b)}{flip} |")
     A("")
     A("### The reference term itself\n")
-    A("`D_cat(MA)` (%), the quantity that cancels in every direct contrast:\n")
+    A("`D_cat(MA)` (%) — the measured parent rate that recovery is referenced "
+      "to, and that cancels out of the child-vs-child estimator:\n")
     A("| thr | family | seed 17 | seed 29 | gap |")
     A("|---|---|---|---|---|")
     for thr in THRESHOLDS:
@@ -213,11 +235,25 @@ def main() -> int:
             b = direct["per_seed"]["seed29"]["reference_dependent"][thr][fam]["D_cat_MA_pct"]
             A(f"| {thr} | {fam} | {a:.1f} | {b:.1f} | {b - a:+.1f} pp |")
     A("")
-    A("The parent difference between the two training runs is **entirely on "
-      "paraphrase prompts**: literal `D_cat(MA)` is identical in both seeds at "
-      "all three thresholds, while the paraphrase value differs by 15–20 pp. "
-      "Any estimand referenced to `D_cat(MA)` inherits that difference; the "
-      "direct child-vs-child contrasts do not.\n")
+    A("The **parent's own** across-seed difference sits entirely on paraphrase "
+      "prompts: literal `D_cat(MA)` is identical in both seeds at all three "
+      "thresholds, while the paraphrase value differs by 15–20 pp.\n")
+    A("That is a fact about the parent only, and it does **not** mean the "
+      "across-seed change in recovery is mostly a parent effect. Decomposing "
+      "the sandwich-L2 case at t=0.5, where recovery moves by −20.0 pp between "
+      "seeds:\n")
+    A("| component | seed 17 | seed 29 | contribution to the −20.0 pp change |")
+    A("|---|---|---|---|")
+    a_ma = direct["per_seed"]["seed17"]["reference_dependent"]["0.5"]["all"]["D_cat_MA_pct"]
+    b_ma = direct["per_seed"]["seed29"]["reference_dependent"]["0.5"]["all"]["D_cat_MA_pct"]
+    a_ch = direct["per_seed"]["seed17"]["effectiveness_context"]["0.5"]["MAC_L2"]["D_pct"]["cat"]
+    b_ch = direct["per_seed"]["seed29"]["effectiveness_context"]["0.5"]["MAC_L2"]["D_pct"]["cat"]
+    A(f"| child `D_cat(MAC_L2)` | {a_ch:.1f}% | {b_ch:.1f}% | {b_ch - a_ch:+.1f} pp |")
+    A(f"| parent `D_cat(MA)` | {a_ma:.1f}% | {b_ma:.1f}% | {-(b_ma - a_ma):+.1f} pp |")
+    A("")
+    A("**Both contribute, and here in equal measure**: the child's cat presence "
+      "falls 10 pp while the parent's rises 10 pp. Attributing the "
+      "non-replication mainly to the parent would be wrong.\n")
 
     # ====================================================================== 4
     A("## 4. Deletion effectiveness context\n")

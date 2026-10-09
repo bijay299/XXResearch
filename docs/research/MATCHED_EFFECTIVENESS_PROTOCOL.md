@@ -1,370 +1,394 @@
-# MATCHED_EFFECTIVENESS_PROTOCOL — proposed diagnostic, for review
+# MATCHED_EFFECTIVENESS_PROTOCOL — bounded diagnostic, for review
 
 **Status: a proposal. Nothing here has been run.** No GPU work was launched in
-preparing it. The GPU-hour figure is a **ceiling put forward for review, not
-permission to run**. The PI decides; the main research chat reviews.
+preparing it. The GPU-hour figure and the 4-hour ceiling are **proposed for
+review, not approved**. The PI decides; the main research chat reviews.
 
-**Prepared by** AUDIT-01, from the audited snapshot
-[`a9de625`](https://github.com/bijay299/XXResearch/tree/a9de625).
-Evidence: [`results/audit_v1/AUDIT_REPORT.md`](../../results/audit_v1/AUDIT_REPORT.md).
+**Revision.** This replaces the first version (commit `f7f4ba8`, preserved at
+[`results/audit_v1/preserved_originals/v1/`](../../results/audit_v1/preserved_originals/v1/MATCHED_EFFECTIVENESS_PROTOCOL.md)).
+Changes: the run matrix is the bounded one specified for review (full fixed
+scan, no bisection; no lower-L2 stage; no sandwich coefficient search), and
+seven overstatements in the v1 text are corrected — see
+[`CLAIM_CORRECTIONS_V2.md`](../../results/audit_v1/CLAIM_CORRECTIONS_V2.md).
+
+Evidence base: [`results/audit_v1/AUDIT_REPORT.md`](../../results/audit_v1/AUDIT_REPORT.md).
 
 ---
 
-## 1. The question, and why the pilot cannot answer it
+## 1. The question
 
 The pilot compared L2-SP 25000 against no regularisation at a **fixed 1000
-steps**, so the two arms deleted different amounts. L2-SP left +42.5 pp of dog
-suppression where the unregularised arm achieved +82.5 pp (both seeds), and
-retained ~35–40 pp more bird. Those two facts cannot be combined into a
-preservation claim, because the arm that preserved more also deleted less.
+steps**, so the two arms deleted different amounts of the newest target. L2-SP
+achieved +42.5 pp of dog suppression where the unregularised arm achieved
++82.5 pp (both seeds), and retained ~35–40 pp more bird. Those two facts cannot
+be combined into a preservation claim: the arm that preserved more also deleted
+much less.
 
-> **The question.** At a *matched* level of new-request deletion, does L2-SP
-> retain more than simply making a smaller unregularised update?
->
-> If an unregularised run stopped early at the same deletion level retains just
-> as much, then L2-SP's apparent preservation benefit is a consequence of
-> reduced update magnitude and not of the regulariser. If L2-SP still retains
-> more, the benefit is attributable to *where* it constrains the update rather
-> than *how much*.
+> **The question.** At a *matched* level of dog deletion, does L2-SP retain more
+> bird than simply making a smaller unregularised update?
 
-This is a **diagnostic**, not a proposed method. Its purpose is to decide
-whether our current interpretation survives a fair comparison.
+**This is a diagnostic of our own pilot explanation, not a method proposal.** It
+asks whether the pilot's "L2-SP protects retention" reading survives equalising
+deletion strength. It is explicitly a **partial-suppression** test: the matched
+level will be around 40–50 pp of dog suppression with substantial dog residue,
+not a strongly-suppressed regime, and nothing about strong suppression follows
+from it.
 
 ## 2. What upstream already does — cited before any distinction is claimed
 
-**No novelty is claimed for this diagnostic.** CUIG already contains
-early-stopping controls, and appendices D and E of the accepted paper report
-them. In the pinned upstream tree
-(`9932ac3271a122f6d38d19e0b8c8908fe5237ff7`) the implementation is:
+**No novelty is claimed.** The brief states that appendices D and E of the
+accepted paper report early-stopping controls; that is taken as given here. The
+paper was **not read** for this document, so what follows is strictly what the
+pinned code (`9932ac3271a122f6d38d19e0b8c8908fe5237ff7`) shows, reported
+separately from the appendix claim.
 
-- `Regularizers/Simultaneous/simultaneous.py` → `sample_and_evaluate_ua`,
-  `check_early_stopping`
-- wired into `UnlearningMethods/ConAbl/train_conabl.py:309–364`
-- exposed as `--eval_interval`, `--patience` (default 2000),
-  `--stop_threshold` (default 99.0) in `ConAbl/src/args.py:10–12`
+**The mechanism.** `Regularizers/Simultaneous/simultaneous.py:check_early_stopping`,
+called from `UnlearningMethods/ConAbl/train_conabl.py:309–364`, gated on
+`--eval_interval` (with `--patience`, default 2000, and `--stop_threshold`,
+default 99.0, in `ConAbl/src/args.py:10–12`).
 
-**What that code does.** Every `eval_interval` optimizer steps it samples and
-measures Unlearning Accuracy on the concept being removed, then stops when
-either `ua >= stop_threshold` (default 99%, i.e. the concept is essentially
-gone) or UA has failed to improve for `patience` steps. It is a **convergence
-and compute-saving** rule, driven by one objective: maximise deletion of the
-current request. Each arm stops at *its own* maximum achieved deletion.
+**It is threshold-or-patience stopping.** It stops when `ua >= stop_threshold`
+**or** when `no_improvement_count >= patience`. It tracks `best_ua`, but the
+weights saved at stop time are the **current** ones, not the best-scoring ones.
+So it does **not** certify a per-arm maximum, and the v1 text calling it one was
+wrong.
 
-**The difference here is one of purpose, not mechanism.** This protocol stops
-each arm at a *prescribed level common to both arms*, so retention is compared
-between arms of equal deletion strength. Upstream's rule equalises *convergence*;
-this one equalises *effect size*. That is a measurement-protocol choice — the
-kind of control an evaluation needs, not a contribution.
+**The scored concept pool comes from the caller, not the helper.**
+`train_conabl.py` passes `args.target_concepts` (the CLI arg is
+`--anchor_target_concepts`) together with `--eval_classifier_dir`. The helper
+itself says nothing about which concepts are scored, so it is **no evidence for
+newest-target-only scoring**. In upstream's sequential object script the caller
+passes a single `"${anchor_name}+${object_name}"` mapping; scoring uses an
+UnlearnCanvas classifier, not a COCO detector.
 
-Also not novel, and not claimed: regularisation for concept editing, semantic
-preservation metrics, and sequential-request evaluation itself. **No new
-regularizer and no learned controller is built in this work.**
+**It is not wired into the sequential setting.** `--eval_interval` is passed in
+exactly six `BashScripts/Simultaneous/**` scripts and in **no**
+`BashScripts/Sequential/**` script. Our own pilot runs recorded
+`eval_interval: null`.
+
+**The distinction, stated narrowly.** Upstream's rule stops each arm by its own
+convergence criterion. This protocol stops the unregularised arm at a
+**prescribed level matched to the L2 arm's achieved level**, so retention is
+compared between arms of comparable deletion strength. That is a
+measurement-protocol choice — the kind of control an evaluation needs, not a
+contribution. Also not novel and not claimed: regularisation for concept
+editing, semantic-preservation metrics, and sequential-request evaluation.
+**No new regularizer and no learned controller is built.**
 
 ## 3. Design
 
-Fixed throughout: base SD-1.5, native ConAbl object editing, kv-xattn (32
-tensors, 19,169,280 params), effective LR 8e-6, AdamW, fp32, constant schedule
-with 500 warmup, upstream mappings `horse+cat`, `horse+dog`. Anchor caches
-reused byte-identically. Parents are the **existing seed-specific MA
-checkpoints** — seed 17 MA for seed 17's children, seed 29 MA for seed 29's.
+### Reused without new compute
 
-### Conditions, dog branch (`horse+dog` from MA)
+- **MA17 and MA29** — the existing seed-specific parents.
+- **MAB_L2 at L2=25000** for both seeds — the existing final L2 children
+  (`8ee7d56f62b0`, `c4f3ecdcb945`).
 
-| arm | source | deletion control |
-|---|---|---|
-| **A1** `MAB_L2` | **exists** (`8ee7d56f62b0` s17, `c4f3ecdcb945` s29) | L2-SP 25000, 1000 steps |
-| **A2** `MAB_es@k` | **new trajectory** | unregularised, stopped at step *k* chosen to match A1's deletion level |
-| **A3** `MAB_full` | **exists** (`63c9a8232cfd` s17, `d9f28f0fc6b8` s29) | unregularised, 1000 steps — the unmatched reference the pilot used |
-| **A0** `MA` | **exists** | the parent, for both estimands |
-| **M0** | **exists** | untouched backbone |
+### Explicitly excluded
 
-A2 is the only arm requiring new compute. A single unregularised trajectory per
-seed yields every candidate *k*, because dumps are saved along the way.
+- Any lower-L2 or alternative-coefficient stage.
+- Any sandwich-branch coefficient search.
+- A new M0 evaluation on the frozen test set.
+- An unmatched full-step (MAB) reference arm on the frozen test set.
 
-### Why the sandwich branch is excluded from the confirmatory comparison
+### New compute: two unregularised dog trajectories
 
-`MAC_L2` achieves **+7.5 pp [+0.0, +17.5]** (s17) and **+7.5 pp [+0.0, +15.0]**
-(s29) of sandwich suppression — at or below what 10 prompt clusters can resolve.
-There is no meaningful deletion level to match *to*. Matching an unregularised
-arm down to +7.5 pp would compare two arms that both essentially failed to
-delete, and any retention similarity between them would be an artifact of both
-doing nothing.
+| | |
+|---|---|
+| trajectories | 2 (one per training seed, parent = that seed's MA) |
+| steps | 1000, unregularised, configuration otherwise matched to the pilot |
+| dumps | steps 100, 200, … 1000 — **saved and scored, full fixed scan** |
+| selection | **no bisection**; every dump is scored on the development set |
 
-**It is therefore declared infeasible at this coefficient and reported as
-infeasible — not scored, and not presented as "L2-SP preserves better here".**
-This costs no GPU time: the conclusion follows from existing evidence.
+A full fixed scan is used rather than bisection because bisection assumes
+suppression is monotone in steps, which is untested; scanning all ten costs
+little more here and makes non-monotonicity visible instead of fatal.
 
-Bringing that branch in would first require a coefficient search to find a
-sandwich L2-SP value landing inside the meaningful region. That is a separate,
-separately-priced request (§9), and it must run on development prompts only.
+**Training configuration matched to the pilot**: kv-xattn (32 tensors,
+19,169,280 params), effective LR 8e-6, AdamW, fp32, constant schedule with 500
+warmup, `horse+dog`, 1000 iterations, same anchor caches byte-identically. The
+only intended differences from the existing `MAB` are the periodic dumps and
+`l2sp_weight 0`. **Evaluation RNG is kept separate from training RNG**:
+generation seeds are an evaluation-side quantity and are never reused as
+training seeds (see §4).
 
-### Checkpoint schedule for A2
+### Why the sandwich branch is excluded
 
-Dump the unregularised trajectory every **100 steps** (10 dumps, storage only,
-~730 MiB per trajectory). Then **bisect** on the development set for the
-matched *k* rather than evaluating all ten: ~4 evaluations instead of 10.
+`MAC_L2` achieves **+7.5 pp** of sandwich suppression in both seeds
+(`[+0.0, +17.5]` s17, `[+0.0, +15.0]` s29). **L2-SP suppression there is too
+weak for this question**: a matched comparison needs a meaningful deletion level
+to match *to*, and +7.5 pp does not supply one. Matching an unregularised arm
+down to it would compare two arms that both barely deleted, and any retention
+similarity would be an artifact of both doing nothing.
 
-Bisection assumes suppression is monotone in steps. That assumption is
-**checked** at every evaluated point; if a non-monotonicity appears, the
-fallback is a full 10-point scan on the development set (+6 dev evaluations,
-≈0.13 GPU-h per trajectory). Prune unmatched dumps after selection.
+That is a statement about fitness for the question, **not** a claim that 7.5 pp
+is unmeasurable. With 10 prompt clusters of 4 images the representable step is
+2.5 pp, so 7.5 pp is a real three-step value; separately, its interval reaches
+zero, so it is imprecise. (The v1 text called it a "resolution floor"; that was
+wrong.)
 
-## 4. Prompt sets — three disjoint sets, with distinct roles
+## 4. Prompt sets — drafted, hashed, and frozen before any launch
 
-The pilot's 280-prompt set **has informed the hypotheses in this protocol** and
-is exploratory from here on. It may be used for sanity checks and for continuity
-with the published tables, but **no configuration may be selected on it and no
+Three sets with distinct roles. The pilot's set **has informed the hypotheses in
+this document** and is exploratory from here on: it may be used for continuity
+with published tables, but **no configuration may be selected on it and no
 confirmatory claim may be made from it**.
 
-| set | size | role | may be used for |
-|---|---|---|---|
-| **DEV** (new) | 10 prompts × (new target, cat, bird) | choosing *k*; monotonicity check | all selection |
-| **FINAL** (new, frozen before any arm is chosen) | 7 categories × 10 prompts × 4 gen seeds = 280 | the confirmatory comparison | one evaluation, reported as-is |
-| **PILOT** (existing) | 280 | historical continuity | descriptive comparison only; never selection, never a confirmatory claim |
+| set | distinct prompt texts | gen seeds | pairs / checkpoint | role |
+|---|---|---|---|---|
+| **DEV** (drafted) | **20** (dog only, 10 literal + 10 paraphrase) | 511, 622, 733, 844 | **80** | selection only |
+| **TEST** (drafted, frozen) | **140** (20 per category × 7) | 1301, 1402, 1503, 1604 | **560** | the single confirmatory evaluation |
+| **PILOT** (existing) | 70 (10 per category × 7) | 101, 202, 303, 404 | 280 | descriptive continuity only |
 
-DEV composition, sized so the matching quantity is the best-resolved:
+**Counting, stated explicitly** because the pilot's reports conflated it: these
+are *distinct prompt texts* × *generation seeds* = *prompt × generation-seed
+pairs*. The pilot set is **70 prompt texts**, not 280; 280 is its pair count.
 
-| category | prompts × gen seeds | n | resolution |
-|---|---|---|---|
-| new target (dog) | 10 × 4 | 40 | 2.5 pp |
-| cat (historical) | 10 × 2 | 20 | 5.0 pp |
-| bird (retained) | 10 × 2 | 20 | 5.0 pp |
-| **per checkpoint** | | **80** | |
+The development set is **dog only** by design. Cat and the retained categories
+are endpoints of the confirmatory test; putting them in the development set
+would create an opportunity to select on them.
 
-**Frozen before any arm is chosen**, with a recorded sha256 and a disjointness
-check against the 999 training strings *and* against DEV and PILOT, exactly as
-the pilot manifest was built. The FINAL set is generated and hashed **before**
-the development stage begins, so selection cannot reach it.
+**Drafted and hashed on CPU** —
+[`results/audit_v1/draft_manifests/`](../../results/audit_v1/draft_manifests/):
 
-## 5. Meaningful deletion region, matching tolerance, infeasibility
-
-### Meaningful deletion region
-
-An arm qualifies for a matched comparison only if, on DEV, against its own
-seed's MA parent, at t=0.5:
-
-> **new-target suppression ≥ 40 pp** *and* **new-target residual ≤ 60%**
-
-Rationale: below 40 pp an arm has not meaningfully removed the concept, so its
-retention is not informative about a preservation/effectiveness trade. `MAB_L2`
-sits at +42.5 pp — just inside, which is why the dog branch is feasible and the
-sandwich branch (+7.5 pp) is not. The threshold is **declared here, before the
-data are collected**, and is not to be moved afterwards to admit an arm.
-
-### Matching tolerance
-
-Match A2 to A1's DEV suppression within **±5.0 pp**. With 40 new-target DEV
-images the attainable resolution is 2.5 pp, so ±5.0 pp is two resolution steps —
-tight enough to be a real match, loose enough to be reachable on a 100-step
-grid. Choose the *k* minimising |suppression(A2@k) − suppression(A1)|; break
-ties toward the **smaller** *k* (the weaker update), which is conservative
-against the hypothesis that L2-SP is unnecessary.
-
-### Infeasibility rule — declared in advance
-
-Abandon the matched comparison for a branch, and report infeasibility, if any of:
-
-1. **A1 is outside the meaningful region** (sandwich branch: already true).
-2. **No dumped *k* matches within ±5.0 pp**, i.e. suppression jumps across the
-   band between adjacent dumps. Report the bracketing pair and the gap; do not
-   widen the tolerance to manufacture a match.
-3. **Suppression is non-monotone in *k*** in a way that makes "the matched
-   point" ambiguous (two separated *k* both inside the band with materially
-   different retention). Report both.
-4. **A2@k fails the meaningful region** even where it matches A1.
-
-> Declaring infeasibility is a **result**, not a failure. "These two methods
-> cannot be compared fairly at this coefficient" is the finding, and it is more
-> useful than a comparison run anyway. What must never happen is equating two
-> arms at near-zero suppression and reporting preservation as solved.
-
-### Reporting imperfect matching without reselecting
-
-The achieved match is measured on DEV and **fixed there**. On FINAL, the
-realised suppression difference between A1 and A2 will not be exactly zero.
-Report it:
-
-- State `suppression(A1) − suppression(A2)` on FINAL as a **residual
-  mismatch**, with its paired interval, beside every retention contrast.
-- If |residual mismatch| on FINAL exceeds ±10 pp, the retention comparison is
-  reported as **confounded by residual mismatch** and the primary endpoint is
-  declared unresolved.
-- **Under no circumstances re-pick *k* using FINAL.** If the match transfers
-  poorly, that is reported as a finding about transfer, and any re-selection
-  requires a new frozen FINAL set.
-
-## 6. Endpoints
-
-**Primary.** Retained-category detection rate at matched deletion, as the direct
-paired contrast `D_retained(A1) − D_retained(A2)` at t=0.5, **per category,
-never averaged** — horse, bird, chair, bicycle separately. Bird carries the
-pilot's largest effect and is the pre-declared focus; the other three are
-reported with it, not pooled into it.
-
-**Co-primary (the matching check).** `D_dog(A1) − D_dog(A2)` on FINAL — the
-residual mismatch that licenses or voids the primary.
-
-**Secondary.**
-1. Historical cat residual, direct: `D_cat(A1) − D_cat(A2)`.
-2. Both parent-referenced estimands, `vs` the **same seed's** MA, reported
-   alongside the direct contrasts so reference-dependence stays visible.
-3. Literal vs paraphrase for every endpoint, reported separately — residual
-   presence and parent-referenced change never merged.
-4. Thresholds 0.3 / 0.5 / 0.7 for everything; 0.5 primary.
-5. A3 (`MAB_full`) as the unmatched reference, to quantify how much the pilot's
-   conclusion changes under matching.
-6. Parameter movement (relative L2 vs MA) per arm — descriptive association
-   only, **never** offered as a mechanism.
-
-**Contrast construction.** All contrasts paired at identical
-`(prompt_id, gen_seed)`; paired cluster bootstrap resampling **prompts** with
-their generation seeds held together; 10 000 draws; 95% percentile intervals;
-**training seeds analysed separately and never pooled**. Two seeds supports a
-direction check only.
-
-**Interval discipline, restated because it governs the stop rule.** An interval
-including zero is **not** evidence of no effect. A difference in significance
-labels between arms or seeds is **not** a significant difference. No multiplicity
-correction is applied, so each interval is descriptive, not a test.
-
-## 7. Visual validation — required, not optional
-
-A detector result is a proxy. Before any conclusion from this diagnostic is
-reported:
-
-1. Extend the AUDIT-01 blinded packet with A2 and the new FINAL images, same
-   construction: a stratified-random set **R** plus a separately labelled
-   enriched diagnostic set **D**, key stored outside the packet, presence /
-   ambiguity / quality / context in separate columns.
-2. **A human must complete the sheet.** AI inspection is not human review and
-   may not be described as validation.
-3. Estimate detector error **only from set R**, with its sampling weights, and
-   report it per prompt family. Set D characterises failure modes and is biased
-   upward by construction; never pooled, never quoted as overall accuracy.
-4. If detector error differs materially between the arms being compared, the
-   primary endpoint is reported as **proxy-limited**.
-
-## 8. Run matrix and resource accounting
-
-Measured on this host, from the 10 pilot training runs and 11 pilot checkpoint
-evaluations — not assumed:
-
-| quantity | measured |
+| manifest | sha256 |
 |---|---|
-| per optimizer step | **0.8303 s** (n=10 runs) |
-| per generated image | **1.0083 s** (n=12 reports) |
-| per detected image | **0.0718 s** (n=10 reports) |
+| `dev_manifest_DRAFT.json` | `ebfdd37270dea750…` |
+| `test_manifest_DRAFT.json` | `170696eb5fc2832b…` |
 
-Stated assumptions: **25 s** process setup per invocation (pipeline build +
-checkpoint load; an assumption, since the pilot's `seconds_per_image` already
-amortises setup over 280 images), and **25%** contingency for one failed-stage
-re-run plus bisection overshoot.
+**Disjointness verified** across all five pairings (dev/test, dev/pilot,
+test/pilot, dev/anchor-training, test/anchor-training): **0 exact collisions,
+0 near-duplicates at similarity ≥ 0.90**, against 400 upstream anchor training
+strings. Generation-seed sets are pairwise disjoint across pilot/dev/test, and
+no generation seed equals a training seed (17, 29).
 
-### CORE plan — dog branch, 2 training seeds
+**Shared surface structure is measured and reported, not denied.** Both sets are
+template-built. Dev and test share **0** scene tails, but where any prompt texts
+share a template the bootstrap's prompt clusters are not fully independent and
+intervals are mildly optimistic. That limitation applies to the pilot set too;
+see `disjointness_report.json`.
+
+The test manifest is **frozen and hashed before the development stage begins**,
+so selection cannot reach it.
+
+## 5. Selection, gates, and the infeasibility rule
+
+All on the **development set**, against that seed's **own MA**, at t=0.5.
+
+**Reference gates.** A dump qualifies only with **≥ 30 pp dog suppression** and
+**≤ 60% dog residue**. These gates define an explicitly **partial-suppression**
+comparison — they are the regime the pilot actually explored, and they are what
+makes this a test of the pilot's explanation. No claim about a
+strongly-suppressed regime follows.
+
+**Match rule.** For each seed, select the dump whose dog suppression is closest
+to that seed's L2 endpoint, **earliest step breaking ties**; the mismatch must
+be **≤ 5 pp**. Earliest-step tie-break is conservative against the hypothesis
+that L2-SP is unnecessary, since it favours the smaller update.
+
+**Infeasibility rule — declared in advance.** If **either seed** has no
+qualifying dump within 5 pp, **the planned paired test stops**. Report the
+bracketing steps, their suppression values and the gap. Do not widen the
+tolerance, do not fall back to one seed, and do not proceed with an unmatched
+comparison.
+
+Also stop and report if suppression is **non-monotone in steps** in a way that
+makes "the matched step" ambiguous — two separated dumps both inside the band
+with materially different bird retention. Report both.
+
+> Declaring infeasibility is a **result**. "These two arms cannot be compared
+> fairly at this coefficient" is more useful than a comparison run anyway.
+
+**Reporting imperfect matching on the test set without reselecting.** The match
+is fixed on DEV. On TEST the realised dog suppression difference will not be
+exactly zero. Re-check the same gates and the same match on TEST and report the
+achieved values beside every retention contrast. **Nothing is reselected using
+TEST.** If the match transfers poorly, that is reported as a finding about
+transfer; any re-selection would require a new frozen test set.
+
+## 6. Endpoints and uncertainty
+
+**Primary.** The **paired bird contrast** `D_bird(L2) − D_bird(U*)` on TEST at
+t=0.5, where `U*` is the selected matched unregularised dump.
+
+**Reported alongside, never averaged into it:**
+
+- dog residue and dog suppression for both arms (the matching check);
+- cat change from MA, for both arms, referenced to that seed's own MA;
+- **every retained category separately** — horse, bird, chair, bicycle;
+- the sandwich category, reported separately as a non-target;
+- literal vs paraphrase for each endpoint, with residual presence and
+  parent-referenced change kept distinct;
+- thresholds 0.3 / 0.5 / 0.7, with 0.5 primary.
+
+**Uncertainty.** Conditional paired prompt-cluster bootstrap: resample **prompt
+texts** carrying their four generation seeds together; one resampled list indexes
+both arms; 10 000 draws; 95% percentile intervals. **Training seeds are analysed
+separately and never pooled.** These intervals are conditional on this base
+model, these concepts, these anchors, these prompts and this detector — they are
+**not** broad inference, and two training runs support a **direction check
+only**.
+
+## 7. Decision rule — a prespecified material effect size
+
+**Material bird advantage: 10 percentage points.** Declared now, not afterwards.
+
+| outcome on TEST, both seeds | reading |
+|---|---|
+| **upper 95% bound < +10** in both seeds | A bird benefit of 10 pp or more is **ruled out, conditionally** on this design. The pilot's "L2-SP protects retention" reading does not survive matching at a materially useful size. |
+| **lower 95% bound > +10** in both seeds | A **material** bird benefit carries forward: at matched dog deletion, L2-SP retains more bird by at least the declared size. |
+| intervals **wholly within [−10, +10]** in both seeds | **Practical equivalence** at the declared margin — and only then. |
+| anything else | **Inconclusive.** Report as inconclusive; do not read a point estimate as a result. |
+| directions **disagree** between seeds | **Unresolved.** Cost more training seeds; do **not** report the agreeing seed. |
+| no match within 5 pp (either seed) | **The comparison is rejected, not the hypothesis.** Report the bracketing dumps. |
+
+**Three things no outcome here establishes.**
+
+1. **Lack of significance is not equivalence.** An interval that merely includes
+   zero does not show the arms retain equally. Only the "wholly within
+   [−10, +10]" row supports an equivalence statement, and only at that margin.
+2. **A matched benefit would not prove a geometric mechanism.** A bird advantage
+   at matched dog deletion is consistent with L2-SP sparing particular
+   parameters, but equally with differences in update direction, effective step
+   schedule, or optimisation path. This design does not distinguish them, and
+   "where the update is constrained matters" is **not** a conclusion available
+   from it. Mechanism is a separate follow-up.
+3. **It says nothing about the cat history.** The newest-target quantities are
+   about dog. Cat change is reported as a secondary endpoint, referenced to each
+   seed's own MA, and is not what the primary endpoint measures.
+
+## 8. Resource accounting
+
+Measured on this host from the completed pilot runs — not assumed:
+
+| quantity | measured | n |
+|---|---|---|
+| per optimizer step | **0.8303 s** | 10 runs |
+| per generated image | **1.0083 s** | 12 reports |
+| per detected image | **0.0718 s** | 10 reports |
 
 | stage | runs | images | GPU-h |
 |---|---|---|---|
-| A2 training (new trajectories, 1000 steps, dumps every 100) | 2 | — | 0.461 |
-| Development selection (4 bisection evals × 2 seeds + 6 reference evals, 80 img each) | 14 | 1120 | 0.336 |
-| Final confirmatory (M0 + 2 seeds × {MA, A2@k, A1}) = 7 ckpts × 280 | 7 | 1960 | 0.588 |
-| Process setup (23 invocations × 25 s) | — | — | 0.160 |
-| **subtotal** | | **3080** | **1.545** |
-| **with 25% contingency** | | | **1.93** |
+| Training: 2 trajectories × 1000 steps | 2 | — | **0.461** |
+| Generation + detection, all stages | — | **5280** | **1.584** |
+| └ development: 24 ckpts × 80 | 24 | 1920 | |
+| └ frozen test: 6 ckpts × 560 | 6 | 3360 | |
+| Process setup: 62 invocations × 25 s | — | — | **0.431** |
+| **subtotal** | | **5280** | **2.476** |
+| **with 25% contingency** | | | **3.095** |
 
-**≈1.93 GPU-hours, within the 4 GPU-hour ceiling.**
+Development checkpoints = 2 seeds × (MA + L2 endpoint + 10 dumps) = **24**.
+Frozen-test checkpoints = 2 seeds × (MA, L2, selected-U) = **6**.
+Invocations = 2 training + 30 generation + 30 detection = **62**.
 
-Wall time is **separate** and is not GPU-hours: ≈0.85 h on two idle GPUs,
-≈0.6 h on four. The four A100s are shared without a scheduler, so availability
-is not guaranteed and wall time cannot be promised. Only independently verified
-idle GPUs would be used.
+> **Disclosure on the setup term.** The 0.431 GPU-h may be **partly
+> double-counted**. The measured `s_per_generated_image` is elapsed ÷ images from
+> the pilot reports, so it already amortises that run's pipeline construction and
+> checkpoint load across its 280 images. Charging a further 25 s per invocation
+> therefore counts some setup twice. It is kept as a deliberate **upper bound**
+> because the new runs include many *small* evaluations (80 images) where
+> per-invocation setup is a much larger share than in the pilot's 280-image runs.
+> **Reconcile against the actual implementation before relying on the figure**:
+> if the 24 development checkpoints are scored within one process, most of this
+> term disappears and the subtotal falls toward **2.045 GPU-h**.
 
-**Storage.** Peak 1.72 GiB — 0.73 GiB of intermediate dumps (20 × 73 MiB) plus
-0.29 GiB of images, falling to ≈0.44 GiB once unmatched dumps are pruned.
-`/data` has 1.4 TB free. No weights or image archives are committed.
+**Wall time is separate and is not GPU-hours**: ≈1.45 h with the two
+trajectories in parallel and scoring split across two idle GPUs. The four A100s
+are shared without a scheduler, availability is not guaranteed, and only
+independently verified idle devices would be used.
 
-**Tuning budget, comparable by construction.** A1 receives **zero** tuning here:
-its coefficient 25000 is taken as given, exactly as the pilot ran it. A2
-receives one selection over 10 pre-saved dumps on DEV — a 10-point grid on a
-single scalar, ~4 of which are evaluated. Neither arm is tuned on FINAL. If the
-PI prefers strict parity, the alternative is to spend a matching 10-point L2-SP
-coefficient grid on A1, which is the §9 extension — the asymmetry is recorded
-here rather than hidden, and the current asymmetry **favours A2**, i.e. it is
-conservative against L2-SP.
+**Storage.**
 
-### Alternatives, priced
+| item | size |
+|---|---|
+| 20 intermediate dumps × 76,686,190 bytes | **1.43 GiB** |
+| 5280 images at ~98 KB | 0.49 GiB |
+| **peak total** | **1.92 GiB** |
+| after pruning unselected dumps | 0.63 GiB |
 
-| plan | GPU-h | what it buys / costs |
-|---|---|---|
-| **FALLBACK** — dog branch, 1 seed | **1.02** | one direction check; no cross-seed agreement possible |
-| **CORE** (recommended) | **1.93** | dog branch, both seeds, cross-seed direction check |
-| **EXTENDED** — both branches confirmatory | 3.29 | **not a drop-in**: presupposes a sandwich coefficient already inside the meaningful region. The coefficient search that would find one is **not** costed here |
+Excludes optimizer/RNG state (the current trainer saves none) and logs.
+`/data` has 1.4 TB free.
 
-Full arithmetic: [`results/audit_v1/protocol_cost_model.json`](../../results/audit_v1/protocol_cost_model.json),
-re-derivable with `python3 scripts/seq/protocol_cost_model.py`.
+**Tuning budget.** L2 receives **zero** tuning: 25000 is taken as given, as the
+pilot ran it. The unregularised arm receives one selection over 10 pre-saved
+dumps on DEV. Neither arm is tuned on TEST. The asymmetry is recorded rather
+than hidden, and it **favours the unregularised arm**, i.e. it is conservative
+against L2-SP.
 
-### A free reproducibility check
+Full arithmetic, re-derivable:
+[`results/audit_v1/protocol_cost_model.json`](../../results/audit_v1/protocol_cost_model.json),
+`python3 scripts/seq/protocol_cost_model.py`.
 
-Training reproducibility has **never** been tested on this host (see
-`ARTIFACT_INVENTORY.md` §6). The A2 trajectory re-runs an unregularised dog
-request at 1000 steps — the same configuration as the existing `MAB`. Compare
-the re-run's final `delta.bin` sha256 against `63c9a8232cfd` (s17) /
-`d9f28f0fc6b8` (s29). This costs nothing and is recorded as a **secondary
-observation, not an assumption**: a mismatch does not invalidate the diagnostic
-(each arm is evaluated as itself), but it would tell us bit-exact training
-reproduction does not hold here, which matters for everything downstream.
+## 9. Reproducibility check — tensor-level, prepared on CPU
 
-## 9. Not in this request
+Training reproducibility has **never** been tested on this host. The new
+unregularised trajectory re-runs the same configuration as the existing `MAB`,
+so its final dump can be compared against `63c9a8232cfd` (s17) /
+`d9f28f0fc6b8` (s29) at no extra GPU cost.
 
-Listed so the boundary is explicit, not as a plan.
+The comparison is **tensor-level**, not hash-level:
+`scripts/seq/compare_checkpoints.py` reports, per tensor, max absolute
+difference, mean absolute difference and relative Frobenius difference, on CPU.
 
-- Sandwich L2-SP coefficient search (~10 training runs ≈ 2.3 GPU-h plus DEV
-  evaluation) — required before the sandwich branch can be compared fairly.
-- Matching L2-SP coefficient grid on A1 for strict tuning parity.
+**Three distinct claims, not to be conflated.**
+
+1. **File hashes equal** — byte-identical serialisation. A mismatch can come
+   from serialisation order or metadata alone and is **not** evidence of a
+   training difference.
+2. **Tensors numerically equal** — the weights match to a stated tolerance.
+3. **Training equivalent** — a much stronger claim that neither of the above
+   establishes on its own, and that behavioural comparison would be needed for.
+
+The check is recorded as a **secondary observation**. A mismatch does not
+invalidate the diagnostic — each arm is evaluated as itself — but it would tell
+us bit-exact training reproduction does not hold here, which matters for
+everything downstream.
+
+## 10. Stop rule
+
+Stop and report, without proceeding, if:
+
+- the infeasibility rule (§5) fires for either seed;
+- a trajectory fails the reference gates by step 1000;
+- suppression is non-monotone in a way that makes the matched step ambiguous;
+- the frozen test set is found to overlap DEV, PILOT or the training strings;
+- any artifact fails `scripts/seq/validate_stage.py`;
+- the TEST-set dog mismatch materially exceeds the DEV match — report
+  confounding, do **not** reselect.
+
+### What would weaken, support or reject the current interpretation
+
+- **Weakens it.** Upper bound < +10 on bird in both seeds. L2-SP's apparent
+  preservation benefit would not survive matching at a materially useful size,
+  and "L2-SP protects retention" should be withdrawn as a method claim. Note
+  this is *ruling out a 10 pp benefit*, not demonstrating equality.
+- **Supports it.** Lower bound > +10 on bird in both seeds, with the dog match
+  holding on TEST. A material benefit at matched deletion — with mechanism still
+  open (§7).
+- **Rejects the broader framing.** If matched unregularised early stopping
+  reproduces L2-SP's bird retention within ±10 pp in both seeds, the pilot's
+  "L2-SP is a tradeoff" framing reduces to "smaller updates change less", and
+  sequential-suppression interference is not the limitation this line of work has
+  been looking for. That outcome should be reported as clearly as a positive one.
+
+## 11. Not in this request
+
+- Sandwich-branch coefficient search, and any lower-L2 stage.
+- A new M0 evaluation, and an unmatched full-step reference arm on TEST.
 - More training seeds for population variance.
 - Separating anchor sharing from semantic distance — the standing confound.
-- Longer request streams.
-- Human annotation labour (no GPU).
+- Longer request streams; mechanism attribution; human annotation labour.
 - Any new regularizer or learned controller. **Out of scope.**
-
-## 10. Stop rule, and what would change our interpretation
-
-**Stop immediately and report, without proceeding, if:**
-
-- the infeasibility rule (§5) fires for the dog branch;
-- A2's trajectory fails to reach the meaningful region by step 1000;
-- the FINAL set is found to overlap DEV, PILOT or the training strings;
-- any arm's artifacts fail the completeness guards in `run_seed.sh`;
-- the FINAL residual mismatch exceeds ±10 pp — report confounding, do not
-  re-select.
-
-**Pre-declared readings of the primary endpoint** (per-category retention at
-matched deletion, t=0.5, both seeds):
-
-| outcome | reading |
-|---|---|
-| A1 − A2 retention is **small and includes zero in both seeds** on every retained category | **Weakens our interpretation.** L2-SP's apparent preservation benefit is consistent with being an effect of reduced update magnitude, reproducible by stopping an unregularised run early. The regulariser would then be an expensive way to take a smaller step, and "L2-SP protects retention" should be withdrawn as a method claim. |
-| A1 − A2 retention **excludes zero favouring A1 in both seeds**, with FINAL mismatch within ±10 pp | **Supports our interpretation.** Where the update is constrained matters beyond how much, and a mechanism question becomes well-posed: which tensors A1 spares that a uniformly smaller step does not. |
-| **Directions disagree between the two seeds** | **Unresolved.** Report as unresolved and cost more training seeds. Do **not** report the agreeing seed. |
-| A2 **cannot be matched** within tolerance | **Rejects the comparison, not the hypothesis.** Report the bracketing dumps and the gap. |
-| A1 − A2 retention favours **A2** | Reduced update magnitude preserves *better* than L2-SP at equal deletion — a result against L2-SP, reportable as such. |
-
-**What would reject the broader framing.** If matched unregularised early
-stopping reproduces L2-SP's retention on every retained category in both seeds,
-then the pilot's "L2-SP is a tradeoff" framing collapses into the much duller
-"smaller updates change less", and sequential-suppression interference is not
-the limitation this line of work has been looking for. That outcome should be
-reported as clearly as a positive one.
 
 ---
 
 ### Pre-commitments
 
-Fixed before any data are collected, and not to be moved afterwards: the
-meaningful deletion region (≥40 pp **and** ≤60% residual); the ±5.0 pp matching
-tolerance and the tie-break toward smaller *k*; the ±10 pp FINAL mismatch limit;
-the primary endpoint as per-category retention, never averaged; the FINAL set
-frozen and hashed before the development stage; selection on DEV only; and
-every interval caveat in §6.
+Fixed before any data are collected: the reference gates (≥30 pp suppression
+**and** ≤60% residue); the ≤5 pp match tolerance with earliest-step tie-break;
+the 10 pp material effect size and the [−10, +10] equivalence margin; the
+primary endpoint as the paired bird contrast with every other category reported
+separately and never averaged; both manifest hashes; selection on DEV only; one
+evaluation of TEST with no reselection; and every uncertainty caveat in §6.
 
-**This document authorises nothing.** It is submitted for central review and
-the PI's decision.
+**This document authorises nothing.** Submitted for central review and the PI's
+decision.

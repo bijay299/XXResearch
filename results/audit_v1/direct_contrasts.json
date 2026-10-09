@@ -1,12 +1,12 @@
 {
   "_design": {
-    "resampling_unit": "prompt (10 per category), carrying its 4 generation seeds",
+    "resampling_unit": "prompt text (10 per category; 70 distinct texts across the 7 categories), each carrying its 4 generation seeds -> 280 prompt x generation-seed pairs per checkpoint",
     "n_bootstrap": 10000,
     "pairing": "one resampled prompt list indexes both arms of every contrast",
     "training_seeds": "analysed separately; never pooled, never resampled jointly",
-    "interval_meaning": "sampling uncertainty over the 10 evaluation prompts within ONE training run. With 10 clusters of 4 images the attainable resolution is coarse: a 95% interval cannot be narrower than a few percentage points, and an interval that includes zero is NOT evidence that the effect is zero.",
+    "interval_meaning": "sampling uncertainty over the 10 evaluation prompt texts per category within ONE training run (each carrying 4 generation seeds). With 10 clusters of 4 images the attainable resolution is coarse: a 95% interval cannot be narrower than a few percentage points. An interval that includes zero is NOT evidence that the effect is zero, and it does NOT establish equivalence: ruling out an effect of a stated size requires the interval to lie wholly inside a pre-declared equivalence margin, which is a separate claim no interval here was designed to support.",
     "multiplicity": "no multiple-comparison correction is applied; many contrasts are reported, so individual interval-excludes-zero labels must be read as descriptive, not as tests.",
-    "parent_cancellation": "L2 contrasts are child-vs-child, so the MA parent term cancels and these estimates do not inherit any D_cat(MA) instability."
+    "parent_cancellation": "L2 contrasts are child-vs-child, so the measured D(MA) term cancels out of the estimator and its sampling noise is not inherited. The children remain TRAINED FROM that parent, so the contrast is not independent of MA in any causal sense, and it answers a different question from recovery relative to MA: how the two arms differ from each other, not how either differs from its parent. Neither estimand substitutes for the other."
   },
   "per_seed": {
     "seed17": {
@@ -30,7 +30,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -43,7 +43,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -128,7 +128,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -141,7 +141,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -226,7 +226,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 10.0,
@@ -239,7 +239,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -340,7 +340,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -353,7 +353,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -438,7 +438,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -451,7 +451,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -536,7 +536,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -549,7 +549,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -650,7 +650,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 2.5,
@@ -663,7 +663,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -748,7 +748,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -761,7 +761,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -846,7 +846,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -859,7 +859,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -968,7 +968,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 10.0,
@@ -981,7 +981,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1066,7 +1066,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -1079,7 +1079,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1164,7 +1164,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 15.0,
@@ -1177,7 +1177,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1278,7 +1278,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 7.5,
@@ -1291,7 +1291,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1376,7 +1376,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -1389,7 +1389,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1474,7 +1474,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 15.0,
@@ -1487,7 +1487,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1588,7 +1588,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 7.5,
@@ -1601,7 +1601,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1686,7 +1686,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -1699,7 +1699,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -1784,7 +1784,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 15.0,
@@ -1797,7 +1797,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3159,7 +3159,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 7.5,
@@ -3172,7 +3172,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3257,7 +3257,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -3270,7 +3270,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3355,7 +3355,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 10.0,
@@ -3368,7 +3368,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3469,7 +3469,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -3482,7 +3482,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3567,7 +3567,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -3580,7 +3580,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3665,7 +3665,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -3678,7 +3678,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3779,7 +3779,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 2.5,
@@ -3792,7 +3792,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3877,7 +3877,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -3890,7 +3890,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -3975,7 +3975,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAB) - suppression(MAB_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_dog(MAB_L2) - D_dog(MAB); POSITIVE means the L2-SP arm left more of the newest requested target (dog) standing, i.e. weaker deletion of THAT target. Equals suppression(MAB) - suppression(MAB_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -3988,7 +3988,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAB_L2) - D_cat(MAB); POSITIVE means more residual cat under L2-SP. Equals recovery(MAB_L2) - recovery(MAB), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4097,7 +4097,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -4110,7 +4110,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4195,7 +4195,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -4208,7 +4208,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4293,7 +4293,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -4306,7 +4306,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4407,7 +4407,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 2.5,
@@ -4420,7 +4420,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4505,7 +4505,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -4518,7 +4518,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4603,7 +4603,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 5.0,
@@ -4616,7 +4616,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4717,7 +4717,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": -2.5,
@@ -4730,7 +4730,7 @@
                   "n_prompt_clusters": 10,
                   "n_images_per_arm": 40,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4815,7 +4815,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": true,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": 0.0,
@@ -4828,7 +4828,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {
@@ -4913,7 +4913,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the new target standing, i.e. weaker deletion. Equals suppression(MAC) - suppression(MAC_L2); the MA parent term cancels."
+                  "reads_as": "NEWEST-TARGET RESIDUAL DIFFERENCE. D_sandwich(MAC_L2) - D_sandwich(MAC); POSITIVE means the L2-SP arm left more of the newest requested target (sandwich) standing, i.e. weaker deletion of THAT target. Equals suppression(MAC) - suppression(MAC_L2); the measured D(MA) term cancels from the estimator. This says nothing about the cat history."
                 },
                 "cat_residual_l2_minus_nol2": {
                   "diff_pp": -5.0,
@@ -4926,7 +4926,7 @@
                   "n_prompt_clusters": 5,
                   "n_images_per_arm": 20,
                   "excludes_zero": false,
-                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC); independent of D_cat(MA)."
+                  "reads_as": "D_cat(MAC_L2) - D_cat(MAC); POSITIVE means more residual cat under L2-SP. Equals recovery(MAC_L2) - recovery(MAC), so the measured D_cat(MA) term cancels from the estimator. Both children were trained from MA, so this is not independent of MA, and it is a different estimand from recovery relative to MA."
                 },
                 "retained_l2_minus_nol2": {
                   "horse": {

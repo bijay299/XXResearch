@@ -23,8 +23,13 @@ Design notes that matter for interpretation
   supports a direction check only.
 * The L2 contrasts are deliberately expressed as the direct child-vs-child
   difference. For both suppression and recovery the shared MA parent term cancels
-  algebraically (see ``direct_l2_contrast``), so these contrasts carry no MA
-  uncertainty at all.
+  algebraically (see ``direct_l2_contrast``), so the ESTIMATOR contains no
+  measured D(MA) term and inherits none of its sampling noise. This does NOT
+  make the contrast independent of MA: both children were trained starting from
+  that same parent, so each child's state still depends on it. Nor does it
+  answer the same question as recovery relative to MA -- it is a different
+  estimand (how the two arms differ from each other), not a parent-free version
+  of the same one.
 """
 from __future__ import annotations
 
@@ -248,10 +253,13 @@ def direct_l2_contrast(data: dict[str, list[dict]]) -> dict:
                 c = paired_boot(sel(data[l2], target, fam), sel(data[no_l2], target, fam), thr)
                 if c:
                     c["reads_as"] = (
-                        f"D_{target}({l2}) - D_{target}({no_l2}); POSITIVE means the "
-                        f"L2-SP arm left more of the new target standing, i.e. weaker "
-                        f"deletion. Equals suppression({no_l2}) - suppression({l2}); "
-                        f"the MA parent term cancels.")
+                        f"NEWEST-TARGET RESIDUAL DIFFERENCE. D_{target}({l2}) - "
+                        f"D_{target}({no_l2}); POSITIVE means the L2-SP arm left more "
+                        f"of the newest requested target ({target}) standing, i.e. "
+                        f"weaker deletion of THAT target. Equals "
+                        f"suppression({no_l2}) - suppression({l2}); the measured "
+                        f"D(MA) term cancels from the estimator. This says nothing "
+                        f"about the cat history.")
                 fb["new_target_residual_l2_minus_nol2"] = c
 
                 # (2) historical cat: direct child-vs-child, MA-free.
@@ -259,8 +267,11 @@ def direct_l2_contrast(data: dict[str, list[dict]]) -> dict:
                 if c:
                     c["reads_as"] = (
                         f"D_cat({l2}) - D_cat({no_l2}); POSITIVE means more residual "
-                        f"cat under L2-SP. Equals recovery({l2}) - recovery({no_l2}); "
-                        f"independent of D_cat(MA).")
+                        f"cat under L2-SP. Equals recovery({l2}) - recovery({no_l2}), "
+                        f"so the measured D_cat(MA) term cancels from the estimator. "
+                        f"Both children were trained from MA, so this is not "
+                        f"independent of MA, and it is a different estimand from "
+                        f"recovery relative to MA.")
                 fb["cat_residual_l2_minus_nol2"] = c
 
                 # (3) each retained category separately -- never averaged.
@@ -507,23 +518,35 @@ def main() -> int:
     # ---- 3. direct paired L2 contrasts ------------------------------------
     direct = {
         "_design": {
-            "resampling_unit": "prompt (10 per category), carrying its 4 generation seeds",
+            "resampling_unit": ("prompt text (10 per category; 70 distinct texts "
+                                "across the 7 categories), each carrying its 4 "
+                                "generation seeds -> 280 prompt x generation-seed "
+                                "pairs per checkpoint"),
             "n_bootstrap": N_BOOT,
             "pairing": "one resampled prompt list indexes both arms of every contrast",
             "training_seeds": "analysed separately; never pooled, never resampled jointly",
             "interval_meaning": (
-                "sampling uncertainty over the 10 evaluation prompts within ONE "
-                "training run. With 10 clusters of 4 images the attainable "
-                "resolution is coarse: a 95% interval cannot be narrower than a "
-                "few percentage points, and an interval that includes zero is NOT "
-                "evidence that the effect is zero."),
+                "sampling uncertainty over the 10 evaluation prompt texts per "
+                "category within ONE training run (each carrying 4 generation "
+                "seeds). With 10 clusters of 4 images the attainable resolution is "
+                "coarse: a 95% interval cannot be narrower than a few percentage "
+                "points. An interval that includes zero is NOT evidence that the "
+                "effect is zero, and it does NOT establish equivalence: ruling out "
+                "an effect of a stated size requires the interval to lie wholly "
+                "inside a pre-declared equivalence margin, which is a separate "
+                "claim no interval here was designed to support."),
             "multiplicity": (
                 "no multiple-comparison correction is applied; many contrasts are "
                 "reported, so individual interval-excludes-zero labels must be read "
                 "as descriptive, not as tests."),
             "parent_cancellation": (
-                "L2 contrasts are child-vs-child, so the MA parent term cancels and "
-                "these estimates do not inherit any D_cat(MA) instability."),
+                "L2 contrasts are child-vs-child, so the measured D(MA) term "
+                "cancels out of the estimator and its sampling noise is not "
+                "inherited. The children remain TRAINED FROM that parent, so the "
+                "contrast is not independent of MA in any causal sense, and it "
+                "answers a different question from recovery relative to MA: how "
+                "the two arms differ from each other, not how either differs "
+                "from its parent. Neither estimand substitutes for the other."),
         },
         "per_seed": {},
     }

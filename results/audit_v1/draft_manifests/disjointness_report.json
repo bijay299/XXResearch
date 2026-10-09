@@ -1,0 +1,94 @@
+{
+  "status": "DRAFT disjointness report",
+  "dev_distinct_texts": 20,
+  "test_distinct_texts": 140,
+  "pilot_distinct_texts": 70,
+  "anchor_training_strings_checked": 400,
+  "gen_seed_sets": {
+    "pilot": [
+      101,
+      202,
+      303,
+      404
+    ],
+    "dev": [
+      511,
+      622,
+      733,
+      844
+    ],
+    "test": [
+      1301,
+      1402,
+      1503,
+      1604
+    ],
+    "pairwise_disjoint": true,
+    "training_seeds": [
+      17,
+      29
+    ],
+    "no_generation_seed_equals_a_training_seed": true
+  },
+  "text_overlap_checks": [
+    {
+      "pair": "dev vs frozen test",
+      "n_a": 20,
+      "n_b": 140,
+      "exact_collisions": [],
+      "n_exact": 0,
+      "near_duplicates_ratio_ge_0.90": [],
+      "n_near": 0
+    },
+    {
+      "pair": "dev vs pilot eval set",
+      "n_a": 20,
+      "n_b": 70,
+      "exact_collisions": [],
+      "n_exact": 0,
+      "near_duplicates_ratio_ge_0.90": [],
+      "n_near": 0
+    },
+    {
+      "pair": "frozen test vs pilot eval set",
+      "n_a": 140,
+      "n_b": 70,
+      "exact_collisions": [],
+      "n_exact": 0,
+      "near_duplicates_ratio_ge_0.90": [],
+      "n_near": 0
+    },
+    {
+      "pair": "dev vs anchor training strings",
+      "n_a": 20,
+      "n_b": 400,
+      "exact_collisions": [],
+      "n_exact": 0,
+      "near_duplicates_ratio_ge_0.90": [],
+      "n_near": 0
+    },
+    {
+      "pair": "frozen test vs anchor training strings",
+      "n_a": 140,
+      "n_b": 400,
+      "exact_collisions": [],
+      "n_exact": 0,
+      "near_duplicates_ratio_ge_0.90": [],
+      "n_near": 0
+    }
+  ],
+  "all_exact_collisions_zero": true,
+  "all_near_duplicates_zero": true,
+  "shared_surface_structure": {
+    "why_reported": "These prompts are template-built, so some surface structure is necessarily shared. Reporting it is more honest than claiming independence: a shared scene tail or a shared opening phrase makes two prompts correlated even when the full strings differ, and that correlation is not removed by the disjointness check above.",
+    "n_shared_scene_tails_dev_vs_test": 0,
+    "shared_scene_tails_examples": [],
+    "dev_distinct_scene_tails": 20,
+    "test_distinct_scene_tails": 140,
+    "dev_repeated_opening_phrases": {},
+    "test_repeated_opening_phrases": {
+      "a photo of a": 70
+    },
+    "consequence": "Prompt-cluster bootstrap treats each prompt text as one cluster. Where texts share a template the clusters are not fully independent, so intervals are mildly optimistic. This is a known limitation of the design, not a defect introduced here, and it applies equally to the pilot set."
+  }
+}

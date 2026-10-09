@@ -1,136 +1,94 @@
 {
+  "plan": "BOUNDED matched-effectiveness diagnostic, dog branch, 2 training seeds, full fixed 100-step scan",
+  "status": "PROPOSED FOR REVIEW. Not approved, not authorised to run.",
   "measured_throughput": {
     "s_per_optimizer_step": 0.8303,
     "s_per_generated_image": 1.0083,
     "s_per_detected_image": 0.0718,
-    "n_runs_sampled": 10,
-    "n_gen_sampled": 12,
-    "n_det_sampled": 10
+    "n_training_runs_sampled": 10,
+    "n_generation_reports_sampled": 12,
+    "n_detection_reports_sampled": 10,
+    "source": "the 10 completed pilot training runs and the pilot checkpoint evaluations at a9de625, on A100-SXM4-40GB"
+  },
+  "reused_without_new_compute": [
+    "MA17 and MA29 parents (existing)",
+    "MAB_L2 at L2=25000 for both seeds (existing final children)"
+  ],
+  "explicitly_excluded": [
+    "any lower-L2 / alternative-coefficient stage",
+    "any sandwich-branch coefficient search",
+    "a new M0 evaluation on the frozen test set",
+    "an unmatched full-step (MAB) reference arm on the frozen test set"
+  ],
+  "run_matrix": {
+    "new_unregularised_dog_trajectories": 2,
+    "optimizer_steps_each": 1000,
+    "dumps_saved_and_scored_each": 10,
+    "dump_schedule": "steps 100..1000 every 100 (full fixed scan, no bisection)",
+    "development": {
+      "prompts": 20,
+      "balance": "balanced literal/paraphrase",
+      "gen_seeds": 4,
+      "images_per_checkpoint": 80,
+      "checkpoints_scored": 24,
+      "composition": "per seed: MA + L2 endpoint + 10 dumps = 12",
+      "images_total": 1920
+    },
+    "frozen_test": {
+      "prompts_per_category": 20,
+      "categories": 7,
+      "gen_seeds": 4,
+      "images_per_checkpoint": 560,
+      "checkpoints_scored": 6,
+      "composition": "per seed: MA, L2, selected-U = 3",
+      "images_total": 3360
+    },
+    "images_total": 5280
+  },
+  "gpu_hours": {
+    "training": 0.461,
+    "development_generation_and_detection": 0.576,
+    "frozen_test_generation_and_detection": 1.008,
+    "generation_and_detection_combined": 1.584,
+    "process_setup": 0.431,
+    "subtotal": 2.476,
+    "total_with_25pct_contingency": 3.095
   },
   "assumptions": {
-    "throughput_source": "measured on this host from the 10 pilot training runs and 11 pilot checkpoint evaluations",
-    "process_setup_s": 25.0,
-    "process_setup_basis": "SD-1.5 pipeline construction and checkpoint load per invocation; an assumption, not measured in isolation, because the pilot's seconds_per_image already amortises setup over 280 images",
-    "contingency": 0.25,
-    "contingency_basis": "one re-run of a failed stage plus bisection overshoot",
-    "dev_images_per_checkpoint": 80,
-    "dev_composition": "new target 10 prompts x 4 gen seeds = 40 (2.5 pp resolution, the matching quantity); cat 10 x 2 = 20; bird 10 x 2 = 20",
-    "dumps_evaluated_basis": "bisection over 10 saved dumps, assuming suppression is monotone in steps; monotonicity is checked at the evaluated points and a full scan is the fallback",
-    "final_images_per_checkpoint": 280,
-    "final_composition": "7 categories x 10 NEW prompts x 4 gen seeds, newly frozen; the pilot set is exploratory from here on"
+    "process_setup": {
+      "n_invocations": 62,
+      "breakdown": "2 training + 30 generation + 30 detection",
+      "seconds_each": 25.0,
+      "DISCLOSURE": "This 0.431 GPU-h setup term may be PARTLY DOUBLE-COUNTED. The measured s_per_generated_image is elapsed/n_images from the pilot reports, so it already amortises that run's pipeline construction and checkpoint load over its images. Adding a separate 25 s per invocation therefore charges some setup twice. It is kept as a deliberate upper bound because the new runs have many SMALL evaluations (80 images) where per-invocation setup is a much larger share than in the pilot's 280-image runs. Reconcile against the actual implementation before the figure is relied on: if dev checkpoints are scored within one process, most of this term disappears and the subtotal falls toward 2.045 GPU-h."
+    },
+    "contingency": {
+      "fraction": 0.25,
+      "basis": "one re-run of a failed stage; no allowance for a change of design"
+    },
+    "not_included": [
+      "human annotation labour (no GPU)",
+      "CPU analysis time",
+      "any re-run caused by a failed match (see the stop rule)"
+    ]
   },
-  "plans": [
-    {
-      "label": "CORE \u2014 dog branch only, 2 training seeds. The sandwich branch needs no new compute: it is declared infeasible for matched comparison at L2-SP 25000 from existing evidence (+7.5 pp suppression, below the meaningful region)",
-      "run_matrix": {
-        "training_seeds": 2,
-        "branches": 1,
-        "new_trajectories": 2,
-        "steps_each": 1000,
-        "dumps_saved_each": 10,
-        "dumps_evaluated_each": 4,
-        "dev_checkpoint_evaluations": 14,
-        "final_checkpoint_evaluations": 7
-      },
-      "gpu_hours": {
-        "training": 0.461,
-        "development_selection": 0.336,
-        "final_confirmatory_evaluation": 0.588,
-        "process_setup": 0.16,
-        "subtotal": 1.545,
-        "total_with_25pct_contingency": 1.931
-      },
-      "images": {
-        "development": 1120,
-        "final": 1960,
-        "total": 3080
-      },
-      "storage_gib": {
-        "peak_intermediate_checkpoints": 1.43,
-        "images": 0.29,
-        "peak_total": 1.72,
-        "after_pruning_unmatched_dumps": 0.43
-      },
-      "wall_time_hours_note": {
-        "on_4_idle_gpus": 0.85,
-        "on_2_idle_gpus": 0.85,
-        "caveat": "wall time is NOT GPU-hours; the GPUs are shared without a scheduler and availability is not guaranteed"
-      }
+  "wall_time_hours": {
+    "note": "NOT GPU-hours. The GPUs are shared without a scheduler and availability is not guaranteed; only independently verified idle devices would be used.",
+    "two_trajectories_in_parallel_then_serial_scoring": 2.25,
+    "scoring_split_across_two_idle_gpus": 1.45
+  },
+  "storage": {
+    "intermediate_dumps": {
+      "n": 20,
+      "bytes_each": 76686190,
+      "total_bytes": 1533723800,
+      "total_gib": 1.43,
+      "note": "20 dumps x 76,686,190 bytes; this is the figure an earlier version of this model got wrong"
     },
-    {
-      "label": "EXTENDED \u2014 both branches confirmatory. NOT a drop-in option: it presupposes a sandwich L2-SP coefficient already inside the meaningful region, and the coefficient search that would find one is NOT costed here",
-      "run_matrix": {
-        "training_seeds": 2,
-        "branches": 2,
-        "new_trajectories": 4,
-        "steps_each": 1000,
-        "dumps_saved_each": 10,
-        "dumps_evaluated_each": 4,
-        "dev_checkpoint_evaluations": 22,
-        "final_checkpoint_evaluations": 11
-      },
-      "gpu_hours": {
-        "training": 0.923,
-        "development_selection": 0.528,
-        "final_confirmatory_evaluation": 0.924,
-        "process_setup": 0.257,
-        "subtotal": 2.632,
-        "total_with_25pct_contingency": 3.29
-      },
-      "images": {
-        "development": 1760,
-        "final": 3080,
-        "total": 4840
-      },
-      "storage_gib": {
-        "peak_intermediate_checkpoints": 2.86,
-        "images": 0.45,
-        "peak_total": 3.31,
-        "after_pruning_unmatched_dumps": 0.74
-      },
-      "wall_time_hours_note": {
-        "on_4_idle_gpus": 1.21,
-        "on_2_idle_gpus": 1.44,
-        "caveat": "wall time is NOT GPU-hours; the GPUs are shared without a scheduler and availability is not guaranteed"
-      }
-    },
-    {
-      "label": "FALLBACK \u2014 dog branch, 1 training seed (direction check only, no cross-seed agreement possible)",
-      "run_matrix": {
-        "training_seeds": 1,
-        "branches": 1,
-        "new_trajectories": 1,
-        "steps_each": 1000,
-        "dumps_saved_each": 10,
-        "dumps_evaluated_each": 4,
-        "dev_checkpoint_evaluations": 7,
-        "final_checkpoint_evaluations": 4
-      },
-      "gpu_hours": {
-        "training": 0.231,
-        "development_selection": 0.168,
-        "final_confirmatory_evaluation": 0.336,
-        "process_setup": 0.083,
-        "subtotal": 0.818,
-        "total_with_25pct_contingency": 1.023
-      },
-      "images": {
-        "development": 560,
-        "final": 1120,
-        "total": 1680
-      },
-      "storage_gib": {
-        "peak_intermediate_checkpoints": 0.71,
-        "images": 0.16,
-        "peak_total": 0.87,
-        "after_pruning_unmatched_dumps": 0.23
-      },
-      "wall_time_hours_note": {
-        "on_4_idle_gpus": 0.57,
-        "on_2_idle_gpus": 0.45,
-        "caveat": "wall time is NOT GPU-hours; the GPUs are shared without a scheduler and availability is not guaranteed"
-      }
-    }
-  ],
-  "ceiling_gpu_hours": 4.0
+    "images_gib": 0.49,
+    "peak_total_gib": 1.92,
+    "after_pruning_unselected_dumps_gib": 0.64,
+    "excludes": "optimizer/RNG state (not saved by the current trainer) and any logs"
+  },
+  "ceiling_gpu_hours_proposed_not_approved": 4.0,
+  "within_proposed_ceiling": true
 }

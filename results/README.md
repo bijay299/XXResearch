@@ -14,10 +14,21 @@ checkpoints, Excel reports and logs are git-excluded and live under
 > Nine **narrative** claims were overstated and are corrected in
 > [`audit_v1/CLAIM_CORRECTIONS.md`](audit_v1/CLAIM_CORRECTIONS.md). The
 > headline ones: 3080 images were generated (not 3360 — M0 is reused via a
-> symlink); the sandwich non-replication was **not** a false positive and is
-> largely a `D_cat(MA)` reference-term effect confined to paraphrase prompts;
-> "robust" is unavailable at n=2; and the L2-SP retention comparisons are
-> **confounded by unequal deletion strength**.
+> symlink); the sandwich non-replication was **not** a false positive; "robust"
+> is unavailable at n=2; and the L2-SP retention comparisons are **confounded by
+> unequal deletion strength**.
+>
+> **A second round** then corrected eight overstatements in the audit's own
+> write-up — [`audit_v1/CLAIM_CORRECTIONS_V2.md`](audit_v1/CLAIM_CORRECTIONS_V2.md).
+> Among them: the two runs differ **only in the training RNG seed** and are not
+> independent replications; the child-vs-child contrast is a **different
+> estimand**, not a parent-free recovery and not an isolation of the L2 effect;
+> the non-replication is **half child and half parent** movement, not "largely"
+> the parent; the +40 to +47.5 pp result is a **newest-target** residual
+> difference and says nothing about cat history; the evaluation set is **70
+> prompt texts** (280 prompt × generation-seed pairs), not 280 prompts; and
+> upstream stopping is **threshold-or-patience**, not a certified per-arm
+> maximum, and is not wired into the sequential setting at all.
 >
 > Documents carrying inline corrections are marked **[corrected]**; pre-audit
 > text is preserved at
@@ -29,7 +40,10 @@ checkpoints, Excel reports and logs are git-excluded and live under
 > | [`audit_v1/AUDIT_REPORT.md`](audit_v1/AUDIT_REPORT.md) | what was verified, what was corrected, what is unresolved |
 > | [`audit_v1/CORRECTED_TABLES.md`](audit_v1/CORRECTED_TABLES.md) | corrected counts and the direct L2 contrasts the snapshot never computed |
 > | [`audit_v1/ARTIFACT_INVENTORY.md`](audit_v1/ARTIFACT_INVENTORY.md) | what is reusable; **no intermediate checkpoints exist** |
-> | [`../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md) | the proposed next experiment (≈1.93 GPU-h, **pending review**) |
+> | [`audit_v1/CLAIM_CORRECTIONS_V2.md`](audit_v1/CLAIM_CORRECTIONS_V2.md) | corrections to the audit's own first write-up |
+> | [`../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md) | the bounded proposed experiment (3.095 GPU-h with contingency, **pending review, not approved**) |
+> | [`audit_v1/draft_manifests/FREEZE.md`](audit_v1/draft_manifests/FREEZE.md) | the frozen draft prompt manifests and analysis rules |
+> | [`audit_v1/annotation_packet/ACCESS.md`](audit_v1/annotation_packet/ACCESS.md) | how the PI gets the packet images and blinded sheet |
 >
 > **No human annotation has been performed.** A 236-item blinded packet is built
 > and empty at [`audit_v1/annotation_packet/`](audit_v1/annotation_packet/).

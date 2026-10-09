@@ -18,18 +18,14 @@
 >    `eval/M0`; 3360 is the row count of two stacked tables and counts one
 >    reused evaluation set twice.
 > 2. **"False positive" was wrong** (§3). The two intervals overlap; a differing
->    significance label is not a significant difference. The child-vs-child
+>    significance label is not a significant difference. And the **parent-free**
 >    contrast `D_cat(MAC_L2) − D_cat(MAC)` *does* agree across both seeds
->    (`+7.5` / `+2.5` pp), but that is a **different estimand**, not a
->    parent-free version of recovery. The across-seed change in recovery
->    decomposes **half to the child and half to the parent** (each ±10 pp).
->    Separately, the *parent's own* across-seed gap sits entirely on paraphrase
->    prompts — literal rates are identical in both runs at all three thresholds.
+>    (`+7.5` / `+2.5` pp) — the non-replication is largely in the `D_cat(MA)`
+>    reference term, which differs between runs **only on paraphrase prompts**
+>    (literal rates are identical at all three thresholds).
 > 3. **"Robust" is not available at n=2** (§1). Two runs support a direction
 >    check only. "Robust (both ns)" labels two runs each failing to resolve an
->    effect as a finding. The two runs differ **only in the training RNG seed** —
->    they share one base model, the anchor caches, the concepts, the prompts and
->    the detector — so they bound training-seed variability and nothing wider.
+>    effect as a finding.
 > 4. **The retention comparisons are confounded by unequal deletion strength**
 >    (§2). L2-SP arms deleted far less than the unregularised arms, so their
 >    greater retention is not yet a preservation result. The missing direct
@@ -65,15 +61,12 @@ deletion holds, and in the semantically-near branch it is *reinforced* rather
 than undone. The one apparently credible recovery in seed 17 **did not
 replicate** in seed 29 — see §3.
 
-**L2-SP traded newest-target effectiveness for retention at this one untuned
-coefficient.** **[corrected]** The **newest-target residual difference** — how
-much more of the *newest requested target* (dog, or sandwich) the L2 arm left
-standing — is +40 to +47.5 pp in every seed, branch and threshold, the most
-stable quantity in the snapshot. It is a statement about the newest request and
-says **nothing** about the cat history. In the dog branch the L2 arm also
-retained ~35–40 pp more bird. But the arms being compared **deleted different
-amounts**, so this is not yet a preservation result; see the banner above and
-`audit_v1/CORRECTED_TABLES.md` §4.
+**L2-SP traded new-request effectiveness for retention at this one untuned
+coefficient.** **[corrected]** It cost ~40–47 pp of new-target deletion in every
+seed, branch and threshold — the most stable quantity in the study — and in the
+dog branch retained ~35–40 pp more bird. But the arms being compared **deleted
+different amounts**, so this is not yet a preservation result; see the banner
+above and `audit_v1/CORRECTED_TABLES.md` §4.
 
 ---
 
@@ -122,13 +115,10 @@ L2-SP cuts movement from the parent by roughly 9x. In the dog branch that
 coincides with a large reduction in collateral damage (bird −45 pp → −5 pp) **at
 roughly half the deletion strength — which is exactly why the two are not yet
 comparable**. In the sandwich branch it leaves only **+7.5 pp** of measured
-suppression, with an interval reaching zero, so the value is imprecise.
-**[corrected]** That is **not** a "resolution floor": with 10 prompt clusters of
-4 images the representable step is 2.5 pp, so 7.5 pp is a real three-step
-value. It has not been shown to be eliminated — and because that arm barely
-deleted, its retention must not be scored against an arm that did. For the
-matched-effectiveness question the branch is excluded because **its L2-SP
-suppression is too weak to match to**, not because 7.5 pp is unmeasurable.
+suppression, with an interval reaching zero: at or below the resolution floor,
+so its true deletion strength is unknown and may be near zero. **[corrected]**
+It has *not* been shown to be eliminated, and because that arm barely deleted,
+its retention must not be scored against an arm that did.
 
 So the coefficient 25000 — a documented example, never tuned for SD-1.5 —
 **behaves differently in these two branches**: +42.5 pp of dog suppression
@@ -154,15 +144,9 @@ Much of the gap is the parent itself moving: D_cat(MA) was 17.5% in seed 17 and
 27.5% in seed 29, so the same child rate produces a different signed difference.
 That is exactly the instability one training seed cannot reveal.
 
-**[corrected] — but it is half the story, and the paraphrase point is about the
-parent alone.** The across-seed change in MAC_L2 recovery is −20.0 pp, and it
-decomposes evenly: the child's cat presence **falls** 10 pp (32.5% → 22.5%)
-while the parent's **rises** 10 pp (17.5% → 27.5%). **Each accounts for exactly
-half**, so attributing the non-replication mainly to the parent is wrong.
-
-Separately, the **parent's own** across-seed gap is a paraphrase effect: split
-by prompt family, the two runs produced **identical** literal-prompt parent
-rates at every threshold, with the whole parent divergence on paraphrases:
+**[corrected] — and the gap is specifically a paraphrase effect.** Split by
+prompt family, the two runs produced **identical** literal-prompt parent rates
+at every threshold, with the whole divergence on paraphrases:
 
 | threshold | literal s17 / s29 | paraphrase s17 / s29 |
 |---|---|---|
@@ -170,13 +154,10 @@ rates at every threshold, with the whole parent divergence on paraphrases:
 | 0.5 | 15.0 / 15.0 **identical** | 20.0 / 40.0 |
 | 0.7 | 15.0 / 15.0 **identical** | 20.0 / 35.0 |
 
-So the *parent's* instability sits on exactly the prompt family where 5 prompt
-texts per family resolve least. The child-vs-child contrast
-`D_cat(MAC_L2) − D_cat(MAC)` removes the measured parent term from the
-estimator and *does* agree across both runs — but it answers a **different
-question** (how the two arms differ from each other, not how either differs from
-its parent), and both children were trained *from* MA, so it is not independent
-of the parent.
+So the instability sits in the reference term, on exactly the prompt family
+where 10 prompts resolve least. The **parent-free** contrast
+`D_cat(MAC_L2) − D_cat(MAC)` removes that term algebraically and *does* agree
+across both runs.
 
 **Conclusion: this pair of runs does not resolve the sign of parent-referenced
 cat change in the sandwich branch.** **[corrected]** That is a statement about
@@ -225,10 +206,8 @@ checkpoint-shuffled grids and an empty annotation sheet are prepared in
   fp32, `kv-xattn` (32 tensors, 19,169,280 params), constant schedule, warmup 500.
 - Regularised and unregularised arms differ **only** in `--l2sp_weight 25000`;
   matched arms drew identical target prompts.
-- Evaluation: 7 categories × **10 distinct prompt texts** (5 literal + 5
-  paraphrase) = **70 prompt texts**, × 4 generation seeds = **280 prompt ×
-  generation-seed pairs** per checkpoint. **[corrected]** The set is 70 prompts,
-  not 280. Identical pairs at every checkpoint, CFG 7.5, 30 steps, 512², fp16.
+- Evaluation: 7 categories × 10 prompts (5 literal + 5 paraphrase) × 4 seeds =
+  280 images/checkpoint, identical prompt/seed pairs, CFG 7.5, 30 steps, 512², fp16.
 - Detector: `FasterRCNN_ResNet50_FPN_Weights.COCO_V1`, SHA-256
   `258fb6c638b15964ddcdd1ae0748c5eef1be9e732750120cc857feed3faac384`.
 

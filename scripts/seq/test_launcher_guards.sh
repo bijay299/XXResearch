@@ -1,85 +1,107 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
-# CPU-only regression test for the run_seed.sh completion sentinels.
+# Regression test: the launcher must NOT go back to existence/count-only guards.
 #
-# Extracts the two guard functions from run_seed.sh and exercises them against
-# fabricated artifacts in a temporary directory. No GPU, no model, no network:
-# the point is only to prove that a partial or truncated artifact is classified
-# INCOMPLETE rather than silently accepted as a finished stage.
+# History. The first version of this file extracted two shell sentinels
+# (`train_complete`, `eval_complete`) from run_seed.sh and exercised them
+# against fabricated artifacts. Central review then showed those sentinels
+# accepted three plainly unusable artifacts:
+#
+#   * a delta.bin containing plain text, with a valid-looking report and an
+#     arbitrary non-empty SHA;
+#   * a detections.jsonl of 280 identical rows;
+#   * a detections.jsonl of 280 malformed lines.
+#
+# They were replaced by contract validation in scripts/seq/validate_stage.py,
+# which is tested directly and far more thoroughly by
+# scripts/seq/test_validate_stage.py (78 checks, including revalidation of every
+# real saved artifact).
+#
+# This file therefore no longer tests the old sentinels -- they are gone. It
+# asserts the REPLACEMENT is wired in and that the weak patterns have not crept
+# back. Keeping the old tests would have been worse than useless: with the
+# functions removed, every "expect failure" case passed vacuously because an
+# undefined function also returns non-zero.
 #
 #   bash scripts/seq/test_launcher_guards.sh
 # ---------------------------------------------------------------------------
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LAUNCHER="${HERE}/run_seed.sh"
-
-TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
-MODELS="${TMP}/models"; EVALR="${TMP}/eval"
-mkdir -p "$MODELS" "$EVALR"
-EXPECTED_IMAGES=280
-
-# Pull the sentinels out of the launcher so the test cannot drift from it.
-eval "$(sed -n '/^train_complete()/,/^}/p' "$LAUNCHER")"
-eval "$(sed -n '/^eval_complete()/,/^}/p' "$LAUNCHER")"
+REPO="$(cd "${HERE}/../.." && pwd)"
+SEED_SH="${HERE}/run_seed.sh"
+ANA_SH="${HERE}/run_analysis.sh"
+VALIDATOR="${HERE}/validate_stage.py"
 
 PASS=0; FAIL=0
-check() {   # check <description> <expected pass|fail> <function> <arg>
-    local desc="$1" want="$2" fn="$3" arg="$4" got
-    if "$fn" "$arg"; then got="pass"; else got="fail"; fi
-    if [ "$got" = "$want" ]; then
-        printf '  ok    %-52s -> %s\n' "$desc" "$got"; PASS=$((PASS+1))
-    else
-        printf '  FAIL  %-52s -> %s (wanted %s)\n' "$desc" "$got" "$want"; FAIL=$((FAIL+1))
-    fi
-}
+ok()  { PASS=$((PASS+1)); printf '  ok    %s\n' "$1"; }
+bad() { FAIL=$((FAIL+1)); printf '  FAIL  %s\n' "$1"; [ -n "${2:-}" ] && printf '          %s\n' "$2"; }
 
-mk_report() {   # mk_report <name> <json>
-    mkdir -p "${MODELS}/$1"; printf '%s' "$2" > "${MODELS}/$1/train_report.json"
-}
-mk_jsonl() {    # mk_jsonl <ck> <nlines>
-    mkdir -p "${EVALR}/$1"
-    : > "${EVALR}/$1/detections.jsonl"
-    for ((i=0; i<$2; i++)); do echo '{"x":1}' >> "${EVALR}/$1/detections.jsonl"; done
-}
+has()    { if grep -qF -- "$2" "$1"; then ok "$3"; else bad "$3" "not found: $2"; fi; }
+hasnt()  { if grep -qF -- "$2" "$1"; then bad "$3" "still present: $2"; else ok "$3"; fi; }
+hasre()  { if grep -qE -- "$2" "$1"; then ok "$3"; else bad "$3" "no match: $2"; fi; }
+hasntre(){ if grep -qE -- "$2" "$1"; then bad "$3" "still matches: $2"; else ok "$3"; fi; }
 
-GOOD='{"finished_utc":"2026-10-09T00:00:00+00:00","child_checkpoint":{"sha256":"abc"}}'
-
-echo "train_complete — a stage counts as done only with a parseable report AND weights"
-check "no output at all"                       fail train_complete MISSING
-mk_report A "$GOOD"
-check "valid report but delta.bin absent"      fail train_complete A
-echo x > "${MODELS}/A/delta.bin"
-check "valid report + delta.bin"               pass train_complete A
-mk_report B "${GOOD:0:40}"
-echo x > "${MODELS}/B/delta.bin"
-check "report truncated mid-write by a kill"   fail train_complete B
-mk_report C '{"child_checkpoint":{"sha256":"abc"}}'
-echo x > "${MODELS}/C/delta.bin"
-check "report parses but has no finished_utc"  fail train_complete C
-mk_report D "$GOOD"
-: > "${MODELS}/D/delta.bin"
-check "delta.bin present but zero bytes"       fail train_complete D
+echo "the replacement is present"
+[ -f "$VALIDATOR" ] && ok "validate_stage.py exists" || bad "validate_stage.py missing"
+has "$SEED_SH" 'validate_train' "run_seed.sh validates training stages"
+has "$SEED_SH" 'validate_eval'  "run_seed.sh validates evaluation stages"
+has "$SEED_SH" '$SEQ_VALIDATOR' "run_seed.sh calls the validator by contract path"
+has "$ANA_SH"  '$SEQ_VALIDATOR' "run_analysis.sh validates before aggregating"
+has "$SEED_SH" '--expect_steps' "training validation pins the requested step count"
+has "$SEED_SH" '--expect_seed'  "training validation pins the training seed"
+has "$SEED_SH" '--expect_l2sp'  "training validation pins the L2-SP weight"
+has "$SEED_SH" '--expect_manifest_sha' "evaluation validation pins the manifest"
+has "$SEED_SH" '--expect_gen_settings' "evaluation validation pins generation settings"
+has "$SEED_SH" '--allow_shared_images' "the shared-M0 reuse is declared explicitly"
 
 echo
-echo "eval_complete — a stage counts as done only at the full expected row count"
-check "no detections.jsonl"                    fail eval_complete MISSING
-mk_jsonl E 280
-check "280/280 rows"                           pass eval_complete E
-mk_jsonl F 137
-check "137/280 rows (killed mid-detection)"    fail eval_complete F
-mk_jsonl G 0
-check "file exists but is empty"               fail eval_complete G
-mk_jsonl H 281
-check "281 rows (duplicate appended)"          fail eval_complete H
+echo "the weak patterns have not crept back"
+hasnt "$SEED_SH" 'train_complete' "no existence-only train_complete sentinel"
+hasnt "$SEED_SH" 'eval_complete'  "no existence-only eval_complete sentinel"
+hasntre "$SEED_SH" '\[ -f "\$\{EVALR\}/\$\{ck\}/detections\.jsonl" \] &&' \
+    "no bare -f test on detections.jsonl as a completion check"
+hasntre "$SEED_SH" 'echo "\[done\] \$\{name\} exit=\$\?"' \
+    "no exit status discarded through an echo"
+hasntre "$SEED_SH" 'wait \$P1 \$P2' \
+    "no multi-pid wait that reports only the last child"
+hasntre "$ANA_SH" '\-\-eval_root "\$\{SEQ_ROOT\}/eval"' \
+    "run_analysis.sh does not hard-code the seed-17 eval root"
 
 echo
-echo "The pre-audit guards were [ -f train_report.json ] and [ -f detections.jsonl ],"
-echo "which would have returned pass for every case above that involves an existing"
-echo "but unusable file: truncated report, 137/280 rows, empty file, 281 rows."
+echo "failure propagation and path policy"
+hasre "$SEED_SH" 'rc=\$\?' "the real exit status is captured immediately"
+hasre "$SEED_SH" 'wait "\$P1" \|\| FAILED' "each background child is waited on separately"
+has   "$SEED_SH" 'seq_resolve_eval_root' "run_seed.sh uses the shared path policy"
+has   "$ANA_SH"  'seq_resolve_eval_root' "run_analysis.sh uses the same shared path policy"
+has   "$HERE/exp_config.sh" 'seq_resolve_eval_root' "the policy is defined once, in exp_config.sh"
+hasre "$SEED_SH" 'exit 1' "the launcher exits non-zero on an incomplete seed"
+has   "$SEED_SH" 'quarantine' "invalid artifacts are quarantined, not deleted"
+hasntre "$SEED_SH" 'rm -(r|f|rf) .*detections' "nothing deletes detection evidence"
+has   "$ANA_SH"  'mktemp -d' "analysis stages into an isolated directory"
+has   "$ANA_SH"  'Nothing was published' "analysis says so when it publishes nothing"
+has   "$ANA_SH"  'OPTIONAL_ABSENT' "optional output formats are tracked as optional"
+
 echo
+echo "the validator fails closed"
+has "$VALIDATOR" 'UNCHECKED' "a check that cannot be performed fails the stage"
+has "$VALIDATOR" 'os.replace' "completion metadata is written atomically"
+hasre "$VALIDATOR" 'torch\.isfinite' "tensors are checked for NaN/Inf"
+hasre "$VALIDATOR" 'sha256_file\(ck_p\)' "the checkpoint hash is recomputed, not trusted"
+
+echo
+echo "syntax"
+for f in "$SEED_SH" "$ANA_SH" "${HERE}/exp_config.sh"; do
+    if bash -n "$f" 2>/dev/null; then ok "$(basename "$f") parses"
+    else bad "$(basename "$f") parses"; fi
+done
+
+echo
+echo "-----------------------------------------------------------------"
+echo "${PASS} passed, ${FAIL} failed"
 if [ "$FAIL" -eq 0 ]; then
-    echo "ALL ${PASS} GUARD CHECKS PASSED"
+    echo "ALL GUARD REGRESSION CHECKS PASSED"
+    echo "(behavioural coverage lives in test_validate_stage.py and"
+    echo " test_launcher_e2e.sh; this file only guards against regression)"
 else
-    echo "${FAIL} GUARD CHECK(S) FAILED (${PASS} passed)" >&2; exit 1
+    exit 1
 fi
