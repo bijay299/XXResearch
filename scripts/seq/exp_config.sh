@@ -123,20 +123,39 @@ export SEQ_CKPT_CONTRACT="${SEQ_CKPT_CONTRACT:-${PILOT_REPO_ROOT}/configs/checkp
 export SEQ_VALIDATOR="${SEQ_VALIDATOR:-${PILOT_REPO_ROOT}/scripts/seq/validate_stage.py}"
 
 # ---------------------------------------------------------------------------
-# EXPLICIT legacy-evidence policy.
+# EXPLICIT legacy-evidence policy, scoped to SAVED ARTIFACTS, not seed numbers.
 #
 # The saved pilot (seeds 17 and 29, commit a9de625) was trained before
 # train_request.py recorded optimizer_steps_completed, and the completion check
 # in use at the time was circular. Those ten reports therefore carry NO evidence
 # of training completion. They are still validated STRUCTURALLY in full.
 #
-# Seeds listed here are validated with --steps_evidence legacy_optional, which
-# accepts the counter's absence and records training completion as UNVERIFIED.
-# This is deliberate: missing historic evidence must NOT silently trigger
-# retraining or replacement of the saved pilot. Nothing is backfilled.
+# History of this knob. It used to be SEQ_LEGACY_TRAIN_SEEDS="17 29" -- a list
+# of training-seed NUMBERS. That is not a property of saved evidence: a brand-new
+# run using seed 17 or 29 inherited the same exception and could pass completion
+# validation with no counter at all. The proposed new unregularised trajectories
+# use exactly those two seeds, so the exception would have covered the very runs
+# whose completion has to be proven.
 #
-# A NEW seed is not listed, so its counter is REQUIRED and its absence fails.
-export SEQ_LEGACY_TRAIN_SEEDS="${SEQ_LEGACY_TRAIN_SEEDS:-17 29}"
+# The exception is now bound to the EXACT saved artifacts by CONTENT: a
+# train_report.json sha256 together with its delta.bin sha256, both recorded with
+# explicit provenance in the registry below. Therefore:
+#
+#   * a newly produced run can never match (new report bytes, new checkpoint
+#     bytes), so its counter is REQUIRED regardless of seed or directory label;
+#   * a saved report that was edited, or a checkpoint swapped under a legacy
+#     NAME, breaks the match and is held to the strict policy;
+#   * a registered saved artifact keeps completion UNVERIFIED and is never
+#     retrained, moved, replaced or backfilled on that basis;
+#   * a counter that is PRESENT BUT SHORT fails in both policies.
+#
+# Setting SEQ_LEGACY_ARTIFACT_REGISTRY to the EMPTY STRING removes every
+# exception: the counter is then required everywhere, the saved pilot included.
+# Note the `${VAR-default}` form (not `${VAR:-default}`): an explicitly empty
+# value is honoured rather than silently replaced by the default, which is what
+# the seed-list version got wrong.
+export SEQ_LEGACY_ARTIFACT_REGISTRY="${SEQ_LEGACY_ARTIFACT_REGISTRY-${PILOT_REPO_ROOT}/configs/legacy_training_artifacts.json}"
+export SEQ_LEGACY_POLICY="${SEQ_LEGACY_POLICY:-${PILOT_REPO_ROOT}/scripts/seq/legacy_artifact_policy.py}"
 export SEQ_BASE_MODEL_CONTRACT="${SEQ_BASE_MODEL_CONTRACT:-${PILOT_REPO_ROOT}/configs/base_model_contract.json}"
 
 # The frozen expected identity of the evaluation manifest. Validation recomputes
@@ -144,10 +163,44 @@ export SEQ_BASE_MODEL_CONTRACT="${SEQ_BASE_MODEL_CONTRACT:-${PILOT_REPO_ROOT}/co
 # against the digest field inside the manifest being validated.
 export SEQ_EVAL_MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:-0020c81c4a4dd3580a6574c91b4aea1a7e349e9e89fc845ed8c2077d47564892}"
 
-seq_steps_evidence() {   # seq_steps_evidence <seed> -> counter | legacy_optional
-    local seed="${1:?seq_steps_evidence <seed>}"
-    for s in $SEQ_LEGACY_TRAIN_SEEDS; do
-        [ "$s" = "$seed" ] && { printf 'legacy_optional\n'; return 0; }
-    done
-    printf 'counter\n'
+# seq_steps_evidence_full <models_root> <checkpoint>
+#   -> "<policy>|<reason>" where policy is counter | legacy_optional
+#
+# The decision reads the ARTIFACT on disk and matches its content identity
+# against the frozen registry. It takes no seed number and no directory label.
+# Fail-closed: anything unexpected yields the strict `counter` policy.
+seq_steps_evidence_full() {
+    local mroot="${1:?seq_steps_evidence_full <models_root> <checkpoint>}"
+    local ck="${2:?seq_steps_evidence_full <models_root> <checkpoint>}"
+    local out=""
+    if [ -n "${SEQ_LEGACY_ARTIFACT_REGISTRY}" ] && [ -f "$SEQ_LEGACY_POLICY" ]; then
+        out="$(CUDA_VISIBLE_DEVICES="" python "$SEQ_LEGACY_POLICY" decide \
+                 --models_root "$mroot" --checkpoint "$ck" \
+                 --registry "$SEQ_LEGACY_ARTIFACT_REGISTRY" 2>/dev/null)"
+    fi
+    case "$out" in
+        legacy_optional\|*) printf '%s\n' "$out" ;;
+        counter\|*)         printf '%s\n' "$out" ;;
+        *) printf 'counter|no usable legacy-artifact registry decision; the completed-step counter is required\n' ;;
+    esac
+}
+
+# Just the policy word, for callers that do not want the reason.
+seq_steps_evidence() {   # seq_steps_evidence <models_root> <checkpoint>
+    local line
+    line="$(seq_steps_evidence_full "$1" "$2")"
+    printf '%s\n' "${line%%|*}"
+}
+
+# Is this checkpoint's delta.bin a REGISTERED saved artifact? Exit 0 = yes, and
+# it must not be retrained over, moved or replaced whatever state its report is
+# in. Keyed on the checkpoint alone: an edited report loses the legacy
+# completed-step exception, but the saved checkpoint beside it is still saved
+# evidence and overwriting it would destroy the pilot.
+seq_registered_checkpoint() {   # seq_registered_checkpoint <models_root> <checkpoint>
+    [ -n "${SEQ_LEGACY_ARTIFACT_REGISTRY}" ] || return 1
+    [ -f "$SEQ_LEGACY_POLICY" ] || return 1
+    CUDA_VISIBLE_DEVICES="" python "$SEQ_LEGACY_POLICY" protect \
+        --models_root "$1" --checkpoint "$2" \
+        --registry "$SEQ_LEGACY_ARTIFACT_REGISTRY" >/dev/null 2>&1
 }

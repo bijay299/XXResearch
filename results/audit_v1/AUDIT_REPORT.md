@@ -289,6 +289,20 @@ Inferring it from the layout is impossible anyway — `eval_seed29/M0` is a
 symlink, so resolved paths match and only a literal path comparison plus a
 symlink check detects the reuse.
 
+*Image reuse is bound to provenance (AUDIT-01d).* Binding the metadata to the
+checkpoint was necessary and **not sufficient**: a failed evaluation left its
+`images/` and `image_report.json` in place, the recovery run reused every file
+**by pathname alone**, and the fresh report then carried the current checkpoint
+hash over older pixels. `generate_eval_images.py` now reuses a file only when a
+prior report proves the same generating checkpoint, the same recomputed canonical
+manifest identity, the same generation settings and image-seed rule, and the same
+recorded per-image digest re-verified against the bytes on disk — otherwise it
+**exits 3 before `import torch`** and writes nothing. `run_seed.sh` asks that
+same gate (`--provenance_check_only`, no model loaded) before quarantining
+anything: provable images are kept and only detection re-runs; otherwise the
+**whole** evaluation is preserved together with a reason file and generation goes
+to a fresh, empty directory. See [`CLAIM_CORRECTIONS_V3.md`](CLAIM_CORRECTIONS_V3.md) §G1.
+
 *Other fixes:* completion metadata is written **atomically** (temp + `fsync` +
 `os.replace`) and **only after** validation passes; freshly produced invalid
 artifacts are quarantined alongside a reason file, not only stale ones found at
@@ -315,11 +329,14 @@ present and non-empty; required copies fail hard; and PDF/SVG are declared
 
 ### Tests
 
+Counts are as re-run at AUDIT-01d (**411 assertions**, 0 failures, CPU only).
+
 | suite | cases | what it covers |
 |---|---|---|
-| `test_launcher_guards.sh` | **35** | a **regression** check that the weak patterns have not crept back and the validator is wired in — see the note below |
-| `test_validate_stage.py` | **78** | malformed / duplicate / missing / extra identities; stale configuration, parent and manifest; wrong checkpoint hash and tensors; NaN; incomplete steps; truncated reports; the shared-M0 contract; manifest-derived counts; marker atomicity — plus revalidation of **all 22 real saved artifacts** |
-| `test_launcher_e2e.sh` | 18 groups | clean run, idempotent re-run, failure of the **first** and of the **second** background child, both children of one wave, MA failure **with stale artifacts present**, MA exiting 0 with unvalidatable output, stale configuration, short trajectory, partial detections with quarantine, all-identical rows, settings drift, generation and detection failures, analysis refusing an invalid seed, analysis-stage failure publishing nothing, the seed-17 legacy/new layout policy, a busy GPU |
+| `test_launcher_guards.sh` | **93** | a **regression** check that the weak patterns have not crept back and the validator is wired in — see the note below. Now also: the seed-number legacy list is gone and nothing reads it; the registry honours an explicitly empty value; post-training validation is strict; registered checkpoints are protected; the reuse gate exists, has its own exit status and **runs before any torch import**; the base-model verdict reports itself as partial |
+| `test_validate_stage.py` | **156** | malformed / duplicate / missing / extra identities; stale configuration, parent and manifest; wrong checkpoint hash and tensors; NaN; incomplete steps; truncated reports; the shared-M0 contract; manifest-derived counts; marker atomicity — plus revalidation of **all 22 real saved artifacts**, the legacy-artifact policy against the **real** registry and saved artifacts, the partial-vs-full base-model identity checks, and the image-reuse gate on **all 12 real saved evaluations** (legitimate resume authorized; cross-seed relabelling refused both ways; real reports verified byte-unchanged) |
+| `test_image_provenance.sh` | **57** | image-reuse provenance through the **real** launcher recovery path, the **real** generator reuse branch, the **real** validator and the **real** analysis gate, with fake torch/diffusers and every pipeline construction and generation call counted: valid same-contract resume (0 generations), changed checkpoint under the same name, changed prompt text, changed settings, missing prior report, tampered image bytes, an M0 report claiming a delta, and analysis refusing the refused state |
+| `test_launcher_e2e.sh` | **105** over 30 groups | clean run, idempotent re-run, failure of the **first** and of the **second** background child, both children of one wave, MA failure **with stale artifacts present**, MA exiting 0 with unvalidatable output, stale configuration, short trajectory, partial detections with quarantine, all-identical rows, settings drift, generation and detection failures, analysis refusing an invalid seed, analysis-stage failure publishing nothing, the seed-17 legacy/new layout policy, a busy GPU, stale/absent generation hashes in both paths — plus the artifact-scoped completion policy: fresh seed-29 and fresh seed-17 outputs rejected **under defaults**, a registered saved artifact accepted as UNVERIFIED without retraining, a changed artifact bearing a registered name rejected **and protected from being retrained over**, a short counter rejected even for a registered artifact, and the empty / absent / malformed registry all failing closed |
 
 **Every GPU command is mocked** in the E2E suite — `accelerate`, the three GPU
 python entry points, the GPU selector and `nvidia-smi` are shadowed on `PATH`
@@ -485,10 +502,17 @@ No new regularizer or learned controller is built.
 10. **The setup term in the cost estimate is not reconciled** against an actual
     implementation and may be partly double-counted; the protocol discloses the
     range (2.045–2.476 GPU-h subtotal) rather than resolving it.
-11. **Shared prompt-template structure** means prompt clusters are not fully
-    independent, so bootstrap intervals are mildly optimistic. Measured and
-    reported for the draft manifests; it applies to the pilot set too and is not
-    corrected for.
+11. **Shared prompt-template structure** means the bootstrap's units are not
+    fully independent. Dependence *within* a scene — its two family wordings and
+    its four generation seeds — is absorbed by making the **scene cluster** the
+    resampling unit (`draft_manifests/bootstrap_grouping.json`). Dependence from
+    a template shared *across* clusters is **not** absorbed, and the test set has
+    one: all 70 literal prompts open `"a photo of a"`. **The direction and size
+    of its effect on interval width are not established, and no claim is made
+    about them** — an earlier version of this limitation said such dependence
+    makes intervals "mildly optimistic", which was an unsupported assurance and
+    is withdrawn (see `CLAIM_CORRECTIONS_V3.md` §W3). It applies to the pilot set
+    too and is not corrected for.
 12. **Monotonicity of suppression in optimizer steps is untested**, which is why
     the proposed scan is a full fixed scan rather than a bisection.
 
@@ -523,7 +547,10 @@ Code added or changed:
 | `scripts/seq/protocol_cost_model.py` | re-derives the resource estimate from measured throughput |
 | `scripts/seq/exp_config.sh` | `seq_resolve_eval_root` — the one shared evaluation-path policy |
 | `scripts/seq/run_seed.sh`, `run_analysis.sh` | validation-gated, failure-propagating, staged publication |
-| `scripts/seq/test_validate_stage.py`, `test_launcher_e2e.sh`, `test_launcher_guards.sh` | the CPU test suites |
+| `scripts/seq/test_validate_stage.py`, `test_launcher_e2e.sh`, `test_launcher_guards.sh`, `test_image_provenance.sh` | the CPU test suites |
+| `configs/legacy_training_artifacts.json` | the exact saved artifacts allowed a completed-step exception, by content identity |
+| `scripts/seq/legacy_artifact_policy.py` | that policy, and protection of registered checkpoints from being retrained over |
+| `results/audit_v1/draft_manifests/bootstrap_grouping.json` | the frozen bootstrap resampling grouping |
 
 Reproduce everything (CPU only; no GPU, no network):
 
@@ -535,7 +562,19 @@ python3 scripts/seq/protocol_cost_model.py   # resource estimate
 python3 scripts/seq/build_annotation_packet.py --copy_images
 
 # tests
-bash    scripts/seq/test_launcher_guards.sh  # 35 regression assertions
-python3 scripts/seq/test_validate_stage.py   # 78, incl. all 22 real artifacts
-bash    scripts/seq/test_launcher_e2e.sh     # 68 assertions over 18 groups
+bash    scripts/seq/test_launcher_guards.sh  #  93 regression assertions
+bash    scripts/seq/test_image_provenance.sh #  57 image-reuse provenance checks
+python3 scripts/seq/test_validate_stage.py   # 156, incl. all 22 real artifacts
+bash    scripts/seq/test_launcher_e2e.sh     # 105 assertions over 30 groups
+```
+
+AUDIT-01d additions (all CPU, all re-derive byte-identically):
+
+```bash
+python3 scripts/seq/legacy_artifact_policy.py verify \
+        --registry configs/legacy_training_artifacts.json   # 10 artifacts, 0 mismatches
+python3 scripts/seq/inspect_training_logs.py \
+        --out results/audit_v1/training_log_inspection.json
+python3 scripts/seq/freeze_bootstrap_grouping.py \
+        --out results/audit_v1/draft_manifests/bootstrap_grouping.json
 ```

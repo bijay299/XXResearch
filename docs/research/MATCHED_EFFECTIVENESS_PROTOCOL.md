@@ -171,10 +171,15 @@ strings. Generation-seed sets are pairwise disjoint across pilot/dev/test, and
 no generation seed equals a training seed (17, 29).
 
 **Shared surface structure is measured and reported, not denied.** Both sets are
-template-built. Dev and test share **0** scene tails, but where any prompt texts
-share a template the bootstrap's prompt clusters are not fully independent and
-intervals are mildly optimistic. That limitation applies to the pilot set too;
-see `disjointness_report.json`.
+template-built. Dev and test share **0** scene tails. Dependence *within* a
+scene — its two family wordings and its four generation seeds — is absorbed by
+making the scene cluster the bootstrap's resampling unit (§6). Dependence from a
+template shared *across* clusters is not absorbed, and the test set has one: all
+**70** literal prompts open with `"a photo of a"`. **The direction and size of
+its effect on interval width are not established, and no claim is made about
+them** — the earlier "mildly optimistic" wording was an unsupported assurance.
+The same limitation applies to the pilot set (3 cross-cluster templates over 13
+texts); see `disjointness_report.json` and `bootstrap_grouping.json`.
 
 The test manifest is **frozen and hashed before the development stage begins**,
 so selection cannot reach it.
@@ -229,13 +234,49 @@ t=0.5, where `U*` is the selected matched unregularised dump.
   parent-referenced change kept distinct;
 - thresholds 0.3 / 0.5 / 0.7, with 0.5 primary.
 
-**Uncertainty.** Conditional paired prompt-cluster bootstrap: resample **prompt
-texts** carrying their four generation seeds together; one resampled list indexes
-both arms; 10 000 draws; 95% percentile intervals. **Training seeds are analysed
-separately and never pooled.** These intervals are conditional on this base
-model, these concepts, these anchors, these prompts and this detector — they are
-**not** broad inference, and two training runs support a **direction check
-only**.
+**Uncertainty — conditional paired cluster bootstrap, frozen in full.** The
+grouping is derived from the actual manifests and recorded in
+[`bootstrap_grouping.json`](../../results/audit_v1/draft_manifests/bootstrap_grouping.json)
+(identity `2ba0e8df5034d011…`), so it is fixed before any data exist rather than
+chosen during analysis.
+
+| element | frozen value |
+|---|---|
+| resampling **unit** | the **scene cluster** `(set, category, prompt_index)` |
+| what the unit carries | **both** family wordings (literal *and* paraphrase) of that scene **and all four generation seeds**, moved together |
+| **stratum** | **category**; clusters drawn with replacement within each stratum, that stratum's own cluster count per draw |
+| pairing | **one** resampled cluster list indexes **both arms** and every endpoint in a draw; contrasts paired at identical `(prompt_id, gen_seed)` |
+| draws | **10 000** |
+| interval | 95% **percentile** interval |
+| **RNG** | `numpy.random.default_rng(2026100901)`, recorded; strata in sorted category order, `rng.integers(0, n_k, size=n_k)` per stratum per draw, draws 0…9999 |
+
+Why the unit is the scene cluster and not the prompt text: `literal_i` and
+`paraphrase_i` of a category are **the same scene worded two ways**, by
+construction, and the four generation seeds are four draws of one prompt.
+Resampling prompt *texts* would treat a dependent pair as two independent
+observations. Resampling *clusters* does not.
+
+**Literal/paraphrase strata are preserved exactly**, because every cluster
+contributes both wordings — verified: both families present in **every** cluster
+of dev (10), test (70) and the pilot set (35). The literal-only and
+paraphrase-only endpoints are recomputed on the **same** resampled cluster list,
+restricted to that family's rows, which is what keeps them paired with each
+other, with the per-category endpoints and with both arms.
+
+**Training seeds are analysed separately and never pooled.** Each gets its own
+intervals; two training runs support a **direction check only**.
+
+**Residual template dependence — measured, not characterised.** Clustering
+absorbs dependence *within* a scene cluster. It does **not** absorb dependence
+from a template shared *across* clusters, and the test set has one: all **70**
+literal prompts open with `"a photo of a"`, spanning all 70 clusters (pilot set:
+3 such templates over 13 texts). **Neither the direction nor the size of that
+residual effect on interval width is established by this design, and none is
+claimed.** The earlier wording — that such dependence makes the intervals merely
+"mildly optimistic" — was an unsupported assurance and is withdrawn.
+
+These intervals are conditional on this base model, these concepts, these
+anchors, these prompts and this detector. They are **not** broad inference.
 
 ## 7. Decision rule — a prespecified material effect size
 
@@ -402,11 +443,28 @@ the validator divided the two back). So for all ten runs:
   reached 1000 optimizer steps beyond the request itself and the progress output
   in the logs.
 
-`SEQ_LEGACY_TRAIN_SEEDS="17 29"` declares this explicitly;
-`--steps_evidence legacy_optional` accepts the counter's absence and reports
-`training_completion_verified: false`. **Nothing was backfilled**, and the
-policy exists so that a missing historic counter cannot silently trigger
-retraining or replacement of the saved pilot.
+The exception is scoped to **those exact ten artifacts**, by content:
+[`configs/legacy_training_artifacts.json`](../../configs/legacy_training_artifacts.json)
+records each one's `train_report.json` sha256 **and** its `delta.bin` sha256 with
+explicit provenance, and `--steps_evidence legacy_optional` then accepts the
+counter's absence and reports `training_completion_verified: false`. **Nothing
+was backfilled**, and the policy exists so a missing historic counter cannot
+silently trigger retraining or replacement of the saved pilot — the launcher
+additionally **refuses to retrain over a registered checkpoint** whatever state
+its report is in.
+
+**This matters for this proposal specifically.** The two new unregularised
+trajectories use seeds **17 and 29** — the saved pilot's seed numbers. The
+previous policy was a list of seed NUMBERS (`SEQ_LEGACY_TRAIN_SEEDS="17 29"`),
+so it would have exempted these new runs from completion validation as well.
+Under the artifact-identity policy a newly produced run cannot match the
+registry, and **its completed-step counter is required** regardless of seed or
+directory label. A counter that is present but short fails in both policies.
+
+Terminal progress output in the saved logs is a **separate, weaker** line of
+evidence, inspected on CPU and reported in
+[`TRAINING_LOG_INSPECTION.md`](../../results/audit_v1/TRAINING_LOG_INSPECTION.md).
+It is not a counter and no counter has been derived from it.
 
 **What this means for the proposal.** The reused parents and L2 arms are the
 pilot's, so their step completion inherits this gap. The two NEW unregularised

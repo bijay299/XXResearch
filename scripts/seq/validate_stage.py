@@ -107,7 +107,15 @@ def canonical_manifest_digest(man: dict) -> str:
 
 
 def _base_model_cheap_identity(base: Path, contract: dict) -> str | None:
-    """Recompute the backbone's cheap identity exactly as the contract defines it."""
+    """Recompute the backbone's PARTIAL identity exactly as the contract defines it.
+
+    This hashes the small configuration files and records the weight files'
+    BYTE LENGTHS. It does not hash the weights. A mutation of the weight bytes
+    that preserves file length therefore leaves this value unchanged -- it is a
+    partial identity check, not verification of the backbone's contents. The
+    full weight digest lives in the contract's ``weight_sha256`` and is compared
+    only by ``--verify_base_model_weight_sha``.
+    """
     payload = contract.get("cheap_identity_payload") or {}
     cheap, sizes = {}, {}
     for rel in (payload.get("cheap_identity_files") or {}):
@@ -605,18 +613,52 @@ def validate_evaluation(args) -> Result:
                 if want_dir and got_dir != want_dir:
                     r.bad(f"M0 was generated from base model {got_dir!r}, "
                           f"contract declares {want_dir!r}")
+                # ---- base-model identity: what is actually checked, and what is
+                # not. The cheap identity hashes the small CONFIG files and the
+                # weight files' BYTE LENGTHS; it does not hash the weights, so a
+                # same-size weight mutation passes it. Saying so here keeps the
+                # recorded verdict from overstating itself.
                 if args.verify_base_model:
                     ident = _base_model_cheap_identity(Path(want_dir), bm)
                     if ident != bm.get("cheap_identity_sha256"):
-                        r.bad(f"base-model identity {str(ident)[:12]}… != contract "
-                              f"{str(bm.get('cheap_identity_sha256'))[:12]}…: the "
-                              f"backbone on disk has changed")
+                        r.bad(f"base-model partial identity {str(ident)[:12]}… != "
+                              f"contract {str(bm.get('cheap_identity_sha256'))[:12]}…: "
+                              f"the backbone's config files or weight file sizes "
+                              f"have changed")
                     else:
-                        r.info["base_model_identity"] = "verified"
+                        r.info["base_model_identity"] = (
+                            "PARTIAL: config-file digests and weight-file byte "
+                            "lengths match the contract. The weight CONTENTS were "
+                            "not hashed, so a same-size weight mutation would pass "
+                            "this check; pass --verify_base_model_weight_sha for "
+                            "the full weight digest.")
                 else:
                     r.info["base_model_identity"] = (
-                        f"declared via contract ({str(bm.get('cheap_identity_sha256'))[:12]}…); "
-                        f"pass --verify_base_model to re-hash the backbone")
+                        f"DECLARED, not verified: taken from the contract "
+                        f"({str(bm.get('cheap_identity_sha256'))[:12]}…). Pass "
+                        f"--verify_base_model to recompute the PARTIAL identity "
+                        f"(config digests + weight file sizes), or "
+                        f"--verify_base_model_weight_sha to hash the weights.")
+                if args.verify_base_model_weight_sha:
+                    want_w = bm.get("weight_sha256") or {}
+                    if not want_w:
+                        r.cannot("contract carries no weight_sha256, so the "
+                                 "backbone's weight contents cannot be verified")
+                    else:
+                        mism = []
+                        for rel, want_h in want_w.items():
+                            p = Path(want_dir) / rel
+                            if not p.is_file():
+                                mism.append(f"{rel}: absent")
+                            elif sha256_file(p) != want_h:
+                                mism.append(f"{rel}: content digest differs")
+                        if mism:
+                            r.bad(f"base-model weight contents do not match the "
+                                  f"contract: {mism}")
+                        else:
+                            r.info["base_model_weight_sha256"] = (
+                                f"VERIFIED: {len(want_w)} weight file(s) hashed in "
+                                f"full and matching the contract")
                 r.info["m0_policy"] = (
                     f"no delta applied; shared evaluation counted once "
                     f"({pol.get('shared_evaluation', 'see contract')[:48]}…)")
@@ -773,7 +815,18 @@ def main() -> int:
     ap.add_argument("--base_model_contract", default="configs/base_model_contract.json",
                     help="base-model identity contract, used for the M0 policy")
     ap.add_argument("--verify_base_model", action="store_true",
-                    help="re-hash the backbone's identity files (slower)")
+                    help="recompute the backbone's PARTIAL identity: digests of "
+                         "the small config files plus the weight files' byte "
+                         "LENGTHS. The weight contents are NOT hashed, so a "
+                         "same-size weight mutation passes. This is not full "
+                         "backbone verification.")
+    ap.add_argument("--verify_base_model_weight_sha", action="store_true",
+                    help="additionally hash the backbone's weight files IN FULL "
+                         "and compare against the contract's weight_sha256. This "
+                         "is the complete content check. It reads ~3.4 GB per "
+                         "invocation, so neither launcher enables it per "
+                         "evaluation; see the launch-time policy in "
+                         "configs/base_model_contract.json.")
     ap.add_argument("--expect_records", type=int, default=None)
     ap.add_argument("--expect_prompt_texts", type=int, default=None)
     ap.add_argument("--steps_evidence", choices=["counter", "legacy_optional"],

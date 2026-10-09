@@ -34,7 +34,9 @@ done
 # Frozen expected identity from CONFIGURATION, not from the manifest being
 # validated.
 MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:?SEQ_EVAL_MANIFEST_SHA must be set}"
-STEPS_EVIDENCE="$(seq_steps_evidence "$SEED")"
+# This script validates EVALUATIONS only; the completed-step policy belongs to
+# training validation, is decided per artifact in run_seed.sh, and is not
+# consulted here. It used to be computed per SEED at this point and never used.
 
 ckpt_sha() {   # ckpt_sha <name>
     local f="${MODELS}/$1/delta.bin"

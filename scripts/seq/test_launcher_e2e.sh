@@ -588,36 +588,172 @@ want_rc "400-of-1000 completed steps rejected" 1 "$RC"
 want_out "names the incomplete trajectory" "${ROOT}/t15b.log" "did not complete"
 
 echo
-echo "=== 15c. a missing completed-step counter is rejected for a NON-legacy seed ==="
-# Seed 29 is on the DEFAULT legacy list (SEQ_LEGACY_TRAIN_SEEDS="17 29"), which
-# is correct for the saved pilot. Point the list at a seed that is NOT 29 so
-# this run is treated as new and the strict 'counter' policy is under test.
-# (An empty string would not work: exp_config.sh uses ${VAR:-default}, which
-# substitutes the default on empty as well as unset.)
+echo "=== 15c. a NEW seed-29 output with no counter is rejected under DEFAULTS ==="
+# Seed 29 is a saved-pilot seed number, and the proposed new trajectories use it
+# too. Under the old seed-list policy this run inherited the legacy exception and
+# passed with no counter at all. The policy is now bound to saved ARTIFACT
+# identities, so a freshly produced seed-29 output cannot match and its counter
+# is required. No environment override is needed to make that true.
 reset_seed 29
-SEQ_LEGACY_TRAIN_SEEDS="99" MOCK_TRAIN_BREAK="no_counter" \
-    run_seed 29 "${ROOT}/t15c.log"; RC=$?
-want_rc "absent counter rejected when the seed is not declared legacy" 1 "$RC"
+MOCK_TRAIN_BREAK="no_counter" run_seed 29 "${ROOT}/t15c.log"; RC=$?
+want_rc "a fresh seed-29 output with no counter is rejected by default" 1 "$RC"
 want_out "says completion cannot be evidenced" "${ROOT}/t15c.log" "cannot be evidenced"
 want_out "points at the explicit legacy option" "${ROOT}/t15c.log" "legacy_optional"
+want_not "the legacy exception was NOT applied" "${ROOT}/t15c.log" "[legacy] MA"
 
 echo
-echo "=== 15c2. a short counter is rejected EVEN under the legacy policy ==="
+echo "=== 15c2. a short counter is rejected under DEFAULTS ==="
 reset_seed 29
-SEQ_LEGACY_TRAIN_SEEDS="29" MOCK_TRAIN_BREAK="short_counter" \
-    run_seed 29 "${ROOT}/t15c2.log"; RC=$?
-want_rc "legacy policy cannot wave through a present-but-short counter" 1 "$RC"
+MOCK_TRAIN_BREAK="short_counter" run_seed 29 "${ROOT}/t15c2.log"; RC=$?
+want_rc "a present-but-short counter is rejected" 1 "$RC"
 want_out "names the incomplete trajectory" "${ROOT}/t15c2.log" "did not complete"
 
 echo
-echo "=== 15d. declared-legacy seed accepts an absent counter, structurally ==="
+echo "=== 15c3. a NEW seed-17 output with no counter is rejected under DEFAULTS ==="
+# The same test for the other saved-pilot seed number, in its own isolated
+# evaluation directory so the seed-17 legacy/new layout policy is not involved.
+rm -rf "${SEQ}/models/seed17" "${SEQ}/eval_seed17_probe" "${SEQ}/logs/seed17"
+SEQ_EVAL_ROOT_OVERRIDE="${SEQ}/eval_seed17_probe" MOCK_TRAIN_BREAK="no_counter" \
+    run_seed 17 "${ROOT}/t15c3.log"; RC=$?
+want_rc "a fresh seed-17 output with no counter is rejected by default" 1 "$RC"
+want_out "says completion cannot be evidenced" "${ROOT}/t15c3.log" "cannot be evidenced"
+want_not "the legacy exception was NOT applied" "${ROOT}/t15c3.log" "[legacy] MA"
+rm -rf "${SEQ}/models/seed17" "${SEQ}/eval_seed17_probe" "${SEQ}/logs/seed17"
+
+# A fixture registry, built from whatever artifacts are on disk. It stands in for
+# configs/legacy_training_artifacts.json, which registers the REAL saved pilot
+# and can never match a mock artifact.
+make_legacy_registry() {   # make_legacy_registry <out> <models_root> <ck...>
+    "$MOCK_PY" - "$@" <<'PY'
+import hashlib, json, sys
+from pathlib import Path
+out, mroot, cks = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3:]
+def h(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+arts = [{"id": f"fixture/{ck}", "training_seed": 29, "checkpoint": ck,
+         "train_report_sha256": h(mroot / ck / "train_report.json"),
+         "delta_sha256": h(mroot / ck / "delta.bin"),
+         "in_repo_report_copy": f"results/seq29/train/{ck}.json",
+         "in_repo_report_copy_sha256": None,
+         "provenance": {"produced_by": "E2E fixture, not real saved evidence",
+                        "saved_path": str(mroot / ck / "train_report.json")}}
+        for ck in cks]
+out.write_text(json.dumps({"artifacts": arts}, indent=2))
+print(f"fixture registry: {len(arts)} artifact(s)")
+PY
+}
+strip_counter() {   # strip_counter <models_root> <ck>
+    "$MOCK_PY" - "$1" "$2" <<'PY'
+import json, sys
+from pathlib import Path
+p = Path(sys.argv[1]) / sys.argv[2] / "train_report.json"
+d = json.loads(p.read_text())
+d["runtime"].pop("optimizer_steps_completed", None)
+d["runtime"].pop("optimizer_steps_source", None)
+p.write_text(json.dumps(d, indent=2))
+PY
+}
+
+echo
+echo "=== 15d. a REGISTERED saved artifact accepts an absent counter ==="
+# This is the only thing the legacy exception is allowed to cover: an artifact
+# whose report AND checkpoint hashes are registered. Structural validation still
+# applies in full, completion is reported UNVERIFIED, and nothing is retrained.
 reset_seed 29
-SEQ_LEGACY_TRAIN_SEEDS="29" MOCK_TRAIN_BREAK="no_counter" \
+run_seed 29 /dev/null 2>&1
+strip_counter "${SEQ}/models/seed29" MA
+make_legacy_registry "${ROOT}/legacy_fixture.json" "${SEQ}/models/seed29" MA
+SEQ_LEGACY_ARTIFACT_REGISTRY="${ROOT}/legacy_fixture.json" \
     run_seed 29 "${ROOT}/t15d.log"; RC=$?
-want_rc "declared legacy seed still completes" 0 "$RC"
-want_out "announces the legacy policy" "${ROOT}/t15d.log" "declared LEGACY"
+want_rc "a registered saved artifact still completes" 0 "$RC"
+want_out "names the registered artifact" "${ROOT}/t15d.log" \
+    "registered saved pilot artifact"
 want_out "records completion as unverified" "${ROOT}/t15d.log" "UNVERIFIED"
-want_not "no retraining was implied" "${ROOT}/t15d.log" "[FAIL]"
+want_not "MA was not retrained" "${ROOT}/t15d.log" "[train] seed29 MA "
+want_not "nothing failed" "${ROOT}/t15d.log" "[FAIL]"
+
+echo
+echo "=== 15d2. a CHANGED artifact bearing a registered name is not exempt ==="
+# Its report no longer matches the registry, so the completed-step counter is
+# required again -- and because its delta.bin IS still registered saved
+# evidence, the launcher refuses to retrain over it rather than destroying it.
+"$MOCK_PY" - "${SEQ}/models/seed29/MA/train_report.json" <<'PY'
+import json, sys
+from pathlib import Path
+p = Path(sys.argv[1]); d = json.loads(p.read_text())
+d["note_added_after_registration"] = "this report is no longer the saved bytes"
+p.write_text(json.dumps(d, indent=2))
+PY
+rm -f "${SEQ}/models/seed29/MA/_stage_complete.json"
+SEQ_LEGACY_ARTIFACT_REGISTRY="${ROOT}/legacy_fixture.json" \
+    run_seed 29 "${ROOT}/t15d2.log"; RC=$?
+want_rc "a changed legacy-named artifact is rejected" 1 "$RC"
+want_out "says the identity differs from the registered artifact" "${ROOT}/t15d2.log" \
+    "identity differs"
+want_out "refuses to retrain over saved evidence" "${ROOT}/t15d2.log" \
+    "REGISTERED saved pilot checkpoint"
+want_out "promises not to replace it" "${ROOT}/t15d2.log" "Refusing to retrain"
+want_not "no retraining happened" "${ROOT}/t15d2.log" "[train] seed29 MA "
+
+echo
+echo "=== 15d3. the completed-step policy reads artifacts, not seed numbers ==="
+POL() {  # POL <registry> <models_root> <ck>
+    PATH="${BIN}:$PATH" SEQ_LEGACY_ARTIFACT_REGISTRY="$1" bash -c \
+        "source ${REPO}/scripts/seq/exp_config.sh; seq_steps_evidence_full '$2' '$3'" \
+        2>/dev/null
+}
+reset_seed 29
+run_seed 29 /dev/null 2>&1
+strip_counter "${SEQ}/models/seed29" MA
+make_legacy_registry "${ROOT}/legacy_fixture2.json" "${SEQ}/models/seed29" MA
+OUT="$(POL "${ROOT}/legacy_fixture2.json" "${SEQ}/models/seed29" MA)"
+case "$OUT" in legacy_optional*) ok "a registered artifact -> legacy_optional";;
+  *) bad "registered artifact policy" "$OUT";; esac
+# An EXPLICITLY EMPTY configuration removes every exception, as documented. The
+# old ${VAR:-default} form silently restored the default on an empty value.
+OUT="$(POL "" "${SEQ}/models/seed29" MA)"
+case "$OUT" in counter*) ok "an explicitly EMPTY registry -> counter, no exception";;
+  *) bad "empty registry policy" "$OUT";; esac
+# The real committed registry registers the real saved pilot only, so a mock
+# artifact under the same checkpoint name is held to the strict policy.
+OUT="$(POL "${REPO}/configs/legacy_training_artifacts.json" "${SEQ}/models/seed29" MA)"
+case "$OUT" in counter*) ok "a mock artifact against the REAL registry -> counter";;
+  *) bad "real registry policy" "$OUT";; esac
+OUT="$(POL "${ROOT}/does_not_exist.json" "${SEQ}/models/seed29" MA)"
+case "$OUT" in counter*) ok "an absent registry -> counter (fails closed)";;
+  *) bad "absent registry policy" "$OUT";; esac
+echo '{ not json' > "${ROOT}/broken_registry.json"
+OUT="$(POL "${ROOT}/broken_registry.json" "${SEQ}/models/seed29" MA)"
+case "$OUT" in counter*) ok "a malformed registry -> counter (fails closed)";;
+  *) bad "malformed registry policy" "$OUT";; esac
+# MAB's artifacts are not registered at all, even though the fixture registers
+# MA from the same seed and the same directory.
+OUT="$(POL "${ROOT}/legacy_fixture2.json" "${SEQ}/models/seed29" MAB)"
+case "$OUT" in counter*) ok "an unregistered sibling -> counter";;
+  *) bad "sibling policy" "$OUT";; esac
+
+echo
+echo "=== 15d4. a short counter is rejected EVEN for a registered artifact ==="
+# Build a VALID run first, then shorten MA's counter in place and register the
+# shortened artifact. (Running with MOCK_TRAIN_BREAK=short_counter would leave
+# no train_report.json to register: the launcher quarantines the invalid one.)
+reset_seed 29
+run_seed 29 /dev/null 2>&1
+"$MOCK_PY" - "${SEQ}/models/seed29/MA/train_report.json" <<'PY'
+import json, sys
+from pathlib import Path
+p = Path(sys.argv[1]); d = json.loads(p.read_text())
+d["runtime"]["optimizer_steps_completed"] = 400
+p.write_text(json.dumps(d, indent=2))
+PY
+make_legacy_registry "${ROOT}/legacy_fixture3.json" "${SEQ}/models/seed29" MA
+rm -f "${SEQ}/models/seed29/MA/_stage_complete.json"
+OUT="$(POL "${ROOT}/legacy_fixture3.json" "${SEQ}/models/seed29" MA)"
+case "$OUT" in legacy_optional*) ok "the fixture artifact is registered";;
+  *) bad "fixture registration" "$OUT";; esac
+SEQ_LEGACY_ARTIFACT_REGISTRY="${ROOT}/legacy_fixture3.json" \
+    run_seed 29 "${ROOT}/t15d4.log"; RC=$?
+want_rc "the exception cannot wave through a short counter" 1 "$RC"
+want_out "names the incomplete trajectory" "${ROOT}/t15d4.log" "did not complete"
 
 echo
 echo "=== 15e. stale generation hash rejected in BOTH paths ==="

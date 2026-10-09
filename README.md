@@ -13,7 +13,7 @@ launch scripts, validators, measurements and notes.
 
 ## Current status (2026-10-09)
 
-> **Latest: AUDIT-01 / 01b** re-derived the two-seed SD-1.5 sequential pilot
+> **Latest: AUDIT-01 / 01b / 01c / 01d** re-derived the two-seed SD-1.5 sequential pilot
 > snapshot `a9de625` from raw per-image predictions. Arithmetic and completeness
 > verified exactly (0 mismatches over 1026 values; 0 duplicate and 0 missing
 > rows). Nine **narrative** claims were corrected, then eight further
@@ -33,10 +33,24 @@ launch scripts, validators, measurements and notes.
 > ([`scripts/seq/validate_stage.py`](scripts/seq/validate_stage.py)), not by file
 > existence or row counts: the earlier guards accepted a `delta.bin` holding
 > plain text and a `detections.jsonl` of 280 identical or 280 malformed rows.
-> Three CPU suites cover it — **181 assertions**: 35 regression checks, 78
-> validator checks (including revalidation of all 22 real saved artifacts), and
-> 68 end-to-end orchestration checks over 18 groups — with every GPU command
-> mocked.
+> Four CPU suites cover it — **411 assertions, 0 failures**: 93 regression
+> checks, 57 image-provenance checks, 156 validator checks (including
+> revalidation of all 22 real saved artifacts) and 105 end-to-end orchestration
+> checks over 30 groups — with every GPU command mocked.
+>
+> **AUDIT-01d** closed two guarantees AUDIT-01c had claimed and corrected two
+> overstatements —
+> [`CLAIM_CORRECTIONS_V3.md`](results/audit_v1/CLAIM_CORRECTIONS_V3.md).
+> (1) Binding an evaluation's *metadata* to its checkpoint did not bind its
+> *pixels*: a failed evaluation's images were reused by pathname alone and
+> relabelled under the new checkpoint's hash. Reuse is now gated on verified
+> provenance and fails **before any model loads**. (2) The completed-step
+> exception was a list of training-seed *numbers*, so new runs using seeds 17 or
+> 29 — the seeds the proposed diagnostic uses — inherited it; it is now bound to
+> the exact ten saved artifacts by content. Also: `--verify_base_model` is
+> described as the **partial** identity check it is, and the protocol's
+> uncertainty specification is restored with the bootstrap grouping frozen from
+> the actual manifests. **No GPU work occurred.**
 >
 > **No human annotation has been performed** anywhere in this project. A
 > 236-item blinded packet is built and empty; detector validity is unmeasured.
@@ -47,6 +61,7 @@ launch scripts, validators, measurements and notes.
 | **SD-1.5 sequential pilot, seeds 17 and 29** | **done — exploratory**; numbers verified by AUDIT-01, narrative corrected |
 | **AUDIT-01 evidence audit and claim corrections** | **done** |
 | **AUDIT-01b execution checks, contract validation, CPU test suites** | **done** |
+| **AUDIT-01d image-reuse provenance, artifact-scoped completion policy, claim corrections** | **done** |
 | **Matched-effectiveness protocol (bounded) + frozen draft manifests** | **proposed, pending review — not approved** |
 | **Human evaluator audit** | **packet built, NOT annotated** |
 | Isolated environment, versions pinned to upstream `env.yaml` | **done** |

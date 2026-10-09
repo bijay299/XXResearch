@@ -271,10 +271,21 @@ identity is the **base model**. `configs/base_model_contract.json` declares the
 backbone path, a cheap content identity (config digests plus weight sizes) and
 the full UNet weight hash. M0 validation asserts: no delta applied, no
 `unet_ckpt`, **no** recorded delta hash, the declared `base_model_dir`, and —
-with `--verify_base_model` — the recomputed backbone identity. The
+with `--verify_base_model` — the recomputed **cheap** backbone identity. The
 shared-evaluation policy (generated once, reused by symlink, declared with
 `--allow_shared_images`, counted once) is written into that contract rather
 than left implicit.
+
+> **Correction (AUDIT-01d).** This sentence originally read "the recomputed
+> backbone identity", which reads as full backbone verification. It is **not**.
+> `--verify_base_model` hashes the five small config files and the weight files'
+> **byte lengths**; it never hashes the weight bytes, so a same-size weight
+> mutation passes it — the review reproduced exactly that on CPU. The full weight
+> digest is recorded in the contract but compared only under the new
+> `--verify_base_model_weight_sha`, which neither launcher enables per
+> evaluation. The exact launch-time policy and its limits now live in
+> `configs/base_model_contract.json` → `identity_policy`. See
+> [`CLAIM_CORRECTIONS_V3.md`](CLAIM_CORRECTIONS_V3.md) §W1.
 
 ## C2 — the completed-step check was circular
 
@@ -305,6 +316,17 @@ is correct: the evidence genuinely is not there.
 - Those seeds validate with `--steps_evidence legacy_optional`, which accepts
   the counter's absence, passes **structural** validation in full, and reports
   `training_completion_verified: false` with the gap named.
+
+> **Correction (AUDIT-01d).** Declaring the exception by **seed number** was
+> wrong. A seed number is not a property of saved evidence: a brand-new run
+> using seed 17 or 29 inherited the same exception and could pass completion
+> validation with no counter at all — and the proposed new unregularised
+> trajectories use exactly those two seeds. `SEQ_LEGACY_TRAIN_SEEDS` is gone. The
+> exception is now bound to the **exact ten saved artifacts by content**
+> (`configs/legacy_training_artifacts.json`: each `train_report.json` sha256 plus
+> its `delta.bin` sha256, with provenance), so a newly produced output can never
+> match and its counter is always required. See
+> [`CLAIM_CORRECTIONS_V3.md`](CLAIM_CORRECTIONS_V3.md) §W2.
 - **No counter was backfilled**, and the legacy policy exists specifically so a
   missing historic counter cannot silently trigger retraining or replacement of
   the saved pilot.

@@ -1,0 +1,2954 @@
+{
+  "_contract": "The FROZEN bootstrap resampling grouping for the matched-effectiveness diagnostic. Derived from the actual manifests, not asserted. Fixed before any data are collected.",
+  "resampling_unit": {
+    "definition": "the scene cluster (set, category, prompt_index)",
+    "carries": "both prompt families (literal and paraphrase) of that scene AND all four generation seeds, moved together as one unit",
+    "why": "literal_i and paraphrase_i of a category are the same scene worded two ways, by construction. Drawing them independently would treat a dependent pair as two independent observations. Generation seeds are four draws of the same prompt and are likewise not independent observations of the prompt."
+  },
+  "stratification": {
+    "stratum": "category",
+    "rule": "draw clusters WITH REPLACEMENT within each category stratum, taking the same number of clusters that stratum actually has, so every draw preserves the category composition exactly",
+    "literal_vs_paraphrase": "preserved exactly, because every cluster contributes both family wordings. The literal-only and paraphrase-only endpoints are computed on the SAME resampled cluster list, restricted to the rows of that family -- so they stay paired with each other, with the per-category endpoints, and with both arms."
+  },
+  "pairing": "ONE resampled cluster list indexes BOTH arms and every endpoint in a draw. Contrasts are paired at identical (prompt_id, gen_seed).",
+  "n_draws": 10000,
+  "interval": "95% percentile interval over the draws",
+  "rng": {
+    "bootstrap_rng_seed": 2026100901,
+    "generator": "numpy.random.default_rng(bootstrap_rng_seed)",
+    "draw_order": "strata in sorted category order; within a stratum, rng.integers(0, n_clusters_in_stratum, size=n_clusters_in_stratum) per draw; draws taken in order 0..9999",
+    "distinct_from": "the annotation packet's stratified sampler, rng_seed=20261009. The two must never be conflated."
+  },
+  "training_seeds": "analysed SEPARATELY and never pooled. Each training seed gets its own intervals; two seeds support a direction check only.",
+  "sets": {
+    "dev": {
+      "set": "dev",
+      "manifest_content_sha256": "1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b",
+      "n_rows": 80,
+      "n_clusters": 10,
+      "n_distinct_prompt_texts": 20,
+      "gen_seeds": [
+        511,
+        622,
+        733,
+        844
+      ],
+      "strata_cluster_counts": {
+        "dog": 10
+      },
+      "family_row_counts": {
+        "literal": 40,
+        "paraphrase": 40
+      },
+      "rows_per_cluster_distribution": {
+        "8": 10
+      },
+      "families_per_cluster_distribution": {
+        "2": 10
+      },
+      "gen_seeds_per_cluster_distribution": {
+        "4": 10
+      },
+      "every_cluster_carries_both_families": true,
+      "every_cluster_carries_all_gen_seeds": true,
+      "residual_shared_template_dependence": {
+        "definition": "prompt texts sharing their first 4 tokens, counted only where the sharing crosses cluster boundaries",
+        "n_cross_cluster_templates": 0,
+        "n_prompt_texts_in_cross_cluster_templates": 0,
+        "largest_cross_cluster_template": [
+          null,
+          0
+        ],
+        "examples": {},
+        "effect_on_intervals": "NOT ESTIMATED. Resampling clusters absorbs the dependence WITHIN a scene cluster (its two family wordings and its four generation seeds). It does not absorb dependence induced by a template shared ACROSS clusters. Neither the direction nor the size of that residual effect on interval width is established by this design, and none is claimed. It is reported as an un-quantified limitation of template-built prompt sets."
+      },
+      "clusters": [
+        {
+          "cluster_id": "dev:dog:0",
+          "stratum": "dog",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "dev_dog_literal_0",
+            "dev_dog_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_0": "a photograph of a dog resting on a tiled kitchen floor",
+            "dev_dog_paraphrase_0": "a loyal four-legged companion animal lying on warm tiles"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:1",
+          "stratum": "dog",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "dev_dog_literal_1",
+            "dev_dog_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_1": "a dog standing alert in tall dry grass",
+            "dev_dog_paraphrase_1": "the household pet that barks, alert in dry grass"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:2",
+          "stratum": "dog",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "dev_dog_literal_2",
+            "dev_dog_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_2": "a close view of a dog drinking from a metal bowl",
+            "dev_dog_paraphrase_2": "a furry domesticated canine lapping water from a bowl"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:3",
+          "stratum": "dog",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "dev_dog_literal_3",
+            "dev_dog_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_3": "a dog curled asleep on a folded woollen blanket",
+            "dev_dog_paraphrase_3": "a sleeping pet with a wagging tail on a woollen blanket"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:4",
+          "stratum": "dog",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "dev_dog_literal_4",
+            "dev_dog_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_4": "a dog shaking water from its coat beside a lake",
+            "dev_dog_paraphrase_4": "a shaggy animal flinging droplets from its fur by a lake"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:5",
+          "stratum": "dog",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "dev_dog_literal_5",
+            "dev_dog_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_5": "a dog waiting at the foot of a wooden staircase",
+            "dev_dog_paraphrase_5": "a patient family pet waiting at the bottom of the stairs"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:6",
+          "stratum": "dog",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "dev_dog_literal_6",
+            "dev_dog_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_6": "a dog carrying a rolled newspaper along a path",
+            "dev_dog_paraphrase_6": "an eager animal companion fetching a rolled paper"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:7",
+          "stratum": "dog",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "dev_dog_literal_7",
+            "dev_dog_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_7": "a dog seated beside a bicycle wheel on a driveway",
+            "dev_dog_paraphrase_7": "a tail-wagging pet sitting next to a bicycle wheel"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:8",
+          "stratum": "dog",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "dev_dog_literal_8",
+            "dev_dog_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_8": "a dog looking out through a rain-streaked window",
+            "dev_dog_paraphrase_8": "a damp-nosed household animal watching through wet glass"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "dev:dog:9",
+          "stratum": "dog",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "dev_dog_literal_9",
+            "dev_dog_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "dev_dog_literal_9": "a dog trotting across a shallow stream",
+            "dev_dog_paraphrase_9": "a bounding four-legged pet splashing through a stream"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            511,
+            622,
+            733,
+            844
+          ],
+          "n_rows": 8
+        }
+      ]
+    },
+    "test": {
+      "set": "test",
+      "manifest_content_sha256": "5dd87dbb5a77c0f4c75de79a19b15b0b2e9cddc90d08172857700dac1bcc2a95",
+      "n_rows": 560,
+      "n_clusters": 70,
+      "n_distinct_prompt_texts": 140,
+      "gen_seeds": [
+        1301,
+        1402,
+        1503,
+        1604
+      ],
+      "strata_cluster_counts": {
+        "bicycle": 10,
+        "bird": 10,
+        "cat": 10,
+        "chair": 10,
+        "dog": 10,
+        "horse": 10,
+        "sandwich": 10
+      },
+      "family_row_counts": {
+        "literal": 280,
+        "paraphrase": 280
+      },
+      "rows_per_cluster_distribution": {
+        "8": 70
+      },
+      "families_per_cluster_distribution": {
+        "2": 70
+      },
+      "gen_seeds_per_cluster_distribution": {
+        "4": 70
+      },
+      "every_cluster_carries_both_families": true,
+      "every_cluster_carries_all_gen_seeds": true,
+      "residual_shared_template_dependence": {
+        "definition": "prompt texts sharing their first 4 tokens, counted only where the sharing crosses cluster boundaries",
+        "n_cross_cluster_templates": 1,
+        "n_prompt_texts_in_cross_cluster_templates": 70,
+        "largest_cross_cluster_template": [
+          "a photo of a",
+          70
+        ],
+        "examples": {
+          "a photo of a": [
+            "test:bicycle:0",
+            "test:bicycle:1",
+            "test:bicycle:2",
+            "test:bicycle:3"
+          ]
+        },
+        "effect_on_intervals": "NOT ESTIMATED. Resampling clusters absorbs the dependence WITHIN a scene cluster (its two family wordings and its four generation seeds). It does not absorb dependence induced by a template shared ACROSS clusters. Neither the direction nor the size of that residual effect on interval width is established by this design, and none is claimed. It is reported as an un-quantified limitation of template-built prompt sets."
+      },
+      "clusters": [
+        {
+          "cluster_id": "test:bicycle:0",
+          "stratum": "bicycle",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "test_bicycle_literal_0",
+            "test_bicycle_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_0": "a photo of a bicycle against a graffitied wall",
+            "test_bicycle_paraphrase_0": "a two-wheeled pedal machine against a graffitied wall"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:1",
+          "stratum": "bicycle",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "test_bicycle_literal_1",
+            "test_bicycle_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_1": "a photo of a bicycle beside a canal railing",
+            "test_bicycle_paraphrase_1": "a pedal-driven two-wheeler beside a canal railing"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:2",
+          "stratum": "bicycle",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "test_bicycle_literal_2",
+            "test_bicycle_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_2": "a photo of a bicycle under a stone archway",
+            "test_bicycle_paraphrase_2": "a chain-driven pedal vehicle under a stone archway"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:3",
+          "stratum": "bicycle",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "test_bicycle_literal_3",
+            "test_bicycle_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_3": "a photo of a bicycle at a rack outside a shop",
+            "test_bicycle_paraphrase_3": "a two-wheeled rider's machine at a rack outside a shop"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:4",
+          "stratum": "bicycle",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "test_bicycle_literal_4",
+            "test_bicycle_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_4": "a photo of a bicycle beside a hedge in sunlight",
+            "test_bicycle_paraphrase_4": "a pedalled road vehicle beside a hedge in sunlight"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:5",
+          "stratum": "bicycle",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "test_bicycle_literal_5",
+            "test_bicycle_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_5": "a photo of a bicycle on a cobbled lane",
+            "test_bicycle_paraphrase_5": "a handlebarred two-wheeler on a cobbled lane"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:6",
+          "stratum": "bicycle",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "test_bicycle_literal_6",
+            "test_bicycle_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_6": "a photo of a bicycle against a lamp post",
+            "test_bicycle_paraphrase_6": "a spoke-wheeled pedal machine against a lamp post"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:7",
+          "stratum": "bicycle",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "test_bicycle_literal_7",
+            "test_bicycle_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_7": "a photo of a bicycle beside a wooden shed",
+            "test_bicycle_paraphrase_7": "a leaning pedal cycle beside a wooden shed"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:8",
+          "stratum": "bicycle",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "test_bicycle_literal_8",
+            "test_bicycle_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_8": "a photo of a bicycle at the edge of a playing field",
+            "test_bicycle_paraphrase_8": "a parked two-wheeled vehicle at the edge of a playing field"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bicycle:9",
+          "stratum": "bicycle",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "test_bicycle_literal_9",
+            "test_bicycle_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "test_bicycle_literal_9": "a photo of a bicycle under a railway bridge",
+            "test_bicycle_paraphrase_9": "a pedal-powered cycle under a railway bridge"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:0",
+          "stratum": "bird",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "test_bird_literal_0",
+            "test_bird_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_0": "a photo of a bird on a rusted weathervane",
+            "test_bird_paraphrase_0": "a small feathered flier on a rusted weathervane"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:1",
+          "stratum": "bird",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "test_bird_literal_1",
+            "test_bird_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_1": "a photo of a bird among reeds at a pond edge",
+            "test_bird_paraphrase_1": "a winged singing creature among reeds at a pond edge"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:2",
+          "stratum": "bird",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "test_bird_literal_2",
+            "test_bird_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_2": "a photo of a bird on a chimney pot",
+            "test_bird_paraphrase_2": "a beaked feathered animal on a chimney pot"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:3",
+          "stratum": "bird",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "test_bird_literal_3",
+            "test_bird_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_3": "a photo of a bird beside a scattering of crumbs",
+            "test_bird_paraphrase_3": "a perching winged creature beside a scattering of crumbs"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:4",
+          "stratum": "bird",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "test_bird_literal_4",
+            "test_bird_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_4": "a photo of a bird on a washing line",
+            "test_bird_paraphrase_4": "a feathered animal with folded wings on a washing line"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:5",
+          "stratum": "bird",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "test_bird_literal_5",
+            "test_bird_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_5": "a photo of a bird among apple blossom",
+            "test_bird_paraphrase_5": "a small beaked flier among apple blossom"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:6",
+          "stratum": "bird",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "test_bird_literal_6",
+            "test_bird_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_6": "a photo of a bird on a mooring post",
+            "test_bird_paraphrase_6": "a bright-feathered creature on a mooring post"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:7",
+          "stratum": "bird",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "test_bird_literal_7",
+            "test_bird_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_7": "a photo of a bird beside a puddle on tarmac",
+            "test_bird_paraphrase_7": "a hopping winged animal beside a puddle on tarmac"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:8",
+          "stratum": "bird",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "test_bird_literal_8",
+            "test_bird_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_8": "a photo of a bird on a stone wall",
+            "test_bird_paraphrase_8": "a preening feathered creature on a stone wall"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:bird:9",
+          "stratum": "bird",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "test_bird_literal_9",
+            "test_bird_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "test_bird_literal_9": "a photo of a bird among dry winter hedgerow",
+            "test_bird_paraphrase_9": "a calling winged animal among dry winter hedgerow"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:0",
+          "stratum": "cat",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "test_cat_literal_0",
+            "test_cat_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_0": "a photo of a cat on a library windowsill",
+            "test_cat_paraphrase_0": "a whiskered feline on a library windowsill"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:1",
+          "stratum": "cat",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "test_cat_literal_1",
+            "test_cat_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_1": "a photo of a cat among terracotta flowerpots",
+            "test_cat_paraphrase_1": "a small purring housepet among terracotta flowerpots"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:2",
+          "stratum": "cat",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "test_cat_literal_2",
+            "test_cat_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_2": "a photo of a cat beside a half-open suitcase",
+            "test_cat_paraphrase_2": "a soft-furred feline animal beside a half-open suitcase"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:3",
+          "stratum": "cat",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "test_cat_literal_3",
+            "test_cat_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_3": "a photo of a cat on a stack of newspapers",
+            "test_cat_paraphrase_3": "an agile whiskered creature on a stack of newspapers"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:4",
+          "stratum": "cat",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "test_cat_literal_4",
+            "test_cat_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_4": "a photo of a cat under a kitchen chair",
+            "test_cat_paraphrase_4": "a green-eyed feline under a kitchen chair"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:5",
+          "stratum": "cat",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "test_cat_literal_5",
+            "test_cat_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_5": "a photo of a cat on a worn leather armchair",
+            "test_cat_paraphrase_5": "a quiet feline companion on a worn leather armchair"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:6",
+          "stratum": "cat",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "test_cat_literal_6",
+            "test_cat_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_6": "a photo of a cat beside a wicker laundry basket",
+            "test_cat_paraphrase_6": "a slender whiskered animal beside a wicker laundry basket"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:7",
+          "stratum": "cat",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "test_cat_literal_7",
+            "test_cat_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_7": "a photo of a cat on a sunlit balcony rail",
+            "test_cat_paraphrase_7": "a padding feline pet on a sunlit balcony rail"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:8",
+          "stratum": "cat",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "test_cat_literal_8",
+            "test_cat_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_8": "a photo of a cat near an open garden gate",
+            "test_cat_paraphrase_8": "a curious whiskered creature near an open garden gate"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:cat:9",
+          "stratum": "cat",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "test_cat_literal_9",
+            "test_cat_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "test_cat_literal_9": "a photo of a cat on a patterned hallway rug",
+            "test_cat_paraphrase_9": "a crouching feline on a patterned hallway rug"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:0",
+          "stratum": "chair",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "test_chair_literal_0",
+            "test_chair_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_0": "a photo of a chair beside a shuttered window",
+            "test_chair_paraphrase_0": "a four-legged wooden seat beside a shuttered window"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:1",
+          "stratum": "chair",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "test_chair_literal_1",
+            "test_chair_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_1": "a photo of a chair on a cobbled terrace",
+            "test_chair_paraphrase_1": "a single upright seating piece on a cobbled terrace"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:2",
+          "stratum": "chair",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "test_chair_literal_2",
+            "test_chair_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_2": "a photo of a chair under a striped awning",
+            "test_chair_paraphrase_2": "a backed wooden seat under a striped awning"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:3",
+          "stratum": "chair",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "test_chair_literal_3",
+            "test_chair_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_3": "a photo of a chair beside a bare plaster wall",
+            "test_chair_paraphrase_3": "a plain household seat beside a bare plaster wall"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:4",
+          "stratum": "chair",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "test_chair_literal_4",
+            "test_chair_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_4": "a photo of a chair at the end of a long table",
+            "test_chair_paraphrase_4": "an empty wooden seating piece at the end of a long table"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:5",
+          "stratum": "chair",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "test_chair_literal_5",
+            "test_chair_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_5": "a photo of a chair on a wooden deck",
+            "test_chair_paraphrase_5": "a slatted upright seat on a wooden deck"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:6",
+          "stratum": "chair",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "test_chair_literal_6",
+            "test_chair_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_6": "a photo of a chair beside a coat stand",
+            "test_chair_paraphrase_6": "a worn single seat beside a coat stand"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:7",
+          "stratum": "chair",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "test_chair_literal_7",
+            "test_chair_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_7": "a photo of a chair in an empty waiting room",
+            "test_chair_paraphrase_7": "a straight-backed seating piece in an empty waiting room"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:8",
+          "stratum": "chair",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "test_chair_literal_8",
+            "test_chair_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_8": "a photo of a chair beside a tiled stove",
+            "test_chair_paraphrase_8": "a lone wooden seat beside a tiled stove"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:chair:9",
+          "stratum": "chair",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "test_chair_literal_9",
+            "test_chair_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "test_chair_literal_9": "a photo of a chair on a gravel courtyard",
+            "test_chair_paraphrase_9": "a simple household seating item on a gravel courtyard"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:0",
+          "stratum": "dog",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "test_dog_literal_0",
+            "test_dog_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_0": "a photo of a dog on a pebbled driveway",
+            "test_dog_paraphrase_0": "a four-legged canine companion on a pebbled driveway"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:1",
+          "stratum": "dog",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "test_dog_literal_1",
+            "test_dog_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_1": "a photo of a dog beside a muddy garden spade",
+            "test_dog_paraphrase_1": "a barking household pet beside a muddy garden spade"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:2",
+          "stratum": "dog",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "test_dog_literal_2",
+            "test_dog_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_2": "a photo of a dog under a picnic table",
+            "test_dog_paraphrase_2": "a furry domesticated canine under a picnic table"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:3",
+          "stratum": "dog",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "test_dog_literal_3",
+            "test_dog_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_3": "a photo of a dog on a boat jetty",
+            "test_dog_paraphrase_3": "a tail-wagging pet on a boat jetty"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:4",
+          "stratum": "dog",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "test_dog_literal_4",
+            "test_dog_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_4": "a photo of a dog beside a row of wellington boots",
+            "test_dog_paraphrase_4": "a shaggy animal companion beside a row of wellington boots"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:5",
+          "stratum": "dog",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "test_dog_literal_5",
+            "test_dog_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_5": "a photo of a dog on a frosted lawn",
+            "test_dog_paraphrase_5": "a panting four-legged pet on a frosted lawn"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:6",
+          "stratum": "dog",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "test_dog_literal_6",
+            "test_dog_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_6": "a photo of a dog near a stack of firewood",
+            "test_dog_paraphrase_6": "an eager canine animal near a stack of firewood"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:7",
+          "stratum": "dog",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "test_dog_literal_7",
+            "test_dog_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_7": "a photo of a dog on a sandy footpath",
+            "test_dog_paraphrase_7": "a damp-nosed household animal on a sandy footpath"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:8",
+          "stratum": "dog",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "test_dog_literal_8",
+            "test_dog_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_8": "a photo of a dog beside a garden hose reel",
+            "test_dog_paraphrase_8": "a loyal four-legged friend beside a garden hose reel"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:dog:9",
+          "stratum": "dog",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "test_dog_literal_9",
+            "test_dog_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "test_dog_literal_9": "a photo of a dog on a shaded porch",
+            "test_dog_paraphrase_9": "a bounding canine pet on a shaded porch"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:0",
+          "stratum": "horse",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "test_horse_literal_0",
+            "test_horse_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_0": "a photo of a horse behind a split-rail fence",
+            "test_horse_paraphrase_0": "a large hoofed grazing animal behind a split-rail fence"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:1",
+          "stratum": "horse",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "test_horse_literal_1",
+            "test_horse_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_1": "a photo of a horse beside a water trough",
+            "test_horse_paraphrase_1": "a long-maned riding animal beside a water trough"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:2",
+          "stratum": "horse",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "test_horse_literal_2",
+            "test_horse_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_2": "a photo of a horse on a misty hillside",
+            "test_horse_paraphrase_2": "a tall four-legged grazer on a misty hillside"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:3",
+          "stratum": "horse",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "test_horse_literal_3",
+            "test_horse_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_3": "a photo of a horse under an oak tree",
+            "test_horse_paraphrase_3": "a saddled hoofed animal under an oak tree"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:4",
+          "stratum": "horse",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "test_horse_literal_4",
+            "test_horse_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_4": "a photo of a horse near a red barn door",
+            "test_horse_paraphrase_4": "a chestnut long-faced animal near a red barn door"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:5",
+          "stratum": "horse",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "test_horse_literal_5",
+            "test_horse_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_5": "a photo of a horse on a gravel track",
+            "test_horse_paraphrase_5": "a grazing hoofed beast on a gravel track"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:6",
+          "stratum": "horse",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "test_horse_literal_6",
+            "test_horse_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_6": "a photo of a horse beside a hay bale",
+            "test_horse_paraphrase_6": "a long-tailed riding animal beside a hay bale"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:7",
+          "stratum": "horse",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "test_horse_literal_7",
+            "test_horse_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_7": "a photo of a horse in a fenced paddock",
+            "test_horse_paraphrase_7": "a broad-backed hoofed animal in a fenced paddock"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:8",
+          "stratum": "horse",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "test_horse_literal_8",
+            "test_horse_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_8": "a photo of a horse along a coastal path",
+            "test_horse_paraphrase_8": "a standing mane-flicking animal along a coastal path"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:horse:9",
+          "stratum": "horse",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "test_horse_literal_9",
+            "test_horse_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "test_horse_literal_9": "a photo of a horse near a wooden gate",
+            "test_horse_paraphrase_9": "a tall grazing quadruped near a wooden gate"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:0",
+          "stratum": "sandwich",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "test_sandwich_literal_0",
+            "test_sandwich_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_0": "a photo of a sandwich on a chipped enamel plate",
+            "test_sandwich_paraphrase_0": "a filled bread lunch item on a chipped enamel plate"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:1",
+          "stratum": "sandwich",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "test_sandwich_literal_1",
+            "test_sandwich_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_1": "a photo of a sandwich beside a paper coffee cup",
+            "test_sandwich_paraphrase_1": "two slices of bread with filling beside a paper coffee cup"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:2",
+          "stratum": "sandwich",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "test_sandwich_literal_2",
+            "test_sandwich_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_2": "a photo of a sandwich on a wooden cutting board",
+            "test_sandwich_paraphrase_2": "a layered handheld snack on a wooden cutting board"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:3",
+          "stratum": "sandwich",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "test_sandwich_literal_3",
+            "test_sandwich_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_3": "a photo of a sandwich in an open lunch tin",
+            "test_sandwich_paraphrase_3": "a packed midday bread meal in an open lunch tin"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:4",
+          "stratum": "sandwich",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "test_sandwich_literal_4",
+            "test_sandwich_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_4": "a photo of a sandwich on a checked picnic cloth",
+            "test_sandwich_paraphrase_4": "a stacked bread-and-filling item on a checked picnic cloth"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:5",
+          "stratum": "sandwich",
+          "prompt_index": 5,
+          "prompt_ids": [
+            "test_sandwich_literal_5",
+            "test_sandwich_paraphrase_5"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_5": "a photo of a sandwich beside a glass of water",
+            "test_sandwich_paraphrase_5": "a cut handheld lunch beside a glass of water"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:6",
+          "stratum": "sandwich",
+          "prompt_index": 6,
+          "prompt_ids": [
+            "test_sandwich_literal_6",
+            "test_sandwich_paraphrase_6"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_6": "a photo of a sandwich on a cafe counter",
+            "test_sandwich_paraphrase_6": "a bread-wrapped filled snack on a cafe counter"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:7",
+          "stratum": "sandwich",
+          "prompt_index": 7,
+          "prompt_ids": [
+            "test_sandwich_literal_7",
+            "test_sandwich_paraphrase_7"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_7": "a photo of a sandwich wrapped in waxed paper",
+            "test_sandwich_paraphrase_7": "a halved bread lunch portion wrapped in waxed paper"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:8",
+          "stratum": "sandwich",
+          "prompt_index": 8,
+          "prompt_ids": [
+            "test_sandwich_literal_8",
+            "test_sandwich_paraphrase_8"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_8": "a photo of a sandwich on a tray by a window",
+            "test_sandwich_paraphrase_8": "a filled sliced-bread item on a tray by a window"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "test:sandwich:9",
+          "stratum": "sandwich",
+          "prompt_index": 9,
+          "prompt_ids": [
+            "test_sandwich_literal_9",
+            "test_sandwich_paraphrase_9"
+          ],
+          "prompt_texts": {
+            "test_sandwich_literal_9": "a photo of a sandwich beside a bowl of olives",
+            "test_sandwich_paraphrase_9": "a wrapped bread meal beside a bowl of olives"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            1301,
+            1402,
+            1503,
+            1604
+          ],
+          "n_rows": 8
+        }
+      ]
+    },
+    "pilot": {
+      "set": "pilot",
+      "manifest_content_sha256": "0020c81c4a4dd3580a6574c91b4aea1a7e349e9e89fc845ed8c2077d47564892",
+      "n_rows": 280,
+      "n_clusters": 35,
+      "n_distinct_prompt_texts": 70,
+      "gen_seeds": [
+        101,
+        202,
+        303,
+        404
+      ],
+      "strata_cluster_counts": {
+        "bicycle": 5,
+        "bird": 5,
+        "cat": 5,
+        "chair": 5,
+        "dog": 5,
+        "horse": 5,
+        "sandwich": 5
+      },
+      "family_row_counts": {
+        "literal": 140,
+        "paraphrase": 140
+      },
+      "rows_per_cluster_distribution": {
+        "8": 35
+      },
+      "families_per_cluster_distribution": {
+        "2": 35
+      },
+      "gen_seeds_per_cluster_distribution": {
+        "4": 35
+      },
+      "every_cluster_carries_both_families": true,
+      "every_cluster_carries_all_gen_seeds": true,
+      "residual_shared_template_dependence": {
+        "definition": "prompt texts sharing their first 4 tokens, counted only where the sharing crosses cluster boundaries",
+        "n_cross_cluster_templates": 3,
+        "n_prompt_texts_in_cross_cluster_templates": 13,
+        "largest_cross_cluster_template": [
+          "a photo of a",
+          7
+        ],
+        "examples": {
+          "a photo of a": [
+            "pilot:bicycle:0",
+            "pilot:bird:0",
+            "pilot:cat:0",
+            "pilot:chair:0"
+          ],
+          "a close-up of a": [
+            "pilot:bicycle:3",
+            "pilot:bird:2",
+            "pilot:sandwich:2"
+          ],
+          "a close-up portrait of": [
+            "pilot:cat:2",
+            "pilot:dog:2",
+            "pilot:horse:2"
+          ]
+        },
+        "effect_on_intervals": "NOT ESTIMATED. Resampling clusters absorbs the dependence WITHIN a scene cluster (its two family wordings and its four generation seeds). It does not absorb dependence induced by a template shared ACROSS clusters. Neither the direction nor the size of that residual effect on interval width is established by this design, and none is claimed. It is reported as an un-quantified limitation of template-built prompt sets."
+      },
+      "clusters": [
+        {
+          "cluster_id": "pilot:bicycle:0",
+          "stratum": "bicycle",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "bicycle_literal_0",
+            "bicycle_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "bicycle_literal_0": "a photo of a bicycle leaning against a wall",
+            "bicycle_paraphrase_0": "a two-wheeled pedal-powered vehicle leaning on a railing"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bicycle:1",
+          "stratum": "bicycle",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "bicycle_literal_1",
+            "bicycle_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "bicycle_literal_1": "a bicycle parked on a city street",
+            "bicycle_paraphrase_1": "a pedal-driven cycle with handlebars parked on pavement"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bicycle:2",
+          "stratum": "bicycle",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "bicycle_literal_2",
+            "bicycle_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "bicycle_literal_2": "a bicycle standing on a gravel path",
+            "bicycle_paraphrase_2": "a human-powered two-wheeler with a chain and spokes outdoors"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bicycle:3",
+          "stratum": "bicycle",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "bicycle_literal_3",
+            "bicycle_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "bicycle_literal_3": "a close-up of a bicycle beside a fence",
+            "bicycle_paraphrase_3": "a pedalled two-wheeled machine with a saddle, by a kerb"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bicycle:4",
+          "stratum": "bicycle",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "bicycle_literal_4",
+            "bicycle_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "bicycle_literal_4": "a bicycle resting under a tree",
+            "bicycle_paraphrase_4": "a chain-driven cycle with two spoked wheels against a post"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bird:0",
+          "stratum": "bird",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "bird_literal_0",
+            "bird_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "bird_literal_0": "a photo of a bird perched on a branch",
+            "bird_paraphrase_0": "a small feathered creature with a beak, perched on a twig"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bird:1",
+          "stratum": "bird",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "bird_literal_1",
+            "bird_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "bird_literal_1": "a bird standing on a stone wall",
+            "bird_paraphrase_1": "a winged feathered animal standing on a railing"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bird:2",
+          "stratum": "bird",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "bird_literal_2",
+            "bird_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "bird_literal_2": "a close-up of a bird on a wooden post",
+            "bird_paraphrase_2": "a feathered creature with wings folded, on a fence post"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bird:3",
+          "stratum": "bird",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "bird_literal_3",
+            "bird_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "bird_literal_3": "a bird resting on a wire against the sky",
+            "bird_paraphrase_3": "a beaked feathered animal sitting on a rooftop"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:bird:4",
+          "stratum": "bird",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "bird_literal_4",
+            "bird_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "bird_literal_4": "a bird standing at the edge of a pond",
+            "bird_paraphrase_4": "a plumed winged creature resting on a garden stake"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:cat:0",
+          "stratum": "cat",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "cat_literal_0",
+            "cat_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "cat_literal_0": "a photo of a cat sitting on a wooden floor",
+            "cat_paraphrase_0": "a small domestic feline with whiskers and pointed ears, indoors"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:cat:1",
+          "stratum": "cat",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "cat_literal_1",
+            "cat_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "cat_literal_1": "a cat resting on a windowsill in the afternoon",
+            "cat_paraphrase_1": "a housecat-sized carnivore grooming its fur on a rug"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:cat:2",
+          "stratum": "cat",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "cat_literal_2",
+            "cat_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "cat_literal_2": "a close-up portrait of a cat looking at the camera",
+            "cat_paraphrase_2": "a tabby-patterned feline pet perched on a shelf"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:cat:3",
+          "stratum": "cat",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "cat_literal_3",
+            "cat_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "cat_literal_3": "a cat curled up asleep on a sofa cushion",
+            "cat_paraphrase_3": "a whiskered feline animal with a long tail, sitting upright"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:cat:4",
+          "stratum": "cat",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "cat_literal_4",
+            "cat_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "cat_literal_4": "a cat standing on grass in a garden",
+            "cat_paraphrase_4": "a furry feline companion animal lying beside a window"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:chair:0",
+          "stratum": "chair",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "chair_literal_0",
+            "chair_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "chair_literal_0": "a photo of a chair in an empty room",
+            "chair_paraphrase_0": "a single-person seat with four legs and a backrest, indoors"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:chair:1",
+          "stratum": "chair",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "chair_literal_1",
+            "chair_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "chair_literal_1": "a wooden chair beside a window",
+            "chair_paraphrase_1": "a piece of seating furniture with armrests against a wall"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:chair:2",
+          "stratum": "chair",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "chair_literal_2",
+            "chair_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "chair_literal_2": "a chair placed next to a small table",
+            "chair_paraphrase_2": "an upholstered seat for one with a tall back, in a room"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:chair:3",
+          "stratum": "chair",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "chair_literal_3",
+            "chair_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "chair_literal_3": "a chair standing on a hardwood floor",
+            "chair_paraphrase_3": "a wooden seating item with a straight back beside a desk"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:chair:4",
+          "stratum": "chair",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "chair_literal_4",
+            "chair_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "chair_literal_4": "a chair in the corner of a bright room",
+            "chair_paraphrase_4": "a one-person sitting furniture piece on a tiled floor"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:dog:0",
+          "stratum": "dog",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "dog_literal_0",
+            "dog_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "dog_literal_0": "a photo of a dog standing on a path",
+            "dog_paraphrase_0": "a domestic canine with a wagging tail on a sidewalk"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:dog:1",
+          "stratum": "dog",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "dog_literal_1",
+            "dog_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "dog_literal_1": "a dog lying on a living room carpet",
+            "dog_paraphrase_1": "a four-legged canine pet fetching in a park"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:dog:2",
+          "stratum": "dog",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "dog_literal_2",
+            "dog_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "dog_literal_2": "a close-up portrait of a dog facing the camera",
+            "dog_paraphrase_2": "a loyal canine animal with floppy ears, sitting on grass"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:dog:3",
+          "stratum": "dog",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "dog_literal_3",
+            "dog_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "dog_literal_3": "a dog running across an open field",
+            "dog_paraphrase_3": "a puppy-like canine resting its head on its paws"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:dog:4",
+          "stratum": "dog",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "dog_literal_4",
+            "dog_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "dog_literal_4": "a dog sitting beside a wooden fence",
+            "dog_paraphrase_4": "a barking canine companion animal on a leash outdoors"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:horse:0",
+          "stratum": "horse",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "horse_literal_0",
+            "horse_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "horse_literal_0": "a photo of a horse standing in a paddock",
+            "horse_paraphrase_0": "a large equine animal with a flowing mane in a meadow"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:horse:1",
+          "stratum": "horse",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "horse_literal_1",
+            "horse_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "horse_literal_1": "a horse grazing beside a wooden fence",
+            "horse_paraphrase_1": "a saddled equine mount standing on a trail"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:horse:2",
+          "stratum": "horse",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "horse_literal_2",
+            "horse_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "horse_literal_2": "a close-up portrait of a horse's head",
+            "horse_paraphrase_2": "a hoofed equine quadruped trotting across a field"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:horse:3",
+          "stratum": "horse",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "horse_literal_3",
+            "horse_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "horse_literal_3": "a horse walking along a dirt track",
+            "horse_paraphrase_3": "a chestnut-coloured equine animal beside a barn"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:horse:4",
+          "stratum": "horse",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "horse_literal_4",
+            "horse_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "horse_literal_4": "a horse standing under a tree",
+            "horse_paraphrase_4": "a long-legged equine with a tail, standing in sunlight"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:sandwich:0",
+          "stratum": "sandwich",
+          "prompt_index": 0,
+          "prompt_ids": [
+            "sandwich_literal_0",
+            "sandwich_paraphrase_0"
+          ],
+          "prompt_texts": {
+            "sandwich_literal_0": "a photo of a sandwich on a white plate",
+            "sandwich_paraphrase_0": "two slices of bread with filling layered between them, on a plate"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:sandwich:1",
+          "stratum": "sandwich",
+          "prompt_index": 1,
+          "prompt_ids": [
+            "sandwich_literal_1",
+            "sandwich_paraphrase_1"
+          ],
+          "prompt_texts": {
+            "sandwich_literal_1": "a sandwich sitting on a wooden cutting board",
+            "sandwich_paraphrase_1": "a handheld bread-and-filling lunch item on parchment paper"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:sandwich:2",
+          "stratum": "sandwich",
+          "prompt_index": 2,
+          "prompt_ids": [
+            "sandwich_literal_2",
+            "sandwich_paraphrase_2"
+          ],
+          "prompt_texts": {
+            "sandwich_literal_2": "a close-up of a sandwich cut in half",
+            "sandwich_paraphrase_2": "stacked bread with lettuce, tomato and cheese between the slices"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:sandwich:3",
+          "stratum": "sandwich",
+          "prompt_index": 3,
+          "prompt_ids": [
+            "sandwich_literal_3",
+            "sandwich_paraphrase_3"
+          ],
+          "prompt_texts": {
+            "sandwich_literal_3": "a sandwich next to a glass of water on a table",
+            "sandwich_paraphrase_3": "a bread roll sliced open and filled, resting on a board"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        },
+        {
+          "cluster_id": "pilot:sandwich:4",
+          "stratum": "sandwich",
+          "prompt_index": 4,
+          "prompt_ids": [
+            "sandwich_literal_4",
+            "sandwich_paraphrase_4"
+          ],
+          "prompt_texts": {
+            "sandwich_literal_4": "a sandwich wrapped in paper on a counter",
+            "sandwich_paraphrase_4": "a layered bread snack with meat inside, cut diagonally"
+          },
+          "families": [
+            "literal",
+            "paraphrase"
+          ],
+          "gen_seeds": [
+            101,
+            202,
+            303,
+            404
+          ],
+          "n_rows": 8
+        }
+      ]
+    }
+  },
+  "grouping_sha256": "2ba0e8df5034d011fc9c434ce9d8b44689694cec73aefa6f155d5726a1b8ea8c"
+}

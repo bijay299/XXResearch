@@ -388,11 +388,19 @@ def main() -> int:
             "dev_repeated_opening_phrases": {k: v for k, v in dev_leads.items() if v > 1},
             "test_repeated_opening_phrases": {k: v for k, v in test_leads.items() if v > 1},
             "consequence": (
-                "Prompt-cluster bootstrap treats each prompt text as one cluster. "
-                "Where texts share a template the clusters are not fully "
-                "independent, so intervals are mildly optimistic. This is a known "
-                "limitation of the design, not a defect introduced here, and it "
-                "applies equally to the pilot set."),
+                "The bootstrap's resampling unit is the SCENE CLUSTER "
+                "(category, prompt_index), which carries both family wordings "
+                "and all four generation seeds together; see "
+                "results/audit_v1/draft_manifests/bootstrap_grouping.json. That "
+                "absorbs dependence WITHIN a scene. It does not absorb "
+                "dependence from a template shared ACROSS clusters, and the test "
+                "set has one (all 70 literal prompts open 'a photo of a'). "
+                "NEITHER THE DIRECTION NOR THE SIZE of that residual effect on "
+                "interval width is established by this design and none is "
+                "claimed. An earlier version of this field said such dependence "
+                "makes intervals 'mildly optimistic'; that was an unsupported "
+                "assurance and is withdrawn. The limitation applies equally to "
+                "the pilot set."),
         },
     }
     (out / "disjointness_report.json").write_text(json.dumps(rep, indent=2))
@@ -430,10 +438,13 @@ categories giving **{len(test)} pairs** per checkpoint.
 
 **Shared surface structure is reported, not denied.** Both sets are
 template-built. Dev and test share **{len(shared_tpl)}** scene tails; see
-`disjointness_report.json` for the full analysis. Where prompt texts share a
-template the bootstrap's prompt clusters are not fully independent and intervals
-are mildly optimistic. That limitation applies to the pilot set too and is
-stated rather than assumed away.
+`disjointness_report.json` for the full analysis. The bootstrap's resampling
+unit is the **scene cluster**, carrying both family wordings and all four
+generation seeds together (`bootstrap_grouping.json`), which absorbs dependence
+*within* a scene. A template shared *across* clusters is not absorbed — the test
+set has one, `"a photo of a"` across all 70 literal prompts — and **the
+direction and size of its effect on interval width are not established, and no
+claim is made about them**. The limitation applies to the pilot set too.
 
 ## Rules frozen with these hashes
 

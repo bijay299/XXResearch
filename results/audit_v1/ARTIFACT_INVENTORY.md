@@ -208,3 +208,20 @@ committed**, by `.gitignore` and by this audit's own choice.
 
 **All 10 training runs and all 12 evaluation slots were revalidated on CPU
 against these contracts and pass.**
+
+### Added by AUDIT-01d
+
+| file | purpose |
+|---|---|
+| `configs/legacy_training_artifacts.json` | the **exact ten** saved artifacts permitted a limited completed-step exception, each by `train_report.json` sha256 **and** `delta.bin` sha256, with provenance. Replaces the seed-number list, which also exempted new runs using seeds 17/29. All ten in-repo report copies verified **byte-identical** to the saved reports |
+| `configs/base_model_contract.json` → `identity_policy` | the exact launch-time base-model identity policy and its limits: what the cheap identity covers, what it does **not** (weight contents), and that the full weight digest is checked only under `--verify_base_model_weight_sha` |
+| `scripts/seq/legacy_artifact_policy.py` | decides the policy for one artifact from its content (`decide`), protects registered checkpoints from being retrained over (`protect`), builds the registry (`freeze`), re-checks it (`verify`) |
+| `scripts/seq/inspect_training_logs.py` | bounded CPU inspection of the saved training logs and their linkage to the registered checkpoints — **not** a completed-step counter |
+| `scripts/seq/freeze_bootstrap_grouping.py` | derives and freezes the bootstrap resampling grouping from the actual manifests |
+| `results/audit_v1/draft_manifests/bootstrap_grouping.json` | the frozen grouping: scene-cluster unit, category strata, 10 000 draws, recorded RNG seed, measured cross-cluster template dependence |
+| `results/audit_v1/training_log_inspection.json`, `TRAINING_LOG_INSPECTION.md` | what the terminal progress logs do and do not establish |
+| `scripts/seq/test_image_provenance.sh`, `scripts/seq/testlib/fake_models/` | CPU regressions for image-reuse provenance through the real launcher and the real generator, with fake torch/diffusers |
+
+**The saved pilot was not modified.** No checkpoint, report, image, detection or
+log was edited, moved or deleted in this round; the registry and the log
+inspection only read and hash them.

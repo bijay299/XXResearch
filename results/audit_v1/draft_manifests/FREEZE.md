@@ -31,10 +31,13 @@ categories giving **560 pairs** per checkpoint.
 
 **Shared surface structure is reported, not denied.** Both sets are
 template-built. Dev and test share **0** scene tails; see
-`disjointness_report.json` for the full analysis. Where prompt texts share a
-template the bootstrap's prompt clusters are not fully independent and intervals
-are mildly optimistic. That limitation applies to the pilot set too and is
-stated rather than assumed away.
+`disjointness_report.json` for the full analysis. The bootstrap's resampling
+unit is the **scene cluster**, carrying both family wordings and all four
+generation seeds together (`bootstrap_grouping.json`), which absorbs dependence
+*within* a scene. A template shared *across* clusters is not absorbed — the test
+set has one, `"a photo of a"` across all 70 literal prompts — and **the
+direction and size of its effect on interval width are not established, and no
+claim is made about them**. The limitation applies to the pilot set too.
 
 ## Rules frozen with these hashes
 

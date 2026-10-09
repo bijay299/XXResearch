@@ -30,6 +30,15 @@
     }
   },
   "cheap_identity_sha256": "ed806130829f60630fae67b1b065d1e2b87eeaeecf73e58123f0df8963451e38",
+  "identity_policy": {
+    "_note": "The exact launch-time base-model identity policy and its limits. Written down because AUDIT-01c described --verify_base_model as 'the recomputed backbone identity', which reads as full backbone verification. It is not.",
+    "what_cheap_identity_covers": "sha256 of each file in cheap_identity_payload.cheap_identity_files (five small JSON configs) and the BYTE LENGTH of each file in cheap_identity_payload.weight_file_bytes. The weight bytes themselves are never read.",
+    "what_cheap_identity_does_not_cover": "the contents of unet/diffusion_pytorch_model.safetensors, and of every other weight file. A mutation of weight bytes that preserves the file length leaves cheap_identity_sha256 unchanged and passes --verify_base_model. This was reproduced on CPU by the independent review.",
+    "weight_sha256_is_recorded_but_not_checked_at_launch": "The full weight digest below is the complete content check. validate_stage.py compares it only under --verify_base_model_weight_sha, which reads ~3.4 GB. Neither run_seed.sh nor run_analysis.sh enables it, because evaluation validation runs once per checkpoint per path and re-hashing the backbone each time would add ~3.4 GB of reads per call for a backbone that is not written by this pipeline.",
+    "launch_time_policy": "At launch, M0's identity is asserted STRUCTURALLY: no delta applied, no unet_ckpt, no recorded delta hash, and base_model_dir equal to this contract's. The cheap identity is DECLARED from this contract and is not recomputed unless --verify_base_model is passed. Non-M0 checkpoints are bound by the recomputed sha256 of their own delta.bin, which IS a full content check of the delta.",
+    "how_to_verify_the_backbone_in_full": "python scripts/seq/validate_stage.py eval M0 --eval_root <dir> --manifest <manifest> --expect_manifest_sha <id> --expect_gen_settings configs/generation_settings.json --require_images --allow_shared_images --base_model_contract configs/base_model_contract.json --verify_base_model --verify_base_model_weight_sha",
+    "residual_limitation": "Even the full weight digest is a check against THIS contract, whose values were derived from the on-disk backbone at AUDIT-01c. It establishes that the backbone has not changed since then; it does not establish that the backbone is the published Stable Diffusion v1.5 release. No upstream-published digest is compared here."
+  },
   "m0_policy": {
     "checkpoint_load.applied": false,
     "checkpoint_load.unet_ckpt": null,

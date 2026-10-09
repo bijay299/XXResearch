@@ -1,0 +1,234 @@
+{
+  "_contract": "The EXACT saved training artifacts allowed a limited legacy exception to completed-step validation. Identity is by CONTENT (train_report.json sha256 AND delta.bin sha256), never by training seed number, directory label or checkpoint name. A newly produced run cannot match, so its counter is always required.",
+  "_supersedes": "SEQ_LEGACY_TRAIN_SEEDS=\"17 29\", a seed-number list that also exempted new runs using those seed numbers.",
+  "policy": {
+    "on_match": "--steps_evidence legacy_optional: structural validation applies in full; training completion is reported UNVERIFIED. Nothing is backfilled, retrained, moved or replaced.",
+    "on_miss": "--steps_evidence counter: runtime.optimizer_steps_completed is REQUIRED and must equal the requested step count.",
+    "present_but_short_counter": "ALWAYS a failure, in both modes. The exception covers only the counter's ABSENCE on a registered saved artifact.",
+    "empty_configuration": "SEQ_LEGACY_ARTIFACT_REGISTRY set to the empty string removes every exception: the counter is then required everywhere, including for these saved artifacts.",
+    "fail_closed": "A missing, unparseable or malformed registry, or an unreadable artifact, yields the strict 'counter' policy."
+  },
+  "why_completion_is_unverified_for_these": "These ten reports predate runtime.optimizer_steps_completed, and the completion check in use when they were produced was circular (seconds_per_optimizer_step was defined as train_seconds/iterations and the validator divided the two back). There is therefore no structured evidence that each run reached 1000 optimizer steps. Terminal progress output in the saved logs is inspected separately and is NOT a counter; see results/audit_v1/TRAINING_LOG_INSPECTION.md.",
+  "artifacts": [
+    {
+      "id": "seed17/MA",
+      "training_seed": 17,
+      "checkpoint": "MA",
+      "train_report_sha256": "e96a35cbb1066a275656e1a8e1d205ab56fe96f95f63e3c96d06dc94afdfcbf9",
+      "train_report_bytes": 3517,
+      "delta_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq17/train/MA.json",
+      "in_repo_report_copy_sha256": "e96a35cbb1066a275656e1a8e1d205ab56fe96f95f63e3c96d06dc94afdfcbf9",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed17/MA/train_report.json",
+        "reported_parent": "M0",
+        "reported_target": "cat",
+        "reported_l2sp_weight": 0.0,
+        "reported_finished_utc": "2026-10-09T05:03:50.850382+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed17/MAB",
+      "training_seed": 17,
+      "checkpoint": "MAB",
+      "train_report_sha256": "4205e9812ef22680285242f08919516099b3d8bddcbeeced7838056b49ba10c4",
+      "train_report_bytes": 3885,
+      "delta_sha256": "63c9a8232cfd96ac257560b7cacabae287f4727e23b8ee57d21828fb579978f9",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq17/train/MAB.json",
+      "in_repo_report_copy_sha256": "4205e9812ef22680285242f08919516099b3d8bddcbeeced7838056b49ba10c4",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed17/MAB/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "dog",
+        "reported_l2sp_weight": 0.0,
+        "reported_finished_utc": "2026-10-09T05:18:54.250030+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed17/MAB_L2",
+      "training_seed": 17,
+      "checkpoint": "MAB_L2",
+      "train_report_sha256": "8421b8cd73e52acd94bdc1451def39e525a668d722fe1196b5f28057d6ba5460",
+      "train_report_bytes": 4159,
+      "delta_sha256": "8ee7d56f62b04be98edf6f28aa34c52ed614f5fbaed84f883ae926da329cec8b",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq17/train/MAB_L2.json",
+      "in_repo_report_copy_sha256": "8421b8cd73e52acd94bdc1451def39e525a668d722fe1196b5f28057d6ba5460",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed17/MAB_L2/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "dog",
+        "reported_l2sp_weight": 25000.0,
+        "reported_finished_utc": "2026-10-09T05:19:02.341103+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed17/MAC",
+      "training_seed": 17,
+      "checkpoint": "MAC",
+      "train_report_sha256": "df3230e1e4c71465122f8214bc5002358846717900a3bbc0d6b9f0436896ff80",
+      "train_report_bytes": 3905,
+      "delta_sha256": "e7b6324d3209a9b1ea0f5858679b2623b12e93d0386ae1b00edef5b5f3e4a129",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq17/train/MAC.json",
+      "in_repo_report_copy_sha256": "df3230e1e4c71465122f8214bc5002358846717900a3bbc0d6b9f0436896ff80",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed17/MAC/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "sandwich",
+        "reported_l2sp_weight": 0.0,
+        "reported_finished_utc": "2026-10-09T05:33:06.739841+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed17/MAC_L2",
+      "training_seed": 17,
+      "checkpoint": "MAC_L2",
+      "train_report_sha256": "01bc323eaf33e1e1a2a2358235295a7543d00203c35e6bef530160d391d0e3a4",
+      "train_report_bytes": 4179,
+      "delta_sha256": "c39e03ff85a45d9483418f7629d0fae1fd2f950ffe5658661e3f3c7f7f8ea6b4",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq17/train/MAC_L2.json",
+      "in_repo_report_copy_sha256": "01bc323eaf33e1e1a2a2358235295a7543d00203c35e6bef530160d391d0e3a4",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed17/MAC_L2/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "sandwich",
+        "reported_l2sp_weight": 25000.0,
+        "reported_finished_utc": "2026-10-09T05:33:10.305771+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed29/MA",
+      "training_seed": 29,
+      "checkpoint": "MA",
+      "train_report_sha256": "d3895b16abe0661c3241e3726ba8b5281143b9d20fbabd5a7b8171906f2999f9",
+      "train_report_bytes": 3261,
+      "delta_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq29/train/MA.json",
+      "in_repo_report_copy_sha256": "d3895b16abe0661c3241e3726ba8b5281143b9d20fbabd5a7b8171906f2999f9",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed29/MA/train_report.json",
+        "reported_parent": "M0",
+        "reported_target": "cat",
+        "reported_l2sp_weight": 0.0,
+        "reported_finished_utc": "2026-10-09T06:06:45.003458+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed29/MAB",
+      "training_seed": 29,
+      "checkpoint": "MAB",
+      "train_report_sha256": "6e23c0548a74c7333141f0d65b649f65151d0583dee9005e9ee7cce2b23338cb",
+      "train_report_bytes": 3885,
+      "delta_sha256": "d9f28f0fc6b8cc5b72bc69a962c3c9e84250ccddc88c114008b42e317ed42894",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq29/train/MAB.json",
+      "in_repo_report_copy_sha256": "6e23c0548a74c7333141f0d65b649f65151d0583dee9005e9ee7cce2b23338cb",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed29/MAB/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "dog",
+        "reported_l2sp_weight": 0.0,
+        "reported_finished_utc": "2026-10-09T06:20:47.543237+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed29/MAB_L2",
+      "training_seed": 29,
+      "checkpoint": "MAB_L2",
+      "train_report_sha256": "5ac55eb7991ae38e0155589905e475440c0367a5df0cdbcc388cd98db465b870",
+      "train_report_bytes": 4159,
+      "delta_sha256": "c4f3ecdcb94569646f51712b08ba80f62b23b4ae1162e953f3c16f5c3bfc7871",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq29/train/MAB_L2.json",
+      "in_repo_report_copy_sha256": "5ac55eb7991ae38e0155589905e475440c0367a5df0cdbcc388cd98db465b870",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed29/MAB_L2/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "dog",
+        "reported_l2sp_weight": 25000.0,
+        "reported_finished_utc": "2026-10-09T06:20:51.348940+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed29/MAC",
+      "training_seed": 29,
+      "checkpoint": "MAC",
+      "train_report_sha256": "4f0e97c6c09f6384a44169c1c0c5e5695de9b65e515d95ac5b3ffaa629b8f0a7",
+      "train_report_bytes": 3903,
+      "delta_sha256": "45e910d2fb11fde5b634c3db5d156f0a1b661bd469c6dd35572fa677d57ec842",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq29/train/MAC.json",
+      "in_repo_report_copy_sha256": "4f0e97c6c09f6384a44169c1c0c5e5695de9b65e515d95ac5b3ffaa629b8f0a7",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed29/MAC/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "sandwich",
+        "reported_l2sp_weight": 0.0,
+        "reported_finished_utc": "2026-10-09T06:34:56.333784+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    },
+    {
+      "id": "seed29/MAC_L2",
+      "training_seed": 29,
+      "checkpoint": "MAC_L2",
+      "train_report_sha256": "435584bbc797ca4b8ada9a97655bb0fef3f63612c1fd91072c9e94dd12be8973",
+      "train_report_bytes": 4180,
+      "delta_sha256": "06b62d00a55b9a778113f20ef0a8d63872374c93a6507c71d5a0e0d97de41dea",
+      "delta_bytes": 76686190,
+      "in_repo_report_copy": "results/seq29/train/MAC_L2.json",
+      "in_repo_report_copy_sha256": "435584bbc797ca4b8ada9a97655bb0fef3f63612c1fd91072c9e94dd12be8973",
+      "in_repo_copy_is_byte_identical": true,
+      "provenance": {
+        "produced_by": "saved SD-1.5 sequential pilot, commit a9de625",
+        "recorded_at_commit": "AUDIT-01d",
+        "saved_path": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed29/MAC_L2/train_report.json",
+        "reported_parent": "MA",
+        "reported_target": "sandwich",
+        "reported_l2sp_weight": 25000.0,
+        "reported_finished_utc": "2026-10-09T06:34:57.934079+00:00",
+        "carries_optimizer_steps_completed": false
+      }
+    }
+  ]
+}

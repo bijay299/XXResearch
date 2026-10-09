@@ -89,6 +89,6 @@
     "test_repeated_opening_phrases": {
       "a photo of a": 70
     },
-    "consequence": "Prompt-cluster bootstrap treats each prompt text as one cluster. Where texts share a template the clusters are not fully independent, so intervals are mildly optimistic. This is a known limitation of the design, not a defect introduced here, and it applies equally to the pilot set."
+    "consequence": "The bootstrap's resampling unit is the SCENE CLUSTER (category, prompt_index), which carries both family wordings and all four generation seeds together; see results/audit_v1/draft_manifests/bootstrap_grouping.json. That absorbs dependence WITHIN a scene. It does not absorb dependence from a template shared ACROSS clusters, and the test set has one (all 70 literal prompts open 'a photo of a'). NEITHER THE DIRECTION NOR THE SIZE of that residual effect on interval width is established by this design and none is claimed. An earlier version of this field said such dependence makes intervals 'mildly optimistic'; that was an unsupported assurance and is withdrawn. The limitation applies equally to the pilot set."
   }
 }

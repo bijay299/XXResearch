@@ -567,6 +567,8 @@ def test_evaluation(tmp: Path):
         "cheap_identity_payload": {
             "cheap_identity_files": {"model_index.json": {}, "unet/config.json": {}},
             "weight_file_bytes": {"unet/w.safetensors": 64}},
+        "weight_sha256": {"unet/w.safetensors":
+                          _h.sha256((bm_dir / "unet/w.safetensors").read_bytes()).hexdigest()},
         "m0_policy": {"shared_evaluation": "counted once"}}))
 
     shared_src = root / "M0"
@@ -586,15 +588,57 @@ def test_evaluation(tmp: Path):
     check("M0 reuse declared, base-model identity from contract", "valid",
           *run("eval", "M0", "--eval_root", str(other_root), *m0base,
                "--allow_shared_images"))
-    check("M0 with --verify_base_model (backbone re-hashed)", "valid",
-          *run("eval", "M0", "--eval_root", str(other_root), *m0base,
-               "--allow_shared_images", "--verify_base_model"))
-    (bm_dir / "unet" / "config.json").write_text('{"k":2}')   # backbone changed
-    check("M0 rejected when the backbone has changed", "invalid",
+    # ---- the base-model identity check is PARTIAL, and says so.
+    #
+    # --verify_base_model hashes the small config files and the weight files'
+    # BYTE LENGTHS. It never reads the weight bytes, so a same-size weight
+    # mutation passes it. AUDIT-01c described it as "the recomputed backbone
+    # identity", which reads as full verification; these cases pin down what it
+    # does and does not establish.
+    check("M0 with --verify_base_model reports itself as PARTIAL", "valid",
           *run("eval", "M0", "--eval_root", str(other_root), *m0base,
                "--allow_shared_images", "--verify_base_model"),
-          expect_msg="backbone on disk has changed")
+          expect_msg="PARTIAL")
+    check("without it, identity is reported as DECLARED, not verified", "valid",
+          *run("eval", "M0", "--eval_root", str(other_root), *m0base,
+               "--allow_shared_images"),
+          expect_msg="DECLARED, not verified")
+    (bm_dir / "unet" / "config.json").write_text('{"k":2}')   # config changed
+    check("M0 rejected when a backbone config file has changed", "invalid",
+          *run("eval", "M0", "--eval_root", str(other_root), *m0base,
+               "--allow_shared_images", "--verify_base_model"),
+          expect_msg="config files or weight file sizes have changed")
     (bm_dir / "unet" / "config.json").write_text('{"k":1}')   # restore
+
+    # A SAME-SIZE weight mutation: the partial check passes it, the full weight
+    # digest catches it. This is the exact hole the review reproduced on CPU.
+    (bm_dir / "unet" / "w.safetensors").write_bytes(b"W" * 64)
+    check("same-size weight mutation PASSES the partial check", "valid",
+          *run("eval", "M0", "--eval_root", str(other_root), *m0base,
+               "--allow_shared_images", "--verify_base_model"),
+          expect_msg="weight CONTENTS were not hashed")
+    check("same-size weight mutation FAILS the full weight digest", "invalid",
+          *run("eval", "M0", "--eval_root", str(other_root), *m0base,
+               "--allow_shared_images", "--verify_base_model_weight_sha"),
+          expect_msg="weight contents do not match")
+    (bm_dir / "unet" / "w.safetensors").write_bytes(b"w" * 64)   # restore
+    check("the unmutated backbone passes the full weight digest", "valid",
+          *run("eval", "M0", "--eval_root", str(other_root), *m0base,
+               "--allow_shared_images", "--verify_base_model",
+               "--verify_base_model_weight_sha"),
+          expect_msg="VERIFIED")
+    # A contract with no weight_sha256 cannot perform the full check: UNCHECKED,
+    # never a silent pass.
+    bm_noweight = tmp / "base_model_contract_noweight.json"
+    _c = json.loads(bm_c.read_text())
+    _c.pop("weight_sha256", None)
+    bm_noweight.write_text(json.dumps(_c))
+    check("no weight_sha256 in the contract -> UNCHECKED, not a pass", "invalid",
+          *run("eval", "M0", "--eval_root", str(other_root),
+               "--manifest", str(man_p), "--expect_manifest_sha", MAN_SHA,
+               "--require_images", "--base_model_contract", str(bm_noweight),
+               "--allow_shared_images", "--verify_base_model_weight_sha"),
+          expect_msg="cannot be verified")
     check("M0 without a base-model contract -> UNCHECKED, not a pass", "invalid",
           *run("eval", "M0", "--eval_root", str(other_root),
                "--manifest", str(man_p), "--expect_manifest_sha", MAN_SHA,
@@ -797,6 +841,150 @@ def test_marker(tmp: Path):
           f"-> {'yes' if ok else 'no'}")
 
 
+def test_legacy_artifact_policy(tmp: Path):
+    """The completed-step exception must be bound to SAVED ARTIFACTS by content.
+
+    It used to be a list of training-seed NUMBERS, so a brand-new run using seed
+    17 or 29 inherited the exception -- and the proposed new unregularised
+    trajectories use exactly those two seeds.
+    """
+    print("\nlegacy-artifact policy -- scoped to saved artifacts, not seed numbers")
+    policy = REPO / "scripts" / "seq" / "legacy_artifact_policy.py"
+    registry = REPO / "configs" / "legacy_training_artifacts.json"
+
+    def decide(models_root, ck, reg):
+        p = subprocess.run([sys.executable, str(policy), "decide",
+                            "--models_root", str(models_root), "--checkpoint", ck,
+                            "--registry", str(reg)],
+                           capture_output=True, text=True,
+                           env={**os.environ, "CUDA_VISIBLE_DEVICES": ""})
+        return p.returncode, (p.stdout + p.stderr).strip()
+
+    def want(desc, models_root, ck, reg, expect_policy, expect_msg=None):
+        rc, out = decide(models_root, ck, reg)
+        got = out.split("|", 1)[0]
+        ok = rc == 0 and got == expect_policy
+        if ok and expect_msg and expect_msg.lower() not in out.lower():
+            ok, got = False, f"{got} but message lacks {expect_msg!r}"
+        (PASS if ok else FAIL).append(desc)
+        print(f"  {'ok  ' if ok else 'FAIL'}  {desc:<58} -> {got}"
+              + ("" if ok else f" (wanted {expect_policy})"))
+        if not ok:
+            print(f"          | {out[:200]}")
+
+    if not registry.is_file():
+        print("  FAIL: configs/legacy_training_artifacts.json is absent")
+        FAIL.append("legacy registry committed")
+        return
+    reg = json.loads(registry.read_text())
+    arts = reg["artifacts"]
+    n_ok = len(arts) == 10
+    (PASS if n_ok else FAIL).append("registry holds the ten saved artifacts")
+    print(f"  {'ok  ' if n_ok else 'FAIL'}  "
+          f"{'registry holds the ten saved artifacts':<58} -> {len(arts)}")
+    # Every registered artifact must be recorded as carrying NO counter: that is
+    # the entire reason the exception exists.
+    no_counter = all(
+        a["provenance"]["carries_optimizer_steps_completed"] is False for a in arts)
+    (PASS if no_counter else FAIL).append("all registered artifacts lack a counter")
+    print(f"  {'ok  ' if no_counter else 'FAIL'}  "
+          f"{'all registered artifacts are recorded as counterless':<58} "
+          f"-> {no_counter}")
+    # And every in-repo report copy must be byte-identical to the saved report.
+    copies = all(a["in_repo_copy_is_byte_identical"] for a in arts)
+    (PASS if copies else FAIL).append("in-repo report copies are byte-identical")
+    print(f"  {'ok  ' if copies else 'FAIL'}  "
+          f"{'in-repo report copies are byte-identical':<58} -> {copies}")
+
+    if SEQ_ROOT.exists():
+        for seed in (17, 29):
+            mroot = SEQ_ROOT / "models" / f"seed{seed}"
+            want(f"real seed{seed}/MA is registered -> legacy_optional",
+                 mroot, "MA", registry, "legacy_optional",
+                 expect_msg="registered saved pilot artifact")
+        # The real registry must NOT bless an artifact it does not name, even
+        # under a registered checkpoint NAME in a registered seed's directory.
+        fake = tmp / "fakeseed"
+        (fake / "MA").mkdir(parents=True, exist_ok=True)
+        write_ckpt(fake / "MA" / "delta.bin")
+        (fake / "MA" / "train_report.json").write_text(json.dumps(
+            train_report("MA", parent="M0", target="cat")))
+        want("a NEW artifact named MA -> counter", fake, "MA", registry, "counter",
+             expect_msg="is NOT the saved pilot artifact")
+        # An EDITED saved report loses the exception, and the near miss is named.
+        edited = tmp / "edited"
+        (edited / "MA").mkdir(parents=True, exist_ok=True)
+        src = SEQ_ROOT / "models" / "seed17" / "MA"
+        shutil.copy(src / "delta.bin", edited / "MA" / "delta.bin")
+        d = json.loads((src / "train_report.json").read_text())
+        d["edited_after_registration"] = True
+        (edited / "MA" / "train_report.json").write_text(json.dumps(d))
+        want("an EDITED saved report -> counter, near miss named",
+             edited, "MA", registry, "counter", expect_msg="identity differs")
+        # ...but the checkpoint beside it is still protected from being
+        # retrained over, which is a separate question answered separately.
+        p = subprocess.run([sys.executable, str(policy), "protect",
+                            "--models_root", str(edited), "--checkpoint", "MA",
+                            "--registry", str(registry)],
+                           capture_output=True, text=True,
+                           env={**os.environ, "CUDA_VISIBLE_DEVICES": ""})
+        prot = p.returncode == 0 and "PROTECTED" in p.stdout
+        (PASS if prot else FAIL).append("saved checkpoint stays protected")
+        print(f"  {'ok  ' if prot else 'FAIL'}  "
+              f"{'the saved checkpoint beside it stays PROTECTED':<58} -> "
+              f"{'protected' if prot else p.stdout.strip()[:60]}")
+        want("an unregistered checkpoint -> not protected is independent",
+             SEQ_ROOT / "models" / "seed17", "MAB", registry, "legacy_optional")
+    else:
+        print("  SKIP: /data assets not present; real-artifact cases skipped")
+
+    # Fail-closed configuration cases, with no /data dependency.
+    synth = tmp / "synth"
+    (synth / "MA").mkdir(parents=True, exist_ok=True)
+    write_ckpt(synth / "MA" / "delta.bin")
+    (synth / "MA" / "train_report.json").write_text(json.dumps(train_report("MA")))
+    want("an EMPTY registry -> counter (no exception exists)",
+         synth, "MA", "", "counter", expect_msg="explicitly empty")
+    want("an ABSENT registry -> counter (fails closed)",
+         synth, "MA", tmp / "nope.json", "counter", expect_msg="is absent")
+    broken = tmp / "broken_registry.json"
+    broken.write_text("{ not json")
+    want("a MALFORMED registry -> counter (fails closed)",
+         synth, "MA", broken, "counter", expect_msg="does not parse")
+    noartifacts = tmp / "no_artifacts.json"
+    noartifacts.write_text(json.dumps({"policy": {}}))
+    want("a registry with no 'artifacts' list -> counter",
+         synth, "MA", noartifacts, "counter", expect_msg="no 'artifacts' list")
+    want("an artifact that does not exist -> counter",
+         synth, "MISSING", registry, "counter", expect_msg="absent")
+    # A registry entry matching the report but NOT the checkpoint must not match:
+    # both halves of the identity are required.
+    half = tmp / "half_registry.json"
+    half.write_text(json.dumps({"artifacts": [{
+        "id": "half/MA", "training_seed": 29, "checkpoint": "MA",
+        "train_report_sha256": sha(synth / "MA" / "train_report.json"),
+        "delta_sha256": "0" * 64,
+        "provenance": {"produced_by": "fixture"}}]}))
+    want("report matches but checkpoint does not -> counter",
+         synth, "MA", half, "counter", expect_msg="identity differs")
+    full = tmp / "full_registry.json"
+    full.write_text(json.dumps({"artifacts": [{
+        "id": "full/MA", "training_seed": 29, "checkpoint": "MA",
+        "train_report_sha256": sha(synth / "MA" / "train_report.json"),
+        "delta_sha256": sha(synth / "MA" / "delta.bin"),
+        "provenance": {"produced_by": "fixture"}}]}))
+    want("both halves match -> legacy_optional",
+         synth, "MA", full, "legacy_optional",
+         expect_msg="registered saved pilot artifact")
+    # The checkpoint NAME is part of the identity: the same bytes under another
+    # name are not the registered artifact.
+    (synth / "MAB").mkdir(parents=True, exist_ok=True)
+    shutil.copy(synth / "MA" / "delta.bin", synth / "MAB" / "delta.bin")
+    shutil.copy(synth / "MA" / "train_report.json", synth / "MAB" / "train_report.json")
+    want("the same bytes under a different name -> counter",
+         synth, "MAB", full, "counter")
+
+
 def test_real_artifacts():
     print("\nreal saved artifacts -- revalidated on CPU against the real contracts")
     if not SEQ_ROOT.exists():
@@ -859,6 +1047,60 @@ def test_real_artifacts():
                    "--expect_sha", real_sha(other, "MA")),
               expect_msg="stale with respect to its checkpoint")
 
+        # ---- the IMAGE-REUSE provenance gate, on the real saved evaluations.
+        #
+        # Read-only: --provenance_check_only loads no model and writes nothing.
+        # Two things must hold on real data. A legitimate resume must be
+        # ACCEPTED -- otherwise the gate would block real recovery work -- and
+        # the same images offered against the other seed's checkpoint of the
+        # same name must be REFUSED, which is the relabelling the gate exists
+        # to stop.
+        gen = REPO / "scripts" / "seq" / "generate_eval_images.py"
+        base_model = json.loads(bmc.read_text())["base_model_dir"]
+
+        def prov(ck, ckpt_seed):
+            args = [sys.executable, str(gen), "--manifest", str(man),
+                    "--expect_manifest_sha", man_sha,
+                    "--base_model_dir", base_model, "--checkpoint_name", ck,
+                    "--out_dir", str(evald / ck / "images"),
+                    "--report", str(evald / ck / "image_report.json"),
+                    "--provenance_check_only"]
+            if ck != "M0":
+                args += ["--unet_ckpt", str(SEQ_ROOT / "models"
+                                            / f"seed{ckpt_seed}" / ck / "delta.bin")]
+            p = subprocess.run(args, capture_output=True, text=True,
+                               env={**os.environ, "CUDA_VISIBLE_DEVICES": ""})
+            return p.returncode, p.stdout + p.stderr
+
+        for ck in ("M0", "MA", "MAB", "MAB_L2", "MAC", "MAC_L2"):
+            rc, out = prov(ck, seed)
+            okc = rc == 0 and "authorized" in out
+            (PASS if okc else FAIL).append(f"real seed{seed}/{ck} reuse authorized")
+            print(f"  {'ok  ' if okc else 'FAIL'}  "
+                  f"{f'real seed{seed}/{ck}: a legitimate resume is authorized':<58} "
+                  f"-> rc={rc}")
+            if not okc:
+                for line in out.strip().splitlines()[:3]:
+                    print(f"          | {line}")
+        rc, out = prov("MA", other)
+        okc = rc == 3 and "the model changed under the same name" in out
+        (PASS if okc else FAIL).append(f"real seed{seed}/MA reuse refused cross-seed")
+        print(f"  {'ok  ' if okc else 'FAIL'}  "
+              f"{f'real seed{seed}/MA images REFUSED for seed{other} checkpoint':<58} "
+              f"-> rc={rc}")
+        if not okc:
+            for line in out.strip().splitlines()[:3]:
+                print(f"          | {line}")
+        # Nothing may have been written by any of the above.
+        marker = evald / "MA" / "image_report.json"
+        before = sha(marker)
+        rc, _ = prov("MA", other)
+        unchanged = sha(marker) == before
+        (PASS if unchanged else FAIL).append(f"seed{seed} image report untouched")
+        print(f"  {'ok  ' if unchanged else 'FAIL'}  "
+              f"{f'real seed{seed}/MA image_report.json untouched by the gate':<58} "
+              f"-> {'unchanged' if unchanged else 'MODIFIED (bad)'}")
+
 
 def main() -> int:
     try:
@@ -874,6 +1116,7 @@ def main() -> int:
         test_manifest_stage(tmp)
         test_proposed_manifests()
         test_marker(tmp)
+        test_legacy_artifact_policy(tmp)
         test_real_artifacts()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

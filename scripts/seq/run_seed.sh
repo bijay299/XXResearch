@@ -47,12 +47,18 @@ done
 # manifest being validated: reading the claimed digest out of that same file
 # would make content tampering invisible.
 MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:?SEQ_EVAL_MANIFEST_SHA must be set}"
-STEPS_EVIDENCE="$(seq_steps_evidence "$SEED")"
-echo "seed ${SEED}: manifest identity ${MANIFEST_SHA:0:12}..., steps evidence=${STEPS_EVIDENCE}"
-if [ "$STEPS_EVIDENCE" = "legacy_optional" ]; then
-    echo "seed ${SEED}: declared LEGACY (SEQ_LEGACY_TRAIN_SEEDS) -- training completion" \
-         "will be reported UNVERIFIED where no step counter exists; structural" \
-         "validation still applies and nothing is retrained on that basis."
+echo "seed ${SEED}: manifest identity ${MANIFEST_SHA:0:12}..."
+# The completed-step policy is decided PER ARTIFACT, from that artifact's content
+# identity -- never once per seed. A seed number is not evidence: the former
+# per-seed exception also covered brand-new runs that happened to use seed 17 or
+# 29, which are exactly the seeds the proposed new trajectories use.
+if [ -n "${SEQ_LEGACY_ARTIFACT_REGISTRY}" ]; then
+    echo "seed ${SEED}: legacy-artifact registry = ${SEQ_LEGACY_ARTIFACT_REGISTRY}" \
+         "(exception applies only to artifacts whose report AND checkpoint hashes" \
+         "are registered there; every newly produced output requires the counter)"
+else
+    echo "seed ${SEED}: legacy-artifact registry EMPTY -- the completed-step" \
+         "counter is required for every artifact, with no exception"
 fi
 
 # sha256 of a checkpoint currently on disk, so an evaluation can be bound to it.
@@ -83,13 +89,30 @@ req_anchor() { case "$1" in MA|MAB|MAB_L2) echo horse;; MAC|MAC_L2) echo flower;
 req_parent() { case "$1" in MA) echo M0;; *) echo MA;; esac; }
 req_l2sp()   { case "$1" in *_L2) echo "$SEQ_L2SP_WEIGHT";; *) echo 0;; esac; }
 
-validate_train() {   # validate_train <name>
-    CUDA_VISIBLE_DEVICES="" python "$SEQ_VALIDATOR" train "$1" \
+# validate_train <name> [forced_steps_evidence]
+#
+# With no second argument the completed-step policy is derived from the artifact
+# NOW ON DISK (content identity against the frozen registry). Pass `counter` to
+# force the strict policy: that is used immediately after this run produced the
+# artifact, so nothing this run created can ever take the legacy exception.
+validate_train() {
+    local name="$1" forced="${2:-}" ev line
+    if [ -n "$forced" ]; then
+        ev="$forced"
+    else
+        line="$(seq_steps_evidence_full "$MODELS" "$name")"
+        ev="${line%%|*}"
+        case "${ev}|${line#*|}" in
+            legacy_optional*)      echo "[legacy] ${name}: ${line#*|}" >&2 ;;
+            *"identity differs"*)  echo "[legacy-miss] ${name}: ${line#*|}" >&2 ;;
+        esac
+    fi
+    CUDA_VISIBLE_DEVICES="" python "$SEQ_VALIDATOR" train "$name" \
         --models_root "$MODELS" --contract "$SEQ_CKPT_CONTRACT" \
-        --expect_seed "$SEED" --expect_parent "$(req_parent "$1")" \
-        --expect_target "$(req_target "$1")" --expect_anchor "$(req_anchor "$1")" \
-        --expect_l2sp "$(req_l2sp "$1")" --expect_steps "$SEQ_ITERATIONS" \
-        --steps_evidence "$STEPS_EVIDENCE" \
+        --expect_seed "$SEED" --expect_parent "$(req_parent "$name")" \
+        --expect_target "$(req_target "$name")" --expect_anchor "$(req_anchor "$name")" \
+        --expect_l2sp "$(req_l2sp "$name")" --expect_steps "$SEQ_ITERATIONS" \
+        --steps_evidence "$ev" \
         --write_marker
 }
 
@@ -136,6 +159,19 @@ train() {   # train <gpu> <name> <anchor_name> <target> <adir> <aprompts> <l2> [
     if validate_train "$name" >/dev/null 2>&1; then
         echo "[skip] $name (validated complete)"; return 0
     fi
+    # Saved pilot evidence is never retrained over. A registered checkpoint on
+    # disk is protected whatever state its report is in: a missing or edited
+    # report is a reason to look, never a reason to overwrite the only copy of
+    # the checkpoint that produced the published rates.
+    if [ -e "${MODELS}/${name}/delta.bin" ] && seq_registered_checkpoint "$MODELS" "$name"; then
+        echo "[FAIL] ${name}: its artifacts do not validate, but" \
+             "${MODELS}/${name}/delta.bin is a REGISTERED saved pilot checkpoint" \
+             "(configs/legacy_training_artifacts.json). Refusing to retrain," \
+             "move or replace saved evidence. Inspect it, and if a new" \
+             "trajectory is wanted, train it into a different directory." >&2
+        validate_train "$name" 2>&1 | sed 's/^/        /' >&2
+        return 1
+    fi
     if [ -e "${MODELS}/${name}/train_report.json" ]; then
         echo "[warn] ${name}: existing output does not validate; retraining" >&2
         validate_train "$name" 2>&1 | sed 's/^/        /' >&2
@@ -159,7 +195,10 @@ train() {   # train <gpu> <name> <anchor_name> <target> <adir> <aprompts> <l2> [
         echo "[FAIL] ${name} exit=${rc} (see ${LOGS}/train_${name}.log)" >&2
         return "$rc"
     fi
-    if ! validate_train "$name" 2>&1 | sed 's/^/        /'; then
+    # STRICT: this run produced these artifacts, so the completed-step counter is
+    # required unconditionally. The legacy exception covers saved evidence only
+    # and must never be reachable by something this launcher just created.
+    if ! validate_train "$name" counter 2>&1 | sed 's/^/        /'; then
         echo "[FAIL] ${name} exited 0 but its artifacts do not validate" >&2
         # Quarantine the freshly produced invalid report too (see the note in
         # evaluate). The delta.bin is left in place: it is the only copy of
@@ -173,25 +212,61 @@ train() {   # train <gpu> <name> <anchor_name> <target> <adir> <aprompts> <l2> [
     return 0
 }
 
+# Can the image files already in an evaluation directory be attributed to the
+# checkpoint now on disk? Delegated to the generator's OWN reuse gate, so the
+# launcher and the generator can never disagree about what counts as provenance.
+# CPU only: --provenance_check_only loads no model and writes nothing.
+#   exit 0 -> reuse authorized, or there is nothing to reuse
+#   exit 3 -> provenance absent or mismatched
+images_attributable() {   # images_attributable <checkpoint>
+    local ck="$1" extra=()
+    [ "$ck" != "M0" ] && extra=(--unet_ckpt "${MODELS}/${ck}/delta.bin")
+    CUDA_VISIBLE_DEVICES="" python scripts/seq/generate_eval_images.py \
+        --manifest "$SEQ_EVAL_MANIFEST" --expect_manifest_sha "$MANIFEST_SHA" \
+        --base_model_dir "$SEQ_BASE_MODEL" "${extra[@]}" \
+        --checkpoint_name "$ck" --out_dir "${EVALR}/${ck}/images" \
+        --report "${EVALR}/${ck}/image_report.json" --provenance_check_only
+}
+
 evaluate() {   # evaluate <gpu> <name>
     local gpu="$1" ck="$2" rc=0
     if validate_eval "$ck" >/dev/null 2>&1; then
         echo "[skip] eval $ck (validated complete)"; return 0
     fi
-    if [ -e "${EVALR}/${ck}/detections.jsonl" ]; then
-        echo "[warn] ${ck}: existing detections do not validate; re-running" >&2
+    if [ -e "${EVALR}/${ck}/detections.jsonl" ] || \
+       [ -e "${EVALR}/${ck}/image_report.json" ] || \
+       [ -d "${EVALR}/${ck}/images" ]; then
+        echo "[warn] ${ck}: existing evaluation does not validate; re-running" >&2
         validate_eval "$ck" 2>&1 | sed 's/^/        /' >&2
-        quarantine "${EVALR}/${ck}/detections.jsonl" \
-                   "failed validate_stage.py eval at $(date -Is); re-run after this"
-        quarantine "${EVALR}/${ck}/detect_report.json" "companion of the above"
+        # Quarantining the detections alone used to leave the IMAGES and the old
+        # image_report.json in place, and the recovery run then reused those old
+        # image bytes and wrote the CURRENT checkpoint hash over them. Old
+        # evidence was relabelled as new-model evidence and nothing downstream
+        # could see it. So: reuse the images only when they are provably this
+        # checkpoint's; otherwise preserve the whole evaluation together and
+        # start from an empty directory.
+        if images_attributable "$ck" >/dev/null 2>&1; then
+            echo "        images are provably from the checkpoint now on disk;" \
+                 "preserving them and re-running detection only" >&2
+            quarantine "${EVALR}/${ck}/detections.jsonl" \
+                       "failed validate_stage.py eval at $(date -Is); re-run after this"
+            quarantine "${EVALR}/${ck}/detect_report.json" "companion of the above"
+        else
+            echo "        images CANNOT be attributed to the checkpoint now on" \
+                 "disk; preserving the entire evaluation (images and reports" \
+                 "together) and generating into a fresh directory" >&2
+            images_attributable "$ck" 2>&1 | sed 's/^/          /' >&2
+            if [ -L "${EVALR}/${ck}" ]; then
+                echo "[FAIL] eval ${ck}: ${EVALR}/${ck} is a symlink to a shared" \
+                     "evaluation and must not be regenerated through it" >&2
+                return 1
+            fi
+            quarantine "${EVALR}/${ck}" \
+                       "whole evaluation preserved at $(date -Is): its images could not be attributed to the checkpoint on disk, so reusing any of them would have relabelled older bytes as evidence from the current model"
+            mkdir -p "${EVALR}/${ck}" || return 1
+        fi
     fi
-    if ! CUDA_VISIBLE_DEVICES="" python "$SEQ_VALIDATOR" train "$ck" \
-            --models_root "$MODELS" --contract "$SEQ_CKPT_CONTRACT" \
-            --expect_seed "$SEED" --expect_parent "$(req_parent "$ck")" \
-            --expect_target "$(req_target "$ck")" --expect_anchor "$(req_anchor "$ck")" \
-            --expect_l2sp "$(req_l2sp "$ck")" --expect_steps "$SEQ_ITERATIONS" \
-            --steps_evidence "$STEPS_EVIDENCE" \
-            >/dev/null 2>&1; then
+    if ! validate_train "$ck" >/dev/null 2>&1; then
         echo "[FAIL] eval ${ck}: its training checkpoint does not validate; " \
              "refusing to evaluate an unverified checkpoint" >&2
         return 1
@@ -200,11 +275,16 @@ evaluate() {   # evaluate <gpu> <name>
 
     echo "[eval] seed${SEED} ${ck} on GPU ${gpu}"
     CUDA_VISIBLE_DEVICES="$gpu" python scripts/seq/generate_eval_images.py \
-        --manifest "$SEQ_EVAL_MANIFEST" --base_model_dir "$SEQ_BASE_MODEL" \
+        --manifest "$SEQ_EVAL_MANIFEST" --expect_manifest_sha "$MANIFEST_SHA" \
+        --base_model_dir "$SEQ_BASE_MODEL" \
         --unet_ckpt "${MODELS}/${ck}/delta.bin" --checkpoint_name "$ck" \
         --out_dir "${EVALR}/${ck}/images" --report "${EVALR}/${ck}/image_report.json" \
         > "${LOGS}/gen_${ck}.log" 2>&1
     rc=$?
+    # exit 3 is the generator's provenance refusal: it wrote nothing and left the
+    # old evaluation intact. That is a correct refusal, never a reason to retry.
+    [ "$rc" -eq 3 ] && { echo "[FAIL] generate ${ck}: image reuse REFUSED for want of" \
+        "valid provenance (${LOGS}/gen_${ck}.log). Nothing was overwritten." >&2; return 3; }
     [ "$rc" -ne 0 ] && { echo "[FAIL] generate ${ck} exit=${rc} (${LOGS}/gen_${ck}.log)" >&2; return "$rc"; }
 
     CUDA_VISIBLE_DEVICES="$gpu" python scripts/seq/detect.py \
@@ -267,10 +347,26 @@ wait "$E2" || FAILED+=("eval-lane-B")
 # ---- the fact that the script reached this line.
 echo "=== SEED ${SEED} verification ==="
 INCOMPLETE=()
+LEGACY_UNVERIFIED=()
 for ck in MA MAB MAB_L2 MAC MAC_L2; do
-    if validate_train "$ck" >/dev/null 2>&1; then echo "  train ${ck}: VALID"
-    else echo "  train ${ck}: INVALID"; INCOMPLETE+=("train:${ck}"); fi
+    # Report the completed-step policy PER CHECKPOINT, so a legacy exception is
+    # visible in the summary rather than only in a suppressed stderr note.
+    EV="$(seq_steps_evidence "$MODELS" "$ck")"
+    if [ "$EV" = "legacy_optional" ]; then
+        EVNOTE=" [registered saved artifact: training completion UNVERIFIED]"
+        LEGACY_UNVERIFIED+=("$ck")
+    else
+        EVNOTE=" [completed-step counter required]"
+    fi
+    if validate_train "$ck" >/dev/null 2>&1; then echo "  train ${ck}: VALID${EVNOTE}"
+    else echo "  train ${ck}: INVALID${EVNOTE}"; INCOMPLETE+=("train:${ck}"); fi
 done
+if [ "${#LEGACY_UNVERIFIED[@]}" -gt 0 ]; then
+    echo "  note: training completion is UNVERIFIED for ${LEGACY_UNVERIFIED[*]}" \
+         "-- registered saved artifact(s) that predate the step counter." \
+         "Structural validation passed in full; nothing was retrained," \
+         "replaced or backfilled."
+fi
 for ck in M0 MA MAB MAB_L2 MAC MAC_L2; do
     if validate_eval "$ck" >/dev/null 2>&1; then echo "  eval  ${ck}: VALID"
     else echo "  eval  ${ck}: INVALID"; INCOMPLETE+=("eval:${ck}"); fi

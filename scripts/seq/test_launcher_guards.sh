@@ -103,8 +103,70 @@ has "scripts/seq/train_request.py" 'update_progress_and_checkpoint' \
 hasntre "$VALIDATOR" 'implied = secs / sps' "the circular runtime inference is gone"
 hasntre "$VALIDATOR" 'runtime implies' "no step count inferred from timestamps"
 has "$VALIDATOR" 'steps_evidence' "a legacy policy exists and is explicit"
-has "$HERE/exp_config.sh" 'SEQ_LEGACY_TRAIN_SEEDS' "legacy seeds are declared in config"
 has "$VALIDATOR" 'training_completion_verified' "completion is reported as a flag"
+
+echo
+echo "the legacy exception is scoped to saved ARTIFACTS, not to seed numbers"
+POLICY="${HERE}/legacy_artifact_policy.py"
+REGISTRY="${REPO}/configs/legacy_training_artifacts.json"
+[ -f "$POLICY" ]   && ok "legacy_artifact_policy.py exists" || bad "legacy policy script missing"
+[ -s "$REGISTRY" ] && ok "the saved-artifact registry is committed" || bad "registry missing"
+# The NAME survives in a history comment, deliberately. What must be gone is any
+# assignment or use of it.
+hasntre "$HERE/exp_config.sh" '^export SEQ_LEGACY_TRAIN_SEEDS' \
+    "the seed-number list is no longer exported"
+hasntre "$HERE/exp_config.sh" '\$\{?SEQ_LEGACY_TRAIN_SEEDS' \
+    "and nothing reads it"
+hasnt "$SEED_SH" 'SEQ_LEGACY_TRAIN_SEEDS' "it is gone from the launcher entirely"
+has "$HERE/exp_config.sh" 'SEQ_LEGACY_ARTIFACT_REGISTRY' \
+    "the registry is declared in config"
+# ${VAR-default}, never ${VAR:-default}: an explicitly empty value must be
+# honoured, which is precisely what the seed-list version got wrong.
+hasre "$HERE/exp_config.sh" 'SEQ_LEGACY_ARTIFACT_REGISTRY="\$\{SEQ_LEGACY_ARTIFACT_REGISTRY-' \
+    "an explicitly EMPTY registry is honoured, not replaced by the default"
+hasntre "$HERE/exp_config.sh" 'SEQ_LEGACY_ARTIFACT_REGISTRY="\$\{SEQ_LEGACY_ARTIFACT_REGISTRY:-' \
+    "no :- form that would silently restore the default on empty"
+hasre "$HERE/exp_config.sh" 'seq_steps_evidence_full\(\) \{' \
+    "the policy function takes an artifact, not a seed"
+has "$HERE/exp_config.sh" 'seq_steps_evidence_full <models_root> <checkpoint>' \
+    "its arguments are a models root and a checkpoint"
+has "$POLICY" 'train_report_sha256' "identity is the report's content digest"
+has "$POLICY" 'delta_sha256' "together with the checkpoint's content digest"
+has "$POLICY" 'fail closed' "the policy fails closed"
+# Post-training validation must be strict unconditionally.
+hasre "$SEED_SH" 'validate_train "\$name" counter' \
+    "a freshly produced artifact is validated with the STRICT counter policy"
+has "$SEED_SH" 'seq_registered_checkpoint' "registered saved checkpoints are protected"
+has "$SEED_SH" 'Refusing to retrain' "the launcher refuses to overwrite saved evidence"
+has "$POLICY" 'def protect' "the protection check is implemented once"
+
+echo
+echo "image reuse is bound to provenance, not to a pathname"
+GEN="${HERE}/generate_eval_images.py"
+has "$GEN" 'def reuse_provenance' "the generator has an explicit reuse gate"
+has "$GEN" 'RC_PROVENANCE' "a refusal has its own exit status"
+has "$GEN" 'Nothing was written' "a refusal says it wrote nothing"
+has "$GEN" 'the model changed under' \
+    "a changed checkpoint under the same name is named as such"
+has "$GEN" 'the digest recorded for them' "image bytes are re-verified"
+has "$GEN" 'canonical_manifest_digest' "it uses the ONE canonical manifest rule"
+# The gate must precede any model import: a refusal costs no GPU or model setup.
+if "${MOCK_PY:-python3}" - "$GEN" <<'PY'
+import re, sys
+src = open(sys.argv[1]).read()
+gate = src.index("verdict, reasons, reusable = reuse_provenance(")
+imports = [m.start() for m in re.finditer(r"^\s+import torch", src, re.M)]
+sys.exit(0 if imports and min(imports) > gate else 1)
+PY
+then ok "the provenance gate runs BEFORE any torch import"
+else bad "gate ordering" "torch is imported before the reuse gate"; fi
+has "$SEED_SH" 'images_attributable' "the launcher asks the generator's own gate"
+has "$SEED_SH" '--provenance_check_only' "and asks it without loading a model"
+hasre "$SEED_SH" 'preserving the entire evaluation' \
+    "an unattributable evaluation is preserved whole, not partly quarantined"
+hasntre "$SEED_SH" 'quarantine "\$\{EVALR\}/\$\{ck\}/detections.jsonl" \\\n *"failed validate' \
+    "detections are no longer quarantined unconditionally"
+has "$SEED_SH" 'is a symlink to a shared' "a shared M0 directory is never regenerated through"
 
 echo
 echo "the frozen manifest is validated by content"
@@ -116,6 +178,20 @@ hasntre "$SEED_SH" 'manifest_sha256",""' "the launcher no longer reads the diges
 hasntre "$ANA_SH"  'manifest_sha256",""' "nor does the analysis path"
 has "scripts/seq/build_draft_manifests.py" 'canonical_manifest_digest' \
     "the manifest builder imports the same rule"
+
+echo
+echo "the base-model identity claim is stated as partial"
+has "$VALIDATOR" '--verify_base_model_weight_sha' "the full weight check exists and is explicit"
+hasre "$VALIDATOR" 'PARTIAL: config-file digests and weight-file byte' \
+    "the partial check reports itself as partial"
+hasre "$VALIDATOR" 'DECLARED, not verified' \
+    "an unverified identity is reported as declared, not as verified"
+hasntre "$VALIDATOR" 'r\.info\["base_model_identity"\] = "verified"' \
+    "no bare 'verified' verdict for a partial check"
+has "${REPO}/configs/base_model_contract.json" 'identity_policy' \
+    "the launch-time policy is written into the contract"
+has "${REPO}/configs/base_model_contract.json" 'what_cheap_identity_does_not_cover' \
+    "and so are its limits"
 
 echo
 echo "the validator fails closed"

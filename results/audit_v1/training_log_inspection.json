@@ -1,0 +1,205 @@
+{
+  "_what_this_is": "A bounded CPU inspection of the saved pilot's terminal training logs and their linkage to the registered checkpoints.",
+  "_what_this_is_not": "NOT a completed-step counter, and not a substitute for one. A tqdm progress bar is terminal display output rendering its own configured total; it was written by the same process that would have recorded a counter, was never parsed or validated when produced, and is not the trainer's internal completed-step variable. No counter has been derived from this and none has been written into any report. Training completion for these ten artifacts remains UNVERIFIED.",
+  "_why_logs_are_weaker_evidence": "No contract hashes these logs. They are plain text in a directory and could be edited or truncated with no check noticing. The digests recorded here fix them as of this inspection only.",
+  "expect_steps": 1000,
+  "n_artifacts_expected": 10,
+  "n_logs_found": 10,
+  "n_logs_missing": 0,
+  "missing": [],
+  "n_logs_showing_terminal_full_progress": 10,
+  "n_logs_embedding_the_registered_delta_digest": 10,
+  "summary": "10/10 logs show a terminal 1000/1000 progress line; 10/10 embed the registered delta.bin digest of the artifact they are supposed to belong to.",
+  "logs": [
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/train_MA.log",
+      "log_bytes": 388084,
+      "log_sha256": "2e5a34070256b7ba0ed8742f7e90d3bdeab17450d991745554952b2aed9db506",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82"
+      ],
+      "registered_delta_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "e96a35cbb1066a275656e1a8e1d205ab56fe96f95f63e3c96d06dc94afdfcbf9",
+      "artifact": "seed17/MA"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/train_MAB.log",
+      "log_bytes": 388385,
+      "log_sha256": "06de4e822705ae50fa9d3d4be871c8889c613a6647a7aff37b10e240c8e87cd7",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "63c9a8232cfd96ac257560b7cacabae287f4727e23b8ee57d21828fb579978f9"
+      ],
+      "registered_delta_sha256": "63c9a8232cfd96ac257560b7cacabae287f4727e23b8ee57d21828fb579978f9",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "4205e9812ef22680285242f08919516099b3d8bddcbeeced7838056b49ba10c4",
+      "artifact": "seed17/MAB"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/train_MAB_L2.log",
+      "log_bytes": 470615,
+      "log_sha256": "7ae4fd21665655c769e108bc2b9b33ed1e4f83942808fcbea9f410a4acc88e84",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "8ee7d56f62b04be98edf6f28aa34c52ed614f5fbaed84f883ae926da329cec8b"
+      ],
+      "registered_delta_sha256": "8ee7d56f62b04be98edf6f28aa34c52ed614f5fbaed84f883ae926da329cec8b",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "8421b8cd73e52acd94bdc1451def39e525a668d722fe1196b5f28057d6ba5460",
+      "artifact": "seed17/MAB_L2"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/train_MAC.log",
+      "log_bytes": 418670,
+      "log_sha256": "1a90eeb22ba3b59550102644749f3b980bab72da78a918d7055e6964fcd82b9f",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "e7b6324d3209a9b1ea0f5858679b2623b12e93d0386ae1b00edef5b5f3e4a129"
+      ],
+      "registered_delta_sha256": "e7b6324d3209a9b1ea0f5858679b2623b12e93d0386ae1b00edef5b5f3e4a129",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "df3230e1e4c71465122f8214bc5002358846717900a3bbc0d6b9f0436896ff80",
+      "artifact": "seed17/MAC"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/train_MAC_L2.log",
+      "log_bytes": 501386,
+      "log_sha256": "763d11a92ac63927843becf62cb3cef0c3238cfdf63564908d8e9dfb11465eb8",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "c39e03ff85a45d9483418f7629d0fae1fd2f950ffe5658661e3f3c7f7f8ea6b4"
+      ],
+      "registered_delta_sha256": "c39e03ff85a45d9483418f7629d0fae1fd2f950ffe5658661e3f3c7f7f8ea6b4",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "01bc323eaf33e1e1a2a2358235295a7543d00203c35e6bef530160d391d0e3a4",
+      "artifact": "seed17/MAC_L2"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/seed29/train_MA.log",
+      "log_bytes": 388079,
+      "log_sha256": "8c010eaa0ea27e61967689598c7a16084b786bf0539607e3e7952ac255f6d362",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc"
+      ],
+      "registered_delta_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "d3895b16abe0661c3241e3726ba8b5281143b9d20fbabd5a7b8171906f2999f9",
+      "artifact": "seed29/MA"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/seed29/train_MAB.log",
+      "log_bytes": 388396,
+      "log_sha256": "1e6bea2175e34e2802ecc05fa884c5d7d47504b428fff70d039ba202538540a3",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "d9f28f0fc6b8cc5b72bc69a962c3c9e84250ccddc88c114008b42e317ed42894"
+      ],
+      "registered_delta_sha256": "d9f28f0fc6b8cc5b72bc69a962c3c9e84250ccddc88c114008b42e317ed42894",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "6e23c0548a74c7333141f0d65b649f65151d0583dee9005e9ee7cce2b23338cb",
+      "artifact": "seed29/MAB"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/seed29/train_MAB_L2.log",
+      "log_bytes": 470801,
+      "log_sha256": "b243deec5be4252a1c3f3b62aeb5b53217eb091e38a65548227b0197cf904f1d",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "c4f3ecdcb94569646f51712b08ba80f62b23b4ae1162e953f3c16f5c3bfc7871"
+      ],
+      "registered_delta_sha256": "c4f3ecdcb94569646f51712b08ba80f62b23b4ae1162e953f3c16f5c3bfc7871",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "5ac55eb7991ae38e0155589905e475440c0367a5df0cdbcc388cd98db465b870",
+      "artifact": "seed29/MAB_L2"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/seed29/train_MAC.log",
+      "log_bytes": 418579,
+      "log_sha256": "d17440c521cb1ba21d23a77159f28a0c4435be2e5e7b59bef7327c18af9b7ad4",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "45e910d2fb11fde5b634c3db5d156f0a1b661bd469c6dd35572fa677d57ec842"
+      ],
+      "registered_delta_sha256": "45e910d2fb11fde5b634c3db5d156f0a1b661bd469c6dd35572fa677d57ec842",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "4f0e97c6c09f6384a44169c1c0c5e5695de9b65e515d95ac5b3ffaa629b8f0a7",
+      "artifact": "seed29/MAC"
+    },
+    {
+      "log": "/data/bijaypandey/cuig_pilot/seq_pilot/logs/seed29/train_MAC_L2.log",
+      "log_bytes": 501784,
+      "log_sha256": "6a82393b0a92a68e4e7f2300f575333458000077ebb4c9dbd6087cdeffb490f7",
+      "progress_bar_lines": 2002,
+      "progress_bar_totals_seen": [
+        1000
+      ],
+      "max_step_shown": 1000,
+      "terminal_full_progress_lines": 3,
+      "shows_terminal_full_progress": true,
+      "distinct_sha256_strings_in_log": [
+        "06b62d00a55b9a778113f20ef0a8d63872374c93a6507c71d5a0e0d97de41dea"
+      ],
+      "registered_delta_sha256": "06b62d00a55b9a778113f20ef0a8d63872374c93a6507c71d5a0e0d97de41dea",
+      "log_embeds_registered_delta_sha256": true,
+      "registered_report_sha256": "435584bbc797ca4b8ada9a97655bb0fef3f63612c1fd91072c9e94dd12be8973",
+      "artifact": "seed29/MAC_L2"
+    }
+  ]
+}
