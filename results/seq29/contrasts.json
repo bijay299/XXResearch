@@ -1,0 +1,2472 @@
+{
+  "training_seed": 29,
+  "threshold": "0.5",
+  "note": "signed percentage-point differences; detector-based object-presence proxies, not UA/IRA/CRA",
+  "uncertainty": "paired bootstrap by prompt (2000 draws, 95% CI); one training seed = sampling uncertainty only",
+  "families": {
+    "all": {
+      "initial_cat_suppression": {
+        "diff_pp": 72.5,
+        "ci95_pp": [
+          50.0,
+          90.0
+        ],
+        "D_M0": 100.0,
+        "D_MA": 27.5,
+        "n_images_each": 40
+      },
+      "historical_cat_recovery": {
+        "MAB": {
+          "diff_pp": -27.5,
+          "ci95_pp": [
+            -50.0,
+            -10.0
+          ],
+          "D_MAB": 0.0,
+          "D_MA": 27.5,
+          "n_images_each": 40
+        },
+        "MAC": {
+          "diff_pp": -7.5,
+          "ci95_pp": [
+            -25.0,
+            5.0
+          ],
+          "D_MAC": 20.0,
+          "D_MA": 27.5,
+          "n_images_each": 40
+        },
+        "MAB_L2": {
+          "diff_pp": -22.5,
+          "ci95_pp": [
+            -42.5,
+            -7.5
+          ],
+          "D_MAB_L2": 5.0,
+          "D_MA": 27.5,
+          "n_images_each": 40
+        },
+        "MAC_L2": {
+          "diff_pp": -5.0,
+          "ci95_pp": [
+            -12.5,
+            0.0
+          ],
+          "D_MAC_L2": 22.5,
+          "D_MA": 27.5,
+          "n_images_each": 40
+        }
+      },
+      "new_request_suppression": {
+        "MAB": {
+          "diff_pp": 82.5,
+          "ci95_pp": [
+            67.5,
+            95.0
+          ],
+          "D_MA": 92.5,
+          "D_MAB": 10.0,
+          "n_images_each": 40,
+          "target": "dog",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAC": {
+          "diff_pp": 52.5,
+          "ci95_pp": [
+            30.0,
+            72.5
+          ],
+          "D_MA": 87.5,
+          "D_MAC": 35.0,
+          "n_images_each": 40,
+          "target": "sandwich",
+          "D_M0": 95.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAB_L2": {
+          "diff_pp": 42.5,
+          "ci95_pp": [
+            20.0,
+            67.5
+          ],
+          "D_MA": 92.5,
+          "D_MAB_L2": 50.0,
+          "n_images_each": 40,
+          "target": "dog",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAC_L2": {
+          "diff_pp": 7.5,
+          "ci95_pp": [
+            0.0,
+            15.0
+          ],
+          "D_MA": 87.5,
+          "D_MAC_L2": 80.0,
+          "n_images_each": 40,
+          "target": "sandwich",
+          "D_M0": 95.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        }
+      },
+      "retention_vs_M0": {
+        "MA": {
+          "horse": {
+            "diff_pp": 7.5,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MA": 100.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              0.0,
+              7.5
+            ],
+            "D_MA": 95.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -12.5,
+              0.0
+            ],
+            "D_MA": 85.0,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -7.5,
+              15.0
+            ],
+            "D_MA": 92.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          }
+        },
+        "MAB": {
+          "horse": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              0.0,
+              12.5
+            ],
+            "D_MAB": 97.5,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": -37.5,
+            "ci95_pp": [
+              -65.0,
+              -7.5
+            ],
+            "D_MAB": 55.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -17.5,
+              5.0
+            ],
+            "D_MAB": 85.0,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -7.5,
+              15.0
+            ],
+            "D_MAB": 92.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          }
+        },
+        "MAC": {
+          "horse": {
+            "diff_pp": 7.5,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MAC": 100.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -10.0,
+              15.0
+            ],
+            "D_MAC": 95.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -7.5,
+              0.0
+            ],
+            "D_MAC": 87.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -7.5,
+              15.0
+            ],
+            "D_MAC": 92.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          }
+        },
+        "MAB_L2": {
+          "horse": {
+            "diff_pp": 7.5,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MAB_L2": 100.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -7.5,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -7.5,
+              0.0
+            ],
+            "D_MAB_L2": 87.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -7.5,
+              15.0
+            ],
+            "D_MAB_L2": 92.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          }
+        },
+        "MAC_L2": {
+          "horse": {
+            "diff_pp": 7.5,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 92.5,
+            "D_M0": 92.5,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -10.0,
+              5.0
+            ],
+            "D_MAC_L2": 87.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -7.5,
+              15.0
+            ],
+            "D_MAC_L2": 92.5,
+            "D_M0": 90.0,
+            "n_images_each": 40
+          }
+        }
+      },
+      "retention_incremental_vs_MA": {
+        "MAB": {
+          "horse": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -7.5,
+              0.0
+            ],
+            "D_MAB": 97.5,
+            "D_MA": 100.0,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": -40.0,
+            "ci95_pp": [
+              -67.5,
+              -10.0
+            ],
+            "D_MAB": 55.0,
+            "D_MA": 95.0,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              -15.0,
+              12.5
+            ],
+            "D_MAB": 85.0,
+            "D_MA": 85.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB": 92.5,
+            "D_MA": 92.5,
+            "n_images_each": 40
+          }
+        },
+        "MAC": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              -10.0,
+              12.5
+            ],
+            "D_MAC": 95.0,
+            "D_MA": 95.0,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -5.0,
+              10.0
+            ],
+            "D_MAC": 87.5,
+            "D_MA": 85.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 92.5,
+            "D_MA": 92.5,
+            "n_images_each": 40
+          }
+        },
+        "MAB_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -12.5,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_MA": 95.0,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -5.0,
+              10.0
+            ],
+            "D_MAB_L2": 87.5,
+            "D_MA": 85.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 92.5,
+            "D_MA": 92.5,
+            "n_images_each": 40
+          }
+        },
+        "MAC_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 40
+          },
+          "bird": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -7.5,
+              0.0
+            ],
+            "D_MAC_L2": 92.5,
+            "D_MA": 95.0,
+            "n_images_each": 40
+          },
+          "chair": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              -5.0,
+              10.0
+            ],
+            "D_MAC_L2": 87.5,
+            "D_MA": 85.0,
+            "n_images_each": 40
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 92.5,
+            "D_MA": 92.5,
+            "n_images_each": 40
+          }
+        }
+      },
+      "branch_specific_undeleted_target": {
+        "MAB": {
+          "undeleted_target": "sandwich",
+          "vs_M0": {
+            "diff_pp": -20.0,
+            "ci95_pp": [
+              -35.0,
+              -7.5
+            ],
+            "D_MAB": 75.0,
+            "D_M0": 95.0,
+            "n_images_each": 40
+          },
+          "vs_MA": {
+            "diff_pp": -12.5,
+            "ci95_pp": [
+              -22.5,
+              -2.5
+            ],
+            "D_MAB": 75.0,
+            "D_MA": 87.5,
+            "n_images_each": 40
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAC": {
+          "undeleted_target": "dog",
+          "vs_M0": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -7.5,
+              0.0
+            ],
+            "D_MAC": 97.5,
+            "D_M0": 100.0,
+            "n_images_each": 40
+          },
+          "vs_MA": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              0.0,
+              12.5
+            ],
+            "D_MAC": 97.5,
+            "D_MA": 92.5,
+            "n_images_each": 40
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAB_L2": {
+          "undeleted_target": "sandwich",
+          "vs_M0": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -20.0,
+              0.0
+            ],
+            "D_MAB_L2": 85.0,
+            "D_M0": 95.0,
+            "n_images_each": 40
+          },
+          "vs_MA": {
+            "diff_pp": -2.5,
+            "ci95_pp": [
+              -7.5,
+              0.0
+            ],
+            "D_MAB_L2": 85.0,
+            "D_MA": 87.5,
+            "n_images_each": 40
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAC_L2": {
+          "undeleted_target": "dog",
+          "vs_M0": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -12.5,
+              0.0
+            ],
+            "D_MAC_L2": 95.0,
+            "D_M0": 100.0,
+            "n_images_each": 40
+          },
+          "vs_MA": {
+            "diff_pp": 2.5,
+            "ci95_pp": [
+              0.0,
+              7.5
+            ],
+            "D_MAC_L2": 95.0,
+            "D_MA": 92.5,
+            "n_images_each": 40
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        }
+      }
+    },
+    "literal": {
+      "initial_cat_suppression": {
+        "diff_pp": 85.0,
+        "ci95_pp": [
+          65.0,
+          100.0
+        ],
+        "D_M0": 100.0,
+        "D_MA": 15.0,
+        "n_images_each": 20
+      },
+      "historical_cat_recovery": {
+        "MAB": {
+          "diff_pp": -15.0,
+          "ci95_pp": [
+            -35.0,
+            0.0
+          ],
+          "D_MAB": 0.0,
+          "D_MA": 15.0,
+          "n_images_each": 20
+        },
+        "MAC": {
+          "diff_pp": 0.0,
+          "ci95_pp": [
+            0.0,
+            0.0
+          ],
+          "D_MAC": 15.0,
+          "D_MA": 15.0,
+          "n_images_each": 20
+        },
+        "MAB_L2": {
+          "diff_pp": -10.0,
+          "ci95_pp": [
+            -20.0,
+            0.0
+          ],
+          "D_MAB_L2": 5.0,
+          "D_MA": 15.0,
+          "n_images_each": 20
+        },
+        "MAC_L2": {
+          "diff_pp": 0.0,
+          "ci95_pp": [
+            0.0,
+            0.0
+          ],
+          "D_MAC_L2": 15.0,
+          "D_MA": 15.0,
+          "n_images_each": 20
+        }
+      },
+      "new_request_suppression": {
+        "MAB": {
+          "diff_pp": 70.0,
+          "ci95_pp": [
+            45.0,
+            90.0
+          ],
+          "D_MA": 90.0,
+          "D_MAB": 20.0,
+          "n_images_each": 20,
+          "target": "dog",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAC": {
+          "diff_pp": 75.0,
+          "ci95_pp": [
+            60.0,
+            90.0
+          ],
+          "D_MA": 100.0,
+          "D_MAC": 25.0,
+          "n_images_each": 20,
+          "target": "sandwich",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAB_L2": {
+          "diff_pp": 25.0,
+          "ci95_pp": [
+            0.0,
+            65.0
+          ],
+          "D_MA": 90.0,
+          "D_MAB_L2": 65.0,
+          "n_images_each": 20,
+          "target": "dog",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAC_L2": {
+          "diff_pp": 10.0,
+          "ci95_pp": [
+            0.0,
+            20.0
+          ],
+          "D_MA": 100.0,
+          "D_MAC_L2": 90.0,
+          "n_images_each": 20,
+          "target": "sandwich",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        }
+      },
+      "retention_vs_M0": {
+        "MA": {
+          "horse": {
+            "diff_pp": 15.0,
+            "ci95_pp": [
+              5.0,
+              25.0
+            ],
+            "D_MA": 100.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MA": 90.0,
+            "D_M0": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -20.0,
+              0.0
+            ],
+            "D_MA": 85.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              30.0
+            ],
+            "D_MA": 95.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          }
+        },
+        "MAB": {
+          "horse": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              20.0
+            ],
+            "D_MAB": 95.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -30.0,
+            "ci95_pp": [
+              -70.0,
+              15.0
+            ],
+            "D_MAB": 60.0,
+            "D_M0": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB": 95.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              30.0
+            ],
+            "D_MAB": 95.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC": {
+          "horse": {
+            "diff_pp": 15.0,
+            "ci95_pp": [
+              5.0,
+              25.0
+            ],
+            "D_MAC": 100.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              -15.0,
+              30.0
+            ],
+            "D_MAC": 95.0,
+            "D_M0": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 95.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              30.0
+            ],
+            "D_MAC": 95.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          }
+        },
+        "MAB_L2": {
+          "horse": {
+            "diff_pp": 15.0,
+            "ci95_pp": [
+              5.0,
+              25.0
+            ],
+            "D_MAB_L2": 100.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_M0": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 95.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              30.0
+            ],
+            "D_MAB_L2": 95.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC_L2": {
+          "horse": {
+            "diff_pp": 15.0,
+            "ci95_pp": [
+              5.0,
+              25.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_M0": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              30.0
+            ],
+            "D_MAC_L2": 95.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          }
+        }
+      },
+      "retention_incremental_vs_MA": {
+        "MAB": {
+          "horse": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB": 95.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -30.0,
+            "ci95_pp": [
+              -70.0,
+              15.0
+            ],
+            "D_MAB": 60.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              20.0
+            ],
+            "D_MAB": 95.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB": 95.0,
+            "D_MA": 95.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              -15.0,
+              30.0
+            ],
+            "D_MAC": 95.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              20.0
+            ],
+            "D_MAC": 95.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 95.0,
+            "D_MA": 95.0,
+            "n_images_each": 20
+          }
+        },
+        "MAB_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 10.0,
+            "ci95_pp": [
+              0.0,
+              20.0
+            ],
+            "D_MAB_L2": 95.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 95.0,
+            "D_MA": 95.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 95.0,
+            "D_MA": 95.0,
+            "n_images_each": 20
+          }
+        }
+      },
+      "branch_specific_undeleted_target": {
+        "MAB": {
+          "undeleted_target": "sandwich",
+          "vs_M0": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -20.0,
+              0.0
+            ],
+            "D_MAB": 90.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -20.0,
+              0.0
+            ],
+            "D_MAB": 90.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAC": {
+          "undeleted_target": "dog",
+          "vs_M0": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC": 95.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MAC": 95.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAB_L2": {
+          "undeleted_target": "sandwich",
+          "vs_M0": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB_L2": 95.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB_L2": 95.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAC_L2": {
+          "undeleted_target": "dog",
+          "vs_M0": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -20.0,
+              0.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        }
+      }
+    },
+    "paraphrase": {
+      "initial_cat_suppression": {
+        "diff_pp": 60.0,
+        "ci95_pp": [
+          30.0,
+          90.0
+        ],
+        "D_M0": 100.0,
+        "D_MA": 40.0,
+        "n_images_each": 20
+      },
+      "historical_cat_recovery": {
+        "MAB": {
+          "diff_pp": -40.0,
+          "ci95_pp": [
+            -70.0,
+            -10.0
+          ],
+          "D_MAB": 0.0,
+          "D_MA": 40.0,
+          "n_images_each": 20
+        },
+        "MAC": {
+          "diff_pp": -15.0,
+          "ci95_pp": [
+            -45.0,
+            10.0
+          ],
+          "D_MAC": 25.0,
+          "D_MA": 40.0,
+          "n_images_each": 20
+        },
+        "MAB_L2": {
+          "diff_pp": -35.0,
+          "ci95_pp": [
+            -70.0,
+            -5.0
+          ],
+          "D_MAB_L2": 5.0,
+          "D_MA": 40.0,
+          "n_images_each": 20
+        },
+        "MAC_L2": {
+          "diff_pp": -10.0,
+          "ci95_pp": [
+            -20.0,
+            0.0
+          ],
+          "D_MAC_L2": 30.0,
+          "D_MA": 40.0,
+          "n_images_each": 20
+        }
+      },
+      "new_request_suppression": {
+        "MAB": {
+          "diff_pp": 95.0,
+          "ci95_pp": [
+            85.0,
+            100.0
+          ],
+          "D_MA": 95.0,
+          "D_MAB": 0.0,
+          "n_images_each": 20,
+          "target": "dog",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAC": {
+          "diff_pp": 30.0,
+          "ci95_pp": [
+            0.0,
+            55.0
+          ],
+          "D_MA": 75.0,
+          "D_MAC": 45.0,
+          "n_images_each": 20,
+          "target": "sandwich",
+          "D_M0": 90.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAB_L2": {
+          "diff_pp": 60.0,
+          "ci95_pp": [
+            30.0,
+            90.0
+          ],
+          "D_MA": 95.0,
+          "D_MAB_L2": 35.0,
+          "n_images_each": 20,
+          "target": "dog",
+          "D_M0": 100.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        },
+        "MAC_L2": {
+          "diff_pp": 5.0,
+          "ci95_pp": [
+            0.0,
+            15.0
+          ],
+          "D_MA": 75.0,
+          "D_MAC_L2": 70.0,
+          "n_images_each": 20,
+          "target": "sandwich",
+          "D_M0": 90.0,
+          "note_first_deletion_effect_on_target": "compare D_M0 with D_MA: the cat deletion may already move this target"
+        }
+      },
+      "retention_vs_M0": {
+        "MA": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MA": 100.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MA": 100.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MA": 85.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MA": 90.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          }
+        },
+        "MAB": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB": 100.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -45.0,
+            "ci95_pp": [
+              -85.0,
+              -5.0
+            ],
+            "D_MAB": 50.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -35.0,
+              10.0
+            ],
+            "D_MAB": 75.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB": 90.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 100.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              -15.0,
+              15.0
+            ],
+            "D_MAC": 95.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC": 80.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC": 90.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          }
+        },
+        "MAB_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 100.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB_L2": 80.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 95.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              -15.0,
+              15.0
+            ],
+            "D_MAC_L2": 85.0,
+            "D_M0": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_M0": 95.0,
+            "n_images_each": 20
+          }
+        }
+      },
+      "retention_incremental_vs_MA": {
+        "MAB": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -50.0,
+            "ci95_pp": [
+              -85.0,
+              -15.0
+            ],
+            "D_MAB": 50.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -35.0,
+              10.0
+            ],
+            "D_MAB": 75.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB": 90.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC": 95.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC": 80.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 90.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          }
+        },
+        "MAB_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -10.0,
+            "ci95_pp": [
+              -20.0,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAB_L2": 80.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 90.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          }
+        },
+        "MAC_L2": {
+          "horse": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "bird": {
+            "diff_pp": -5.0,
+            "ci95_pp": [
+              -15.0,
+              0.0
+            ],
+            "D_MAC_L2": 95.0,
+            "D_MA": 100.0,
+            "n_images_each": 20
+          },
+          "chair": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              -15.0,
+              15.0
+            ],
+            "D_MAC_L2": 85.0,
+            "D_MA": 85.0,
+            "n_images_each": 20
+          },
+          "bicycle": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 90.0,
+            "D_MA": 90.0,
+            "n_images_each": 20
+          }
+        }
+      },
+      "branch_specific_undeleted_target": {
+        "MAB": {
+          "undeleted_target": "sandwich",
+          "vs_M0": {
+            "diff_pp": -30.0,
+            "ci95_pp": [
+              -55.0,
+              -5.0
+            ],
+            "D_MAB": 60.0,
+            "D_M0": 90.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": -15.0,
+            "ci95_pp": [
+              -35.0,
+              0.0
+            ],
+            "D_MAB": 60.0,
+            "D_MA": 75.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAC": {
+          "undeleted_target": "dog",
+          "vs_M0": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC": 100.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MAC": 100.0,
+            "D_MA": 95.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAB_L2": {
+          "undeleted_target": "sandwich",
+          "vs_M0": {
+            "diff_pp": -15.0,
+            "ci95_pp": [
+              -35.0,
+              0.0
+            ],
+            "D_MAB_L2": 75.0,
+            "D_M0": 90.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAB_L2": 75.0,
+            "D_MA": 75.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        },
+        "MAC_L2": {
+          "undeleted_target": "dog",
+          "vs_M0": {
+            "diff_pp": 0.0,
+            "ci95_pp": [
+              0.0,
+              0.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_M0": 100.0,
+            "n_images_each": 20
+          },
+          "vs_MA": {
+            "diff_pp": 5.0,
+            "ci95_pp": [
+              0.0,
+              15.0
+            ],
+            "D_MAC_L2": 100.0,
+            "D_MA": 95.0,
+            "n_images_each": 20
+          },
+          "note": "reported separately; NOT folded into a common retain average"
+        }
+      }
+    }
+  },
+  "raw_rates_pct": {
+    "M0": {
+      "cat|all": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "cat|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "cat|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "dog|all": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "dog|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "dog|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "sandwich|all": {
+        "0.3": 97.5,
+        "0.5": 95.0,
+        "0.7": 85.0
+      },
+      "sandwich|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "sandwich|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 90.0,
+        "0.7": 70.0
+      },
+      "horse|all": {
+        "0.3": 95.0,
+        "0.5": 92.5,
+        "0.7": 90.0
+      },
+      "horse|literal": {
+        "0.3": 90.0,
+        "0.5": 85.0,
+        "0.7": 80.0
+      },
+      "horse|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "bird|all": {
+        "0.3": 92.5,
+        "0.5": 92.5,
+        "0.7": 90.0
+      },
+      "bird|literal": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "bird|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      },
+      "chair|all": {
+        "0.3": 95.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "chair|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "chair|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 85.0,
+        "0.7": 85.0
+      },
+      "bicycle|all": {
+        "0.3": 92.5,
+        "0.5": 90.0,
+        "0.7": 87.5
+      },
+      "bicycle|literal": {
+        "0.3": 90.0,
+        "0.5": 85.0,
+        "0.7": 85.0
+      },
+      "bicycle|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      }
+    },
+    "MA": {
+      "cat|all": {
+        "0.3": 27.5,
+        "0.5": 27.5,
+        "0.7": 25.0
+      },
+      "cat|literal": {
+        "0.3": 15.0,
+        "0.5": 15.0,
+        "0.7": 15.0
+      },
+      "cat|paraphrase": {
+        "0.3": 40.0,
+        "0.5": 40.0,
+        "0.7": 35.0
+      },
+      "dog|all": {
+        "0.3": 95.0,
+        "0.5": 92.5,
+        "0.7": 90.0
+      },
+      "dog|literal": {
+        "0.3": 95.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "dog|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      },
+      "sandwich|all": {
+        "0.3": 92.5,
+        "0.5": 87.5,
+        "0.7": 85.0
+      },
+      "sandwich|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 95.0
+      },
+      "sandwich|paraphrase": {
+        "0.3": 85.0,
+        "0.5": 75.0,
+        "0.7": 75.0
+      },
+      "horse|all": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "bird|all": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "bird|literal": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "bird|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "chair|all": {
+        "0.3": 90.0,
+        "0.5": 85.0,
+        "0.7": 80.0
+      },
+      "chair|literal": {
+        "0.3": 95.0,
+        "0.5": 85.0,
+        "0.7": 85.0
+      },
+      "chair|paraphrase": {
+        "0.3": 85.0,
+        "0.5": 85.0,
+        "0.7": 75.0
+      },
+      "bicycle|all": {
+        "0.3": 95.0,
+        "0.5": 92.5,
+        "0.7": 92.5
+      },
+      "bicycle|literal": {
+        "0.3": 100.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "bicycle|paraphrase": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      }
+    },
+    "MAB": {
+      "cat|all": {
+        "0.3": 0.0,
+        "0.5": 0.0,
+        "0.7": 0.0
+      },
+      "cat|literal": {
+        "0.3": 0.0,
+        "0.5": 0.0,
+        "0.7": 0.0
+      },
+      "cat|paraphrase": {
+        "0.3": 0.0,
+        "0.5": 0.0,
+        "0.7": 0.0
+      },
+      "dog|all": {
+        "0.3": 15.0,
+        "0.5": 10.0,
+        "0.7": 0.0
+      },
+      "dog|literal": {
+        "0.3": 30.0,
+        "0.5": 20.0,
+        "0.7": 0.0
+      },
+      "dog|paraphrase": {
+        "0.3": 0.0,
+        "0.5": 0.0,
+        "0.7": 0.0
+      },
+      "sandwich|all": {
+        "0.3": 80.0,
+        "0.5": 75.0,
+        "0.7": 67.5
+      },
+      "sandwich|literal": {
+        "0.3": 95.0,
+        "0.5": 90.0,
+        "0.7": 85.0
+      },
+      "sandwich|paraphrase": {
+        "0.3": 65.0,
+        "0.5": 60.0,
+        "0.7": 50.0
+      },
+      "horse|all": {
+        "0.3": 100.0,
+        "0.5": 97.5,
+        "0.7": 95.0
+      },
+      "horse|literal": {
+        "0.3": 100.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      },
+      "horse|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "bird|all": {
+        "0.3": 55.0,
+        "0.5": 55.0,
+        "0.7": 47.5
+      },
+      "bird|literal": {
+        "0.3": 60.0,
+        "0.5": 60.0,
+        "0.7": 55.0
+      },
+      "bird|paraphrase": {
+        "0.3": 50.0,
+        "0.5": 50.0,
+        "0.7": 40.0
+      },
+      "chair|all": {
+        "0.3": 85.0,
+        "0.5": 85.0,
+        "0.7": 80.0
+      },
+      "chair|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "chair|paraphrase": {
+        "0.3": 75.0,
+        "0.5": 75.0,
+        "0.7": 65.0
+      },
+      "bicycle|all": {
+        "0.3": 95.0,
+        "0.5": 92.5,
+        "0.7": 87.5
+      },
+      "bicycle|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      },
+      "bicycle|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 90.0,
+        "0.7": 85.0
+      }
+    },
+    "MAC": {
+      "cat|all": {
+        "0.3": 27.5,
+        "0.5": 20.0,
+        "0.7": 20.0
+      },
+      "cat|literal": {
+        "0.3": 20.0,
+        "0.5": 15.0,
+        "0.7": 15.0
+      },
+      "cat|paraphrase": {
+        "0.3": 35.0,
+        "0.5": 25.0,
+        "0.7": 25.0
+      },
+      "dog|all": {
+        "0.3": 97.5,
+        "0.5": 97.5,
+        "0.7": 92.5
+      },
+      "dog|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      },
+      "dog|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 95.0
+      },
+      "sandwich|all": {
+        "0.3": 42.5,
+        "0.5": 35.0,
+        "0.7": 30.0
+      },
+      "sandwich|literal": {
+        "0.3": 30.0,
+        "0.5": 25.0,
+        "0.7": 25.0
+      },
+      "sandwich|paraphrase": {
+        "0.3": 55.0,
+        "0.5": 45.0,
+        "0.7": 35.0
+      },
+      "horse|all": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "bird|all": {
+        "0.3": 97.5,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "bird|literal": {
+        "0.3": 100.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "bird|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "chair|all": {
+        "0.3": 90.0,
+        "0.5": 87.5,
+        "0.7": 85.0
+      },
+      "chair|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      },
+      "chair|paraphrase": {
+        "0.3": 85.0,
+        "0.5": 80.0,
+        "0.7": 80.0
+      },
+      "bicycle|all": {
+        "0.3": 95.0,
+        "0.5": 92.5,
+        "0.7": 92.5
+      },
+      "bicycle|literal": {
+        "0.3": 100.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "bicycle|paraphrase": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      }
+    },
+    "MAB_L2": {
+      "cat|all": {
+        "0.3": 7.5,
+        "0.5": 5.0,
+        "0.7": 2.5
+      },
+      "cat|literal": {
+        "0.3": 5.0,
+        "0.5": 5.0,
+        "0.7": 0.0
+      },
+      "cat|paraphrase": {
+        "0.3": 10.0,
+        "0.5": 5.0,
+        "0.7": 5.0
+      },
+      "dog|all": {
+        "0.3": 57.5,
+        "0.5": 50.0,
+        "0.7": 45.0
+      },
+      "dog|literal": {
+        "0.3": 75.0,
+        "0.5": 65.0,
+        "0.7": 60.0
+      },
+      "dog|paraphrase": {
+        "0.3": 40.0,
+        "0.5": 35.0,
+        "0.7": 30.0
+      },
+      "sandwich|all": {
+        "0.3": 90.0,
+        "0.5": 85.0,
+        "0.7": 77.5
+      },
+      "sandwich|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 90.0
+      },
+      "sandwich|paraphrase": {
+        "0.3": 85.0,
+        "0.5": 75.0,
+        "0.7": 65.0
+      },
+      "horse|all": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "bird|all": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 87.5
+      },
+      "bird|literal": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "bird|paraphrase": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 85.0
+      },
+      "chair|all": {
+        "0.3": 90.0,
+        "0.5": 87.5,
+        "0.7": 80.0
+      },
+      "chair|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "chair|paraphrase": {
+        "0.3": 85.0,
+        "0.5": 80.0,
+        "0.7": 65.0
+      },
+      "bicycle|all": {
+        "0.3": 92.5,
+        "0.5": 92.5,
+        "0.7": 92.5
+      },
+      "bicycle|literal": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "bicycle|paraphrase": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      }
+    },
+    "MAC_L2": {
+      "cat|all": {
+        "0.3": 27.5,
+        "0.5": 22.5,
+        "0.7": 17.5
+      },
+      "cat|literal": {
+        "0.3": 20.0,
+        "0.5": 15.0,
+        "0.7": 15.0
+      },
+      "cat|paraphrase": {
+        "0.3": 35.0,
+        "0.5": 30.0,
+        "0.7": 20.0
+      },
+      "dog|all": {
+        "0.3": 97.5,
+        "0.5": 95.0,
+        "0.7": 92.5
+      },
+      "dog|literal": {
+        "0.3": 95.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "dog|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 95.0
+      },
+      "sandwich|all": {
+        "0.3": 90.0,
+        "0.5": 80.0,
+        "0.7": 72.5
+      },
+      "sandwich|literal": {
+        "0.3": 100.0,
+        "0.5": 90.0,
+        "0.7": 85.0
+      },
+      "sandwich|paraphrase": {
+        "0.3": 80.0,
+        "0.5": 70.0,
+        "0.7": 60.0
+      },
+      "horse|all": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|literal": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "horse|paraphrase": {
+        "0.3": 100.0,
+        "0.5": 100.0,
+        "0.7": 100.0
+      },
+      "bird|all": {
+        "0.3": 92.5,
+        "0.5": 92.5,
+        "0.7": 87.5
+      },
+      "bird|literal": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "bird|paraphrase": {
+        "0.3": 95.0,
+        "0.5": 95.0,
+        "0.7": 85.0
+      },
+      "chair|all": {
+        "0.3": 90.0,
+        "0.5": 87.5,
+        "0.7": 87.5
+      },
+      "chair|literal": {
+        "0.3": 95.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      },
+      "chair|paraphrase": {
+        "0.3": 85.0,
+        "0.5": 85.0,
+        "0.7": 85.0
+      },
+      "bicycle|all": {
+        "0.3": 95.0,
+        "0.5": 92.5,
+        "0.7": 92.5
+      },
+      "bicycle|literal": {
+        "0.3": 100.0,
+        "0.5": 95.0,
+        "0.7": 95.0
+      },
+      "bicycle|paraphrase": {
+        "0.3": 90.0,
+        "0.5": 90.0,
+        "0.7": 90.0
+      }
+    }
+  },
+  "counts": {
+    "M0": {
+      "cat": 40,
+      "dog": 40,
+      "sandwich": 40,
+      "horse": 40,
+      "bird": 40,
+      "chair": 40,
+      "bicycle": 40
+    },
+    "MA": {
+      "cat": 40,
+      "dog": 40,
+      "sandwich": 40,
+      "horse": 40,
+      "bird": 40,
+      "chair": 40,
+      "bicycle": 40
+    },
+    "MAB": {
+      "cat": 40,
+      "dog": 40,
+      "sandwich": 40,
+      "horse": 40,
+      "bird": 40,
+      "chair": 40,
+      "bicycle": 40
+    },
+    "MAC": {
+      "cat": 40,
+      "dog": 40,
+      "sandwich": 40,
+      "horse": 40,
+      "bird": 40,
+      "chair": 40,
+      "bicycle": 40
+    },
+    "MAB_L2": {
+      "cat": 40,
+      "dog": 40,
+      "sandwich": 40,
+      "horse": 40,
+      "bird": 40,
+      "chair": 40,
+      "bicycle": 40
+    },
+    "MAC_L2": {
+      "cat": 40,
+      "dog": 40,
+      "sandwich": 40,
+      "horse": 40,
+      "bird": 40,
+      "chair": 40,
+      "bicycle": 40
+    }
+  }
+}
