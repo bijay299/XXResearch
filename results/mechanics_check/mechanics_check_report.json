@@ -1,0 +1,66 @@
+{
+  "RUN_KIND": "MECHANICS CHECK ON SUBSTITUTE CONFIGURATION",
+  "IS_BASELINE": false,
+  "IS_REPRODUCTION": false,
+  "warning": "Generator is base Stable Diffusion v1.5, NOT the UnlearnCanvas style50 generator. No UnlearnCanvas classifiers available. UA/IRA/CRA are UNAVAILABLE. Timings/memory apply only to this substitute configuration.",
+  "finished": "2026-10-08T23:45:04-04:00",
+  "host": "hyperplane",
+  "upstream_cuig_commit": "9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
+  "gpu": {
+    "index": "2",
+    "name": "NVIDIA A100-SXM4-40GB",
+    "uuid": "GPU-3594d682-af4b-13e1-3266-8a55455d669d",
+    "cuda_visible_devices": "2"
+  },
+  "substitute_generator": "/data/bijaypandey/cuig_pilot/Generators_substitute/sd-v1-5",
+  "config": {
+    "target_style": "Abstractionism",
+    "optimizer_steps": 8,
+    "num_anchor_images": 16,
+    "num_anchor_prompts": 16,
+    "parameter_group": "kv-xattn (upstream default)",
+    "note": "released config is iterations=1000, anchors=200; reduced here on purpose"
+  },
+  "timings_seconds": {
+    "train_incl_anchor_generation": 48,
+    "checkpoint_verify": 9,
+    "sample_4_images": 29
+  },
+  "peak_gpu_mem_mib_own_procs": 11156,
+  "losses": {
+    "n_logged": 16,
+    "all_finite": true,
+    "first": 0.000486,
+    "last": 0.000249,
+    "min": 8.7e-05,
+    "max": 0.000628
+  },
+  "checkpoint_verify": {
+    "delta_path": "/data/bijaypandey/cuig_pilot/mechanics_check/Models/Abstractionism/delta.bin",
+    "base_model_dir": "/data/bijaypandey/cuig_pilot/Generators_substitute/sd-v1-5",
+    "top_level_keys": [
+      "unet"
+    ],
+    "num_tensors": 32,
+    "all_keys_are_kv_xattn": true,
+    "sample_keys": [
+      "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+      "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+      "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+      "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v.weight"
+    ],
+    "all_values_finite": true,
+    "total_params": 19169280,
+    "keys_absent_from_unet": [],
+    "shape_mismatches": [],
+    "tensors_differing_from_base": 32,
+    "max_abs_delta_vs_base": 6.331875920295715e-05,
+    "load_missing_keys": 654,
+    "load_unexpected_keys": 0,
+    "unexpected_key_names": [],
+    "PASS": true
+  },
+  "images_generated": 4,
+  "image_dir": "/data/bijaypandey/cuig_pilot/mechanics_check/Results/Abstractionism/images",
+  "metrics_UA_IRA_CRA": "UNAVAILABLE - UnlearnCanvas classifiers not obtainable on this host"
+}

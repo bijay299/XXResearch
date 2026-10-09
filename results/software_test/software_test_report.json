@@ -1,0 +1,34 @@
+{
+  "TEST_KIND": "SOFTWARE TEST OF evaluate.py CODE PATH",
+  "IS_EXPERIMENT": false,
+  "classifiers": "SYNTHETIC, RANDOMLY INITIALISED - accuracies below are meaningless noise",
+  "artefacts_written": {
+    "style_results.json": true,
+    "object_results.json": true,
+    "summary.json": true,
+    "xlsx_report": true
+  },
+  "images_scored_style_task": 4,
+  "summary_keys_present": [
+    "CRA",
+    "IRA",
+    "UA",
+    "cross_retain",
+    "retain",
+    "unlearn"
+  ],
+  "meaningless_summary_values": {
+    "UA": 100.0,
+    "IRA": 0.0,
+    "CRA": 50.0
+  },
+  "code_path_exercised": [
+    "load_task_classifier (timm backbone + Linear head + model_state_dict)",
+    "STYLES_AVAILABLE.index / OBJECTS_AVAILABLE.index label lookup",
+    "_record_prediction img_path.split('images/') bookkeeping",
+    "normalize_and_prune_results",
+    "compute_unlearncanvas_summary",
+    "write_excel_report"
+  ],
+  "PASS": true
+}
