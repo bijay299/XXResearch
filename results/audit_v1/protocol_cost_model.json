@@ -1,0 +1,136 @@
+{
+  "measured_throughput": {
+    "s_per_optimizer_step": 0.8303,
+    "s_per_generated_image": 1.0083,
+    "s_per_detected_image": 0.0718,
+    "n_runs_sampled": 10,
+    "n_gen_sampled": 12,
+    "n_det_sampled": 10
+  },
+  "assumptions": {
+    "throughput_source": "measured on this host from the 10 pilot training runs and 11 pilot checkpoint evaluations",
+    "process_setup_s": 25.0,
+    "process_setup_basis": "SD-1.5 pipeline construction and checkpoint load per invocation; an assumption, not measured in isolation, because the pilot's seconds_per_image already amortises setup over 280 images",
+    "contingency": 0.25,
+    "contingency_basis": "one re-run of a failed stage plus bisection overshoot",
+    "dev_images_per_checkpoint": 80,
+    "dev_composition": "new target 10 prompts x 4 gen seeds = 40 (2.5 pp resolution, the matching quantity); cat 10 x 2 = 20; bird 10 x 2 = 20",
+    "dumps_evaluated_basis": "bisection over 10 saved dumps, assuming suppression is monotone in steps; monotonicity is checked at the evaluated points and a full scan is the fallback",
+    "final_images_per_checkpoint": 280,
+    "final_composition": "7 categories x 10 NEW prompts x 4 gen seeds, newly frozen; the pilot set is exploratory from here on"
+  },
+  "plans": [
+    {
+      "label": "CORE \u2014 dog branch only, 2 training seeds. The sandwich branch needs no new compute: it is declared infeasible for matched comparison at L2-SP 25000 from existing evidence (+7.5 pp suppression, below the meaningful region)",
+      "run_matrix": {
+        "training_seeds": 2,
+        "branches": 1,
+        "new_trajectories": 2,
+        "steps_each": 1000,
+        "dumps_saved_each": 10,
+        "dumps_evaluated_each": 4,
+        "dev_checkpoint_evaluations": 14,
+        "final_checkpoint_evaluations": 7
+      },
+      "gpu_hours": {
+        "training": 0.461,
+        "development_selection": 0.336,
+        "final_confirmatory_evaluation": 0.588,
+        "process_setup": 0.16,
+        "subtotal": 1.545,
+        "total_with_25pct_contingency": 1.931
+      },
+      "images": {
+        "development": 1120,
+        "final": 1960,
+        "total": 3080
+      },
+      "storage_gib": {
+        "peak_intermediate_checkpoints": 1.43,
+        "images": 0.29,
+        "peak_total": 1.72,
+        "after_pruning_unmatched_dumps": 0.43
+      },
+      "wall_time_hours_note": {
+        "on_4_idle_gpus": 0.85,
+        "on_2_idle_gpus": 0.85,
+        "caveat": "wall time is NOT GPU-hours; the GPUs are shared without a scheduler and availability is not guaranteed"
+      }
+    },
+    {
+      "label": "EXTENDED \u2014 both branches confirmatory. NOT a drop-in option: it presupposes a sandwich L2-SP coefficient already inside the meaningful region, and the coefficient search that would find one is NOT costed here",
+      "run_matrix": {
+        "training_seeds": 2,
+        "branches": 2,
+        "new_trajectories": 4,
+        "steps_each": 1000,
+        "dumps_saved_each": 10,
+        "dumps_evaluated_each": 4,
+        "dev_checkpoint_evaluations": 22,
+        "final_checkpoint_evaluations": 11
+      },
+      "gpu_hours": {
+        "training": 0.923,
+        "development_selection": 0.528,
+        "final_confirmatory_evaluation": 0.924,
+        "process_setup": 0.257,
+        "subtotal": 2.632,
+        "total_with_25pct_contingency": 3.29
+      },
+      "images": {
+        "development": 1760,
+        "final": 3080,
+        "total": 4840
+      },
+      "storage_gib": {
+        "peak_intermediate_checkpoints": 2.86,
+        "images": 0.45,
+        "peak_total": 3.31,
+        "after_pruning_unmatched_dumps": 0.74
+      },
+      "wall_time_hours_note": {
+        "on_4_idle_gpus": 1.21,
+        "on_2_idle_gpus": 1.44,
+        "caveat": "wall time is NOT GPU-hours; the GPUs are shared without a scheduler and availability is not guaranteed"
+      }
+    },
+    {
+      "label": "FALLBACK \u2014 dog branch, 1 training seed (direction check only, no cross-seed agreement possible)",
+      "run_matrix": {
+        "training_seeds": 1,
+        "branches": 1,
+        "new_trajectories": 1,
+        "steps_each": 1000,
+        "dumps_saved_each": 10,
+        "dumps_evaluated_each": 4,
+        "dev_checkpoint_evaluations": 7,
+        "final_checkpoint_evaluations": 4
+      },
+      "gpu_hours": {
+        "training": 0.231,
+        "development_selection": 0.168,
+        "final_confirmatory_evaluation": 0.336,
+        "process_setup": 0.083,
+        "subtotal": 0.818,
+        "total_with_25pct_contingency": 1.023
+      },
+      "images": {
+        "development": 560,
+        "final": 1120,
+        "total": 1680
+      },
+      "storage_gib": {
+        "peak_intermediate_checkpoints": 0.71,
+        "images": 0.16,
+        "peak_total": 0.87,
+        "after_pruning_unmatched_dumps": 0.23
+      },
+      "wall_time_hours_note": {
+        "on_4_idle_gpus": 0.57,
+        "on_2_idle_gpus": 0.45,
+        "caveat": "wall time is NOT GPU-hours; the GPUs are shared without a scheduler and availability is not guaranteed"
+      }
+    }
+  ],
+  "ceiling_gpu_hours": 4.0
+}

@@ -11,10 +11,31 @@ launch scripts, validators, measurements and notes.
 
 ---
 
-## Current status (2026-10-08)
+## Current status (2026-10-09)
+
+> **Latest: AUDIT-01** re-derived the two-seed SD-1.5 sequential pilot snapshot
+> `a9de625` from raw per-image predictions. Arithmetic and completeness verified
+> exactly (0 mismatches over 1026 values; 0 duplicate and 0 missing rows); nine
+> **narrative** claims corrected. Start at
+> [`results/audit_v1/AUDIT_REPORT.md`](results/audit_v1/AUDIT_REPORT.md).
+>
+> The headline change: the L2-SP retention comparisons are **confounded by
+> unequal deletion strength**, and **no intermediate checkpoints exist** to
+> resolve that from existing artifacts. A matched-effectiveness diagnostic is
+> proposed at
+> [`docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md)
+> (≈1.93 GPU-hours) and is **pending central review and the PI's decision — not
+> authorised to run**.
+>
+> **No human annotation has been performed** anywhere in this project. A
+> 236-item blinded packet is built and empty; detector validity is unmeasured.
 
 | Item | Status |
 |---|---|
+| **SD-1.5 sequential pilot, seeds 17 and 29** | **done — exploratory**; numbers verified by AUDIT-01, narrative corrected |
+| **AUDIT-01 evidence audit and claim corrections** | **done** |
+| **Matched-effectiveness protocol** | **proposed, pending review** |
+| **Human evaluator audit** | **packet built, NOT annotated** |
 | Isolated environment, versions pinned to upstream `env.yaml` | **done** |
 | Upstream CUIG pinned, licence + attribution preserved | **done** |
 | Training / evaluation code inspected, label agreement analysed | **done** |

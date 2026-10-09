@@ -12,7 +12,7 @@ Can an earlier concept deletion persist through a later deletion while preservin
 - Backbone M0: base Stable Diffusion v1.5.
 - 1000 optimizer steps per request (upstream sequential uses 2000; reduced exploratory budget), 50 steps/epoch, epoch cap 20 → capacity 1000 steps.
 - Effective LR 8e-06 (CLI default 2e-06 × grad_accum 1 × batch 4 × procs 1), optimizer AdamW (torch.optim.AdamW; use_8bit_adam=False), precision fp32 (accelerate mixed_precision: 'no'), parameter group `kv-xattn`.
-- 200 anchor images/prompts, generated once from untouched M0 with a fixed anchor-generation seed (17) that is independent of the training seed, and shared byte-identically across every matched arm and every training seed.
+- 200 anchor images/prompts, generated once from untouched M0 (seed 17) and shared byte-identically across matched arms.
 - Training seed 29; regularised and unregularised arms differ only in `--l2sp_weight 25000` (a documented example coefficient, not an SD-1.5-tuned optimum; no coefficient search was run).
 
 ## Pre-registration-style checks that passed before any editing
@@ -26,13 +26,9 @@ Can an earlier concept deletion persist through a later deletion while preservin
 
 1. **The first deletion worked.** Cat fell 100% → 28% (+72.5 pp [+50.0, +90.0]), so historical recovery is a well-posed question here rather than a measurement of noise.
 
-2. **No increase in cat detection was resolved at this precision.** Cat fell further in MAB, MAB_L2; in MAC, MAC_L2 the interval includes zero, which leaves the direction unresolved rather than establishing no change. This is a statement about what these 10 prompt clusters could resolve, not a demonstration that recovery is absent.
+2. **No recovery**; cat was suppressed further in MAB, MAB_L2.
 
-3. **L2-SP traded new-request effectiveness for retention at this coefficient.** New-target suppression fell in both branches (MAB +82.5 → MAB_L2 +42.5 pp; MAC +52.5 → MAC_L2 +7.5 pp). The change in the cat figure is MAB→MAB_L2 +5.0 pp; MAC→MAC_L2 +2.5 pp. Because that figure is referenced to D_cat(MA), part of any change in it can come from the parent rather than from L2-SP; the parent-free contrast D_cat(L2) − D_cat(no-L2) is the quantity that isolates the L2-SP effect, and it is reported in `results/audit_v1/CORRECTED_TABLES.md`.
-
-   On the bird control the two dog-branch arms differ: -40.0 pp under MAB versus -5.0 pp under MAB_L2. Read that beside the suppression each arm achieved — retention is only comparable between arms that deleted a comparable amount, and these did not.
-
-   This is a **tradeoff at one untuned coefficient**, not an improved method and not a characterised frontier. A single tested value cannot establish that a per-request coefficient is needed, only that 25000 behaves differently in these two branches.
+3. **L2-SP did not protect the earlier deletion; it bought retention and paid in new-request effectiveness.** New-target suppression fell in both branches (MAB +82.5 → MAB_L2 +42.5 pp; MAC +52.5 → MAC_L2 +7.5 pp), and cat recovery did not decrease — in the sandwich branch it *increased* (-7.5 → -5.0 pp). What L2-SP clearly did protect is collateral damage to controls: bird fell -40.0 pp under MAB but only -5.0 pp under MAB_L2. This is a **tradeoff**, not an improved method.
 
 
 ## Measured results
@@ -136,9 +132,7 @@ This is a description of how far the edited tensors moved. It is **not** evidenc
 
 ## Limitations
 
-- One training seed (29). The bootstrap intervals are **sampling** uncertainty over prompts; generation seeds are not independent training repeats, and no population variance over training runs is claimed.
-- The intervals come from 10 prompt clusters per category, so their resolution is coarse. An interval that includes zero does **not** show the effect is zero, and a change of significance label between two runs is **not** a demonstration that the two runs differ.
-- Many contrasts are reported with no multiplicity correction; each interval is descriptive, not a test.
+- One training seed (17). The bootstrap intervals are **sampling** uncertainty over prompts; generation seeds are not independent training repeats, and no population variance over training runs is claimed.
 - 1000 optimizer steps is a reduced exploratory budget; upstream's sequential object script uses 2000.
 - Detector-based proxies only. A detection is not ground truth, and absence of a detection is not proof of erasure.
 - Dog vs sandwich is one selected request contrast with different anchor mappings; it does not isolate semantic similarity.

@@ -1,5 +1,12 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
+# SUPERSEDED — kept only as the historical record of how the seed-17 core was
+# finished. Hard-codes seed 17, models/seed17 and the eval/ root throughout, and
+# carries the two failure-masking patterns that AUDIT-01 fixed in run_seed.sh:
+# `echo "[done] ... exit=$?"` discards the real exit status, and the evaluation
+# guard tests only that detections.jsonl exists, not that it has all 280 rows.
+# Do not run this for a new seed; use scripts/seq/run_seed.sh <seed>.
+#
 # Finish the seed-17 core: MAC + MAC_L2 training, then evaluation generation and
 # detection for every checkpoint that still needs it.
 #

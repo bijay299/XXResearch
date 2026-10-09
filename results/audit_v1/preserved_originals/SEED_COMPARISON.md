@@ -40,12 +40,5 @@ Two training runs cannot establish population variance. Each seed's intervals be
 **Credible, same-direction agreement on historical recovery: 2/4 children.** 'both ns' is not agreement on an effect -- it is two runs each finding nothing. With n=2 training runs this is a consistency check, not an estimate of variability.
 
 
-> **Replication warning.** MAC_L2 changed credibility class between the two training seeds, so no claim resting on that child is established by this pair of runs.
->
-> Three things this does **not** license, all of which are easy to write by accident:
-> - It is **not** a finding that the effect is absent or was a false positive. A differing significance label across two runs is not a significant difference between them; the two intervals here overlap, and neither run had the precision to resolve a small effect.
-> - It does **not** by itself locate the instability in the method. `D_cat(child) − D_cat(MA)` moves when the parent moves, so a parent difference alone can flip its sign. The parent-free contrast `D_cat(L2) − D_cat(no-L2)` separates the two and is reported in `results/audit_v1/CORRECTED_TABLES.md`.
-> - It does **not** mean the seeds agree about everything else. Agreement is assessed per quantity, at the stated threshold, and only on direction.
->
-> The supportable statement is: **this pair of runs does not resolve the sign of that quantity, and more training runs are required before it is reported either way.**
+> **Replication warning.** MAC_L2 changed credibility class between the two training seeds. Any claim resting on that child is **not** supported by this pair of runs and must not be presented as an established effect.
 

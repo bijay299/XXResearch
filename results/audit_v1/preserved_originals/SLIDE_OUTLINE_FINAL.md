@@ -1,7 +1,3 @@
-> **⚠ AUDITED — see `results/audit_v1/AUDIT_REPORT.md`.** Lines marked
-> **[corrected]** were overstated; the original is preserved at
-> `results/audit_v1/preserved_originals/SLIDE_OUTLINE_FINAL.md`.
-
 # Five-slide outline — populated with measured results (seeds 17 and 29)
 
 Figures: `seq17/figures/fig1..3`, `seq29/figures/fig1..3`,
@@ -18,7 +14,7 @@ Figures: `seq17/figures/fig1..3`, `seq29/figures/fig1..3`,
   new method, not an end-to-end lifelong method.
 - SD-1.5 backbone · CUIG ConAbl · 1000 steps/request · COCO Faster R-CNN
   evaluator · 280 images/checkpoint · frozen manifest · **two training seeds**.
-- **3080 images generated across 11 distinct checkpoint evaluations, zero failures.** (3360 is the row count of two stacked tables; M0's 280 samples are reused by both.) Not UA/IRA/CRA; not a reproduction. **[corrected]**
+- **3360 evaluation images, zero failures.** Not UA/IRA/CRA; not a reproduction.
 
 ## Slide 2 — The first deletion works, and a later deletion does not undo it  *(fig1, fig4)*
 
@@ -27,11 +23,8 @@ Figures: `seq17/figures/fig1..3`, `seq29/figures/fig1..3`,
   MAB **−17.5 / −27.5 pp**, MAB_L2 **−12.5 / −22.5 pp**.
 - Deleting **sandwich**: seed 17 suggested recovery (MAC_L2 +15.0 pp), **seed 29
   did not replicate it** (−5.0 pp).
-- **Headline: no reversal was resolved at this precision** — not a demonstration
-  that reversal does not occur. **[corrected]** In the near branch the old
-  deletion is reinforced. The one-seed sandwich result is **unresolved, not a
-  false positive**: the two intervals overlap, and the parent-free contrast
-  agrees across both seeds. D_cat(MA) alone moved
+- **Headline: no evidence of reversal.** In the near branch the old deletion is
+  reinforced. One-seed recovery was a false positive — D_cat(MA) alone moved
   10 pp between seeds.
 
 ## Slide 3 — The new request works, but costs retention  *(fig2, fig3)*
@@ -49,10 +42,7 @@ Figures: `seq17/figures/fig1..3`, `seq29/figures/fig1..3`,
 - Movement from MA cut ~**9×** (0.0136 → 0.0015 relative L2).
 - **Buys:** bird collateral **−45 pp → −5 pp** (identical in both seeds).
 - **Costs:** dog deletion **+82.5 → +42.5 pp**; sandwich deletion
-  **+50.0 → +7.5 pp**, an interval reaching zero — at or below the resolution
-  floor, so the arm's true deletion strength is unknown. **[corrected]** It is
-  not shown to be zero, and its retention must not be scored against an arm
-  that deleted. The request is
+  **+50.0 → +7.5 pp**, an interval touching zero — the request is effectively
   **not carried out**.
 - **Does not** protect the earlier deletion; cat recovery did not fall.
 - One fixed coefficient (25000, a documented example, untuned) is roughly
