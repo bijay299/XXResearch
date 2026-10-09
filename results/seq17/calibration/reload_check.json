@@ -1,0 +1,67 @@
+{
+  "experiment": "SD-1.5 exploratory sequential object-erasure pilot",
+  "check": "no-update reload preserves outputs",
+  "method": "a no-op delta holding M0's own kv-xattn tensors is loaded through the same strict=False path a real delta.bin uses, then the same prompt/seed pairs are regenerated",
+  "n_sampled": 8,
+  "n_byte_identical": 8,
+  "all_identical": true,
+  "noop_delta_tensors": 32,
+  "images": [
+    {
+      "image_name": "cat_literal_0_seed101.jpg",
+      "prompt_id": "cat_literal_0",
+      "sha256_noop_reload": "9a5aad296c1f8dcaea57e1ea96a1ec64feaa06cb370590272ad33c79d93d9d2a",
+      "sha256_m0_direct": "9a5aad296c1f8dcaea57e1ea96a1ec64feaa06cb370590272ad33c79d93d9d2a",
+      "identical": true
+    },
+    {
+      "image_name": "cat_paraphrase_3_seed404.jpg",
+      "prompt_id": "cat_paraphrase_3",
+      "sha256_noop_reload": "c1f6366c4228e908a302250a54b26b4caa793107cdb1b74fd0ab3ee8638aca6b",
+      "sha256_m0_direct": "c1f6366c4228e908a302250a54b26b4caa793107cdb1b74fd0ab3ee8638aca6b",
+      "identical": true
+    },
+    {
+      "image_name": "dog_paraphrase_2_seed303.jpg",
+      "prompt_id": "dog_paraphrase_2",
+      "sha256_noop_reload": "0c256197fd1664b88bea0eb9caa87baf762162f6cdf18d9b4e06df0a25a79828",
+      "sha256_m0_direct": "0c256197fd1664b88bea0eb9caa87baf762162f6cdf18d9b4e06df0a25a79828",
+      "identical": true
+    },
+    {
+      "image_name": "sandwich_paraphrase_1_seed202.jpg",
+      "prompt_id": "sandwich_paraphrase_1",
+      "sha256_noop_reload": "50e3c494b049c7d9b2779dc02ee16a020247f09e7eb262ea39886ab82f943f85",
+      "sha256_m0_direct": "50e3c494b049c7d9b2779dc02ee16a020247f09e7eb262ea39886ab82f943f85",
+      "identical": true
+    },
+    {
+      "image_name": "horse_paraphrase_0_seed101.jpg",
+      "prompt_id": "horse_paraphrase_0",
+      "sha256_noop_reload": "4d0c070b7f379f297379f25b71e06d38aafbaaf53bea88387d9e943bee24e061",
+      "sha256_m0_direct": "4d0c070b7f379f297379f25b71e06d38aafbaaf53bea88387d9e943bee24e061",
+      "identical": true
+    },
+    {
+      "image_name": "bird_literal_3_seed404.jpg",
+      "prompt_id": "bird_literal_3",
+      "sha256_noop_reload": "462dfc170805c1f17a79e3048b102e002234527c46855f1effc93fce9b84a81f",
+      "sha256_m0_direct": "462dfc170805c1f17a79e3048b102e002234527c46855f1effc93fce9b84a81f",
+      "identical": true
+    },
+    {
+      "image_name": "chair_literal_2_seed303.jpg",
+      "prompt_id": "chair_literal_2",
+      "sha256_noop_reload": "48d13bcc18c7079ee8ade67e27f5944b394624981c48db87de994c2878d5b9de",
+      "sha256_m0_direct": "48d13bcc18c7079ee8ade67e27f5944b394624981c48db87de994c2878d5b9de",
+      "identical": true
+    },
+    {
+      "image_name": "bicycle_literal_1_seed202.jpg",
+      "prompt_id": "bicycle_literal_1",
+      "sha256_noop_reload": "5b9c3da99557a93c072ad6cda25c6ef4f0e61d9ecda07bdbaece509ee39f8970",
+      "sha256_m0_direct": "5b9c3da99557a93c072ad6cda25c6ef4f0e61d9ecda07bdbaece509ee39f8970",
+      "identical": true
+    }
+  ]
+}

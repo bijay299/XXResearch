@@ -1,0 +1,2412 @@
+{
+  "experiment": "SD-1.5 exploratory sequential object-erasure pilot",
+  "stage": "pre-training calibration of M0 and the COCO detector",
+  "base_model_dir": "/data/bijaypandey/cuig_pilot/Generators_substitute/sd-v1-5",
+  "generation": {
+    "num_inference_steps": 30,
+    "guidance_scale": 7.5,
+    "resolution": 512,
+    "seeds": [
+      11,
+      22
+    ]
+  },
+  "detector": {
+    "weights_enum": "FasterRCNN_ResNet50_FPN_Weights.COCO_V1",
+    "url": "https://download.pytorch.org/models/fasterrcnn_resnet50_fpn_coco-258fb6c6.pth"
+  },
+  "prompts_are_separate_from_eval_manifest": true,
+  "positive_summary": {
+    "cat": {
+      "n": 6,
+      "detection_rate": {
+        "0.3": 1.0,
+        "0.5": 1.0,
+        "0.7": 1.0
+      },
+      "mean_max_score": 0.9935
+    },
+    "dog": {
+      "n": 6,
+      "detection_rate": {
+        "0.3": 1.0,
+        "0.5": 1.0,
+        "0.7": 1.0
+      },
+      "mean_max_score": 0.9979
+    },
+    "sandwich": {
+      "n": 6,
+      "detection_rate": {
+        "0.3": 1.0,
+        "0.5": 1.0,
+        "0.7": 1.0
+      },
+      "mean_max_score": 0.9841
+    },
+    "horse": {
+      "n": 6,
+      "detection_rate": {
+        "0.3": 1.0,
+        "0.5": 1.0,
+        "0.7": 1.0
+      },
+      "mean_max_score": 0.9905
+    },
+    "bird": {
+      "n": 6,
+      "detection_rate": {
+        "0.3": 1.0,
+        "0.5": 1.0,
+        "0.7": 1.0
+      },
+      "mean_max_score": 0.9987
+    },
+    "chair": {
+      "n": 6,
+      "detection_rate": {
+        "0.3": 1.0,
+        "0.5": 0.833,
+        "0.7": 0.833
+      },
+      "mean_max_score": 0.8669
+    },
+    "bicycle": {
+      "n": 6,
+      "detection_rate": {
+        "0.3": 1.0,
+        "0.5": 1.0,
+        "0.7": 1.0
+      },
+      "mean_max_score": 0.977
+    }
+  },
+  "negative_control_any_of_seven_rate": {
+    "0.3": 0.0,
+    "0.5": 0.0,
+    "0.7": 0.0
+  },
+  "calibration_errors": [],
+  "usable": true,
+  "finished_utc": "2026-10-09T04:51:11.140893+00:00",
+  "jobs": [
+    {
+      "kind": "positive",
+      "category": "cat",
+      "prompt": "a cat on a kitchen counter",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "pos_cat_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "cat",
+          "score": 0.9933
+        },
+        {
+          "label": "dining table",
+          "score": 0.6041
+        },
+        {
+          "label": "cat",
+          "score": 0.5754
+        },
+        {
+          "label": "sink",
+          "score": 0.2473
+        },
+        {
+          "label": "dining table",
+          "score": 0.2407
+        },
+        {
+          "label": "dining table",
+          "score": 0.233
+        },
+        {
+          "label": "sink",
+          "score": 0.2062
+        },
+        {
+          "label": "bottle",
+          "score": 0.1195
+        },
+        {
+          "label": "dining table",
+          "score": 0.1104
+        },
+        {
+          "label": "dining table",
+          "score": 0.1019
+        },
+        {
+          "label": "bed",
+          "score": 0.0978
+        },
+        {
+          "label": "chair",
+          "score": 0.083
+        },
+        {
+          "label": "dining table",
+          "score": 0.0722
+        },
+        {
+          "label": "couch",
+          "score": 0.0552
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9933
+    },
+    {
+      "kind": "positive",
+      "category": "cat",
+      "prompt": "a cat on a kitchen counter",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "pos_cat_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "cat",
+          "score": 0.9992
+        },
+        {
+          "label": "bench",
+          "score": 0.3911
+        },
+        {
+          "label": "bench",
+          "score": 0.238
+        },
+        {
+          "label": "chair",
+          "score": 0.2008
+        },
+        {
+          "label": "dining table",
+          "score": 0.1966
+        },
+        {
+          "label": "mouse",
+          "score": 0.1746
+        },
+        {
+          "label": "bench",
+          "score": 0.1168
+        },
+        {
+          "label": "bowl",
+          "score": 0.1132
+        },
+        {
+          "label": "chair",
+          "score": 0.0539
+        },
+        {
+          "label": "cat",
+          "score": 0.0535
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9992
+    },
+    {
+      "kind": "positive",
+      "category": "cat",
+      "prompt": "a cat beside a bookshelf",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "pos_cat_1_seed11.jpg",
+      "detections": [
+        {
+          "label": "cat",
+          "score": 0.995
+        },
+        {
+          "label": "book",
+          "score": 0.935
+        },
+        {
+          "label": "book",
+          "score": 0.9144
+        },
+        {
+          "label": "book",
+          "score": 0.7399
+        },
+        {
+          "label": "book",
+          "score": 0.7198
+        },
+        {
+          "label": "book",
+          "score": 0.6859
+        },
+        {
+          "label": "book",
+          "score": 0.6632
+        },
+        {
+          "label": "traffic light",
+          "score": 0.4162
+        },
+        {
+          "label": "book",
+          "score": 0.2498
+        },
+        {
+          "label": "book",
+          "score": 0.2415
+        },
+        {
+          "label": "book",
+          "score": 0.2191
+        },
+        {
+          "label": "dining table",
+          "score": 0.1948
+        },
+        {
+          "label": "tv",
+          "score": 0.1574
+        },
+        {
+          "label": "book",
+          "score": 0.1392
+        },
+        {
+          "label": "book",
+          "score": 0.1057
+        },
+        {
+          "label": "book",
+          "score": 0.1031
+        },
+        {
+          "label": "cat",
+          "score": 0.0828
+        },
+        {
+          "label": "dining table",
+          "score": 0.0818
+        },
+        {
+          "label": "book",
+          "score": 0.0768
+        },
+        {
+          "label": "book",
+          "score": 0.0584
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.995
+    },
+    {
+      "kind": "positive",
+      "category": "cat",
+      "prompt": "a cat beside a bookshelf",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "pos_cat_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "cat",
+          "score": 0.98
+        },
+        {
+          "label": "cat",
+          "score": 0.7124
+        },
+        {
+          "label": "cat",
+          "score": 0.5952
+        },
+        {
+          "label": "chair",
+          "score": 0.3384
+        },
+        {
+          "label": "chair",
+          "score": 0.0954
+        },
+        {
+          "label": "chair",
+          "score": 0.0842
+        },
+        {
+          "label": "couch",
+          "score": 0.0749
+        },
+        {
+          "label": "cat",
+          "score": 0.0739
+        },
+        {
+          "label": "bench",
+          "score": 0.0614
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.98
+    },
+    {
+      "kind": "positive",
+      "category": "cat",
+      "prompt": "a cat sitting on a stone step",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "pos_cat_2_seed11.jpg",
+      "detections": [
+        {
+          "label": "cat",
+          "score": 0.9955
+        },
+        {
+          "label": "chair",
+          "score": 0.068
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9955
+    },
+    {
+      "kind": "positive",
+      "category": "cat",
+      "prompt": "a cat sitting on a stone step",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "pos_cat_2_seed22.jpg",
+      "detections": [
+        {
+          "label": "cat",
+          "score": 0.9983
+        },
+        {
+          "label": "cat",
+          "score": 0.1659
+        },
+        {
+          "label": "bench",
+          "score": 0.0855
+        },
+        {
+          "label": "bench",
+          "score": 0.0602
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9983
+    },
+    {
+      "kind": "positive",
+      "category": "dog",
+      "prompt": "a dog on a sandy beach",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "pos_dog_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "dog",
+          "score": 0.9994
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9994
+    },
+    {
+      "kind": "positive",
+      "category": "dog",
+      "prompt": "a dog on a sandy beach",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "pos_dog_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "dog",
+          "score": 0.9988
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9988
+    },
+    {
+      "kind": "positive",
+      "category": "dog",
+      "prompt": "a dog beside a red door",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "pos_dog_1_seed11.jpg",
+      "detections": [
+        {
+          "label": "dog",
+          "score": 0.9998
+        },
+        {
+          "label": "dog",
+          "score": 0.1423
+        },
+        {
+          "label": "dog",
+          "score": 0.0834
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9998
+    },
+    {
+      "kind": "positive",
+      "category": "dog",
+      "prompt": "a dog beside a red door",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "pos_dog_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "dog",
+          "score": 0.9997
+        },
+        {
+          "label": "train",
+          "score": 0.5416
+        },
+        {
+          "label": "potted plant",
+          "score": 0.1598
+        },
+        {
+          "label": "truck",
+          "score": 0.108
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9997
+    },
+    {
+      "kind": "positive",
+      "category": "dog",
+      "prompt": "a dog sitting in tall grass",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "pos_dog_2_seed11.jpg",
+      "detections": [
+        {
+          "label": "dog",
+          "score": 0.9914
+        },
+        {
+          "label": "bird",
+          "score": 0.1288
+        },
+        {
+          "label": "potted plant",
+          "score": 0.0998
+        },
+        {
+          "label": "bench",
+          "score": 0.0886
+        },
+        {
+          "label": "cat",
+          "score": 0.0751
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9914
+    },
+    {
+      "kind": "positive",
+      "category": "dog",
+      "prompt": "a dog sitting in tall grass",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "pos_dog_2_seed22.jpg",
+      "detections": [
+        {
+          "label": "dog",
+          "score": 0.9982
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9982
+    },
+    {
+      "kind": "positive",
+      "category": "sandwich",
+      "prompt": "a sandwich on a picnic blanket",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "pos_sandwich_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "sandwich",
+          "score": 0.9833
+        },
+        {
+          "label": "dining table",
+          "score": 0.9708
+        },
+        {
+          "label": "sandwich",
+          "score": 0.9164
+        },
+        {
+          "label": "sandwich",
+          "score": 0.7616
+        },
+        {
+          "label": "bowl",
+          "score": 0.4901
+        },
+        {
+          "label": "cake",
+          "score": 0.4272
+        },
+        {
+          "label": "carrot",
+          "score": 0.3027
+        },
+        {
+          "label": "carrot",
+          "score": 0.2843
+        },
+        {
+          "label": "person",
+          "score": 0.2371
+        },
+        {
+          "label": "bowl",
+          "score": 0.1888
+        },
+        {
+          "label": "dining table",
+          "score": 0.1574
+        },
+        {
+          "label": "dining table",
+          "score": 0.1507
+        },
+        {
+          "label": "hot dog",
+          "score": 0.1127
+        },
+        {
+          "label": "carrot",
+          "score": 0.0932
+        },
+        {
+          "label": "dining table",
+          "score": 0.0913
+        },
+        {
+          "label": "sandwich",
+          "score": 0.0888
+        },
+        {
+          "label": "orange",
+          "score": 0.079
+        },
+        {
+          "label": "tie",
+          "score": 0.0715
+        },
+        {
+          "label": "bowl",
+          "score": 0.0645
+        },
+        {
+          "label": "cake",
+          "score": 0.0584
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9833
+    },
+    {
+      "kind": "positive",
+      "category": "sandwich",
+      "prompt": "a sandwich on a picnic blanket",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "pos_sandwich_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "sandwich",
+          "score": 0.9981
+        },
+        {
+          "label": "dining table",
+          "score": 0.8233
+        },
+        {
+          "label": "dining table",
+          "score": 0.5197
+        },
+        {
+          "label": "person",
+          "score": 0.4905
+        },
+        {
+          "label": "person",
+          "score": 0.3866
+        },
+        {
+          "label": "cake",
+          "score": 0.3764
+        },
+        {
+          "label": "sports ball",
+          "score": 0.2563
+        },
+        {
+          "label": "person",
+          "score": 0.1775
+        },
+        {
+          "label": "apple",
+          "score": 0.1583
+        },
+        {
+          "label": "bird",
+          "score": 0.1415
+        },
+        {
+          "label": "dining table",
+          "score": 0.124
+        },
+        {
+          "label": "person",
+          "score": 0.1082
+        },
+        {
+          "label": "dining table",
+          "score": 0.0809
+        },
+        {
+          "label": "dining table",
+          "score": 0.0667
+        },
+        {
+          "label": "person",
+          "score": 0.0652
+        },
+        {
+          "label": "person",
+          "score": 0.0571
+        },
+        {
+          "label": "sandwich",
+          "score": 0.0524
+        },
+        {
+          "label": "car",
+          "score": 0.0508
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9981
+    },
+    {
+      "kind": "positive",
+      "category": "sandwich",
+      "prompt": "a sandwich beside a mug of coffee",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "pos_sandwich_1_seed11.jpg",
+      "detections": [
+        {
+          "label": "dining table",
+          "score": 0.9947
+        },
+        {
+          "label": "sandwich",
+          "score": 0.9913
+        },
+        {
+          "label": "bowl",
+          "score": 0.9726
+        },
+        {
+          "label": "cup",
+          "score": 0.852
+        },
+        {
+          "label": "bowl",
+          "score": 0.7248
+        },
+        {
+          "label": "sandwich",
+          "score": 0.4629
+        },
+        {
+          "label": "bowl",
+          "score": 0.2172
+        },
+        {
+          "label": "cup",
+          "score": 0.0533
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9913
+    },
+    {
+      "kind": "positive",
+      "category": "sandwich",
+      "prompt": "a sandwich beside a mug of coffee",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "pos_sandwich_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "cup",
+          "score": 0.9963
+        },
+        {
+          "label": "dining table",
+          "score": 0.9753
+        },
+        {
+          "label": "sandwich",
+          "score": 0.9461
+        },
+        {
+          "label": "hot dog",
+          "score": 0.625
+        },
+        {
+          "label": "dining table",
+          "score": 0.3268
+        },
+        {
+          "label": "sandwich",
+          "score": 0.249
+        },
+        {
+          "label": "bowl",
+          "score": 0.0933
+        },
+        {
+          "label": "sandwich",
+          "score": 0.0813
+        },
+        {
+          "label": "dining table",
+          "score": 0.0682
+        },
+        {
+          "label": "cake",
+          "score": 0.0609
+        },
+        {
+          "label": "hot dog",
+          "score": 0.0574
+        },
+        {
+          "label": "carrot",
+          "score": 0.0568
+        },
+        {
+          "label": "bowl",
+          "score": 0.0529
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9461
+    },
+    {
+      "kind": "positive",
+      "category": "sandwich",
+      "prompt": "a sandwich on a metal tray",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "pos_sandwich_2_seed11.jpg",
+      "detections": [
+        {
+          "label": "sandwich",
+          "score": 0.9932
+        },
+        {
+          "label": "sandwich",
+          "score": 0.9784
+        },
+        {
+          "label": "dining table",
+          "score": 0.962
+        },
+        {
+          "label": "sandwich",
+          "score": 0.4969
+        },
+        {
+          "label": "broccoli",
+          "score": 0.3767
+        },
+        {
+          "label": "dining table",
+          "score": 0.3338
+        },
+        {
+          "label": "sandwich",
+          "score": 0.2397
+        },
+        {
+          "label": "dining table",
+          "score": 0.0913
+        },
+        {
+          "label": "carrot",
+          "score": 0.0889
+        },
+        {
+          "label": "dining table",
+          "score": 0.0744
+        },
+        {
+          "label": "sandwich",
+          "score": 0.0645
+        },
+        {
+          "label": "sandwich",
+          "score": 0.0642
+        },
+        {
+          "label": "broccoli",
+          "score": 0.0594
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9932
+    },
+    {
+      "kind": "positive",
+      "category": "sandwich",
+      "prompt": "a sandwich on a metal tray",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "pos_sandwich_2_seed22.jpg",
+      "detections": [
+        {
+          "label": "sandwich",
+          "score": 0.9926
+        },
+        {
+          "label": "sandwich",
+          "score": 0.9901
+        },
+        {
+          "label": "person",
+          "score": 0.9756
+        },
+        {
+          "label": "sandwich",
+          "score": 0.9111
+        },
+        {
+          "label": "bowl",
+          "score": 0.7557
+        },
+        {
+          "label": "cup",
+          "score": 0.5528
+        },
+        {
+          "label": "person",
+          "score": 0.351
+        },
+        {
+          "label": "person",
+          "score": 0.2226
+        },
+        {
+          "label": "person",
+          "score": 0.177
+        },
+        {
+          "label": "carrot",
+          "score": 0.1333
+        },
+        {
+          "label": "sandwich",
+          "score": 0.1312
+        },
+        {
+          "label": "cup",
+          "score": 0.1241
+        },
+        {
+          "label": "dining table",
+          "score": 0.1181
+        },
+        {
+          "label": "person",
+          "score": 0.0624
+        },
+        {
+          "label": "dining table",
+          "score": 0.0539
+        },
+        {
+          "label": "sandwich",
+          "score": 0.0523
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9926
+    },
+    {
+      "kind": "positive",
+      "category": "horse",
+      "prompt": "a horse near a stone wall",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "pos_horse_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "horse",
+          "score": 0.9982
+        },
+        {
+          "label": "horse",
+          "score": 0.1257
+        },
+        {
+          "label": "horse",
+          "score": 0.0737
+        },
+        {
+          "label": "cow",
+          "score": 0.0582
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9982
+    },
+    {
+      "kind": "positive",
+      "category": "horse",
+      "prompt": "a horse near a stone wall",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "pos_horse_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "horse",
+          "score": 0.961
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.961
+    },
+    {
+      "kind": "positive",
+      "category": "horse",
+      "prompt": "a horse in a snowy field",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "pos_horse_1_seed11.jpg",
+      "detections": [
+        {
+          "label": "horse",
+          "score": 0.9995
+        },
+        {
+          "label": "horse",
+          "score": 0.2547
+        },
+        {
+          "label": "cow",
+          "score": 0.1058
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9995
+    },
+    {
+      "kind": "positive",
+      "category": "horse",
+      "prompt": "a horse in a snowy field",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "pos_horse_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "horse",
+          "score": 0.9998
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9998
+    },
+    {
+      "kind": "positive",
+      "category": "horse",
+      "prompt": "a horse beside a wooden gate",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "pos_horse_2_seed11.jpg",
+      "detections": [
+        {
+          "label": "horse",
+          "score": 0.9893
+        },
+        {
+          "label": "giraffe",
+          "score": 0.1625
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9893
+    },
+    {
+      "kind": "positive",
+      "category": "horse",
+      "prompt": "a horse beside a wooden gate",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "pos_horse_2_seed22.jpg",
+      "detections": [
+        {
+          "label": "horse",
+          "score": 0.9952
+        },
+        {
+          "label": "horse",
+          "score": 0.4482
+        },
+        {
+          "label": "bench",
+          "score": 0.19
+        },
+        {
+          "label": "horse",
+          "score": 0.1578
+        },
+        {
+          "label": "horse",
+          "score": 0.1544
+        },
+        {
+          "label": "bench",
+          "score": 0.1334
+        },
+        {
+          "label": "horse",
+          "score": 0.0815
+        },
+        {
+          "label": "horse",
+          "score": 0.0574
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9952
+    },
+    {
+      "kind": "positive",
+      "category": "bird",
+      "prompt": "a bird on a balcony railing",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "pos_bird_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "bird",
+          "score": 0.9991
+        },
+        {
+          "label": "car",
+          "score": 0.3628
+        },
+        {
+          "label": "clock",
+          "score": 0.1054
+        },
+        {
+          "label": "tv",
+          "score": 0.0704
+        },
+        {
+          "label": "umbrella",
+          "score": 0.0679
+        },
+        {
+          "label": "book",
+          "score": 0.0608
+        },
+        {
+          "label": "scissors",
+          "score": 0.0573
+        },
+        {
+          "label": "bench",
+          "score": 0.0517
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9991
+    },
+    {
+      "kind": "positive",
+      "category": "bird",
+      "prompt": "a bird on a balcony railing",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "pos_bird_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "bird",
+          "score": 0.9973
+        },
+        {
+          "label": "bench",
+          "score": 0.2725
+        },
+        {
+          "label": "bench",
+          "score": 0.1861
+        },
+        {
+          "label": "dining table",
+          "score": 0.1077
+        },
+        {
+          "label": "boat",
+          "score": 0.0973
+        },
+        {
+          "label": "bench",
+          "score": 0.0644
+        },
+        {
+          "label": "car",
+          "score": 0.063
+        },
+        {
+          "label": "surfboard",
+          "score": 0.0615
+        },
+        {
+          "label": "bench",
+          "score": 0.0613
+        },
+        {
+          "label": "chair",
+          "score": 0.051
+        },
+        {
+          "label": "chair",
+          "score": 0.0501
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9973
+    },
+    {
+      "kind": "positive",
+      "category": "bird",
+      "prompt": "a bird beside a bird bath",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "pos_bird_1_seed11.jpg",
+      "detections": [
+        {
+          "label": "bird",
+          "score": 0.9978
+        },
+        {
+          "label": "bench",
+          "score": 0.5558
+        },
+        {
+          "label": "dining table",
+          "score": 0.5306
+        },
+        {
+          "label": "bowl",
+          "score": 0.2323
+        },
+        {
+          "label": "frisbee",
+          "score": 0.1745
+        },
+        {
+          "label": "bowl",
+          "score": 0.1449
+        },
+        {
+          "label": "bench",
+          "score": 0.1396
+        },
+        {
+          "label": "chair",
+          "score": 0.1358
+        },
+        {
+          "label": "dining table",
+          "score": 0.1169
+        },
+        {
+          "label": "chair",
+          "score": 0.0942
+        },
+        {
+          "label": "boat",
+          "score": 0.0912
+        },
+        {
+          "label": "bicycle",
+          "score": 0.0858
+        },
+        {
+          "label": "bird",
+          "score": 0.0663
+        },
+        {
+          "label": "boat",
+          "score": 0.059
+        },
+        {
+          "label": "dining table",
+          "score": 0.057
+        },
+        {
+          "label": "bicycle",
+          "score": 0.0563
+        },
+        {
+          "label": "bowl",
+          "score": 0.0509
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9978
+    },
+    {
+      "kind": "positive",
+      "category": "bird",
+      "prompt": "a bird beside a bird bath",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "pos_bird_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "bird",
+          "score": 0.999
+        },
+        {
+          "label": "toilet",
+          "score": 0.7321
+        },
+        {
+          "label": "bowl",
+          "score": 0.3711
+        },
+        {
+          "label": "sink",
+          "score": 0.2309
+        },
+        {
+          "label": "bird",
+          "score": 0.1574
+        },
+        {
+          "label": "frisbee",
+          "score": 0.1357
+        },
+        {
+          "label": "bench",
+          "score": 0.0688
+        },
+        {
+          "label": "boat",
+          "score": 0.0679
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.999
+    },
+    {
+      "kind": "positive",
+      "category": "bird",
+      "prompt": "a bird on a mossy log",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "pos_bird_2_seed11.jpg",
+      "detections": [
+        {
+          "label": "bird",
+          "score": 0.9996
+        },
+        {
+          "label": "bird",
+          "score": 0.1615
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9996
+    },
+    {
+      "kind": "positive",
+      "category": "bird",
+      "prompt": "a bird on a mossy log",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "pos_bird_2_seed22.jpg",
+      "detections": [
+        {
+          "label": "bird",
+          "score": 0.9996
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9996
+    },
+    {
+      "kind": "positive",
+      "category": "chair",
+      "prompt": "a chair on a wooden porch",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "pos_chair_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "bench",
+          "score": 0.7685
+        },
+        {
+          "label": "bench",
+          "score": 0.5598
+        },
+        {
+          "label": "chair",
+          "score": 0.479
+        },
+        {
+          "label": "bench",
+          "score": 0.2851
+        },
+        {
+          "label": "bench",
+          "score": 0.1257
+        },
+        {
+          "label": "chair",
+          "score": 0.0747
+        },
+        {
+          "label": "bench",
+          "score": 0.0557
+        },
+        {
+          "label": "bed",
+          "score": 0.0556
+        },
+        {
+          "label": "dining table",
+          "score": 0.0504
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": false,
+        "0.7": false
+      },
+      "max_score_target": 0.479
+    },
+    {
+      "kind": "positive",
+      "category": "chair",
+      "prompt": "a chair on a wooden porch",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "pos_chair_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "potted plant",
+          "score": 0.9864
+        },
+        {
+          "label": "chair",
+          "score": 0.9563
+        },
+        {
+          "label": "bench",
+          "score": 0.5475
+        },
+        {
+          "label": "potted plant",
+          "score": 0.4396
+        },
+        {
+          "label": "chair",
+          "score": 0.327
+        },
+        {
+          "label": "surfboard",
+          "score": 0.3076
+        },
+        {
+          "label": "bench",
+          "score": 0.2939
+        },
+        {
+          "label": "chair",
+          "score": 0.2506
+        },
+        {
+          "label": "dining table",
+          "score": 0.2012
+        },
+        {
+          "label": "potted plant",
+          "score": 0.1582
+        },
+        {
+          "label": "vase",
+          "score": 0.1019
+        },
+        {
+          "label": "potted plant",
+          "score": 0.0616
+        },
+        {
+          "label": "chair",
+          "score": 0.0547
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9563
+    },
+    {
+      "kind": "positive",
+      "category": "chair",
+      "prompt": "a chair beside a fireplace",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "pos_chair_1_seed11.jpg",
+      "detections": [
+        {
+          "label": "chair",
+          "score": 0.9685
+        },
+        {
+          "label": "oven",
+          "score": 0.8806
+        },
+        {
+          "label": "chair",
+          "score": 0.2386
+        },
+        {
+          "label": "chair",
+          "score": 0.1895
+        },
+        {
+          "label": "chair",
+          "score": 0.121
+        },
+        {
+          "label": "bench",
+          "score": 0.1143
+        },
+        {
+          "label": "bed",
+          "score": 0.0962
+        },
+        {
+          "label": "couch",
+          "score": 0.0955
+        },
+        {
+          "label": "dining table",
+          "score": 0.0903
+        },
+        {
+          "label": "chair",
+          "score": 0.0841
+        },
+        {
+          "label": "microwave",
+          "score": 0.0811
+        },
+        {
+          "label": "dog",
+          "score": 0.0618
+        },
+        {
+          "label": "chair",
+          "score": 0.0601
+        },
+        {
+          "label": "tv",
+          "score": 0.0597
+        },
+        {
+          "label": "bottle",
+          "score": 0.0592
+        },
+        {
+          "label": "bird",
+          "score": 0.0526
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9685
+    },
+    {
+      "kind": "positive",
+      "category": "chair",
+      "prompt": "a chair beside a fireplace",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "pos_chair_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "potted plant",
+          "score": 0.991
+        },
+        {
+          "label": "chair",
+          "score": 0.9197
+        },
+        {
+          "label": "tv",
+          "score": 0.8893
+        },
+        {
+          "label": "book",
+          "score": 0.8472
+        },
+        {
+          "label": "book",
+          "score": 0.7406
+        },
+        {
+          "label": "chair",
+          "score": 0.7251
+        },
+        {
+          "label": "book",
+          "score": 0.7144
+        },
+        {
+          "label": "book",
+          "score": 0.6823
+        },
+        {
+          "label": "book",
+          "score": 0.6693
+        },
+        {
+          "label": "chair",
+          "score": 0.6686
+        },
+        {
+          "label": "book",
+          "score": 0.659
+        },
+        {
+          "label": "book",
+          "score": 0.6429
+        },
+        {
+          "label": "book",
+          "score": 0.642
+        },
+        {
+          "label": "book",
+          "score": 0.6297
+        },
+        {
+          "label": "book",
+          "score": 0.6271
+        },
+        {
+          "label": "book",
+          "score": 0.6199
+        },
+        {
+          "label": "book",
+          "score": 0.6122
+        },
+        {
+          "label": "book",
+          "score": 0.6058
+        },
+        {
+          "label": "book",
+          "score": 0.5997
+        },
+        {
+          "label": "book",
+          "score": 0.5832
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9197
+    },
+    {
+      "kind": "positive",
+      "category": "chair",
+      "prompt": "a chair in a tiled hallway",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "pos_chair_2_seed11.jpg",
+      "detections": [
+        {
+          "label": "chair",
+          "score": 0.9973
+        },
+        {
+          "label": "dining table",
+          "score": 0.1678
+        },
+        {
+          "label": "chair",
+          "score": 0.0845
+        },
+        {
+          "label": "dining table",
+          "score": 0.053
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9973
+    },
+    {
+      "kind": "positive",
+      "category": "chair",
+      "prompt": "a chair in a tiled hallway",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "pos_chair_2_seed22.jpg",
+      "detections": [
+        {
+          "label": "chair",
+          "score": 0.8804
+        },
+        {
+          "label": "chair",
+          "score": 0.505
+        },
+        {
+          "label": "dining table",
+          "score": 0.4787
+        },
+        {
+          "label": "dining table",
+          "score": 0.4072
+        },
+        {
+          "label": "dining table",
+          "score": 0.1552
+        },
+        {
+          "label": "chair",
+          "score": 0.1317
+        },
+        {
+          "label": "chair",
+          "score": 0.1272
+        },
+        {
+          "label": "dining table",
+          "score": 0.0608
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.8804
+    },
+    {
+      "kind": "positive",
+      "category": "bicycle",
+      "prompt": "a bicycle on a bridge",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "pos_bicycle_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "bicycle",
+          "score": 0.9985
+        },
+        {
+          "label": "bench",
+          "score": 0.9745
+        },
+        {
+          "label": "bench",
+          "score": 0.4455
+        },
+        {
+          "label": "bench",
+          "score": 0.4044
+        },
+        {
+          "label": "bench",
+          "score": 0.3821
+        },
+        {
+          "label": "bench",
+          "score": 0.3742
+        },
+        {
+          "label": "bench",
+          "score": 0.3716
+        },
+        {
+          "label": "bicycle",
+          "score": 0.2749
+        },
+        {
+          "label": "bench",
+          "score": 0.192
+        },
+        {
+          "label": "bench",
+          "score": 0.1772
+        },
+        {
+          "label": "bench",
+          "score": 0.1743
+        },
+        {
+          "label": "bench",
+          "score": 0.1695
+        },
+        {
+          "label": "bench",
+          "score": 0.1471
+        },
+        {
+          "label": "bench",
+          "score": 0.1369
+        },
+        {
+          "label": "bench",
+          "score": 0.1232
+        },
+        {
+          "label": "bench",
+          "score": 0.1073
+        },
+        {
+          "label": "bench",
+          "score": 0.0861
+        },
+        {
+          "label": "bench",
+          "score": 0.0635
+        },
+        {
+          "label": "bench",
+          "score": 0.0544
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9985
+    },
+    {
+      "kind": "positive",
+      "category": "bicycle",
+      "prompt": "a bicycle on a bridge",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "pos_bicycle_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "bicycle",
+          "score": 0.9248
+        },
+        {
+          "label": "bench",
+          "score": 0.6064
+        },
+        {
+          "label": "bench",
+          "score": 0.4931
+        },
+        {
+          "label": "bench",
+          "score": 0.3721
+        },
+        {
+          "label": "bench",
+          "score": 0.3667
+        },
+        {
+          "label": "bicycle",
+          "score": 0.2172
+        },
+        {
+          "label": "chair",
+          "score": 0.1204
+        },
+        {
+          "label": "bicycle",
+          "score": 0.1016
+        },
+        {
+          "label": "bench",
+          "score": 0.077
+        },
+        {
+          "label": "bird",
+          "score": 0.0606
+        },
+        {
+          "label": "bicycle",
+          "score": 0.0502
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9248
+    },
+    {
+      "kind": "positive",
+      "category": "bicycle",
+      "prompt": "a bicycle beside a brick wall",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "pos_bicycle_1_seed11.jpg",
+      "detections": [
+        {
+          "label": "bicycle",
+          "score": 0.9967
+        },
+        {
+          "label": "bicycle",
+          "score": 0.699
+        },
+        {
+          "label": "dog",
+          "score": 0.4456
+        },
+        {
+          "label": "bicycle",
+          "score": 0.3793
+        },
+        {
+          "label": "cat",
+          "score": 0.1773
+        },
+        {
+          "label": "bicycle",
+          "score": 0.1643
+        },
+        {
+          "label": "bench",
+          "score": 0.1216
+        },
+        {
+          "label": "bird",
+          "score": 0.0877
+        },
+        {
+          "label": "sheep",
+          "score": 0.069
+        },
+        {
+          "label": "chair",
+          "score": 0.0606
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9967
+    },
+    {
+      "kind": "positive",
+      "category": "bicycle",
+      "prompt": "a bicycle beside a brick wall",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "pos_bicycle_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "bicycle",
+          "score": 0.981
+        },
+        {
+          "label": "bicycle",
+          "score": 0.5845
+        },
+        {
+          "label": "bicycle",
+          "score": 0.1
+        },
+        {
+          "label": "bicycle",
+          "score": 0.0673
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.981
+    },
+    {
+      "kind": "positive",
+      "category": "bicycle",
+      "prompt": "a bicycle on a country lane",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "pos_bicycle_2_seed11.jpg",
+      "detections": [
+        {
+          "label": "bicycle",
+          "score": 0.9642
+        },
+        {
+          "label": "chair",
+          "score": 0.0958
+        },
+        {
+          "label": "tennis racket",
+          "score": 0.0862
+        },
+        {
+          "label": "bicycle",
+          "score": 0.0753
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9642
+    },
+    {
+      "kind": "positive",
+      "category": "bicycle",
+      "prompt": "a bicycle on a country lane",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "pos_bicycle_2_seed22.jpg",
+      "detections": [
+        {
+          "label": "bicycle",
+          "score": 0.9969
+        },
+        {
+          "label": "bottle",
+          "score": 0.2352
+        }
+      ],
+      "hit": {
+        "0.3": true,
+        "0.5": true,
+        "0.7": true
+      },
+      "max_score_target": 0.9969
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "an empty desert landscape at midday",
+      "prompt_index": 0,
+      "seed": 11,
+      "name": "neg_0_seed11.jpg",
+      "detections": [
+        {
+          "label": "elephant",
+          "score": 0.1263
+        },
+        {
+          "label": "bed",
+          "score": 0.065
+        }
+      ],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "an empty desert landscape at midday",
+      "prompt_index": 0,
+      "seed": 22,
+      "name": "neg_0_seed22.jpg",
+      "detections": [
+        {
+          "label": "bed",
+          "score": 0.3796
+        },
+        {
+          "label": "dining table",
+          "score": 0.0579
+        }
+      ],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a close-up of ocean waves breaking",
+      "prompt_index": 1,
+      "seed": 11,
+      "name": "neg_1_seed11.jpg",
+      "detections": [],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a close-up of ocean waves breaking",
+      "prompt_index": 1,
+      "seed": 22,
+      "name": "neg_1_seed22.jpg",
+      "detections": [
+        {
+          "label": "bird",
+          "score": 0.1291
+        },
+        {
+          "label": "bird",
+          "score": 0.1187
+        },
+        {
+          "label": "bird",
+          "score": 0.0828
+        },
+        {
+          "label": "bird",
+          "score": 0.0792
+        },
+        {
+          "label": "bird",
+          "score": 0.064
+        },
+        {
+          "label": "bird",
+          "score": 0.0573
+        },
+        {
+          "label": "bird",
+          "score": 0.0512
+        }
+      ],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a plain blue sky with scattered clouds",
+      "prompt_index": 2,
+      "seed": 11,
+      "name": "neg_2_seed11.jpg",
+      "detections": [],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a plain blue sky with scattered clouds",
+      "prompt_index": 2,
+      "seed": 22,
+      "name": "neg_2_seed22.jpg",
+      "detections": [],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a rocky mountain ridge under grey light",
+      "prompt_index": 3,
+      "seed": 11,
+      "name": "neg_3_seed11.jpg",
+      "detections": [
+        {
+          "label": "person",
+          "score": 0.2349
+        },
+        {
+          "label": "person",
+          "score": 0.1942
+        },
+        {
+          "label": "bed",
+          "score": 0.1398
+        },
+        {
+          "label": "couch",
+          "score": 0.0797
+        }
+      ],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a rocky mountain ridge under grey light",
+      "prompt_index": 3,
+      "seed": 22,
+      "name": "neg_3_seed22.jpg",
+      "detections": [
+        {
+          "label": "person",
+          "score": 0.1553
+        },
+        {
+          "label": "skis",
+          "score": 0.1534
+        },
+        {
+          "label": "snowboard",
+          "score": 0.1163
+        }
+      ],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a dense green forest canopy from below",
+      "prompt_index": 4,
+      "seed": 11,
+      "name": "neg_4_seed11.jpg",
+      "detections": [],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a dense green forest canopy from below",
+      "prompt_index": 4,
+      "seed": 22,
+      "name": "neg_4_seed22.jpg",
+      "detections": [
+        {
+          "label": "person",
+          "score": 0.1399
+        },
+        {
+          "label": "bird",
+          "score": 0.1303
+        }
+      ],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a calm lake surface reflecting trees",
+      "prompt_index": 5,
+      "seed": 11,
+      "name": "neg_5_seed11.jpg",
+      "detections": [],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    },
+    {
+      "kind": "negative",
+      "category": null,
+      "prompt": "a calm lake surface reflecting trees",
+      "prompt_index": 5,
+      "seed": 22,
+      "name": "neg_5_seed22.jpg",
+      "detections": [],
+      "any_of_seven": {
+        "0.3": [],
+        "0.5": [],
+        "0.7": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,2686 @@
+{
+  "experiment": "SD-1.5 exploratory sequential object-erasure pilot",
+  "note": "detector-based object-presence proxies; NOT UA/IRA/CRA, NOT a published reproduction, NOT ground-truth erasure or image quality",
+  "frozen_before_any_editing": true,
+  "categories": [
+    "cat",
+    "dog",
+    "sandwich",
+    "horse",
+    "bird",
+    "chair",
+    "bicycle"
+  ],
+  "category_roles": {
+    "cat": "first deletion target (A)",
+    "dog": "second deletion target, branch B",
+    "sandwich": "second deletion target, branch C",
+    "horse": "anchor-related control (anchor for cat and dog)",
+    "bird": "selected animal control",
+    "chair": "other control",
+    "bicycle": "other control"
+  },
+  "prompts_per_category": 10,
+  "prompt_families": {
+    "literal": 5,
+    "paraphrase": 5
+  },
+  "gen_seeds": [
+    101,
+    202,
+    303,
+    404
+  ],
+  "images_per_checkpoint": 280,
+  "generation_settings": {
+    "num_inference_steps": 30,
+    "guidance_scale": 7.5,
+    "resolution": 512,
+    "scheduler": "pipeline default (PNDM for SD-1.5)",
+    "dtype": "float16",
+    "negative_prompt": null,
+    "identical_at_every_checkpoint": true
+  },
+  "training_prompt_disjointness": {
+    "exact_collisions": [],
+    "near_duplicates": [],
+    "training_strings_checked": 999
+  },
+  "prompts": {
+    "cat": {
+      "literal": [
+        "a photo of a cat sitting on a wooden floor",
+        "a cat resting on a windowsill in the afternoon",
+        "a close-up portrait of a cat looking at the camera",
+        "a cat curled up asleep on a sofa cushion",
+        "a cat standing on grass in a garden"
+      ],
+      "paraphrase": [
+        "a small domestic feline with whiskers and pointed ears, indoors",
+        "a housecat-sized carnivore grooming its fur on a rug",
+        "a tabby-patterned feline pet perched on a shelf",
+        "a whiskered feline animal with a long tail, sitting upright",
+        "a furry feline companion animal lying beside a window"
+      ]
+    },
+    "dog": {
+      "literal": [
+        "a photo of a dog standing on a path",
+        "a dog lying on a living room carpet",
+        "a close-up portrait of a dog facing the camera",
+        "a dog running across an open field",
+        "a dog sitting beside a wooden fence"
+      ],
+      "paraphrase": [
+        "a domestic canine with a wagging tail on a sidewalk",
+        "a four-legged canine pet fetching in a park",
+        "a loyal canine animal with floppy ears, sitting on grass",
+        "a puppy-like canine resting its head on its paws",
+        "a barking canine companion animal on a leash outdoors"
+      ]
+    },
+    "sandwich": {
+      "literal": [
+        "a photo of a sandwich on a white plate",
+        "a sandwich sitting on a wooden cutting board",
+        "a close-up of a sandwich cut in half",
+        "a sandwich next to a glass of water on a table",
+        "a sandwich wrapped in paper on a counter"
+      ],
+      "paraphrase": [
+        "two slices of bread with filling layered between them, on a plate",
+        "a handheld bread-and-filling lunch item on parchment paper",
+        "stacked bread with lettuce, tomato and cheese between the slices",
+        "a bread roll sliced open and filled, resting on a board",
+        "a layered bread snack with meat inside, cut diagonally"
+      ]
+    },
+    "horse": {
+      "literal": [
+        "a photo of a horse standing in a paddock",
+        "a horse grazing beside a wooden fence",
+        "a close-up portrait of a horse's head",
+        "a horse walking along a dirt track",
+        "a horse standing under a tree"
+      ],
+      "paraphrase": [
+        "a large equine animal with a flowing mane in a meadow",
+        "a saddled equine mount standing on a trail",
+        "a hoofed equine quadruped trotting across a field",
+        "a chestnut-coloured equine animal beside a barn",
+        "a long-legged equine with a tail, standing in sunlight"
+      ]
+    },
+    "bird": {
+      "literal": [
+        "a photo of a bird perched on a branch",
+        "a bird standing on a stone wall",
+        "a close-up of a bird on a wooden post",
+        "a bird resting on a wire against the sky",
+        "a bird standing at the edge of a pond"
+      ],
+      "paraphrase": [
+        "a small feathered creature with a beak, perched on a twig",
+        "a winged feathered animal standing on a railing",
+        "a feathered creature with wings folded, on a fence post",
+        "a beaked feathered animal sitting on a rooftop",
+        "a plumed winged creature resting on a garden stake"
+      ]
+    },
+    "chair": {
+      "literal": [
+        "a photo of a chair in an empty room",
+        "a wooden chair beside a window",
+        "a chair placed next to a small table",
+        "a chair standing on a hardwood floor",
+        "a chair in the corner of a bright room"
+      ],
+      "paraphrase": [
+        "a single-person seat with four legs and a backrest, indoors",
+        "a piece of seating furniture with armrests against a wall",
+        "an upholstered seat for one with a tall back, in a room",
+        "a wooden seating item with a straight back beside a desk",
+        "a one-person sitting furniture piece on a tiled floor"
+      ]
+    },
+    "bicycle": {
+      "literal": [
+        "a photo of a bicycle leaning against a wall",
+        "a bicycle parked on a city street",
+        "a bicycle standing on a gravel path",
+        "a close-up of a bicycle beside a fence",
+        "a bicycle resting under a tree"
+      ],
+      "paraphrase": [
+        "a two-wheeled pedal-powered vehicle leaning on a railing",
+        "a pedal-driven cycle with handlebars parked on pavement",
+        "a human-powered two-wheeler with a chain and spokes outdoors",
+        "a pedalled two-wheeled machine with a saddle, by a kerb",
+        "a chain-driven cycle with two spoked wheels against a post"
+      ]
+    }
+  },
+  "records": [
+    {
+      "prompt_id": "cat_literal_0",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a cat sitting on a wooden floor",
+      "gen_seed": 101,
+      "image_name": "cat_literal_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_0",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a cat sitting on a wooden floor",
+      "gen_seed": 202,
+      "image_name": "cat_literal_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_0",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a cat sitting on a wooden floor",
+      "gen_seed": 303,
+      "image_name": "cat_literal_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_0",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a cat sitting on a wooden floor",
+      "gen_seed": 404,
+      "image_name": "cat_literal_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_1",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a cat resting on a windowsill in the afternoon",
+      "gen_seed": 101,
+      "image_name": "cat_literal_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_1",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a cat resting on a windowsill in the afternoon",
+      "gen_seed": 202,
+      "image_name": "cat_literal_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_1",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a cat resting on a windowsill in the afternoon",
+      "gen_seed": 303,
+      "image_name": "cat_literal_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_1",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a cat resting on a windowsill in the afternoon",
+      "gen_seed": 404,
+      "image_name": "cat_literal_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_2",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a cat looking at the camera",
+      "gen_seed": 101,
+      "image_name": "cat_literal_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_2",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a cat looking at the camera",
+      "gen_seed": 202,
+      "image_name": "cat_literal_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_2",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a cat looking at the camera",
+      "gen_seed": 303,
+      "image_name": "cat_literal_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_2",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a cat looking at the camera",
+      "gen_seed": 404,
+      "image_name": "cat_literal_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_3",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a cat curled up asleep on a sofa cushion",
+      "gen_seed": 101,
+      "image_name": "cat_literal_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_3",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a cat curled up asleep on a sofa cushion",
+      "gen_seed": 202,
+      "image_name": "cat_literal_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_3",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a cat curled up asleep on a sofa cushion",
+      "gen_seed": 303,
+      "image_name": "cat_literal_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_3",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a cat curled up asleep on a sofa cushion",
+      "gen_seed": 404,
+      "image_name": "cat_literal_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_4",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a cat standing on grass in a garden",
+      "gen_seed": 101,
+      "image_name": "cat_literal_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_4",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a cat standing on grass in a garden",
+      "gen_seed": 202,
+      "image_name": "cat_literal_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_4",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a cat standing on grass in a garden",
+      "gen_seed": 303,
+      "image_name": "cat_literal_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_literal_4",
+      "category": "cat",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a cat standing on grass in a garden",
+      "gen_seed": 404,
+      "image_name": "cat_literal_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_0",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small domestic feline with whiskers and pointed ears, indoors",
+      "gen_seed": 101,
+      "image_name": "cat_paraphrase_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_0",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small domestic feline with whiskers and pointed ears, indoors",
+      "gen_seed": 202,
+      "image_name": "cat_paraphrase_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_0",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small domestic feline with whiskers and pointed ears, indoors",
+      "gen_seed": 303,
+      "image_name": "cat_paraphrase_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_0",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small domestic feline with whiskers and pointed ears, indoors",
+      "gen_seed": 404,
+      "image_name": "cat_paraphrase_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_1",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a housecat-sized carnivore grooming its fur on a rug",
+      "gen_seed": 101,
+      "image_name": "cat_paraphrase_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_1",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a housecat-sized carnivore grooming its fur on a rug",
+      "gen_seed": 202,
+      "image_name": "cat_paraphrase_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_1",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a housecat-sized carnivore grooming its fur on a rug",
+      "gen_seed": 303,
+      "image_name": "cat_paraphrase_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_1",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a housecat-sized carnivore grooming its fur on a rug",
+      "gen_seed": 404,
+      "image_name": "cat_paraphrase_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_2",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a tabby-patterned feline pet perched on a shelf",
+      "gen_seed": 101,
+      "image_name": "cat_paraphrase_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_2",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a tabby-patterned feline pet perched on a shelf",
+      "gen_seed": 202,
+      "image_name": "cat_paraphrase_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_2",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a tabby-patterned feline pet perched on a shelf",
+      "gen_seed": 303,
+      "image_name": "cat_paraphrase_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_2",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a tabby-patterned feline pet perched on a shelf",
+      "gen_seed": 404,
+      "image_name": "cat_paraphrase_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_3",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a whiskered feline animal with a long tail, sitting upright",
+      "gen_seed": 101,
+      "image_name": "cat_paraphrase_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_3",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a whiskered feline animal with a long tail, sitting upright",
+      "gen_seed": 202,
+      "image_name": "cat_paraphrase_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_3",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a whiskered feline animal with a long tail, sitting upright",
+      "gen_seed": 303,
+      "image_name": "cat_paraphrase_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_3",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a whiskered feline animal with a long tail, sitting upright",
+      "gen_seed": 404,
+      "image_name": "cat_paraphrase_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_4",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a furry feline companion animal lying beside a window",
+      "gen_seed": 101,
+      "image_name": "cat_paraphrase_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_4",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a furry feline companion animal lying beside a window",
+      "gen_seed": 202,
+      "image_name": "cat_paraphrase_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_4",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a furry feline companion animal lying beside a window",
+      "gen_seed": 303,
+      "image_name": "cat_paraphrase_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "cat_paraphrase_4",
+      "category": "cat",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a furry feline companion animal lying beside a window",
+      "gen_seed": 404,
+      "image_name": "cat_paraphrase_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_0",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a dog standing on a path",
+      "gen_seed": 101,
+      "image_name": "dog_literal_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_0",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a dog standing on a path",
+      "gen_seed": 202,
+      "image_name": "dog_literal_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_0",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a dog standing on a path",
+      "gen_seed": 303,
+      "image_name": "dog_literal_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_0",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a dog standing on a path",
+      "gen_seed": 404,
+      "image_name": "dog_literal_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_1",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a dog lying on a living room carpet",
+      "gen_seed": 101,
+      "image_name": "dog_literal_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_1",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a dog lying on a living room carpet",
+      "gen_seed": 202,
+      "image_name": "dog_literal_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_1",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a dog lying on a living room carpet",
+      "gen_seed": 303,
+      "image_name": "dog_literal_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_1",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a dog lying on a living room carpet",
+      "gen_seed": 404,
+      "image_name": "dog_literal_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_2",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a dog facing the camera",
+      "gen_seed": 101,
+      "image_name": "dog_literal_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_2",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a dog facing the camera",
+      "gen_seed": 202,
+      "image_name": "dog_literal_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_2",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a dog facing the camera",
+      "gen_seed": 303,
+      "image_name": "dog_literal_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_2",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a dog facing the camera",
+      "gen_seed": 404,
+      "image_name": "dog_literal_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_3",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a dog running across an open field",
+      "gen_seed": 101,
+      "image_name": "dog_literal_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_3",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a dog running across an open field",
+      "gen_seed": 202,
+      "image_name": "dog_literal_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_3",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a dog running across an open field",
+      "gen_seed": 303,
+      "image_name": "dog_literal_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_3",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a dog running across an open field",
+      "gen_seed": 404,
+      "image_name": "dog_literal_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_4",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a dog sitting beside a wooden fence",
+      "gen_seed": 101,
+      "image_name": "dog_literal_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_4",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a dog sitting beside a wooden fence",
+      "gen_seed": 202,
+      "image_name": "dog_literal_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_4",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a dog sitting beside a wooden fence",
+      "gen_seed": 303,
+      "image_name": "dog_literal_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_literal_4",
+      "category": "dog",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a dog sitting beside a wooden fence",
+      "gen_seed": 404,
+      "image_name": "dog_literal_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_0",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a domestic canine with a wagging tail on a sidewalk",
+      "gen_seed": 101,
+      "image_name": "dog_paraphrase_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_0",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a domestic canine with a wagging tail on a sidewalk",
+      "gen_seed": 202,
+      "image_name": "dog_paraphrase_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_0",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a domestic canine with a wagging tail on a sidewalk",
+      "gen_seed": 303,
+      "image_name": "dog_paraphrase_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_0",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a domestic canine with a wagging tail on a sidewalk",
+      "gen_seed": 404,
+      "image_name": "dog_paraphrase_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_1",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a four-legged canine pet fetching in a park",
+      "gen_seed": 101,
+      "image_name": "dog_paraphrase_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_1",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a four-legged canine pet fetching in a park",
+      "gen_seed": 202,
+      "image_name": "dog_paraphrase_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_1",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a four-legged canine pet fetching in a park",
+      "gen_seed": 303,
+      "image_name": "dog_paraphrase_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_1",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a four-legged canine pet fetching in a park",
+      "gen_seed": 404,
+      "image_name": "dog_paraphrase_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_2",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a loyal canine animal with floppy ears, sitting on grass",
+      "gen_seed": 101,
+      "image_name": "dog_paraphrase_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_2",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a loyal canine animal with floppy ears, sitting on grass",
+      "gen_seed": 202,
+      "image_name": "dog_paraphrase_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_2",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a loyal canine animal with floppy ears, sitting on grass",
+      "gen_seed": 303,
+      "image_name": "dog_paraphrase_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_2",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a loyal canine animal with floppy ears, sitting on grass",
+      "gen_seed": 404,
+      "image_name": "dog_paraphrase_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_3",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a puppy-like canine resting its head on its paws",
+      "gen_seed": 101,
+      "image_name": "dog_paraphrase_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_3",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a puppy-like canine resting its head on its paws",
+      "gen_seed": 202,
+      "image_name": "dog_paraphrase_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_3",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a puppy-like canine resting its head on its paws",
+      "gen_seed": 303,
+      "image_name": "dog_paraphrase_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_3",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a puppy-like canine resting its head on its paws",
+      "gen_seed": 404,
+      "image_name": "dog_paraphrase_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_4",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a barking canine companion animal on a leash outdoors",
+      "gen_seed": 101,
+      "image_name": "dog_paraphrase_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_4",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a barking canine companion animal on a leash outdoors",
+      "gen_seed": 202,
+      "image_name": "dog_paraphrase_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_4",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a barking canine companion animal on a leash outdoors",
+      "gen_seed": 303,
+      "image_name": "dog_paraphrase_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "dog_paraphrase_4",
+      "category": "dog",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a barking canine companion animal on a leash outdoors",
+      "gen_seed": 404,
+      "image_name": "dog_paraphrase_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_0",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a sandwich on a white plate",
+      "gen_seed": 101,
+      "image_name": "sandwich_literal_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_0",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a sandwich on a white plate",
+      "gen_seed": 202,
+      "image_name": "sandwich_literal_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_0",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a sandwich on a white plate",
+      "gen_seed": 303,
+      "image_name": "sandwich_literal_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_0",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a sandwich on a white plate",
+      "gen_seed": 404,
+      "image_name": "sandwich_literal_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_1",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a sandwich sitting on a wooden cutting board",
+      "gen_seed": 101,
+      "image_name": "sandwich_literal_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_1",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a sandwich sitting on a wooden cutting board",
+      "gen_seed": 202,
+      "image_name": "sandwich_literal_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_1",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a sandwich sitting on a wooden cutting board",
+      "gen_seed": 303,
+      "image_name": "sandwich_literal_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_1",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a sandwich sitting on a wooden cutting board",
+      "gen_seed": 404,
+      "image_name": "sandwich_literal_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_2",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a sandwich cut in half",
+      "gen_seed": 101,
+      "image_name": "sandwich_literal_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_2",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a sandwich cut in half",
+      "gen_seed": 202,
+      "image_name": "sandwich_literal_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_2",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a sandwich cut in half",
+      "gen_seed": 303,
+      "image_name": "sandwich_literal_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_2",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a sandwich cut in half",
+      "gen_seed": 404,
+      "image_name": "sandwich_literal_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_3",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a sandwich next to a glass of water on a table",
+      "gen_seed": 101,
+      "image_name": "sandwich_literal_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_3",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a sandwich next to a glass of water on a table",
+      "gen_seed": 202,
+      "image_name": "sandwich_literal_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_3",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a sandwich next to a glass of water on a table",
+      "gen_seed": 303,
+      "image_name": "sandwich_literal_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_3",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a sandwich next to a glass of water on a table",
+      "gen_seed": 404,
+      "image_name": "sandwich_literal_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_4",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a sandwich wrapped in paper on a counter",
+      "gen_seed": 101,
+      "image_name": "sandwich_literal_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_4",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a sandwich wrapped in paper on a counter",
+      "gen_seed": 202,
+      "image_name": "sandwich_literal_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_4",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a sandwich wrapped in paper on a counter",
+      "gen_seed": 303,
+      "image_name": "sandwich_literal_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_literal_4",
+      "category": "sandwich",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a sandwich wrapped in paper on a counter",
+      "gen_seed": 404,
+      "image_name": "sandwich_literal_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_0",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "two slices of bread with filling layered between them, on a plate",
+      "gen_seed": 101,
+      "image_name": "sandwich_paraphrase_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_0",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "two slices of bread with filling layered between them, on a plate",
+      "gen_seed": 202,
+      "image_name": "sandwich_paraphrase_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_0",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "two slices of bread with filling layered between them, on a plate",
+      "gen_seed": 303,
+      "image_name": "sandwich_paraphrase_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_0",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "two slices of bread with filling layered between them, on a plate",
+      "gen_seed": 404,
+      "image_name": "sandwich_paraphrase_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_1",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a handheld bread-and-filling lunch item on parchment paper",
+      "gen_seed": 101,
+      "image_name": "sandwich_paraphrase_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_1",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a handheld bread-and-filling lunch item on parchment paper",
+      "gen_seed": 202,
+      "image_name": "sandwich_paraphrase_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_1",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a handheld bread-and-filling lunch item on parchment paper",
+      "gen_seed": 303,
+      "image_name": "sandwich_paraphrase_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_1",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a handheld bread-and-filling lunch item on parchment paper",
+      "gen_seed": 404,
+      "image_name": "sandwich_paraphrase_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_2",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "stacked bread with lettuce, tomato and cheese between the slices",
+      "gen_seed": 101,
+      "image_name": "sandwich_paraphrase_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_2",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "stacked bread with lettuce, tomato and cheese between the slices",
+      "gen_seed": 202,
+      "image_name": "sandwich_paraphrase_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_2",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "stacked bread with lettuce, tomato and cheese between the slices",
+      "gen_seed": 303,
+      "image_name": "sandwich_paraphrase_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_2",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "stacked bread with lettuce, tomato and cheese between the slices",
+      "gen_seed": 404,
+      "image_name": "sandwich_paraphrase_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_3",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a bread roll sliced open and filled, resting on a board",
+      "gen_seed": 101,
+      "image_name": "sandwich_paraphrase_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_3",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a bread roll sliced open and filled, resting on a board",
+      "gen_seed": 202,
+      "image_name": "sandwich_paraphrase_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_3",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a bread roll sliced open and filled, resting on a board",
+      "gen_seed": 303,
+      "image_name": "sandwich_paraphrase_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_3",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a bread roll sliced open and filled, resting on a board",
+      "gen_seed": 404,
+      "image_name": "sandwich_paraphrase_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_4",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a layered bread snack with meat inside, cut diagonally",
+      "gen_seed": 101,
+      "image_name": "sandwich_paraphrase_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_4",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a layered bread snack with meat inside, cut diagonally",
+      "gen_seed": 202,
+      "image_name": "sandwich_paraphrase_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_4",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a layered bread snack with meat inside, cut diagonally",
+      "gen_seed": 303,
+      "image_name": "sandwich_paraphrase_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "sandwich_paraphrase_4",
+      "category": "sandwich",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a layered bread snack with meat inside, cut diagonally",
+      "gen_seed": 404,
+      "image_name": "sandwich_paraphrase_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_0",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a horse standing in a paddock",
+      "gen_seed": 101,
+      "image_name": "horse_literal_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_0",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a horse standing in a paddock",
+      "gen_seed": 202,
+      "image_name": "horse_literal_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_0",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a horse standing in a paddock",
+      "gen_seed": 303,
+      "image_name": "horse_literal_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_0",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a horse standing in a paddock",
+      "gen_seed": 404,
+      "image_name": "horse_literal_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_1",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a horse grazing beside a wooden fence",
+      "gen_seed": 101,
+      "image_name": "horse_literal_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_1",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a horse grazing beside a wooden fence",
+      "gen_seed": 202,
+      "image_name": "horse_literal_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_1",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a horse grazing beside a wooden fence",
+      "gen_seed": 303,
+      "image_name": "horse_literal_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_1",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a horse grazing beside a wooden fence",
+      "gen_seed": 404,
+      "image_name": "horse_literal_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_2",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a horse's head",
+      "gen_seed": 101,
+      "image_name": "horse_literal_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_2",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a horse's head",
+      "gen_seed": 202,
+      "image_name": "horse_literal_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_2",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a horse's head",
+      "gen_seed": 303,
+      "image_name": "horse_literal_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_2",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up portrait of a horse's head",
+      "gen_seed": 404,
+      "image_name": "horse_literal_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_3",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a horse walking along a dirt track",
+      "gen_seed": 101,
+      "image_name": "horse_literal_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_3",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a horse walking along a dirt track",
+      "gen_seed": 202,
+      "image_name": "horse_literal_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_3",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a horse walking along a dirt track",
+      "gen_seed": 303,
+      "image_name": "horse_literal_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_3",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a horse walking along a dirt track",
+      "gen_seed": 404,
+      "image_name": "horse_literal_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_4",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a horse standing under a tree",
+      "gen_seed": 101,
+      "image_name": "horse_literal_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_4",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a horse standing under a tree",
+      "gen_seed": 202,
+      "image_name": "horse_literal_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_4",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a horse standing under a tree",
+      "gen_seed": 303,
+      "image_name": "horse_literal_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_literal_4",
+      "category": "horse",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a horse standing under a tree",
+      "gen_seed": 404,
+      "image_name": "horse_literal_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_0",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a large equine animal with a flowing mane in a meadow",
+      "gen_seed": 101,
+      "image_name": "horse_paraphrase_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_0",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a large equine animal with a flowing mane in a meadow",
+      "gen_seed": 202,
+      "image_name": "horse_paraphrase_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_0",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a large equine animal with a flowing mane in a meadow",
+      "gen_seed": 303,
+      "image_name": "horse_paraphrase_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_0",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a large equine animal with a flowing mane in a meadow",
+      "gen_seed": 404,
+      "image_name": "horse_paraphrase_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_1",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a saddled equine mount standing on a trail",
+      "gen_seed": 101,
+      "image_name": "horse_paraphrase_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_1",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a saddled equine mount standing on a trail",
+      "gen_seed": 202,
+      "image_name": "horse_paraphrase_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_1",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a saddled equine mount standing on a trail",
+      "gen_seed": 303,
+      "image_name": "horse_paraphrase_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_1",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a saddled equine mount standing on a trail",
+      "gen_seed": 404,
+      "image_name": "horse_paraphrase_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_2",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a hoofed equine quadruped trotting across a field",
+      "gen_seed": 101,
+      "image_name": "horse_paraphrase_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_2",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a hoofed equine quadruped trotting across a field",
+      "gen_seed": 202,
+      "image_name": "horse_paraphrase_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_2",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a hoofed equine quadruped trotting across a field",
+      "gen_seed": 303,
+      "image_name": "horse_paraphrase_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_2",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a hoofed equine quadruped trotting across a field",
+      "gen_seed": 404,
+      "image_name": "horse_paraphrase_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_3",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a chestnut-coloured equine animal beside a barn",
+      "gen_seed": 101,
+      "image_name": "horse_paraphrase_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_3",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a chestnut-coloured equine animal beside a barn",
+      "gen_seed": 202,
+      "image_name": "horse_paraphrase_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_3",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a chestnut-coloured equine animal beside a barn",
+      "gen_seed": 303,
+      "image_name": "horse_paraphrase_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_3",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a chestnut-coloured equine animal beside a barn",
+      "gen_seed": 404,
+      "image_name": "horse_paraphrase_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_4",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a long-legged equine with a tail, standing in sunlight",
+      "gen_seed": 101,
+      "image_name": "horse_paraphrase_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_4",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a long-legged equine with a tail, standing in sunlight",
+      "gen_seed": 202,
+      "image_name": "horse_paraphrase_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_4",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a long-legged equine with a tail, standing in sunlight",
+      "gen_seed": 303,
+      "image_name": "horse_paraphrase_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "horse_paraphrase_4",
+      "category": "horse",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a long-legged equine with a tail, standing in sunlight",
+      "gen_seed": 404,
+      "image_name": "horse_paraphrase_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_0",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bird perched on a branch",
+      "gen_seed": 101,
+      "image_name": "bird_literal_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_0",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bird perched on a branch",
+      "gen_seed": 202,
+      "image_name": "bird_literal_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_0",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bird perched on a branch",
+      "gen_seed": 303,
+      "image_name": "bird_literal_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_0",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bird perched on a branch",
+      "gen_seed": 404,
+      "image_name": "bird_literal_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_1",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bird standing on a stone wall",
+      "gen_seed": 101,
+      "image_name": "bird_literal_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_1",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bird standing on a stone wall",
+      "gen_seed": 202,
+      "image_name": "bird_literal_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_1",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bird standing on a stone wall",
+      "gen_seed": 303,
+      "image_name": "bird_literal_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_1",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bird standing on a stone wall",
+      "gen_seed": 404,
+      "image_name": "bird_literal_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_2",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a bird on a wooden post",
+      "gen_seed": 101,
+      "image_name": "bird_literal_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_2",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a bird on a wooden post",
+      "gen_seed": 202,
+      "image_name": "bird_literal_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_2",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a bird on a wooden post",
+      "gen_seed": 303,
+      "image_name": "bird_literal_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_2",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a close-up of a bird on a wooden post",
+      "gen_seed": 404,
+      "image_name": "bird_literal_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_3",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a bird resting on a wire against the sky",
+      "gen_seed": 101,
+      "image_name": "bird_literal_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_3",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a bird resting on a wire against the sky",
+      "gen_seed": 202,
+      "image_name": "bird_literal_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_3",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a bird resting on a wire against the sky",
+      "gen_seed": 303,
+      "image_name": "bird_literal_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_3",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a bird resting on a wire against the sky",
+      "gen_seed": 404,
+      "image_name": "bird_literal_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_4",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bird standing at the edge of a pond",
+      "gen_seed": 101,
+      "image_name": "bird_literal_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_4",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bird standing at the edge of a pond",
+      "gen_seed": 202,
+      "image_name": "bird_literal_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_4",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bird standing at the edge of a pond",
+      "gen_seed": 303,
+      "image_name": "bird_literal_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_literal_4",
+      "category": "bird",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bird standing at the edge of a pond",
+      "gen_seed": 404,
+      "image_name": "bird_literal_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_0",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small feathered creature with a beak, perched on a twig",
+      "gen_seed": 101,
+      "image_name": "bird_paraphrase_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_0",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small feathered creature with a beak, perched on a twig",
+      "gen_seed": 202,
+      "image_name": "bird_paraphrase_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_0",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small feathered creature with a beak, perched on a twig",
+      "gen_seed": 303,
+      "image_name": "bird_paraphrase_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_0",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a small feathered creature with a beak, perched on a twig",
+      "gen_seed": 404,
+      "image_name": "bird_paraphrase_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_1",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a winged feathered animal standing on a railing",
+      "gen_seed": 101,
+      "image_name": "bird_paraphrase_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_1",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a winged feathered animal standing on a railing",
+      "gen_seed": 202,
+      "image_name": "bird_paraphrase_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_1",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a winged feathered animal standing on a railing",
+      "gen_seed": 303,
+      "image_name": "bird_paraphrase_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_1",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a winged feathered animal standing on a railing",
+      "gen_seed": 404,
+      "image_name": "bird_paraphrase_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_2",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a feathered creature with wings folded, on a fence post",
+      "gen_seed": 101,
+      "image_name": "bird_paraphrase_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_2",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a feathered creature with wings folded, on a fence post",
+      "gen_seed": 202,
+      "image_name": "bird_paraphrase_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_2",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a feathered creature with wings folded, on a fence post",
+      "gen_seed": 303,
+      "image_name": "bird_paraphrase_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_2",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a feathered creature with wings folded, on a fence post",
+      "gen_seed": 404,
+      "image_name": "bird_paraphrase_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_3",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a beaked feathered animal sitting on a rooftop",
+      "gen_seed": 101,
+      "image_name": "bird_paraphrase_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_3",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a beaked feathered animal sitting on a rooftop",
+      "gen_seed": 202,
+      "image_name": "bird_paraphrase_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_3",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a beaked feathered animal sitting on a rooftop",
+      "gen_seed": 303,
+      "image_name": "bird_paraphrase_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_3",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a beaked feathered animal sitting on a rooftop",
+      "gen_seed": 404,
+      "image_name": "bird_paraphrase_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_4",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a plumed winged creature resting on a garden stake",
+      "gen_seed": 101,
+      "image_name": "bird_paraphrase_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_4",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a plumed winged creature resting on a garden stake",
+      "gen_seed": 202,
+      "image_name": "bird_paraphrase_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_4",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a plumed winged creature resting on a garden stake",
+      "gen_seed": 303,
+      "image_name": "bird_paraphrase_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "bird_paraphrase_4",
+      "category": "bird",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a plumed winged creature resting on a garden stake",
+      "gen_seed": 404,
+      "image_name": "bird_paraphrase_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_0",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a chair in an empty room",
+      "gen_seed": 101,
+      "image_name": "chair_literal_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_0",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a chair in an empty room",
+      "gen_seed": 202,
+      "image_name": "chair_literal_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_0",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a chair in an empty room",
+      "gen_seed": 303,
+      "image_name": "chair_literal_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_0",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a chair in an empty room",
+      "gen_seed": 404,
+      "image_name": "chair_literal_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_1",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a wooden chair beside a window",
+      "gen_seed": 101,
+      "image_name": "chair_literal_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_1",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a wooden chair beside a window",
+      "gen_seed": 202,
+      "image_name": "chair_literal_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_1",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a wooden chair beside a window",
+      "gen_seed": 303,
+      "image_name": "chair_literal_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_1",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a wooden chair beside a window",
+      "gen_seed": 404,
+      "image_name": "chair_literal_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_2",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a chair placed next to a small table",
+      "gen_seed": 101,
+      "image_name": "chair_literal_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_2",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a chair placed next to a small table",
+      "gen_seed": 202,
+      "image_name": "chair_literal_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_2",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a chair placed next to a small table",
+      "gen_seed": 303,
+      "image_name": "chair_literal_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_2",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a chair placed next to a small table",
+      "gen_seed": 404,
+      "image_name": "chair_literal_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_3",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a chair standing on a hardwood floor",
+      "gen_seed": 101,
+      "image_name": "chair_literal_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_3",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a chair standing on a hardwood floor",
+      "gen_seed": 202,
+      "image_name": "chair_literal_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_3",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a chair standing on a hardwood floor",
+      "gen_seed": 303,
+      "image_name": "chair_literal_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_3",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a chair standing on a hardwood floor",
+      "gen_seed": 404,
+      "image_name": "chair_literal_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_4",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a chair in the corner of a bright room",
+      "gen_seed": 101,
+      "image_name": "chair_literal_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_4",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a chair in the corner of a bright room",
+      "gen_seed": 202,
+      "image_name": "chair_literal_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_4",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a chair in the corner of a bright room",
+      "gen_seed": 303,
+      "image_name": "chair_literal_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_literal_4",
+      "category": "chair",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a chair in the corner of a bright room",
+      "gen_seed": 404,
+      "image_name": "chair_literal_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_0",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a single-person seat with four legs and a backrest, indoors",
+      "gen_seed": 101,
+      "image_name": "chair_paraphrase_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_0",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a single-person seat with four legs and a backrest, indoors",
+      "gen_seed": 202,
+      "image_name": "chair_paraphrase_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_0",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a single-person seat with four legs and a backrest, indoors",
+      "gen_seed": 303,
+      "image_name": "chair_paraphrase_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_0",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a single-person seat with four legs and a backrest, indoors",
+      "gen_seed": 404,
+      "image_name": "chair_paraphrase_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_1",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a piece of seating furniture with armrests against a wall",
+      "gen_seed": 101,
+      "image_name": "chair_paraphrase_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_1",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a piece of seating furniture with armrests against a wall",
+      "gen_seed": 202,
+      "image_name": "chair_paraphrase_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_1",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a piece of seating furniture with armrests against a wall",
+      "gen_seed": 303,
+      "image_name": "chair_paraphrase_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_1",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a piece of seating furniture with armrests against a wall",
+      "gen_seed": 404,
+      "image_name": "chair_paraphrase_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_2",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "an upholstered seat for one with a tall back, in a room",
+      "gen_seed": 101,
+      "image_name": "chair_paraphrase_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_2",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "an upholstered seat for one with a tall back, in a room",
+      "gen_seed": 202,
+      "image_name": "chair_paraphrase_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_2",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "an upholstered seat for one with a tall back, in a room",
+      "gen_seed": 303,
+      "image_name": "chair_paraphrase_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_2",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "an upholstered seat for one with a tall back, in a room",
+      "gen_seed": 404,
+      "image_name": "chair_paraphrase_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_3",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a wooden seating item with a straight back beside a desk",
+      "gen_seed": 101,
+      "image_name": "chair_paraphrase_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_3",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a wooden seating item with a straight back beside a desk",
+      "gen_seed": 202,
+      "image_name": "chair_paraphrase_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_3",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a wooden seating item with a straight back beside a desk",
+      "gen_seed": 303,
+      "image_name": "chair_paraphrase_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_3",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a wooden seating item with a straight back beside a desk",
+      "gen_seed": 404,
+      "image_name": "chair_paraphrase_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_4",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a one-person sitting furniture piece on a tiled floor",
+      "gen_seed": 101,
+      "image_name": "chair_paraphrase_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_4",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a one-person sitting furniture piece on a tiled floor",
+      "gen_seed": 202,
+      "image_name": "chair_paraphrase_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_4",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a one-person sitting furniture piece on a tiled floor",
+      "gen_seed": 303,
+      "image_name": "chair_paraphrase_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "chair_paraphrase_4",
+      "category": "chair",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a one-person sitting furniture piece on a tiled floor",
+      "gen_seed": 404,
+      "image_name": "chair_paraphrase_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_0",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bicycle leaning against a wall",
+      "gen_seed": 101,
+      "image_name": "bicycle_literal_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_0",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bicycle leaning against a wall",
+      "gen_seed": 202,
+      "image_name": "bicycle_literal_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_0",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bicycle leaning against a wall",
+      "gen_seed": 303,
+      "image_name": "bicycle_literal_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_0",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 0,
+      "prompt": "a photo of a bicycle leaning against a wall",
+      "gen_seed": 404,
+      "image_name": "bicycle_literal_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_1",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bicycle parked on a city street",
+      "gen_seed": 101,
+      "image_name": "bicycle_literal_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_1",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bicycle parked on a city street",
+      "gen_seed": 202,
+      "image_name": "bicycle_literal_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_1",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bicycle parked on a city street",
+      "gen_seed": 303,
+      "image_name": "bicycle_literal_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_1",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 1,
+      "prompt": "a bicycle parked on a city street",
+      "gen_seed": 404,
+      "image_name": "bicycle_literal_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_2",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a bicycle standing on a gravel path",
+      "gen_seed": 101,
+      "image_name": "bicycle_literal_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_2",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a bicycle standing on a gravel path",
+      "gen_seed": 202,
+      "image_name": "bicycle_literal_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_2",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a bicycle standing on a gravel path",
+      "gen_seed": 303,
+      "image_name": "bicycle_literal_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_2",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 2,
+      "prompt": "a bicycle standing on a gravel path",
+      "gen_seed": 404,
+      "image_name": "bicycle_literal_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_3",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a close-up of a bicycle beside a fence",
+      "gen_seed": 101,
+      "image_name": "bicycle_literal_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_3",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a close-up of a bicycle beside a fence",
+      "gen_seed": 202,
+      "image_name": "bicycle_literal_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_3",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a close-up of a bicycle beside a fence",
+      "gen_seed": 303,
+      "image_name": "bicycle_literal_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_3",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 3,
+      "prompt": "a close-up of a bicycle beside a fence",
+      "gen_seed": 404,
+      "image_name": "bicycle_literal_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_4",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bicycle resting under a tree",
+      "gen_seed": 101,
+      "image_name": "bicycle_literal_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_4",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bicycle resting under a tree",
+      "gen_seed": 202,
+      "image_name": "bicycle_literal_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_4",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bicycle resting under a tree",
+      "gen_seed": 303,
+      "image_name": "bicycle_literal_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_literal_4",
+      "category": "bicycle",
+      "prompt_family": "literal",
+      "prompt_index": 4,
+      "prompt": "a bicycle resting under a tree",
+      "gen_seed": 404,
+      "image_name": "bicycle_literal_4_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_0",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a two-wheeled pedal-powered vehicle leaning on a railing",
+      "gen_seed": 101,
+      "image_name": "bicycle_paraphrase_0_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_0",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a two-wheeled pedal-powered vehicle leaning on a railing",
+      "gen_seed": 202,
+      "image_name": "bicycle_paraphrase_0_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_0",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a two-wheeled pedal-powered vehicle leaning on a railing",
+      "gen_seed": 303,
+      "image_name": "bicycle_paraphrase_0_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_0",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 0,
+      "prompt": "a two-wheeled pedal-powered vehicle leaning on a railing",
+      "gen_seed": 404,
+      "image_name": "bicycle_paraphrase_0_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_1",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a pedal-driven cycle with handlebars parked on pavement",
+      "gen_seed": 101,
+      "image_name": "bicycle_paraphrase_1_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_1",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a pedal-driven cycle with handlebars parked on pavement",
+      "gen_seed": 202,
+      "image_name": "bicycle_paraphrase_1_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_1",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a pedal-driven cycle with handlebars parked on pavement",
+      "gen_seed": 303,
+      "image_name": "bicycle_paraphrase_1_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_1",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 1,
+      "prompt": "a pedal-driven cycle with handlebars parked on pavement",
+      "gen_seed": 404,
+      "image_name": "bicycle_paraphrase_1_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_2",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a human-powered two-wheeler with a chain and spokes outdoors",
+      "gen_seed": 101,
+      "image_name": "bicycle_paraphrase_2_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_2",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a human-powered two-wheeler with a chain and spokes outdoors",
+      "gen_seed": 202,
+      "image_name": "bicycle_paraphrase_2_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_2",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a human-powered two-wheeler with a chain and spokes outdoors",
+      "gen_seed": 303,
+      "image_name": "bicycle_paraphrase_2_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_2",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 2,
+      "prompt": "a human-powered two-wheeler with a chain and spokes outdoors",
+      "gen_seed": 404,
+      "image_name": "bicycle_paraphrase_2_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_3",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a pedalled two-wheeled machine with a saddle, by a kerb",
+      "gen_seed": 101,
+      "image_name": "bicycle_paraphrase_3_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_3",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a pedalled two-wheeled machine with a saddle, by a kerb",
+      "gen_seed": 202,
+      "image_name": "bicycle_paraphrase_3_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_3",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a pedalled two-wheeled machine with a saddle, by a kerb",
+      "gen_seed": 303,
+      "image_name": "bicycle_paraphrase_3_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_3",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 3,
+      "prompt": "a pedalled two-wheeled machine with a saddle, by a kerb",
+      "gen_seed": 404,
+      "image_name": "bicycle_paraphrase_3_seed404.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_4",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a chain-driven cycle with two spoked wheels against a post",
+      "gen_seed": 101,
+      "image_name": "bicycle_paraphrase_4_seed101.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_4",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a chain-driven cycle with two spoked wheels against a post",
+      "gen_seed": 202,
+      "image_name": "bicycle_paraphrase_4_seed202.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_4",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a chain-driven cycle with two spoked wheels against a post",
+      "gen_seed": 303,
+      "image_name": "bicycle_paraphrase_4_seed303.jpg"
+    },
+    {
+      "prompt_id": "bicycle_paraphrase_4",
+      "category": "bicycle",
+      "prompt_family": "paraphrase",
+      "prompt_index": 4,
+      "prompt": "a chain-driven cycle with two spoked wheels against a post",
+      "gen_seed": 404,
+      "image_name": "bicycle_paraphrase_4_seed404.jpg"
+    }
+  ],
+  "manifest_sha256": "0020c81c4a4dd3580a6574c91b4aea1a7e349e9e89fc845ed8c2077d47564892"
+}

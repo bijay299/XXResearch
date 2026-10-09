@@ -1,0 +1,19 @@
+{
+  "experiment": "SD-1.5 exploratory sequential object-erasure pilot",
+  "anchor": "Flowers",
+  "anchor_name": "flower",
+  "target_used_for_exclusion_string": "sandwich",
+  "backbone_M0": "/data/bijaypandey/cuig_pilot/Generators_substitute/sd-v1-5",
+  "anchor_seed": 17,
+  "num_images": 200,
+  "num_prompt_lines": 200,
+  "prompt_file": "/data/bijaypandey/cuig_pilot/CUIG/UnlearningMethods/ConAbl/anchor_prompts/object/Flowers.txt",
+  "generation": {
+    "num_inference_steps": 100,
+    "guidance_scale": 6.0,
+    "scheduler": "DPMSolverMultistep",
+    "resolution": 512,
+    "source": "CUIG src/data/_generate_images_from_prompts"
+  },
+  "cache_dir": "/data/bijaypandey/cuig_pilot/seq_pilot/anchor_caches/Flowers"
+}
