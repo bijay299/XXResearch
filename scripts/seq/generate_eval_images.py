@@ -239,6 +239,13 @@ def main() -> int:
                     help="frozen manifest identity, supplied from CONFIGURATION; "
                          "the manifest's content digest is recomputed and "
                          "compared against it")
+    ap.add_argument("--expect_gen_settings", default=None,
+                    help="path to configs/generation_settings.json. REQUIRED "
+                         "when the manifest declares its settings by contract "
+                         "reference (`generation_settings_contract`) rather "
+                         "than inlining them, as the frozen dev and test sets "
+                         "do. Never used to override settings a manifest "
+                         "carries inline.")
     ap.add_argument("--prior_report", default=None,
                     help="report establishing provenance for images already in "
                          "--out_dir (default: --report)")
@@ -255,11 +262,46 @@ def main() -> int:
         print(f"FATAL: manifest unreadable ({type(e).__name__}: {e})", file=sys.stderr)
         return RC_FATAL
     try:
-        gs = man["generation_settings"]
         records = man["records"]
     except KeyError as e:
         print(f"FATAL: manifest lacks {e}", file=sys.stderr)
         return RC_FATAL
+
+    # Generation settings: inlined in the manifest (the pilot set), or declared
+    # by CONTRACT REFERENCE (the frozen dev/test sets, which carry
+    # `generation_settings_contract` instead). The contract route exists so the
+    # frozen manifests do not have to be rewritten -- and must not be, since
+    # their published identities are what selection and the test freeze rest on.
+    # Exactly one source is used, and the report records which.
+    gs_source = "manifest.generation_settings"
+    if "generation_settings" in man:
+        gs = man["generation_settings"]
+    elif man.get("generation_settings_contract"):
+        if not args.expect_gen_settings:
+            print(f"FATAL: this manifest declares its settings by contract "
+                  f"({man['generation_settings_contract']!r}) and carries none "
+                  f"inline, so --expect_gen_settings must supply the contract "
+                  f"path. Refusing to invent generation settings.",
+                  file=sys.stderr)
+            return RC_FATAL
+        try:
+            contract = json.loads(Path(args.expect_gen_settings).read_text())
+        except Exception as e:
+            print(f"FATAL: generation-settings contract unreadable "
+                  f"({type(e).__name__}: {e})", file=sys.stderr)
+            return RC_FATAL
+        gs = {k: v for k, v in contract.items() if not k.startswith("_")}
+        gs_source = f"contract {args.expect_gen_settings}"
+        print(f"[settings] from {gs_source} (manifest declares "
+              f"{man['generation_settings_contract']!r})")
+    else:
+        print("FATAL: manifest carries neither 'generation_settings' nor "
+              "'generation_settings_contract'", file=sys.stderr)
+        return RC_FATAL
+    for k in ("resolution", "num_inference_steps", "guidance_scale"):
+        if k not in gs:
+            print(f"FATAL: generation settings lack {k!r}", file=sys.stderr)
+            return RC_FATAL
 
     digest = canonical_manifest_digest(man)
     stored = man.get("manifest_sha256")
@@ -412,6 +454,7 @@ def main() -> int:
         "manifest_sha256": digest,
         "manifest_stored_sha256": stored,
         "generation_settings": gs,
+        "generation_settings_source": gs_source,
         "image_seed_rule": SEED_RULE,
         "expected_images": len(records),
         "generated_or_reused": len(rows),

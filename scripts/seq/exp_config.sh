@@ -169,6 +169,44 @@ export SEQ_EVAL_MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:-0020c81c4a4dd3580a6574c91
 # The decision reads the ARTIFACT on disk and matches its content identity
 # against the frozen registry. It takes no seed number and no directory label.
 # Fail-closed: anything unexpected yields the strict `counter` policy.
+# ---------------------------------------------------------------------------
+# MATCHED-EFFECTIVENESS DIAGNOSTIC (approved: four total GPU-hours).
+#
+# Writes into its OWN root. The saved pilot under ${SEQ_ROOT}/models,
+# ${SEQ_ROOT}/eval and ${SEQ_ROOT}/eval_seed29 is read-only here: the parents
+# (MA17, MA29) and the L2 endpoints (MAB_L2 17/29) are REUSED by path and bound
+# by hash, never retrained, moved or rewritten.
+export SEQ_DIAG_ROOT="${SEQ_DIAG_ROOT:-${SEQ_ROOT}/diag_v1}"
+export SEQ_DIAG_SEEDS="${SEQ_DIAG_SEEDS:-17 29}"
+export SEQ_DIAG_ITERATIONS="${SEQ_DIAG_ITERATIONS:-1000}"
+export SEQ_DIAG_DUMP_EVERY="${SEQ_DIAG_DUMP_EVERY:-100}"
+
+# The two frozen prompt sets, used BY PATH from the repository so their
+# published identities are the ones in use. They declare their generation
+# settings by contract reference rather than inline, which is why the generator
+# accepts --expect_gen_settings as the settings source.
+export SEQ_DEV_MANIFEST="${SEQ_DEV_MANIFEST:-${PILOT_REPO_ROOT}/results/audit_v1/draft_manifests/dev_manifest_DRAFT.json}"
+export SEQ_DEV_MANIFEST_SHA="${SEQ_DEV_MANIFEST_SHA:-1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b}"
+export SEQ_TEST_MANIFEST="${SEQ_TEST_MANIFEST:-${PILOT_REPO_ROOT}/results/audit_v1/draft_manifests/test_manifest_DRAFT.json}"
+export SEQ_TEST_MANIFEST_SHA="${SEQ_TEST_MANIFEST_SHA:-5dd87dbb5a77c0f4c75de79a19b15b0b2e9cddc90d08172857700dac1bcc2a95}"
+export SEQ_BOOTSTRAP_GROUPING="${SEQ_BOOTSTRAP_GROUPING:-${PILOT_REPO_ROOT}/results/audit_v1/draft_manifests/bootstrap_grouping.json}"
+
+# The HARD ceiling, in device-hours, counting successes, failed attempts and
+# setup alike. The confirmatory test stage is reserved so development work
+# cannot consume it and leave the experiment with selection done and no
+# confirmatory measurement. Both figures come from the approved cost model
+# (results/audit_v1/protocol_cost_model.json).
+export SEQ_DIAG_CEILING_GPU_HOURS="${SEQ_DIAG_CEILING_GPU_HOURS:-4.0}"
+export SEQ_DIAG_TEST_RESERVE_GPU_HOURS="${SEQ_DIAG_TEST_RESERVE_GPU_HOURS:-1.008}"
+export SEQ_DIAG_LEDGER="${SEQ_DIAG_LEDGER:-${SEQ_DIAG_ROOT}/gpu_budget.json}"
+export SEQ_BUDGET="${SEQ_BUDGET:-${PILOT_REPO_ROOT}/scripts/seq/gpu_budget.py}"
+
+# Bounded wait for capacity on a shared host with no scheduler. This is the only
+# queue this host has: poll the real fail-closed selector and start only on
+# verified idle capacity. Other users' jobs are never touched or pre-empted.
+export SEQ_DIAG_WAIT_SECONDS="${SEQ_DIAG_WAIT_SECONDS:-0}"
+export SEQ_DIAG_WAIT_POLL_SECONDS="${SEQ_DIAG_WAIT_POLL_SECONDS:-120}"
+
 seq_steps_evidence_full() {
     local mroot="${1:?seq_steps_evidence_full <models_root> <checkpoint>}"
     local ck="${2:?seq_steps_evidence_full <models_root> <checkpoint>}"

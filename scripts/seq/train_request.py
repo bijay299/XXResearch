@@ -141,6 +141,13 @@ def main() -> int:
     ap.add_argument("--num_anchor_prompts", type=int, default=200)
     ap.add_argument("--seed", type=int, default=17)
     ap.add_argument("--l2sp_weight", type=float, default=0.0)
+    ap.add_argument("--checkpoint_every", type=int, default=0,
+                    help="save an intermediate dump every N optimizer steps "
+                         "(0 = off). Uses upstream's own periodic save, so a "
+                         "dump has exactly the same structure as delta.bin and "
+                         "validates against the same checkpoint contract. "
+                         "Required by the matched-effectiveness diagnostic, "
+                         "which scans every dump rather than bisecting.")
     ap.add_argument("--report", required=True, help="where to write the run report JSON")
     args = ap.parse_args()
 
@@ -207,6 +214,13 @@ def main() -> int:
         argv += ["--unet_ckpt", args.unet_ckpt]
     if args.l2sp_weight > 0:
         argv += ["--l2sp_weight", str(args.l2sp_weight)]
+    if args.checkpoint_every > 0:
+        # Upstream's own periodic save, inside update_progress_and_checkpoint:
+        # it writes output_dir/delta-<completed_steps> via the SAME
+        # save_pretrained(parameter_group=...) call that writes the final
+        # delta.bin. Same structure, same contract, no custom dump path.
+        argv += ["--turn_on_checkpointing",
+                 "--checkpointing_steps", str(args.checkpoint_every)]
     sys.argv = argv
     report["upstream_argv"] = argv
 
@@ -386,6 +400,48 @@ def main() -> int:
         "peak_gpu_mem_mib": round(torch.cuda.max_memory_allocated() / 2**20),
         "peak_gpu_mem_reserved_mib": round(torch.cuda.max_memory_reserved() / 2**20),
     }
+    # ---- intermediate dumps: inventoried by CONTENT, and the schedule checked.
+    #
+    # Each dump is evidence in its own right (the diagnostic selects one of them
+    # as an arm), so it is recorded with its own digest and the expected
+    # schedule is verified rather than assumed. A missing dump is reported here,
+    # not discovered later by an analysis that silently scores fewer arms.
+    if args.checkpoint_every > 0:
+        want_steps = list(range(args.checkpoint_every,
+                                steps_completed + 1, args.checkpoint_every))
+        dumps, missing = [], []
+        for st in want_steps:
+            p = out_dir / f"delta-{st}"
+            if not p.is_file() or p.stat().st_size == 0:
+                missing.append(st)
+                continue
+            dumps.append({"step": st, "path": str(p), "sha256": sha256_file(p),
+                          "bytes": p.stat().st_size})
+        stray = sorted(q.name for q in out_dir.glob("delta-*")
+                       if q.is_file() and q.name not in
+                       {f"delta-{d['step']}" for d in dumps})
+        digests = [d["sha256"] for d in dumps]
+        report["dumps"] = {
+            "checkpoint_every": args.checkpoint_every,
+            "expected_steps": want_steps,
+            "n_expected": len(want_steps),
+            "n_present": len(dumps),
+            "missing_steps": missing,
+            "unexpected_files": stray,
+            "all_digests_distinct": len(set(digests)) == len(digests),
+            "complete": not missing and len(dumps) == len(want_steps),
+            "source": ("upstream update_progress_and_checkpoint periodic save; "
+                       "same save_pretrained(parameter_group) call as delta.bin"),
+            "dumps": dumps,
+        }
+        print(f"[verify] dumps: {len(dumps)}/{len(want_steps)} present, "
+              f"distinct digests={report['dumps']['all_digests_distinct']}"
+              + (f", MISSING {missing}" if missing else ""))
+        if not report["dumps"]["complete"]:
+            print(f"[warn] intermediate dump schedule incomplete: missing "
+                  f"{missing}; the report records this and validation will "
+                  f"reject the trajectory", file=sys.stderr)
+
     report["finished_utc"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     Path(args.report).parent.mkdir(parents=True, exist_ok=True)

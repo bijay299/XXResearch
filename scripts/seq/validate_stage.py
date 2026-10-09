@@ -272,7 +272,12 @@ def validate_training(args) -> Result:
     # 4. parent identity: the recorded parent hash must match the parent file
     pv = rep.get("parent_verification") or {}
     if args.expect_parent and args.expect_parent != "M0":
-        parent_file = Path(args.models_root) / args.expect_parent / "delta.bin"
+        # The parent is not always a sibling of the child. The matched-
+        # effectiveness diagnostic trains new children into their own root while
+        # REUSING the saved pilot's MA as the parent, so the parent root is
+        # separable. It defaults to --models_root, which is the sequential case.
+        parent_root = Path(args.parent_models_root or args.models_root)
+        parent_file = parent_root / args.expect_parent / "delta.bin"
         claimed = pv.get("parent_sha256")
         if not parent_file.exists():
             r.bad(f"parent checkpoint {parent_file} absent, so this child's "
@@ -800,6 +805,11 @@ def main() -> int:
     ap.add_argument("stage", choices=["train", "eval", "manifest"])
     ap.add_argument("name")
     ap.add_argument("--models_root", default="")
+    ap.add_argument("--parent_models_root", default="",
+                    help="where to find --expect_parent's delta.bin, when the "
+                         "parent is not a sibling of the child (the diagnostic "
+                         "reuses the saved pilot's MA). Defaults to "
+                         "--models_root.")
     ap.add_argument("--eval_root", default="")
     ap.add_argument("--manifest", default="")
     ap.add_argument("--contract", default="configs/checkpoint_contract.json")
