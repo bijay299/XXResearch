@@ -1,81 +1,112 @@
-[
-  {
-    "check": "environment versions",
-    "status": "PASS",
-    "detail": {
-      "torch": "2.4.0+cu121",
-      "torchvision": "0.19.0+cu121",
-      "diffusers": "0.30.2",
-      "transformers": "4.44.2",
-      "accelerate": "0.34.2",
-      "timm": "1.0.15",
-      "numpy": "1.26.4",
-      "safetensors": "0.4.5",
-      "openpyxl": "3.1.5",
-      "python": "3.10.12",
-      "torch.version.cuda": "12.1",
-      "cuda_available": true,
-      "device_count": 4,
-      "CUDA_VISIBLE_DEVICES": "<unset>",
-      "mismatches": "none"
+{
+  "checks": [
+    {
+      "check": "environment versions",
+      "status": "PASS",
+      "detail": {
+        "torch": "2.4.0+cu121",
+        "torchvision": "0.19.0+cu121",
+        "diffusers": "0.30.2",
+        "transformers": "4.44.2",
+        "accelerate": "0.34.2",
+        "timm": "1.0.15",
+        "numpy": "1.26.4",
+        "safetensors": "0.4.5",
+        "openpyxl": "3.1.5",
+        "python": "3.10.12",
+        "torch.version.cuda": "12.1",
+        "cuda_available": true,
+        "device_count": 4,
+        "CUDA_VISIBLE_DEVICES": "<unset>",
+        "mismatches": "none"
+      }
+    },
+    {
+      "check": "upstream CUIG checkout",
+      "status": "PASS",
+      "detail": {
+        "head": "9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
+        "pinned": "9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
+        "matches_pin": true,
+        "working_tree_clean": true
+      }
+    },
+    {
+      "check": "asset validation receipt",
+      "status": "FAIL",
+      "detail": {
+        "path": "/home/bijaypandey/FINMLResearch/results/assets/validation_receipt.json",
+        "generated_utc": "2026-10-09T04:06:37.797021+00:00",
+        "overall": "FAIL",
+        "label_mapping_confirmed": null,
+        "heldout_accuracy_pass": null,
+        "untouched_generator_pass": null,
+        "UA_IRA_CRA": "UNAVAILABLE"
+      }
+    },
+    {
+      "check": "UnlearnCanvas generator",
+      "status": "FAIL",
+      "detail": {
+        "dir": "/data/bijaypandey/cuig_pilot/Checkpoints/Generators/UnlearnCanvas",
+        "state": "MISSING",
+        "present": false,
+        "verified_by_receipt": false,
+        "note": "baseline blocked; see docs/ASSETS.md"
+      }
+    },
+    {
+      "check": "UnlearnCanvas classifiers",
+      "status": "FAIL",
+      "detail": {
+        "dir": "/data/bijaypandey/cuig_pilot/Checkpoints/Classifiers/UnlearnCanvas",
+        "state": "MISSING",
+        "style_classifier.pth": false,
+        "object_classifier.pth": false,
+        "verified_by_receipt": false,
+        "note": "UA/IRA/CRA cannot be computed; run scripts/validate_assets.py"
+      }
+    },
+    {
+      "check": "unresolved provenance / label mapping",
+      "status": "WARN",
+      "detail": {
+        "style_classifier_label_order": "unknown",
+        "object_classifier_label_order": "unknown",
+        "classifier_provenance": "unknown",
+        "generator_provenance": "unknown",
+        "generator_ema_selection": "unknown"
+      }
+    },
+    {
+      "check": "label lists (static)",
+      "status": "PASS",
+      "detail": {
+        "num_styles": 51,
+        "num_objects": 20,
+        "styles_sorted_alphabetically": true,
+        "objects_sorted_alphabetically": true,
+        "style_label_of_index_0": "Abstractionism",
+        "object_label_of_index_0": "Architectures",
+        "sample_prompt_template": "A {object} image in {style} style",
+        "eval_label_lookup": "STYLES_AVAILABLE.index(style) / OBJECTS_AVAILABLE.index(object)"
+      }
+    },
+    {
+      "check": "classifier head shape vs label lists",
+      "status": "SKIP",
+      "detail": "classifiers unavailable - cannot confirm the checkpoint head matches 51 style / 20 object classes"
+    },
+    {
+      "check": "image generation",
+      "status": "SKIP",
+      "detail": "--gpu not provided"
+    },
+    {
+      "check": "classifier evaluation",
+      "status": "SKIP",
+      "detail": "--gpu not provided"
     }
-  },
-  {
-    "check": "upstream CUIG checkout",
-    "status": "PASS",
-    "detail": {
-      "head": "9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
-      "pinned": "9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
-      "matches_pin": true,
-      "working_tree_clean": true
-    }
-  },
-  {
-    "check": "UnlearnCanvas generator",
-    "status": "FAIL",
-    "detail": {
-      "dir": "/data/bijaypandey/cuig_pilot/Checkpoints/Generators/UnlearnCanvas",
-      "model_index.json": false,
-      "subdirs_found": []
-    }
-  },
-  {
-    "check": "UnlearnCanvas classifiers",
-    "status": "FAIL",
-    "detail": {
-      "dir": "/data/bijaypandey/cuig_pilot/Checkpoints/Classifiers/UnlearnCanvas",
-      "style_classifier.pth": false,
-      "object_classifier.pth": false,
-      "note": "UA/IRA/CRA cannot be computed; see docs/ASSETS.md"
-    }
-  },
-  {
-    "check": "label lists (static)",
-    "status": "PASS",
-    "detail": {
-      "num_styles": 51,
-      "num_objects": 20,
-      "styles_sorted_alphabetically": true,
-      "objects_sorted_alphabetically": true,
-      "style_label_of_index_0": "Abstractionism",
-      "object_label_of_index_0": "Architectures",
-      "sample_prompt_template": "A {object} image in {style} style",
-      "eval_label_lookup": "STYLES_AVAILABLE.index(style) / OBJECTS_AVAILABLE.index(object)"
-    }
-  },
-  {
-    "check": "classifier head dim vs label lists",
-    "status": "SKIP",
-    "detail": "classifiers unavailable - cannot confirm the checkpoint head matches 51 style / 20 object classes"
-  },
-  {
-    "check": "image generation",
-    "status": "SKIP",
-    "detail": "--gpu not provided"
-  },
-  {
-    "check": "classifier evaluation",
-    "status": "SKIP",
-    "detail": "--gpu not provided"
-  }
-]
+  ],
+  "baseline_gate_open": false
+}

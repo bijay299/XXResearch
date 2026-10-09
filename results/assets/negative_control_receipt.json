@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-10-09T04:06:53.724622+00:00",
+  "host": "hyperplane",
+  "gpu_index": "2",
+  "gpu_name": "NVIDIA A100-SXM4-40GB",
+  "upstream_cuig_commit": "9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
+  "thresholds_are_local_policy": true,
+  "checks": {
+    "presence": {
+      "generator": {
+        "path": "/data/bijaypandey/cuig_pilot/Checkpoints/Generators/UnlearnCanvas",
+        "present": false,
+        "members_found": [],
+        "members_expected": [
+          "model_index.json",
+          "scheduler",
+          "text_encoder",
+          "tokenizer",
+          "unet",
+          "vae"
+        ]
+      },
+      "style_classifier": {
+        "path": "/data/bijaypandey/cuig_pilot/software_tests/evaluate_path/synthetic_classifiers_DO_NOT_USE_FOR_RESULTS/style_classifier.pth",
+        "present": true
+      },
+      "object_classifier": {
+        "path": "/data/bijaypandey/cuig_pilot/software_tests/evaluate_path/synthetic_classifiers_DO_NOT_USE_FOR_RESULTS/object_classifier.pth",
+        "present": true
+      }
+    },
+    "shape_compatibility": {
+      "style": {
+        "status": "checked",
+        "head_out_features": 51,
+        "expected_out_features": 51,
+        "shape_compatible": true,
+        "state_dict_key": "model_state_dict",
+        "IMPORTANT": "shape compatibility is NOT scientific validation; a permuted class ordering is shape-identical to a correct one"
+      },
+      "object": {
+        "status": "checked",
+        "head_out_features": 20,
+        "expected_out_features": 20,
+        "shape_compatible": true,
+        "state_dict_key": "model_state_dict",
+        "IMPORTANT": "shape compatibility is NOT scientific validation; a permuted class ordering is shape-identical to a correct one"
+      }
+    },
+    "heldout_label_mapping": {
+      "style": {
+        "status": "checked",
+        "images_scored": 115,
+        "images_skipped_label_out_of_list": [
+          "Dreamweave",
+          "Pointillism"
+        ],
+        "distinct_true_classes": 8,
+        "accuracy_assumed_ordering": 0.0348,
+        "chance_level": 0.0196,
+        "threshold": 0.7,
+        "label_mapping": "inconclusive",
+        "label_mapping_detail": "top-1 3.5% (chance 2.0%); neither the assumed ordering nor a consistent permutation is supported by this evidence",
+        "modal_prediction_agrees_with_assumed_index": "0/8",
+        "modal_predictions_distinct": false,
+        "modal_consistency": 0.2522,
+        "per_class_accuracy": {
+          "Abstractionism": 0.0,
+          "Greenfield": 0.0625,
+          "Liquid_Dreams": 0.0,
+          "Magic_Cube": 0.0,
+          "Neon_Lines": 0.1111,
+          "Picasso": 0.0,
+          "Rust": 0.0556,
+          "Surrealism": 0.0
+        },
+        "accuracy_pass": false
+      },
+      "object": {
+        "status": "checked",
+        "images_scored": 137,
+        "images_skipped_label_out_of_list": [],
+        "distinct_true_classes": 20,
+        "accuracy_assumed_ordering": 0.0292,
+        "chance_level": 0.05,
+        "threshold": 0.7,
+        "label_mapping": "inconclusive",
+        "label_mapping_detail": "top-1 2.9% (chance 5.0%); neither the assumed ordering nor a consistent permutation is supported by this evidence",
+        "modal_prediction_agrees_with_assumed_index": "0/20",
+        "modal_predictions_distinct": false,
+        "modal_consistency": 0.4234,
+        "per_class_accuracy": {
+          "Architectures": 0.1667,
+          "Bears": 0.0,
+          "Birds": 0.0,
+          "Butterfly": 0.0,
+          "Cats": 0.0,
+          "Dogs": 0.0,
+          "Fishes": 0.125,
+          "Flame": 0.0,
+          "Flowers": 0.0,
+          "Frogs": 0.0,
+          "Horses": 0.125,
+          "Human": 0.0,
+          "Jellyfish": 0.0,
+          "Rabbits": 0.0,
+          "Sandwiches": 0.125,
+          "Sea": 0.0,
+          "Statues": 0.0,
+          "Towers": 0.0,
+          "Trees": 0.0,
+          "Waterfalls": 0.0
+        },
+        "accuracy_pass": false
+      }
+    },
+    "untouched_generator_baseline": {
+      "status": "skipped_by_flag"
+    }
+  },
+  "unknowns": {
+    "style_classifier_label_order": "unknown",
+    "object_classifier_label_order": "unknown",
+    "classifier_provenance": "unknown",
+    "generator_provenance": "unknown",
+    "generator_ema_selection": "unknown",
+    "preprocessing_matches_classifier_training": "unknown",
+    "provenance_note": "behavioural agreement does not prove these are the authors' checkpoints; only a published checksum or a direct copy can"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "shape_compatible": true,
+    "label_mapping_confirmed": false,
+    "heldout_accuracy_pass": false,
+    "untouched_generator_pass": "unknown",
+    "classifiers_verified": false,
+    "assets_verified": false,
+    "UA_IRA_CRA": "UNAVAILABLE"
+  }
+}

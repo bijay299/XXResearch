@@ -170,15 +170,77 @@ system toolkit is irrelevant to these runs.
 
 ---
 
-## 6. Substitute-configuration mechanics check (not a baseline)
+## 6. Baseline settings PRESERVED vs mechanics-test settings CHANGED
 
-Because the UnlearnCanvas generator and classifiers could not be obtained
-(`docs/ASSETS.md`), `scripts/mechanics_check.sh` exercises the code path with
-base Stable Diffusion v1.5 and deliberately reduced settings
-(`--iterations 8`, `--num_anchor_images 16`, `--num_anchor_prompts 16`,
-`--epochs 4`, 4 sampled images). Its outputs are written to a separate root,
-`/data/bijaypandey/cuig_pilot/mechanics_check/`, never to the experiment output
-root, and its report is stamped `IS_BASELINE: false`,
-`IS_REPRODUCTION: false`. UA/IRA/CRA are not computed there and remain
-unavailable. These reduced settings are **not** a deviation in the baseline —
-the baseline configuration in §1 is unchanged and simply has not been run.
+These are two different configurations and must never be conflated. The baseline
+configuration is unchanged from upstream and **has not been run**. The mechanics
+test is a deliberately shrunken substitute configuration that **was** run.
+
+### 6.1 Baseline configuration — PRESERVED (not yet run)
+
+Every setting below is upstream's, unchanged, as used by
+`scripts/run_single_concept_conabl.sh`.
+
+| Setting | Value | Source |
+|---|---|---|
+| generator | UnlearnCanvas `style50` | upstream |
+| `--concept_type` | `style` | upstream script |
+| `--iterations` | **1000** | upstream script |
+| `--num_anchor_images` | **200** | upstream script |
+| `--num_anchor_prompts` | **200** | upstream script |
+| `--epochs` | 1 | argparse default |
+| anchor prompts | `anchor_prompts/style/Laion.txt` | upstream script |
+| `--scale_lr`, `--hflip`, `--noaug`, xformers | on | upstream script |
+| `--learning_rate` | 2e-6 (→ 8e-6 after `--scale_lr`) | argparse default |
+| `--anchor_batch_size` | 4 | argparse default |
+| `--parameter_group` | `kv-xattn` | argparse default |
+| `--lr_scheduler` / `--lr_warmup_steps` | `constant` / 500 | argparse default |
+| `--seed`, `--max_grad_norm` | 42, 1.0 | argparse default |
+| anchor preservation, L1SP/L2SP, projection, SelFT, `eval_interval` | all off | argparse default |
+| sampling | 13 styles × 8 objects × 5 seeds, CFG 9.0, 100 steps, 512 px | upstream defaults |
+| evaluation splits | `XLSX_ALL_*` from `constants.py` | upstream script |
+
+### 6.2 Mechanics test — CHANGED (was run; not a baseline)
+
+`scripts/mechanics_check.sh`. Every row is a deliberate reduction or
+substitution; nothing here describes the baseline.
+
+| Setting | Baseline | Mechanics test | Why |
+|---|---|---|---|
+| generator | UnlearnCanvas `style50` | **base Stable Diffusion v1.5** | real generator unobtainable |
+| `--iterations` | 1000 | **8** | just enough to prove steps execute |
+| `--num_anchor_images` | 200 | **16** | keep anchor generation short |
+| `--num_anchor_prompts` | 200 | **16** | match the reduced image count |
+| `--epochs` | 1 | **4** | 16 images ÷ batch 4 = 4 iters/epoch; 4 epochs allows 8 steps |
+| `--overwrite_existing_ckpt` | not set | **set** | repeatable re-runs |
+| sampled images | 520 (13×8×5) | **4** (2 styles × 2 objects × 1 seed) | smoke test only |
+| anchor dataset dir | `.../anchor_datasets/...` | separate `mechanics_check/anchor_datasets/...` | never pollute baseline anchors |
+| output root | `outputs/` | **`mechanics_check/`** | substitute results can never be mistaken for benchmark results |
+| UA / IRA / CRA | computed | **not computed** | no classifiers |
+
+Unchanged between the two: batch size (4), `parameter_group` (`kv-xattn`),
+precision (fp32, `mixed_precision: 'no'`), optimizer settings, sampler CFG/steps/
+resolution. So the measured peak memory (11,156 MiB) is informative for the
+baseline; the measured *durations* are not, since step and image counts differ by
+two orders of magnitude.
+
+The mechanics report is stamped `IS_BASELINE: false` and
+`IS_REPRODUCTION: false`.
+
+---
+
+## 7. Software test of `evaluate.py` (not an experiment)
+
+`scripts/software_test_evaluate_path.sh` exercises the evaluation code path with
+**synthetic, randomly-initialised** classifier heads. They are written to
+`/data/bijaypandey/cuig_pilot/software_tests/synthetic_classifiers_DO_NOT_USE_FOR_RESULTS/`,
+never to the benchmark checkpoint paths, and the script refuses to run if the
+real classifiers are present. Its accuracies are noise and carry no scientific
+meaning.
+
+The same synthetic heads double as a **negative control** for the asset gate:
+run through `scripts/validate_assets.py` they are `shape_compatible: true` yet
+scored 3.5% (style, chance 2.0%) and 2.9% (object, chance 5.0%) with modal-index
+agreement 0/8 and 0/20, and were correctly **rejected**
+(`classifiers_verified: false`, `UA_IRA_CRA: UNAVAILABLE`). That is the evidence
+that shape compatibility alone cannot open the gate.

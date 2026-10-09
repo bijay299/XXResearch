@@ -107,31 +107,93 @@ def check_upstream(cuig_root: Path) -> None:
 
 
 # --------------------------------------------------------------------------- 3
-def check_assets(gen_dir: Path, cls_dir: Path) -> dict:
-    present = {}
+def load_receipt(receipt_path: Path) -> dict | None:
+    """Read the validation receipt produced by scripts/validate_assets.py."""
+    if not receipt_path.exists():
+        return None
+    try:
+        return json.loads(receipt_path.read_text())
+    except Exception:
+        return None
 
-    gen_ok = (gen_dir / "model_index.json").exists()
-    gen_parts = [p for p in ("unet", "vae", "text_encoder", "tokenizer", "scheduler")
-                 if (gen_dir / p).is_dir()]
-    present["generator"] = gen_ok and len(gen_parts) == 5
+
+def asset_state(present: bool, verified: bool) -> str:
+    """Tri-state asset status. Presence alone is never 'VERIFIED'."""
+    if not present:
+        return "MISSING"
+    return "VERIFIED" if verified else "PRESENT_UNVERIFIED"
+
+
+def check_assets(gen_dir: Path, cls_dir: Path, receipt: dict | None) -> dict:
+    """Presence AND verification. An unverified asset fails the baseline gate.
+
+    Being on disk is not sufficient: a checkpoint of the right shape with a
+    permuted class order, or a generator that was never fine-tuned on
+    UnlearnCanvas, is indistinguishable from the real thing by inspection alone.
+    Only scripts/validate_assets.py may mark an asset verified.
+    """
+    v = (receipt or {}).get("verdict", {})
+    cls_verified = bool(v.get("classifiers_verified"))
+    gen_verified = bool(v.get("assets_verified"))
+
+    gen_present = ((gen_dir / "model_index.json").exists()
+                   and all((gen_dir / p).is_dir()
+                           for p in ("unet", "vae", "text_encoder", "tokenizer", "scheduler")))
+    style_p, object_p = cls_dir / "style_classifier.pth", cls_dir / "object_classifier.pth"
+    cls_present = style_p.exists() and object_p.exists()
+
+    gen_state = asset_state(gen_present, gen_verified)
+    cls_state = asset_state(cls_present, cls_verified)
+
     record(
         "UnlearnCanvas generator",
-        "PASS" if present["generator"] else "FAIL",
-        {"dir": str(gen_dir), "model_index.json": gen_ok, "subdirs_found": gen_parts},
+        "PASS" if gen_state == "VERIFIED" else "FAIL",
+        {"dir": str(gen_dir), "state": gen_state, "present": gen_present,
+         "verified_by_receipt": gen_verified,
+         "note": "" if gen_state == "VERIFIED"
+                 else "baseline blocked; see docs/ASSETS.md"},
     )
-
-    style_p = cls_dir / "style_classifier.pth"
-    object_p = cls_dir / "object_classifier.pth"
-    present["classifiers"] = style_p.exists() and object_p.exists()
     record(
         "UnlearnCanvas classifiers",
-        "PASS" if present["classifiers"] else "FAIL",
-        {"dir": str(cls_dir),
+        "PASS" if cls_state == "VERIFIED" else "FAIL",
+        {"dir": str(cls_dir), "state": cls_state,
          "style_classifier.pth": style_p.exists(),
          "object_classifier.pth": object_p.exists(),
-         "note": "" if present["classifiers"] else "UA/IRA/CRA cannot be computed; see docs/ASSETS.md"},
+         "verified_by_receipt": cls_verified,
+         "note": "" if cls_state == "VERIFIED"
+                 else "UA/IRA/CRA cannot be computed; run scripts/validate_assets.py"},
     )
-    return present
+
+    # Unresolved facts are surfaced explicitly rather than silently defaulting.
+    unknowns = (receipt or {}).get("unknowns", {})
+    record(
+        "unresolved provenance / label mapping",
+        "WARN" if unknowns else "SKIP",
+        unknowns or "no validation receipt yet; every provenance and label-mapping "
+                    "fact is unknown",
+    )
+
+    return {"generator": gen_present, "classifiers": cls_present,
+            "generator_state": gen_state, "classifiers_state": cls_state,
+            "generator_verified": gen_verified, "classifiers_verified": cls_verified}
+
+
+def check_receipt(receipt: dict | None, receipt_path: Path) -> None:
+    if receipt is None:
+        record("asset validation receipt", "FAIL",
+               {"path": str(receipt_path),
+                "status": "absent",
+                "how_to_resolve": "python scripts/validate_assets.py --gpu <idle>"})
+        return
+    v = receipt.get("verdict", {})
+    record("asset validation receipt",
+           "PASS" if v.get("assets_verified") else "FAIL",
+           {"path": str(receipt_path), "generated_utc": receipt.get("generated_utc"),
+            "overall": v.get("overall"),
+            "label_mapping_confirmed": v.get("label_mapping_confirmed"),
+            "heldout_accuracy_pass": v.get("heldout_accuracy_pass"),
+            "untouched_generator_pass": v.get("untouched_generator_pass"),
+            "UA_IRA_CRA": v.get("UA_IRA_CRA")})
 
 
 # --------------------------------------------------------------------------- 4
@@ -157,7 +219,7 @@ def check_label_agreement(cuig_root: Path, cls_dir: Path, present: dict) -> None
 
     if not present["classifiers"]:
         record(
-            "classifier head dim vs label lists",
+            "classifier head shape vs label lists",
             "SKIP",
             "classifiers unavailable - cannot confirm the checkpoint head matches "
             f"{len(styles)} style / {len(objects)} object classes",
@@ -178,7 +240,13 @@ def check_label_agreement(cuig_root: Path, cls_dir: Path, present: dict) -> None
         detail[f"{task}_expected"] = n
         if got_n != n:
             ok = False
-    record("classifier head dim vs label lists", "PASS" if ok else "FAIL", detail)
+    # A shape match is a necessary precondition, nothing more. It is reported as
+    # WARN rather than PASS so it can never be read as scientific validation: a
+    # checkpoint with a permuted class order has an identical head shape.
+    detail["IMPORTANT"] = ("shape compatibility is NOT validation; label order must be "
+                           "confirmed behaviourally by scripts/validate_assets.py")
+    record("classifier head shape vs label lists (shape only)",
+           "WARN" if ok else "FAIL", detail)
 
 
 # --------------------------------------------------------------------------- 5/6
@@ -250,6 +318,9 @@ def main() -> int:
                     help="GPU index to pin for generation/eval checks; omit to skip them")
     ap.add_argument("--out_dir", default="/data/bijaypandey/cuig_pilot/preflight")
     ap.add_argument("--json", default=None)
+    ap.add_argument("--receipt", default=str(
+        Path(__file__).resolve().parents[1] / "results" / "assets" / "validation_receipt.json"),
+        help="asset validation receipt from scripts/validate_assets.py")
     args = ap.parse_args()
 
     if args.gpu is not None:
@@ -259,9 +330,13 @@ def main() -> int:
     print("CUIG ConAbl / UnlearnCanvas pilot - PREFLIGHT")
     print("=" * 78)
 
+    receipt_path = Path(args.receipt)
+    receipt = load_receipt(receipt_path)
+
     check_environment()
     check_upstream(Path(args.cuig_root))
-    present = check_assets(Path(args.generator_dir), Path(args.classifier_dir))
+    check_receipt(receipt, receipt_path)
+    present = check_assets(Path(args.generator_dir), Path(args.classifier_dir), receipt)
     check_label_agreement(Path(args.cuig_root), Path(args.classifier_dir), present)
 
     if args.gpu is not None:
@@ -278,13 +353,27 @@ def main() -> int:
           f"WARN={sum(1 for r in results if r['status']=='WARN')} "
           f"FAIL={n_fail} SKIP={n_skip}")
 
+    # The baseline gate: assets must be present AND verified by a receipt.
+    baseline_ready = bool(present.get("generator_verified")
+                          and present.get("classifiers_verified"))
+    print()
+    print(f"generator  : {present.get('generator_state')}")
+    print(f"classifiers: {present.get('classifiers_state')}")
+    print(f"BASELINE GATE: {'OPEN' if baseline_ready else 'CLOSED'}  "
+          f"(UA/IRA/CRA {'available' if baseline_ready else 'UNAVAILABLE'})")
+    if not baseline_ready:
+        print("  -> obtain the assets (docs/ASSETS.md), then:")
+        print("       python scripts/record_asset_hashes.py")
+        print("       python scripts/build_heldout_eval_set.py")
+        print("       python scripts/validate_assets.py --gpu <idle> --update-manifest")
+
     if args.json:
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)
         with open(args.json, "w") as fh:
-            json.dump(results, fh, indent=2)
+            json.dump({"checks": results, "baseline_gate_open": baseline_ready}, fh, indent=2)
         print(f"report written to {args.json}")
 
-    return 1 if n_fail else 0
+    return 0 if (baseline_ready and not n_fail) else 1
 
 
 if __name__ == "__main__":

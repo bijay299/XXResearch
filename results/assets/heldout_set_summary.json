@@ -1,0 +1,69 @@
+{
+  "description": "Labelled held-out images for UnlearnCanvas classifier validation",
+  "source": {
+    "hf_dataset": "OPTML-Group/UnlearnCanvas",
+    "shards_used": [
+      "data/train-00000-of-00153-79d12fbacb5609a3.parquet",
+      "data/train-00041-of-00153-c4842404d9a1af64.parquet",
+      "data/train-00061-of-00153-fb57e604deafbb76.parquet",
+      "data/train-00075-of-00153-23264acc02cbaf0f.parquet",
+      "data/train-00089-of-00153-58d68ed4146e909e.parquet",
+      "data/train-00102-of-00153-d3d9f1cd485d6b91.parquet",
+      "data/train-00116-of-00153-45b5e354c959ab19.parquet",
+      "data/train-00131-of-00153-753dae6e986623b7.parquet"
+    ]
+  },
+  "label_source": "parsed from the dataset's own caption field",
+  "caption_regex": "^\\s*An?\\s+(?P<obj>.+?)\\s+image\\s+in\\s+(?P<style>.+?)\\s+style\\s*$",
+  "never_used_for": [
+    "unlearning",
+    "anchor generation",
+    "any training"
+  ],
+  "processing": {
+    "converted_to": "RGB",
+    "max_side_px": 512,
+    "note": "downscale only reduces storage; evaluate.py resizes to 224x224"
+  },
+  "counts": {
+    "images": 137,
+    "styles": 10,
+    "objects": 20,
+    "unparsed_captions": 0
+  },
+  "images_per_style": {
+    "Abstractionism": 16,
+    "Dreamweave": 16,
+    "Greenfield": 16,
+    "Liquid_Dreams": 2,
+    "Magic_Cube": 16,
+    "Neon_Lines": 18,
+    "Picasso": 12,
+    "Pointillism": 6,
+    "Rust": 18,
+    "Surrealism": 17
+  },
+  "images_per_object": {
+    "Architectures": 6,
+    "Bears": 6,
+    "Birds": 6,
+    "Butterfly": 4,
+    "Cats": 4,
+    "Dogs": 8,
+    "Fishes": 8,
+    "Flame": 8,
+    "Flowers": 8,
+    "Frogs": 8,
+    "Horses": 8,
+    "Human": 10,
+    "Jellyfish": 10,
+    "Rabbits": 9,
+    "Sandwiches": 8,
+    "Sea": 8,
+    "Statues": 4,
+    "Towers": 4,
+    "Trees": 4,
+    "Waterfalls": 6
+  },
+  "records_note": "per-image records omitted here; full list at /data/bijaypandey/cuig_pilot/heldout_eval_set/labels.json"
+}

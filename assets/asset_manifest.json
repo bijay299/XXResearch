@@ -1,0 +1,312 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-10-09T04:14:29.976042+00:00",
+  "generated_by": "scripts/make_asset_manifest.py",
+  "hash_caveat": "A locally computed SHA-256 identifies the exact bytes held on this host. It does NOT independently prove equivalence to the authors' released checkpoint. Establishing that requires a checksum published by the authors, or a copy obtained directly from them.",
+  "status_vocabulary": {
+    "unknown": "value not established; must not be guessed or inferred",
+    "not_downloaded": "asset absent from this host",
+    "present_unverified": "bytes present but provenance and/or behaviour not validated",
+    "verified": "present AND passed scripts/validate_assets.py; receipt recorded"
+  },
+  "assets": {
+    "generator": {
+      "role": "base text-to-image generator for ConAbl training and UnlearnCanvas sampling",
+      "upstream_name": "style50",
+      "required_by": [
+        "UnlearningMethods/ConAbl/train_conabl.py",
+        "Evaluation/UnlearnCanvas/sample.py"
+      ],
+      "expected_local_path": "/data/bijaypandey/cuig_pilot/Checkpoints/Generators/UnlearnCanvas",
+      "expected_format": "diffusers StableDiffusionPipeline directory",
+      "expected_members": [
+        "model_index.json",
+        "scheduler/",
+        "text_encoder/",
+        "tokenizer/",
+        "unet/",
+        "vae/"
+      ],
+      "documented_sources": [
+        {
+          "url": "https://drive.google.com/drive/folders/18x40pLBcfNFyxBWZBGncTjqJTs_75SLx",
+          "cited_by": "CUIG Checkpoints/README.md",
+          "observed_http": 404
+        },
+        {
+          "url": "https://drive.google.com/drive/folders/18dhkXyZQWjdMvlAlxZx3fZhdCZvlj2Hw",
+          "cited_by": "UnlearnCanvas README.md / machine_unlearning / style_transfer",
+          "observed_http": 404
+        }
+      ],
+      "version": {
+        "value": null,
+        "status": "unknown",
+        "how_to_resolve": "ask maintainers which released generator revision CUIG's results used"
+      },
+      "architecture": {
+        "value": null,
+        "status": "unknown",
+        "how_to_resolve": "confirm SD v1.x variant and exact base checkpoint after download"
+      },
+      "ema_selection": {
+        "value": null,
+        "status": "unknown",
+        "how_to_resolve": "the released CompVis checkpoint carries both `model.` and `model_ema.` weights; ask which set the released diffusers `style50` folder was converted from"
+      },
+      "finetune_config": {
+        "base_model": {
+          "value": null,
+          "status": "unknown",
+          "how_to_resolve": "ask maintainers (SD v1.4 vs v1.5)"
+        },
+        "training_steps": {
+          "value": null,
+          "status": "unknown",
+          "how_to_resolve": "ask maintainers; the third-party CompVis mirror embeds global_step=7000, epoch=778, unconfirmed"
+        },
+        "resolution": {
+          "value": null,
+          "status": "unknown",
+          "how_to_resolve": "ask maintainers"
+        },
+        "scheduler_config": {
+          "value": null,
+          "status": "unknown",
+          "how_to_resolve": "read scheduler/scheduler_config.json after download"
+        }
+      },
+      "download": {
+        "status": "not_downloaded",
+        "source_url": null,
+        "revision": null,
+        "local_path": null,
+        "size_bytes": null,
+        "sha256": null,
+        "retrieved_at": null
+      },
+      "provenance": {
+        "status": "unknown",
+        "note": "no authors' checksum published; no verified copy obtained"
+      },
+      "validation": {
+        "status": "not_validated",
+        "receipt_path": null
+      }
+    },
+    "style_classifier": {
+      "role": "UnlearnCanvas style classifier; drives UA and IRA for style unlearning",
+      "upstream_filename": "style50.pth",
+      "required_filename": "style_classifier.pth",
+      "expected_local_path": "/data/bijaypandey/cuig_pilot/Checkpoints/Classifiers/UnlearnCanvas/style_classifier.pth",
+      "required_by": [
+        "Evaluation/UnlearnCanvas/evaluate.py"
+      ],
+      "expected_architecture": "timm vit_large_patch16_224.augreg_in21k with head = Linear(1024, 51)",
+      "expected_state_dict_key": "model_state_dict",
+      "expected_num_classes": 51,
+      "documented_sources": [
+        {
+          "url": "https://drive.google.com/drive/folders/1AoazlvDgWgc3bAyHDpqlafqltmn4vm61",
+          "cited_by": "CUIG Checkpoints/README.md",
+          "observed_http": 404
+        },
+        {
+          "url": "https://drive.google.com/drive/folders/18dhkXyZQWjdMvlAlxZx3fZhdCZvlj2Hw",
+          "cited_by": "UnlearnCanvas machine_unlearning/README.md (cls_model)",
+          "observed_http": 404
+        }
+      ],
+      "class_index_order": {
+        "value": null,
+        "status": "unknown",
+        "how_to_resolve": "confirm empirically via scripts/validate_assets.py against labelled held-out images"
+      },
+      "download": {
+        "status": "not_downloaded",
+        "source_url": null,
+        "revision": null,
+        "local_path": null,
+        "size_bytes": null,
+        "sha256": null,
+        "retrieved_at": null
+      },
+      "provenance": {
+        "status": "unknown",
+        "note": "no accessible mirror found in the sources searched"
+      },
+      "validation": {
+        "status": "not_validated",
+        "receipt_path": null
+      }
+    },
+    "object_classifier": {
+      "role": "UnlearnCanvas object classifier; drives CRA for style unlearning",
+      "upstream_filename": "style50_cls.pth",
+      "required_filename": "object_classifier.pth",
+      "expected_local_path": "/data/bijaypandey/cuig_pilot/Checkpoints/Classifiers/UnlearnCanvas/object_classifier.pth",
+      "required_by": [
+        "Evaluation/UnlearnCanvas/evaluate.py"
+      ],
+      "expected_architecture": "timm vit_large_patch16_224.augreg_in21k with head = Linear(1024, 20)",
+      "expected_state_dict_key": "model_state_dict",
+      "expected_num_classes": 20,
+      "documented_sources": [
+        {
+          "url": "https://drive.google.com/drive/folders/1AoazlvDgWgc3bAyHDpqlafqltmn4vm61",
+          "cited_by": "CUIG Checkpoints/README.md",
+          "observed_http": 404
+        },
+        {
+          "url": "https://drive.google.com/drive/folders/18dhkXyZQWjdMvlAlxZx3fZhdCZvlj2Hw",
+          "cited_by": "UnlearnCanvas machine_unlearning/README.md (cls_model)",
+          "observed_http": 404
+        }
+      ],
+      "class_index_order": {
+        "value": null,
+        "status": "unknown",
+        "how_to_resolve": "confirm empirically via scripts/validate_assets.py against labelled held-out images"
+      },
+      "download": {
+        "status": "not_downloaded",
+        "source_url": null,
+        "revision": null,
+        "local_path": null,
+        "size_bytes": null,
+        "sha256": null,
+        "retrieved_at": null
+      },
+      "provenance": {
+        "status": "unknown",
+        "note": "no accessible mirror found in the sources searched"
+      },
+      "validation": {
+        "status": "not_validated",
+        "receipt_path": null
+      }
+    }
+  },
+  "class_mappings": {
+    "source_of_truth": "CUIG Evaluation/UnlearnCanvas/constants.py @ 9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
+    "assumed_index_order": "list position == classifier output index",
+    "assumption_status": "unverified",
+    "assumption_evidence": "both lists are exactly alphabetically sorted, consistent with torchvision ImageFolder ordering; necessary but NOT sufficient",
+    "styles": {
+      "count": 51,
+      "ordered": [
+        "Abstractionism",
+        "Artist_Sketch",
+        "Blossom_Season",
+        "Bricks",
+        "Byzantine",
+        "Cartoon",
+        "Cold_Warm",
+        "Color_Fantasy",
+        "Comic_Etch",
+        "Crayon",
+        "Cubism",
+        "Dadaism",
+        "Dapple",
+        "Defoliation",
+        "Early_Autumn",
+        "Expressionism",
+        "Fauvism",
+        "French",
+        "Glowing_Sunset",
+        "Gorgeous_Love",
+        "Greenfield",
+        "Impressionism",
+        "Ink_Art",
+        "Joy",
+        "Liquid_Dreams",
+        "Magic_Cube",
+        "Meta_Physics",
+        "Meteor_Shower",
+        "Monet",
+        "Mosaic",
+        "Neon_Lines",
+        "On_Fire",
+        "Pastel",
+        "Pencil_Drawing",
+        "Picasso",
+        "Pop_Art",
+        "Red_Blue_Ink",
+        "Rust",
+        "Seed_Images",
+        "Sketch",
+        "Sponge_Dabbed",
+        "Structuralism",
+        "Superstring",
+        "Surrealism",
+        "Ukiyoe",
+        "Van_Gogh",
+        "Vibrant_Flow",
+        "Warm_Love",
+        "Warm_Smear",
+        "Watercolor",
+        "Winter"
+      ]
+    },
+    "objects": {
+      "count": 20,
+      "ordered": [
+        "Architectures",
+        "Bears",
+        "Birds",
+        "Butterfly",
+        "Cats",
+        "Dogs",
+        "Fishes",
+        "Flame",
+        "Flowers",
+        "Frogs",
+        "Horses",
+        "Human",
+        "Jellyfish",
+        "Rabbits",
+        "Sandwiches",
+        "Sea",
+        "Statues",
+        "Towers",
+        "Trees",
+        "Waterfalls"
+      ]
+    },
+    "note_seed_images": "STYLES_AVAILABLE contains 51 entries: 50 painting styles plus 'Seed_Images'"
+  },
+  "preprocessing": {
+    "source_of_truth": "Evaluation/UnlearnCanvas/evaluate.py::build_image_transform",
+    "transform": [
+      "Resize((224, 224))",
+      "ToTensor()",
+      "Normalize(mean=[0.5], std=[0.5])"
+    ],
+    "input_color_mode": "PIL default from Image.open (no explicit convert('RGB'))",
+    "classifier_input_size": [
+      224,
+      224
+    ],
+    "confirmed_matches_classifier_training": {
+      "value": null,
+      "status": "unknown",
+      "how_to_resolve": "ask maintainers whether the released classifiers were trained with this exact transform"
+    }
+  },
+  "sampling_config_for_reference": {
+    "source_of_truth": "Evaluation/UnlearnCanvas/sample.py defaults",
+    "prompt_template": "A {object} image in {style} style",
+    "seeds": [
+      188,
+      288,
+      588,
+      688,
+      888
+    ],
+    "guidance_scale": 9.0,
+    "num_inference_steps": 100,
+    "resolution": 512,
+    "dtype_on_cuda": "float16",
+    "note_dataset_caption_difference": "UnlearnCanvas dataset captions use the article 'An' before vowel-initial objects (e.g. 'An Architectures image in ...'); sample.py always emits 'A'."
+  }
+}

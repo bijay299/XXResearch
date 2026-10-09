@@ -67,6 +67,35 @@ RETAIN_STYLES_JSON="$(to_json "${RETAIN_STYLES[@]}")"
 RETAIN_OBJECTS_JSON="$(to_json "${RETAIN_OBJECTS[@]}")"
 STYLES_SUBSET_JSON="$(to_json "$STYLE" "${RETAIN_STYLES[@]}")"
 
+# --- Asset gate: refuse to produce numbers from unverified assets ------------
+# Presence on disk is not enough. A classifier with a permuted class order, or a
+# generator that was never fine-tuned on UnlearnCanvas, is shape-identical to the
+# real thing and would yield confident, wrong UA/IRA/CRA. Only
+# scripts/validate_assets.py may open this gate, by writing a receipt.
+RECEIPT="${PILOT_REPO_ROOT}/results/assets/validation_receipt.json"
+if ! python3 - "$RECEIPT" <<'PY'
+import json, sys
+from pathlib import Path
+p = Path(sys.argv[1])
+if not p.exists():
+    print(f"ERROR: no asset validation receipt at {p}", file=sys.stderr)
+    print("       run: python scripts/validate_assets.py --gpu <idle> --update-manifest",
+          file=sys.stderr)
+    raise SystemExit(1)
+v = json.loads(p.read_text()).get("verdict", {})
+if not v.get("assets_verified"):
+    print(f"ERROR: benchmark assets are NOT verified (overall={v.get('overall')}).", file=sys.stderr)
+    for k in ("label_mapping_confirmed", "heldout_accuracy_pass", "untouched_generator_pass"):
+        print(f"         {k}: {v.get(k)}", file=sys.stderr)
+    print("       UA/IRA/CRA must stay UNAVAILABLE. See docs/ASSETS.md.", file=sys.stderr)
+    raise SystemExit(1)
+print("Asset validation receipt OK: assets verified.")
+PY
+then
+    echo "Refusing to run the baseline on unverified assets." >&2
+    exit 5
+fi
+
 # --- GPU selection: must be explicit and verified immediately before launch --
 if [[ -z "$GPU" ]]; then
     echo "### No --gpu given; probing for an idle GPU ###"

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-10-09T04:06:37.797021+00:00",
+  "host": "hyperplane",
+  "gpu_index": "2",
+  "gpu_name": "NVIDIA A100-SXM4-40GB",
+  "upstream_cuig_commit": "9932ac3271a122f6d38d19e0b8c8908fe5237ff7",
+  "thresholds_are_local_policy": true,
+  "checks": {
+    "presence": {
+      "generator": {
+        "path": "/data/bijaypandey/cuig_pilot/Checkpoints/Generators/UnlearnCanvas",
+        "present": false,
+        "members_found": [],
+        "members_expected": [
+          "model_index.json",
+          "scheduler",
+          "text_encoder",
+          "tokenizer",
+          "unet",
+          "vae"
+        ]
+      },
+      "style_classifier": {
+        "path": "/data/bijaypandey/cuig_pilot/Checkpoints/Classifiers/UnlearnCanvas/style_classifier.pth",
+        "present": false
+      },
+      "object_classifier": {
+        "path": "/data/bijaypandey/cuig_pilot/Checkpoints/Classifiers/UnlearnCanvas/object_classifier.pth",
+        "present": false
+      }
+    }
+  },
+  "unknowns": {
+    "style_classifier_label_order": "unknown",
+    "object_classifier_label_order": "unknown",
+    "classifier_provenance": "unknown",
+    "generator_provenance": "unknown",
+    "generator_ema_selection": "unknown"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "reason": "classifier checkpoints absent",
+    "assets_verified": false,
+    "UA_IRA_CRA": "UNAVAILABLE"
+  }
+}
