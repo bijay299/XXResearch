@@ -234,3 +234,119 @@ per tensor), with hash mismatch recorded as a serialisation observation only.
 - The identification of unequal deletion strength as the confound that makes the
   pilot's retention comparison uninterpretable — the finding that motivates the
   proposed diagnostic.
+
+
+---
+
+# AUDIT-01c — three validation gaps in the AUDIT-01b checks themselves
+
+AUDIT-01b replaced existence/row-count sentinels with contract validation.
+Central review then found that **three of those contract checks did not bind
+what they claimed to bind**. All three were reproduced before being fixed, and
+all three are now covered by tests. No measured value changed.
+
+## C1 — evaluations were not bound to the model that produced them
+
+**Reproduced.** Three separate holes, all closed:
+
+| probe | before | now |
+|---|---|---|
+| `checkpoint_load.sha256` set to a stale value, launcher-style call (no `--expect_sha`) | **VALID** | `INVALID` — "stale with respect to its checkpoint" |
+| `--expect_sha` supplied, recorded hash **absent** from the report | **VALID** | `INVALID` — "records no sha256" |
+| `--expect_sha` omitted entirely for a non-M0 checkpoint | **VALID** | `INVALID` — `UNCHECKED`, fails closed |
+
+**Cause.** Neither `run_seed.sh` nor `run_analysis.sh` passed `--expect_sha`,
+and the validator's comparison was guarded by
+`if args.expect_sha and cl.get("sha256") and …` — so either side being absent
+silently skipped it.
+
+**Fix.** Both callers now recompute the checkpoint's sha256 from disk
+(`ckpt_sha`) and pass it at **every** non-M0 evaluation-validation entry point,
+in the launch path and the analysis path alike. The validator requires the
+expected hash to be supplied *and* the report to record one *and* the two to
+match; any of the three missing is a failure.
+
+**M0 is no longer an accidental exception.** M0 applies no delta, so its
+identity is the **base model**. `configs/base_model_contract.json` declares the
+backbone path, a cheap content identity (config digests plus weight sizes) and
+the full UNet weight hash. M0 validation asserts: no delta applied, no
+`unet_ckpt`, **no** recorded delta hash, the declared `base_model_dir`, and —
+with `--verify_base_model` — the recomputed backbone identity. The
+shared-evaluation policy (generated once, reused by symlink, declared with
+`--allow_shared_images`, counted once) is written into that contract rather
+than left implicit.
+
+## C2 — the completed-step check was circular
+
+**Cause.** `train_request.py` recorded
+`seconds_per_optimizer_step = train_seconds / iterations_requested`, and the
+validator computed `train_seconds / seconds_per_optimizer_step`. That returns
+`iterations_requested` by construction: the check compared the request with
+itself and could never fail.
+
+**Fix.** `train_request.py` now wraps upstream's
+`update_progress_and_checkpoint` — the function the trainer itself uses to
+advance its completed-step count, called only when gradients are synced — and
+records `runtime.optimizer_steps_completed` with an
+`optimizer_steps_source` note. The validator accepts **only** that counter as
+completion evidence; it is never inferred from requested iterations, timestamps,
+epoch capacity, or the L2-SP trace. `seconds_per_optimizer_step` is retained as
+a throughput figure and flagged `..._is_derived`.
+
+The L2-SP trace is now checked solely as evidence that regularisation *ran*
+(`steps_recorded > 0` on a regularised arm), never as a step count.
+
+**Legacy evidence gap, stated rather than papered over.** The ten saved pilot
+reports predate this counter, so **training completion is UNVERIFIED for the
+entire saved pilot**. Under the default policy they now fail validation, which
+is correct: the evidence genuinely is not there.
+
+- `SEQ_LEGACY_TRAIN_SEEDS="17 29"` in `exp_config.sh` declares them legacy.
+- Those seeds validate with `--steps_evidence legacy_optional`, which accepts
+  the counter's absence, passes **structural** validation in full, and reports
+  `training_completion_verified: false` with the gap named.
+- **No counter was backfilled**, and the legacy policy exists specifically so a
+  missing historic counter cannot silently trigger retraining or replacement of
+  the saved pilot.
+- A counter that is *present but short* is rejected even under
+  `legacy_optional`, so the mode cannot be used to wave through a real failure.
+- Any **new** seed is not on that list, so its counter is required.
+
+## C3 — the frozen manifest's digest was read from the manifest being validated
+
+**Reproduced.** Changing **every prompt text** while preserving prompt ids, the
+row count and the stored digest field: **VALID** before, now two failures
+naming the content mismatch and the stored-vs-recomputed disagreement.
+
+**Fix.** One canonical rule,
+`canonical_manifest_digest` in `validate_stage.py`:
+`sha256(json.dumps(manifest_without_its_digest_field, sort_keys=True))`.
+Validation **recomputes** it from the contents and compares against a frozen
+expected identity supplied from **configuration** (`SEQ_EVAL_MANIFEST_SHA`),
+never from the file under test; it also checks the stored field against the
+recomputation, so an un-migrated or edited file is named as such. Generation
+metadata is compared against the recomputed digest. A new
+`validate_stage.py manifest` stage checks a manifest standalone, including that
+prompt ids and prompt texts are one-to-one.
+
+**Migration, explicit.** The rule matches the **pilot** manifest, which needs no
+migration. The AUDIT-01b drafts used `indent=2` and were migrated: prompt sets
+byte-identical, identities changed. Both digests, the reason and the verbatim
+superseded drafts are recorded in
+[`draft_manifests/DIGEST_MIGRATION.md`](draft_manifests/DIGEST_MIGRATION.md)
+and [`draft_manifests/superseded_indent2_rule/`](draft_manifests/superseded_indent2_rule/).
+
+| manifest | superseded | current |
+|---|---|---|
+| dev | `ebfdd37270de…` | **`1cd1f902669c…`** |
+| test | `170696eb5fc2…` | **`5dd87dbb5a77…`** |
+| pilot | — | `0020c81c4a4d…` (unchanged) |
+
+## What AUDIT-01c did not change
+
+The scientific design is untouched: two new unregularised dog trajectories, ten
+fixed checkpoints each, 1,920 development images plus 3,360 test images,
+**3.095 GPU-hours** proposed with contingency against a **proposed** four-hour
+ceiling. No coefficient sweep and no added research scope. Every measured value
+in the pilot still re-derives exactly. Human annotation, central review and the
+PI's launch decision remain outstanding.

@@ -150,10 +150,19 @@ would create an opportunity to select on them.
 **Drafted and hashed on CPU** —
 [`results/audit_v1/draft_manifests/`](../../results/audit_v1/draft_manifests/):
 
-| manifest | sha256 |
+| manifest | sha256 (canonical rule) |
 |---|---|
-| `dev_manifest_DRAFT.json` | `ebfdd37270dea750…` |
-| `test_manifest_DRAFT.json` | `170696eb5fc2832b…` |
+| `dev_manifest_DRAFT.json` | `1cd1f902669cefdc…` |
+| `test_manifest_DRAFT.json` | `5dd87dbb5a77c0f4…` |
+
+These identities were **migrated** at AUDIT-01c from an earlier `indent=2`
+digest rule to the single canonical rule now used everywhere. The prompt sets
+are byte-identical — only the digests changed. Both old and new values, the
+reason, and the verbatim superseded drafts are recorded in
+[`draft_manifests/DIGEST_MIGRATION.md`](../../results/audit_v1/draft_manifests/DIGEST_MIGRATION.md).
+Validation **recomputes** a manifest's digest from its contents and compares it
+against the frozen identity, so altering a prompt text is caught even when
+prompt ids, the row count and the stored digest field are preserved.
 
 **Disjointness verified** across all five pairings (dev/test, dev/pilot,
 test/pilot, dev/anchor-training, test/anchor-training): **0 exact collisions,
@@ -329,6 +338,12 @@ The comparison is **tensor-level**, not hash-level:
 `scripts/seq/compare_checkpoints.py` reports, per tensor, max absolute
 difference, mean absolute difference and relative Frobenius difference, on CPU.
 
+Separately, every arm of this diagnostic records
+`runtime.optimizer_steps_completed` — an actual count of optimizer updates taken
+from upstream's own counter — so "the trajectory ran 1000 steps" is evidenced
+rather than inferred. The saved pilot predates that field and its training
+completion is therefore **UNVERIFIED**; see §12.
+
 **Three distinct claims, not to be conflated.**
 
 1. **File hashes equal** — byte-identical serialisation. A mismatch can come
@@ -370,7 +385,39 @@ Stop and report, without proceeding, if:
   sequential-suppression interference is not the limitation this line of work has
   been looking for. That outcome should be reported as clearly as a positive one.
 
-## 11. Not in this request
+## 11. Legacy evidence gap in the saved pilot
+
+Stated here because this diagnostic reuses pilot artifacts (MA17/MA29 and the
+L2=25000 children).
+
+The ten saved pilot training reports carry **no counter of completed optimizer
+steps**, and the completion check in use when they were produced was circular
+(`seconds_per_optimizer_step` was defined as `train_seconds / iterations`, and
+the validator divided the two back). So for all ten runs:
+
+- **structural validation passes in full** — report schema, run identity,
+  parent lineage by recomputed hash, the checkpoint's own recomputed hash, exact
+  tensor names, shapes, dtypes, finiteness and CPU reload;
+- **training completion is UNVERIFIED** — there is no evidence that each run
+  reached 1000 optimizer steps beyond the request itself and the progress output
+  in the logs.
+
+`SEQ_LEGACY_TRAIN_SEEDS="17 29"` declares this explicitly;
+`--steps_evidence legacy_optional` accepts the counter's absence and reports
+`training_completion_verified: false`. **Nothing was backfilled**, and the
+policy exists so that a missing historic counter cannot silently trigger
+retraining or replacement of the saved pilot.
+
+**What this means for the proposal.** The reused parents and L2 arms are the
+pilot's, so their step completion inherits this gap. The two NEW unregularised
+trajectories will record the counter, so the arms actually being compared on the
+newly frozen test set — matched-U versus L2 — are not symmetric in this respect:
+the L2 arm's completion is unverified, the U arm's is verified. That asymmetry
+is a limitation of reusing the existing L2 children rather than retraining them,
+and the alternative (retraining both L2 arms, ~0.46 GPU-h more) is **not**
+included here. It is recorded for the PI rather than decided.
+
+## 12. Not in this request
 
 - Sandwich-branch coefficient search, and any lower-L2 stage.
 - A new M0 evaluation, and an unmatched full-step reference arm on TEST.
@@ -378,6 +425,8 @@ Stop and report, without proceeding, if:
 - Separating anchor sharing from semantic distance — the standing confound.
 - Longer request streams; mechanism attribution; human annotation labour.
 - Any new regularizer or learned controller. **Out of scope.**
+- Retraining the existing L2=25000 children to give them a completed-step
+  counter (see §11). Not costed here.
 
 ---
 

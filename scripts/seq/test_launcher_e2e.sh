@@ -169,7 +169,12 @@ def make_train(a):
         "started_utc": "2026-10-09T00:00:00+00:00",
         "finished_utc": "2026-10-09T00:14:00+00:00",
         "runtime": {"train_seconds": steps * 0.83,
-                    "seconds_per_optimizer_step": 0.83},
+                    "seconds_per_optimizer_step": 0.83,
+                    "seconds_per_optimizer_step_is_derived": True,
+                    # The ACTUAL completed-step counter the real
+                    # train_request.py now records from upstream's own counter.
+                    "optimizer_steps_completed": steps,
+                    "optimizer_steps_source": "mock (test fixture)"},
     }
     # Scripted corruption modes, to prove the launcher rejects them.
     if a.__dict__.get("break") == "stale_seed":
@@ -182,6 +187,12 @@ def make_train(a):
         rep["child_checkpoint"]["sha256"] = hashlib.sha256(ck.read_bytes()).hexdigest()
     elif a.__dict__.get("break") == "no_finish":
         rep["finished_utc"] = None
+    elif a.__dict__.get("break") == "short_counter":
+        # Exits 0, report looks complete, but only 400 steps actually ran.
+        rep["runtime"]["optimizer_steps_completed"] = 400
+    elif a.__dict__.get("break") == "no_counter":
+        rep["runtime"].pop("optimizer_steps_completed", None)
+        rep["runtime"].pop("optimizer_steps_source", None)
     (out / "train_report.json").write_text(json.dumps(rep, indent=2))
     print(f"mock trained {a.name}")
 
@@ -207,9 +218,15 @@ def gpu_entry(argv):
             Image.new("RGB", (32, 32), ((i * 37) % 256, (i * 73) % 256,
                                         (i * 113) % 256)).save(
                 od / r["image_name"], "JPEG", quality=70)
-        cl = {"applied": True}
+        cl = {"applied": bool(g.get("unet_ckpt")),
+              "unet_ckpt": g.get("unet_ckpt")}
         if g.get("unet_ckpt") and Path(g["unet_ckpt"]).exists():
             cl["sha256"] = hashlib.sha256(Path(g["unet_ckpt"]).read_bytes()).hexdigest()
+        if mode == "stale_ckpt_hash":
+            # As if these images came from an older same-named checkpoint.
+            cl["sha256"] = "dead" + "b" * 60
+        elif mode == "no_ckpt_hash":
+            cl.pop("sha256", None)
         gs = json.loads(Path(os.environ["SEQ_GEN_SETTINGS_CONTRACT"]).read_text())
         gs = {k: v for k, v in gs.items() if not k.startswith("_")}
         if mode == "settings":
@@ -220,6 +237,7 @@ def gpu_entry(argv):
             "generated_or_reused": len(man["records"]),
             "manifest_sha256": man.get("manifest_sha256"),
             "generation_settings": gs, "checkpoint_load": cl,
+            "base_model_dir": os.environ.get("SEQ_BASE_MODEL"),
             "out_dir": str(od),
         }, indent=2))
         return 0
@@ -307,7 +325,7 @@ for c in ["cat","dog","sandwich","horse","bird","chair","bicycle"]:
             for s in (101,202):
                 recs.append({"prompt_id":f"{c}_{fam}_{i}","category":c,
                              "prompt_family":fam,"prompt_index":i,
-                             "prompt":f"a photo of a {c}","gen_seed":s,
+                             "prompt":f"a photo of a {c} ({fam} {i})","gen_seed":s,
                              "image_name":f"{c}_{fam}_{i}_seed{s}.jpg"})
 m={"experiment":"mock","frozen_before_any_editing":True,"records":recs,
    "gen_seeds":[101,202],"images_per_checkpoint":len(recs)}
@@ -335,6 +353,39 @@ cat > "${ROOT}/tiny_contract.json" <<'EOF'
             "a.attn2.to_v.weight":{"shape":[2,3],"dtype":"torch.float32"}}}
 EOF
 export SEQ_CKPT_CONTRACT="${ROOT}/tiny_contract.json"
+
+# A mock base-model contract matching the sandbox backbone, so M0 can be
+# validated under the explicit base-model identity policy rather than as an
+# exception. Also export the frozen manifest identity the launcher now requires
+# from CONFIGURATION (never read out of the manifest being validated).
+mkdir -p "${SEQ_BASE_MODEL}/unet"
+echo '{"_class_name":"MockPipeline"}' > "${SEQ_BASE_MODEL}/model_index.json"
+echo '{"mock":1}'                    > "${SEQ_BASE_MODEL}/unet/config.json"
+head -c 128 /dev/zero               > "${SEQ_BASE_MODEL}/unet/w.safetensors"
+export SEQ_BASE_MODEL_CONTRACT="${ROOT}/base_model_contract.json"
+"$MOCK_PY" - "$SEQ_BASE_MODEL" "$SEQ_BASE_MODEL_CONTRACT" <<'MOCKBM'
+import hashlib, json, sys
+from pathlib import Path
+base, out = Path(sys.argv[1]), Path(sys.argv[2])
+small = ["model_index.json", "unet/config.json"]
+weights = ["unet/w.safetensors"]
+cheap = {r: {"sha256": hashlib.sha256((base / r).read_bytes()).hexdigest(),
+             "bytes": (base / r).stat().st_size} for r in small}
+sizes = {r: (base / r).stat().st_size for r in weights}
+payload = {"cheap_identity_files": cheap, "weight_file_bytes": sizes}
+out.write_text(json.dumps({
+    "base_model_dir": str(base),
+    "cheap_identity_sha256": hashlib.sha256(
+        json.dumps(payload, sort_keys=True).encode()).hexdigest(),
+    "cheap_identity_payload": payload,
+    "m0_policy": {"shared_evaluation": "generated once, counted once"},
+}, indent=2))
+print("mock base-model contract written")
+MOCKBM
+export SEQ_EVAL_MANIFEST_SHA="$("$MOCK_PY" -c "
+import json,sys; print(json.load(open(sys.argv[1]))['manifest_sha256'])
+" "$SEQ_EVAL_MANIFEST")"
+echo "mock manifest identity: ${SEQ_EVAL_MANIFEST_SHA:0:12}..."
 
 # A valid shared M0 evaluation, built with the same mocks. run_seed.sh symlinks
 # eval_seed<N>/M0 to it, so without this the M0 stage is legitimately invalid
@@ -528,6 +579,73 @@ A="$( PATH="${BIN}:$PATH" bash -c "source ${REPO}/scripts/seq/exp_config.sh; seq
 B="$( PATH="${BIN}:$PATH" bash -c "source ${REPO}/scripts/seq/exp_config.sh; seq_resolve_eval_root 29" 2>/dev/null )"
 if [ "$A" = "$B" ] && [ -n "$A" ]; then ok "one shared policy returns one directory"
 else bad "shared policy" "got '$A' and '$B'"; fi
+
+echo
+echo "=== 15b. a short completed-step counter is rejected ==="
+reset_seed 29
+MOCK_TRAIN_BREAK="short_counter" run_seed 29 "${ROOT}/t15b.log"; RC=$?
+want_rc "400-of-1000 completed steps rejected" 1 "$RC"
+want_out "names the incomplete trajectory" "${ROOT}/t15b.log" "did not complete"
+
+echo
+echo "=== 15c. a missing completed-step counter is rejected for a NON-legacy seed ==="
+# Seed 29 is on the DEFAULT legacy list (SEQ_LEGACY_TRAIN_SEEDS="17 29"), which
+# is correct for the saved pilot. Point the list at a seed that is NOT 29 so
+# this run is treated as new and the strict 'counter' policy is under test.
+# (An empty string would not work: exp_config.sh uses ${VAR:-default}, which
+# substitutes the default on empty as well as unset.)
+reset_seed 29
+SEQ_LEGACY_TRAIN_SEEDS="99" MOCK_TRAIN_BREAK="no_counter" \
+    run_seed 29 "${ROOT}/t15c.log"; RC=$?
+want_rc "absent counter rejected when the seed is not declared legacy" 1 "$RC"
+want_out "says completion cannot be evidenced" "${ROOT}/t15c.log" "cannot be evidenced"
+want_out "points at the explicit legacy option" "${ROOT}/t15c.log" "legacy_optional"
+
+echo
+echo "=== 15c2. a short counter is rejected EVEN under the legacy policy ==="
+reset_seed 29
+SEQ_LEGACY_TRAIN_SEEDS="29" MOCK_TRAIN_BREAK="short_counter" \
+    run_seed 29 "${ROOT}/t15c2.log"; RC=$?
+want_rc "legacy policy cannot wave through a present-but-short counter" 1 "$RC"
+want_out "names the incomplete trajectory" "${ROOT}/t15c2.log" "did not complete"
+
+echo
+echo "=== 15d. declared-legacy seed accepts an absent counter, structurally ==="
+reset_seed 29
+SEQ_LEGACY_TRAIN_SEEDS="29" MOCK_TRAIN_BREAK="no_counter" \
+    run_seed 29 "${ROOT}/t15d.log"; RC=$?
+want_rc "declared legacy seed still completes" 0 "$RC"
+want_out "announces the legacy policy" "${ROOT}/t15d.log" "declared LEGACY"
+want_out "records completion as unverified" "${ROOT}/t15d.log" "UNVERIFIED"
+want_not "no retraining was implied" "${ROOT}/t15d.log" "[FAIL]"
+
+echo
+echo "=== 15e. stale generation hash rejected in BOTH paths ==="
+reset_seed 29
+MOCK_GEN_BREAK="stale_ckpt_hash" run_seed 29 "${ROOT}/t15e.log"; RC=$?
+want_rc "launch path rejects a stale evaluation" 1 "$RC"
+want_out "names the staleness" "${ROOT}/t15e.log" "stale with respect to its checkpoint"
+# Produce a clean seed, then corrupt only the recorded generation hash so the
+# ANALYSIS path has to catch it on its own.
+reset_seed 29
+run_seed 29 /dev/null 2>&1
+"$MOCK_PY" - "${SEQ}/eval_seed29/MA/image_report.json" <<'TAMPER'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p))
+d["checkpoint_load"]["sha256"] = "dead" + "b" * 60
+json.dump(d, open(p, "w"))
+TAMPER
+run_analysis 29 "${ROOT}/t15f.log"; RC=$?
+want_rc "analysis path rejects a stale evaluation" 1 "$RC"
+want_out "analysis names the staleness" "${ROOT}/t15f.log" "stale with respect to its checkpoint"
+want_out "analysis publishes nothing" "${ROOT}/t15f.log" "do not validate"
+
+echo
+echo "=== 15g. a missing recorded generation hash is rejected ==="
+reset_seed 29
+MOCK_GEN_BREAK="no_ckpt_hash" run_seed 29 "${ROOT}/t15g.log"; RC=$?
+want_rc "absent generation hash rejected" 1 "$RC"
+want_out "says the generating model is unidentifiable" "${ROOT}/t15g.log" "records no sha256"
 
 echo
 echo "=== 16b. a busy GPU is never used ==="

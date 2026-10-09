@@ -31,23 +31,43 @@ for f in "$SEQ_EVAL_MANIFEST" "$SEQ_CKPT_CONTRACT" "$SEQ_GEN_SETTINGS_CONTRACT" 
          "$SEQ_VALIDATOR"; do
     [ -s "$f" ] || { echo "FATAL: required contract/validator missing: $f" >&2; exit 1; }
 done
-MANIFEST_SHA="$(python - "$SEQ_EVAL_MANIFEST" <<'PY'
-import json,sys; print(json.load(open(sys.argv[1])).get("manifest_sha256",""))
-PY
-)"
-[ -n "$MANIFEST_SHA" ] || { echo "FATAL: manifest carries no manifest_sha256" >&2; exit 1; }
+# Frozen expected identity from CONFIGURATION, not from the manifest being
+# validated.
+MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:?SEQ_EVAL_MANIFEST_SHA must be set}"
+STEPS_EVIDENCE="$(seq_steps_evidence "$SEED")"
+
+ckpt_sha() {   # ckpt_sha <name>
+    local f="${MODELS}/$1/delta.bin"
+    [ -s "$f" ] || return 1
+    sha256sum "$f" | cut -d" " -f1
+}
 
 # Refuse to analyse a seed whose evaluations do not validate. A short, stale or
 # malformed detections.jsonl would otherwise be aggregated into rates that look
 # finished.
 INVALID=()
 for ck in M0 MA MAB MAB_L2 MAC MAC_L2; do
-    shared=(); [ "$ck" = "M0" ] && shared=(--allow_shared_images)
+    extra=()
+    if [ "$ck" = "M0" ]; then
+        # Same explicit policy as the launcher: declared reuse plus base-model
+        # identity, because M0 applies no delta.
+        extra=(--allow_shared_images --base_model_contract "$SEQ_BASE_MODEL_CONTRACT")
+    else
+        # Bind each evaluation to the checkpoint now on disk. The analysis path
+        # needs this as much as the launch path: aggregating an evaluation that
+        # was generated from a different same-named checkpoint would silently
+        # mix evidence from two models.
+        if ! sha="$(ckpt_sha "$ck")"; then
+            echo "    ${ck}: delta.bin missing or empty; cannot bind evaluation" >&2
+            INVALID+=("$ck"); continue
+        fi
+        extra=(--expect_sha "$sha")
+    fi
     if ! CUDA_VISIBLE_DEVICES="" python "$SEQ_VALIDATOR" eval "$ck" \
             --eval_root "$EVALR" --manifest "$SEQ_EVAL_MANIFEST" \
             --expect_manifest_sha "$MANIFEST_SHA" \
             --expect_gen_settings "$SEQ_GEN_SETTINGS_CONTRACT" \
-            --require_images "${shared[@]}" 2>&1 | sed 's/^/    /'; then
+            --require_images "${extra[@]}" 2>&1 | sed 's/^/    /'; then
         INVALID+=("$ck")
     fi
 done

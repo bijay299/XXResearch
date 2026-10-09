@@ -259,11 +259,45 @@ def main() -> int:
     l2sp_mod.calculate_l2sp_loss = instrumented_l2sp
     train_conabl.calculate_l2sp_loss = instrumented_l2sp
 
+    # ---- 3b. instrument the ACTUAL optimizer-step counter -----------------
+    # Upstream increments its own completed-step count inside
+    # update_progress_and_checkpoint, which it calls only when gradients are
+    # synced, and returns the updated value. Wrapping that captures the
+    # trainer's authoritative count of real optimizer updates.
+    #
+    # This exists because the previous completion check was circular: the report
+    # stored seconds_per_optimizer_step = train_seconds / iterations_requested,
+    # and the validator then divided those two quantities back, recovering
+    # iterations_requested by construction and comparing the request against
+    # itself. A completed-step count must come from the optimizer loop, never
+    # from the request, a timestamp, epoch capacity or the L2-SP trace.
+    orig_update = train_conabl.update_progress_and_checkpoint
+    step_state = {"completed": 0, "calls": 0}
+
+    def instrumented_update(*a, **kw):
+        n = orig_update(*a, **kw)
+        step_state["calls"] += 1
+        try:
+            step_state["completed"] = max(step_state["completed"], int(n))
+        except (TypeError, ValueError):
+            pass
+        return n
+
+    train_conabl.update_progress_and_checkpoint = instrumented_update
+
     # ---- 4. train ---------------------------------------------------------
     t0 = time.time()
     torch.cuda.reset_peak_memory_stats()
     train_conabl.main(up_args)
     train_seconds = time.time() - t0
+    steps_completed = int(step_state["completed"])
+    print(f"[verify] optimizer steps completed (upstream counter): "
+          f"{steps_completed} over {step_state['calls']} sync points")
+    if steps_completed != int(up_args.iterations):
+        print(f"[warn] completed {steps_completed} optimizer steps but "
+              f"{up_args.iterations} were requested; the report will record the "
+              f"actual count and validation will reject it as incomplete",
+              file=sys.stderr)
 
     # ---- 5. record effective hyperparameters ------------------------------
     # NOTE: upstream's setup_training_configuration MUTATES args.learning_rate in
@@ -337,7 +371,18 @@ def main() -> int:
     }
     report["runtime"] = {
         "train_seconds": round(train_seconds, 1),
-        "seconds_per_optimizer_step": round(train_seconds / max(1, up_args.iterations), 3),
+        # ACTUAL completed optimizer updates, from upstream's own counter. This
+        # is the only field that evidences training completion.
+        "optimizer_steps_completed": steps_completed,
+        "optimizer_steps_source": ("upstream update_progress_and_checkpoint "
+                                   "return value, captured per gradient sync"),
+        "optimizer_sync_points": step_state["calls"],
+        # DERIVED from train_seconds and the COMPLETED step count -- a
+        # throughput figure only. It is not evidence of completion: dividing
+        # train_seconds by it merely returns the denominator used here.
+        "seconds_per_optimizer_step": round(
+            train_seconds / max(1, steps_completed), 3),
+        "seconds_per_optimizer_step_is_derived": True,
         "peak_gpu_mem_mib": round(torch.cuda.max_memory_allocated() / 2**20),
         "peak_gpu_mem_reserved_mib": round(torch.cuda.max_memory_reserved() / 2**20),
     }

@@ -43,11 +43,24 @@ for f in "$SEQ_EVAL_MANIFEST" "$SEQ_CKPT_CONTRACT" "$SEQ_GEN_SETTINGS_CONTRACT" 
          "$SEQ_VALIDATOR"; do
     [ -s "$f" ] || { echo "FATAL: required contract/validator missing: $f" >&2; exit 1; }
 done
-MANIFEST_SHA="$(python - "$SEQ_EVAL_MANIFEST" <<'PY'
-import json,sys; print(json.load(open(sys.argv[1])).get("manifest_sha256",""))
-PY
-)"
-[ -n "$MANIFEST_SHA" ] || { echo "FATAL: manifest carries no manifest_sha256" >&2; exit 1; }
+# The frozen expected identity comes from CONFIGURATION, never from the
+# manifest being validated: reading the claimed digest out of that same file
+# would make content tampering invisible.
+MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:?SEQ_EVAL_MANIFEST_SHA must be set}"
+STEPS_EVIDENCE="$(seq_steps_evidence "$SEED")"
+echo "seed ${SEED}: manifest identity ${MANIFEST_SHA:0:12}..., steps evidence=${STEPS_EVIDENCE}"
+if [ "$STEPS_EVIDENCE" = "legacy_optional" ]; then
+    echo "seed ${SEED}: declared LEGACY (SEQ_LEGACY_TRAIN_SEEDS) -- training completion" \
+         "will be reported UNVERIFIED where no step counter exists; structural" \
+         "validation still applies and nothing is retrained on that basis."
+fi
+
+# sha256 of a checkpoint currently on disk, so an evaluation can be bound to it.
+ckpt_sha() {   # ckpt_sha <name>
+    local f="${MODELS}/$1/delta.bin"
+    [ -s "$f" ] || return 1
+    sha256sum "$f" | cut -d" " -f1
+}
 
 # The idle-GPU selector is a seam so the CPU test suite can substitute a mock.
 # It defaults to the real fail-closed selector; an override is only ever set by
@@ -76,19 +89,32 @@ validate_train() {   # validate_train <name>
         --expect_seed "$SEED" --expect_parent "$(req_parent "$1")" \
         --expect_target "$(req_target "$1")" --expect_anchor "$(req_anchor "$1")" \
         --expect_l2sp "$(req_l2sp "$1")" --expect_steps "$SEQ_ITERATIONS" \
+        --steps_evidence "$STEPS_EVIDENCE" \
         --write_marker
 }
 
 validate_eval() {    # validate_eval <checkpoint>
-    local shared=()
-    # M0 is one evaluation set reused by every seed. That reuse is DECLARED
-    # here, never inferred from the directory layout.
-    [ "$1" = "M0" ] && shared=(--allow_shared_images)
+    local extra=() sha
+    if [ "$1" = "M0" ]; then
+        # M0 is one evaluation set reused by every seed, and it applies no
+        # delta: its identity is the BASE MODEL, asserted via the base-model
+        # contract. Both facts are declared, not left as an exception.
+        extra=(--allow_shared_images --base_model_contract "$SEQ_BASE_MODEL_CONTRACT")
+    else
+        # Bind the images to the checkpoint on disk RIGHT NOW. Without this, an
+        # evaluation generated from an older same-named checkpoint validates clean.
+        if ! sha="$(ckpt_sha "$1")"; then
+            echo "[FAIL] eval $1: ${MODELS}/$1/delta.bin missing or empty, so the" \
+                 "evaluation cannot be bound to a checkpoint" >&2
+            return 1
+        fi
+        extra=(--expect_sha "$sha")
+    fi
     CUDA_VISIBLE_DEVICES="" python "$SEQ_VALIDATOR" eval "$1" \
         --eval_root "$EVALR" --manifest "$SEQ_EVAL_MANIFEST" \
         --expect_manifest_sha "$MANIFEST_SHA" \
         --expect_gen_settings "$SEQ_GEN_SETTINGS_CONTRACT" \
-        --require_images "${shared[@]}" --write_marker
+        --require_images "${extra[@]}" --write_marker
 }
 
 # Move a failed artifact aside with a reason. Evidence is preserved, never
@@ -164,6 +190,7 @@ evaluate() {   # evaluate <gpu> <name>
             --expect_seed "$SEED" --expect_parent "$(req_parent "$ck")" \
             --expect_target "$(req_target "$ck")" --expect_anchor "$(req_anchor "$ck")" \
             --expect_l2sp "$(req_l2sp "$ck")" --expect_steps "$SEQ_ITERATIONS" \
+            --steps_evidence "$STEPS_EVIDENCE" \
             >/dev/null 2>&1; then
         echo "[FAIL] eval ${ck}: its training checkpoint does not validate; " \
              "refusing to evaluate an unverified checkpoint" >&2

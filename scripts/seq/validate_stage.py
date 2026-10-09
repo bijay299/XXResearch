@@ -85,6 +85,45 @@ def sha256_file(p: Path, chunk: int = 1 << 20) -> str:
     return h.hexdigest()
 
 
+DIGEST_FIELD = "manifest_sha256"
+
+
+def canonical_manifest_digest(man: dict) -> str:
+    """The ONE canonical manifest digest rule.
+
+    sha256 over ``json.dumps(payload, sort_keys=True)`` of the whole manifest
+    with the digest field itself removed. Defined in exactly one place so a
+    caller cannot accidentally use a different rule, and recomputed from the
+    manifest's own CONTENT so that altering a prompt text changes the digest
+    even when prompt ids, row counts and the stored digest field are preserved.
+
+    This is the rule the frozen pilot manifest was built with, so that manifest
+    needs no migration. The AUDIT-01b draft manifests were built with a
+    different rule (indent=2) and were explicitly migrated; see
+    results/audit_v1/draft_manifests/FREEZE.md.
+    """
+    payload = {k: v for k, v in man.items() if k != DIGEST_FIELD}
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+
+def _base_model_cheap_identity(base: Path, contract: dict) -> str | None:
+    """Recompute the backbone's cheap identity exactly as the contract defines it."""
+    payload = contract.get("cheap_identity_payload") or {}
+    cheap, sizes = {}, {}
+    for rel in (payload.get("cheap_identity_files") or {}):
+        p = base / rel
+        if not p.is_file():
+            return None
+        cheap[rel] = {"sha256": sha256_file(p), "bytes": p.stat().st_size}
+    for rel in (payload.get("weight_file_bytes") or {}):
+        p = base / rel
+        if not p.is_file():
+            return None
+        sizes[rel] = p.stat().st_size
+    body = {"cheap_identity_files": cheap, "weight_file_bytes": sizes}
+    return hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
+
+
 def load_json(p: Path):
     """Parse JSON, distinguishing 'absent' from 'present but unparseable'."""
     if not p.exists():
@@ -142,43 +181,85 @@ def validate_training(args) -> Result:
         r.bad(f"effective_hyperparameters.seed is {eh.get('seed')!r}, "
               f"this request is {args.expect_seed!r}")
 
-    # 3. optimizer-step count actually completed
+    # 3. optimizer steps ACTUALLY COMPLETED.
+    #
+    # The previous runtime cross-check was circular and could never fail:
+    # train_request.py sets
+    #     seconds_per_optimizer_step = train_seconds / iterations_requested
+    # and the validator then computed train_seconds / seconds_per_optimizer_step,
+    # which returns iterations_requested by construction. It compared the request
+    # against itself.
+    #
+    # Completion is now evidenced only by an explicit counter of real optimizer
+    # updates, recorded by train_request.py from the trainer's own progress
+    # output. It is NEVER inferred from the requested iteration count, from
+    # timestamps, from epoch capacity, or from the L2-SP trace.
     want_steps = args.expect_steps
     if want_steps is not None:
         got = eh.get("iterations_requested")
         if got is None or int(got) != int(want_steps):
-            r.bad(f"iterations_requested is {got!r}, this request is {want_steps}")
+            r.bad(f"iterations_requested is {got!r}, this request is {want_steps} "
+                  f"(this is the REQUEST, not evidence of completion)")
         cap = eh.get("epoch_capacity_steps")
         if cap is not None and int(cap) < int(want_steps):
             r.bad(f"epoch_capacity_steps {cap} < requested {want_steps}: the run "
                   f"could not have completed the requested steps")
-        # l2sp_trace is a REGULARISATION-loss trace, not a step counter: it is
-        # populated only when l2sp_weight > 0 and is legitimately
-        # steps_recorded=0 on every unregularised arm. Only use it as step
-        # evidence where it is actually recorded.
-        regularised = args.expect_l2sp is not None and float(args.expect_l2sp) > 0
-        trace = rep.get("l2sp_trace") or {}
-        rec = trace.get("steps_recorded")
-        if regularised:
+
+        rt = rep.get("runtime") or {}
+        completed = rt.get("optimizer_steps_completed")
+        if completed is None:
+            completed = rep.get("optimizer_steps_completed")
+
+        if completed is not None:
+            try:
+                completed = int(completed)
+            except (TypeError, ValueError):
+                r.bad(f"optimizer_steps_completed is {completed!r}, not an integer")
+                completed = None
+
+        if completed is not None:
+            if completed != int(want_steps):
+                r.bad(f"optimizer_steps_completed is {completed}, request is "
+                      f"{want_steps}: the trajectory did not complete")
+            else:
+                r.info["optimizer_steps_completed"] = completed
+                r.info["training_completion_verified"] = True
+                src = rt.get("optimizer_steps_source") or \
+                      rep.get("optimizer_steps_source")
+                if src:
+                    r.info["step_counter_source"] = src
+        elif args.steps_evidence == "legacy_optional":
+            # An explicitly declared legacy artifact. Structural validation still
+            # applies in full; training completion is simply NOT VERIFIED, and
+            # that is reported rather than papered over. Absence here must never
+            # silently trigger retraining or replacement of saved evidence.
+            r.info["training_completion_verified"] = False
+            r.info["step_count_evidence"] = (
+                "NONE -- declared legacy artifact. This report schema records no "
+                "counter of completed optimizer steps, and the former runtime "
+                "cross-check was circular, so completion is UNVERIFIED. "
+                "Structural validation below is unaffected. No counter has been "
+                "backfilled and no retraining is implied.")
+        else:
+            r.bad("runtime.optimizer_steps_completed absent: training completion "
+                  "cannot be evidenced. The requested iteration count is not "
+                  "evidence, and the former runtime cross-check was circular. "
+                  "For a known-legacy artifact pass --steps_evidence "
+                  "legacy_optional, which records completion as UNVERIFIED "
+                  "instead of inventing a counter.")
+
+        # The L2-SP trace is a regularisation-loss trace, not a step counter: it
+        # is populated only when l2sp_weight > 0 and is legitimately
+        # steps_recorded=0 on every unregularised arm. It is checked only as
+        # evidence that regularisation was active, never as step evidence.
+        if args.expect_l2sp is not None and float(args.expect_l2sp) > 0:
+            trace = rep.get("l2sp_trace") or {}
+            rec = trace.get("steps_recorded")
             if rec is None:
                 r.bad("l2sp_trace.steps_recorded absent on a regularised arm")
-            elif int(rec) != int(want_steps):
-                r.bad(f"l2sp_trace.steps_recorded is {rec}, expected "
-                      f"{want_steps}: the trajectory is short")
-        else:
-            # No direct counter of completed optimizer steps exists for an
-            # unregularised arm in this report schema. Say so rather than
-            # implying the step count was confirmed.
-            r.info["step_count_evidence"] = (
-                "runtime cross-check only -- this schema records no direct "
-                "completed-step counter for unregularised arms")
-        rt = rep.get("runtime") or {}
-        sps, secs = rt.get("seconds_per_optimizer_step"), rt.get("train_seconds")
-        if sps and secs and sps > 0:
-            implied = secs / sps
-            if abs(implied - int(want_steps)) > max(5, 0.02 * int(want_steps)):
-                r.bad(f"runtime implies ~{implied:.0f} optimizer steps, "
-                      f"expected {want_steps}")
+            elif int(rec) <= 0:
+                r.bad(f"l2sp_trace.steps_recorded is {rec} on a regularised arm: "
+                      f"the regulariser does not appear to have been active")
 
     # 4. parent identity: the recorded parent hash must match the parent file
     pv = rep.get("parent_verification") or {}
@@ -332,10 +413,32 @@ def validate_evaluation(args) -> Result:
         return r
     r.info["expected_from_manifest"] = n_expected
 
-    man_sha = man.get("manifest_sha256")
-    if args.expect_manifest_sha and man_sha != args.expect_manifest_sha:
-        r.bad(f"manifest sha256 {str(man_sha)[:12]}… != expected "
-              f"{args.expect_manifest_sha[:12]}…")
+    # Manifest identity is RECOMPUTED over the canonical payload. Reading the
+    # claimed digest out of the same file being validated is no check at all:
+    # altering every prompt text while preserving prompt ids, the row count and
+    # the stored digest field would pass unnoticed.
+    stored_sha = man.get(DIGEST_FIELD)
+    actual_sha = canonical_manifest_digest(man)
+    r.info["manifest_digest_recomputed"] = actual_sha[:12] + "…"
+
+    if not args.expect_manifest_sha:
+        r.cannot("no --expect_manifest_sha given: the manifest's frozen identity "
+                 "cannot be confirmed, so its contents are unverified")
+    elif actual_sha != args.expect_manifest_sha:
+        r.bad(f"manifest CONTENT digest {actual_sha[:12]}… != frozen expected "
+              f"identity {args.expect_manifest_sha[:12]}…: this manifest is not "
+              f"the frozen one (contents altered, or a different manifest)")
+
+    if stored_sha is None:
+        r.bad(f"manifest carries no {DIGEST_FIELD} field")
+    elif stored_sha != actual_sha:
+        r.bad(f"manifest's stored {DIGEST_FIELD} ({str(stored_sha)[:12]}…) does "
+              f"not match its own recomputed content digest ({actual_sha[:12]}…): "
+              f"either the contents were altered after the digest was written, or "
+              f"the file predates the canonical digest rule and needs an explicit, "
+              f"recorded migration")
+    # Every later check compares against the RECOMPUTED digest, not the claim.
+    man_sha = actual_sha
 
     if not det_p.exists():
         r.bad("detections.jsonl absent")
@@ -452,15 +555,71 @@ def validate_evaluation(args) -> Result:
                               f"image_report.generation_settings")
                     elif gs[k] != v:
                         r.bad(f"generation setting {k} is {gs[k]!r}, expected {v!r}")
-        # The checkpoint actually loaded for generation.
+        # ---- identity of the model the images were actually generated from.
+        # This is the binding that makes a stale evaluation detectable. Both
+        # halves are mandatory: an expected hash must be supplied by the caller,
+        # AND the report must actually record one. Previously either being
+        # absent silently skipped the comparison.
         cl = img_rep.get("checkpoint_load") or {}
         if args.name != "M0":
             if cl.get("applied") is not True:
                 r.bad(f"image_report.checkpoint_load.applied is "
                       f"{cl.get('applied')!r}: the delta may not have been used")
-            if args.expect_sha and cl.get("sha256") and cl["sha256"] != args.expect_sha:
-                r.bad(f"images were generated from checkpoint "
-                      f"{cl['sha256'][:12]}…, expected {args.expect_sha[:12]}…")
+            recorded = cl.get("sha256")
+            if not args.expect_sha:
+                r.cannot(f"no --expect_sha given for non-M0 checkpoint "
+                         f"{args.name!r}: the model these images were generated "
+                         f"from cannot be bound to the checkpoint on disk, so a "
+                         f"stale evaluation would be undetectable")
+            elif not recorded:
+                r.bad(f"image_report.checkpoint_load records no sha256, so the "
+                      f"generating model is unidentifiable; expected "
+                      f"{args.expect_sha[:12]}…")
+            elif recorded != args.expect_sha:
+                r.bad(f"images were generated from checkpoint {recorded[:12]}…, "
+                      f"but the checkpoint now on disk is {args.expect_sha[:12]}…: "
+                      f"this evaluation is stale with respect to its checkpoint")
+            else:
+                r.info["generating_checkpoint"] = recorded[:12] + "…"
+        else:
+            # M0 applies no delta, so its identity IS the base model. Handled by
+            # an explicit policy, not as an exception to the binding above.
+            bm, bmerr = load_json(Path(args.base_model_contract)) \
+                if args.base_model_contract else (None, "not supplied")
+            if bmerr:
+                r.cannot(f"base-model contract unavailable ({bmerr}): M0's "
+                         f"identity cannot be confirmed")
+            else:
+                pol = bm.get("m0_policy", {})
+                if cl.get("applied") is not False:
+                    r.bad(f"M0 must apply no delta, but checkpoint_load.applied "
+                          f"is {cl.get('applied')!r}")
+                if cl.get("unet_ckpt") is not None:
+                    r.bad(f"M0 must load no delta, but checkpoint_load.unet_ckpt "
+                          f"is {cl.get('unet_ckpt')!r}")
+                if cl.get("sha256"):
+                    r.bad(f"M0 records a delta hash ({cl['sha256'][:12]}…); it "
+                          f"must record none")
+                want_dir = bm.get("base_model_dir")
+                got_dir = img_rep.get("base_model_dir")
+                if want_dir and got_dir != want_dir:
+                    r.bad(f"M0 was generated from base model {got_dir!r}, "
+                          f"contract declares {want_dir!r}")
+                if args.verify_base_model:
+                    ident = _base_model_cheap_identity(Path(want_dir), bm)
+                    if ident != bm.get("cheap_identity_sha256"):
+                        r.bad(f"base-model identity {str(ident)[:12]}… != contract "
+                              f"{str(bm.get('cheap_identity_sha256'))[:12]}…: the "
+                              f"backbone on disk has changed")
+                    else:
+                        r.info["base_model_identity"] = "verified"
+                else:
+                    r.info["base_model_identity"] = (
+                        f"declared via contract ({str(bm.get('cheap_identity_sha256'))[:12]}…); "
+                        f"pass --verify_base_model to re-hash the backbone")
+                r.info["m0_policy"] = (
+                    f"no delta applied; shared evaluation counted once "
+                    f"({pol.get('shared_evaluation', 'see contract')[:48]}…)")
     if det_rep:
         if det_rep.get("complete") is not True:
             r.bad(f"detect_report.complete is {det_rep.get('complete')!r}")
@@ -502,6 +661,70 @@ def validate_evaluation(args) -> Result:
     return r
 
 
+# ------------------------------------------------------------------ manifest
+def validate_manifest(args) -> Result:
+    """Validate a frozen manifest standalone, against its expected identity.
+
+    Exists so the proposed development and test manifests can be checked
+    directly -- not only incidentally, via an evaluation that happens to use
+    them -- and so a format/hash migration can be demonstrated rather than
+    asserted.
+    """
+    r = Result("manifest", args.name)
+    man, err = load_json(Path(args.manifest))
+    if err:
+        r.bad(err)
+        return r
+
+    stored = man.get(DIGEST_FIELD)
+    actual = canonical_manifest_digest(man)
+    r.info["content_digest"] = actual
+
+    if not args.expect_manifest_sha:
+        r.cannot("no --expect_manifest_sha given: there is no frozen identity to "
+                 "compare the recomputed content digest against")
+    elif actual != args.expect_manifest_sha:
+        r.bad(f"content digest {actual[:12]}… != frozen expected identity "
+              f"{args.expect_manifest_sha[:12]}…")
+    if stored is None:
+        r.bad(f"no {DIGEST_FIELD} field")
+    elif stored != actual:
+        r.bad(f"stored {DIGEST_FIELD} {str(stored)[:12]}… != recomputed content "
+              f"digest {actual[:12]}… (altered after writing, or an un-migrated "
+              f"digest rule)")
+
+    recs = man.get("records")
+    if not recs:
+        r.bad("manifest has no 'records'")
+        return r
+    ids = [(x.get("category"), x.get("prompt_id"), x.get("gen_seed")) for x in recs]
+    dups = {k for k, c in Counter(ids).items() if c > 1}
+    if dups:
+        r.bad(f"{len(dups)} duplicate (category, prompt_id, gen_seed) identities")
+    texts = {x.get("prompt") for x in recs}
+    pids = {x.get("prompt_id") for x in recs}
+    missing_text = [x.get("prompt_id") for x in recs if not x.get("prompt")]
+    if missing_text:
+        r.bad(f"{len(missing_text)} record(s) carry no prompt text, e.g. "
+              f"{missing_text[:2]}")
+    if len(texts) != len(pids):
+        r.bad(f"{len(pids)} distinct prompt_ids but {len(texts)} distinct prompt "
+              f"texts: ids and texts are not in one-to-one correspondence, so a "
+              f"text could have been changed without changing an id")
+    r.info["records"] = len(recs)
+    r.info["distinct_prompt_ids"] = len(pids)
+    r.info["distinct_prompt_texts"] = len(texts)
+    r.info["counting"] = (f"{len(texts)} prompt texts x "
+                          f"{len(man.get('gen_seeds') or [])} generation seeds = "
+                          f"{len(recs)} prompt x generation-seed pairs")
+    if args.expect_records is not None and len(recs) != args.expect_records:
+        r.bad(f"{len(recs)} records, expected {args.expect_records}")
+    if args.expect_prompt_texts is not None and len(texts) != args.expect_prompt_texts:
+        r.bad(f"{len(texts)} distinct prompt texts, expected "
+              f"{args.expect_prompt_texts}")
+    return r
+
+
 # -------------------------------------------------------------------- marker
 def write_marker(args, r: Result) -> None:
     """Write completion metadata atomically, only after validation passed."""
@@ -532,7 +755,7 @@ def write_marker(args, r: Result) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("stage", choices=["train", "eval"])
+    ap.add_argument("stage", choices=["train", "eval", "manifest"])
     ap.add_argument("name")
     ap.add_argument("--models_root", default="")
     ap.add_argument("--eval_root", default="")
@@ -544,7 +767,21 @@ def main() -> int:
     ap.add_argument("--expect_anchor", default=None)
     ap.add_argument("--expect_l2sp", type=float, default=None)
     ap.add_argument("--expect_steps", type=int, default=None)
-    ap.add_argument("--expect_sha", default=None)
+    ap.add_argument("--expect_sha", default=None,
+                    help="sha256 of the checkpoint on disk; REQUIRED for every "
+                         "non-M0 evaluation so the images can be bound to it")
+    ap.add_argument("--base_model_contract", default="configs/base_model_contract.json",
+                    help="base-model identity contract, used for the M0 policy")
+    ap.add_argument("--verify_base_model", action="store_true",
+                    help="re-hash the backbone's identity files (slower)")
+    ap.add_argument("--expect_records", type=int, default=None)
+    ap.add_argument("--expect_prompt_texts", type=int, default=None)
+    ap.add_argument("--steps_evidence", choices=["counter", "legacy_optional"],
+                    default="counter",
+                    help="'counter' (default) requires an explicit "
+                         "optimizer_steps_completed; 'legacy_optional' accepts its "
+                         "absence on a declared legacy artifact and records "
+                         "training completion as UNVERIFIED")
     ap.add_argument("--expect_manifest_sha", default=None)
     ap.add_argument("--expect_gen_settings", default=None)
     ap.add_argument("--require_images", action="store_true")
@@ -557,12 +794,16 @@ def main() -> int:
     if args.stage == "train" and not args.models_root:
         print("--models_root is required for stage 'train'", file=sys.stderr)
         return 2
+    if args.stage == "manifest" and not args.manifest:
+        print("--manifest is required for stage 'manifest'", file=sys.stderr)
+        return 2
     if args.stage == "eval" and not (args.eval_root and args.manifest):
         print("--eval_root and --manifest are required for stage 'eval'",
               file=sys.stderr)
         return 2
 
     r = (validate_training(args) if args.stage == "train"
+         else validate_manifest(args) if args.stage == "manifest"
          else validate_evaluation(args))
     rc = r.report()
     if rc == 0 and args.write_marker:

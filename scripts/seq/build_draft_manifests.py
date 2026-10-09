@@ -24,9 +24,13 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from collections import Counter
 from difflib import SequenceMatcher
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from validate_stage import canonical_manifest_digest  # noqa: E402
 
 # Development set: DOG ONLY, by design. Matching is done on dog suppression, and
 # 20 prompt texts x 4 generation seeds = 80 images per checkpoint is the whole
@@ -300,8 +304,11 @@ def main() -> int:
                 "training seeds and must never be reused as such"),
             "records": recs,
         }
-        body = json.dumps(m, indent=2, sort_keys=True)
-        m["manifest_sha256"] = hashlib.sha256(body.encode()).hexdigest()
+        # ONE canonical digest rule, imported from the validator so a second
+        # copy cannot drift from it. Earlier drafts used json.dumps(indent=2)
+        # and were explicitly migrated; the superseded files and both digests
+        # are preserved under draft_manifests/superseded_indent2_rule/.
+        m["manifest_sha256"] = canonical_manifest_digest(m)
         return m
 
     dev_m = manifest(
@@ -455,7 +462,30 @@ stated rather than assumed away.
 8. Generation seeds are evaluation-side RNG only and are never reused as
    training seeds.
 
-Re-derive with `python scripts/seq/build_draft_manifests.py` (CPU, no GPU).
+## Digest rule
+
+Identities use the ONE canonical rule, `sha256` over
+`json.dumps(manifest_without_its_digest_field, sort_keys=True)`, defined in
+`scripts/seq/validate_stage.py:canonical_manifest_digest` and imported here so a
+second copy cannot drift. Validation **recomputes** this digest from the
+manifest's contents and compares it with the frozen identity above, so altering
+a prompt text is detected even when prompt ids, the row count and the stored
+digest field are preserved.
+
+These drafts were migrated to that rule from an earlier `indent=2` rule; the
+prompt sets are byte-identical and only the identities changed. Both digests,
+the reason, and the verbatim superseded drafts are recorded in
+[`DIGEST_MIGRATION.md`](DIGEST_MIGRATION.md) and
+[`superseded_indent2_rule/`](superseded_indent2_rule/). The frozen pilot
+manifest needs no migration under this rule.
+
+Re-derive with `python scripts/seq/build_draft_manifests.py` (CPU, no GPU), and
+check an identity with:
+
+    python scripts/seq/validate_stage.py manifest dev \\
+        --manifest results/audit_v1/draft_manifests/dev_manifest_DRAFT.json \\
+        --expect_manifest_sha <the hash above> \\
+        --expect_records 80 --expect_prompt_texts 20
 """
     (out / "FREEZE.md").write_text(freeze)
 

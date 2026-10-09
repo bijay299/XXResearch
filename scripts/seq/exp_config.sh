@@ -121,3 +121,33 @@ export SEQ_EVAL_MANIFEST="${SEQ_EVAL_MANIFEST:-${SEQ_ROOT}/eval_manifest.json}"
 export SEQ_GEN_SETTINGS_CONTRACT="${SEQ_GEN_SETTINGS_CONTRACT:-${PILOT_REPO_ROOT}/configs/generation_settings.json}"
 export SEQ_CKPT_CONTRACT="${SEQ_CKPT_CONTRACT:-${PILOT_REPO_ROOT}/configs/checkpoint_contract.json}"
 export SEQ_VALIDATOR="${SEQ_VALIDATOR:-${PILOT_REPO_ROOT}/scripts/seq/validate_stage.py}"
+
+# ---------------------------------------------------------------------------
+# EXPLICIT legacy-evidence policy.
+#
+# The saved pilot (seeds 17 and 29, commit a9de625) was trained before
+# train_request.py recorded optimizer_steps_completed, and the completion check
+# in use at the time was circular. Those ten reports therefore carry NO evidence
+# of training completion. They are still validated STRUCTURALLY in full.
+#
+# Seeds listed here are validated with --steps_evidence legacy_optional, which
+# accepts the counter's absence and records training completion as UNVERIFIED.
+# This is deliberate: missing historic evidence must NOT silently trigger
+# retraining or replacement of the saved pilot. Nothing is backfilled.
+#
+# A NEW seed is not listed, so its counter is REQUIRED and its absence fails.
+export SEQ_LEGACY_TRAIN_SEEDS="${SEQ_LEGACY_TRAIN_SEEDS:-17 29}"
+export SEQ_BASE_MODEL_CONTRACT="${SEQ_BASE_MODEL_CONTRACT:-${PILOT_REPO_ROOT}/configs/base_model_contract.json}"
+
+# The frozen expected identity of the evaluation manifest. Validation recomputes
+# the manifest's content digest and compares it against THIS value, rather than
+# against the digest field inside the manifest being validated.
+export SEQ_EVAL_MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:-0020c81c4a4dd3580a6574c91b4aea1a7e349e9e89fc845ed8c2077d47564892}"
+
+seq_steps_evidence() {   # seq_steps_evidence <seed> -> counter | legacy_optional
+    local seed="${1:?seq_steps_evidence <seed>}"
+    for s in $SEQ_LEGACY_TRAIN_SEEDS; do
+        [ "$s" = "$seed" ] && { printf 'legacy_optional\n'; return 0; }
+    done
+    printf 'counter\n'
+}

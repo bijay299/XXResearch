@@ -8,8 +8,8 @@ rules are fixed *before* any approved launch, not chosen afterwards.
 
 | manifest | distinct prompt texts | gen seeds | pairs/checkpoint | sha256 |
 |---|---|---|---|---|
-| `dev_manifest_DRAFT.json` | 20 | [511, 622, 733, 844] | 80 | `1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b` |
-| `test_manifest_DRAFT.json` | 140 | [1301, 1402, 1503, 1604] | 560 | `5dd87dbb5a77c0f4c75de79a19b15b0b2e9cddc90d08172857700dac1bcc2a95` |
+| `dev_manifest_DRAFT.json` | 20 | [511, 622, 733, 844] | 80 | `ebfdd37270dea75012756fdc877fb614a9bd5ae0dd78af76ed426844136e5b89` |
+| `test_manifest_DRAFT.json` | 140 | [1301, 1402, 1503, 1604] | 560 | `170696eb5fc2832b832e7e2baca6c820344ac9636c66e510398c3a19e6ef8ae1` |
 
 Counting, stated explicitly because the pilot conflated these: the development
 set is **20 distinct prompt texts** over 1
@@ -63,27 +63,4 @@ stated rather than assumed away.
 8. Generation seeds are evaluation-side RNG only and are never reused as
    training seeds.
 
-## Digest rule
-
-Identities use the ONE canonical rule, `sha256` over
-`json.dumps(manifest_without_its_digest_field, sort_keys=True)`, defined in
-`scripts/seq/validate_stage.py:canonical_manifest_digest` and imported here so a
-second copy cannot drift. Validation **recomputes** this digest from the
-manifest's contents and compares it with the frozen identity above, so altering
-a prompt text is detected even when prompt ids, the row count and the stored
-digest field are preserved.
-
-These drafts were migrated to that rule from an earlier `indent=2` rule; the
-prompt sets are byte-identical and only the identities changed. Both digests,
-the reason, and the verbatim superseded drafts are recorded in
-[`DIGEST_MIGRATION.md`](DIGEST_MIGRATION.md) and
-[`superseded_indent2_rule/`](superseded_indent2_rule/). The frozen pilot
-manifest needs no migration under this rule.
-
-Re-derive with `python scripts/seq/build_draft_manifests.py` (CPU, no GPU), and
-check an identity with:
-
-    python scripts/seq/validate_stage.py manifest dev \
-        --manifest results/audit_v1/draft_manifests/dev_manifest_DRAFT.json \
-        --expect_manifest_sha <the hash above> \
-        --expect_records 80 --expect_prompt_texts 20
+Re-derive with `python scripts/seq/build_draft_manifests.py` (CPU, no GPU).

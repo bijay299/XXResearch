@@ -82,6 +82,42 @@ has   "$ANA_SH"  'Nothing was published' "analysis says so when it publishes not
 has   "$ANA_SH"  'OPTIONAL_ABSENT' "optional output formats are tracked as optional"
 
 echo
+echo "evaluation is bound to the model that produced it"
+has "$SEED_SH" '--expect_sha' "run_seed.sh passes the on-disk checkpoint hash"
+has "$ANA_SH"  '--expect_sha' "run_analysis.sh passes it too"
+has "$SEED_SH" 'ckpt_sha' "the launcher recomputes the hash from disk"
+has "$ANA_SH"  'ckpt_sha' "the analysis path recomputes it as well"
+has "$SEED_SH" '--base_model_contract' "M0 is validated under a base-model contract"
+has "$ANA_SH"  '--base_model_contract' "analysis applies the same M0 policy"
+hasre "$VALIDATOR" 'records no sha256' "a missing recorded hash is a failure"
+hasre "$VALIDATOR" 'stale with respect to its checkpoint' "a changed checkpoint is named as stale"
+hasntre "$VALIDATOR" 'args\.expect_sha and cl\.get\("sha256"\) and' \
+    "no short-circuit that skips the hash check when either side is absent"
+
+echo
+echo "step completion is evidenced, not inferred"
+has "$VALIDATOR" 'optimizer_steps_completed' "the validator requires a real counter"
+has "scripts/seq/train_request.py" 'optimizer_steps_completed' "the trainer records one"
+has "scripts/seq/train_request.py" 'update_progress_and_checkpoint' \
+    "it comes from upstream's own step counter"
+hasntre "$VALIDATOR" 'implied = secs / sps' "the circular runtime inference is gone"
+hasntre "$VALIDATOR" 'runtime implies' "no step count inferred from timestamps"
+has "$VALIDATOR" 'steps_evidence' "a legacy policy exists and is explicit"
+has "$HERE/exp_config.sh" 'SEQ_LEGACY_TRAIN_SEEDS' "legacy seeds are declared in config"
+has "$VALIDATOR" 'training_completion_verified' "completion is reported as a flag"
+
+echo
+echo "the frozen manifest is validated by content"
+has "$VALIDATOR" 'canonical_manifest_digest' "one canonical digest rule exists"
+hasre "$VALIDATOR" 'man_sha = actual_sha' "later checks use the RECOMPUTED digest"
+has "$VALIDATOR" 'CONTENT digest' "a content mismatch is named as such"
+has "$HERE/exp_config.sh" 'SEQ_EVAL_MANIFEST_SHA' "the frozen identity lives in config"
+hasntre "$SEED_SH" 'manifest_sha256",""' "the launcher no longer reads the digest from the manifest"
+hasntre "$ANA_SH"  'manifest_sha256",""' "nor does the analysis path"
+has "scripts/seq/build_draft_manifests.py" 'canonical_manifest_digest' \
+    "the manifest builder imports the same rule"
+
+echo
 echo "the validator fails closed"
 has "$VALIDATOR" 'UNCHECKED' "a check that cannot be performed fails the stage"
 has "$VALIDATOR" 'os.replace' "completion metadata is written atomically"

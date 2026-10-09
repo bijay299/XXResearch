@@ -1,0 +1,42 @@
+{
+  "_contract": "Base-model identity for the SD-1.5 backbone (M0). Every evaluation uses this backbone; an M0 evaluation is identified BY it, since M0 applies no delta. This replaces treating M0 as an accidental exception to checkpoint-hash binding.",
+  "_derived_from": "the on-disk backbone at AUDIT-01c, 2026-10-09",
+  "base_model_dir": "/data/bijaypandey/cuig_pilot/Generators_substitute/sd-v1-5",
+  "cheap_identity_payload": {
+    "cheap_identity_files": {
+      "model_index.json": {
+        "bytes": 541,
+        "sha256": "e2f6f22e274374010aec30c79eb2d6e53fff4a36ac0225523a92cb2d41a83347"
+      },
+      "scheduler/scheduler_config.json": {
+        "bytes": 308,
+        "sha256": "699cce92eb7c122e2eb7dfdea78e6187fda76a5ed4a8e42319b85610e620e091"
+      },
+      "text_encoder/config.json": {
+        "bytes": 617,
+        "sha256": "845df614cb9327ae7bbea027316246fae917827407da6df13572e41b5f93b4cc"
+      },
+      "unet/config.json": {
+        "bytes": 743,
+        "sha256": "78f474de6bab3d893868f37be97b636ae65c0df3073ed3256ca458ff599b5f96"
+      },
+      "vae/config.json": {
+        "bytes": 547,
+        "sha256": "786a7d21647ddea6a04b9675c03d3cb45e90a2f3c6da5fbda2c54ade040036de"
+      }
+    },
+    "weight_file_bytes": {
+      "unet/diffusion_pytorch_model.safetensors": 3438167540
+    }
+  },
+  "cheap_identity_sha256": "ed806130829f60630fae67b1b065d1e2b87eeaeecf73e58123f0df8963451e38",
+  "m0_policy": {
+    "checkpoint_load.applied": false,
+    "checkpoint_load.unet_ckpt": null,
+    "rationale": "M0 is the untouched backbone: no delta is applied, so its identity is the base model, asserted via base_model_dir plus cheap_identity_sha256. A recorded delta hash must be ABSENT.",
+    "shared_evaluation": "The M0 evaluation set is generated once and reused by every training seed via a symlink. Reuse must be declared with --allow_shared_images and M0 is counted ONCE in any generated-image total."
+  },
+  "weight_sha256": {
+    "unet/diffusion_pytorch_model.safetensors": "19da7aaa4b880e59d56843f1fcb4dd9b599c28a1d9d9af7c1143057c8ffae9f1"
+  }
+}
