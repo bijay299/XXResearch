@@ -1,0 +1,101 @@
+# ---------------------------------------------------------------------------
+# Credentials / local secrets
+# ---------------------------------------------------------------------------
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+private_exports.sh
+secrets/
+.git-credentials
+*token*.txt
+*credential*
+
+# ---------------------------------------------------------------------------
+# Environments (ours live on /data; never commit them)
+# ---------------------------------------------------------------------------
+venv/
+venv-*/
+.venv/
+env/bin/
+env/lib/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# Upstream source trees (vendored by clone at a pinned commit; see
+# third_party/CUIG/UPSTREAM.md). Never commit upstream code into this repo.
+# ---------------------------------------------------------------------------
+third_party/CUIG/src/
+third_party/**/checkout/
+# Root-anchored: an upstream checkout accidentally placed at the repo root.
+# NOT anchored would also swallow third_party/CUIG/, which holds our tracked
+# attribution files (UPSTREAM.md, LICENSE.upstream).
+/CUIG/
+
+# ---------------------------------------------------------------------------
+# Model weights, classifiers, checkpoints
+# ---------------------------------------------------------------------------
+*.pth
+*.pt
+*.bin
+*.ckpt
+*.safetensors
+*.onnx
+Checkpoints/
+checkpoints/
+Generators/
+Classifiers/
+
+# ---------------------------------------------------------------------------
+# Datasets and anchor data (regenerated / downloaded; see docs/ASSETS.md)
+# ---------------------------------------------------------------------------
+data/
+datasets/
+anchor_datasets/
+*.tar
+*.tar.gz
+*.zip
+
+# ---------------------------------------------------------------------------
+# Generated images and large run outputs
+# ---------------------------------------------------------------------------
+images/
+samples/
+outputs/
+runs/
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.mp4
+
+# ---------------------------------------------------------------------------
+# Logs and caches
+# ---------------------------------------------------------------------------
+logs/
+*.log
+cache/
+.cache/
+wandb/
+tensorboard/
+events.out.tfevents.*
+
+# ---------------------------------------------------------------------------
+# Results: keep small metric/summary files, exclude bulky artefacts.
+# (results/**/*.json and *.md are force-added where relevant.)
+# ---------------------------------------------------------------------------
+results/**/images/
+results/**/*.xlsx
+
+# ---------------------------------------------------------------------------
+# OS / editor noise
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
