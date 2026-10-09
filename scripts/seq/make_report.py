@@ -124,6 +124,64 @@ def main() -> int:
               f"(5 literal + 5 paraphrase) × 4 seeds = 280 images per checkpoint; zero "
               f"overlap with training prompts or their target-substituted forms.\n")
 
+    # ---- headline findings, derived from the measured contrasts ------------
+    def credible(c, sign):
+        if not c:
+            return False
+        lo, hi = c["ci95_pp"]
+        return lo > 0 if sign > 0 else hi < 0
+
+    up = [c for c in children if credible(rec[c], +1)]
+    down = [c for c in children if credible(rec[c], -1)]
+    md.append("## Headline findings\n")
+    md.append(f"1. **The first deletion worked.** Cat fell {init['D_M0']:.0f}% → "
+              f"{init['D_MA']:.0f}% ({ci(init)}), so historical recovery is a "
+              "well-posed question here rather than a measurement of noise.\n")
+    if up and down:
+        md.append(f"2. **Historical interference is real but direction depends on the "
+                  f"second request.** Cat detection rose credibly after "
+                  f"{', '.join(up)} and fell further after {', '.join(down)}. "
+                  "Deleting dog — which shares the `horse` anchor with cat and is "
+                  "semantically close — pushed cat *further down*; deleting sandwich, "
+                  "with a different (`flower`) anchor, let cat partially return. "
+                  "A single 'does deletion survive?' answer would misdescribe this.\n")
+    elif up:
+        md.append(f"2. **Historical recovery observed** in {', '.join(up)}.\n")
+    elif down:
+        md.append(f"2. **No recovery**; cat was suppressed further in "
+                  f"{', '.join(down)}.\n")
+    else:
+        md.append("2. **No credible change** in cat detection after the second request.\n")
+
+    l2_pairs = [(a, b) for a, b in (("MAB", "MAB_L2"), ("MAC", "MAC_L2"))
+                if a in rec and b in rec and rec[a] and rec[b] and sup.get(a) and sup.get(b)]
+    if l2_pairs:
+        costs = [f"{a} {sup[a]['diff_pp']:+.1f} → {b} {sup[b]['diff_pp']:+.1f} pp"
+                 for a, b in l2_pairs]
+        md.append(f"3. **L2-SP did not protect the earlier deletion; it bought retention "
+                  f"and paid in new-request effectiveness.** New-target suppression fell "
+                  f"in both branches ({'; '.join(costs)}), and cat recovery did not "
+                  f"decrease — in the sandwich branch it *increased* "
+                  f"({rec['MAC']['diff_pp']:+.1f} → {rec['MAC_L2']['diff_pp']:+.1f} pp). "
+                  "What L2-SP clearly did protect is collateral damage to controls: "
+                  "bird fell "
+                  f"{(ret.get('MAB', {}).get('bird') or {}).get('diff_pp', 0):+.1f} pp "
+                  f"under MAB but only "
+                  f"{(ret.get('MAB_L2', {}).get('bird') or {}).get('diff_pp', 0):+.1f} pp "
+                  "under MAB_L2. This is a **tradeoff**, not an improved method.\n")
+
+    lit_rec = L["historical_cat_recovery"]
+    par_rec = P["historical_cat_recovery"]
+    gaps = [(c, par_rec[c]["diff_pp"] - lit_rec[c]["diff_pp"])
+            for c in children if lit_rec.get(c) and par_rec.get(c)]
+    if gaps and max(g for _, g in gaps) >= 10:
+        worst = max(gaps, key=lambda t: t[1])
+        md.append(f"4. **Recovery is larger under paraphrased prompts.** For {worst[0]} the "
+                  f"paraphrase family recovered {worst[1]:.1f} pp more than the literal "
+                  "family. Measuring erasure only with prompts that name the concept would "
+                  "understate what the edited model still produces.\n")
+    md.append("")
+
     md.append("## Measured results\n")
     md.append("### Raw detection rate D (%) at t=0.5, all prompts\n")
     cats = ["cat", "dog", "sandwich", "horse", "bird", "chair", "bicycle"]
@@ -256,10 +314,18 @@ def main() -> int:
                   "budget (2000, as upstream) **applied identically to every arm it "
                   "compares**, keeping these results rather than replacing them.\n")
     elif any_recovery:
-        md.append("- At least one second request measurably increased cat detection "
-                  "relative to the shared parent. The next experiment should extend the "
-                  "stream beyond two requests and test whether recovery accumulates, and "
-                  "repeat with a second training seed before any claim about magnitude.\n")
+        md.append("- **Separate anchor sharing from semantic similarity.** The two branches "
+                  "differ both in anchor (`horse` vs `flower`) and in semantic distance from "
+                  "cat, and they moved cat in opposite directions. The decisive next run is a "
+                  "second request that is semantically far from cat but *shares* the `horse` "
+                  "anchor, and one that is semantically close but uses a different anchor. "
+                  "Only that factorisation can tell which caused the sign flip.\n"
+                  "- **Does recovery accumulate?** Extend the stream past two requests and "
+                  "test whether cat keeps returning in the sandwich-like branches.\n"
+                  "- **Does the L2-SP tradeoff have a usable setting?** At 25000 it cost most "
+                  "of the sandwich deletion (+50.0 → +7.5 pp). A coefficient sweep — chosen "
+                  "on a held-out split, not on these final numbers — would show whether any "
+                  "value keeps retention without surrendering the new request.\n")
     else:
         md.append("- No branch showed a credible increase in cat detection relative to the "
                   "shared parent. The next experiment should test whether this holds at a "

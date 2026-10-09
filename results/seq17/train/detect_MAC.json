@@ -1,0 +1,31 @@
+{
+  "experiment": "SD-1.5 exploratory sequential object-erasure pilot",
+  "metric_definition": "target detection rate D = fraction of images with >=1 detection of the requested category at confidence >= t",
+  "caveat": "detector-based object-presence proxy; not ground-truth erasure, not an image-quality score; not UA/IRA/CRA",
+  "checkpoint": "MAC",
+  "detector": {
+    "architecture": "fasterrcnn_resnet50_fpn",
+    "weights_enum": "FasterRCNN_ResNet50_FPN_Weights.COCO_V1",
+    "url": "https://download.pytorch.org/models/fasterrcnn_resnet50_fpn_coco-258fb6c6.pth",
+    "local_file": "/data/bijaypandey/cuig_pilot/torch_home/hub/checkpoints/fasterrcnn_resnet50_fpn_coco-258fb6c6.pth",
+    "file_sha256": "258fb6c638b15964ddcdd1ae0748c5eef1be9e732750120cc857feed3faac384",
+    "num_categories_incl_background": 91,
+    "torchvision": "0.19.0+cu121",
+    "mode": "eval()",
+    "preprocessing": "ObjectDetection()",
+    "meta_min_size": [
+      1,
+      1
+    ]
+  },
+  "thresholds": [
+    0.3,
+    0.5,
+    0.7
+  ],
+  "images_scored": 280,
+  "images_expected": 280,
+  "complete": true,
+  "per_image_jsonl": "/data/bijaypandey/cuig_pilot/seq_pilot/eval/MAC/detections.jsonl",
+  "finished_utc": "2026-10-09T05:49:26.090410+00:00"
+}

@@ -163,7 +163,20 @@ def fig_tradeoff(con, out_dir):
     ax2.set_xticklabels(controls, fontsize=9.5)
     ax2.set_ylabel("retention change vs MA (pp)", fontsize=10, color=INK2)
     ax2.set_title("Common controls (not deletion targets)", fontsize=11, color=INK)
-    ax2.legend(frameon=False, fontsize=8, loc="lower left", labelcolor=INK2, ncol=1)
+    # Legend outside the plot: the largest bar (bird under MAB) runs deep enough
+    # that any in-axes placement covers data.
+    ax2.legend(frameon=False, fontsize=8, loc="upper left", bbox_to_anchor=(1.02, 1.0),
+               labelcolor=INK2, ncol=1)
+    # Label the one bar that dominates the scale, so it is readable without
+    # measuring against the axis.
+    worst = min(((ck, (ret.get(ck, {}).get(c) or {}).get("diff_pp", 0), c)
+                 for ck in BRANCH_STYLE for c in controls), key=lambda t: t[1])
+    if worst[1] < -20:
+        j = controls.index(worst[2])
+        i = list(BRANCH_STYLE).index(worst[0])
+        ax2.annotate(f"{worst[1]:+.0f} pp", (j + (i - 1.5) * width, worst[1]),
+                     textcoords="offset points", xytext=(0, -12), ha="center",
+                     fontsize=8.5, color=INK)
 
     fig.text(0.5, -0.06, "Two settings only - no Pareto frontier is claimed. "
              "Branch-specific undeleted targets (dog in the sandwich branch and vice versa) "

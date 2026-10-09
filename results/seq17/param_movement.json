@@ -1,0 +1,48 @@
+{
+  "metric": "relative_l2 = ||vec(X) - vec(R)||_2 / ||vec(R)||_2 over kv-xattn tensors",
+  "caveat": "diagnostic association only; not evidence that weight movement causes historical recovery",
+  "n_tensors": 32,
+  "n_elements": 19169280,
+  "checkpoints": {
+    "MA": {
+      "relative_l2_vs_M0": 0.011841,
+      "max_abs_diff_vs_M0": 0.00479926,
+      "mean_abs_diff_vs_M0": 0.0003673511,
+      "relative_l2_vs_MA": 0.0,
+      "max_abs_diff_vs_MA": 0.0,
+      "mean_abs_diff_vs_MA": 0.0
+    },
+    "MAB": {
+      "relative_l2_vs_M0": 0.020781,
+      "max_abs_diff_vs_M0": 0.00975729,
+      "mean_abs_diff_vs_M0": 0.0006376317,
+      "relative_l2_vs_MA": 0.013582,
+      "max_abs_diff_vs_MA": 0.00583354,
+      "mean_abs_diff_vs_MA": 0.000414254
+    },
+    "MAB_L2": {
+      "relative_l2_vs_M0": 0.012253,
+      "max_abs_diff_vs_M0": 0.00629078,
+      "mean_abs_diff_vs_M0": 0.0003775533,
+      "relative_l2_vs_MA": 0.001537,
+      "max_abs_diff_vs_MA": 0.00359195,
+      "mean_abs_diff_vs_MA": 2.84173e-05
+    },
+    "MAC": {
+      "relative_l2_vs_M0": 0.016732,
+      "max_abs_diff_vs_M0": 0.00627628,
+      "mean_abs_diff_vs_M0": 0.0005355519,
+      "relative_l2_vs_MA": 0.011752,
+      "max_abs_diff_vs_MA": 0.0057454,
+      "mean_abs_diff_vs_MA": 0.0003636202
+    },
+    "MAC_L2": {
+      "relative_l2_vs_M0": 0.011925,
+      "max_abs_diff_vs_M0": 0.00485938,
+      "mean_abs_diff_vs_M0": 0.0003696168,
+      "relative_l2_vs_MA": 0.001475,
+      "max_abs_diff_vs_MA": 0.00384194,
+      "mean_abs_diff_vs_MA": 2.15804e-05
+    }
+  }
+}
