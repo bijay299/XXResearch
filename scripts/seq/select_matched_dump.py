@@ -169,11 +169,36 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
         # the gap is visible rather than just asserted.
         below = [r for r in rows if r["dog_suppression_pp_vs_own_MA"] < l2_sup]
         above = [r for r in rows if r["dog_suppression_pp_vs_own_MA"] >= l2_sup]
+        # When every dump already overshoots the L2 level, the lower bracket is
+        # the PARENT itself: step 0, 0 pp suppression by definition. Reporting
+        # `null` there would hide where the match point actually falls, and the
+        # protocol requires the bracketing steps to be reported.
+        lower = max(below, key=lambda r: r["dog_suppression_pp_vs_own_MA"],
+                    default=None)
+        if lower is None:
+            lower = {"step": 0, "checkpoint": f"seed{seed}_MA",
+                     "dog_residue_pct": ma["dog_residue_pct"],
+                     "dog_hits": ma["dog_hits"], "n_dog_pairs": ma["n_dog_pairs"],
+                     "dog_suppression_pp_vs_own_MA": 0.0,
+                     "is_the_parent_not_a_dump": True,
+                     "note": ("every dump overshoots the L2 level, so the match "
+                              "point lies between the parent (step 0) and the "
+                              "first dump -- inside the frozen 100-step grid, "
+                              "which cannot resolve it"),
+                     "mismatch_vs_L2_pp": round(abs(l2_sup), 4)}
         brk = {
-            "nearest_below": max(below, key=lambda r: r["dog_suppression_pp_vs_own_MA"],
-                                 default=None),
+            "nearest_below": lower,
             "nearest_above": min(above, key=lambda r: r["dog_suppression_pp_vs_own_MA"],
                                  default=None),
+            "gap_pp": (round(min(above, key=lambda r: r["dog_suppression_pp_vs_own_MA"])
+                             ["dog_suppression_pp_vs_own_MA"]
+                             - lower["dog_suppression_pp_vs_own_MA"], 4)
+                       if above else None),
+            "match_point_falls_between": (
+                f"step {lower['step']} ({lower['dog_suppression_pp_vs_own_MA']:.1f} pp) "
+                f"and step {min(above, key=lambda r: r['dog_suppression_pp_vs_own_MA'])['step']} "
+                f"({min(above, key=lambda r: r['dog_suppression_pp_vs_own_MA'])['dog_suppression_pp_vs_own_MA']:.1f} pp)"
+                if above else "above every dump scanned"),
         }
         best = min(rows, key=lambda r: r["mismatch_vs_L2_pp"], default=None)
         out["selected"] = None
