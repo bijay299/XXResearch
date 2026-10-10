@@ -1,39 +1,178 @@
 {
-  "_what_this_is": "Amendment 01 evidence: the decision records, the bridge, the reference bindings, the full analysis (and the superseded earlier analysis), the supervisor log and the GPU usage record. Bulk weights and images stay private; the annotation arm key is NOT here.",
+  "_what_this_is": "Amendment 01 evidence: the decision records, the bridge, the reference bindings, every analysis version, the supervisor log, the GPU usage record, and the RAW per-image detector rows and stage reports for both the development scan and the frozen test. Bulk weights and images stay private; the annotation arm keys are NOT here.",
+  "built_utc": "2026-10-10T22:34:46.525868+00:00",
+  "repo_commit_at_build": "7e01fbd33bfce24fbfe56aada5eba7273429f34c",
   "execution_commit": "0cd9dc611b737e32774c631930ddf5a4199edc27",
   "output_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid",
+  "outcome": "DEVELOPMENT matches were found at step 70 on both seeds. On the FROZEN TEST set the prespecified \u00a75 conditions FAIL: both arms of both seeds fall below the 30 pp suppression gate, and seed 29 additionally exceeds the 5 pp match tolerance (6.25 pp). NEITHER seed supplies a valid matched comparison in the prespecified regime, so the matched-retention question is INCONCLUSIVE there. The bird contrasts and intervals are retained as descriptive results. Human labels remain pending.",
+  "reproducibility": "selection and every interval can be re-derived from this bundle alone: development_slots.tar.gz and frozen_test_slots.tar.gz carry the raw per-image detector rows, and the frozen bootstrap grouping is committed at results/audit_v1/draft_manifests/.",
+  "deliberate_exclusions": {
+    "model_weights": "delta.bin and the 20 early dumps are NOT included; their sha256 digests are in selection.json and bridge_check.json",
+    "generated_images": "~592 MB (413 MB frozen test + 179 MB development) are NOT included; per-image digests are in each slot's image_report.json inside the archives",
+    "annotation_arm_key": "NOT included and not referenced. Both the supplementary 228-item packet's key and the prescribed 180-item paired packet's key stay closed until labels are frozen; nothing from either packet appears in this bundle."
+  },
+  "access_limitations": [
+    {
+      "none": "every listed payload is present and hash-checked"
+    }
+  ],
+  "budget_reconciliation": {
+    "_what_this_is": "A RECOMPUTATION of the existing ledger, for cross-checking only. No entry was added, removed, re-weighted or re-dated.",
+    "n_entries_total": 56,
+    "n_entries_carried_forward": 27,
+    "n_entries_this_amendment": 29,
+    "device_hours_total_from_wall_seconds": 2.9013889,
+    "device_hours_this_amendment_from_wall_seconds": 1.6991667,
+    "device_hours_carried_forward_from_wall_seconds": 1.2022222,
+    "ledger_stored_spent_gpu_hours": 2.901391,
+    "rounding_note": "the ledger's stored total is the sum of per-entry gpu_hours, each rounded at write time; recomputing from wall_seconds gives a value ~2e-6 h (about 8 ms) lower. Both are recorded; neither was altered.",
+    "all_entries_ok": true,
+    "n_open_reservations": 0,
+    "ceiling": "RETIRED (PI, 2026-10-10). The ledger remains a record; it caps nothing. Compute is gated by verified GPU availability instead."
+  },
+  "provisional": "Detector output is a PROXY. No final scientific conclusion follows until the blinded human annotation is complete; no labels exist yet.",
   "files": {
     "STATUS.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/STATUS.json",
+      "note": "supervisor state machine and its full history",
       "sha256": "60627a7f10f99c46b696555e8d473eb9f324e75e63aad1a09d7277828278bf2c",
-      "bytes": 2100
+      "bytes": 2100,
+      "matches_previously_recorded_identity": true,
+      "previously_recorded": {
+        "sha256": "60627a7f10f99c46b696555e8d473eb9f324e75e63aad1a09d7277828278bf2c",
+        "bytes": 2100
+      }
     },
-    "analysis_test.20261010T205055.superseded.json": {
-      "sha256": "4ff576991f9214e237e97b5673de92c847bab4acde4c251df50afde490ba9600",
-      "bytes": 94103
+    "selection.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/selection.json",
+      "note": "the DEVELOPMENT-set selection decision, with gate outcomes and the sha256 of every development input it read",
+      "sha256": "f8d7ea0a3e130afbc7329f91ed6cf3b195522a6b5b70d430a165256855d17c98",
+      "bytes": 34028,
+      "matches_previously_recorded_identity": true,
+      "previously_recorded": {
+        "sha256": "f8d7ea0a3e130afbc7329f91ed6cf3b195522a6b5b70d430a165256855d17c98",
+        "bytes": 34028
+      }
+    },
+    "bridge_check.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/bridge_check.json",
+      "note": "the step-100 bridge between the original run and the rerun",
+      "sha256": "a0d326284b72e1800e7b14cc7dc05db3040c27926c44f44a5a273fb78cabc25e",
+      "bytes": 32423,
+      "matches_previously_recorded_identity": true,
+      "previously_recorded": {
+        "sha256": "a0d326284b72e1800e7b14cc7dc05db3040c27926c44f44a5a273fb78cabc25e",
+        "bytes": 32423
+      }
+    },
+    "reference_bindings.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/reference_bindings.json",
+      "note": "the four-way binding of the reused MA and L2 reference evaluations",
+      "sha256": "5b6e774cf2981fdc52f537fa7fe31c1bab08e053bfd5520d77deef52c5b82d24",
+      "bytes": 5598,
+      "matches_previously_recorded_identity": true,
+      "previously_recorded": {
+        "sha256": "5b6e774cf2981fdc52f537fa7fe31c1bab08e053bfd5520d77deef52c5b82d24",
+        "bytes": 5598
+      }
+    },
+    "gpu_usage_record.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/matched_effectiveness_gpu_budget.json",
+      "note": "the experiment's device-hour ledger, all prior spend carried forward",
+      "sha256": "e07753d1cc18b1a320801e64e62053f6dcfbbdf19e87156fd733da864c20f69c",
+      "bytes": 27765,
+      "matches_previously_recorded_identity": true,
+      "previously_recorded": {
+        "sha256": "e07753d1cc18b1a320801e64e62053f6dcfbbdf19e87156fd733da864c20f69c",
+        "bytes": 27765
+      }
     },
     "analysis_test.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/analysis_test.json",
+      "note": "CURRENT analysis (v3): re-checks the SAME \u00a75 GATES and the match on TEST. Eligibility fails on both seeds; tolerance additionally fails on seed 29; no seed supplies a valid matched comparison",
+      "sha256": "a79e8fc501bb5222b39fe3d51d59612583c3316ea0e6721c3438d514ad90461b",
+      "bytes": 107052,
+      "matches_previously_recorded_identity": null,
+      "previously_recorded": {
+        "sha256": "fc551d50c9fb05c0a964fcddf9f78c7f222dd2263d1cf914a25c2ed07b0f05cd",
+        "bytes": 96566
+      },
+      "supersedes_published_version": {
+        "published_at_7e01fbd": {
+          "sha256": "fc551d50c9fb05c0a964fcddf9f78c7f222dd2263d1cf914a25c2ed07b0f05cd",
+          "bytes": 96566
+        },
+        "those_bytes_preserved_in_this_bundle_as": "analysis_test.20261010T205657.superseded.json",
+        "why": "a NEW analysis version, written by the repaired diag_analysis.py. The published version is kept verbatim beside it; nothing was overwritten."
+      }
+    },
+    "analysis_test.20261010T205055.superseded.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/analysis_test.20261010T205055.superseded.json",
+      "note": "PRESERVED earlier analysis record, not overwritten",
+      "sha256": "4ff576991f9214e237e97b5673de92c847bab4acde4c251df50afde490ba9600",
+      "bytes": 94103,
+      "matches_previously_recorded_identity": true,
+      "previously_recorded": {
+        "sha256": "4ff576991f9214e237e97b5673de92c847bab4acde4c251df50afde490ba9600",
+        "bytes": 94103
+      }
+    },
+    "analysis_test.20261010T205657.superseded.json": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/analysis_test.20261010T205657.superseded.json",
+      "note": "PRESERVED earlier analysis record, not overwritten",
       "sha256": "fc551d50c9fb05c0a964fcddf9f78c7f222dd2263d1cf914a25c2ed07b0f05cd",
       "bytes": 96566
     },
-    "bridge_check.json": {
-      "sha256": "a0d326284b72e1800e7b14cc7dc05db3040c27926c44f44a5a273fb78cabc25e",
-      "bytes": 32423
-    },
-    "gpu_usage_record.json": {
-      "sha256": "e07753d1cc18b1a320801e64e62053f6dcfbbdf19e87156fd733da864c20f69c",
-      "bytes": 27765
-    },
-    "reference_bindings.json": {
-      "sha256": "5b6e774cf2981fdc52f537fa7fe31c1bab08e053bfd5520d77deef52c5b82d24",
-      "bytes": 5598
-    },
-    "selection.json": {
-      "sha256": "f8d7ea0a3e130afbc7329f91ed6cf3b195522a6b5b70d430a165256855d17c98",
-      "bytes": 34028
-    },
     "unattended.log": {
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/logs/unattended.log",
+      "note": "the unattended supervisor log, verbatim. Listed in the manifest published at 7e01fbd but absent from that commit because .gitignore excludes '*.log'; supplied here and force-added to git",
       "sha256": "8ab803ee43796e68f541d1e44a8a1fd59f7246796a1dcdcebb0b585176b396ca",
-      "bytes": 73561
+      "bytes": 73561,
+      "matches_previously_recorded_identity": true,
+      "previously_recorded": {
+        "sha256": "8ab803ee43796e68f541d1e44a8a1fd59f7246796a1dcdcebb0b585176b396ca",
+        "bytes": 73561
+      },
+      "resolves": "the archive gap reported at 7e01fbd: the bytes supplied are the ones the published manifest already identified"
+    },
+    "development_slots.tar.gz": {
+      "sha256": "b471593ca50154fee221bfa1a76629f892af063845a4ddef0cb66daa9a095397",
+      "bytes": 488420,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_dev",
+      "note": "the DEVELOPMENT scan: the 20 candidate dumps (10 early steps x 2 seeds) that selection scored (1600 detector rows over 20 slots)"
+    },
+    "development_slots_index.json": {
+      "sha256": "5c2606ec00ebd926e80f6555baf3f7d8dad3ef37f92c3e4a85f123383d722ed8",
+      "bytes": 19267,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_dev",
+      "note": "the DEVELOPMENT scan: the 20 candidate dumps (10 early steps x 2 seeds) that selection scored (1600 detector rows over 20 slots)"
+    },
+    "frozen_test_slots.tar.gz": {
+      "sha256": "9251276a85975cdc697ff030810df293663d44765ae4d62e68569ca08b9a4821",
+      "bytes": 1159093,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_test",
+      "note": "the FROZEN TEST evaluation: 6 slots (MA, L2, U*=step 70 per seed), evaluated once (3360 detector rows over 6 slots)"
+    },
+    "frozen_test_slots_index.json": {
+      "sha256": "e495d293bde3d3c219203e3197439754ecc93db22a8343b350a96360364245eb",
+      "bytes": 6090,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_test",
+      "note": "the FROZEN TEST evaluation: 6 slots (MA, L2, U*=step 70 per seed), evaluated once (3360 detector rows over 6 slots)"
+    },
+    "budget_reconciliation.json": {
+      "sha256": "07e6d42c643609ba618ee1ea92706f71896773e28153d36ed80bac0eb079ac64",
+      "bytes": 881,
+      "note": "recomputed cross-check of the existing ledger"
+    },
+    "MANIFEST.published_at_7e01fbd.json": {
+      "sha256": "b723ddb6ac90039242b8f6de69c9bc41c396672500e47e8a24cca7d28c4b2af8",
+      "bytes": 1580,
+      "note": "PRESERVED previous manifest, not overwritten"
     }
-  }
+  },
+  "supersedes": {
+    "preserved_at": "MANIFEST.published_at_7e01fbd.json",
+    "note": "the manifest published at 7e01fbd, kept verbatim so the listing that named an absent unattended.log stays on the record"
+  },
+  "identity_baseline": "the manifest published at 7e01fbd"
 }

@@ -41,12 +41,21 @@ checkpoints, Excel reports and logs are git-excluded and live under
 > | [`audit_v1/CORRECTED_TABLES.md`](audit_v1/CORRECTED_TABLES.md) | corrected counts and the direct L2 contrasts the snapshot never computed |
 > | [`audit_v1/ARTIFACT_INVENTORY.md`](audit_v1/ARTIFACT_INVENTORY.md) | what is reusable; **no intermediate checkpoints exist** |
 > | [`audit_v1/CLAIM_CORRECTIONS_V2.md`](audit_v1/CLAIM_CORRECTIONS_V2.md) | corrections to the audit's own first write-up |
-> | [`../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md) | the bounded proposed experiment (3.095 GPU-h with contingency, **pending review, not approved**) |
+> | [`audit_v1/AMENDMENT_01_CLOSEOUT.md`](audit_v1/AMENDMENT_01_CLOSEOUT.md) | **start here for the latest result.** Amendment 01 run and closed: development matched at step 70, **test conditions failed on both seeds**, matched-retention question **inconclusive in the intended regime** |
+> | [`audit_v1/AMENDMENT_01_RESULTS.md`](audit_v1/AMENDMENT_01_RESULTS.md) | the corrected results in full, with the evidence index |
+> | [`audit_v1/CLAIM_CORRECTIONS_V5.md`](audit_v1/CLAIM_CORRECTIONS_V5.md) | the withdrawn practical-equivalence reading, the annotation-deliverable reconciliation, and the archive gap |
+> | [`../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](../docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md) | the bounded experiment — **approved and run**; 2.9013889 device-hours total |
+> | [`../docs/research/NEXT_SCREEN_PROPOSAL.md`](../docs/research/NEXT_SCREEN_PROPOSAL.md) | the next scientific screen — CPU-only, **not authorised to run** |
 > | [`audit_v1/draft_manifests/FREEZE.md`](audit_v1/draft_manifests/FREEZE.md) | the frozen draft prompt manifests and analysis rules |
 > | [`audit_v1/annotation_packet/ACCESS.md`](audit_v1/annotation_packet/ACCESS.md) | how the PI gets the packet images and blinded sheet |
 >
 > **No human annotation has been performed.** A 236-item blinded packet is built
 > and empty at [`audit_v1/annotation_packet/`](audit_v1/annotation_packet/).
+> Amendment 01 adds two more, also empty and also unpooled: the prescribed
+> 180-item paired audit
+> [`audit_v1/annotation_packet_paired180/`](audit_v1/annotation_packet_paired180/)
+> and the 228-item supplementary audit
+> [`audit_v1/annotation_packet_v2/`](audit_v1/annotation_packet_v2/).
 > Every visual statement in these reports is AI inspection, not human review.
 
 ## What is here

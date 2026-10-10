@@ -11,9 +11,30 @@ launch scripts, validators, measurements and notes.
 
 ---
 
-## Current status (2026-10-09)
+## Current status (2026-10-10)
 
-> **Latest: AUDIT-01 / 01b / 01c / 01d** re-derived the two-seed SD-1.5 sequential pilot
+> **Latest: Amendment 01 is RUN AND CLOSED.** The matched-effectiveness
+> diagnostic reached the frozen test set, and **the prespecified test conditions
+> failed on both training seeds**: all four arms fall below the ≥ 30 pp
+> target-suppression gate on the test prompts (17.50 / 16.25 pp seed 17;
+> 22.50 / 28.75 pp seed 29) while clearing the ≤ 60% residue gate, and seed 29
+> additionally exceeds the 5 pp match tolerance at 6.25 pp. **Neither seed
+> supplies a valid matched comparison**, so the matched-retention question is
+> **inconclusive in the intended regime**; the bird contrasts are retained as
+> descriptive results, and the earlier practical-equivalence reading for seed 17
+> is **withdrawn**. Start at
+> [`AMENDMENT_01_CLOSEOUT.md`](results/audit_v1/AMENDMENT_01_CLOSEOUT.md), with
+> [`CLAIM_CORRECTIONS_V5.md`](results/audit_v1/CLAIM_CORRECTIONS_V5.md).
+>
+> This is **not** a general finding about matched-effectiveness designs: one
+> selected pair did not satisfy declared conditions in one pilot, and the causes
+> are unresolved. The confound AUDIT-01 identified — unequal deletion strength
+> — therefore **remains unresolved**, because the diagnostic meant to resolve it
+> did not reach its authorised regime on the set it reported. The next direction
+> is [`docs/research/NEXT_SCREEN_PROPOSAL.md`](docs/research/NEXT_SCREEN_PROPOSAL.md)
+> — **CPU-only, not authorised to run**. The frozen test set is spent.
+>
+> **AUDIT-01 / 01b / 01c / 01d** re-derived the two-seed SD-1.5 sequential pilot
 > snapshot `a9de625` from raw per-image predictions. Arithmetic and completeness
 > verified exactly (0 mismatches over 1026 values; 0 duplicate and 0 missing
 > rows). Nine **narrative** claims were corrected, then eight further
@@ -24,10 +45,10 @@ launch scripts, validators, measurements and notes.
 > The headline change: the L2-SP retention comparisons are **confounded by
 > unequal deletion strength**, and **no intermediate checkpoints exist** to
 > resolve that from existing artifacts. A bounded matched-effectiveness
-> diagnostic is proposed at
-> [`docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md)
-> (**3.095 GPU-hours** with contingency) and is **pending central review and the
-> PI's decision — not authorised to run**.
+> diagnostic was proposed at
+> [`docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md`](docs/research/MATCHED_EFFECTIVENESS_PROTOCOL.md),
+> approved, and **run to completion** at **2.9013889 device-hours** total
+> (**1.6991667** of them for Amendment 01) — see the closeout above.
 >
 > Stage completion is now decided by contract validation
 > ([`scripts/seq/validate_stage.py`](scripts/seq/validate_stage.py)), not by file
@@ -52,9 +73,16 @@ launch scripts, validators, measurements and notes.
 > uncertainty specification is restored with the bootstrap grouping frozen from
 > the actual manifests. **No GPU work occurred.**
 >
-> **No human annotation has been performed** anywhere in this project. A
-> 236-item blinded packet is built and empty; detector validity is unmeasured.
-> See [`ACCESS.md`](results/audit_v1/annotation_packet/ACCESS.md).
+> **No human annotation has been performed** anywhere in this project, and
+> detector validity is therefore unmeasured. Three blinded packets are built and
+> **empty**: the prescribed **180-item paired** audit for Amendment 01
+> ([`annotation_packet_paired180/`](results/audit_v1/annotation_packet_paired180/)),
+> the **228-item** supplementary audit preserved beside it
+> ([`annotation_packet_v2/`](results/audit_v1/annotation_packet_v2/)), and the
+> original 236-item pilot packet
+> ([`ACCESS.md`](results/audit_v1/annotation_packet/ACCESS.md)). They are
+> separate instruments and must not be pooled. **Every detector number in this
+> repository is provisional until labels exist.**
 
 | Item | Status |
 |---|---|
@@ -62,8 +90,11 @@ launch scripts, validators, measurements and notes.
 | **AUDIT-01 evidence audit and claim corrections** | **done** |
 | **AUDIT-01b execution checks, contract validation, CPU test suites** | **done** |
 | **AUDIT-01d image-reuse provenance, artifact-scoped completion policy, claim corrections** | **done** |
-| **Matched-effectiveness protocol (bounded) + frozen draft manifests** | **proposed, pending review — not approved** |
-| **Human evaluator audit** | **packet built, NOT annotated** |
+| **Matched-effectiveness protocol (bounded) + frozen draft manifests** | **approved and run** |
+| **Diagnostic 01 (100-step grid)** | **done** — stopped at selection by the pre-declared infeasibility rule |
+| **Amendment 01 (early grid 10…90)** | **done and CLOSED** — matched on development at step 70; **test conditions failed on both seeds**; matched-retention question **inconclusive in the intended regime** |
+| **Next screen: what drives sequential-erasure interference** | **proposed, CPU-only — not authorised to run** |
+| **Human evaluator audit** | **3 packets built, NONE annotated** |
 | Isolated environment, versions pinned to upstream `env.yaml` | **done** |
 | Upstream CUIG pinned, licence + attribution preserved | **done** |
 | Training / evaluation code inspected, label agreement analysed | **done** |

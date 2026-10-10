@@ -1,11 +1,28 @@
 # MATCHED_EFFECTIVENESS_PROTOCOL — bounded diagnostic, for review
 
-**Status: the bounded diagnostic in §1–§6 HAS been run** (commit `3a5a69c`); it
-stopped at selection by the pre-declared infeasibility rule — see
+**Status: RUN AND CLOSED.** The bounded diagnostic in §1–§6 was run (commit
+`3a5a69c`) and stopped at selection by the pre-declared infeasibility rule —
 [`DIAGNOSTIC_01_FINDINGS.md`](../../results/audit_v1/DIAGNOSTIC_01_FINDINGS.md).
-The frozen test set has never been evaluated. The follow-up now proposed is
-[`AMENDMENT_01_EARLY_GRID.md`](AMENDMENT_01_EARLY_GRID.md), awaiting the PI's
-separate decision.
+Amendment 01 ([`AMENDMENT_01_EARLY_GRID.md`](AMENDMENT_01_EARLY_GRID.md)) was
+then approved and run: it matched on the development set at step 70 on both
+seeds and **evaluated the frozen test set once**.
+
+> **Outcome: the §5 test conditions FAIL on both seeds.** All four arms fall
+> below the ≥ 30 pp suppression gate on the test prompts (17.50 / 16.25 pp seed
+> 17; 22.50 / 28.75 pp seed 29) while clearing the ≤ 60% residue gate, and seed
+> 29 additionally exceeds the 5 pp tolerance at 6.25 pp. **Neither seed supplies
+> a valid matched comparison**, so the comparison is rejected, not the
+> hypothesis (§7's last row for a failed match; §10 for a failed reference gate),
+> and the matched-retention question is **inconclusive in the intended regime**. The §5 reporting rule — "the same gates and the same match"
+> on TEST — was initially implemented as the match alone; that is corrected and
+> recorded in
+> [`CLAIM_CORRECTIONS_V5.md`](../../results/audit_v1/CLAIM_CORRECTIONS_V5.md).
+> Closeout:
+> [`AMENDMENT_01_CLOSEOUT.md`](../../results/audit_v1/AMENDMENT_01_CLOSEOUT.md).
+> **The frozen test set is spent. It may not be re-used for selection or for a
+> second confirmatory reading.** The next direction is
+> [`NEXT_SCREEN_PROPOSAL.md`](NEXT_SCREEN_PROPOSAL.md) — CPU-only, not
+> authorised to run.
 
 > **The 4-hour ceiling in §7 is RETIRED** (PI, 2026-10-10). The GPU-hour figures
 > below remain useful as planning estimates and as provenance, but they cap

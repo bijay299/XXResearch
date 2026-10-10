@@ -1,0 +1,38 @@
+{
+  "_what_this_is": "Source identity for the Amendment 01 CLOSEOUT corrections, recorded with the CPU check logs beside it. The logs in this directory were produced by exactly these bytes. No GPU was used.",
+  "git_head_at_check_time": "7e01fbd33bfce24fbfe56aada5eba7273429f34c",
+  "note": "HEAD above is the PARENT commit: these checks ran on the working tree that the next commit records. The sha256 of each file is the binding that matters.",
+  "results": {
+    "test_diag_analysis.py": {
+      "log": "closeout_test_diag_analysis.log",
+      "result": "41 passed, 0 failed",
+      "passed": 41,
+      "failed": 0,
+      "log_sha256": "edf123950ba21831af3c877e03651898c5e60b22086fb4306431631308632b31"
+    },
+    "test_diag_test_conditions.py": {
+      "log": "closeout_test_diag_test_conditions.log",
+      "result": "59 passed, 0 failed",
+      "passed": 59,
+      "failed": 0,
+      "log_sha256": "714f452065566ed9171ae290797ec5ea8d3047ba0e28b6ad2747357a8c4ffdf7"
+    }
+  },
+  "total": {
+    "passed": 100,
+    "failed": 0
+  },
+  "sha256": {
+    "scripts/seq/diag_analysis.py": "90059e03c132f33a8cc29856bff83671f8e87d2ffd573258651132bb6f0296e0",
+    "scripts/seq/test_diag_analysis.py": "069c36782d621a5aeea2a57e2728376fc474f21bc14a94d7a126fc4f766b6851",
+    "scripts/seq/test_diag_test_conditions.py": "6a532df3b861509bea32c1c025583b2344b84d2f07b042426c7a3515fd3c6aea",
+    "scripts/seq/build_paired_annotation_packet.py": "a91b6816967ae6d3efc417a6116e50ec6c9e1b7b80fa55625cc7dc5751a62824",
+    "scripts/seq/build_amendment01_evidence.py": "62fbe6078b1cef76592d4f572f6e0191c2740279b0a6283486ba71c620f7e1fc"
+  },
+  "also_verified": {
+    "amendment01_evidence/MANIFEST.json": "all 15 listed payloads present; sha256 and byte count re-checked independently; 0 failures; access_limitations empty",
+    "analysis_test v2 vs v3": "all 378 estimates per training seed are bit-identical; only interpretation fields differ",
+    "paired packet": "180 items, 60 tuples x 3 arms, 18 cells of 10, 180 distinct images, 0 non-empty label cells, key and overlap report outside the packet",
+    "paired packet blinding": "blinded ids use a fresh 32-byte SECRET salt stored beside the key at mode 600; only its sha256 is published; the drawn tuples are withheld from the published manifest; the secret does not appear anywhere in the repository (grepped)"
+  }
+}

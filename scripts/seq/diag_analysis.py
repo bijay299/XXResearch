@@ -24,6 +24,24 @@ chosen at runtime:
 The primary endpoint is the paired bird contrast D_bird(L2) - D_bird(U*) on the
 frozen test set at t=0.5, where U* is the development-selected matched dump.
 
+Three separate test-set checks, never collapsed into one
+--------------------------------------------------------
+Protocol §5 requires "the SAME gates and the same match" to be re-checked on
+TEST. That is three distinct questions and they are reported as three:
+
+  (a) TOLERANCE AGREEMENT   do the two arms delete the same amount here
+                            (mismatch <= 5 pp)?
+  (b) ELIGIBILITY           does EACH arm, on its own, sit inside the declared
+                            partial-suppression regime here (>= 30 pp target
+                            suppression vs its own MA AND <= 60% residue)?
+  (c) PROTOCOL VALIDITY     (a) AND (b). Only this licenses the word "matched"
+                            and the §7 decision table.
+
+(a) without (b) is agreement outside the authorised regime -- two arms that both
+under-deleted can agree with each other perfectly. Where (c) fails the retention
+contrast is retained as a DESCRIPTIVE measurement and every protocol-level claim
+is WITHDRAWN for that seed; withheld is not disproved.
+
 A note on the parent-referenced estimand. Both arms of a seed share that seed's
 own MA, so the contrast of parent-referenced changes is ALGEBRAICALLY IDENTICAL
 to the direct contrast:
@@ -60,6 +78,14 @@ EQUIV_LO, EQUIV_HI = -10.0, 10.0
 # the test set -- and a retention comparison between arms that are not matched
 # on the set being reported is not a matched comparison.
 MATCH_TOLERANCE_PP = 5.0
+# The REFERENCE GATES of the protocol, MATCHED_EFFECTIVENESS_PROTOCOL.md §5.
+# They define the partial-suppression regime the comparison was prespecified to
+# live in, and §5 requires "the SAME gates and the same match" to be re-checked
+# on TEST -- not the tolerance alone. Both arms must clear both gates: a
+# tolerance agreement between two arms that each failed the suppression gate is
+# agreement outside the declared regime, which is not a matched comparison.
+GATE_SUPPRESSION_PP = 30.0   # >= 30 pp target suppression vs that seed's own MA
+GATE_RESIDUE_PCT = 60.0      # <= 60% target residue
 
 
 def verify_grouping(p: Path) -> dict:
@@ -200,6 +226,29 @@ def analyse_seed(seed: int, sel_step: int, eval_root: Path,
             "estimates": ci}
 
 
+def arm_eligibility(arm: str, suppression_pp: float,
+                    residue_pct: float) -> dict:
+    """Re-apply the §5 reference gates to ONE arm on the set being reported.
+
+    Eligibility is a property of each arm on its own. It is NOT the matching
+    tolerance, and the two must never be collapsed: the tolerance asks whether
+    the arms deleted the SAME amount, the gates ask whether that amount is
+    inside the declared partial-suppression regime at all.
+    """
+    g_sup = suppression_pp >= GATE_SUPPRESSION_PP - 1e-9
+    g_res = residue_pct <= GATE_RESIDUE_PCT + 1e-9
+    return {
+        "arm": arm,
+        "target_suppression_pp_vs_own_MA": round(suppression_pp, 4),
+        "target_residue_pct": round(residue_pct, 4),
+        "gate_suppression_ge_30pp": g_sup,
+        "gate_residue_le_60pct": g_res,
+        "eligible": bool(g_sup and g_res),
+        "failed_gates": [n for n, ok in (("suppression_ge_30pp", g_sup),
+                                         ("residue_le_60pct", g_res)) if not ok],
+    }
+
+
 def read_decision(ci: dict, tag: str) -> dict:
     """Map one interval onto the prespecified rows of the decision table.
 
@@ -212,25 +261,84 @@ def read_decision(ci: dict, tag: str) -> dict:
     c = ci[f"contrast[{tag}]"]
     lo, hi = c["lo95"], c["hi95"]
     rows = []
-    equivalent = EQUIV_LO <= lo and hi <= EQUIV_HI
-    if equivalent:
-        rows.append(f"interval wholly within [{EQUIV_LO:.0f}, {EQUIV_HI:.0f}]: "
-                    f"PRACTICAL EQUIVALENCE at the declared margin")
+    within = EQUIV_LO <= lo and hi <= EQUIV_HI
+    if within:
+        rows.append(f"interval wholly within [{EQUIV_LO:.0f}, {EQUIV_HI:.0f}]")
     if hi < MATERIAL_PP:
-        rows.append(f"upper bound {hi:+.1f} < +{MATERIAL_PP:.0f}: a benefit of "
-                    f"{MATERIAL_PP:.0f} pp or more is RULED OUT, conditionally")
+        rows.append(f"upper bound {hi:+.1f} < +{MATERIAL_PP:.0f}")
     if lo > MATERIAL_PP:
-        rows.append(f"lower bound {lo:+.1f} > +{MATERIAL_PP:.0f}: a MATERIAL "
-                    f"benefit carries forward")
+        rows.append(f"lower bound {lo:+.1f} > +{MATERIAL_PP:.0f}")
     if not rows:
-        rows.append("INCONCLUSIVE: the interval spans the declared margin; do "
-                    "not read the point estimate as a result")
+        rows.append("the interval spans the declared margin")
     return {"point": c["point"], "lo95": lo, "hi95": hi,
-            "practical_equivalence": equivalent,
-            "material_benefit": lo > MATERIAL_PP,
-            "benefit_of_10pp_ruled_out": hi < MATERIAL_PP,
-            "inconclusive": len(rows) == 1 and rows[0].startswith("INCONCLUSIVE"),
-            "reading": "; ".join(rows)}
+            "interval_within_declared_margin": within,
+            "interval_upper_below_material": hi < MATERIAL_PP,
+            "interval_lower_above_material": lo > MATERIAL_PP,
+            "interval_spans_material_margin": not (hi < MATERIAL_PP
+                                                   or lo > MATERIAL_PP),
+            "interval_arithmetic": "; ".join(rows)}
+
+
+def protocol_reading(arith: dict, valid: bool, failures: list[str]) -> dict:
+    """Attach the §7 decision table to an interval -- ONLY if §5 was satisfied.
+
+    Where §5 was not satisfied on the set being reported, the interval survives
+    as a DESCRIPTIVE result and every protocol-level claim is withheld. §7's last
+    row states this for a failed MATCH -- "the comparison is rejected, not the
+    hypothesis" -- and a failed REFERENCE GATE is the same kind of failure of the
+    declared test conditions: §10 makes a reference-gate failure a
+    stop-and-report condition in its own right. Either way no equivalence
+    statement and no exclusion of a material benefit is available.
+    """
+    if valid:
+        rows = []
+        if arith["interval_within_declared_margin"]:
+            rows.append(f"interval wholly within [{EQUIV_LO:.0f}, {EQUIV_HI:.0f}]: "
+                        f"PRACTICAL EQUIVALENCE at the declared margin")
+        if arith["interval_upper_below_material"]:
+            rows.append(f"upper bound {arith['hi95']:+.1f} < +{MATERIAL_PP:.0f}: a "
+                        f"benefit of {MATERIAL_PP:.0f} pp or more is RULED OUT, "
+                        f"conditionally")
+        if arith["interval_lower_above_material"]:
+            rows.append(f"lower bound {arith['lo95']:+.1f} > +{MATERIAL_PP:.0f}: a "
+                        f"MATERIAL benefit carries forward")
+        if not rows:
+            rows.append("INCONCLUSIVE: the interval spans the declared margin; "
+                        "do not read the point estimate as a result")
+        return {
+            **arith,
+            "practical_equivalence": arith["interval_within_declared_margin"],
+            "material_benefit": arith["interval_lower_above_material"],
+            "benefit_of_10pp_ruled_out": arith["interval_upper_below_material"],
+            "inconclusive": arith["interval_spans_material_margin"],
+            "protocol_level_claim_available": True,
+            "withdrawn_claims": [],
+            "reading": "; ".join(rows),
+        }
+    return {
+        **arith,
+        # Every protocol-level claim is FALSE here -- withheld, not disproved.
+        "practical_equivalence": False,
+        "material_benefit": False,
+        "benefit_of_10pp_ruled_out": False,
+        "inconclusive": True,
+        "protocol_level_claim_available": False,
+        "withdrawn_claims": ["practical_equivalence_at_the_declared_margin",
+                             "exclusion_of_a_10pp_material_benefit",
+                             "material_benefit_carries_forward"],
+        "reading": (
+            "DESCRIPTIVE ONLY -- no protocol-level reading is available. The "
+            f"prespecified test conditions of §5 were not met on this set "
+            f"({', '.join(failures)}), so the §7 decision table does not apply. "
+            f"§7's last row rejects the COMPARISON rather than the hypothesis "
+            f"when the match fails, and §10 makes a reference-gate failure a "
+            f"stop-and-report condition; this is read the same way. The interval "
+            f"({arith['point']:+.1f} pp [{arith['lo95']:+.1f}, "
+            f"{arith['hi95']:+.1f}]) stands as a description of what was "
+            f"measured between these two checkpoints and supports no "
+            f"equivalence statement and no exclusion of a material benefit. "
+            f"Arithmetically: {arith['interval_arithmetic']}."),
+    }
 
 
 def main() -> int:
@@ -286,7 +394,7 @@ def main() -> int:
     # arms are still matched on the FROZEN TEST set is a separate question, and
     # it is the one that licenses calling the retention contrast "matched".
     match_tag = f"{MATCHING_CHECK}|{PRIMARY_THR}"
-    test_matching = {}
+    test_matching, test_eligibility, test_validity = {}, {}, {}
     for s in seeds:
         est = per_seed[s]["estimates"]
         c = est[f"contrast[{match_tag}]"]
@@ -295,7 +403,13 @@ def main() -> int:
         mismatch = abs(c["point"])
         ok = mismatch <= MATCH_TOLERANCE_PP + 1e-9
         dev_mismatch = sel["per_seed"][str(s)]["selected"]["mismatch_vs_L2_pp"]
+
+        # ---- (a) TOLERANCE AGREEMENT: did the two arms delete the SAME amount?
         test_matching[str(s)] = {
+            "_this_checks": ("ONLY whether the two arms agree in target "
+                             "deletion. It says nothing about whether that "
+                             "deletion level is inside the declared regime; "
+                             "that is the separate eligibility check."),
             "target": MATCHING_CHECK, "threshold": PRIMARY_THR,
             "L2_target_deletion_pp_vs_MA": -l2["point"],
             "U_target_deletion_pp_vs_MA": -u["point"],
@@ -304,24 +418,105 @@ def main() -> int:
             "which_arm_deleted_more": ("U" if c["point"] > 0 else
                                        "L2" if c["point"] < 0 else "neither"),
             "tolerance_pp": MATCH_TOLERANCE_PP,
-            "matched_on_test": ok,
+            "tolerance_agreement_on_test": ok,
+            "matched_on_test": ok,   # retained key name; tolerance only
             "development_mismatch_pp": dev_mismatch,
-            "status": ("MATCHED_ON_TEST" if ok else "NOT_MATCHED_ON_TEST"),
+            "status": ("TOLERANCE_AGREEMENT_ON_TEST" if ok else
+                       "TOLERANCE_FAILED_ON_TEST"),
             "consequence": (
-                "the arms are matched on the frozen test set within the same "
-                "tolerance selection used, so the retention contrast for this "
-                "seed is a matched comparison"
+                "the two arms agree in target deletion on the frozen test set "
+                "within the tolerance selection used. This is necessary but "
+                "NOT sufficient: the reference gates must also hold on this "
+                "set for the comparison to be a matched comparison in the "
+                "prespecified regime."
                 if ok else
                 f"the arms differ by {mismatch:.2f} pp in target deletion ON "
                 f"THE TEST SET, beyond the {MATCH_TOLERANCE_PP} pp tolerance. "
-                f"Matching held on the development set "
+                f"Agreement held on the development set "
                 f"({dev_mismatch} pp) but does not hold here, so the retention "
                 f"contrast for this seed is INCONCLUSIVE as a matched "
                 f"comparison. No reselection is performed: the selected "
                 f"checkpoint stands and this failure is reported as the result "
                 f"for this seed."),
         }
+
+        # ---- (b) ELIGIBILITY: is each arm inside the declared regime at all?
+        #
+        # §5 gates the REFERENCE and the CANDIDATE, and §5's reporting rule
+        # requires the SAME gates re-checked on TEST. Deletion measured on the
+        # test prompts is a different quantity from deletion measured on the
+        # development prompts, so passing on DEV does not carry over.
+        sup_l2, sup_u = -l2["point"], -u["point"]
+        res_l2 = est[f"D[{match_tag}]|L2"]["point"]
+        res_u = est[f"D[{match_tag}]|U"]["point"]
+        e_l2 = arm_eligibility("L2", sup_l2, res_l2)      # the reference arm
+        e_u = arm_eligibility("U", sup_u, res_u)           # the candidate arm
+        both_eligible = e_l2["eligible"] and e_u["eligible"]
+        test_eligibility[str(s)] = {
+            "_this_checks": ("whether EACH arm independently clears the §5 "
+                             "reference gates on the set being reported: "
+                             f">= {GATE_SUPPRESSION_PP:.0f} pp target "
+                             f"suppression vs that seed's own MA AND "
+                             f"<= {GATE_RESIDUE_PCT:.0f}% target residue."),
+            "target": MATCHING_CHECK, "threshold": PRIMARY_THR,
+            "gate_suppression_pp": GATE_SUPPRESSION_PP,
+            "gate_residue_pct": GATE_RESIDUE_PCT,
+            "reference_arm_L2": e_l2,
+            "candidate_arm_U": e_u,
+            "both_arms_eligible": both_eligible,
+            "status": ("BOTH_ARMS_ELIGIBLE_ON_TEST" if both_eligible else
+                       "NOT_ELIGIBLE_ON_TEST"),
+            "development_note": (
+                "Eligibility was satisfied on the DEVELOPMENT set at selection "
+                "time; it is re-checked here because the test prompts are a "
+                "different measurement. A DEV pass does not transfer."),
+            "consequence": (
+                "both arms sit inside the declared partial-suppression regime "
+                "on this set"
+                if both_eligible else
+                "at least one arm is OUTSIDE the declared partial-suppression "
+                "regime on this set, so there is no prespecified regime in "
+                "which to read the retention contrast: the arms may agree with "
+                "each other while both having deleted too little to be the "
+                "comparison that was authorised."),
+        }
+
+        # ---- (c) OVERALL PROTOCOL VALIDITY: (a) AND (b), stated separately
+        failures: list[str] = []
+        if not ok:
+            failures.append(f"tolerance: mismatch {mismatch:.2f} pp > "
+                            f"{MATCH_TOLERANCE_PP:.0f} pp")
+        for e in (e_l2, e_u):
+            if not e["eligible"]:
+                failures.append(
+                    f"eligibility ({e['arm']}): suppression "
+                    f"{e['target_suppression_pp_vs_own_MA']:.2f} pp, residue "
+                    f"{e['target_residue_pct']:.2f}% -> failed "
+                    f"{', '.join(e['failed_gates'])}")
+        test_validity[str(s)] = {
+            "tolerance_agreement_on_test": ok,
+            "both_arms_eligible_on_test": both_eligible,
+            "valid_matched_comparison": bool(ok and both_eligible),
+            "failed_conditions": failures,
+            "status": ("VALID_MATCHED_COMPARISON" if ok and both_eligible
+                       else "NOT_A_VALID_MATCHED_COMPARISON"),
+            "consequence": (
+                "the prespecified test conditions hold on this set, so the §7 "
+                "decision table applies to this seed's retention contrast"
+                if ok and both_eligible else
+                "the prespecified test conditions do NOT hold on this set. The "
+                "retention contrast is retained as a DESCRIPTIVE result and "
+                "every protocol-level reading is withdrawn for this seed: the "
+                "comparison is rejected, not the hypothesis (§7 last row for a "
+                "failed match; §10 for a failed reference gate). No "
+                "reselection, no widened tolerance, no retraining."),
+        }
+
     all_matched_on_test = all(v["matched_on_test"] for v in test_matching.values())
+    all_eligible_on_test = all(v["both_arms_eligible"]
+                               for v in test_eligibility.values())
+    any_valid = any(v["valid_matched_comparison"] for v in test_validity.values())
+    all_valid = all(v["valid_matched_comparison"] for v in test_validity.values())
     payload = {
         "_what_this_is": (
             "The matched-effectiveness diagnostic's detector-based estimates. "
@@ -341,24 +536,51 @@ def main() -> int:
                       for s in seeds},
         "seeds_pooled": False,
         "per_seed": {str(s): per_seed[s] for s in seeds},
+        "test_conditions_are_three_separate_checks": (
+            "(a) test_matching_check -- TOLERANCE AGREEMENT between the arms; "
+            "(b) test_eligibility_check -- each arm's own §5 REFERENCE GATES; "
+            "(c) test_protocol_validity -- (a) AND (b), which is what licenses "
+            "the word 'matched' and the §7 decision table. These are reported "
+            "separately and must not be collapsed into one another."),
         "test_matching_check": test_matching,
+        "test_eligibility_check": test_eligibility,
+        "test_protocol_validity": test_validity,
         "matched_on_test_all_seeds": all_matched_on_test,
+        "eligible_on_test_all_seeds": all_eligible_on_test,
+        "valid_matched_comparison_all_seeds": all_valid,
+        "valid_matched_comparison_any_seed": any_valid,
         "matched_comparison_status": (
-            "MATCHED on the frozen test set for every seed"
-            if all_matched_on_test else
-            "NOT MATCHED on the frozen test set for at least one seed: the "
-            "matched retention comparison is INCONCLUSIVE for that seed. The "
-            "equivalence readings below describe the contrast that was measured; "
-            "they do NOT license a matched-effectiveness claim where matching "
-            "failed."),
+            "VALID matched comparison on the frozen test set for every seed: "
+            "both arms clear the §5 reference gates and agree within tolerance"
+            if all_valid else
+            "NOT A VALID MATCHED COMPARISON on the frozen test set for " +
+            ("at least one seed" if any_valid else "ANY seed") + ". The "
+            "prespecified test conditions of §5 -- the reference gates AND the "
+            "match tolerance -- were not all met. The retention contrasts below "
+            "are retained as DESCRIPTIVE results; they do NOT license a "
+            "matched-effectiveness claim, a practical-equivalence statement or "
+            "the exclusion of a material benefit for any seed whose conditions "
+            "failed. The comparison is rejected, not the hypothesis."),
         "primary_reading_per_seed": {
-            str(s): {**read_decision(per_seed[s]["estimates"], primary_tag),
+            str(s): {**protocol_reading(
+                         read_decision(per_seed[s]["estimates"], primary_tag),
+                         test_validity[str(s)]["valid_matched_comparison"],
+                         test_validity[str(s)]["failed_conditions"]),
                      "matched_on_test": test_matching[str(s)]["matched_on_test"],
+                     "tolerance_agreement_on_test":
+                         test_matching[str(s)]["tolerance_agreement_on_test"],
+                     "both_arms_eligible_on_test":
+                         test_eligibility[str(s)]["both_arms_eligible"],
+                     "valid_matched_comparison":
+                         test_validity[str(s)]["valid_matched_comparison"],
+                     "failed_conditions":
+                         test_validity[str(s)]["failed_conditions"],
                      "matched_comparison": (
-                         "VALID: the arms are matched on this set"
-                         if test_matching[str(s)]["matched_on_test"] else
-                         "INCONCLUSIVE AS A MATCHED COMPARISON: the arms are "
-                         "not matched on this set")}
+                         "VALID: the arms clear the reference gates and agree "
+                         "within tolerance on this set"
+                         if test_validity[str(s)]["valid_matched_comparison"] else
+                         "NOT A VALID MATCHED COMPARISON on this set: " +
+                         "; ".join(test_validity[str(s)]["failed_conditions"]))}
             for s in seeds},
         "parent_referenced_note": (
             "Both arms of a seed share that seed's own MA, so the contrast of "
@@ -386,6 +608,22 @@ def main() -> int:
             "here on the TEST set. Where the on-test check fails, the retention "
             "contrast for that seed is INCONCLUSIVE as a matched comparison, "
             "and no reselection is permitted.",
+            "The on-test re-check is the SAME GATES AND THE SAME MATCH, not the "
+            "match alone: each arm must independently clear >= 30 pp target "
+            "suppression and <= 60% target residue on this set, AND the two "
+            "arms must agree within 5 pp. Tolerance agreement between two "
+            "arms that both under-deleted is agreement outside the declared "
+            "regime and is not a matched comparison.",
+            "Where the prespecified test conditions fail, the contrast is "
+            "retained as a DESCRIPTIVE measurement and every protocol-level "
+            "claim -- practical equivalence at the declared margin, and the "
+            "exclusion of a 10 pp material benefit -- is WITHDRAWN for that "
+            "seed. Withheld is not disproved: nothing here shows the arms "
+            "differ, only that this run cannot say they do not.",
+            "A failure of the test conditions is a statement about THIS "
+            "selected pair in THIS pilot. It is not evidence of a general "
+            "defect in matched-effectiveness designs, and its causes are "
+            "unresolved here.",
         ],
         "analysed_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
@@ -408,24 +646,43 @@ def main() -> int:
     out.write_text(json.dumps(payload, indent=2) + "\n")
 
     # ---- human-readable summary
-    print(f"\n=== MATCHING CHECK RE-REPORTED ON THE FROZEN TEST SET ===")
+    print(f"\n=== THE SAME GATES AND THE SAME MATCH, RE-CHECKED ON THE "
+          f"FROZEN TEST SET ===")
+    print(f"gates: >= {GATE_SUPPRESSION_PP:.0f} pp {MATCHING_CHECK} suppression "
+          f"vs own MA AND <= {GATE_RESIDUE_PCT:.0f}% residue, EACH ARM; "
+          f"tolerance: mismatch <= {MATCH_TOLERANCE_PP:.0f} pp")
     for s in seeds:
-        m = test_matching[str(s)]
-        print(f"seed {s}: {MATCHING_CHECK} deletion vs MA -- L2 "
-              f"{m['L2_target_deletion_pp_vs_MA']:.2f} pp, U* "
-              f"{m['U_target_deletion_pp_vs_MA']:.2f} pp -> mismatch "
-              f"{m['mismatch_pp']:.2f} pp "
-              f"(development: {m['development_mismatch_pp']} pp)  "
-              f"[{m['status']}]")
-        if not m["matched_on_test"]:
-            print(f"         {m['consequence']}")
+        m, el, v = test_matching[str(s)], test_eligibility[str(s)], test_validity[str(s)]
+        print(f"\nseed {s}:")
+        for e in (el["reference_arm_L2"], el["candidate_arm_U"]):
+            label = "L2 (reference)" if e["arm"] == "L2" else "U* (candidate)"
+            print(f"  {label:<16} suppression "
+                  f"{e['target_suppression_pp_vs_own_MA']:6.2f} pp "
+                  f"[{'PASS' if e['gate_suppression_ge_30pp'] else 'FAIL'}]   "
+                  f"residue {e['target_residue_pct']:6.2f}% "
+                  f"[{'PASS' if e['gate_residue_le_60pct'] else 'FAIL'}]   -> "
+                  f"{'ELIGIBLE' if e['eligible'] else 'NOT ELIGIBLE'}")
+        print(f"  tolerance        mismatch {m['mismatch_pp']:6.2f} pp "
+              f"(development: {m['development_mismatch_pp']} pp) -> "
+              f"{m['status']}")
+        print(f"  OVERALL          {v['status']}")
+        for f in v["failed_conditions"]:
+            print(f"                   failed: {f}")
+        if not v["valid_matched_comparison"]:
+            print(f"                   {v['consequence']}")
+    if not any_valid:
+        print(f"\n  NO SEED supplies a valid matched comparison in the "
+              f"prespecified regime.")
 
     print(f"\n=== PRIMARY: paired {PRIMARY_CATEGORY} contrast at t={PRIMARY_THR} "
           f"(L2 minus matched-U), per seed ===")
     for s in seeds:
         r = payload["primary_reading_per_seed"][str(s)]
-        print(f"  seed {s}: {r['point']:+.1f} pp  [{r['lo95']:+.1f}, {r['hi95']:+.1f}]")
+        print(f"  seed {s}: {r['point']:+.1f} pp  [{r['lo95']:+.1f}, {r['hi95']:+.1f}]"
+              f"   {'PROTOCOL-LEVEL' if r['protocol_level_claim_available'] else 'DESCRIPTIVE ONLY'}")
         print(f"           {r['reading']}")
+        if r["withdrawn_claims"]:
+            print(f"           withdrawn: {', '.join(r['withdrawn_claims'])}")
     dirs = {s: payload["primary_reading_per_seed"][str(s)]["point"] for s in seeds}
     if len(seeds) == 2 and (dirs[seeds[0]] > 0) != (dirs[seeds[1]] > 0):
         print("  DIRECTIONS DISAGREE between seeds -> UNRESOLVED. Do not report "

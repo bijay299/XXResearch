@@ -3834,10 +3834,8 @@
       }
     }
   },
-  "test_conditions_are_three_separate_checks": "(a) test_matching_check -- TOLERANCE AGREEMENT between the arms; (b) test_eligibility_check -- each arm's own \u00a75 REFERENCE GATES; (c) test_protocol_validity -- (a) AND (b), which is what licenses the word 'matched' and the \u00a77 decision table. These are reported separately and must not be collapsed into one another.",
   "test_matching_check": {
     "17": {
-      "_this_checks": "ONLY whether the two arms agree in target deletion. It says nothing about whether that deletion level is inside the declared regime; that is the separate eligibility check.",
       "target": "dog",
       "threshold": "0.5",
       "L2_target_deletion_pp_vs_MA": 17.5,
@@ -3849,14 +3847,12 @@
       ],
       "which_arm_deleted_more": "L2",
       "tolerance_pp": 5.0,
-      "tolerance_agreement_on_test": true,
       "matched_on_test": true,
       "development_mismatch_pp": 1.25,
-      "status": "TOLERANCE_AGREEMENT_ON_TEST",
-      "consequence": "the two arms agree in target deletion on the frozen test set within the tolerance selection used. This is necessary but NOT sufficient: the reference gates must also hold on this set for the comparison to be a matched comparison in the prespecified regime."
+      "status": "MATCHED_ON_TEST",
+      "consequence": "the arms are matched on the frozen test set within the same tolerance selection used, so the retention contrast for this seed is a matched comparison"
     },
     "29": {
-      "_this_checks": "ONLY whether the two arms agree in target deletion. It says nothing about whether that deletion level is inside the declared regime; that is the separate eligibility check.",
       "target": "dog",
       "threshold": "0.5",
       "L2_target_deletion_pp_vs_MA": 22.5,
@@ -3868,172 +3864,38 @@
       ],
       "which_arm_deleted_more": "U",
       "tolerance_pp": 5.0,
-      "tolerance_agreement_on_test": false,
       "matched_on_test": false,
       "development_mismatch_pp": 2.5,
-      "status": "TOLERANCE_FAILED_ON_TEST",
-      "consequence": "the arms differ by 6.25 pp in target deletion ON THE TEST SET, beyond the 5.0 pp tolerance. Agreement held on the development set (2.5 pp) but does not hold here, so the retention contrast for this seed is INCONCLUSIVE as a matched comparison. No reselection is performed: the selected checkpoint stands and this failure is reported as the result for this seed."
-    }
-  },
-  "test_eligibility_check": {
-    "17": {
-      "_this_checks": "whether EACH arm independently clears the \u00a75 reference gates on the set being reported: >= 30 pp target suppression vs that seed's own MA AND <= 60% target residue.",
-      "target": "dog",
-      "threshold": "0.5",
-      "gate_suppression_pp": 30.0,
-      "gate_residue_pct": 60.0,
-      "reference_arm_L2": {
-        "arm": "L2",
-        "target_suppression_pp_vs_own_MA": 17.5,
-        "target_residue_pct": 51.25,
-        "gate_suppression_ge_30pp": false,
-        "gate_residue_le_60pct": true,
-        "eligible": false,
-        "failed_gates": [
-          "suppression_ge_30pp"
-        ]
-      },
-      "candidate_arm_U": {
-        "arm": "U",
-        "target_suppression_pp_vs_own_MA": 16.25,
-        "target_residue_pct": 52.5,
-        "gate_suppression_ge_30pp": false,
-        "gate_residue_le_60pct": true,
-        "eligible": false,
-        "failed_gates": [
-          "suppression_ge_30pp"
-        ]
-      },
-      "both_arms_eligible": false,
-      "status": "NOT_ELIGIBLE_ON_TEST",
-      "development_note": "Eligibility was satisfied on the DEVELOPMENT set at selection time; it is re-checked here because the test prompts are a different measurement. A DEV pass does not transfer.",
-      "consequence": "at least one arm is OUTSIDE the declared partial-suppression regime on this set, so there is no prespecified regime in which to read the retention contrast: the arms may agree with each other while both having deleted too little to be the comparison that was authorised."
-    },
-    "29": {
-      "_this_checks": "whether EACH arm independently clears the \u00a75 reference gates on the set being reported: >= 30 pp target suppression vs that seed's own MA AND <= 60% target residue.",
-      "target": "dog",
-      "threshold": "0.5",
-      "gate_suppression_pp": 30.0,
-      "gate_residue_pct": 60.0,
-      "reference_arm_L2": {
-        "arm": "L2",
-        "target_suppression_pp_vs_own_MA": 22.5,
-        "target_residue_pct": 52.5,
-        "gate_suppression_ge_30pp": false,
-        "gate_residue_le_60pct": true,
-        "eligible": false,
-        "failed_gates": [
-          "suppression_ge_30pp"
-        ]
-      },
-      "candidate_arm_U": {
-        "arm": "U",
-        "target_suppression_pp_vs_own_MA": 28.75,
-        "target_residue_pct": 46.25,
-        "gate_suppression_ge_30pp": false,
-        "gate_residue_le_60pct": true,
-        "eligible": false,
-        "failed_gates": [
-          "suppression_ge_30pp"
-        ]
-      },
-      "both_arms_eligible": false,
-      "status": "NOT_ELIGIBLE_ON_TEST",
-      "development_note": "Eligibility was satisfied on the DEVELOPMENT set at selection time; it is re-checked here because the test prompts are a different measurement. A DEV pass does not transfer.",
-      "consequence": "at least one arm is OUTSIDE the declared partial-suppression regime on this set, so there is no prespecified regime in which to read the retention contrast: the arms may agree with each other while both having deleted too little to be the comparison that was authorised."
-    }
-  },
-  "test_protocol_validity": {
-    "17": {
-      "tolerance_agreement_on_test": true,
-      "both_arms_eligible_on_test": false,
-      "valid_matched_comparison": false,
-      "failed_conditions": [
-        "eligibility (L2): suppression 17.50 pp, residue 51.25% -> failed suppression_ge_30pp",
-        "eligibility (U): suppression 16.25 pp, residue 52.50% -> failed suppression_ge_30pp"
-      ],
-      "status": "NOT_A_VALID_MATCHED_COMPARISON",
-      "consequence": "the prespecified test conditions do NOT hold on this set. The retention contrast is retained as a DESCRIPTIVE result and every protocol-level reading is withdrawn for this seed: the comparison is rejected, not the hypothesis (\u00a77 last row for a failed match; \u00a710 for a failed reference gate). No reselection, no widened tolerance, no retraining."
-    },
-    "29": {
-      "tolerance_agreement_on_test": false,
-      "both_arms_eligible_on_test": false,
-      "valid_matched_comparison": false,
-      "failed_conditions": [
-        "tolerance: mismatch 6.25 pp > 5 pp",
-        "eligibility (L2): suppression 22.50 pp, residue 52.50% -> failed suppression_ge_30pp",
-        "eligibility (U): suppression 28.75 pp, residue 46.25% -> failed suppression_ge_30pp"
-      ],
-      "status": "NOT_A_VALID_MATCHED_COMPARISON",
-      "consequence": "the prespecified test conditions do NOT hold on this set. The retention contrast is retained as a DESCRIPTIVE result and every protocol-level reading is withdrawn for this seed: the comparison is rejected, not the hypothesis (\u00a77 last row for a failed match; \u00a710 for a failed reference gate). No reselection, no widened tolerance, no retraining."
+      "status": "NOT_MATCHED_ON_TEST",
+      "consequence": "the arms differ by 6.25 pp in target deletion ON THE TEST SET, beyond the 5.0 pp tolerance. Matching held on the development set (2.5 pp) but does not hold here, so the retention contrast for this seed is INCONCLUSIVE as a matched comparison. No reselection is performed: the selected checkpoint stands and this failure is reported as the result for this seed."
     }
   },
   "matched_on_test_all_seeds": false,
-  "eligible_on_test_all_seeds": false,
-  "valid_matched_comparison_all_seeds": false,
-  "valid_matched_comparison_any_seed": false,
-  "matched_comparison_status": "NOT A VALID MATCHED COMPARISON on the frozen test set for ANY seed. The prespecified test conditions of \u00a75 -- the reference gates AND the match tolerance -- were not all met. The retention contrasts below are retained as DESCRIPTIVE results; they do NOT license a matched-effectiveness claim, a practical-equivalence statement or the exclusion of a material benefit for any seed whose conditions failed. The comparison is rejected, not the hypothesis.",
+  "matched_comparison_status": "NOT MATCHED on the frozen test set for at least one seed: the matched retention comparison is INCONCLUSIVE for that seed. The equivalence readings below describe the contrast that was measured; they do NOT license a matched-effectiveness claim where matching failed.",
   "primary_reading_per_seed": {
     "17": {
       "point": 1.25,
       "lo95": -2.5,
       "hi95": 5.0,
-      "interval_within_declared_margin": true,
-      "interval_upper_below_material": true,
-      "interval_lower_above_material": false,
-      "interval_spans_material_margin": false,
-      "interval_arithmetic": "interval wholly within [-10, 10]; upper bound +5.0 < +10",
-      "practical_equivalence": false,
+      "practical_equivalence": true,
       "material_benefit": false,
-      "benefit_of_10pp_ruled_out": false,
-      "inconclusive": true,
-      "protocol_level_claim_available": false,
-      "withdrawn_claims": [
-        "practical_equivalence_at_the_declared_margin",
-        "exclusion_of_a_10pp_material_benefit",
-        "material_benefit_carries_forward"
-      ],
-      "reading": "DESCRIPTIVE ONLY -- no protocol-level reading is available. The prespecified test conditions of \u00a75 were not met on this set (eligibility (L2): suppression 17.50 pp, residue 51.25% -> failed suppression_ge_30pp, eligibility (U): suppression 16.25 pp, residue 52.50% -> failed suppression_ge_30pp), so the \u00a77 decision table does not apply. \u00a77's last row rejects the COMPARISON rather than the hypothesis when the match fails, and \u00a710 makes a reference-gate failure a stop-and-report condition; this is read the same way. The interval (+1.2 pp [-2.5, +5.0]) stands as a description of what was measured between these two checkpoints and supports no equivalence statement and no exclusion of a material benefit. Arithmetically: interval wholly within [-10, 10]; upper bound +5.0 < +10.",
+      "benefit_of_10pp_ruled_out": true,
+      "inconclusive": false,
+      "reading": "interval wholly within [-10, 10]: PRACTICAL EQUIVALENCE at the declared margin; upper bound +5.0 < +10: a benefit of 10 pp or more is RULED OUT, conditionally",
       "matched_on_test": true,
-      "tolerance_agreement_on_test": true,
-      "both_arms_eligible_on_test": false,
-      "valid_matched_comparison": false,
-      "failed_conditions": [
-        "eligibility (L2): suppression 17.50 pp, residue 51.25% -> failed suppression_ge_30pp",
-        "eligibility (U): suppression 16.25 pp, residue 52.50% -> failed suppression_ge_30pp"
-      ],
-      "matched_comparison": "NOT A VALID MATCHED COMPARISON on this set: eligibility (L2): suppression 17.50 pp, residue 51.25% -> failed suppression_ge_30pp; eligibility (U): suppression 16.25 pp, residue 52.50% -> failed suppression_ge_30pp"
+      "matched_comparison": "VALID: the arms are matched on this set"
     },
     "29": {
       "point": -1.25,
       "lo95": -6.25,
       "hi95": 3.75,
-      "interval_within_declared_margin": true,
-      "interval_upper_below_material": true,
-      "interval_lower_above_material": false,
-      "interval_spans_material_margin": false,
-      "interval_arithmetic": "interval wholly within [-10, 10]; upper bound +3.8 < +10",
-      "practical_equivalence": false,
+      "practical_equivalence": true,
       "material_benefit": false,
-      "benefit_of_10pp_ruled_out": false,
-      "inconclusive": true,
-      "protocol_level_claim_available": false,
-      "withdrawn_claims": [
-        "practical_equivalence_at_the_declared_margin",
-        "exclusion_of_a_10pp_material_benefit",
-        "material_benefit_carries_forward"
-      ],
-      "reading": "DESCRIPTIVE ONLY -- no protocol-level reading is available. The prespecified test conditions of \u00a75 were not met on this set (tolerance: mismatch 6.25 pp > 5 pp, eligibility (L2): suppression 22.50 pp, residue 52.50% -> failed suppression_ge_30pp, eligibility (U): suppression 28.75 pp, residue 46.25% -> failed suppression_ge_30pp), so the \u00a77 decision table does not apply. \u00a77's last row rejects the COMPARISON rather than the hypothesis when the match fails, and \u00a710 makes a reference-gate failure a stop-and-report condition; this is read the same way. The interval (-1.2 pp [-6.2, +3.8]) stands as a description of what was measured between these two checkpoints and supports no equivalence statement and no exclusion of a material benefit. Arithmetically: interval wholly within [-10, 10]; upper bound +3.8 < +10.",
+      "benefit_of_10pp_ruled_out": true,
+      "inconclusive": false,
+      "reading": "interval wholly within [-10, 10]: PRACTICAL EQUIVALENCE at the declared margin; upper bound +3.8 < +10: a benefit of 10 pp or more is RULED OUT, conditionally",
       "matched_on_test": false,
-      "tolerance_agreement_on_test": false,
-      "both_arms_eligible_on_test": false,
-      "valid_matched_comparison": false,
-      "failed_conditions": [
-        "tolerance: mismatch 6.25 pp > 5 pp",
-        "eligibility (L2): suppression 22.50 pp, residue 52.50% -> failed suppression_ge_30pp",
-        "eligibility (U): suppression 28.75 pp, residue 46.25% -> failed suppression_ge_30pp"
-      ],
-      "matched_comparison": "NOT A VALID MATCHED COMPARISON on this set: tolerance: mismatch 6.25 pp > 5 pp; eligibility (L2): suppression 22.50 pp, residue 52.50% -> failed suppression_ge_30pp; eligibility (U): suppression 28.75 pp, residue 46.25% -> failed suppression_ge_30pp"
+      "matched_comparison": "INCONCLUSIVE AS A MATCHED COMPARISON: the arms are not matched on this set"
     }
   },
   "parent_referenced_note": "Both arms of a seed share that seed's own MA, so the contrast of parent-referenced changes is algebraically identical to the direct contrast. Per-arm changes from MA are reported for interpretation; the coincidence is stated, not presented as a second result.",
@@ -4046,14 +3908,11 @@
     "Intervals are conditional on this base model, these concepts, these anchors, these prompts and this detector.",
     "Residual dependence from a template shared ACROSS scene clusters is not absorbed by this bootstrap, and its direction and size are not established.",
     "The detector is a PROXY. Final conclusions require the blinded human annotation.",
-    "Matching was established on the DEVELOPMENT set and is re-checked here on the TEST set. Where the on-test check fails, the retention contrast for that seed is INCONCLUSIVE as a matched comparison, and no reselection is permitted.",
-    "The on-test re-check is the SAME GATES AND THE SAME MATCH, not the match alone: each arm must independently clear >= 30 pp target suppression and <= 60% target residue on this set, AND the two arms must agree within 5 pp. Tolerance agreement between two arms that both under-deleted is agreement outside the declared regime and is not a matched comparison.",
-    "Where the prespecified test conditions fail, the contrast is retained as a DESCRIPTIVE measurement and every protocol-level claim -- practical equivalence at the declared margin, and the exclusion of a 10 pp material benefit -- is WITHDRAWN for that seed. Withheld is not disproved: nothing here shows the arms differ, only that this run cannot say they do not.",
-    "A failure of the test conditions is a statement about THIS selected pair in THIS pilot. It is not evidence of a general defect in matched-effectiveness designs, and its causes are unresolved here."
+    "Matching was established on the DEVELOPMENT set and is re-checked here on the TEST set. Where the on-test check fails, the retention contrast for that seed is INCONCLUSIVE as a matched comparison, and no reselection is permitted."
   ],
-  "analysed_utc": "2026-10-10T22:34:38.423371+00:00",
+  "analysed_utc": "2026-10-10T20:56:57.170545+00:00",
   "supersedes": {
-    "preserved_at": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/analysis_test.20261010T205657.superseded.json",
-    "preserved_analysed_utc": "2026-10-10T20:56:57.170545+00:00"
+    "preserved_at": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/analysis_test.20261010T205055.superseded.json",
+    "preserved_analysed_utc": "2026-10-10T20:50:55.367161+00:00"
   }
 }

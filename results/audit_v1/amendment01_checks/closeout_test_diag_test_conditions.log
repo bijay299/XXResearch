@@ -1,0 +1,76 @@
+
+the gate constants are the protocol's, not invented here
+  ok    suppression gate is 30 pp
+  ok    residue gate is 60%
+  ok    match tolerance is 5 pp
+
+arm_eligibility: both gates, and the boundaries are inclusive
+  ok    exactly on both gates is ELIGIBLE
+  ok    29.99 pp suppression fails the suppression gate
+  ok    60.01% residue fails the residue gate
+  ok    an under-suppressed arm that clears residue is NOT eligible
+  ok    the failing gate is named
+
+protocol_reading withholds every claim when §5 was not satisfied
+  ok    the arithmetic layer carries no protocol claim
+  ok    a VALID comparison gets the equivalence reading
+  ok    an INVALID comparison gets no equivalence claim
+  ok    and the withdrawal is recorded explicitly, not implied
+  ok    the interval survives as a descriptive result
+  ok    withheld is not presented as disproved
+
+CASE A: arms close, BOTH under-suppressed
+  ok    analysis still exits 0 and reports, rather than crashing
+  ok    tolerance agreement PASSES (mismatch 0.00 pp)
+  ok    suppression is 20.00 pp on both arms
+  ok    residue clears its gate on both arms
+  ok    ELIGIBILITY FAILS for both arms
+  ok    overall: NOT a valid matched comparison
+  ok    the failure names eligibility, not tolerance
+  ok    the bird interval is exactly [0.0, 0.0] and is still reported
+  ok    a zero-width interval inside the margin is NOT called equivalence
+  ok    and a 10 pp benefit is NOT reported as ruled out
+  ok    the arithmetic fact is still available, separately
+  ok    no seed is reported as a valid matched comparison
+  ok    the top-level status says ANY seed, not just one
+  ok    the three checks are documented as separate
+  ok    the output warns against generalising the failure
+
+CASE B: a VALID positive case
+  ok    analysis exits 0
+  ok    suppression is 50.00 pp on both arms, residue 40.00%
+  ok    BOTH arms are eligible
+  ok    tolerance agreement passes
+  ok    overall: VALID matched comparison, no failed conditions
+  ok    every seed is valid, so the top-level status says so
+  ok    the §7 decision table IS applied here
+  ok    the +30 pp reading agrees with its own bounds
+  ok    a valid comparison carries no DESCRIPTIVE-ONLY disclaimer
+
+CASE C: suppression exactly on the gate, residue over it
+  ok    analysis exits 0
+  ok    suppression of exactly 30.00 pp PASSES
+  ok    70.00% residue FAILS, so the arm is not eligible
+  ok    the failure names the residue gate specifically
+  ok    tolerance still passes, and is reported separately
+  ok    overall is invalid despite the tolerance passing
+
+source-bound: the committed Amendment 01 analysis record
+  ok    the record carries the eligibility check
+  ok    seed 17: L2 suppression 17.5 pp, below the 30 pp gate
+  ok    seed 17: U* suppression 16.25 pp, below the 30 pp gate
+  ok    seed 17: tolerance agreement is PASS, reported separately
+  ok    seed 17: NOT a valid matched comparison
+  ok    seed 17: no practical-equivalence claim stands
+  ok    seed 17: the bird interval is retained as descriptive
+  ok    seed 29: L2 suppression 22.5 pp, below the 30 pp gate
+  ok    seed 29: U* suppression 28.75 pp, below the 30 pp gate
+  ok    seed 29: tolerance agreement is FAIL, reported separately
+  ok    seed 29: NOT a valid matched comparison
+  ok    seed 29: no practical-equivalence claim stands
+  ok    seed 29: the bird interval is retained as descriptive
+  ok    NEITHER seed supplies a valid matched comparison
+  ok    the record is still labelled provisional on human annotation
+
+59 passed, 0 failed
+ALL ON-TEST CONDITION CHECKS PASSED (CPU only)

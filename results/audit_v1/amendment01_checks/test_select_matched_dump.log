@@ -1,0 +1,46 @@
+
+the demonstrated defect: an INELIGIBLE L2 reference
+  ok    the reference's own suppression is computed (27.5 pp)
+  ok    the reference is marked INELIGIBLE
+  ok    the decision is INELIGIBLE_L2_REFERENCE, not MATCHED
+  ok    nothing is selected
+  ok    the run does not proceed to the frozen test set
+  ok    exit status is non-zero
+  ok    the reason names the gate it fails
+  ok    and explains why matching would be meaningless
+  ok    a dump within 5 pp did exist, so this was a real near-miss
+
+gate boundaries bind at the threshold, not one step inside it
+  ok    suppression exactly 30.0 pp is eligible
+  ok    and is flagged as sitting exactly on the gate
+  ok    28.75 pp (one detection inside the gate) is ineligible
+  ok    residue exactly 60.0% is eligible
+  ok    and is flagged as sitting exactly on the residue gate
+  ok    residue 61.25% is ineligible even with 38.75 pp suppression
+
+the other decision branches still behave
+  ok    an eligible reference with a close dump MATCHES
+  ok    it selects the dump within tolerance
+  ok    and permits the frozen test set
+  ok    a tie is broken by the EARLIEST step
+  ok    an eligible reference with no close dump is INFEASIBLE
+  ok    the bracketing is recorded with a parent lower bound
+  ok    the gap between brackets is reported
+
+a re-run PRESERVES the previous decision record
+  ok    the earlier record is preserved beside the new one
+  ok    the preserved record is the earlier decision verbatim
+  ok    the new record points at what it superseded
+  ok    with the preserved record's own digest
+
+the REAL development records: references eligible, both unmatched
+  ok    real seed 17: L2 reference is ELIGIBLE (30.0 pp, 52.5% residue)
+  ok    real seed 17: still INFEASIBLE under the added gate
+  ok    real seed 29: L2 reference is ELIGIBLE (33.8 pp, 48.8% residue)
+  ok    real seed 29: still INFEASIBLE under the added gate
+  ok    real run: both seeds remain unmatched
+  ok    real run: the frozen test set is still forbidden
+  ok    real seed 17 sits EXACTLY on the 30 pp suppression gate
+
+33 passed, 0 failed
+ALL SELECTION CHECKS PASSED (CPU only)

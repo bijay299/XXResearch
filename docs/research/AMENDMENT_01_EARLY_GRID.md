@@ -1,7 +1,19 @@
 # Amendment 01 — a fixed early dump grid at steps 10…90
 
-**Status: AUTHORISED AND RUNNING** (PI, 2026-10-10). This supersedes the
-earlier "prepared, awaiting approval" status.
+> **Status: APPROVED, RUN, AND CLOSED (2026-10-10).** Development matching
+> succeeded at step 70 on both seeds; the frozen test set was evaluated once; the
+> §5 test conditions then **failed on both seeds** (eligibility on both, tolerance
+> additionally on seed 29), so **neither seed supplies a valid matched
+> comparison**. Results:
+> [`AMENDMENT_01_RESULTS.md`](../../results/audit_v1/AMENDMENT_01_RESULTS.md).
+> Closeout:
+> [`AMENDMENT_01_CLOSEOUT.md`](../../results/audit_v1/AMENDMENT_01_CLOSEOUT.md).
+> Nothing further on this amendment is proposed; no GPU work is authorised by its
+> closeout.
+
+**Authorisation history** (superseded by the closeout banner above):
+*prepared, awaiting approval* → **AUTHORISED AND RUNNING** (PI, 2026-10-10) →
+**run and closed**, same day.
 
 > **Authorisation, recorded before any new measurement was collected.** The PI
 > authorised completing the control corrections in §0 and then launching this

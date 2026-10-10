@@ -1,0 +1,153 @@
+{
+  "_what_this_is": "The PRESCRIBED paired human-audit packet, built to the approved audit: ten matched (prompt, generation-seed) tuples for each training seed and each of cat/dog/bird, all three arms per tuple. Nothing was generated. Labels are EMPTY.",
+  "approved_design": {
+    "training_seeds": [
+      17,
+      29
+    ],
+    "categories": [
+      "cat",
+      "dog",
+      "bird"
+    ],
+    "tuples_per_training_seed_and_category": 10,
+    "arms_per_tuple": [
+      "MA",
+      "MAB_L2",
+      "U"
+    ],
+    "n_items": 180,
+    "arithmetic": "2 seeds x 3 categories x 10 tuples x 3 arms = 180",
+    "why_paired": "the same prompt and generation seed is judged under all three arms, so a human can see whether a detector verdict change BETWEEN arms is a real change in the image. An independently stratified sample cannot answer that question, because it does not hold the tuple fixed."
+  },
+  "generated_utc": "2026-10-10T22:44:47.265574+00:00",
+  "eval_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_test",
+  "slots": {
+    "17": {
+      "MA": "seed17_MA",
+      "MAB_L2": "seed17_MAB_L2",
+      "U": "seed17_U_step70"
+    },
+    "29": {
+      "MA": "seed29_MA",
+      "MAB_L2": "seed29_MAB_L2",
+      "U": "seed29_U_step70"
+    }
+  },
+  "tuple_universe_source": {
+    "manifest": "results/audit_v1/draft_manifests/test_manifest_DRAFT.json",
+    "manifest_sha256_as_stored": "5dd87dbb5a77c0f4c75de79a19b15b0b2e9cddc90d08172857700dac1bcc2a95",
+    "note": "the frozen TEST manifest supplies the tuple universe"
+  },
+  "sampling": {
+    "rng_seed": 20261012,
+    "declared": "fixed as a CLI argument and recorded here; the draw is uniform without replacement over the tuples present in all three arms",
+    "detector_independence": "STRUCTURAL: this script opens only each slot's image_report.json (the generation-side record) and the frozen test manifest. detections.jsonl is never read, so no detector score, verdict or threshold can enter the draw.",
+    "per_cell": {
+      "17|cat": {
+        "tuple_universe": 80,
+        "available_in_all_three_arms": 80,
+        "dropped_not_in_all_arms": 0,
+        "drawn": 10,
+        "realised_family_split": {
+          "literal": 6,
+          "paraphrase": 4
+        },
+        "distinct_prompt_ids": 8
+      },
+      "17|dog": {
+        "tuple_universe": 80,
+        "available_in_all_three_arms": 80,
+        "dropped_not_in_all_arms": 0,
+        "drawn": 10,
+        "realised_family_split": {
+          "literal": 4,
+          "paraphrase": 6
+        },
+        "distinct_prompt_ids": 8
+      },
+      "17|bird": {
+        "tuple_universe": 80,
+        "available_in_all_three_arms": 80,
+        "dropped_not_in_all_arms": 0,
+        "drawn": 10,
+        "realised_family_split": {
+          "literal": 6,
+          "paraphrase": 4
+        },
+        "distinct_prompt_ids": 9
+      },
+      "29|cat": {
+        "tuple_universe": 80,
+        "available_in_all_three_arms": 80,
+        "dropped_not_in_all_arms": 0,
+        "drawn": 10,
+        "realised_family_split": {
+          "literal": 6,
+          "paraphrase": 4
+        },
+        "distinct_prompt_ids": 9
+      },
+      "29|dog": {
+        "tuple_universe": 80,
+        "available_in_all_three_arms": 80,
+        "dropped_not_in_all_arms": 0,
+        "drawn": 10,
+        "realised_family_split": {
+          "literal": 4,
+          "paraphrase": 6
+        },
+        "distinct_prompt_ids": 9
+      },
+      "29|bird": {
+        "tuple_universe": 80,
+        "available_in_all_three_arms": 80,
+        "dropped_not_in_all_arms": 0,
+        "drawn": 10,
+        "realised_family_split": {
+          "literal": 6,
+          "paraphrase": 4
+        },
+        "distinct_prompt_ids": 9
+      }
+    },
+    "withheld_from_this_copy": "the drawn (prompt_id, gen_seed) tuples and their generation seeds. They live in the full manifest beside the key, outside the repository, for the same reason the salt does."
+  },
+  "blinding": {
+    "hidden_from_annotator": [
+      "arm",
+      "training seed",
+      "detector score",
+      "detector verdict",
+      "tuple grouping"
+    ],
+    "shown_to_annotator": [
+      "the category to judge"
+    ],
+    "order": "shuffled once under RNG seed 20261012",
+    "blinded_id_rule": "sha256(<secret salt> | <image_path>)[:12]",
+    "salt_is_secret": "The salt is NOT published. Image paths are deterministic, so a published salt would make the entire id space enumerable and the blind recoverable by anyone who can read this manifest. Only the salt's digest appears here.",
+    "salt_sha256": "428cb146d37a0ad25a0d924b2a0bfad417bcadfc6db118447a7288ececf6ea97",
+    "salt_location": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/BLINDING_SALT_SECRET.txt",
+    "salt_source": "freshly generated and stored at /data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/BLINDING_SALT_SECRET.txt",
+    "key_location": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/KEY_DO_NOT_OPEN_WHILE_ANNOTATING.csv",
+    "key_inside_packet": false,
+    "probe": "the packet's text files were scanned for arm, seed and detector strings; no match, or the build aborts",
+    "disclosed_limitation": "a paired packet necessarily contains three images of the same prompt and generation seed. An annotator may notice the similarity and infer that items belong together; nothing identifies WHICH of a similar group came from which arm. This is a property of the approved design and is recorded, not concealed."
+  },
+  "relationship_to_other_packets": {
+    "supplementary_packet_preserved": "the previously delivered 228-item packet (168 independently stratified items over seven categories + 60 enriched diagnostics) is retained unchanged as a SEPARATE supplementary audit",
+    "must_not_be_pooled": "the enriched subset is biased upward by construction and this packet's sample is paired rather than category-stratified; an error rate computed across them is not an error rate",
+    "compared_against": [
+      "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_v2/packet/label_sheet.csv",
+      "/data/bijaypandey/cuig_pilot/seq_pilot/annotation_v1/packet/label_sheet_EMPTY.csv"
+    ],
+    "n_overlapping_images": 13,
+    "n_overlapping_already_labelled": 0,
+    "overlap_report": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/OVERLAP_coordinator_only.csv",
+    "overlap_report_is_outside_the_packet_because": "overlap reveals set membership, which the annotator must not see",
+    "prior_labels_preserved": "any answer already entered in an earlier packet is carried into the overlap report with its source item id, so no human work is lost. The new packet's own cells stay EMPTY: pre-filling them would import another packet's sampling design into this one."
+  },
+  "label_state": "EMPTY -- no labels are supplied or implied",
+  "provisional": "Detector results stay PROVISIONAL until this audit is complete. No labels exist yet."
+}

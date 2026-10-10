@@ -225,3 +225,22 @@ against these contracts and pass.**
 **The saved pilot was not modified.** No checkpoint, report, image, detection or
 log was edited, moved or deleted in this round; the registry and the log
 inspection only read and hash them.
+
+### Added by the Amendment 01 closeout (2026-10-10)
+
+| file | purpose |
+|---|---|
+| `scripts/seq/diag_analysis.py` (repaired) | re-applies protocol §5's **reference gates** on the frozen test set alongside the match, and reports **three separate** fields — `test_matching_check` (tolerance agreement), `test_eligibility_check` (each arm's own gates), `test_protocol_validity` (both). Where validity fails, every protocol-level claim is withheld with `withdrawn_claims` populated, while `interval_*` keeps the arithmetic facts and the contrast survives as descriptive |
+| `scripts/seq/test_diag_test_conditions.py` | **59 CPU checks, 0 failures.** Gate boundaries; **arms close but both under-suppressed** (tolerance passes, eligibility fails, no claim available, interval retained); a **valid positive** case where the §7 table does apply; a residue-only failure; and **source-bound** assertions against the committed `analysis_test.json` |
+| `scripts/seq/build_paired_annotation_packet.py` | builds the **prescribed 180-item paired** audit from existing images — 2 seeds × {cat,dog,bird} × 10 tuples × 3 arms. Reads only `image_report.json` and the frozen manifest, never `detections.jsonl`, so detector independence is structural; declared sampling seed; labels asserted empty; key and overlap report written outside the packet; a blinding probe aborts the build on a leak |
+| `results/audit_v1/annotation_packet_paired180/` | that packet's key-free metadata: empty sheet, instructions, manifest, overlap summary, README |
+| `scripts/seq/build_amendment01_evidence.py` | completes the evidence archive: supplies `unattended.log` checked against the identity the published manifest recorded, adds the raw development and frozen-test detector rows with their stage reports as deterministic archives, preserves every analysis version, recomputes the device-hour ledger without altering it, and records access limitations explicitly |
+| `results/audit_v1/amendment01_evidence/` | 15 hash-listed payloads, 0 access limitations; `MANIFEST.published_at_7e01fbd.json` keeps the earlier listing verbatim |
+| `results/audit_v1/AMENDMENT_01_CLOSEOUT.md`, `CLAIM_CORRECTIONS_V5.md` | the one-page closeout, and every withdrawn claim with what replaced it |
+| `docs/research/NEXT_SCREEN_PROPOSAL.md` | the next scientific screen — CPU-only, **not authorised to run** |
+
+**Nothing was reselected, retrained or re-evaluated**, no tolerance or gate was
+changed, the frozen test set was not touched again, and both step-70 checkpoints
+and all run outputs are preserved. The only new computation is a CPU re-analysis
+of the existing detector rows; the two superseded analysis records are kept
+verbatim beside the current one.
