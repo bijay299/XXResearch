@@ -19,7 +19,9 @@ on either seed: the measured points **straddled** the target (0 pp at step 0,
 discrete checkpoint, so this amendment **tested** whether some step on the fixed
 grid 10, 20, …, 90 lands inside the band.
 
-**It does, on both seeds, at step 70.**
+**It does, on both seeds, at step 70 — on the development set.** On the frozen
+test set the matching survived for seed 17 (1.25 pp) but **not** for seed 29
+(6.25 pp), which makes seed 29's matched comparison inconclusive. See §7.1.
 
 | seed | fixed L2 target | step-70 suppression | mismatch | within 5 pp |
 |---|---|---|---|---|
@@ -141,9 +143,91 @@ so there is no path to an automatic reselection after test access.
 
 ---
 
-## 7. Frozen test and analysis
+## 7. Frozen test, evaluated once
 
-<!-- filled in when the run completes -->
+6 slots (MA, L2, U*=step 70 per seed) × 560 pairs = **3,360 images, 3,360
+detector rows**. The manifest identity `5dd87dbb5a77c0f4…` is unchanged, the set
+was evaluated **once**, and selection is now locked out of running at all.
+
+### 7.1 The matching check, re-reported on TEST — and it does not hold on both seeds
+
+The protocol requires the matching check to be re-reported on the test set
+without reselection. Matching was established on the **development** set; whether
+it still holds on the **frozen test** set is a separate question, and it is the
+one that licenses the word "matched".
+
+| seed | dog deletion, L2 | dog deletion, U* | mismatch on TEST | dev mismatch | verdict |
+|---|---|---|---|---|---|
+| 17 | 17.50 pp | 16.25 pp | **1.25 pp** | 1.25 pp | **MATCHED ON TEST** |
+| 29 | 22.50 pp | 28.75 pp | **6.25 pp** (U* deleted more) | 2.50 pp | **NOT MATCHED ON TEST** |
+
+**Consequence, by the prespecified rule:** seed 29's retention contrast is
+**INCONCLUSIVE as a matched comparison** — the arms are 6.25 pp apart in target
+deletion on the very set being reported, beyond the 5 pp tolerance. The selected
+checkpoint stands; **no reselection was performed**, the tolerance was not
+widened, and nothing was retrained. Since the design requires **both** seeds, the
+confirmatory matched claim is **not** satisfied across seeds.
+
+> This check was missing from the analysis script and was added here (CPU only,
+> no reselection, previous analysis record preserved as
+> `analysis_test.20261010T205055.superseded.json`). It is the single most
+> consequential number in this run, and the run would have over-claimed without
+> it.
+
+### 7.2 Primary endpoint: paired bird retention at matched deletion, t=0.5
+
+Per training seed, never pooled. Frozen scene-cluster bootstrap
+`2ba0e8df5034d011…`, 70 clusters, 7 category strata, 10,000 draws, RNG
+2026100901, 95% percentile intervals.
+
+| seed | D_bird(L2) | D_bird(U*) | contrast L2 − U* | 95% interval | reading | matched on TEST |
+|---|---|---|---|---|---|---|
+| 17 | 73.75% | 72.50% | **+1.25 pp** | [−2.50, +5.00] | practical equivalence; a ≥10 pp benefit **ruled out** | **yes** |
+| 29 | 76.25% | 77.50% | **−1.25 pp** | [−6.25, +3.75] | practical equivalence; a ≥10 pp benefit **ruled out** | **no — inconclusive** |
+
+**What this supports, on the one seed where matching holds on the test set:** at
+matched dog deletion, the L2-SP arm shows **no material retention advantage** on
+bird. The interval lies wholly inside ±10 pp and its upper bound is +5.0 pp, so a
+benefit of 10 pp or more is ruled out at that margin, conditionally.
+
+**What it does not support:** a two-seed confirmatory claim. Seed 29's arms were
+not matched on the test set, so its numerically similar result cannot be read as
+a matched comparison — even though it points the same way.
+
+### 7.3 Every category separately, never averaged (t=0.5, contrast L2 − U*)
+
+| category | role | seed 17 | seed 29 |
+|---|---|---|---|
+| **bird** | **primary retained** | +1.25 [−2.50, +5.00] | −1.25 [−6.25, +3.75] |
+| horse | retained (anchor) | +1.25 [−2.50, +5.00] | +1.25 [0.00, +3.75] |
+| chair | retained | −2.50 [−8.75, +3.75] | −3.75 [−10.00, +2.50] |
+| bicycle | retained | +2.50 [0.00, +6.25] | +2.50 [−2.50, +8.75] |
+| sandwich | never-targeted control | −2.50 [−7.50, +2.50] | 0.00 [−7.50, +6.25] |
+| cat | earlier deletion target | −2.50 [−8.75, +2.50] | +1.25 [−3.75, +6.25] |
+| dog | current target (matching check) | −1.25 [−6.25, +3.75] | **+6.25 [−1.25, +13.75]** |
+
+Thresholds 0.3 and 0.7, and the literal/paraphrase split, are reported in
+`analysis_test.json`; 0.5 is primary. Every interval is **descriptive**: no
+multiplicity correction is applied, an interval including zero is not evidence of
+no effect, and a difference in labels between seeds is not a significant
+difference.
+
+### 7.4 Blinded human-audit packet
+
+**228 items** (SET R 168 stratified-random, SET D 60 enriched for scores in
+[0.3, 0.7] and parent→child verdict flips), shuffled once under RNG 20261011.
+Every label cell is **empty**. The key lives outside the packet at
+`annotation_v2/KEY_DO_NOT_OPEN_WHILE_ANNOTATING.csv`; the packet directory
+contains no arm, seed, score or set label — verified by probing it. Key-free
+metadata is committed at
+[`annotation_packet_v2/`](annotation_packet_v2/).
+
+### 7.5 Compute
+
+2.9014 device-hours recorded in total across both runs (1.2022 carried forward
+from the original run, 1.6992 for this amendment), 56 stages, **0 failed, 0
+orphaned**. No ceiling applied. GPUs 0 and 1 only, both verified idle before
+assignment; GPUs 2 and 3 were never touched.
 
 ---
 

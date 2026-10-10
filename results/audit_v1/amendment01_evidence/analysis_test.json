@@ -1,0 +1,3918 @@
+{
+  "_what_this_is": "The matched-effectiveness diagnostic's detector-based estimates. PROVISIONAL: the blinded human annotation is a prerequisite for any final scientific conclusion and is not an input here.",
+  "primary_endpoint": "paired contrast D_bird(L2) - D_bird(U*) on the frozen test set at t=0.5",
+  "grouping_sha256": "2ba0e8df5034d011fc9c434ce9d8b44689694cec73aefa6f155d5726a1b8ea8c",
+  "bootstrap": {
+    "n_draws": 10000,
+    "rng_seed": 2026100901,
+    "interval": "95% percentile",
+    "unit": "the scene cluster (set, category, prompt_index)",
+    "stratum": "category"
+  },
+  "selection": {
+    "17": {
+      "step": 70,
+      "mismatch_vs_L2_pp": 1.25
+    },
+    "29": {
+      "step": 70,
+      "mismatch_vs_L2_pp": 2.5
+    }
+  },
+  "seeds_pooled": false,
+  "per_seed": {
+    "17": {
+      "training_seed": 17,
+      "selected_U_step": 70,
+      "n_clusters": 70,
+      "clusters_per_stratum": {
+        "bicycle": 10,
+        "bird": 10,
+        "cat": 10,
+        "chair": 10,
+        "dog": 10,
+        "horse": 10,
+        "sandwich": 10
+      },
+      "estimates": {
+        "D[bicycle|0.3]|L2": {
+          "point": 85.0,
+          "lo95": 72.5,
+          "hi95": 95.0
+        },
+        "D[bicycle|0.3]|U": {
+          "point": 83.75,
+          "lo95": 71.25,
+          "hi95": 93.75
+        },
+        "D[bicycle|0.3]|MA": {
+          "point": 82.5,
+          "lo95": 70.0,
+          "hi95": 92.5
+        },
+        "contrast[bicycle|0.3]": {
+          "point": 1.25,
+          "lo95": 0.0,
+          "hi95": 3.75
+        },
+        "vsMA[bicycle|0.3]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 6.25
+        },
+        "vsMA[bicycle|0.3]|U": {
+          "point": 1.25,
+          "lo95": 0.0,
+          "hi95": 3.75
+        },
+        "D[bicycle|0.3|literal]|L2": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.3|literal]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.3|literal]|MA": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "contrast[bicycle|0.3|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.3|literal]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.3|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.3|paraphrase]|L2": {
+          "point": 77.5,
+          "lo95": 57.5,
+          "hi95": 92.5
+        },
+        "D[bicycle|0.3|paraphrase]|U": {
+          "point": 75.0,
+          "lo95": 55.0,
+          "hi95": 90.0
+        },
+        "D[bicycle|0.3|paraphrase]|MA": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "contrast[bicycle|0.3|paraphrase]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[bicycle|0.3|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 12.5
+        },
+        "vsMA[bicycle|0.3|paraphrase]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[bird|0.3]|L2": {
+          "point": 76.25,
+          "lo95": 65.0,
+          "hi95": 86.25
+        },
+        "D[bird|0.3]|U": {
+          "point": 77.5,
+          "lo95": 65.0,
+          "hi95": 88.75
+        },
+        "D[bird|0.3]|MA": {
+          "point": 81.25,
+          "lo95": 67.5,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.3]": {
+          "point": -1.25,
+          "lo95": -6.25,
+          "hi95": 3.75
+        },
+        "vsMA[bird|0.3]|L2": {
+          "point": -5.0,
+          "lo95": -12.5,
+          "hi95": 1.25
+        },
+        "vsMA[bird|0.3]|U": {
+          "point": -3.75,
+          "lo95": -10.0,
+          "hi95": 2.5
+        },
+        "D[bird|0.3|literal]|L2": {
+          "point": 75.0,
+          "lo95": 52.5,
+          "hi95": 92.5
+        },
+        "D[bird|0.3|literal]|U": {
+          "point": 77.5,
+          "lo95": 57.5,
+          "hi95": 92.5
+        },
+        "D[bird|0.3|literal]|MA": {
+          "point": 75.0,
+          "lo95": 52.5,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.3|literal]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.3|literal]|L2": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[bird|0.3|literal]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[bird|0.3|paraphrase]|L2": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "D[bird|0.3|paraphrase]|U": {
+          "point": 77.5,
+          "lo95": 65.0,
+          "hi95": 90.0
+        },
+        "D[bird|0.3|paraphrase]|MA": {
+          "point": 87.5,
+          "lo95": 77.5,
+          "hi95": 97.5
+        },
+        "contrast[bird|0.3|paraphrase]": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "vsMA[bird|0.3|paraphrase]|L2": {
+          "point": -10.0,
+          "lo95": -25.0,
+          "hi95": 2.5
+        },
+        "vsMA[bird|0.3|paraphrase]|U": {
+          "point": -10.0,
+          "lo95": -20.0,
+          "hi95": 0.0
+        },
+        "D[cat|0.3]|L2": {
+          "point": 8.75,
+          "lo95": 1.25,
+          "hi95": 18.75
+        },
+        "D[cat|0.3]|U": {
+          "point": 15.0,
+          "lo95": 3.75,
+          "hi95": 30.0
+        },
+        "D[cat|0.3]|MA": {
+          "point": 32.5,
+          "lo95": 18.75,
+          "hi95": 50.0
+        },
+        "contrast[cat|0.3]": {
+          "point": -6.25,
+          "lo95": -12.5,
+          "hi95": 0.0
+        },
+        "vsMA[cat|0.3]|L2": {
+          "point": -23.75,
+          "lo95": -33.75,
+          "hi95": -15.0
+        },
+        "vsMA[cat|0.3]|U": {
+          "point": -17.5,
+          "lo95": -25.0,
+          "hi95": -10.0
+        },
+        "D[cat|0.3|literal]|L2": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "D[cat|0.3|literal]|U": {
+          "point": 17.5,
+          "lo95": 2.5,
+          "hi95": 35.0
+        },
+        "D[cat|0.3|literal]|MA": {
+          "point": 40.0,
+          "lo95": 22.5,
+          "hi95": 60.0
+        },
+        "contrast[cat|0.3|literal]": {
+          "point": -10.0,
+          "lo95": -22.5,
+          "hi95": 0.0
+        },
+        "vsMA[cat|0.3|literal]|L2": {
+          "point": -32.5,
+          "lo95": -47.5,
+          "hi95": -20.0
+        },
+        "vsMA[cat|0.3|literal]|U": {
+          "point": -22.5,
+          "lo95": -30.0,
+          "hi95": -15.0
+        },
+        "D[cat|0.3|paraphrase]|L2": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 25.0
+        },
+        "D[cat|0.3|paraphrase]|U": {
+          "point": 12.5,
+          "lo95": 0.0,
+          "hi95": 27.5
+        },
+        "D[cat|0.3|paraphrase]|MA": {
+          "point": 25.0,
+          "lo95": 10.0,
+          "hi95": 45.0
+        },
+        "contrast[cat|0.3|paraphrase]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[cat|0.3|paraphrase]|L2": {
+          "point": -15.0,
+          "lo95": -22.5,
+          "hi95": -7.5
+        },
+        "vsMA[cat|0.3|paraphrase]|U": {
+          "point": -12.5,
+          "lo95": -22.5,
+          "hi95": -2.5
+        },
+        "D[chair|0.3]|L2": {
+          "point": 71.25,
+          "lo95": 52.5,
+          "hi95": 87.5
+        },
+        "D[chair|0.3]|U": {
+          "point": 76.25,
+          "lo95": 60.0,
+          "hi95": 88.75
+        },
+        "D[chair|0.3]|MA": {
+          "point": 71.25,
+          "lo95": 55.0,
+          "hi95": 85.0
+        },
+        "contrast[chair|0.3]": {
+          "point": -5.0,
+          "lo95": -12.5,
+          "hi95": 1.25
+        },
+        "vsMA[chair|0.3]|L2": {
+          "point": 0.0,
+          "lo95": -5.0,
+          "hi95": 5.0
+        },
+        "vsMA[chair|0.3]|U": {
+          "point": 5.0,
+          "lo95": 1.25,
+          "hi95": 8.75
+        },
+        "D[chair|0.3|literal]|L2": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "D[chair|0.3|literal]|U": {
+          "point": 80.0,
+          "lo95": 65.0,
+          "hi95": 95.0
+        },
+        "D[chair|0.3|literal]|MA": {
+          "point": 80.0,
+          "lo95": 65.0,
+          "hi95": 92.5
+        },
+        "contrast[chair|0.3|literal]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[chair|0.3|literal]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[chair|0.3|literal]|U": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "D[chair|0.3|paraphrase]|L2": {
+          "point": 65.0,
+          "lo95": 42.5,
+          "hi95": 85.0
+        },
+        "D[chair|0.3|paraphrase]|U": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "D[chair|0.3|paraphrase]|MA": {
+          "point": 62.5,
+          "lo95": 42.5,
+          "hi95": 82.5
+        },
+        "contrast[chair|0.3|paraphrase]": {
+          "point": -7.5,
+          "lo95": -15.0,
+          "hi95": 0.0
+        },
+        "vsMA[chair|0.3|paraphrase]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[chair|0.3|paraphrase]|U": {
+          "point": 10.0,
+          "lo95": 2.5,
+          "hi95": 17.5
+        },
+        "D[dog|0.3]|L2": {
+          "point": 56.25,
+          "lo95": 41.25,
+          "hi95": 70.0
+        },
+        "D[dog|0.3]|U": {
+          "point": 56.25,
+          "lo95": 40.0,
+          "hi95": 71.25
+        },
+        "D[dog|0.3]|MA": {
+          "point": 71.25,
+          "lo95": 57.5,
+          "hi95": 83.75
+        },
+        "contrast[dog|0.3]": {
+          "point": 0.0,
+          "lo95": -3.75,
+          "hi95": 3.75
+        },
+        "vsMA[dog|0.3]|L2": {
+          "point": -15.0,
+          "lo95": -25.0,
+          "hi95": -6.25
+        },
+        "vsMA[dog|0.3]|U": {
+          "point": -15.0,
+          "lo95": -25.0,
+          "hi95": -5.0
+        },
+        "D[dog|0.3|literal]|L2": {
+          "point": 62.5,
+          "lo95": 47.5,
+          "hi95": 77.5
+        },
+        "D[dog|0.3|literal]|U": {
+          "point": 57.5,
+          "lo95": 37.5,
+          "hi95": 75.0
+        },
+        "D[dog|0.3|literal]|MA": {
+          "point": 82.5,
+          "lo95": 70.0,
+          "hi95": 95.0
+        },
+        "contrast[dog|0.3|literal]": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 15.0
+        },
+        "vsMA[dog|0.3|literal]|L2": {
+          "point": -20.0,
+          "lo95": -37.5,
+          "hi95": 0.0
+        },
+        "vsMA[dog|0.3|literal]|U": {
+          "point": -25.0,
+          "lo95": -45.0,
+          "hi95": -7.5
+        },
+        "D[dog|0.3|paraphrase]|L2": {
+          "point": 50.0,
+          "lo95": 27.5,
+          "hi95": 72.5
+        },
+        "D[dog|0.3|paraphrase]|U": {
+          "point": 55.0,
+          "lo95": 35.0,
+          "hi95": 75.0
+        },
+        "D[dog|0.3|paraphrase]|MA": {
+          "point": 60.0,
+          "lo95": 32.5,
+          "hi95": 85.0
+        },
+        "contrast[dog|0.3|paraphrase]": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 5.0
+        },
+        "vsMA[dog|0.3|paraphrase]|L2": {
+          "point": -10.0,
+          "lo95": -20.0,
+          "hi95": 0.0
+        },
+        "vsMA[dog|0.3|paraphrase]|U": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 7.5
+        },
+        "D[horse|0.3]|L2": {
+          "point": 98.75,
+          "lo95": 96.25,
+          "hi95": 100.0
+        },
+        "D[horse|0.3]|U": {
+          "point": 98.75,
+          "lo95": 96.25,
+          "hi95": 100.0
+        },
+        "D[horse|0.3]|MA": {
+          "point": 96.25,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.3]": {
+          "point": 0.0,
+          "lo95": -3.75,
+          "hi95": 3.75
+        },
+        "vsMA[horse|0.3]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 6.25
+        },
+        "vsMA[horse|0.3]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 6.25
+        },
+        "D[horse|0.3|literal]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|literal]|U": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|literal]|MA": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.3|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.3|literal]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[horse|0.3|literal]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[horse|0.3|paraphrase]|L2": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|paraphrase]|U": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|paraphrase]|MA": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.3|paraphrase]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[horse|0.3|paraphrase]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[horse|0.3|paraphrase]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[sandwich|0.3]|L2": {
+          "point": 75.0,
+          "lo95": 61.25,
+          "hi95": 88.75
+        },
+        "D[sandwich|0.3]|U": {
+          "point": 78.75,
+          "lo95": 67.5,
+          "hi95": 90.0
+        },
+        "D[sandwich|0.3]|MA": {
+          "point": 76.25,
+          "lo95": 65.0,
+          "hi95": 87.5
+        },
+        "contrast[sandwich|0.3]": {
+          "point": -3.75,
+          "lo95": -10.0,
+          "hi95": 2.5
+        },
+        "vsMA[sandwich|0.3]|L2": {
+          "point": -1.25,
+          "lo95": -7.5,
+          "hi95": 6.25
+        },
+        "vsMA[sandwich|0.3]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 6.25
+        },
+        "D[sandwich|0.3|literal]|L2": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.3|literal]|U": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.3|literal]|MA": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "contrast[sandwich|0.3|literal]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[sandwich|0.3|literal]|L2": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[sandwich|0.3|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[sandwich|0.3|paraphrase]|L2": {
+          "point": 55.0,
+          "lo95": 30.0,
+          "hi95": 77.5
+        },
+        "D[sandwich|0.3|paraphrase]|U": {
+          "point": 62.5,
+          "lo95": 40.0,
+          "hi95": 82.5
+        },
+        "D[sandwich|0.3|paraphrase]|MA": {
+          "point": 57.5,
+          "lo95": 35.0,
+          "hi95": 77.5
+        },
+        "contrast[sandwich|0.3|paraphrase]": {
+          "point": -7.5,
+          "lo95": -20.0,
+          "hi95": 2.5624999999990905
+        },
+        "vsMA[sandwich|0.3|paraphrase]|L2": {
+          "point": -2.5,
+          "lo95": -15.0,
+          "hi95": 12.5
+        },
+        "vsMA[sandwich|0.3|paraphrase]|U": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 12.5
+        },
+        "D[bicycle|0.5]|L2": {
+          "point": 85.0,
+          "lo95": 72.5,
+          "hi95": 95.0
+        },
+        "D[bicycle|0.5]|U": {
+          "point": 82.5,
+          "lo95": 70.0,
+          "hi95": 92.5
+        },
+        "D[bicycle|0.5]|MA": {
+          "point": 82.5,
+          "lo95": 70.0,
+          "hi95": 92.5
+        },
+        "contrast[bicycle|0.5]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 6.25
+        },
+        "vsMA[bicycle|0.5]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 6.25
+        },
+        "vsMA[bicycle|0.5]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.5|literal]|L2": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.5|literal]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.5|literal]|MA": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "contrast[bicycle|0.5|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.5|literal]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.5|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.5|paraphrase]|L2": {
+          "point": 77.5,
+          "lo95": 57.5,
+          "hi95": 92.5
+        },
+        "D[bicycle|0.5|paraphrase]|U": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "D[bicycle|0.5|paraphrase]|MA": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "contrast[bicycle|0.5|paraphrase]": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 12.5
+        },
+        "vsMA[bicycle|0.5|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 12.5
+        },
+        "vsMA[bicycle|0.5|paraphrase]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[bird|0.5]|L2": {
+          "point": 73.75,
+          "lo95": 61.25,
+          "hi95": 85.0
+        },
+        "D[bird|0.5]|U": {
+          "point": 72.5,
+          "lo95": 57.5,
+          "hi95": 86.25
+        },
+        "D[bird|0.5]|MA": {
+          "point": 78.75,
+          "lo95": 61.25,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.5]": {
+          "point": 1.25,
+          "lo95": -2.5,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.5]|L2": {
+          "point": -5.0,
+          "lo95": -12.5,
+          "hi95": 2.5
+        },
+        "vsMA[bird|0.5]|U": {
+          "point": -6.25,
+          "lo95": -13.75,
+          "hi95": 1.25
+        },
+        "D[bird|0.5|literal]|L2": {
+          "point": 75.0,
+          "lo95": 52.5,
+          "hi95": 92.5
+        },
+        "D[bird|0.5|literal]|U": {
+          "point": 77.5,
+          "lo95": 57.5,
+          "hi95": 92.5
+        },
+        "D[bird|0.5|literal]|MA": {
+          "point": 75.0,
+          "lo95": 52.5,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.5|literal]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.5|literal]|L2": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[bird|0.5|literal]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[bird|0.5|paraphrase]|L2": {
+          "point": 72.5,
+          "lo95": 57.5,
+          "hi95": 87.5
+        },
+        "D[bird|0.5|paraphrase]|U": {
+          "point": 67.5,
+          "lo95": 50.0,
+          "hi95": 82.5
+        },
+        "D[bird|0.5|paraphrase]|MA": {
+          "point": 82.5,
+          "lo95": 67.5,
+          "hi95": 95.0
+        },
+        "contrast[bird|0.5|paraphrase]": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 12.5
+        },
+        "vsMA[bird|0.5|paraphrase]|L2": {
+          "point": -10.0,
+          "lo95": -25.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.5|paraphrase]|U": {
+          "point": -15.0,
+          "lo95": -27.5,
+          "hi95": -2.5
+        },
+        "D[cat|0.5]|L2": {
+          "point": 8.75,
+          "lo95": 1.25,
+          "hi95": 18.75
+        },
+        "D[cat|0.5]|U": {
+          "point": 11.25,
+          "lo95": 0.0,
+          "hi95": 27.5
+        },
+        "D[cat|0.5]|MA": {
+          "point": 30.0,
+          "lo95": 16.25,
+          "hi95": 48.75
+        },
+        "contrast[cat|0.5]": {
+          "point": -2.5,
+          "lo95": -8.75,
+          "hi95": 2.5
+        },
+        "vsMA[cat|0.5]|L2": {
+          "point": -21.25,
+          "lo95": -31.25,
+          "hi95": -11.25
+        },
+        "vsMA[cat|0.5]|U": {
+          "point": -18.75,
+          "lo95": -27.5,
+          "hi95": -8.75
+        },
+        "D[cat|0.5|literal]|L2": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "D[cat|0.5|literal]|U": {
+          "point": 12.5,
+          "lo95": 0.0,
+          "hi95": 27.5
+        },
+        "D[cat|0.5|literal]|MA": {
+          "point": 35.0,
+          "lo95": 17.5,
+          "hi95": 55.0
+        },
+        "contrast[cat|0.5|literal]": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 0.0
+        },
+        "vsMA[cat|0.5|literal]|L2": {
+          "point": -27.5,
+          "lo95": -42.5,
+          "hi95": -12.5
+        },
+        "vsMA[cat|0.5|literal]|U": {
+          "point": -22.5,
+          "lo95": -32.5,
+          "hi95": -12.5
+        },
+        "D[cat|0.5|paraphrase]|L2": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 25.0
+        },
+        "D[cat|0.5|paraphrase]|U": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 25.0
+        },
+        "D[cat|0.5|paraphrase]|MA": {
+          "point": 25.0,
+          "lo95": 10.0,
+          "hi95": 45.0
+        },
+        "contrast[cat|0.5|paraphrase]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.5|paraphrase]|L2": {
+          "point": -15.0,
+          "lo95": -22.5,
+          "hi95": -7.5
+        },
+        "vsMA[cat|0.5|paraphrase]|U": {
+          "point": -15.0,
+          "lo95": -25.0,
+          "hi95": -5.0
+        },
+        "D[chair|0.5]|L2": {
+          "point": 62.5,
+          "lo95": 46.25,
+          "hi95": 78.75
+        },
+        "D[chair|0.5]|U": {
+          "point": 65.0,
+          "lo95": 50.0,
+          "hi95": 80.0
+        },
+        "D[chair|0.5]|MA": {
+          "point": 62.5,
+          "lo95": 47.5,
+          "hi95": 76.25
+        },
+        "contrast[chair|0.5]": {
+          "point": -2.5,
+          "lo95": -8.75,
+          "hi95": 3.75
+        },
+        "vsMA[chair|0.5]|L2": {
+          "point": 0.0,
+          "lo95": -6.25,
+          "hi95": 5.0
+        },
+        "vsMA[chair|0.5]|U": {
+          "point": 2.5,
+          "lo95": -2.5,
+          "hi95": 7.5
+        },
+        "D[chair|0.5|literal]|L2": {
+          "point": 75.0,
+          "lo95": 60.0,
+          "hi95": 87.5
+        },
+        "D[chair|0.5|literal]|U": {
+          "point": 77.5,
+          "lo95": 60.0,
+          "hi95": 92.5
+        },
+        "D[chair|0.5|literal]|MA": {
+          "point": 75.0,
+          "lo95": 60.0,
+          "hi95": 87.5
+        },
+        "contrast[chair|0.5|literal]": {
+          "point": -2.5,
+          "lo95": -12.5,
+          "hi95": 7.5
+        },
+        "vsMA[chair|0.5|literal]|L2": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[chair|0.5|literal]|U": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "D[chair|0.5|paraphrase]|L2": {
+          "point": 50.0,
+          "lo95": 27.5,
+          "hi95": 72.5
+        },
+        "D[chair|0.5|paraphrase]|U": {
+          "point": 52.5,
+          "lo95": 32.5,
+          "hi95": 72.5
+        },
+        "D[chair|0.5|paraphrase]|MA": {
+          "point": 50.0,
+          "lo95": 30.0,
+          "hi95": 70.0
+        },
+        "contrast[chair|0.5|paraphrase]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[chair|0.5|paraphrase]|L2": {
+          "point": 0.0,
+          "lo95": -12.5,
+          "hi95": 10.0
+        },
+        "vsMA[chair|0.5|paraphrase]|U": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "D[dog|0.5]|L2": {
+          "point": 51.25,
+          "lo95": 35.0,
+          "hi95": 66.25
+        },
+        "D[dog|0.5]|U": {
+          "point": 52.5,
+          "lo95": 35.0,
+          "hi95": 68.75
+        },
+        "D[dog|0.5]|MA": {
+          "point": 68.75,
+          "lo95": 53.75,
+          "hi95": 81.25
+        },
+        "contrast[dog|0.5]": {
+          "point": -1.25,
+          "lo95": -6.25,
+          "hi95": 3.75
+        },
+        "vsMA[dog|0.5]|L2": {
+          "point": -17.5,
+          "lo95": -30.0,
+          "hi95": -7.5
+        },
+        "vsMA[dog|0.5]|U": {
+          "point": -16.25,
+          "lo95": -31.25,
+          "hi95": -5.0
+        },
+        "D[dog|0.5|literal]|L2": {
+          "point": 55.0,
+          "lo95": 35.0,
+          "hi95": 72.5
+        },
+        "D[dog|0.5|literal]|U": {
+          "point": 57.5,
+          "lo95": 37.5,
+          "hi95": 75.0
+        },
+        "D[dog|0.5|literal]|MA": {
+          "point": 80.0,
+          "lo95": 67.5,
+          "hi95": 90.0
+        },
+        "contrast[dog|0.5|literal]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[dog|0.5|literal]|L2": {
+          "point": -25.0,
+          "lo95": -45.0,
+          "hi95": -7.5
+        },
+        "vsMA[dog|0.5|literal]|U": {
+          "point": -22.5,
+          "lo95": -45.0,
+          "hi95": -5.0
+        },
+        "D[dog|0.5|paraphrase]|L2": {
+          "point": 47.5,
+          "lo95": 27.5,
+          "hi95": 67.5
+        },
+        "D[dog|0.5|paraphrase]|U": {
+          "point": 47.5,
+          "lo95": 27.5,
+          "hi95": 67.5
+        },
+        "D[dog|0.5|paraphrase]|MA": {
+          "point": 57.5,
+          "lo95": 32.5,
+          "hi95": 80.0
+        },
+        "contrast[dog|0.5|paraphrase]": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "vsMA[dog|0.5|paraphrase]|L2": {
+          "point": -10.0,
+          "lo95": -25.0,
+          "hi95": 5.0
+        },
+        "vsMA[dog|0.5|paraphrase]|U": {
+          "point": -10.0,
+          "lo95": -25.0,
+          "hi95": 5.0
+        },
+        "D[horse|0.5]|L2": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.5]|U": {
+          "point": 96.25,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.5]|MA": {
+          "point": 93.75,
+          "lo95": 88.75,
+          "hi95": 98.75
+        },
+        "contrast[horse|0.5]": {
+          "point": 1.25,
+          "lo95": -2.5,
+          "hi95": 5.0
+        },
+        "vsMA[horse|0.5]|L2": {
+          "point": 3.75,
+          "lo95": -2.5,
+          "hi95": 10.0
+        },
+        "vsMA[horse|0.5]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[horse|0.5|literal]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|literal]|U": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|literal]|MA": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.5|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.5|literal]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[horse|0.5|literal]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[horse|0.5|paraphrase]|L2": {
+          "point": 95.0,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|paraphrase]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|paraphrase]|MA": {
+          "point": 90.0,
+          "lo95": 80.0,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.5|paraphrase]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[horse|0.5|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": -10.0,
+          "hi95": 20.0
+        },
+        "vsMA[horse|0.5|paraphrase]|U": {
+          "point": 2.5,
+          "lo95": -7.5,
+          "hi95": 15.0
+        },
+        "D[sandwich|0.5]|L2": {
+          "point": 70.0,
+          "lo95": 56.25,
+          "hi95": 83.75
+        },
+        "D[sandwich|0.5]|U": {
+          "point": 72.5,
+          "lo95": 61.25,
+          "hi95": 85.0
+        },
+        "D[sandwich|0.5]|MA": {
+          "point": 67.5,
+          "lo95": 57.5,
+          "hi95": 78.75
+        },
+        "contrast[sandwich|0.5]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 2.5
+        },
+        "vsMA[sandwich|0.5]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[sandwich|0.5]|U": {
+          "point": 5.0,
+          "lo95": -1.25,
+          "hi95": 11.25
+        },
+        "D[sandwich|0.5|literal]|L2": {
+          "point": 90.0,
+          "lo95": 77.5,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.5|literal]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.5|literal]|MA": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "contrast[sandwich|0.5|literal]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.5|literal]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.5|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[sandwich|0.5|paraphrase]|L2": {
+          "point": 50.0,
+          "lo95": 27.5,
+          "hi95": 72.5
+        },
+        "D[sandwich|0.5|paraphrase]|U": {
+          "point": 52.5,
+          "lo95": 32.5,
+          "hi95": 72.5
+        },
+        "D[sandwich|0.5|paraphrase]|MA": {
+          "point": 42.5,
+          "lo95": 22.5,
+          "hi95": 62.5
+        },
+        "contrast[sandwich|0.5|paraphrase]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[sandwich|0.5|paraphrase]|L2": {
+          "point": 7.5,
+          "lo95": -5.0,
+          "hi95": 22.5
+        },
+        "vsMA[sandwich|0.5|paraphrase]|U": {
+          "point": 10.0,
+          "lo95": -2.5,
+          "hi95": 22.5
+        },
+        "D[bicycle|0.7]|L2": {
+          "point": 82.5,
+          "lo95": 70.0,
+          "hi95": 93.75
+        },
+        "D[bicycle|0.7]|U": {
+          "point": 80.0,
+          "lo95": 67.5,
+          "hi95": 91.25
+        },
+        "D[bicycle|0.7]|MA": {
+          "point": 81.25,
+          "lo95": 67.5,
+          "hi95": 92.5
+        },
+        "contrast[bicycle|0.7]": {
+          "point": 2.5,
+          "lo95": -2.5,
+          "hi95": 7.5
+        },
+        "vsMA[bicycle|0.7]|L2": {
+          "point": 1.25,
+          "lo95": -2.5,
+          "hi95": 5.0
+        },
+        "vsMA[bicycle|0.7]|U": {
+          "point": -1.25,
+          "lo95": -3.75,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.7|literal]|L2": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.7|literal]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.7|literal]|MA": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "contrast[bicycle|0.7|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.7|literal]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.7|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.7|paraphrase]|L2": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "D[bicycle|0.7|paraphrase]|U": {
+          "point": 67.5,
+          "lo95": 45.0,
+          "hi95": 87.5
+        },
+        "D[bicycle|0.7|paraphrase]|MA": {
+          "point": 70.0,
+          "lo95": 47.5,
+          "hi95": 90.0
+        },
+        "contrast[bicycle|0.7|paraphrase]": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 15.0
+        },
+        "vsMA[bicycle|0.7|paraphrase]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[bicycle|0.7|paraphrase]|U": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "D[bird|0.7]|L2": {
+          "point": 71.25,
+          "lo95": 58.75,
+          "hi95": 82.5
+        },
+        "D[bird|0.7]|U": {
+          "point": 71.25,
+          "lo95": 56.25,
+          "hi95": 85.0
+        },
+        "D[bird|0.7]|MA": {
+          "point": 76.25,
+          "lo95": 58.75,
+          "hi95": 91.25
+        },
+        "contrast[bird|0.7]": {
+          "point": 0.0,
+          "lo95": -5.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.7]|L2": {
+          "point": -5.0,
+          "lo95": -13.75,
+          "hi95": 3.75
+        },
+        "vsMA[bird|0.7]|U": {
+          "point": -5.0,
+          "lo95": -11.25,
+          "hi95": 1.25
+        },
+        "D[bird|0.7|literal]|L2": {
+          "point": 72.5,
+          "lo95": 50.0,
+          "hi95": 90.0
+        },
+        "D[bird|0.7|literal]|U": {
+          "point": 77.5,
+          "lo95": 57.5,
+          "hi95": 92.5
+        },
+        "D[bird|0.7|literal]|MA": {
+          "point": 75.0,
+          "lo95": 52.5,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.7|literal]": {
+          "point": -5.0,
+          "lo95": -12.5,
+          "hi95": 0.0
+        },
+        "vsMA[bird|0.7|literal]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[bird|0.7|literal]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[bird|0.7|paraphrase]|L2": {
+          "point": 70.0,
+          "lo95": 55.0,
+          "hi95": 85.0
+        },
+        "D[bird|0.7|paraphrase]|U": {
+          "point": 65.0,
+          "lo95": 50.0,
+          "hi95": 80.0
+        },
+        "D[bird|0.7|paraphrase]|MA": {
+          "point": 77.5,
+          "lo95": 60.0,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.7|paraphrase]": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 15.0
+        },
+        "vsMA[bird|0.7|paraphrase]|L2": {
+          "point": -7.5,
+          "lo95": -25.0,
+          "hi95": 10.0
+        },
+        "vsMA[bird|0.7|paraphrase]|U": {
+          "point": -12.5,
+          "lo95": -22.5,
+          "hi95": -2.5
+        },
+        "D[cat|0.7]|L2": {
+          "point": 8.75,
+          "lo95": 1.25,
+          "hi95": 18.75
+        },
+        "D[cat|0.7]|U": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 25.0
+        },
+        "D[cat|0.7]|MA": {
+          "point": 26.25,
+          "lo95": 11.25,
+          "hi95": 46.25
+        },
+        "contrast[cat|0.7]": {
+          "point": -1.25,
+          "lo95": -7.5,
+          "hi95": 3.75
+        },
+        "vsMA[cat|0.7]|L2": {
+          "point": -17.5,
+          "lo95": -27.5,
+          "hi95": -8.75
+        },
+        "vsMA[cat|0.7]|U": {
+          "point": -16.25,
+          "lo95": -23.75,
+          "hi95": -8.75
+        },
+        "D[cat|0.7|literal]|L2": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "D[cat|0.7|literal]|U": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 25.0
+        },
+        "D[cat|0.7|literal]|MA": {
+          "point": 32.5,
+          "lo95": 15.0,
+          "hi95": 52.5
+        },
+        "contrast[cat|0.7|literal]": {
+          "point": -2.5,
+          "lo95": -15.0,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.7|literal]|L2": {
+          "point": -25.0,
+          "lo95": -40.0,
+          "hi95": -12.5
+        },
+        "vsMA[cat|0.7|literal]|U": {
+          "point": -22.5,
+          "lo95": -30.0,
+          "hi95": -15.0
+        },
+        "D[cat|0.7|paraphrase]|L2": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 25.0
+        },
+        "D[cat|0.7|paraphrase]|U": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 25.0
+        },
+        "D[cat|0.7|paraphrase]|MA": {
+          "point": 20.0,
+          "lo95": 5.0,
+          "hi95": 40.0
+        },
+        "contrast[cat|0.7|paraphrase]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.7|paraphrase]|L2": {
+          "point": -10.0,
+          "lo95": -17.5,
+          "hi95": -2.5
+        },
+        "vsMA[cat|0.7|paraphrase]|U": {
+          "point": -10.0,
+          "lo95": -20.0,
+          "hi95": 0.0
+        },
+        "D[chair|0.7]|L2": {
+          "point": 53.75,
+          "lo95": 36.25,
+          "hi95": 71.25
+        },
+        "D[chair|0.7]|U": {
+          "point": 53.75,
+          "lo95": 38.75,
+          "hi95": 68.75
+        },
+        "D[chair|0.7]|MA": {
+          "point": 52.5,
+          "lo95": 36.25,
+          "hi95": 70.0
+        },
+        "contrast[chair|0.7]": {
+          "point": 0.0,
+          "lo95": -6.25,
+          "hi95": 6.25
+        },
+        "vsMA[chair|0.7]|L2": {
+          "point": 1.25,
+          "lo95": -5.0,
+          "hi95": 8.75
+        },
+        "vsMA[chair|0.7]|U": {
+          "point": 1.25,
+          "lo95": -2.5,
+          "hi95": 5.0
+        },
+        "D[chair|0.7|literal]|L2": {
+          "point": 67.5,
+          "lo95": 52.5,
+          "hi95": 82.5
+        },
+        "D[chair|0.7|literal]|U": {
+          "point": 67.5,
+          "lo95": 52.5,
+          "hi95": 82.5
+        },
+        "D[chair|0.7|literal]|MA": {
+          "point": 70.0,
+          "lo95": 50.0,
+          "hi95": 87.5
+        },
+        "contrast[chair|0.7|literal]": {
+          "point": 0.0,
+          "lo95": -12.5,
+          "hi95": 12.5
+        },
+        "vsMA[chair|0.7|literal]|L2": {
+          "point": -2.5,
+          "lo95": -15.0,
+          "hi95": 10.0
+        },
+        "vsMA[chair|0.7|literal]|U": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "D[chair|0.7|paraphrase]|L2": {
+          "point": 40.0,
+          "lo95": 20.0,
+          "hi95": 62.5
+        },
+        "D[chair|0.7|paraphrase]|U": {
+          "point": 40.0,
+          "lo95": 17.5,
+          "hi95": 62.5
+        },
+        "D[chair|0.7|paraphrase]|MA": {
+          "point": 35.0,
+          "lo95": 15.0,
+          "hi95": 57.5
+        },
+        "contrast[chair|0.7|paraphrase]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[chair|0.7|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 17.5
+        },
+        "vsMA[chair|0.7|paraphrase]|U": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "D[dog|0.7]|L2": {
+          "point": 48.75,
+          "lo95": 32.5,
+          "hi95": 65.0
+        },
+        "D[dog|0.7]|U": {
+          "point": 51.25,
+          "lo95": 33.75,
+          "hi95": 67.5
+        },
+        "D[dog|0.7]|MA": {
+          "point": 67.5,
+          "lo95": 53.75,
+          "hi95": 81.25
+        },
+        "contrast[dog|0.7]": {
+          "point": -2.5,
+          "lo95": -8.75,
+          "hi95": 2.5
+        },
+        "vsMA[dog|0.7]|L2": {
+          "point": -18.75,
+          "lo95": -31.25,
+          "hi95": -8.75
+        },
+        "vsMA[dog|0.7]|U": {
+          "point": -16.25,
+          "lo95": -28.75,
+          "hi95": -6.25
+        },
+        "D[dog|0.7|literal]|L2": {
+          "point": 55.0,
+          "lo95": 35.0,
+          "hi95": 72.5
+        },
+        "D[dog|0.7|literal]|U": {
+          "point": 55.0,
+          "lo95": 32.5,
+          "hi95": 75.0
+        },
+        "D[dog|0.7|literal]|MA": {
+          "point": 80.0,
+          "lo95": 67.5,
+          "hi95": 90.0
+        },
+        "contrast[dog|0.7|literal]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[dog|0.7|literal]|L2": {
+          "point": -25.0,
+          "lo95": -45.0,
+          "hi95": -7.5
+        },
+        "vsMA[dog|0.7|literal]|U": {
+          "point": -25.0,
+          "lo95": -47.5,
+          "hi95": -5.0
+        },
+        "D[dog|0.7|paraphrase]|L2": {
+          "point": 42.5,
+          "lo95": 20.0,
+          "hi95": 65.0
+        },
+        "D[dog|0.7|paraphrase]|U": {
+          "point": 47.5,
+          "lo95": 27.5,
+          "hi95": 67.5
+        },
+        "D[dog|0.7|paraphrase]|MA": {
+          "point": 55.0,
+          "lo95": 30.0,
+          "hi95": 80.0
+        },
+        "contrast[dog|0.7|paraphrase]": {
+          "point": -5.0,
+          "lo95": -17.5,
+          "hi95": 5.0
+        },
+        "vsMA[dog|0.7|paraphrase]|L2": {
+          "point": -12.5,
+          "lo95": -30.0,
+          "hi95": 2.5
+        },
+        "vsMA[dog|0.7|paraphrase]|U": {
+          "point": -7.5,
+          "lo95": -20.0,
+          "hi95": 5.0
+        },
+        "D[horse|0.7]|L2": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.7]|U": {
+          "point": 96.25,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.7]|MA": {
+          "point": 92.5,
+          "lo95": 87.5,
+          "hi95": 97.5
+        },
+        "contrast[horse|0.7]": {
+          "point": 1.25,
+          "lo95": -2.5,
+          "hi95": 5.0
+        },
+        "vsMA[horse|0.7]|L2": {
+          "point": 5.0,
+          "lo95": -1.25,
+          "hi95": 11.25
+        },
+        "vsMA[horse|0.7]|U": {
+          "point": 3.75,
+          "lo95": 0.0,
+          "hi95": 8.75
+        },
+        "D[horse|0.7|literal]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|literal]|U": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|literal]|MA": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.7|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.7|literal]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[horse|0.7|literal]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[horse|0.7|paraphrase]|L2": {
+          "point": 95.0,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|paraphrase]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|paraphrase]|MA": {
+          "point": 87.5,
+          "lo95": 77.5,
+          "hi95": 97.5
+        },
+        "contrast[horse|0.7|paraphrase]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[horse|0.7|paraphrase]|L2": {
+          "point": 7.5,
+          "lo95": -7.5,
+          "hi95": 22.5
+        },
+        "vsMA[horse|0.7|paraphrase]|U": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 17.5
+        },
+        "D[sandwich|0.7]|L2": {
+          "point": 62.5,
+          "lo95": 47.5,
+          "hi95": 77.5
+        },
+        "D[sandwich|0.7]|U": {
+          "point": 61.25,
+          "lo95": 50.0,
+          "hi95": 73.75
+        },
+        "D[sandwich|0.7]|MA": {
+          "point": 56.25,
+          "lo95": 47.5,
+          "hi95": 65.0
+        },
+        "contrast[sandwich|0.7]": {
+          "point": 1.25,
+          "lo95": -5.0,
+          "hi95": 7.5
+        },
+        "vsMA[sandwich|0.7]|L2": {
+          "point": 6.25,
+          "lo95": -2.5,
+          "hi95": 15.0
+        },
+        "vsMA[sandwich|0.7]|U": {
+          "point": 5.0,
+          "lo95": -2.5,
+          "hi95": 12.5
+        },
+        "D[sandwich|0.7|literal]|L2": {
+          "point": 87.5,
+          "lo95": 77.5,
+          "hi95": 97.5
+        },
+        "D[sandwich|0.7|literal]|U": {
+          "point": 85.0,
+          "lo95": 75.0,
+          "hi95": 95.0
+        },
+        "D[sandwich|0.7|literal]|MA": {
+          "point": 85.0,
+          "lo95": 75.0,
+          "hi95": 95.0
+        },
+        "contrast[sandwich|0.7|literal]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[sandwich|0.7|literal]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[sandwich|0.7|literal]|U": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "D[sandwich|0.7|paraphrase]|L2": {
+          "point": 37.5,
+          "lo95": 15.0,
+          "hi95": 60.0
+        },
+        "D[sandwich|0.7|paraphrase]|U": {
+          "point": 37.5,
+          "lo95": 20.0,
+          "hi95": 57.5
+        },
+        "D[sandwich|0.7|paraphrase]|MA": {
+          "point": 27.5,
+          "lo95": 12.5,
+          "hi95": 42.5
+        },
+        "contrast[sandwich|0.7|paraphrase]": {
+          "point": 0.0,
+          "lo95": -12.5,
+          "hi95": 12.5
+        },
+        "vsMA[sandwich|0.7|paraphrase]|L2": {
+          "point": 10.0,
+          "lo95": -5.0,
+          "hi95": 25.0
+        },
+        "vsMA[sandwich|0.7|paraphrase]|U": {
+          "point": 10.0,
+          "lo95": -2.5,
+          "hi95": 22.5
+        }
+      }
+    },
+    "29": {
+      "training_seed": 29,
+      "selected_U_step": 70,
+      "n_clusters": 70,
+      "clusters_per_stratum": {
+        "bicycle": 10,
+        "bird": 10,
+        "cat": 10,
+        "chair": 10,
+        "dog": 10,
+        "horse": 10,
+        "sandwich": 10
+      },
+      "estimates": {
+        "D[bicycle|0.3]|L2": {
+          "point": 85.0,
+          "lo95": 71.25,
+          "hi95": 95.0
+        },
+        "D[bicycle|0.3]|U": {
+          "point": 85.0,
+          "lo95": 72.5,
+          "hi95": 95.0
+        },
+        "D[bicycle|0.3]|MA": {
+          "point": 83.75,
+          "lo95": 71.25,
+          "hi95": 93.75
+        },
+        "contrast[bicycle|0.3]": {
+          "point": 0.0,
+          "lo95": -5.0,
+          "hi95": 5.0
+        },
+        "vsMA[bicycle|0.3]|L2": {
+          "point": 1.25,
+          "lo95": -5.0,
+          "hi95": 7.5
+        },
+        "vsMA[bicycle|0.3]|U": {
+          "point": 1.25,
+          "lo95": 0.0,
+          "hi95": 3.75
+        },
+        "D[bicycle|0.3|literal]|L2": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.3|literal]|U": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.3|literal]|MA": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "contrast[bicycle|0.3|literal]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.3|literal]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.3|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.3|paraphrase]|L2": {
+          "point": 77.5,
+          "lo95": 55.0,
+          "hi95": 92.5
+        },
+        "D[bicycle|0.3|paraphrase]|U": {
+          "point": 75.0,
+          "lo95": 55.0,
+          "hi95": 90.0
+        },
+        "D[bicycle|0.3|paraphrase]|MA": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "contrast[bicycle|0.3|paraphrase]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[bicycle|0.3|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 17.5
+        },
+        "vsMA[bicycle|0.3|paraphrase]|U": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "D[bird|0.3]|L2": {
+          "point": 76.25,
+          "lo95": 67.5,
+          "hi95": 85.0
+        },
+        "D[bird|0.3]|U": {
+          "point": 80.0,
+          "lo95": 70.0,
+          "hi95": 87.5
+        },
+        "D[bird|0.3]|MA": {
+          "point": 82.5,
+          "lo95": 68.75,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.3]": {
+          "point": -3.75,
+          "lo95": -8.75,
+          "hi95": 1.25
+        },
+        "vsMA[bird|0.3]|L2": {
+          "point": -6.25,
+          "lo95": -15.0,
+          "hi95": 2.5
+        },
+        "vsMA[bird|0.3]|U": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 6.25
+        },
+        "D[bird|0.3|literal]|L2": {
+          "point": 77.5,
+          "lo95": 60.0,
+          "hi95": 92.5
+        },
+        "D[bird|0.3|literal]|U": {
+          "point": 82.5,
+          "lo95": 67.5,
+          "hi95": 95.0
+        },
+        "D[bird|0.3|literal]|MA": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "contrast[bird|0.3|literal]": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.3|literal]|L2": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[bird|0.3|literal]|U": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 12.5
+        },
+        "D[bird|0.3|paraphrase]|L2": {
+          "point": 75.0,
+          "lo95": 62.5,
+          "hi95": 87.5
+        },
+        "D[bird|0.3|paraphrase]|U": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "D[bird|0.3|paraphrase]|MA": {
+          "point": 87.5,
+          "lo95": 72.5,
+          "hi95": 100.0
+        },
+        "contrast[bird|0.3|paraphrase]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.3|paraphrase]|L2": {
+          "point": -12.5,
+          "lo95": -30.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.3|paraphrase]|U": {
+          "point": -10.0,
+          "lo95": -30.0,
+          "hi95": 7.5
+        },
+        "D[cat|0.3]|L2": {
+          "point": 17.5,
+          "lo95": 7.5,
+          "hi95": 32.5
+        },
+        "D[cat|0.3]|U": {
+          "point": 17.5,
+          "lo95": 5.0,
+          "hi95": 35.0
+        },
+        "D[cat|0.3]|MA": {
+          "point": 25.0,
+          "lo95": 11.25,
+          "hi95": 42.5
+        },
+        "contrast[cat|0.3]": {
+          "point": 0.0,
+          "lo95": -6.25,
+          "hi95": 6.25
+        },
+        "vsMA[cat|0.3]|L2": {
+          "point": -7.5,
+          "lo95": -17.5,
+          "hi95": 1.25
+        },
+        "vsMA[cat|0.3]|U": {
+          "point": -7.5,
+          "lo95": -15.0,
+          "hi95": 0.0
+        },
+        "D[cat|0.3|literal]|L2": {
+          "point": 20.0,
+          "lo95": 7.5,
+          "hi95": 35.0
+        },
+        "D[cat|0.3|literal]|U": {
+          "point": 20.0,
+          "lo95": 5.0,
+          "hi95": 35.0
+        },
+        "D[cat|0.3|literal]|MA": {
+          "point": 35.0,
+          "lo95": 17.5,
+          "hi95": 55.0
+        },
+        "contrast[cat|0.3|literal]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.3|literal]|L2": {
+          "point": -15.0,
+          "lo95": -27.5,
+          "hi95": -2.5
+        },
+        "vsMA[cat|0.3|literal]|U": {
+          "point": -15.0,
+          "lo95": -22.5,
+          "hi95": -7.5
+        },
+        "D[cat|0.3|paraphrase]|L2": {
+          "point": 15.0,
+          "lo95": 2.5,
+          "hi95": 30.0
+        },
+        "D[cat|0.3|paraphrase]|U": {
+          "point": 15.0,
+          "lo95": 0.0,
+          "hi95": 35.0
+        },
+        "D[cat|0.3|paraphrase]|MA": {
+          "point": 15.0,
+          "lo95": 2.5,
+          "hi95": 30.0
+        },
+        "contrast[cat|0.3|paraphrase]": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "vsMA[cat|0.3|paraphrase]|L2": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "vsMA[cat|0.3|paraphrase]|U": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "D[chair|0.3]|L2": {
+          "point": 78.75,
+          "lo95": 61.25,
+          "hi95": 91.25
+        },
+        "D[chair|0.3]|U": {
+          "point": 75.0,
+          "lo95": 57.5,
+          "hi95": 90.0
+        },
+        "D[chair|0.3]|MA": {
+          "point": 75.0,
+          "lo95": 57.5,
+          "hi95": 88.75
+        },
+        "contrast[chair|0.3]": {
+          "point": 3.75,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[chair|0.3]|L2": {
+          "point": 3.75,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[chair|0.3]|U": {
+          "point": 0.0,
+          "lo95": -5.0,
+          "hi95": 5.0
+        },
+        "D[chair|0.3|literal]|L2": {
+          "point": 85.0,
+          "lo95": 70.0,
+          "hi95": 97.5
+        },
+        "D[chair|0.3|literal]|U": {
+          "point": 85.0,
+          "lo95": 70.0,
+          "hi95": 97.5
+        },
+        "D[chair|0.3|literal]|MA": {
+          "point": 85.0,
+          "lo95": 70.0,
+          "hi95": 97.5
+        },
+        "contrast[chair|0.3|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[chair|0.3|literal]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[chair|0.3|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[chair|0.3|paraphrase]|L2": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "D[chair|0.3|paraphrase]|U": {
+          "point": 65.0,
+          "lo95": 42.5,
+          "hi95": 85.0
+        },
+        "D[chair|0.3|paraphrase]|MA": {
+          "point": 65.0,
+          "lo95": 42.5,
+          "hi95": 85.0
+        },
+        "contrast[chair|0.3|paraphrase]": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "vsMA[chair|0.3|paraphrase]|L2": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "vsMA[chair|0.3|paraphrase]|U": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "D[dog|0.3]|L2": {
+          "point": 55.0,
+          "lo95": 38.75,
+          "hi95": 70.0
+        },
+        "D[dog|0.3]|U": {
+          "point": 46.25,
+          "lo95": 26.25,
+          "hi95": 65.0
+        },
+        "D[dog|0.3]|MA": {
+          "point": 75.0,
+          "lo95": 61.25,
+          "hi95": 87.5
+        },
+        "contrast[dog|0.3]": {
+          "point": 8.75,
+          "lo95": 1.25,
+          "hi95": 16.25
+        },
+        "vsMA[dog|0.3]|L2": {
+          "point": -20.0,
+          "lo95": -31.25,
+          "hi95": -11.25
+        },
+        "vsMA[dog|0.3]|U": {
+          "point": -28.75,
+          "lo95": -42.5,
+          "hi95": -16.25
+        },
+        "D[dog|0.3|literal]|L2": {
+          "point": 65.0,
+          "lo95": 50.0,
+          "hi95": 77.5
+        },
+        "D[dog|0.3|literal]|U": {
+          "point": 50.0,
+          "lo95": 27.5,
+          "hi95": 70.0
+        },
+        "D[dog|0.3|literal]|MA": {
+          "point": 87.5,
+          "lo95": 77.5,
+          "hi95": 97.5
+        },
+        "contrast[dog|0.3|literal]": {
+          "point": 15.0,
+          "lo95": 5.0,
+          "hi95": 25.0
+        },
+        "vsMA[dog|0.3|literal]|L2": {
+          "point": -22.5,
+          "lo95": -35.0,
+          "hi95": -10.0
+        },
+        "vsMA[dog|0.3|literal]|U": {
+          "point": -37.5,
+          "lo95": -57.5,
+          "hi95": -20.0
+        },
+        "D[dog|0.3|paraphrase]|L2": {
+          "point": 45.0,
+          "lo95": 22.5,
+          "hi95": 65.0
+        },
+        "D[dog|0.3|paraphrase]|U": {
+          "point": 42.5,
+          "lo95": 20.0,
+          "hi95": 65.0
+        },
+        "D[dog|0.3|paraphrase]|MA": {
+          "point": 62.5,
+          "lo95": 37.5,
+          "hi95": 85.0
+        },
+        "contrast[dog|0.3|paraphrase]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[dog|0.3|paraphrase]|L2": {
+          "point": -17.5,
+          "lo95": -30.0,
+          "hi95": -5.0
+        },
+        "vsMA[dog|0.3|paraphrase]|U": {
+          "point": -20.0,
+          "lo95": -30.0,
+          "hi95": -10.0
+        },
+        "D[horse|0.3]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.3]|U": {
+          "point": 97.5,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.3]|MA": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.3]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[horse|0.3]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.3]|U": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "D[horse|0.3|literal]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|literal]|U": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|literal]|MA": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.3|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.3|literal]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.3|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[horse|0.3|paraphrase]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|paraphrase]|U": {
+          "point": 95.0,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.3|paraphrase]|MA": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.3|paraphrase]": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "vsMA[horse|0.3|paraphrase]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.3|paraphrase]|U": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 0.0
+        },
+        "D[sandwich|0.3]|L2": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "D[sandwich|0.3]|U": {
+          "point": 80.0,
+          "lo95": 65.0,
+          "hi95": 92.5
+        },
+        "D[sandwich|0.3]|MA": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "contrast[sandwich|0.3]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 2.5
+        },
+        "vsMA[sandwich|0.3]|L2": {
+          "point": 0.0,
+          "lo95": -5.0,
+          "hi95": 6.25
+        },
+        "vsMA[sandwich|0.3]|U": {
+          "point": 2.5,
+          "lo95": -2.5,
+          "hi95": 7.5
+        },
+        "D[sandwich|0.3|literal]|L2": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.3|literal]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.3|literal]|MA": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "contrast[sandwich|0.3|literal]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[sandwich|0.3|literal]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[sandwich|0.3|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[sandwich|0.3|paraphrase]|L2": {
+          "point": 60.0,
+          "lo95": 35.0,
+          "hi95": 82.5
+        },
+        "D[sandwich|0.3|paraphrase]|U": {
+          "point": 67.5,
+          "lo95": 42.5,
+          "hi95": 90.0
+        },
+        "D[sandwich|0.3|paraphrase]|MA": {
+          "point": 62.5,
+          "lo95": 37.5,
+          "hi95": 85.0
+        },
+        "contrast[sandwich|0.3|paraphrase]": {
+          "point": -7.5,
+          "lo95": -15.0,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.3|paraphrase]|L2": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[sandwich|0.3|paraphrase]|U": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 15.0
+        },
+        "D[bicycle|0.5]|L2": {
+          "point": 85.0,
+          "lo95": 71.25,
+          "hi95": 95.0
+        },
+        "D[bicycle|0.5]|U": {
+          "point": 82.5,
+          "lo95": 68.75,
+          "hi95": 93.75
+        },
+        "D[bicycle|0.5]|MA": {
+          "point": 83.75,
+          "lo95": 71.25,
+          "hi95": 93.75
+        },
+        "contrast[bicycle|0.5]": {
+          "point": 2.5,
+          "lo95": -2.5,
+          "hi95": 8.75
+        },
+        "vsMA[bicycle|0.5]|L2": {
+          "point": 1.25,
+          "lo95": -5.0,
+          "hi95": 7.5
+        },
+        "vsMA[bicycle|0.5]|U": {
+          "point": -1.25,
+          "lo95": -5.0,
+          "hi95": 2.5
+        },
+        "D[bicycle|0.5|literal]|L2": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.5|literal]|U": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.5|literal]|MA": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "contrast[bicycle|0.5|literal]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.5|literal]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.5|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.5|paraphrase]|L2": {
+          "point": 77.5,
+          "lo95": 55.0,
+          "hi95": 92.5
+        },
+        "D[bicycle|0.5|paraphrase]|U": {
+          "point": 70.0,
+          "lo95": 47.5,
+          "hi95": 87.5
+        },
+        "D[bicycle|0.5|paraphrase]|MA": {
+          "point": 72.5,
+          "lo95": 52.5,
+          "hi95": 90.0
+        },
+        "contrast[bicycle|0.5|paraphrase]": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 20.0
+        },
+        "vsMA[bicycle|0.5|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 17.5
+        },
+        "vsMA[bicycle|0.5|paraphrase]|U": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "D[bird|0.5]|L2": {
+          "point": 76.25,
+          "lo95": 67.5,
+          "hi95": 85.0
+        },
+        "D[bird|0.5]|U": {
+          "point": 77.5,
+          "lo95": 66.25,
+          "hi95": 86.25
+        },
+        "D[bird|0.5]|MA": {
+          "point": 78.75,
+          "lo95": 65.0,
+          "hi95": 88.75
+        },
+        "contrast[bird|0.5]": {
+          "point": -1.25,
+          "lo95": -6.25,
+          "hi95": 3.75
+        },
+        "vsMA[bird|0.5]|L2": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 6.25
+        },
+        "vsMA[bird|0.5]|U": {
+          "point": -1.25,
+          "lo95": -6.25,
+          "hi95": 3.75
+        },
+        "D[bird|0.5|literal]|L2": {
+          "point": 77.5,
+          "lo95": 60.0,
+          "hi95": 92.5
+        },
+        "D[bird|0.5|literal]|U": {
+          "point": 82.5,
+          "lo95": 67.5,
+          "hi95": 95.0
+        },
+        "D[bird|0.5|literal]|MA": {
+          "point": 75.0,
+          "lo95": 57.5,
+          "hi95": 90.0
+        },
+        "contrast[bird|0.5|literal]": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.5|literal]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[bird|0.5|literal]|U": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 20.0
+        },
+        "D[bird|0.5|paraphrase]|L2": {
+          "point": 75.0,
+          "lo95": 62.5,
+          "hi95": 87.5
+        },
+        "D[bird|0.5|paraphrase]|U": {
+          "point": 72.5,
+          "lo95": 57.5,
+          "hi95": 85.0
+        },
+        "D[bird|0.5|paraphrase]|MA": {
+          "point": 82.5,
+          "lo95": 67.5,
+          "hi95": 95.0
+        },
+        "contrast[bird|0.5|paraphrase]": {
+          "point": 2.5,
+          "lo95": -7.5,
+          "hi95": 12.5
+        },
+        "vsMA[bird|0.5|paraphrase]|L2": {
+          "point": -7.5,
+          "lo95": -20.0,
+          "hi95": 7.5
+        },
+        "vsMA[bird|0.5|paraphrase]|U": {
+          "point": -10.0,
+          "lo95": -22.5,
+          "hi95": 2.5
+        },
+        "D[cat|0.5]|L2": {
+          "point": 16.25,
+          "lo95": 5.0,
+          "hi95": 31.25
+        },
+        "D[cat|0.5]|U": {
+          "point": 15.0,
+          "lo95": 3.75,
+          "hi95": 32.5
+        },
+        "D[cat|0.5]|MA": {
+          "point": 23.75,
+          "lo95": 10.0,
+          "hi95": 41.25
+        },
+        "contrast[cat|0.5]": {
+          "point": 1.25,
+          "lo95": -3.75,
+          "hi95": 6.25
+        },
+        "vsMA[cat|0.5]|L2": {
+          "point": -7.5,
+          "lo95": -17.5,
+          "hi95": 1.25
+        },
+        "vsMA[cat|0.5]|U": {
+          "point": -8.75,
+          "lo95": -17.5,
+          "hi95": -2.5
+        },
+        "D[cat|0.5|literal]|L2": {
+          "point": 20.0,
+          "lo95": 7.5,
+          "hi95": 35.0
+        },
+        "D[cat|0.5|literal]|U": {
+          "point": 17.5,
+          "lo95": 5.0,
+          "hi95": 32.5
+        },
+        "D[cat|0.5|literal]|MA": {
+          "point": 32.5,
+          "lo95": 12.5,
+          "hi95": 55.0
+        },
+        "contrast[cat|0.5|literal]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.5|literal]|L2": {
+          "point": -12.5,
+          "lo95": -25.0,
+          "hi95": 0.0
+        },
+        "vsMA[cat|0.5|literal]|U": {
+          "point": -15.0,
+          "lo95": -25.0,
+          "hi95": -5.0
+        },
+        "D[cat|0.5|paraphrase]|L2": {
+          "point": 12.5,
+          "lo95": 0.0,
+          "hi95": 27.5
+        },
+        "D[cat|0.5|paraphrase]|U": {
+          "point": 12.5,
+          "lo95": 0.0,
+          "hi95": 32.5
+        },
+        "D[cat|0.5|paraphrase]|MA": {
+          "point": 15.0,
+          "lo95": 2.5,
+          "hi95": 30.0
+        },
+        "contrast[cat|0.5|paraphrase]": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "vsMA[cat|0.5|paraphrase]|L2": {
+          "point": -2.5,
+          "lo95": -12.5,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.5|paraphrase]|U": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "D[chair|0.5]|L2": {
+          "point": 63.75,
+          "lo95": 47.5,
+          "hi95": 78.75
+        },
+        "D[chair|0.5]|U": {
+          "point": 67.5,
+          "lo95": 50.0,
+          "hi95": 82.5
+        },
+        "D[chair|0.5]|MA": {
+          "point": 63.75,
+          "lo95": 48.75,
+          "hi95": 77.5
+        },
+        "contrast[chair|0.5]": {
+          "point": -3.75,
+          "lo95": -10.0,
+          "hi95": 2.5
+        },
+        "vsMA[chair|0.5]|L2": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[chair|0.5]|U": {
+          "point": 3.75,
+          "lo95": -2.5,
+          "hi95": 12.5
+        },
+        "D[chair|0.5|literal]|L2": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "D[chair|0.5|literal]|U": {
+          "point": 82.5,
+          "lo95": 67.5,
+          "hi95": 95.0
+        },
+        "D[chair|0.5|literal]|MA": {
+          "point": 75.0,
+          "lo95": 55.0,
+          "hi95": 92.5
+        },
+        "contrast[chair|0.5|literal]": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 0.0
+        },
+        "vsMA[chair|0.5|literal]|L2": {
+          "point": 2.5,
+          "lo95": -12.5,
+          "hi95": 17.5
+        },
+        "vsMA[chair|0.5|literal]|U": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 17.5
+        },
+        "D[chair|0.5|paraphrase]|L2": {
+          "point": 50.0,
+          "lo95": 30.0,
+          "hi95": 70.0
+        },
+        "D[chair|0.5|paraphrase]|U": {
+          "point": 52.5,
+          "lo95": 30.0,
+          "hi95": 75.0
+        },
+        "D[chair|0.5|paraphrase]|MA": {
+          "point": 52.5,
+          "lo95": 30.0,
+          "hi95": 72.5
+        },
+        "contrast[chair|0.5|paraphrase]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[chair|0.5|paraphrase]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[chair|0.5|paraphrase]|U": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "D[dog|0.5]|L2": {
+          "point": 52.5,
+          "lo95": 33.75,
+          "hi95": 70.0
+        },
+        "D[dog|0.5]|U": {
+          "point": 46.25,
+          "lo95": 26.25,
+          "hi95": 65.0
+        },
+        "D[dog|0.5]|MA": {
+          "point": 75.0,
+          "lo95": 61.25,
+          "hi95": 87.5
+        },
+        "contrast[dog|0.5]": {
+          "point": 6.25,
+          "lo95": -1.25,
+          "hi95": 13.75
+        },
+        "vsMA[dog|0.5]|L2": {
+          "point": -22.5,
+          "lo95": -36.25,
+          "hi95": -12.5
+        },
+        "vsMA[dog|0.5]|U": {
+          "point": -28.75,
+          "lo95": -42.5,
+          "hi95": -16.25
+        },
+        "D[dog|0.5|literal]|L2": {
+          "point": 60.0,
+          "lo95": 40.0,
+          "hi95": 77.5
+        },
+        "D[dog|0.5|literal]|U": {
+          "point": 50.0,
+          "lo95": 27.5,
+          "hi95": 70.0
+        },
+        "D[dog|0.5|literal]|MA": {
+          "point": 87.5,
+          "lo95": 77.5,
+          "hi95": 97.5
+        },
+        "contrast[dog|0.5|literal]": {
+          "point": 10.0,
+          "lo95": 2.5,
+          "hi95": 17.5
+        },
+        "vsMA[dog|0.5|literal]|L2": {
+          "point": -27.5,
+          "lo95": -47.5,
+          "hi95": -12.5
+        },
+        "vsMA[dog|0.5|literal]|U": {
+          "point": -37.5,
+          "lo95": -57.5,
+          "hi95": -20.0
+        },
+        "D[dog|0.5|paraphrase]|L2": {
+          "point": 45.0,
+          "lo95": 22.5,
+          "hi95": 65.0
+        },
+        "D[dog|0.5|paraphrase]|U": {
+          "point": 42.5,
+          "lo95": 20.0,
+          "hi95": 65.0
+        },
+        "D[dog|0.5|paraphrase]|MA": {
+          "point": 62.5,
+          "lo95": 37.5,
+          "hi95": 85.0
+        },
+        "contrast[dog|0.5|paraphrase]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[dog|0.5|paraphrase]|L2": {
+          "point": -17.5,
+          "lo95": -30.0,
+          "hi95": -5.0
+        },
+        "vsMA[dog|0.5|paraphrase]|U": {
+          "point": -20.0,
+          "lo95": -30.0,
+          "hi95": -10.0
+        },
+        "D[horse|0.5]|L2": {
+          "point": 97.5,
+          "lo95": 93.75,
+          "hi95": 100.0
+        },
+        "D[horse|0.5]|U": {
+          "point": 96.25,
+          "lo95": 91.25,
+          "hi95": 100.0
+        },
+        "D[horse|0.5]|MA": {
+          "point": 95.0,
+          "lo95": 89.96875000000003,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.5]": {
+          "point": 1.25,
+          "lo95": 0.0,
+          "hi95": 3.75
+        },
+        "vsMA[horse|0.5]|L2": {
+          "point": 2.5,
+          "lo95": -2.5,
+          "hi95": 8.75
+        },
+        "vsMA[horse|0.5]|U": {
+          "point": 1.25,
+          "lo95": -6.25,
+          "hi95": 8.75
+        },
+        "D[horse|0.5|literal]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|literal]|U": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|literal]|MA": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.5|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.5|literal]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.5|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[horse|0.5|paraphrase]|L2": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|paraphrase]|U": {
+          "point": 92.5,
+          "lo95": 82.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.5|paraphrase]|MA": {
+          "point": 90.0,
+          "lo95": 79.93750000000006,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.5|paraphrase]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[horse|0.5|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 17.5
+        },
+        "vsMA[horse|0.5|paraphrase]|U": {
+          "point": 2.5,
+          "lo95": -12.5,
+          "hi95": 17.5
+        },
+        "D[sandwich|0.5]|L2": {
+          "point": 72.5,
+          "lo95": 57.5,
+          "hi95": 86.25
+        },
+        "D[sandwich|0.5]|U": {
+          "point": 72.5,
+          "lo95": 58.75,
+          "hi95": 85.0
+        },
+        "D[sandwich|0.5]|MA": {
+          "point": 70.0,
+          "lo95": 57.5,
+          "hi95": 82.5
+        },
+        "contrast[sandwich|0.5]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 6.25
+        },
+        "vsMA[sandwich|0.5]|L2": {
+          "point": 2.5,
+          "lo95": -7.5,
+          "hi95": 11.25
+        },
+        "vsMA[sandwich|0.5]|U": {
+          "point": 2.5,
+          "lo95": -3.75,
+          "hi95": 8.75
+        },
+        "D[sandwich|0.5|literal]|L2": {
+          "point": 90.0,
+          "lo95": 77.5,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.5|literal]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.5|literal]|MA": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "contrast[sandwich|0.5|literal]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.5|literal]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.5|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[sandwich|0.5|paraphrase]|L2": {
+          "point": 55.0,
+          "lo95": 32.5,
+          "hi95": 75.0
+        },
+        "D[sandwich|0.5|paraphrase]|U": {
+          "point": 52.5,
+          "lo95": 30.0,
+          "hi95": 75.0
+        },
+        "D[sandwich|0.5|paraphrase]|MA": {
+          "point": 47.5,
+          "lo95": 25.0,
+          "hi95": 70.0
+        },
+        "contrast[sandwich|0.5|paraphrase]": {
+          "point": 2.5,
+          "lo95": -12.5,
+          "hi95": 15.0
+        },
+        "vsMA[sandwich|0.5|paraphrase]|L2": {
+          "point": 7.5,
+          "lo95": -10.0,
+          "hi95": 25.0
+        },
+        "vsMA[sandwich|0.5|paraphrase]|U": {
+          "point": 5.0,
+          "lo95": -7.5,
+          "hi95": 17.5
+        },
+        "D[bicycle|0.7]|L2": {
+          "point": 82.5,
+          "lo95": 68.75,
+          "hi95": 93.75
+        },
+        "D[bicycle|0.7]|U": {
+          "point": 80.0,
+          "lo95": 66.25,
+          "hi95": 91.25
+        },
+        "D[bicycle|0.7]|MA": {
+          "point": 82.5,
+          "lo95": 70.0,
+          "hi95": 92.5
+        },
+        "contrast[bicycle|0.7]": {
+          "point": 2.5,
+          "lo95": -2.5,
+          "hi95": 7.5
+        },
+        "vsMA[bicycle|0.7]|L2": {
+          "point": 0.0,
+          "lo95": -5.0,
+          "hi95": 6.25
+        },
+        "vsMA[bicycle|0.7]|U": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 2.5
+        },
+        "D[bicycle|0.7|literal]|L2": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.7|literal]|U": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[bicycle|0.7|literal]|MA": {
+          "point": 95.0,
+          "lo95": 87.5,
+          "hi95": 100.0
+        },
+        "contrast[bicycle|0.7|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.7|literal]|L2": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[bicycle|0.7|literal]|U": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "D[bicycle|0.7|paraphrase]|L2": {
+          "point": 72.5,
+          "lo95": 50.0,
+          "hi95": 90.0
+        },
+        "D[bicycle|0.7|paraphrase]|U": {
+          "point": 67.5,
+          "lo95": 45.0,
+          "hi95": 87.5
+        },
+        "D[bicycle|0.7|paraphrase]|MA": {
+          "point": 70.0,
+          "lo95": 50.0,
+          "hi95": 87.5
+        },
+        "contrast[bicycle|0.7|paraphrase]": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 15.0
+        },
+        "vsMA[bicycle|0.7|paraphrase]|L2": {
+          "point": 2.5,
+          "lo95": -7.5,
+          "hi95": 15.0
+        },
+        "vsMA[bicycle|0.7|paraphrase]|U": {
+          "point": -2.5,
+          "lo95": -12.5,
+          "hi95": 7.5
+        },
+        "D[bird|0.7]|L2": {
+          "point": 73.75,
+          "lo95": 65.0,
+          "hi95": 81.25
+        },
+        "D[bird|0.7]|U": {
+          "point": 73.75,
+          "lo95": 62.5,
+          "hi95": 82.5
+        },
+        "D[bird|0.7]|MA": {
+          "point": 75.0,
+          "lo95": 61.25,
+          "hi95": 85.0
+        },
+        "contrast[bird|0.7]": {
+          "point": 0.0,
+          "lo95": -5.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.7]|L2": {
+          "point": -1.25,
+          "lo95": -7.5,
+          "hi95": 6.25
+        },
+        "vsMA[bird|0.7]|U": {
+          "point": -1.25,
+          "lo95": -6.25,
+          "hi95": 3.75
+        },
+        "D[bird|0.7|literal]|L2": {
+          "point": 75.0,
+          "lo95": 57.5,
+          "hi95": 90.0
+        },
+        "D[bird|0.7|literal]|U": {
+          "point": 77.5,
+          "lo95": 62.5,
+          "hi95": 90.0
+        },
+        "D[bird|0.7|literal]|MA": {
+          "point": 72.5,
+          "lo95": 55.0,
+          "hi95": 87.5
+        },
+        "contrast[bird|0.7|literal]": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "vsMA[bird|0.7|literal]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[bird|0.7|literal]|U": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "D[bird|0.7|paraphrase]|L2": {
+          "point": 72.5,
+          "lo95": 57.5,
+          "hi95": 87.5
+        },
+        "D[bird|0.7|paraphrase]|U": {
+          "point": 70.0,
+          "lo95": 55.0,
+          "hi95": 85.0
+        },
+        "D[bird|0.7|paraphrase]|MA": {
+          "point": 77.5,
+          "lo95": 60.0,
+          "hi95": 92.5
+        },
+        "contrast[bird|0.7|paraphrase]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[bird|0.7|paraphrase]|L2": {
+          "point": -5.0,
+          "lo95": -17.5,
+          "hi95": 10.0
+        },
+        "vsMA[bird|0.7|paraphrase]|U": {
+          "point": -7.5,
+          "lo95": -17.5,
+          "hi95": 2.5
+        },
+        "D[cat|0.7]|L2": {
+          "point": 15.0,
+          "lo95": 5.0,
+          "hi95": 27.5
+        },
+        "D[cat|0.7]|U": {
+          "point": 13.75,
+          "lo95": 2.5,
+          "hi95": 31.25
+        },
+        "D[cat|0.7]|MA": {
+          "point": 23.75,
+          "lo95": 10.0,
+          "hi95": 41.25
+        },
+        "contrast[cat|0.7]": {
+          "point": 1.25,
+          "lo95": -6.25,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.7]|L2": {
+          "point": -8.75,
+          "lo95": -18.75,
+          "hi95": 1.25
+        },
+        "vsMA[cat|0.7]|U": {
+          "point": -10.0,
+          "lo95": -21.25,
+          "hi95": -2.5
+        },
+        "D[cat|0.7|literal]|L2": {
+          "point": 17.5,
+          "lo95": 7.5,
+          "hi95": 27.5
+        },
+        "D[cat|0.7|literal]|U": {
+          "point": 15.0,
+          "lo95": 2.5,
+          "hi95": 30.0
+        },
+        "D[cat|0.7|literal]|MA": {
+          "point": 32.5,
+          "lo95": 12.5,
+          "hi95": 55.0
+        },
+        "contrast[cat|0.7|literal]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[cat|0.7|literal]|L2": {
+          "point": -15.0,
+          "lo95": -30.0,
+          "hi95": 0.0
+        },
+        "vsMA[cat|0.7|literal]|U": {
+          "point": -17.5,
+          "lo95": -32.5,
+          "hi95": -5.0
+        },
+        "D[cat|0.7|paraphrase]|L2": {
+          "point": 12.5,
+          "lo95": 0.0,
+          "hi95": 27.5
+        },
+        "D[cat|0.7|paraphrase]|U": {
+          "point": 12.5,
+          "lo95": 0.0,
+          "hi95": 32.5
+        },
+        "D[cat|0.7|paraphrase]|MA": {
+          "point": 15.0,
+          "lo95": 2.5,
+          "hi95": 30.0
+        },
+        "contrast[cat|0.7|paraphrase]": {
+          "point": 0.0,
+          "lo95": -10.0,
+          "hi95": 10.0
+        },
+        "vsMA[cat|0.7|paraphrase]|L2": {
+          "point": -2.5,
+          "lo95": -12.5,
+          "hi95": 7.5
+        },
+        "vsMA[cat|0.7|paraphrase]|U": {
+          "point": -2.5,
+          "lo95": -10.0,
+          "hi95": 5.0
+        },
+        "D[chair|0.7]|L2": {
+          "point": 55.0,
+          "lo95": 37.5,
+          "hi95": 72.5
+        },
+        "D[chair|0.7]|U": {
+          "point": 56.25,
+          "lo95": 40.0,
+          "hi95": 72.5
+        },
+        "D[chair|0.7]|MA": {
+          "point": 55.0,
+          "lo95": 40.0,
+          "hi95": 70.0
+        },
+        "contrast[chair|0.7]": {
+          "point": -1.25,
+          "lo95": -7.5,
+          "hi95": 5.031249999999545
+        },
+        "vsMA[chair|0.7]|L2": {
+          "point": 0.0,
+          "lo95": -8.75,
+          "hi95": 8.75
+        },
+        "vsMA[chair|0.7]|U": {
+          "point": 1.25,
+          "lo95": -2.5,
+          "hi95": 5.0
+        },
+        "D[chair|0.7|literal]|L2": {
+          "point": 70.0,
+          "lo95": 52.5,
+          "hi95": 85.0
+        },
+        "D[chair|0.7|literal]|U": {
+          "point": 75.0,
+          "lo95": 60.0,
+          "hi95": 90.0
+        },
+        "D[chair|0.7|literal]|MA": {
+          "point": 72.5,
+          "lo95": 55.0,
+          "hi95": 90.0
+        },
+        "contrast[chair|0.7|literal]": {
+          "point": -5.0,
+          "lo95": -15.0,
+          "hi95": 5.0
+        },
+        "vsMA[chair|0.7|literal]|L2": {
+          "point": -2.5,
+          "lo95": -17.5,
+          "hi95": 10.0
+        },
+        "vsMA[chair|0.7|literal]|U": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "D[chair|0.7|paraphrase]|L2": {
+          "point": 40.0,
+          "lo95": 20.0,
+          "hi95": 62.5
+        },
+        "D[chair|0.7|paraphrase]|U": {
+          "point": 37.5,
+          "lo95": 17.5,
+          "hi95": 57.5
+        },
+        "D[chair|0.7|paraphrase]|MA": {
+          "point": 37.5,
+          "lo95": 17.5,
+          "hi95": 57.5
+        },
+        "contrast[chair|0.7|paraphrase]": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[chair|0.7|paraphrase]|L2": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[chair|0.7|paraphrase]|U": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "D[dog|0.7]|L2": {
+          "point": 51.25,
+          "lo95": 33.75,
+          "hi95": 67.5
+        },
+        "D[dog|0.7]|U": {
+          "point": 43.75,
+          "lo95": 23.75,
+          "hi95": 62.5
+        },
+        "D[dog|0.7]|MA": {
+          "point": 70.0,
+          "lo95": 53.75,
+          "hi95": 85.0
+        },
+        "contrast[dog|0.7]": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 15.0
+        },
+        "vsMA[dog|0.7]|L2": {
+          "point": -18.75,
+          "lo95": -26.25,
+          "hi95": -11.25
+        },
+        "vsMA[dog|0.7]|U": {
+          "point": -26.25,
+          "lo95": -36.25,
+          "hi95": -16.25
+        },
+        "D[dog|0.7|literal]|L2": {
+          "point": 57.5,
+          "lo95": 37.5,
+          "hi95": 75.0
+        },
+        "D[dog|0.7|literal]|U": {
+          "point": 45.0,
+          "lo95": 22.5,
+          "hi95": 67.5
+        },
+        "D[dog|0.7|literal]|MA": {
+          "point": 82.5,
+          "lo95": 72.5,
+          "hi95": 92.5
+        },
+        "contrast[dog|0.7|literal]": {
+          "point": 12.5,
+          "lo95": 5.0,
+          "hi95": 20.0
+        },
+        "vsMA[dog|0.7|literal]|L2": {
+          "point": -25.0,
+          "lo95": -40.0,
+          "hi95": -10.0
+        },
+        "vsMA[dog|0.7|literal]|U": {
+          "point": -37.5,
+          "lo95": -55.0,
+          "hi95": -20.0
+        },
+        "D[dog|0.7|paraphrase]|L2": {
+          "point": 45.0,
+          "lo95": 22.5,
+          "hi95": 65.0
+        },
+        "D[dog|0.7|paraphrase]|U": {
+          "point": 42.5,
+          "lo95": 20.0,
+          "hi95": 65.0
+        },
+        "D[dog|0.7|paraphrase]|MA": {
+          "point": 57.5,
+          "lo95": 30.0,
+          "hi95": 82.5
+        },
+        "contrast[dog|0.7|paraphrase]": {
+          "point": 2.5,
+          "lo95": -5.0,
+          "hi95": 10.0
+        },
+        "vsMA[dog|0.7|paraphrase]|L2": {
+          "point": -12.5,
+          "lo95": -22.5,
+          "hi95": -2.5
+        },
+        "vsMA[dog|0.7|paraphrase]|U": {
+          "point": -15.0,
+          "lo95": -22.5,
+          "hi95": -7.5
+        },
+        "D[horse|0.7]|L2": {
+          "point": 96.25,
+          "lo95": 92.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.7]|U": {
+          "point": 96.25,
+          "lo95": 91.25,
+          "hi95": 100.0
+        },
+        "D[horse|0.7]|MA": {
+          "point": 92.5,
+          "lo95": 83.75,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.7]": {
+          "point": 0.0,
+          "lo95": -3.75,
+          "hi95": 3.75
+        },
+        "vsMA[horse|0.7]|L2": {
+          "point": 3.75,
+          "lo95": -2.5,
+          "hi95": 12.5
+        },
+        "vsMA[horse|0.7]|U": {
+          "point": 3.75,
+          "lo95": -5.0,
+          "hi95": 13.75
+        },
+        "D[horse|0.7|literal]|L2": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|literal]|U": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|literal]|MA": {
+          "point": 100.0,
+          "lo95": 100.0,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.7|literal]": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.7|literal]|L2": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "vsMA[horse|0.7|literal]|U": {
+          "point": 0.0,
+          "lo95": 0.0,
+          "hi95": 0.0
+        },
+        "D[horse|0.7|paraphrase]|L2": {
+          "point": 92.5,
+          "lo95": 85.0,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|paraphrase]|U": {
+          "point": 92.5,
+          "lo95": 82.5,
+          "hi95": 100.0
+        },
+        "D[horse|0.7|paraphrase]|MA": {
+          "point": 85.0,
+          "lo95": 67.5,
+          "hi95": 100.0
+        },
+        "contrast[horse|0.7|paraphrase]": {
+          "point": 0.0,
+          "lo95": -7.5,
+          "hi95": 7.5
+        },
+        "vsMA[horse|0.7|paraphrase]|L2": {
+          "point": 7.5,
+          "lo95": -5.0,
+          "hi95": 25.0
+        },
+        "vsMA[horse|0.7|paraphrase]|U": {
+          "point": 7.5,
+          "lo95": -10.0,
+          "hi95": 27.5
+        },
+        "D[sandwich|0.7]|L2": {
+          "point": 62.5,
+          "lo95": 51.25,
+          "hi95": 75.0
+        },
+        "D[sandwich|0.7]|U": {
+          "point": 66.25,
+          "lo95": 53.75,
+          "hi95": 78.75
+        },
+        "D[sandwich|0.7]|MA": {
+          "point": 58.75,
+          "lo95": 47.5,
+          "hi95": 71.25
+        },
+        "contrast[sandwich|0.7]": {
+          "point": -3.75,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.7]|L2": {
+          "point": 3.75,
+          "lo95": -2.5,
+          "hi95": 12.5
+        },
+        "vsMA[sandwich|0.7]|U": {
+          "point": 7.5,
+          "lo95": 0.0,
+          "hi95": 16.25
+        },
+        "D[sandwich|0.7|literal]|L2": {
+          "point": 87.5,
+          "lo95": 77.5,
+          "hi95": 97.5
+        },
+        "D[sandwich|0.7|literal]|U": {
+          "point": 90.0,
+          "lo95": 77.5,
+          "hi95": 100.0
+        },
+        "D[sandwich|0.7|literal]|MA": {
+          "point": 85.0,
+          "lo95": 75.0,
+          "hi95": 95.0
+        },
+        "contrast[sandwich|0.7|literal]": {
+          "point": -2.5,
+          "lo95": -7.5,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.7|literal]|L2": {
+          "point": 2.5,
+          "lo95": 0.0,
+          "hi95": 7.5
+        },
+        "vsMA[sandwich|0.7|literal]|U": {
+          "point": 5.0,
+          "lo95": 0.0,
+          "hi95": 12.5
+        },
+        "D[sandwich|0.7|paraphrase]|L2": {
+          "point": 37.5,
+          "lo95": 20.0,
+          "hi95": 55.0
+        },
+        "D[sandwich|0.7|paraphrase]|U": {
+          "point": 42.5,
+          "lo95": 22.5,
+          "hi95": 62.5
+        },
+        "D[sandwich|0.7|paraphrase]|MA": {
+          "point": 32.5,
+          "lo95": 15.0,
+          "hi95": 50.0
+        },
+        "contrast[sandwich|0.7|paraphrase]": {
+          "point": -5.0,
+          "lo95": -12.5,
+          "hi95": 0.0
+        },
+        "vsMA[sandwich|0.7|paraphrase]|L2": {
+          "point": 5.0,
+          "lo95": -5.0,
+          "hi95": 17.5
+        },
+        "vsMA[sandwich|0.7|paraphrase]|U": {
+          "point": 10.0,
+          "lo95": 0.0,
+          "hi95": 20.0
+        }
+      }
+    }
+  },
+  "test_matching_check": {
+    "17": {
+      "target": "dog",
+      "threshold": "0.5",
+      "L2_target_deletion_pp_vs_MA": 17.5,
+      "U_target_deletion_pp_vs_MA": 16.25,
+      "mismatch_pp": 1.25,
+      "mismatch_interval_pp": [
+        -6.25,
+        3.75
+      ],
+      "which_arm_deleted_more": "L2",
+      "tolerance_pp": 5.0,
+      "matched_on_test": true,
+      "development_mismatch_pp": 1.25,
+      "status": "MATCHED_ON_TEST",
+      "consequence": "the arms are matched on the frozen test set within the same tolerance selection used, so the retention contrast for this seed is a matched comparison"
+    },
+    "29": {
+      "target": "dog",
+      "threshold": "0.5",
+      "L2_target_deletion_pp_vs_MA": 22.5,
+      "U_target_deletion_pp_vs_MA": 28.75,
+      "mismatch_pp": 6.25,
+      "mismatch_interval_pp": [
+        -1.25,
+        13.75
+      ],
+      "which_arm_deleted_more": "U",
+      "tolerance_pp": 5.0,
+      "matched_on_test": false,
+      "development_mismatch_pp": 2.5,
+      "status": "NOT_MATCHED_ON_TEST",
+      "consequence": "the arms differ by 6.25 pp in target deletion ON THE TEST SET, beyond the 5.0 pp tolerance. Matching held on the development set (2.5 pp) but does not hold here, so the retention contrast for this seed is INCONCLUSIVE as a matched comparison. No reselection is performed: the selected checkpoint stands and this failure is reported as the result for this seed."
+    }
+  },
+  "matched_on_test_all_seeds": false,
+  "matched_comparison_status": "NOT MATCHED on the frozen test set for at least one seed: the matched retention comparison is INCONCLUSIVE for that seed. The equivalence readings below describe the contrast that was measured; they do NOT license a matched-effectiveness claim where matching failed.",
+  "primary_reading_per_seed": {
+    "17": {
+      "point": 1.25,
+      "lo95": -2.5,
+      "hi95": 5.0,
+      "practical_equivalence": true,
+      "material_benefit": false,
+      "benefit_of_10pp_ruled_out": true,
+      "inconclusive": false,
+      "reading": "interval wholly within [-10, 10]: PRACTICAL EQUIVALENCE at the declared margin; upper bound +5.0 < +10: a benefit of 10 pp or more is RULED OUT, conditionally",
+      "matched_on_test": true,
+      "matched_comparison": "VALID: the arms are matched on this set"
+    },
+    "29": {
+      "point": -1.25,
+      "lo95": -6.25,
+      "hi95": 3.75,
+      "practical_equivalence": true,
+      "material_benefit": false,
+      "benefit_of_10pp_ruled_out": true,
+      "inconclusive": false,
+      "reading": "interval wholly within [-10, 10]: PRACTICAL EQUIVALENCE at the declared margin; upper bound +3.8 < +10: a benefit of 10 pp or more is RULED OUT, conditionally",
+      "matched_on_test": false,
+      "matched_comparison": "INCONCLUSIVE AS A MATCHED COMPARISON: the arms are not matched on this set"
+    }
+  },
+  "parent_referenced_note": "Both arms of a seed share that seed's own MA, so the contrast of parent-referenced changes is algebraically identical to the direct contrast. Per-arm changes from MA are reported for interpretation; the coincidence is stated, not presented as a second result.",
+  "interpretation_rules": [
+    "An interval including zero is NOT evidence of no effect.",
+    "A difference in significance labels between arms or seeds is NOT a significant difference.",
+    "No multiplicity correction is applied, so each interval is DESCRIPTIVE, not a test.",
+    "Only an interval wholly within [-10, +10] supports an equivalence statement, and only at that margin.",
+    "Two training seeds support a DIRECTION CHECK only; they are never pooled and support no population claim.",
+    "Intervals are conditional on this base model, these concepts, these anchors, these prompts and this detector.",
+    "Residual dependence from a template shared ACROSS scene clusters is not absorbed by this bootstrap, and its direction and size are not established.",
+    "The detector is a PROXY. Final conclusions require the blinded human annotation.",
+    "Matching was established on the DEVELOPMENT set and is re-checked here on the TEST set. Where the on-test check fails, the retention contrast for that seed is INCONCLUSIVE as a matched comparison, and no reselection is permitted."
+  ],
+  "analysed_utc": "2026-10-10T20:56:57.170545+00:00",
+  "supersedes": {
+    "preserved_at": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/analysis_test.20261010T205055.superseded.json",
+    "preserved_analysed_utc": "2026-10-10T20:50:55.367161+00:00"
+  }
+}

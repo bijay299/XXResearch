@@ -1,0 +1,690 @@
+{
+  "_what_this_is": "The bridge between the original 1000-step run and the short early-grid rerun, measured at the one step they share. Three questions -- settings, weights, behaviour -- answered separately.",
+  "generated_utc": "2026-10-10T20:18:24.295351+00:00",
+  "original_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1",
+  "rerun_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid",
+  "bridge_step": 100,
+  "tolerance_pp": 5.0,
+  "settings_preserved": true,
+  "fixed_references_verified": true,
+  "behaviour_within_tolerance": true,
+  "weights_bitwise_identical": false,
+  "verdict": "BRIDGE_HELD",
+  "reason": "settings that determine the first 100 updates are identical, the only changes are the declared stopping limit and save cadence, and the two realisations' step-100 development dog suppression agrees within 5.0 pp. Selection on the early grid may proceed. The step-100 weights are NOT bitwise identical, so the early dumps are a second realisation rather than the original path; the distance is recorded and its cause is not isolated.",
+  "declared_contract": {
+    "original_iterations": 1000,
+    "rerun_iterations": 100,
+    "original_cadence": 100,
+    "rerun_cadence": 10,
+    "bridge_step": 100,
+    "tolerance_pp": 5.0,
+    "seeds": [
+      17,
+      29
+    ],
+    "declared_L2_suppression_pp": {
+      "17": 30.0,
+      "29": 33.75
+    }
+  },
+  "not_established": [
+    "That the two runs passed through the same states at steps 1..99. Only step 100 is compared; bitwise identity THERE would not prove identity along the path to it, and the amendment's candidates come from the unmeasured interior.",
+    "WHY any weight difference exists. Identical recorded configuration and the same saved parent do not isolate nondeterminism as the cause: the runs also differ in library and driver state, in the periodic-checkpointing code path at a different cadence, in dataloader ordering, and in anything outside the recorded hyperparameters. No controlled repeat was run.",
+    "That either realisation's step-k state is THE state of this configuration at step k. Run-to-run variation is measured at this one step; it is not characterised across the early grid.",
+    "Anything about retention. This tool measures dog suppression only and never touches the frozen test set."
+  ],
+  "per_seed": {
+    "17": {
+      "training_seed": 17,
+      "settings": {
+        "request_field_differences": {},
+        "settings_that_determine_the_first_updates": {
+          "n_compared": 29,
+          "n_identical": 29,
+          "violations": {},
+          "missing_required_fields": {},
+          "all_preserved": true,
+          "preserved": [
+            {
+              "setting": "learning_rate_cli_default_before_scaling",
+              "value": 2e-06
+            },
+            {
+              "setting": "scale_lr",
+              "value": true
+            },
+            {
+              "setting": "effective_learning_rate",
+              "value": 8e-06
+            },
+            {
+              "setting": "effective_lr_cross_check",
+              "value": 8e-06
+            },
+            {
+              "setting": "scale_lr_formula",
+              "value": "lr * grad_accum * anchor_batch_size * num_processes"
+            },
+            {
+              "setting": "anchor_batch_size",
+              "value": 4
+            },
+            {
+              "setting": "gradient_accumulation_steps",
+              "value": 1
+            },
+            {
+              "setting": "num_processes",
+              "value": 1
+            },
+            {
+              "setting": "optimizer",
+              "value": "AdamW (torch.optim.AdamW; use_8bit_adam=False)"
+            },
+            {
+              "setting": "adam_beta1",
+              "value": 0.9
+            },
+            {
+              "setting": "adam_beta2",
+              "value": 0.999
+            },
+            {
+              "setting": "adam_weight_decay",
+              "value": 0.01
+            },
+            {
+              "setting": "adam_epsilon",
+              "value": 1e-08
+            },
+            {
+              "setting": "max_grad_norm",
+              "value": 1.0
+            },
+            {
+              "setting": "lr_scheduler",
+              "value": "constant"
+            },
+            {
+              "setting": "lr_warmup_steps",
+              "value": 500
+            },
+            {
+              "setting": "precision",
+              "value": "fp32 (accelerate mixed_precision: 'no')"
+            },
+            {
+              "setting": "parameter_group",
+              "value": "kv-xattn"
+            },
+            {
+              "setting": "with_anchor_preservation",
+              "value": false
+            },
+            {
+              "setting": "l1sp_weight",
+              "value": 0.0
+            },
+            {
+              "setting": "l2sp_weight",
+              "value": 0.0
+            },
+            {
+              "setting": "with_gradient_projection",
+              "value": false
+            },
+            {
+              "setting": "with_selft",
+              "value": false
+            },
+            {
+              "setting": "eval_interval",
+              "value": null
+            },
+            {
+              "setting": "seed",
+              "value": 17
+            },
+            {
+              "setting": "hflip",
+              "value": true
+            },
+            {
+              "setting": "noaug",
+              "value": true
+            },
+            {
+              "setting": "resolution",
+              "value": 512
+            },
+            {
+              "setting": "steps_per_epoch",
+              "value": 50
+            }
+          ],
+          "rule": "every setting here must be identical, because it enters the first 100 optimizer updates; a difference invalidates the rerun rather than telling us anything about training"
+        },
+        "declared_changes": {
+          "stopping_limit_and_derived": {
+            "iterations_requested": {
+              "original": 1000,
+              "rerun": 100
+            },
+            "epochs_cap": {
+              "original": 20,
+              "rerun": 2
+            },
+            "epoch_capacity_steps": {
+              "original": 1000,
+              "rerun": 100
+            }
+          },
+          "save_cadence": {
+            "original_every_n_steps": 100,
+            "rerun_every_n_steps": 10
+          },
+          "declared_before_the_run": true,
+          "note": "the stopping limit and the save cadence are the ONLY intended changes; epochs_cap and epoch_capacity_steps are recomputed by upstream FROM the stopping limit (epochs = ceil(iterations / steps_per_epoch)) and are therefore consequences of it, not separate changes"
+        },
+        "unclassified_hyperparameters": {
+          "names": [],
+          "differences": {},
+          "note": "a hyperparameter this tool does not classify must not differ silently; any difference here is reported as a settings violation"
+        },
+        "lr_schedule_is_horizon_independent": {
+          "original_lr_scheduler": "constant",
+          "rerun_lr_scheduler": "constant",
+          "horizon_free": true,
+          "why_it_matters": "upstream passes num_training_steps = iterations * gradient_accumulation_steps to diffusers' get_scheduler. For CONSTANT (and PIECEWISE_CONSTANT) get_scheduler discards both num_warmup_steps and num_training_steps, so the learning rate at update k does not depend on the stopping limit. Under any other scheduler, shortening the horizon would change the learning rate at every one of the first 100 updates and this rerun would NOT be comparable.",
+          "recorded_lr_warmup_steps_is_inert_here": 500
+        },
+        "declared_contract": {
+          "expected": {
+            "original_iterations": 1000,
+            "rerun_iterations": 100,
+            "original_cadence": 100,
+            "rerun_cadence": 10,
+            "bridge_step": 100,
+            "tolerance_pp": 5.0,
+            "seeds": [
+              17,
+              29
+            ],
+            "declared_L2_suppression_pp": {
+              "17": 30.0,
+              "29": 33.75
+            }
+          },
+          "violations": {},
+          "ok": true,
+          "rule": "the two declared changes have declared VALUES: 100 optimizer steps and a dump every 10. A different horizon or cadence is an undeclared change to the experiment, not a declared one."
+        },
+        "parent_identity": {
+          "original_recorded_parent_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+          "rerun_recorded_parent_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+          "same_parent": true,
+          "rule": "both trajectories must record the SAME saved MA digest; a different parent makes the two runs incomparable whatever their hyperparameters say"
+        },
+        "settings_ok": true,
+        "what_this_comparison_cannot_see": [
+          "the anchor images and prompt file CONTENTS -- the reports record paths and counts, not digests of the data, so identical paths are assumed to mean identical data",
+          "library, driver and upstream-commit state at the two run times, none of which the reports record",
+          "any upstream default that is not among the recorded effective hyperparameters, including dataloader worker count and ordering"
+        ]
+      },
+      "report_bindings": {
+        "original_train_report": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/models/seed17/U/train_report.json",
+        "original_train_report_sha256": "57f0ca3ec42eeaeaaa548225ff2c1a5abcffddd71b19019d4f9ea25b56e015fc",
+        "rerun_train_report": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/models/seed17/U/train_report.json",
+        "rerun_train_report_sha256": "1212e70b88e1d1c5d37db33cd0280b2398b957b5a62319739c00cacfe11a55f1"
+      },
+      "fixed_references": {
+        "reference_dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/eval_dev",
+        "candidate_dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_dev",
+        "references_are_separate_from_candidates": true,
+        "regenerated_references_beside_candidates": [],
+        "declared_L2_suppression_pp": 30.0,
+        "measured_L2_suppression_pp": 30.0,
+        "L2_target_matches_declared": true,
+        "slots": {
+          "MA": {
+            "dog_residue_pct": 82.5,
+            "dog_hits": 66,
+            "n_dog_pairs": 80,
+            "detections_sha256": "610d077fa5b8e324eb572149f89ee8edaa085451f73b1cf7fe285a15e9dbddf6",
+            "image_report_sha256": "536ddf9f3c1e1db2f6ed5ef4941c4908c997e4a678935d31d477cba915e512f4",
+            "generating_checkpoint_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+            "manifest_sha256": "1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b",
+            "generation_settings_source": "contract /home/bijaypandey/FINMLResearch/configs/generation_settings.json",
+            "registered_checkpoint_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+            "generated_by_the_registered_saved_artifact": true,
+            "published_detections_sha256": "610d077fa5b8e324eb572149f89ee8edaa085451f73b1cf7fe285a15e9dbddf6",
+            "published_image_report_sha256": "536ddf9f3c1e1db2f6ed5ef4941c4908c997e4a678935d31d477cba915e512f4",
+            "matches_published_index": true
+          },
+          "MAB_L2": {
+            "dog_residue_pct": 52.5,
+            "dog_hits": 42,
+            "n_dog_pairs": 80,
+            "detections_sha256": "8559457044f6c8a9c2570eece7d2eb3fc09cfbda993ae0cf23d8912ebcc1393e",
+            "image_report_sha256": "bfda697408d13ffdae0dc740b13e3d6a1bfb228ec875472377548c7e1c8751ad",
+            "generating_checkpoint_sha256": "8ee7d56f62b04be98edf6f28aa34c52ed614f5fbaed84f883ae926da329cec8b",
+            "manifest_sha256": "1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b",
+            "generation_settings_source": "contract /home/bijaypandey/FINMLResearch/configs/generation_settings.json",
+            "registered_checkpoint_sha256": "8ee7d56f62b04be98edf6f28aa34c52ed614f5fbaed84f883ae926da329cec8b",
+            "generated_by_the_registered_saved_artifact": true,
+            "published_detections_sha256": "8559457044f6c8a9c2570eece7d2eb3fc09cfbda993ae0cf23d8912ebcc1393e",
+            "published_image_report_sha256": "bfda697408d13ffdae0dc740b13e3d6a1bfb228ec875472377548c7e1c8751ad",
+            "matches_published_index": true
+          }
+        },
+        "problems": [],
+        "ok": true,
+        "rule": "MA and MAB_L2 are read from one fixed, separately verified evaluation; their generating checkpoints must be the registered saved artifacts and their manifest the frozen development manifest"
+      },
+      "weights_at_bridge_step": {
+        "original_dump": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/models/seed17/U/delta-100",
+        "rerun_dump": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/models/seed17/U/delta-100",
+        "original_sha256": "63cfa9b9de77cb3d027a53febcdb4b44ad7d7976dfd8d17f196093be887ec95b",
+        "rerun_sha256": "65dba5ef81a88f509058edb7e54e99a875cb4a1e1d653115033eadca44ffb8ef",
+        "file_hashes_equal": false,
+        "tensors_compared": 32,
+        "bitwise_identical_tensors": 0,
+        "all_bitwise_identical": false,
+        "max_abs_diff": 0.00032966677099466324,
+        "overall_relative_frobenius": 0.001189852540257468,
+        "most_divergent": [
+          {
+            "tensor": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.00032966677099466324,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "mid_block.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0003218678757548332,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0003147711977362633,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.00031325221061706543,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0003120815381407738,
+            "bitwise_identical": false
+          }
+        ],
+        "interpretation": "This compares ONE step. Bitwise identity at step 100 is strong evidence that the two runs agreed there, but it does NOT prove the intermediate states at steps 1..99 were identical: those states were never compared, and agreement at a single later point does not establish agreement along the path to it. A difference is likewise a measured distance ONLY: this comparison cannot say whether it came from nondeterministic kernels, the changed save cadence, library or driver state, dataloader ordering, or anything else outside the recorded hyperparameters.",
+        "what_identity_here_would_and_would_not_show": {
+          "would": "the two runs reached the same state at step 100",
+          "would_not": "that they passed through the same states at steps 1..99, which is where this amendment's candidates come from and which is not measured by either run"
+        }
+      },
+      "behaviour_at_bridge_step": {
+        "fixed_reference": {
+          "MA_dog_residue_pct": 82.5,
+          "L2_dog_residue_pct": 52.5,
+          "L2_dog_suppression_pp": 30.0,
+          "L2_gate_suppression_ge_30pp": true,
+          "L2_gate_residue_le_60pct": true,
+          "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/eval_dev",
+          "note": "both realisations are measured against THIS parent evaluation, not against their own; the match target is this L2 suppression and it cannot move with a rescan"
+        },
+        "original": {
+          "dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/eval_dev",
+          "fixed_MA_dog_residue_pct": 82.5,
+          "dump_dog_residue_pct": 43.75,
+          "dog_hits": 35,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp": 38.75,
+          "detections_sha256": "3defaa0758876545e916260c8305d923869874b9d9a14f63bfe62dccf1809eb0"
+        },
+        "rerun": {
+          "dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_dev",
+          "fixed_MA_dog_residue_pct": 82.5,
+          "dump_dog_residue_pct": 45.0,
+          "dog_hits": 36,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp": 37.5,
+          "detections_sha256": "878dabd5e6a5914a9359dc50732b30c79e99ee7c1a57e5091eece1bd35593193"
+        },
+        "difference_pp": 1.25,
+        "stop_condition_pp": 5.0,
+        "holds": true,
+        "rule": "declared before the measurement: if the two realisations' step-100 dog suppression differs by more than 5.0 pp -- the same tolerance the match itself uses -- then run-to-run variation is of the same order as the quantity being matched, the early grid cannot be trusted to locate the match point, and the amendment stops and reports that instead"
+      }
+    },
+    "29": {
+      "training_seed": 29,
+      "settings": {
+        "request_field_differences": {},
+        "settings_that_determine_the_first_updates": {
+          "n_compared": 29,
+          "n_identical": 29,
+          "violations": {},
+          "missing_required_fields": {},
+          "all_preserved": true,
+          "preserved": [
+            {
+              "setting": "learning_rate_cli_default_before_scaling",
+              "value": 2e-06
+            },
+            {
+              "setting": "scale_lr",
+              "value": true
+            },
+            {
+              "setting": "effective_learning_rate",
+              "value": 8e-06
+            },
+            {
+              "setting": "effective_lr_cross_check",
+              "value": 8e-06
+            },
+            {
+              "setting": "scale_lr_formula",
+              "value": "lr * grad_accum * anchor_batch_size * num_processes"
+            },
+            {
+              "setting": "anchor_batch_size",
+              "value": 4
+            },
+            {
+              "setting": "gradient_accumulation_steps",
+              "value": 1
+            },
+            {
+              "setting": "num_processes",
+              "value": 1
+            },
+            {
+              "setting": "optimizer",
+              "value": "AdamW (torch.optim.AdamW; use_8bit_adam=False)"
+            },
+            {
+              "setting": "adam_beta1",
+              "value": 0.9
+            },
+            {
+              "setting": "adam_beta2",
+              "value": 0.999
+            },
+            {
+              "setting": "adam_weight_decay",
+              "value": 0.01
+            },
+            {
+              "setting": "adam_epsilon",
+              "value": 1e-08
+            },
+            {
+              "setting": "max_grad_norm",
+              "value": 1.0
+            },
+            {
+              "setting": "lr_scheduler",
+              "value": "constant"
+            },
+            {
+              "setting": "lr_warmup_steps",
+              "value": 500
+            },
+            {
+              "setting": "precision",
+              "value": "fp32 (accelerate mixed_precision: 'no')"
+            },
+            {
+              "setting": "parameter_group",
+              "value": "kv-xattn"
+            },
+            {
+              "setting": "with_anchor_preservation",
+              "value": false
+            },
+            {
+              "setting": "l1sp_weight",
+              "value": 0.0
+            },
+            {
+              "setting": "l2sp_weight",
+              "value": 0.0
+            },
+            {
+              "setting": "with_gradient_projection",
+              "value": false
+            },
+            {
+              "setting": "with_selft",
+              "value": false
+            },
+            {
+              "setting": "eval_interval",
+              "value": null
+            },
+            {
+              "setting": "seed",
+              "value": 29
+            },
+            {
+              "setting": "hflip",
+              "value": true
+            },
+            {
+              "setting": "noaug",
+              "value": true
+            },
+            {
+              "setting": "resolution",
+              "value": 512
+            },
+            {
+              "setting": "steps_per_epoch",
+              "value": 50
+            }
+          ],
+          "rule": "every setting here must be identical, because it enters the first 100 optimizer updates; a difference invalidates the rerun rather than telling us anything about training"
+        },
+        "declared_changes": {
+          "stopping_limit_and_derived": {
+            "iterations_requested": {
+              "original": 1000,
+              "rerun": 100
+            },
+            "epochs_cap": {
+              "original": 20,
+              "rerun": 2
+            },
+            "epoch_capacity_steps": {
+              "original": 1000,
+              "rerun": 100
+            }
+          },
+          "save_cadence": {
+            "original_every_n_steps": 100,
+            "rerun_every_n_steps": 10
+          },
+          "declared_before_the_run": true,
+          "note": "the stopping limit and the save cadence are the ONLY intended changes; epochs_cap and epoch_capacity_steps are recomputed by upstream FROM the stopping limit (epochs = ceil(iterations / steps_per_epoch)) and are therefore consequences of it, not separate changes"
+        },
+        "unclassified_hyperparameters": {
+          "names": [],
+          "differences": {},
+          "note": "a hyperparameter this tool does not classify must not differ silently; any difference here is reported as a settings violation"
+        },
+        "lr_schedule_is_horizon_independent": {
+          "original_lr_scheduler": "constant",
+          "rerun_lr_scheduler": "constant",
+          "horizon_free": true,
+          "why_it_matters": "upstream passes num_training_steps = iterations * gradient_accumulation_steps to diffusers' get_scheduler. For CONSTANT (and PIECEWISE_CONSTANT) get_scheduler discards both num_warmup_steps and num_training_steps, so the learning rate at update k does not depend on the stopping limit. Under any other scheduler, shortening the horizon would change the learning rate at every one of the first 100 updates and this rerun would NOT be comparable.",
+          "recorded_lr_warmup_steps_is_inert_here": 500
+        },
+        "declared_contract": {
+          "expected": {
+            "original_iterations": 1000,
+            "rerun_iterations": 100,
+            "original_cadence": 100,
+            "rerun_cadence": 10,
+            "bridge_step": 100,
+            "tolerance_pp": 5.0,
+            "seeds": [
+              17,
+              29
+            ],
+            "declared_L2_suppression_pp": {
+              "17": 30.0,
+              "29": 33.75
+            }
+          },
+          "violations": {},
+          "ok": true,
+          "rule": "the two declared changes have declared VALUES: 100 optimizer steps and a dump every 10. A different horizon or cadence is an undeclared change to the experiment, not a declared one."
+        },
+        "parent_identity": {
+          "original_recorded_parent_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+          "rerun_recorded_parent_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+          "same_parent": true,
+          "rule": "both trajectories must record the SAME saved MA digest; a different parent makes the two runs incomparable whatever their hyperparameters say"
+        },
+        "settings_ok": true,
+        "what_this_comparison_cannot_see": [
+          "the anchor images and prompt file CONTENTS -- the reports record paths and counts, not digests of the data, so identical paths are assumed to mean identical data",
+          "library, driver and upstream-commit state at the two run times, none of which the reports record",
+          "any upstream default that is not among the recorded effective hyperparameters, including dataloader worker count and ordering"
+        ]
+      },
+      "report_bindings": {
+        "original_train_report": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/models/seed29/U/train_report.json",
+        "original_train_report_sha256": "97b5d404e745b583b4ee07060315e2533ea195caa119405e5407b2292c0ab507",
+        "rerun_train_report": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/models/seed29/U/train_report.json",
+        "rerun_train_report_sha256": "fe764e5ae0a6ca55873e3ccc2847964180550b48d0a417ad260dbbe455fc3115"
+      },
+      "fixed_references": {
+        "reference_dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/eval_dev",
+        "candidate_dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_dev",
+        "references_are_separate_from_candidates": true,
+        "regenerated_references_beside_candidates": [],
+        "declared_L2_suppression_pp": 33.75,
+        "measured_L2_suppression_pp": 33.75,
+        "L2_target_matches_declared": true,
+        "slots": {
+          "MA": {
+            "dog_residue_pct": 82.5,
+            "dog_hits": 66,
+            "n_dog_pairs": 80,
+            "detections_sha256": "a1e644511fde2afdfed74526c071f0f8532ae455cf012258d4cfac830ffde01d",
+            "image_report_sha256": "04db5e7d3ba7708e6f8897fd16145ef186b1f173f49c2f43ac085b659ab3ef33",
+            "generating_checkpoint_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+            "manifest_sha256": "1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b",
+            "generation_settings_source": "contract /home/bijaypandey/FINMLResearch/configs/generation_settings.json",
+            "registered_checkpoint_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+            "generated_by_the_registered_saved_artifact": true,
+            "published_detections_sha256": "a1e644511fde2afdfed74526c071f0f8532ae455cf012258d4cfac830ffde01d",
+            "published_image_report_sha256": "04db5e7d3ba7708e6f8897fd16145ef186b1f173f49c2f43ac085b659ab3ef33",
+            "matches_published_index": true
+          },
+          "MAB_L2": {
+            "dog_residue_pct": 48.75,
+            "dog_hits": 39,
+            "n_dog_pairs": 80,
+            "detections_sha256": "29c9ce96cd6dfc9bab3413afa2cc983ab9713cc644f7039ae770848597e6d281",
+            "image_report_sha256": "bf0d041bbc2da7b634fadcee3a34f1f9ab545962f2a890f91e78150d93ee7d05",
+            "generating_checkpoint_sha256": "c4f3ecdcb94569646f51712b08ba80f62b23b4ae1162e953f3c16f5c3bfc7871",
+            "manifest_sha256": "1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b",
+            "generation_settings_source": "contract /home/bijaypandey/FINMLResearch/configs/generation_settings.json",
+            "registered_checkpoint_sha256": "c4f3ecdcb94569646f51712b08ba80f62b23b4ae1162e953f3c16f5c3bfc7871",
+            "generated_by_the_registered_saved_artifact": true,
+            "published_detections_sha256": "29c9ce96cd6dfc9bab3413afa2cc983ab9713cc644f7039ae770848597e6d281",
+            "published_image_report_sha256": "bf0d041bbc2da7b634fadcee3a34f1f9ab545962f2a890f91e78150d93ee7d05",
+            "matches_published_index": true
+          }
+        },
+        "problems": [],
+        "ok": true,
+        "rule": "MA and MAB_L2 are read from one fixed, separately verified evaluation; their generating checkpoints must be the registered saved artifacts and their manifest the frozen development manifest"
+      },
+      "weights_at_bridge_step": {
+        "original_dump": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/models/seed29/U/delta-100",
+        "rerun_dump": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/models/seed29/U/delta-100",
+        "original_sha256": "6cc77c21bd57ee47b414e621c42b62f5a9a7783a84775dcb5a58bbbeded9aa7e",
+        "rerun_sha256": "066622ea6f2a47cae2e22195129dc50b3b28fe27425ba161437a3dea80a2ea7f",
+        "file_hashes_equal": false,
+        "tensors_compared": 32,
+        "bitwise_identical_tensors": 0,
+        "all_bitwise_identical": false,
+        "max_abs_diff": 0.0003339890390634537,
+        "overall_relative_frobenius": 0.0012471051461855605,
+        "most_divergent": [
+          {
+            "tensor": "mid_block.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0003339890390634537,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0003286323044449091,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0003278180956840515,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0003145243972539902,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.000314103439450264,
+            "bitwise_identical": false
+          }
+        ],
+        "interpretation": "This compares ONE step. Bitwise identity at step 100 is strong evidence that the two runs agreed there, but it does NOT prove the intermediate states at steps 1..99 were identical: those states were never compared, and agreement at a single later point does not establish agreement along the path to it. A difference is likewise a measured distance ONLY: this comparison cannot say whether it came from nondeterministic kernels, the changed save cadence, library or driver state, dataloader ordering, or anything else outside the recorded hyperparameters.",
+        "what_identity_here_would_and_would_not_show": {
+          "would": "the two runs reached the same state at step 100",
+          "would_not": "that they passed through the same states at steps 1..99, which is where this amendment's candidates come from and which is not measured by either run"
+        }
+      },
+      "behaviour_at_bridge_step": {
+        "fixed_reference": {
+          "MA_dog_residue_pct": 82.5,
+          "L2_dog_residue_pct": 48.75,
+          "L2_dog_suppression_pp": 33.75,
+          "L2_gate_suppression_ge_30pp": true,
+          "L2_gate_residue_le_60pct": true,
+          "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/eval_dev",
+          "note": "both realisations are measured against THIS parent evaluation, not against their own; the match target is this L2 suppression and it cannot move with a rescan"
+        },
+        "original": {
+          "dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/eval_dev",
+          "fixed_MA_dog_residue_pct": 82.5,
+          "dump_dog_residue_pct": 40.0,
+          "dog_hits": 32,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp": 42.5,
+          "detections_sha256": "ae6c6508ec6eaaaf5387751d6bc1736c4704fa8063601de98442244db36c7cb4"
+        },
+        "rerun": {
+          "dev_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_dev",
+          "fixed_MA_dog_residue_pct": 82.5,
+          "dump_dog_residue_pct": 38.75,
+          "dog_hits": 31,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp": 43.75,
+          "detections_sha256": "5ccc98db832954c39f62c6be3825df1023c3092cd4f386f7b4aa8f2def67dda5"
+        },
+        "difference_pp": 1.25,
+        "stop_condition_pp": 5.0,
+        "holds": true,
+        "rule": "declared before the measurement: if the two realisations' step-100 dog suppression differs by more than 5.0 pp -- the same tolerance the match itself uses -- then run-to-run variation is of the same order as the quantity being matched, the early grid cannot be trusted to locate the match point, and the amendment stops and reports that instead"
+      }
+    }
+  }
+}

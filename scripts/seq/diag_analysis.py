@@ -55,6 +55,11 @@ NON_TARGET = "sandwich"
 HISTORICAL = "cat"
 MATERIAL_PP = 10.0          # prespecified material effect size
 EQUIV_LO, EQUIV_HI = -10.0, 10.0
+# The matching tolerance the selection used. Re-applied HERE, on the frozen test
+# set, because matching on the development set does not guarantee matching on
+# the test set -- and a retention comparison between arms that are not matched
+# on the set being reported is not a matched comparison.
+MATCH_TOLERANCE_PP = 5.0
 
 
 def verify_grouping(p: Path) -> dict:
@@ -272,6 +277,51 @@ def main() -> int:
         per_seed[s] = analyse_seed(s, step, eval_root, gset, n_draws, rng_seed)
 
     primary_tag = f"{PRIMARY_CATEGORY}|{PRIMARY_THR}"
+
+    # ---- the matching check, RE-REPORTED ON TEST. No reselection.
+    #
+    # Both arms of a seed share that seed's own MA, so the on-test difference in
+    # target deletion is exactly -contrast[dog], and its interval comes free from
+    # the same bootstrap. Selection matched on the DEVELOPMENT set; whether the
+    # arms are still matched on the FROZEN TEST set is a separate question, and
+    # it is the one that licenses calling the retention contrast "matched".
+    match_tag = f"{MATCHING_CHECK}|{PRIMARY_THR}"
+    test_matching = {}
+    for s in seeds:
+        est = per_seed[s]["estimates"]
+        c = est[f"contrast[{match_tag}]"]
+        l2 = est[f"vsMA[{match_tag}]|L2"]
+        u = est[f"vsMA[{match_tag}]|U"]
+        mismatch = abs(c["point"])
+        ok = mismatch <= MATCH_TOLERANCE_PP + 1e-9
+        dev_mismatch = sel["per_seed"][str(s)]["selected"]["mismatch_vs_L2_pp"]
+        test_matching[str(s)] = {
+            "target": MATCHING_CHECK, "threshold": PRIMARY_THR,
+            "L2_target_deletion_pp_vs_MA": -l2["point"],
+            "U_target_deletion_pp_vs_MA": -u["point"],
+            "mismatch_pp": round(mismatch, 4),
+            "mismatch_interval_pp": [c["lo95"], c["hi95"]],
+            "which_arm_deleted_more": ("U" if c["point"] > 0 else
+                                       "L2" if c["point"] < 0 else "neither"),
+            "tolerance_pp": MATCH_TOLERANCE_PP,
+            "matched_on_test": ok,
+            "development_mismatch_pp": dev_mismatch,
+            "status": ("MATCHED_ON_TEST" if ok else "NOT_MATCHED_ON_TEST"),
+            "consequence": (
+                "the arms are matched on the frozen test set within the same "
+                "tolerance selection used, so the retention contrast for this "
+                "seed is a matched comparison"
+                if ok else
+                f"the arms differ by {mismatch:.2f} pp in target deletion ON "
+                f"THE TEST SET, beyond the {MATCH_TOLERANCE_PP} pp tolerance. "
+                f"Matching held on the development set "
+                f"({dev_mismatch} pp) but does not hold here, so the retention "
+                f"contrast for this seed is INCONCLUSIVE as a matched "
+                f"comparison. No reselection is performed: the selected "
+                f"checkpoint stands and this failure is reported as the result "
+                f"for this seed."),
+        }
+    all_matched_on_test = all(v["matched_on_test"] for v in test_matching.values())
     payload = {
         "_what_this_is": (
             "The matched-effectiveness diagnostic's detector-based estimates. "
@@ -291,8 +341,24 @@ def main() -> int:
                       for s in seeds},
         "seeds_pooled": False,
         "per_seed": {str(s): per_seed[s] for s in seeds},
+        "test_matching_check": test_matching,
+        "matched_on_test_all_seeds": all_matched_on_test,
+        "matched_comparison_status": (
+            "MATCHED on the frozen test set for every seed"
+            if all_matched_on_test else
+            "NOT MATCHED on the frozen test set for at least one seed: the "
+            "matched retention comparison is INCONCLUSIVE for that seed. The "
+            "equivalence readings below describe the contrast that was measured; "
+            "they do NOT license a matched-effectiveness claim where matching "
+            "failed."),
         "primary_reading_per_seed": {
-            str(s): read_decision(per_seed[s]["estimates"], primary_tag)
+            str(s): {**read_decision(per_seed[s]["estimates"], primary_tag),
+                     "matched_on_test": test_matching[str(s)]["matched_on_test"],
+                     "matched_comparison": (
+                         "VALID: the arms are matched on this set"
+                         if test_matching[str(s)]["matched_on_test"] else
+                         "INCONCLUSIVE AS A MATCHED COMPARISON: the arms are "
+                         "not matched on this set")}
             for s in seeds},
         "parent_referenced_note": (
             "Both arms of a seed share that seed's own MA, so the contrast of "
@@ -316,14 +382,44 @@ def main() -> int:
             "established.",
             "The detector is a PROXY. Final conclusions require the blinded human "
             "annotation.",
+            "Matching was established on the DEVELOPMENT set and is re-checked "
+            "here on the TEST set. Where the on-test check fails, the retention "
+            "contrast for that seed is INCONCLUSIVE as a matched comparison, "
+            "and no reselection is permitted.",
         ],
         "analysed_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
 
     out = Path(args.out) if args.out else diag / f"analysis_{args.set}.json"
+    # Never overwrite a previous analysis record: it is evidence of what was
+    # reported and when.
+    if out.exists():
+        prev = json.loads(out.read_text())
+        stamp = (prev.get("analysed_utc") or "unknown").replace(":", "").replace("-", "")[:15]
+        keep = out.with_name(f"{out.stem}.{stamp}.superseded.json")
+        n = 0
+        while keep.exists():
+            n += 1
+            keep = out.with_name(f"{out.stem}.{stamp}.superseded.{n}.json")
+        keep.write_text(json.dumps(prev, indent=2) + "\n")
+        payload["supersedes"] = {"preserved_at": str(keep),
+                                 "preserved_analysed_utc": prev.get("analysed_utc")}
+        print(f"[preserved] previous analysis record -> {keep}")
     out.write_text(json.dumps(payload, indent=2) + "\n")
 
     # ---- human-readable summary
+    print(f"\n=== MATCHING CHECK RE-REPORTED ON THE FROZEN TEST SET ===")
+    for s in seeds:
+        m = test_matching[str(s)]
+        print(f"seed {s}: {MATCHING_CHECK} deletion vs MA -- L2 "
+              f"{m['L2_target_deletion_pp_vs_MA']:.2f} pp, U* "
+              f"{m['U_target_deletion_pp_vs_MA']:.2f} pp -> mismatch "
+              f"{m['mismatch_pp']:.2f} pp "
+              f"(development: {m['development_mismatch_pp']} pp)  "
+              f"[{m['status']}]")
+        if not m["matched_on_test"]:
+            print(f"         {m['consequence']}")
+
     print(f"\n=== PRIMARY: paired {PRIMARY_CATEGORY} contrast at t={PRIMARY_THR} "
           f"(L2 minus matched-U), per seed ===")
     for s in seeds:

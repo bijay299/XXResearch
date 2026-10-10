@@ -1,0 +1,51 @@
+{
+  "experiment": "Amendment 01 - fixed early dump grid 10..90",
+  "state": "COMPLETED",
+  "phase": "done",
+  "reason": "early grid trained, development scan complete, bridge held, both seeds matched, frozen test evaluated ONCE, CPU analysis written, blinded audit packet built with labels blank. Detector results are PROVISIONAL until the human annotation is complete.",
+  "updated_utc": "2026-10-10T20:50:55.796713+00:00",
+  "started_utc": "2026-10-10T15:56:23-04:00",
+  "execution_commit": "0cd9dc611b737e32774c631930ddf5a4199edc27",
+  "supervisor_pid": 155411,
+  "output_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid",
+  "log": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/logs/unattended.log",
+  "states": "RUNNING | QUEUED | BLOCKED | STOPPED_BY_RULE | COMPLETED",
+  "history": [
+    {
+      "utc": "2026-10-10T19:56:23.788458+00:00",
+      "state": "RUNNING",
+      "phase": "startup",
+      "reason": "supervisor started under lock"
+    },
+    {
+      "utc": "2026-10-10T19:56:36.253890+00:00",
+      "state": "RUNNING",
+      "phase": "early_grid",
+      "reason": "preflight, smoke, train, dev, bridge, select"
+    },
+    {
+      "utc": "2026-10-10T20:18:21.784873+00:00",
+      "state": "RUNNING",
+      "phase": "frozen_test",
+      "reason": "evaluating the frozen test set ONCE"
+    },
+    {
+      "utc": "2026-10-10T20:49:36.306089+00:00",
+      "state": "RUNNING",
+      "phase": "analysis",
+      "reason": "prescribed CPU analysis of the frozen test set"
+    },
+    {
+      "utc": "2026-10-10T20:50:55.423134+00:00",
+      "state": "RUNNING",
+      "phase": "annotation_packet",
+      "reason": "building the blinded human-audit packet (labels left blank)"
+    },
+    {
+      "utc": "2026-10-10T20:50:55.796713+00:00",
+      "state": "COMPLETED",
+      "phase": "done",
+      "reason": "early grid trained, development scan complete, bridge held, both seeds matched, frozen test evaluated ONCE, CPU analysis written, blinded audit packet built with labels blank. Detector results are PROVISIONAL until the human annotation is complete."
+    }
+  ]
+}
