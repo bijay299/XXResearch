@@ -1,14 +1,88 @@
 # Amendment 01 — a fixed early dump grid at steps 10…90
 
-**Status: PREPARED AND CPU-VERIFIED, NOT EXECUTED.** No GPU work has been done
-for this amendment and none is authorised by it. It awaits the PI's separate
-amendment decision.
+**Status: AUTHORISED AND RUNNING** (PI, 2026-10-10). This supersedes the
+earlier "prepared, awaiting approval" status.
 
-> The resource clarification of 2026-10-10 (no GPU-hour ceiling; see
-> [`RESOURCE_POLICY_2026-10-10.md`](RESOURCE_POLICY_2026-10-10.md)) **does not
-> approve this amendment.** Free devices are not a protocol decision. Nothing
-> here was widened because compute became cheaper, and nothing was narrowed to
-> fit the retired budget.
+> **Authorisation, recorded before any new measurement was collected.** The PI
+> authorised completing the control corrections in §0 and then launching this
+> amendment once the focused CPU checks pass — including the **conditional
+> frozen-test evaluation**, which is explicitly authorised in advance and runs
+> automatically if and only if the freshly recomputed bridge holds within 5 pp
+> on both seeds and both seeds satisfy development eligibility and matching. No
+> further confirmation is required, and the pipeline runs unattended. The
+> scientific stopping conditions in §5 are unchanged and are binding: a
+> prespecified stop is a result, and it authorises nothing else.
+>
+> The resource clarification of the same day (no GPU-hour ceiling; see
+> [`RESOURCE_POLICY_2026-10-10.md`](RESOURCE_POLICY_2026-10-10.md)) is separate
+> from this protocol decision. Nothing here was widened because compute became
+> cheaper, and nothing was narrowed to fit the retired budget.
+
+---
+
+## 0. Control corrections made before launch (2026-10-10)
+
+The coordinator reproduced three ways the gates could be satisfied by evidence
+that did not actually hold. All three are closed, and each has a focused CPU
+test that reproduces the original defect shape.
+
+### 0.1 A stale bridge could authorise the test
+
+**Reproduced:** a bridge computed while the settings were right, then a changed
+learning rate — and the wrapper still delegated `test`, because it read the
+`verdict` string out of `bridge_check.json`.
+
+**Closed:** the wrapper no longer reads a stored verdict. `select` and `test`
+each **recompute** the bridge at that moment, and then **re-bind** the record to
+the artifacts on disk: every input (both train reports, both step-100 dumps,
+every reference evaluation, both bridge-dump detection files) is digested when
+the bridge is computed, and `bridge_check.py --verify` re-checks each digest.
+Stale, incomplete and failed evidence are all refused, and the earlier record is
+preserved rather than overwritten. Selection is additionally bound to the
+development inputs it read (`development_inputs`, with digests) and is
+**re-bound before the test stage runs**.
+
+**And never reselect after test access:** once the frozen-test output directory
+holds any file, `select_matched_dump.py` refuses to run at all — re-deciding the
+compared checkpoint with test evidence in hand is test-based selection whatever
+the intent.
+
+### 0.2 A moving reference target
+
+**Reproduced:** the rerun regenerated `MA`/`MAB_L2` in its own output root and
+each run was measured against **its own** parent evaluation, so a synthetic L2
+shift from 30 pp to 45 pp still passed the bridge.
+
+**Closed:** the references are **not regenerated**. The rerun reads the original
+run's verified development evaluations read-only, and before anything is
+selected or generated they are checked four ways:
+
+| check | what it catches |
+|---|---|
+| generating checkpoint digest == the registered saved artifact | a different checkpoint behind a familiar slot name |
+| manifest digest == the frozen development manifest | an evaluation scored on a different prompt set |
+| detections and image-report digests == the **published** `development_slots_index.json` | a reference whose *measurements* were rewritten while checkpoint and manifest still look right |
+| measured L2 suppression == the **declared** target (30.00 pp s17, 33.75 pp s29) | the target drifting for any reason at all |
+
+Both realisations are then measured against that one fixed parent evaluation,
+and a regenerated reference sitting beside the candidates is itself a violation.
+All of it is recorded in `reference_bindings.json` and in the bridge record.
+
+### 0.3 The settings contract was not enforced
+
+**Reproduced:** required fields that were simply **absent** compared equal
+(`None == None`), and **any** difference in horizon or cadence was labelled a
+"declared change".
+
+**Closed:** absence is a violation in its own right, and the declared changes
+have declared **values** — seeds 17/29, 100 optimizer steps, dump cadence 10,
+bridge step 100, tolerance 5 pp. A 250-step horizon or a cadence of 25 is an
+**undeclared** change however it is labelled; so is a trajectory that stopped
+short of its horizon or wrote a different dump grid. Parent-digest validation is
+preserved and now also requires both runs to record the **same** saved `MA`.
+What the report comparison **cannot** see is stated in every record rather than
+implied: anchor data contents, library/driver/upstream state, and any upstream
+default outside the recorded hyperparameters.
 
 Parent protocol: [`MATCHED_EFFECTIVENESS_PROTOCOL.md`](MATCHED_EFFECTIVENESS_PROTOCOL.md).
 Original run: commit `3a5a69c`, output `/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1`.
@@ -182,20 +256,32 @@ configuration, same parent, same seed — found them numerically different
 1. **All dumps used for the match come from ONE run per seed.** Selection under
    this amendment uses only the new run's early grid (10…90). The original run's
    100…1000 dumps are *not* mixed into the match.
-2. **The reference arms are unchanged saved artifacts.** `MA` and `MAB_L2` are
-   reused by path and bound by hash. They are rescored in the new output
-   directory so the new root is self-contained; because the scoring pipeline is
-   seeded and manifest-bound, that rescoring doubles as a free reproducibility
-   cross-check against the original run's detections for those four slots.
+2. **The reference arms are the original run's FIXED evaluations, read-only.**
+   `MA` and `MAB_L2` are **not** rescored in the new output root. The rerun
+   reads the original run's verified development evaluations for them, and
+   preflight checks each one's generating-checkpoint digest against the
+   registered saved artifact, its manifest identity against the frozen
+   development manifest, and its completeness — recording all of it in
+   `reference_bindings.json`.
+
+   > **Why this is not a convenience.** An earlier draft rescored MA and
+   > MAB_L2 in the new root. That lets the **match target move**: the number
+   > every candidate is compared against is a measurement, and a reference
+   > evaluation that came out at 45 pp instead of 30 pp would silently redefine
+   > the comparison while every candidate check still passed. The references are
+   > now fixed, bound by content, and a regenerated copy sitting beside the
+   > candidates is itself treated as a violation.
 3. **A measured bridge at step 100 — the one step both runs write.**
    `scripts/seq/bridge_check.py` answers three questions separately:
    * **settings** — every setting in §2.1 identical, changes exactly those in
      §2.2 plus the cadence, schedule horizon-free;
    * **weights** — the two step-100 dumps compared tensor by tensor: bitwise
-     identity, max absolute difference, relative Frobenius. Bitwise identity
-     would mean the first 100 updates were reproduced exactly and the early
-     dumps lie on the original path. Anything else is a measured distance whose
-     **cause is not attributed**;
+     identity, max absolute difference, relative Frobenius. **This compares one
+     step.** Bitwise identity at step 100 would be strong evidence that the two
+     runs agreed *there*; it would **not** prove the intermediate states at
+     steps 1–99 were identical, and those are exactly where this amendment's
+     candidates come from. Anything other than identity is a measured distance
+     whose **cause is not attributed**;
    * **behaviour** — development dog suppression at step 100 in both runs
      (original: 38.75 pp s17, 42.50 pp s29).
 4. **A stop condition on the bridge, declared now, before the measurement.** If
@@ -210,10 +296,16 @@ configuration, same parent, same seed — found them numerically different
    preserved untouched; the new run writes to its own directory
    (`diag_v2_early_grid`).
 
-**What this still does not establish.** That either realisation's step-*k* state
-is "the" state of that configuration at step *k*. Run-to-run variation is
-measured at the endpoint and bridged at step 100; it is **not** characterised
-across the early grid, and no claim is made that it is small there.
+**What this still does not establish.**
+
+* That either realisation's step-*k* state is "the" state of that configuration
+  at step *k*. Run-to-run variation is measured at the endpoint and bridged at
+  step 100; it is **not** characterised across the early grid, and no claim is
+  made that it is small there.
+* That agreement at step 100 implies agreement before it. Even bitwise-identical
+  step-100 dumps would leave steps 1–99 unmeasured in both runs: one shared
+  later state is not a shared path, and the candidates are drawn from the
+  unmeasured interior.
 
 ---
 
@@ -273,17 +365,25 @@ way; that is equally decision-relevant and costs one short rerun to learn.
 
 ---
 
-## 6. Decision requested
+## 6. Execution
 
-Approve, modify, or decline **this single amendment**. Nothing runs until a
-separate decision is recorded.
+Authorised and launched unattended (§0). The supervisor holds a lock so a second
+copy cannot start on the same output root, waits for devices that are **verified
+unoccupied** by the fail-closed selector, resumes validated stages after an
+interruption, and writes `STATUS.json` throughout
+(`RUNNING | QUEUED | BLOCKED | STOPPED_BY_RULE | COMPLETED`).
 
 ```bash
-# everything below is CPU-gated and starts only on verified-idle devices
-bash scripts/seq/run_early_grid.sh preflight   # identities, reuse bindings, capacity
-bash scripts/seq/run_early_grid.sh all         # smoke -> train -> dev -> bridge -> select
-# the frozen test set stays a separate, explicitly gated invocation:
-bash scripts/seq/run_early_grid.sh test        # refuses unless the bridge HELD
+setsid nohup bash scripts/seq/run_amendment_unattended.sh &
+```
+
+which runs, stopping only where §5 says to stop:
+
+```bash
+bash scripts/seq/run_early_grid.sh all    # preflight -> smoke -> train -> dev -> bridge -> select
+bash scripts/seq/run_early_grid.sh test   # ONLY if the recomputed bridge held and both seeds matched
+python scripts/seq/diag_analysis.py --diag_root <root> --set test
+python scripts/seq/build_diag_annotation_packet.py ...   # labels left blank, key outside the packet
 ```
 
 Configuration, for the record (`scripts/seq/run_early_grid.sh`):

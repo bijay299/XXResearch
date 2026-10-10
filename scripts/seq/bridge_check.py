@@ -28,16 +28,32 @@ Three separate questions, reported separately and never merged:
      That is checked here rather than trusted.
 
   B  WEIGHTS at step 100. Bitwise identity, max absolute difference, relative
-     Frobenius norm. Bitwise identity would mean the first 100 updates were
-     reproduced exactly and the early dumps lie on the original path. Anything
-     else is a measured distance, and its CAUSE is not isolated by this tool.
+     Frobenius norm. This is ONE step: identity there is strong evidence that
+     the two runs agreed at step 100, but it does NOT prove the intermediate
+     states at steps 1..99 were identical -- and that unmeasured interior is
+     exactly where this amendment's candidates come from. Anything other than
+     identity is a measured distance, and its CAUSE is not isolated here.
 
-  C  BEHAVIOUR at step 100. Development dog suppression (vs that seed's own MA,
-     t=0.5, the same 80 pairs) in each run, and the difference in pp against the
+  C  BEHAVIOUR at step 100. Development dog suppression against the FIXED
+     reference parent evaluation -- not each run's own regenerated parent -- at
+     t=0.5 over the same 80 pairs, and the difference in pp against the
      amendment's declared stop condition: if the two realisations differ by more
      than the match tolerance itself, run-to-run variation is of the same order
      as the quantity being matched, the early grid cannot be trusted to locate a
      match point, and the amendment stops and reports that instead.
+
+  D  FIXED REFERENCES. MA and MAB_L2 define the target every candidate is
+     matched to, so they are read from one fixed, verified evaluation; each
+     one's generating checkpoint must be the registered saved artifact and its
+     manifest the frozen development manifest. A regenerated reference beside
+     the candidates is itself a violation: that is how a reference measuring
+     45 pp instead of 30 pp once passed unnoticed.
+
+  E  THE DECLARED CONTRACT, by value. The two declared changes have declared
+     numbers -- 100 optimizer steps, a dump every 10 -- and the rerun must also
+     reach that horizon and write that grid. A different horizon or cadence is
+     an UNDECLARED change however it is labelled. Required settings that are
+     simply absent are violations, not matches.
 
 What this tool does NOT do
 --------------------------
@@ -48,7 +64,8 @@ What this tool does NOT do
   anything else outside the 32 recorded hyperparameters. No controlled repeat
   was run and none is requested here.
 * It does not establish that either realisation's step-k state is "the" state
-  of that configuration at step k.
+  of that configuration at step k, nor that agreement at step 100 implies
+  agreement at any earlier step.
 * It says nothing about retention, and it never touches the frozen test set.
 
     python scripts/seq/bridge_check.py \
@@ -87,6 +104,13 @@ FIRST_UPDATES_KEYS = (
 # Changed on purpose, or derived by upstream from the stopping limit.
 DECLARED_CHANGE_KEYS = ("iterations_requested", "epochs_cap",
                         "epoch_capacity_steps")
+# The amendment's declared numbers. A difference is "declared" only if it
+# matches THESE; any other horizon or cadence is an undeclared change, however
+# it is labelled. Overridable on the command line only so the contract can be
+# stated explicitly by a caller, never to make a mismatch pass.
+CONTRACT = {"original_iterations": 1000, "rerun_iterations": 100,
+            "original_cadence": 100, "rerun_cadence": 10,
+            "bridge_step": 100, "tolerance_pp": 5.0, "seeds": (17, 29)}
 REQUEST_KEYS = ("parent", "new_deletion_target", "anchor_concept",
                 "anchor_target_mapping", "l2sp_weight", "training_seed")
 # Only these schedulers are horizon-independent, so only under these may the
@@ -110,24 +134,35 @@ def sha256_file(p: Path, chunk: int = 1 << 20) -> str:
     return h.hexdigest()
 
 
-def compare_settings(orig: dict, rerun: dict, bridge_step: int) -> dict:
+def compare_settings(orig: dict, rerun: dict, bridge_step: int,
+                     contract: dict, seed: int) -> dict:
     eo = orig.get("effective_hyperparameters") or {}
     er = rerun.get("effective_hyperparameters") or {}
     req_diff = {k: {"original": orig.get(k), "rerun": rerun.get(k)}
                 for k in REQUEST_KEYS if orig.get(k) != rerun.get(k)}
 
-    preserved, violated = [], {}
+    # MISSING IS NOT EQUAL. A report that simply does not record a setting
+    # cannot be said to preserve it: `eo.get(k) == er.get(k)` was True for
+    # None == None, so a report missing half its hyperparameters passed. Absence
+    # is now a violation in its own right.
+    preserved, violated, missing = [], {}, {}
     for k in FIRST_UPDATES_KEYS:
-        if k not in eo and k not in er:
+        in_o, in_r = k in eo, k in er
+        if not (in_o and in_r):
+            missing[k] = {"present_in_original": in_o, "present_in_rerun": in_r}
             continue
-        if eo.get(k) == er.get(k):
-            preserved.append({"setting": k, "value": eo.get(k)})
+        if eo[k] == er[k]:
+            preserved.append({"setting": k, "value": eo[k]})
         else:
             violated[k] = {"original": eo.get(k), "rerun": er.get(k)}
 
     declared, undeclared_same = {}, []
     for k in DECLARED_CHANGE_KEYS:
-        if eo.get(k) != er.get(k):
+        if k not in eo or k not in er:
+            missing[k] = {"present_in_original": k in eo,
+                          "present_in_rerun": k in er}
+            continue
+        if eo[k] != er[k]:
             declared[k] = {"original": eo.get(k), "rerun": er.get(k)}
         else:
             undeclared_same.append(k)
@@ -149,13 +184,63 @@ def compare_settings(orig: dict, rerun: dict, bridge_step: int) -> dict:
             return steps[1] - steps[0]
         return steps[0] if steps else None
 
+    # ---- the declared contract, enforced by VALUE.
+    #
+    # "Declared" is not a label a run can award itself by differing. The
+    # amendment declared exactly two changes with exactly two values; a rerun at
+    # 250 steps, or saving every 25, is an UNDECLARED change to the experiment
+    # even though it would show up in the same diff. Checked here so the word
+    # keeps its meaning.
+    o_cad, r_cad = cadence(orig), cadence(rerun)
+    want = {
+        "original_iterations": (eo.get("iterations_requested"),
+                                contract["original_iterations"]),
+        "rerun_iterations": (er.get("iterations_requested"),
+                             contract["rerun_iterations"]),
+        "original_cadence": (o_cad, contract["original_cadence"]),
+        "rerun_cadence": (r_cad, contract["rerun_cadence"]),
+        "bridge_step": (bridge_step, contract["bridge_step"]),
+        "training_seed": (er.get("seed"), seed),
+    }
+    contract_violations = {k: {"actual": a, "declared": w}
+                           for k, (a, w) in want.items() if a != w}
+    if seed not in tuple(contract["seeds"]):
+        contract_violations["seed_is_declared"] = {
+            "actual": seed, "declared": list(contract["seeds"])}
+    # The rerun must also actually reach its horizon, and write the dump grid
+    # the amendment asked for.
+    r_steps = sorted(((rerun.get("dumps") or {}).get("expected_steps")) or [])
+    want_steps = list(range(contract["rerun_cadence"],
+                            contract["rerun_iterations"] + 1,
+                            contract["rerun_cadence"]))
+    if r_steps != want_steps:
+        contract_violations["rerun_dump_grid"] = {"actual": r_steps,
+                                                  "declared": want_steps}
+    r_done = (rerun.get("runtime") or {}).get("optimizer_steps_completed")
+    if r_done != contract["rerun_iterations"]:
+        contract_violations["rerun_optimizer_steps_completed"] = {
+            "actual": r_done, "declared": contract["rerun_iterations"]}
+
+    # ---- parent identity, preserved from the original design.
+    po = (orig.get("parent_verification") or {}).get("parent_sha256")
+    pr = (rerun.get("parent_verification") or {}).get("parent_sha256")
+    parent = {
+        "original_recorded_parent_sha256": po,
+        "rerun_recorded_parent_sha256": pr,
+        "same_parent": bool(po) and po == pr,
+        "rule": ("both trajectories must record the SAME saved MA digest; a "
+                 "different parent makes the two runs incomparable whatever "
+                 "their hyperparameters say"),
+    }
+
     return {
         "request_field_differences": req_diff,
         "settings_that_determine_the_first_updates": {
             "n_compared": len(preserved) + len(violated),
             "n_identical": len(preserved),
             "violations": violated,
-            "all_preserved": not violated and not req_diff,
+            "missing_required_fields": missing,
+            "all_preserved": not violated and not req_diff and not missing,
             "preserved": preserved,
             "rule": (f"every setting here must be identical, because it enters "
                      f"the first {bridge_step} optimizer updates; a difference "
@@ -195,8 +280,28 @@ def compare_settings(orig: dict, rerun: dict, bridge_step: int) -> dict:
                 "and this rerun would NOT be comparable."),
             "recorded_lr_warmup_steps_is_inert_here": eo.get("lr_warmup_steps"),
         },
-        "settings_ok": bool(not violated and not req_diff
-                            and not unclassified_diff and horizon_free),
+        "declared_contract": {
+            "expected": contract,
+            "violations": contract_violations,
+            "ok": not contract_violations,
+            "rule": ("the two declared changes have declared VALUES: 100 "
+                     "optimizer steps and a dump every 10. A different horizon "
+                     "or cadence is an undeclared change to the experiment, not "
+                     "a declared one."),
+        },
+        "parent_identity": parent,
+        "settings_ok": bool(not violated and not req_diff and not missing
+                            and not unclassified_diff and horizon_free
+                            and not contract_violations and parent["same_parent"]),
+        "what_this_comparison_cannot_see": [
+            "the anchor images and prompt file CONTENTS -- the reports record "
+            "paths and counts, not digests of the data, so identical paths are "
+            "assumed to mean identical data",
+            "library, driver and upstream-commit state at the two run times, "
+            "none of which the reports record",
+            "any upstream default that is not among the recorded effective "
+            "hyperparameters, including dataloader worker count and ordering",
+        ],
     }
 
 
@@ -239,29 +344,182 @@ def compare_weights(orig_dump: Path, rerun_dump: Path, contract: dict) -> dict:
         "overall_relative_frobenius": (num ** 0.5) / ((den ** 0.5) + 1e-12),
         "most_divergent": per_tensor[:5],
         "interpretation": (
-            "bitwise identity would mean the first updates were reproduced "
-            "exactly, so the early dumps lie on the original path. A difference "
-            "is a measured distance ONLY: this comparison cannot say whether it "
-            "came from nondeterministic kernels, the changed save cadence, "
-            "library or driver state, dataloader ordering, or anything else "
-            "outside the recorded hyperparameters."),
+            "This compares ONE step. Bitwise identity at step 100 is strong "
+            "evidence that the two runs agreed there, but it does NOT prove the "
+            "intermediate states at steps 1..99 were identical: those states "
+            "were never compared, and agreement at a single later point does "
+            "not establish agreement along the path to it. A difference is "
+            "likewise a measured distance ONLY: this comparison cannot say "
+            "whether it came from nondeterministic kernels, the changed save "
+            "cadence, library or driver state, dataloader ordering, or anything "
+            "else outside the recorded hyperparameters."),
+        "what_identity_here_would_and_would_not_show": {
+            "would": "the two runs reached the same state at step 100",
+            "would_not": ("that they passed through the same states at steps "
+                          "1..99, which is where this amendment's candidates "
+                          "come from and which is not measured by either run"),
+        },
     }
 
 
-def compare_behaviour(sel, orig_dev: Path, rerun_dev: Path, seed: int,
-                      step: int, tol_pp: float) -> dict:
-    def suppression(dev_root: Path) -> dict:
-        ma = sel.load_checkpoint(dev_root, f"seed{seed}_MA")
-        ck = sel.load_checkpoint(dev_root, f"seed{seed}_U_step{step}")
-        return {"MA_dog_residue_pct": ma["dog_residue_pct"],
+def check_references(sel, ref_root: Path, rerun_dev: Path, seed: int,
+                     registry: Path | None, expect_manifest_sha: str | None,
+                     published: dict | None = None,
+                     expect_l2_sup_pp: float | None = None) -> dict:
+    """The reference arms must be the FIXED, verified evaluations -- not
+    regenerated beside the candidates.
+
+    What went wrong before: the rerun regenerated `seed*_MA` and `seed*_MAB_L2`
+    in its own output root, and the bridge compared each run against its OWN
+    parent evaluation. A reference whose measured L2 suppression had shifted
+    from 30 pp to 45 pp therefore passed: the target every dump is matched to
+    had moved, and nothing looked at it. So the references are now read from one
+    fixed root, their generating checkpoints are checked against the registered
+    saved artifacts by digest, and a regenerated copy sitting beside the
+    candidates is itself a violation.
+    """
+    out: dict = {"reference_dev_root": str(ref_root),
+                 "candidate_dev_root": str(rerun_dev),
+                 "references_are_separate_from_candidates":
+                     str(ref_root) != str(rerun_dev)}
+    problems, slots = [], {}
+    registered = {}
+    if registry and registry.is_file():
+        for a in json.loads(registry.read_text()).get("artifacts", []):
+            registered[a.get("id")] = a.get("delta_sha256")
+    for slot in ("MA", "MAB_L2"):
+        name = f"seed{seed}_{slot}"
+        try:
+            ck = sel.load_checkpoint(ref_root, name, role=f"fixed_reference_{slot}")
+        except Exception as e:
+            problems.append(f"{name}: {type(e).__name__}: {e}")
+            continue
+        b = ck["_binding"]
+        rec = {"dog_residue_pct": ck["dog_residue_pct"],
+               "dog_hits": ck["dog_hits"], "n_dog_pairs": ck["n_dog_pairs"],
+               "detections_sha256": b["detections_sha256"],
+               "image_report_sha256": b.get("image_report_sha256"),
+               "generating_checkpoint_sha256": b.get("generating_checkpoint_sha256"),
+               "manifest_sha256": b.get("manifest_sha256"),
+               "generation_settings_source": b.get("generation_settings_source")}
+        want_ck = registered.get(f"seed{seed}/{slot}")
+        rec["registered_checkpoint_sha256"] = want_ck
+        rec["generated_by_the_registered_saved_artifact"] = (
+            bool(want_ck) and rec["generating_checkpoint_sha256"] == want_ck)
+        if registered and not rec["generated_by_the_registered_saved_artifact"]:
+            problems.append(
+                f"{name}: generated by checkpoint "
+                f"{str(rec['generating_checkpoint_sha256'])[:12]}…, which is not "
+                f"the registered saved artifact "
+                f"{str(want_ck)[:12]}… for seed{seed}/{slot}")
+        if expect_manifest_sha and rec["manifest_sha256"] != expect_manifest_sha:
+            problems.append(
+                f"{name}: evaluated against manifest "
+                f"{str(rec['manifest_sha256'])[:12]}…, not the frozen "
+                f"development manifest {expect_manifest_sha[:12]}…")
+        # Bound to the PUBLISHED, verified original. This is what catches a
+        # reference whose MEASUREMENTS were rewritten while its checkpoint and
+        # manifest still look right -- the 30 pp -> 45 pp shift.
+        if published is not None:
+            pub = published.get(name)
+            if pub is None:
+                problems.append(f"{name}: absent from the published slot index, "
+                                f"so it is not one of the verified original "
+                                f"evaluations")
+            else:
+                rec["published_detections_sha256"] = \
+                    (pub.get("detections.jsonl") or {}).get("sha256")
+                rec["published_image_report_sha256"] = \
+                    (pub.get("image_report.json") or {}).get("sha256")
+                rec["matches_published_index"] = (
+                    rec["detections_sha256"] == rec["published_detections_sha256"]
+                    and rec["image_report_sha256"]
+                    == rec["published_image_report_sha256"])
+                if not rec["matches_published_index"]:
+                    problems.append(
+                        f"{name}: its measurements differ from the published, "
+                        f"verified original (detections "
+                        f"{rec['detections_sha256'][:12]}… vs "
+                        f"{str(rec['published_detections_sha256'])[:12]}…). A "
+                        f"rewritten reference evaluation is not the fixed "
+                        f"reference, whatever its checkpoint says.")
+        slots[slot] = rec
+    # A regenerated reference beside the candidates must not exist, even unused:
+    # it is the thing that silently substituted itself last time.
+    if str(ref_root) != str(rerun_dev):
+        # Exact names: `seed17_MA*` would also match `seed17_MAB_L2`.
+        intruders = sorted({d.name for d in rerun_dev.iterdir()
+                            if d.is_dir() and d.name in
+                            (f"seed{seed}_MA", f"seed{seed}_MAB_L2")}
+                           ) if rerun_dev.is_dir() else []
+        out["regenerated_references_beside_candidates"] = intruders
+        if intruders:
+            problems.append(
+                f"the candidate root holds its own reference evaluation(s) "
+                f"{intruders}: regenerated references must not sit beside the "
+                f"candidates, because selection or a later bridge could read "
+                f"them instead of the fixed ones")
+    # The match TARGET itself, checked against the declared value. The gates
+    # and the tolerance are meaningless if the number they are applied to can
+    # drift: a reference measuring 45 pp instead of the declared 30 pp would
+    # redefine the whole comparison.
+    if expect_l2_sup_pp is not None and "MA" in slots and "MAB_L2" in slots:
+        measured = round(slots["MA"]["dog_residue_pct"]
+                         - slots["MAB_L2"]["dog_residue_pct"], 4)
+        out["declared_L2_suppression_pp"] = expect_l2_sup_pp
+        out["measured_L2_suppression_pp"] = measured
+        out["L2_target_matches_declared"] = abs(measured - expect_l2_sup_pp) < 0.01
+        if not out["L2_target_matches_declared"]:
+            problems.append(
+                f"the fixed L2 reference now measures {measured} pp "
+                f"suppression, but the amendment declared "
+                f"{expect_l2_sup_pp} pp. The match target has MOVED; nothing "
+                f"may be selected or tested against it.")
+    out["slots"] = slots
+    out["problems"] = problems
+    out["ok"] = not problems and len(slots) == 2
+    out["rule"] = ("MA and MAB_L2 are read from one fixed, separately verified "
+                   "evaluation; their generating checkpoints must be the "
+                   "registered saved artifacts and their manifest the frozen "
+                   "development manifest")
+    return out
+
+
+def compare_behaviour(sel, ref_root: Path, orig_dev: Path, rerun_dev: Path,
+                      seed: int, step: int, tol_pp: float) -> dict:
+    # ONE fixed MA for both sides. Measuring each run against its own
+    # regenerated parent is what let the target move.
+    ma = sel.load_checkpoint(ref_root, f"seed{seed}_MA",
+                             role="fixed_reference_parent")
+    l2 = sel.load_checkpoint(ref_root, f"seed{seed}_MAB_L2",
+                             role="fixed_reference_L2")
+
+    def suppression(dev_root: Path, which: str) -> dict:
+        ck = sel.load_checkpoint(dev_root, f"seed{seed}_U_step{step}",
+                                 role=f"{which}_bridge_dump")
+        return {"dev_root": str(dev_root),
+                "fixed_MA_dog_residue_pct": ma["dog_residue_pct"],
                 "dump_dog_residue_pct": ck["dog_residue_pct"],
                 "dog_hits": ck["dog_hits"], "n_dog_pairs": ck["n_dog_pairs"],
                 "dog_suppression_pp": round(ma["dog_residue_pct"]
-                                            - ck["dog_residue_pct"], 4)}
+                                            - ck["dog_residue_pct"], 4),
+                "detections_sha256": ck["_binding"]["detections_sha256"]}
 
-    o, r = suppression(orig_dev), suppression(rerun_dev)
+    o, r = suppression(orig_dev, "original"), suppression(rerun_dev, "rerun")
     diff = abs(o["dog_suppression_pp"] - r["dog_suppression_pp"])
+    l2_sup = round(ma["dog_residue_pct"] - l2["dog_residue_pct"], 4)
     return {
+        "fixed_reference": {
+            "MA_dog_residue_pct": ma["dog_residue_pct"],
+            "L2_dog_residue_pct": l2["dog_residue_pct"],
+            "L2_dog_suppression_pp": l2_sup,
+            "L2_gate_suppression_ge_30pp": l2_sup >= 30.0,
+            "L2_gate_residue_le_60pct": l2["dog_residue_pct"] <= 60.0,
+            "source": str(ref_root),
+            "note": ("both realisations are measured against THIS parent "
+                     "evaluation, not against their own; the match target is "
+                     "this L2 suppression and it cannot move with a rescan"),
+        },
         "original": o, "rerun": r,
         "difference_pp": round(diff, 4),
         "stop_condition_pp": tol_pp,
@@ -275,6 +533,94 @@ def compare_behaviour(sel, orig_dev: Path, rerun_dev: Path, seed: int,
     }
 
 
+def cmd_verify(record: Path) -> int:
+    """Re-bind a stored bridge record to the bytes now on disk.
+
+    The defect this closes: the wrapper trusted a stored `verdict` string. A
+    bridge computed when the settings were right stayed "HELD" on disk after the
+    learning rate was changed, and `test` was delegated on the strength of it.
+    A verdict is only as good as the inputs it was computed from, so every input
+    is digested at the time and re-checked here.
+    """
+    if not record.is_file():
+        print(f"NO BRIDGE RECORD at {record}: the bridge has not been run.",
+              file=sys.stderr)
+        return 2
+    d = json.loads(record.read_text())
+    bad, checked = [], 0
+
+    def cmp_file(path: str | None, want: str | None, label: str) -> None:
+        nonlocal checked
+        if not path or not want:
+            bad.append(f"{label}: the record carries no binding for this input")
+            return
+        checked += 1
+        p = Path(path)
+        if not p.is_file():
+            bad.append(f"{label}: {p} is gone")
+        elif sha256_file(p) != want:
+            bad.append(f"{label}: changed since the bridge was computed "
+                       f"({want[:12]}… -> {sha256_file(p)[:12]}…)")
+
+    for seed, rec in (d.get("per_seed") or {}).items():
+        rb = rec.get("report_bindings") or {}
+        cmp_file(rb.get("original_train_report"),
+                 rb.get("original_train_report_sha256"),
+                 f"seed {seed} original train_report")
+        cmp_file(rb.get("rerun_train_report"),
+                 rb.get("rerun_train_report_sha256"),
+                 f"seed {seed} rerun train_report")
+        w = rec.get("weights_at_bridge_step") or {}
+        if w and "error" not in w:
+            cmp_file(w.get("original_dump"), w.get("original_sha256"),
+                     f"seed {seed} original step-{d.get('bridge_step')} dump")
+            cmp_file(w.get("rerun_dump"), w.get("rerun_sha256"),
+                     f"seed {seed} rerun step-{d.get('bridge_step')} dump")
+        fr = rec.get("fixed_references") or {}
+        for slot, r in (fr.get("slots") or {}).items():
+            root = Path(fr.get("reference_dev_root", ""))
+            name = f"seed{seed}_{slot}"
+            cmp_file(str(root / name / "detections.jsonl"),
+                     r.get("detections_sha256"),
+                     f"seed {seed} fixed reference {slot} detections")
+            cmp_file(str(root / name / "image_report.json"),
+                     r.get("image_report_sha256"),
+                     f"seed {seed} fixed reference {slot} image_report")
+        b = rec.get("behaviour_at_bridge_step") or {}
+        for which in ("original", "rerun"):
+            side = b.get(which) or {}
+            if side.get("dev_root"):
+                cmp_file(str(Path(side["dev_root"])
+                             / f"seed{seed}_U_step{d.get('bridge_step')}"
+                             / "detections.jsonl"),
+                         side.get("detections_sha256"),
+                         f"seed {seed} {which} bridge-dump detections")
+
+    print(f"bridge record : {record}")
+    print(f"computed      : {d.get('generated_utc')}")
+    print(f"verdict stored: {d.get('verdict')}")
+    print(f"inputs bound  : {checked}")
+    if d.get("verdict") != "BRIDGE_HELD":
+        print(f"BRIDGE DID NOT HOLD ({d.get('verdict')}): nothing may proceed "
+              f"on this record.", file=sys.stderr)
+        return 1
+    if not checked:
+        print("UNVERIFIABLE: the record carries no input bindings, so it cannot "
+              "be shown to describe the artifacts now on disk. Recompute the "
+              "bridge.", file=sys.stderr)
+        return 2
+    if bad:
+        print("BRIDGE RECORD IS STALE:")
+        for m in bad:
+            print(f"  - {m}")
+        print("Recompute the bridge. A verdict computed from different bytes is "
+              "not evidence about these ones.", file=sys.stderr)
+        return 1
+    print("BRIDGE BINDINGS OK: every input is byte-identical to the one the "
+          "verdict was computed from")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -284,16 +630,69 @@ def main() -> int:
     ap.add_argument("--bridge_step", type=int, default=100)
     ap.add_argument("--tolerance_pp", type=float, default=5.0)
     ap.add_argument("--contract", default="configs/checkpoint_contract.json")
+    ap.add_argument("--reference_dev_root", default=None,
+                    help="the FIXED reference evaluations (MA, MAB_L2). Defaults "
+                         "to <original_root>/eval_dev. Never the rerun's own "
+                         "output: a regenerated reference lets the match target "
+                         "move.")
+    ap.add_argument("--registry", default="configs/legacy_training_artifacts.json",
+                    help="registered saved artifacts, for checking that each "
+                         "reference evaluation was generated by the registered "
+                         "checkpoint")
+    ap.add_argument("--expect_dev_manifest_sha", default=None)
+    ap.add_argument("--expect_slots_index", default=None,
+                    help="published per-slot index of the verified original "
+                         "development evaluations; each reference's detections "
+                         "and image-report digests must match it")
+    ap.add_argument("--expect_l2_suppression_pp", default=None,
+                    help="the DECLARED match target per seed, e.g. "
+                         "\"17=30.0,29=33.75\". A reference that no longer "
+                         "measures its declared suppression has moved the "
+                         "target and is refused.")
+    ap.add_argument("--declared_rerun_iterations", type=int, default=100)
+    ap.add_argument("--declared_rerun_cadence", type=int, default=10)
+    ap.add_argument("--declared_original_iterations", type=int, default=1000)
+    ap.add_argument("--declared_original_cadence", type=int, default=100)
     ap.add_argument("--out", required=True)
     ap.add_argument("--skip_weights", action="store_true",
                     help="settings and behaviour only (no torch needed)")
+    ap.add_argument("--verify", default=None,
+                    help="re-bind an existing bridge record to the bytes now on "
+                         "disk and exit: 0 if every input is unchanged, 1 if the "
+                         "record is stale, 2 if it cannot be bound at all")
     a = ap.parse_args()
+
+    if a.verify:
+        return cmd_verify(Path(a.verify))
 
     sel = _load_selection_helpers()
     contract = json.loads(Path(a.contract).read_text())
     O, R = Path(a.original_root), Path(a.rerun_root)
+    REF = Path(a.reference_dev_root) if a.reference_dev_root else O / "eval_dev"
+    registry = Path(a.registry) if a.registry else None
     seeds = [int(x) for x in a.seeds.replace(",", " ").split()]
     step = a.bridge_step
+    published = None
+    if a.expect_slots_index:
+        ip = Path(a.expect_slots_index)
+        if ip.is_file():
+            published = {row.get("slot"): row
+                         for row in json.loads(ip.read_text()).get("slots", [])}
+        else:
+            published = {}
+    want_l2 = {}
+    if a.expect_l2_suppression_pp:
+        for part in a.expect_l2_suppression_pp.replace(" ", "").split(","):
+            if "=" in part:
+                k, v = part.split("=", 1)
+                want_l2[int(k)] = float(v)
+    declared = {"original_iterations": a.declared_original_iterations,
+                "rerun_iterations": a.declared_rerun_iterations,
+                "original_cadence": a.declared_original_cadence,
+                "rerun_cadence": a.declared_rerun_cadence,
+                "bridge_step": step, "tolerance_pp": a.tolerance_pp,
+                "seeds": tuple(seeds),
+                "declared_L2_suppression_pp": want_l2 or None}
 
     per_seed, problems = {}, []
     for s in seeds:
@@ -302,10 +701,29 @@ def main() -> int:
         r_rep = R / "models" / f"seed{s}" / "U" / "train_report.json"
         try:
             rec["settings"] = compare_settings(
-                json.loads(o_rep.read_text()), json.loads(r_rep.read_text()), step)
+                json.loads(o_rep.read_text()), json.loads(r_rep.read_text()),
+                step, declared, s)
+            rec["report_bindings"] = {
+                "original_train_report": str(o_rep),
+                "original_train_report_sha256": sha256_file(o_rep),
+                "rerun_train_report": str(r_rep),
+                "rerun_train_report_sha256": sha256_file(r_rep),
+            }
         except Exception as e:
             rec["settings"] = {"error": f"{type(e).__name__}: {e}", "settings_ok": False}
             problems.append(f"seed {s} settings: {type(e).__name__}: {e}")
+        try:
+            # Note what is NOT done here: reference problems are deliberately
+            # kept out of `problems`. `problems` means "the bridge could not be
+            # evaluated" (INCOMPLETE); an invalid or moved reference IS
+            # evaluable and has its own, more specific verdict.
+            rec["fixed_references"] = check_references(
+                sel, REF, R / "eval_dev", s, registry, a.expect_dev_manifest_sha,
+                published, want_l2.get(s))
+        except Exception as e:
+            rec["fixed_references"] = {"error": f"{type(e).__name__}: {e}",
+                                       "ok": False}
+            problems.append(f"seed {s} reference: {type(e).__name__}: {e}")
         if not a.skip_weights:
             try:
                 rec["weights_at_bridge_step"] = compare_weights(
@@ -316,7 +734,7 @@ def main() -> int:
                 problems.append(f"seed {s} weights: {type(e).__name__}: {e}")
         try:
             rec["behaviour_at_bridge_step"] = compare_behaviour(
-                sel, O / "eval_dev", R / "eval_dev", s, step, a.tolerance_pp)
+                sel, REF, O / "eval_dev", R / "eval_dev", s, step, a.tolerance_pp)
         except Exception as e:
             rec["behaviour_at_bridge_step"] = {
                 "error": f"{type(e).__name__}: {e}", "holds": False}
@@ -325,6 +743,8 @@ def main() -> int:
 
     settings_ok = all((p.get("settings") or {}).get("settings_ok")
                       for p in per_seed.values())
+    references_ok = all((p.get("fixed_references") or {}).get("ok")
+                        for p in per_seed.values())
     behaviour_ok = all((p.get("behaviour_at_bridge_step") or {}).get("holds")
                        for p in per_seed.values())
     all_bitwise = all((p.get("weights_at_bridge_step") or {}).get("all_bitwise_identical")
@@ -334,6 +754,12 @@ def main() -> int:
         verdict, why = "INCOMPLETE", (
             "the bridge could not be evaluated; nothing follows from it and the "
             "early grid must not be used for selection: " + "; ".join(problems[:4]))
+    elif not references_ok:
+        verdict, why = "REFERENCES_INVALID", (
+            "the fixed reference evaluations (MA and MAB_L2) are not the "
+            "verified ones, or a regenerated copy sits beside the candidates. "
+            "The match target is defined by those evaluations, so nothing may "
+            "be selected or tested until they are the registered, frozen ones.")
     elif not settings_ok:
         verdict, why = "SETTINGS_VIOLATED", (
             "the rerun changed something other than the declared stopping limit "
@@ -370,11 +796,17 @@ def main() -> int:
         "original_root": str(O), "rerun_root": str(R),
         "bridge_step": step, "tolerance_pp": a.tolerance_pp,
         "settings_preserved": settings_ok,
+        "fixed_references_verified": references_ok,
         "behaviour_within_tolerance": behaviour_ok,
         "weights_bitwise_identical": all_bitwise,
         "verdict": verdict,
         "reason": why,
+        "declared_contract": declared,
         "not_established": [
+            "That the two runs passed through the same states at steps 1..99. "
+            "Only step 100 is compared; bitwise identity THERE would not prove "
+            "identity along the path to it, and the amendment's candidates come "
+            "from the unmeasured interior.",
             "WHY any weight difference exists. Identical recorded configuration "
             "and the same saved parent do not isolate nondeterminism as the "
             "cause: the runs also differ in library and driver state, in the "
@@ -405,6 +837,14 @@ def main() -> int:
               f"{list(((st.get('declared_changes') or {}).get('stopping_limit_and_derived') or {}).keys())}"
               f" + save cadence "
               f"{((st.get('declared_changes') or {}).get('save_cadence') or {})}")
+        fr = p.get("fixed_references") or {}
+        if fr:
+            print(f"  fixed references verified             : {fr.get('ok')}"
+                  + (f" (L2 target {fr.get('measured_L2_suppression_pp')} pp"
+                     f" vs declared {fr.get('declared_L2_suppression_pp')} pp)"
+                     if fr.get("declared_L2_suppression_pp") is not None else ""))
+            for m in (fr.get("problems") or []):
+                print(f"    REFERENCE PROBLEM: {m}")
         hf = st.get("lr_schedule_is_horizon_independent") or {}
         print(f"  lr schedule horizon-independent       : {hf.get('horizon_free')} "
               f"({hf.get('rerun_lr_scheduler')})")

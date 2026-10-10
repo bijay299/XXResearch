@@ -176,13 +176,26 @@ def make_traj(a):
             "lr_warmup_steps": 500,
             "effective_learning_rate": float(
                 os.environ.get("MOCK_LR", "8e-06")),
+            "learning_rate_cli_default_before_scaling": 2e-06,
+            "scale_lr": True,
+            "effective_lr_cross_check": float(
+                os.environ.get("MOCK_LR", "8e-06")),
+            "scale_lr_formula": "lr * grad_accum * anchor_batch_size * num_processes",
             "anchor_batch_size": 4,
             "gradient_accumulation_steps": 1,
             "num_processes": 1,
-            "optimizer": "AdamW",
+            "optimizer": "AdamW (torch.optim.AdamW; use_8bit_adam=False)",
+            "adam_beta1": 0.9, "adam_beta2": 0.999,
+            "adam_weight_decay": 0.01, "adam_epsilon": 1e-08,
             "max_grad_norm": 1.0,
-            "precision": "fp32",
+            "precision": "fp32 (accelerate mixed_precision: 'no')",
             "resolution": 512,
+            "hflip": True, "noaug": True,
+            "with_anchor_preservation": False,
+            "with_gradient_projection": False,
+            "with_selft": False,
+            "eval_interval": None,
+            "l1sp_weight": 0.0,
             "l2sp_weight": float(a.l2),
         },
         "parent_verification": {"parent_sha256": parent_sha, "PASS": True,
@@ -597,9 +610,35 @@ want_eq "the interrupted occupancy is still recorded" "$TO" "RECORDED"
 echo
 echo "=== 12. AMENDMENT 01: the early-grid runner, end to end on CPU ==="
 # The original run is the suite's own 1000-step diagnostic in ${ROOT}/diag.
+# A published slot index stands in for the evidence bundle's
+# development_slots_index.json: the fixed references are bound to it, so a
+# reference whose measurements are later rewritten cannot pass as the verified
+# original.
+"$MOCK_PY" - "${ROOT}/diag/eval_dev" "${ROOT}/slots_index.json" <<'PYEOF'
+import hashlib, json, sys
+from pathlib import Path
+root, out = Path(sys.argv[1]), Path(sys.argv[2])
+def sha(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+slots = []
+for d in sorted(root.iterdir()):
+    if not d.is_dir():
+        continue
+    row = {"slot": d.name}
+    for f in ("detections.jsonl", "image_report.json"):
+        if (d / f).is_file():
+            row[f] = {"sha256": sha(d / f), "bytes": (d / f).stat().st_size}
+    slots.append(row)
+out.write_text(json.dumps({"n_slots": len(slots), "slots": slots}, indent=2))
+print(f"published index: {len(slots)} slots")
+PYEOF
+# The sandbox's scripted residue profile puts MA at 95% and L2 at 55%, so the
+# declared match target is 40 pp on both seeds.
 eg() { ( cd "$REPO" && PATH="${BIN}:$PATH" \
          SEQ_EG_ORIGINAL_ROOT="${ROOT}/diag" \
          SEQ_EG_ROOT="${ROOT}/early_grid" \
+         SEQ_EG_REFERENCE_SLOTS_INDEX="${ROOT}/slots_index.json" \
+         SEQ_EG_DECLARED_L2_PP="17=40.0,29=40.0" \
          bash scripts/seq/run_early_grid.sh "$@" ) ; }
 EG="${ROOT}/early_grid"
 
@@ -620,15 +659,30 @@ want_eq "ten early dumps per seed on disk" \
 want_eq "the original run's trajectory is untouched" \
     "$(find "${ROOT}/diag/models" -name 'delta-*' | wc -l)" "20"
 
+want_out "binds the FIXED reference evaluations by content" \
+    "${ROOT}/t12a.log" "VALID fixed reference"
+want_out "and says it will not regenerate them" \
+    "${ROOT}/t12a.log" "read-only; never regenerated here"
+REFB=$("$MOCK_PY" -c "
+import json,sys
+d=json.load(open(sys.argv[1]))
+print(f\"{d['ok']}/{len(d['slots'])}/\" +
+      str(all(v['generated_by_the_registered_saved_artifact'] for v in d['slots'].values())))" \
+    "${EG}/reference_bindings.json")
+want_eq "four references bound, each from its registered saved artifact" \
+    "$REFB" "True/4/True"
+
 eg dev > "${ROOT}/t12c.log" 2>&1; RC=$?
 want_rc "the early grid is scored on the development set" 0 "$RC"
-want_eq "24 slots: MA, L2 and ten dumps per seed" \
-    "$(find "${EG}/eval_dev" -name detections.jsonl | wc -l)" "24"
+want_eq "20 slots: ten dumps per seed, and NO regenerated references" \
+    "$(find "${EG}/eval_dev" -name detections.jsonl | wc -l)" "20"
+want_eq "no reference evaluation was written beside the candidates" \
+    "$(find "${EG}/eval_dev" -maxdepth 1 -name 'seed*_MA' -o -maxdepth 1 -name 'seed*_MAB_L2' | wc -l)" "0"
 
 # The frozen test set must be unreachable until the bridge has been run AND held.
 eg test > "${ROOT}/t12d.log" 2>&1; RC=$?
-want_rc "the frozen test set is refused before the bridge is checked" 3 "$RC"
-want_out "says why" "${ROOT}/t12d.log" "bridge did not hold (or was never run)"
+want_rc "the frozen test set is refused before anything has been chosen" 3 "$RC"
+want_out "says why" "${ROOT}/t12d.log" "selection record is missing"
 want_eq "and nothing was generated for it" \
     "$(find "${EG}/eval_test" -type f 2>/dev/null | wc -l)" "0"
 
@@ -655,6 +709,102 @@ NSC=$("$MOCK_PY" -c "
 import json,sys; print(json.load(open(sys.argv[1]))['per_seed']['17']['n_dumps_scored'])" \
     "${EG}/selection.json")
 want_eq "selection considers the nine early dumps only" "$NSC" "9"
+want_out "selection is gated on a freshly computed bridge" \
+    "${ROOT}/t12f.log" "requires a FRESHLY COMPUTED bridge"
+SELREF=$("$MOCK_PY" -c "
+import json,sys
+d=json.load(open(sys.argv[1]))
+r=d['per_seed']['17']
+print(f\"{d['references_are_fixed_and_separate']}/\" +
+      str(len([b for b in r['development_inputs'] if 'reference' in b['role']])))" \
+    "${EG}/selection.json")
+want_eq "and matches to the fixed references, bound by content" "$SELREF" "True/2"
+
+echo
+echo "=== 13. the STALE BRIDGE: a held verdict is not evidence after a change ==="
+# Exactly the reproduction: the bridge holds, then the learning rate changes,
+# and `test` must NOT be delegated on the strength of the stored verdict.
+"$MOCK_PY" - "${EG}/bridge_check.json" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+print("stored verdict before tampering:", d["verdict"])
+PYEOF
+# Keep the HELD record aside. THIS is the artifact the old wrapper trusted.
+cp "${EG}/bridge_check.json" "${ROOT}/t13_record_held.json"
+cp "${EG}/models/seed17/U/train_report.json" "${ROOT}/t13_report_backup.json"
+"$MOCK_PY" - "${EG}/models/seed17/U/train_report.json" <<'PYEOF'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p))
+d["effective_hyperparameters"]["effective_learning_rate"] = 1.6e-05
+json.dump(d, open(p, "w"), indent=2)
+print("learning rate changed AFTER the bridge held")
+PYEOF
+eg test > "${ROOT}/t13.log" 2>&1; RC=$?
+want_rc "test is refused after a post-bridge settings change" 3 "$RC"
+want_out "the bridge is recomputed rather than read" "${ROOT}/t13.log" "recomputing now"
+want_out "and the recomputation rejects the change" "${ROOT}/t13.log" "SETTINGS_VIOLATED"
+want_eq "the frozen test set is still untouched" \
+    "$(find "${EG}/eval_test" -type f 2>/dev/null | wc -l)" "0"
+# The HELD record from before the change must now fail its content bindings --
+# this is the exact artifact that used to authorise the test stage.
+HELD_V=$("$MOCK_PY" -c "
+import json,sys; print(json.load(open(sys.argv[1]))['verdict'])" \
+    "${ROOT}/t13_record_held.json")
+want_eq "the kept record really did say the bridge held" "$HELD_V" "BRIDGE_HELD"
+"$MOCK_PY" "${REPO}/scripts/seq/bridge_check.py" --verify "${ROOT}/t13_record_held.json" \
+    --original_root x --rerun_root y --out "${ROOT}/t13_record_held.json" \
+    > "${ROOT}/t13b.log" 2>&1; RC=$?
+want_rc "that HELD record fails its content bindings after the change" 1 "$RC"
+want_out "and names the changed input" "${ROOT}/t13b.log" "rerun train_report"
+cp "${ROOT}/t13_report_backup.json" "${EG}/models/seed17/U/train_report.json"
+
+echo
+echo "=== 14. the MOVING REFERENCE TARGET: a shifted L2 cannot pass ==="
+# A synthetic L2 shift in the FIXED reference root must be rejected, not
+# absorbed: it would redefine the suppression target every dump is matched to.
+cp "${ROOT}/diag/eval_dev/seed17_MAB_L2/detections.jsonl" "${ROOT}/t14_backup.jsonl"
+"$MOCK_PY" - "${ROOT}/diag/eval_dev/seed17_MAB_L2/detections.jsonl" <<'PYEOF'
+import json, sys
+p = sys.argv[1]
+rows = [json.loads(l) for l in open(p) if l.strip()]
+# Shift the measured L2 suppression by flipping dog detections off.
+flipped = 0
+for r in rows:
+    if r.get("category") == "dog" and r["hit"].get("0.5") and flipped < 12:
+        r["hit"]["0.5"] = False
+        flipped += 1
+with open(p, "w") as fh:
+    for r in rows:
+        print(json.dumps(r), file=fh)
+print(f"shifted the L2 reference by flipping {flipped} dog detections")
+PYEOF
+eg bridge > "${ROOT}/t14.log" 2>&1; RC=$?
+want_rc "the bridge refuses a reference whose evaluation changed" 1 "$RC"
+want_out "names it a reference failure, not a candidate failure" \
+    "${ROOT}/t14.log" "REFERENCES_INVALID"
+if grep -qE "differ from the published, verified original" "${ROOT}/t14.log"; then
+    ok "because its measurements differ from the published original"
+else bad "published-index binding" "no digest mismatch reported"; fi
+if grep -qE "match target has MOVED" "${ROOT}/t14.log"; then
+    ok "and because the declared match target moved"
+else bad "declared target" "the moved L2 target was not reported"; fi
+eg test > "${ROOT}/t14b.log" 2>&1; RC=$?
+want_rc "and the frozen test set stays refused" 3 "$RC"
+want_eq "still nothing generated for the test set" \
+    "$(find "${EG}/eval_test" -type f 2>/dev/null | wc -l)" "0"
+cp "${ROOT}/t14_backup.jsonl" "${ROOT}/diag/eval_dev/seed17_MAB_L2/detections.jsonl"
+eg bridge > "${ROOT}/t14c.log" 2>&1; RC=$?
+want_rc "restoring the fixed reference restores the bridge" 0 "$RC"
+
+echo
+echo "=== 15. no automatic reselection once the test set has been seen ==="
+mkdir -p "${EG}/eval_test/seed17_MA"
+echo '{}' > "${EG}/eval_test/seed17_MA/detections.jsonl"
+eg select > "${ROOT}/t15.log" 2>&1; RC=$?
+want_rc "selection refuses after test access" 4 "$RC"
+want_out "and says it would be test-based selection" "${ROOT}/t15.log" "test-based"
+rm -rf "${EG}/eval_test/seed17_MA"
 
 echo
 echo "=== 11. isolation: no GPU, no repository mutation, pilot untouched ==="

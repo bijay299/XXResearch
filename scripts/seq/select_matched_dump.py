@@ -69,7 +69,24 @@ def dog_residue_pct(rows: list[dict]) -> tuple[float, int, int]:
     return 100.0 * hits / len(d), hits, len(d)
 
 
-def load_checkpoint(dev_root: Path, name: str) -> dict:
+def sha256_file(p: Path, chunk: int = 1 << 20) -> str:
+    h = hashlib.sha256()
+    with p.open("rb") as fh:
+        for b in iter(lambda: fh.read(chunk), b""):
+            h.update(b)
+    return h.hexdigest()
+
+
+def load_checkpoint(dev_root: Path, name: str, role: str = "candidate") -> dict:
+    """Read one scored slot, and BIND the decision to the bytes it was read from.
+
+    The digest of the detections file, its row count, and the digest of the
+    checkpoint that generated the images are recorded in the decision. Without
+    that, a decision record says only "seed17_MAB_L2 was 52.5%" -- it cannot
+    distinguish the evaluation it actually used from a later regeneration of the
+    same slot name, which is exactly how a reference target could move
+    underneath a selection that had already been made.
+    """
     det = dev_root / name / "detections.jsonl"
     if not det.is_file():
         raise FileNotFoundError(f"{det} absent: this checkpoint was not scored "
@@ -80,19 +97,54 @@ def load_checkpoint(dev_root: Path, name: str) -> dict:
     if cks != {name}:
         raise ValueError(f"{det} carries checkpoint label(s) {sorted(map(str, cks))}, "
                          f"expected only {name!r}")
+    binding = {"role": role, "slot": name, "dev_root": str(dev_root),
+               "detections_path": str(det),
+               "detections_sha256": sha256_file(det),
+               "detection_rows": len(rows)}
+    rep = dev_root / name / "image_report.json"
+    if rep.is_file():
+        ir = json.loads(rep.read_text())
+        binding.update({
+            "image_report_sha256": sha256_file(rep),
+            "generating_checkpoint_sha256": (ir.get("checkpoint_load")
+                                             or {}).get("sha256"),
+            "manifest_sha256": ir.get("manifest_sha256"),
+            "generating_checkpoint_path": (ir.get("checkpoint_load")
+                                           or {}).get("unet_ckpt"),
+            "generation_settings_source": ir.get("generation_settings_source"),
+        })
+    else:
+        binding["image_report_sha256"] = None
+        binding["unbound_warning"] = ("no image_report.json beside the "
+                                      "detections, so the generating checkpoint "
+                                      "and manifest cannot be bound")
     return {"checkpoint": name, "dog_residue_pct": round(pct, 4),
-            "dog_hits": hits, "n_dog_pairs": n}
+            "dog_hits": hits, "n_dog_pairs": n, "_binding": binding}
 
 
-def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
-    ma = load_checkpoint(dev_root, f"seed{seed}_MA")
-    l2 = load_checkpoint(dev_root, f"seed{seed}_MAB_L2")
+def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int],
+                    ref_root: Path | None = None) -> dict:
+    """`ref_root`, when given, is where the FIXED reference evaluations live.
+
+    The two reference arms -- the parent MA and the L2 endpoint -- define the
+    target this selection matches TO. Regenerating them beside each new
+    candidate scan lets the target move: a shifted L2 evaluation changes the
+    number every dump is compared against, and nothing downstream would notice.
+    So they are read from one fixed, separately verified location (by default
+    the same root, which is the original run's behaviour).
+    """
+    refs = ref_root or dev_root
+    ma = load_checkpoint(refs, f"seed{seed}_MA", role="fixed_reference_parent")
+    l2 = load_checkpoint(refs, f"seed{seed}_MAB_L2", role="fixed_reference_L2")
 
     def suppression(ck: dict) -> float:
         # Suppression is measured against THAT SEED'S OWN MA, in pp.
         return ma["dog_residue_pct"] - ck["dog_residue_pct"]
 
     l2_sup = suppression(l2)
+    # Collected as inputs are read, so the decision record can be re-bound to
+    # the exact bytes it was made from.
+    bindings = [ma["_binding"], l2["_binding"]]
 
     # ---- the L2 REFERENCE must itself satisfy the reference gates.
     #
@@ -129,7 +181,7 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
     for st in dump_steps:
         name = f"seed{seed}_U_step{st}"
         try:
-            ck = load_checkpoint(dev_root, name)
+            ck = load_checkpoint(dev_root, name, role="candidate")
         except Exception as e:
             errors.append({"step": st, "error": f"{type(e).__name__}: {e}"})
             continue
@@ -146,13 +198,18 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
             "qualifies": bool(gate_sup and gate_res),
             "mismatch_vs_L2_pp": round(abs(sup - l2_sup), 4),
         })
+        bindings.append(ck["_binding"])
 
     qualifying = [r for r in rows if r["qualifies"]]
     within = [r for r in qualifying if r["mismatch_vs_L2_pp"] <= MATCH_TOLERANCE_PP + 1e-9]
 
     out = {
         "training_seed": seed,
-        "MA": ma, "L2_endpoint": l2,
+        "reference_dev_root": str(refs),
+        "candidate_dev_root": str(dev_root),
+        "references_are_fixed_and_separate": str(refs) != str(dev_root),
+        "MA": {k: v for k, v in ma.items() if k != "_binding"},
+        "L2_endpoint": {k: v for k, v in l2.items() if k != "_binding"},
         "L2_dog_suppression_pp": round(l2_sup, 4),
         "L2_reference_eligibility": l2_eligibility,
         "gates": {"min_suppression_pp": GATE_MIN_SUPPRESSION_PP,
@@ -167,6 +224,7 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
         "n_dumps_scored": len(rows),
         "n_qualifying_gates": len(qualifying),
         "n_within_tolerance": len(within),
+        "development_inputs": bindings,
     }
 
     # Checked BEFORE any matching: an ineligible reference cannot be matched to
@@ -282,23 +340,101 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
     return out
 
 
+def cmd_verify(record: Path) -> int:
+    """Re-bind an existing decision record to the bytes now on disk.
+
+    A decision is stale the moment any input it read has changed. This is what
+    the runner checks before it will act on a selection -- in particular before
+    the frozen test set is touched.
+    """
+    d = json.loads(record.read_text())
+    bad, checked = [], 0
+    for seed, rec in (d.get("per_seed") or {}).items():
+        for b in rec.get("development_inputs") or []:
+            checked += 1
+            det = Path(b["detections_path"])
+            if not det.is_file():
+                bad.append(f"seed {seed} {b['slot']}: {det} is gone")
+                continue
+            now = sha256_file(det)
+            if now != b["detections_sha256"]:
+                bad.append(f"seed {seed} {b['slot']} ({b.get('role')}): "
+                           f"detections changed since the decision "
+                           f"({b['detections_sha256'][:12]}… -> {now[:12]}…)")
+            rep = det.parent / "image_report.json"
+            want = b.get("image_report_sha256")
+            if want:
+                if not rep.is_file():
+                    bad.append(f"seed {seed} {b['slot']}: image_report.json is gone")
+                elif sha256_file(rep) != want:
+                    bad.append(f"seed {seed} {b['slot']} ({b.get('role')}): "
+                               f"image_report changed since the decision")
+    if not checked:
+        print(f"UNVERIFIABLE: {record} records no development_inputs, so it "
+              f"cannot be bound to anything. It predates binding and must be "
+              f"re-decided before use.", file=sys.stderr)
+        return 2
+    print(f"decision record : {record}")
+    print(f"decided_utc     : {d.get('decided_utc')}")
+    print(f"inputs bound    : {checked}")
+    if bad:
+        print("SELECTION IS STALE:")
+        for m in bad:
+            print(f"  - {m}")
+        return 1
+    print("SELECTION BINDINGS OK: every development input is byte-identical to "
+          "the one this decision was made from")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--dev_root", required=True)
+    ap.add_argument("--dev_root", default=None)
     ap.add_argument("--seeds", default="17 29")
     ap.add_argument("--dump_steps", default="100,200,300,400,500,600,700,800,900,1000")
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--reference_dev_root", default=None,
+                    help="where the FIXED reference evaluations (MA and MAB_L2) "
+                         "live. Defaults to --dev_root. Point it at a verified, "
+                         "read-only evaluation so the match target cannot move "
+                         "when candidates are rescored.")
+    ap.add_argument("--refuse_if_test_evaluated", default=None,
+                    help="a frozen-test output directory. If it holds any files, "
+                         "selection REFUSES to run: once the test set has been "
+                         "seen, re-deciding which checkpoint to compare is "
+                         "test-based selection, whatever the intention.")
+    ap.add_argument("--verify", default=None,
+                    help="verify an existing decision record's development "
+                         "bindings against the bytes now on disk, and exit")
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
+
+    if args.verify:
+        return cmd_verify(Path(args.verify))
+    if not (args.dev_root and args.out):
+        ap.error("--dev_root and --out are required unless --verify is given")
+
+    if args.refuse_if_test_evaluated:
+        td = Path(args.refuse_if_test_evaluated)
+        seen = [p for p in td.rglob("*") if p.is_file()] if td.is_dir() else []
+        if seen:
+            print(f"REFUSED: the frozen test output {td} already holds "
+                  f"{len(seen)} file(s). Selection must not run after the test "
+                  f"set has been evaluated -- re-deciding the compared "
+                  f"checkpoint with test evidence in hand is test-based "
+                  f"selection. The existing decision record stands.",
+                  file=sys.stderr)
+            return 4
 
     seeds = [int(s) for s in args.seeds.replace(",", " ").split()]
     steps = [int(s) for s in args.dump_steps.replace(" ", "").split(",")]
     dev_root = Path(args.dev_root)
+    ref_root = Path(args.reference_dev_root) if args.reference_dev_root else None
 
     per_seed, fatal = {}, []
     for s in seeds:
         try:
-            per_seed[s] = select_for_seed(dev_root, s, steps)
+            per_seed[s] = select_for_seed(dev_root, s, steps, ref_root)
         except Exception as e:
             per_seed[s] = {"training_seed": s, "decision": "ERROR",
                            "reason": f"{type(e).__name__}: {e}", "selected": None}
@@ -318,6 +454,15 @@ def main() -> int:
                  "planned paired test stops"),
         "dump_steps_scanned": steps,
         "seeds": seeds,
+        "candidate_dev_root": str(dev_root),
+        "reference_dev_root": str(ref_root or dev_root),
+        "references_are_fixed_and_separate": bool(ref_root)
+                                             and str(ref_root) != str(dev_root),
+        "binding_note": (
+            "every development input this decision read is recorded under "
+            "per_seed[*].development_inputs with its sha256, so the decision can "
+            "be re-bound to the exact bytes it used. Verify with "
+            "`select_matched_dump.py --verify <this file> --dev_root x --out x`."),
         "per_seed": {str(s): per_seed[s] for s in seeds},
         "both_seeds_matched": matched,
         "proceed_to_frozen_test": matched,
