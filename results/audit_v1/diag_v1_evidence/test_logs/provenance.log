@@ -1,0 +1,91 @@
+# suite: provenance
+# commit: 926e6b9ded3c4849d05c2416f38afc22426b6943
+# started: 2026-10-10T10:55:56-04:00
+manifest: 28 records, b99d2ac3fb6b
+manifest identity b99d2ac3fb6b..., 28 records
+shared M0 evaluation built: 28 rows
+
+=== 0. baseline: a clean seed-29 run with the real generator ===
+  ok    clean run succeeds (exit 0)
+  ok    every stage validated
+  ok    the real generator produced every image for 5 checkpoints (140)
+
+=== 1. valid same-contract resume: images reused, nothing regenerated ===
+  ok    resume succeeds (exit 0)
+  ok    launcher attributes the images to the checkpoint on disk
+  ok    generator reports verified-provenance reuse
+  ok    ZERO images generated during the resume (0)
+  ok    no model was loaded during the resume (0)
+  ok    image bytes untouched (597db5e7bcbf802d89a463a35efd8f798b86fe92c2d35ef3fc5ef0c87c3a9afb)
+  ok    the valid evaluation directory was NOT quarantined (0)
+  ok    the invalid detections were quarantined, not deleted
+  ok    the reused report records n_reused = every image (28)
+
+=== 2. changed checkpoint under the same name (launcher recovery path) ===
+MA replaced in place; new delta 3f0c65219ceb
+  ok    recovery after a checkpoint swap succeeds (exit 0)
+  ok    launcher refuses to attribute the old images
+  ok    the whole evaluation is preserved together
+  ok    the reason names the changed model
+  ok    the old evaluation directory was quarantined whole
+  ok    images AND the old image report are preserved together
+  ok    quarantined image bytes are the ORIGINAL bytes (597db5e7bcbf802d89a463a35efd8f798b86fe92c2d35ef3fc5ef0c87c3a9afb)
+  ok    a reason file accompanies the quarantine
+  ok    the fresh evaluation holds NEW image bytes
+  ok    MA's images were actually regenerated (28)
+  ok    the fresh report reused nothing (0)
+  ok    the fresh report records the checkpoint now on disk (True)
+
+=== 3. the generator refuses BEFORE any model setup ===
+  ok    changed checkpoint: generator exits 3 (exit 3)
+  ok    names the changed model
+  ok    says nothing was written
+  ok    no pipeline was constructed (0)
+  ok    no image was generated (0)
+  ok    the old image report is byte-identical afterwards (02f55457a922570052256145068a30380867725f340cd5fc33444b6033f562f3)
+
+=== 4. changed prompt text, same filenames ===
+  ok    a changed prompt set is refused (missing ckpt is fatal first) (exit 2)
+  ok    changed prompt text with old filenames: exit 3 (exit 3)
+  ok    names the manifest identity change
+  ok    no pipeline was constructed (0)
+  ok    the frozen manifest identity gate rejects it first (exit 2)
+  ok    names the frozen identity
+
+=== 5. changed generation settings, same filenames ===
+  ok    changed settings with old filenames: exit 3 (exit 3)
+  ok    names the settings difference
+  ok    no pipeline was constructed (0)
+
+=== 6. missing prior provenance ===
+  ok    images with no prior report: exit 3 (exit 3)
+  ok    says provenance is absent
+  ok    no pipeline was constructed (0)
+  ok    no report was written
+
+=== 7. a recorded image digest that no longer matches its bytes ===
+  ok    tampered image bytes: exit 3 (exit 3)
+  ok    names the digest mismatch
+  ok    no pipeline was constructed (0)
+
+=== 8. M0: images claiming a delta are refused ===
+  ok    an M0 report claiming a delta is refused (exit 3)
+  ok    names the delta claim
+
+=== 9. analysis rejects the refused state and publishes nothing ===
+  ok    analysis refuses to aggregate (exit 1)
+  ok    says the evaluations do not validate
+  ok    nothing was published
+
+=== 10. no real GPU work, no repository mutation ===
+  ok    no mock was invoked with a numeric CUDA device
+  ok    the real generator was exercised (not mocked away)
+  ok    the fake torch served the delta loads
+  ok    no real-sized artifact was produced (0)
+  ok    ran against a temporary SEQ_ROOT, not the real /data tree
+  ok    committed results/ and configs/ byte-identical after this suite
+
+-----------------------------------------------------------------
+57 passed, 0 failed
+ALL IMAGE-PROVENANCE CHECKS PASSED (fake model modules; no GPU, no generation)
+# exit: 0

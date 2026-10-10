@@ -99,3 +99,12 @@ Thumbs.db
 *~
 .vscode/
 .idea/
+
+# --- Diagnostic 01 evidence bundle: an explicit exception -------------------
+# The global *.log and *.tar.gz ignores above would silently drop the three most
+# substantive parts of the committed evidence bundle: the per-image detector
+# outputs, the verbatim preflight/start/stop records, and the test-suite logs
+# with their commit stamps. They are deliberately committed, and they are text
+# (824 KB for the whole bundle). No weights and no images are included.
+!results/audit_v1/diag_v1_evidence/
+!results/audit_v1/diag_v1_evidence/**

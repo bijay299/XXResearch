@@ -48,6 +48,32 @@ EVAL_TEST="${DIAG}/eval_test"
 LOGS="${DIAG}/logs"
 mkdir -p "$DIAG" "$MODELS" "$EVAL_DEV" "$EVAL_TEST" "$LOGS"
 
+# Per-stage estimates. An estimate is BOTH an admission amount and a runtime
+# bound, so it must come from measurement with margin, never from a guess: an
+# under-estimate would kill legitimate work, and an under-provisioned reserve
+# would strand the confirmatory stage after selection had been paid for. The
+# measured model (scripts/seq/diag_cost_model.py) supplies them when present.
+load_estimates() {
+    EST_TRAIN="${SEQ_EST_TRAIN:-0.2924}"
+    EST_DEV_SLOT="${SEQ_EST_DEV_SLOT:-0.0397}"
+    EST_TEST_SLOT="${SEQ_EST_TEST_SLOT:-0.2246}"
+    EST_SMOKE="${SEQ_EST_SMOKE:-0.0300}"
+    EST_SOURCE="built-in defaults derived from the completed run"
+    if [ -s "${SEQ_DIAG_COST_MODEL:-}" ]; then
+        local j
+        j="$(CUDA_VISIBLE_DEVICES="" python -c '
+import json, sys
+m = json.load(open(sys.argv[1]))["estimates_gpu_hours"]
+print(m["train_trajectory"], m["development_slot"], m["frozen_test_slot"])
+' "$SEQ_DIAG_COST_MODEL" 2>/dev/null)" && [ -n "$j" ] && {
+            read -r EST_TRAIN EST_DEV_SLOT EST_TEST_SLOT <<<"$j"
+            EST_SOURCE="$SEQ_DIAG_COST_MODEL"
+        }
+    fi
+    export EST_TRAIN EST_DEV_SLOT EST_TEST_SLOT EST_SMOKE
+}
+load_estimates
+
 GPU_SELECT="${GPU_SELECT:-${HERE}/../gpu_select.sh}"
 COMMIT="$(git -C "$PILOT_REPO_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
 read -r -a SEEDS <<<"$SEQ_DIAG_SEEDS"
@@ -64,29 +90,71 @@ fail() { say "FATAL: $*" >&2; exit 1; }
 # --- budget ------------------------------------------------------------------
 budget() { CUDA_VISIBLE_DEVICES="" python "$SEQ_BUDGET" "$@"; }
 
+jfield() {   # jfield <json-line> <key>
+    printf '%s' "$1" | CUDA_VISIBLE_DEVICES="" python -c '
+import json, sys
+line = [l for l in sys.stdin.read().splitlines() if l.strip().startswith("{")][-1]
+print(json.loads(line)[sys.argv[1]])' "$2"
+}
+
 # charge <stage> <gpus> <gpu_index> <est_gpu_hours> <reserve:0|1> -- cmd...
 #
-# Refuses before launching if the remaining budget (minus the withheld test
-# reserve, unless this stage IS the reserved one) cannot afford the estimate.
-# Records the ACTUAL occupancy afterwards, success or failure.
+# ADMISSION, not a check-then-hope. `budget admit` writes a durable OPEN
+# RESERVATION holding the full estimate against the balance before anything is
+# launched, so a concurrent lane cannot be admitted against the same GPU-hour.
+# The admission returns the wall-clock bound that estimate implies; the stage
+# exports it as STAGE_TIMEOUT and every GPU child runs under `timeout`, which
+# signals its own process group and so covers the processes accelerate spawns.
+# `budget settle` then charges the ACTUAL occupancy, success, failure or
+# timeout alike. If this shell dies in between, the reservation stays on the
+# books and the next admission reconciles it conservatively.
 charge() {
     local stage="$1" gpus="$2" gidx="$3" est="$4" res="$5"; shift 5
     [ "${1:-}" = "--" ] && shift
-    local resflag=() t0 t1 rc
+    local resflag=() adm rid t0 t1 rc mypid
     [ "$res" = "1" ] && resflag=(--draws_on_reserve)
-    if ! budget check --ledger "$LEDGER" --need "$est" --stage "$stage" "${resflag[@]}"; then
+    # Capture the owning pid OUTSIDE the command substitution. $BASHPID inside
+    # "$(...)" is the substitution's own short-lived subshell, which exits the
+    # moment admit returns -- so the reservation would look orphaned to the very
+    # next admission and be reconciled away while its stage was still running.
+    mypid="$BASHPID"
+    adm="$(budget admit --ledger "$LEDGER" --stage "$stage" --need "$est" \
+             --gpus "$gpus" --gpu_index "$gidx" --pid "$mypid" \
+             "${resflag[@]}" 2>&1)"
+    if [ $? -ne 0 ]; then
+        say "$adm" >&2
         say "[budget] REFUSED ${stage}; nothing was launched" >&2
         return 97
     fi
+    say "$adm"
+    rid="$(jfield "$adm" reservation_id)"
+    STAGE_TIMEOUT="$(jfield "$adm" max_wall_seconds)"
+    export STAGE_TIMEOUT
+    local bound="$STAGE_TIMEOUT"
     t0=$(date +%s)
     "$@"
     rc=$?
     t1=$(date +%s)
-    budget record --ledger "$LEDGER" --stage "$stage" --gpus "$gpus" \
-        --gpu_index "$gidx" --wall_seconds "$((t1 - t0))" --exit_code "$rc" \
-        "${resflag[@]}" >/dev/null || {
+    unset STAGE_TIMEOUT
+    budget settle --ledger "$LEDGER" --id "$rid" \
+        --wall_seconds "$((t1 - t0))" --exit_code "$rc" >/dev/null || {
             say "[budget] CEILING EXCEEDED after ${stage}" >&2; return 98; }
+    if [ "$rc" -eq 124 ] || [ "$rc" -eq 137 ]; then
+        say "[budget] ${stage} hit its ${bound}s runtime bound and was stopped;" \
+            "the occupancy it used is charged" >&2
+    fi
     return "$rc"
+}
+
+# Run a GPU child under the admitted runtime bound. `timeout` without
+# --foreground puts the child in its own process group and signals the group,
+# so accelerate's workers are stopped too rather than left holding the device.
+bounded() {
+    if [ -n "${STAGE_TIMEOUT:-}" ]; then
+        timeout --kill-after=60 "${STAGE_TIMEOUT}" "$@"
+    else
+        "$@"
+    fi
 }
 
 # --- GPU capacity ------------------------------------------------------------
@@ -217,14 +285,26 @@ PY
     [ "$bad" -eq 0 ] || fail "the artifacts this diagnostic must reuse are not the registered saved ones"
 
     say ""
-    say "--- budget ledger ---"
+    say "--- per-stage estimates (admission amount AND runtime bound) ---"
+    say "source: ${EST_SOURCE}"
+    say "  train trajectory : ${EST_TRAIN} GPU-h"
+    say "  development slot : ${EST_DEV_SLOT} GPU-h"
+    say "  frozen-test slot : ${EST_TEST_SLOT} GPU-h  (x6 = the reserve)"
+    say ""
+    say "--- budget ledger (the EXPERIMENT's, not this output directory's) ---"
+    say "ledger: ${LEDGER}"
     if [ -s "$LEDGER" ]; then
+        # Charge anything a crash or interruption left unaccounted BEFORE any
+        # new admission decision is taken.
+        budget reconcile --ledger "$LEDGER" || true
         budget report --ledger "$LEDGER"
     else
         budget init --ledger "$LEDGER" \
             --ceiling "$SEQ_DIAG_CEILING_GPU_HOURS" \
             --reserve "$SEQ_DIAG_TEST_RESERVE_GPU_HOURS" \
-            --reserve_for frozen_test --commit "$COMMIT" || fail "ledger init"
+            --reserve_for frozen_test \
+            --reserve_basis "6 frozen-test slots x ${EST_TEST_SLOT} GPU-h, from ${EST_SOURCE}" \
+            --commit "$COMMIT" || fail "ledger init"
     fi
     say ""
     say "--- GPU capacity (real fail-closed probe) ---"
@@ -252,7 +332,7 @@ sys.exit(0 if d.get('complete') and d.get('n_present')==2 else 1)" \
     fi
     rm -rf "$out"; mkdir -p "$out"
     smoke_run() {
-        CUDA_VISIBLE_DEVICES="$gpu" accelerate launch --config_file "$SEQ_ACCEL_CFG" \
+        CUDA_VISIBLE_DEVICES="$gpu" bounded accelerate launch --config_file "$SEQ_ACCEL_CFG" \
             scripts/seq/train_request.py \
             --name U --parent_name MA --anchor_name horse --target dog \
             --anchor_dataset_dir "$SEQ_ANCHOR_HORSES" \
@@ -263,7 +343,7 @@ sys.exit(0 if d.get('complete') and d.get('n_present')==2 else 1)" \
             --report "${out}/train_report.json" \
             > "${LOGS}/smoke_train.log" 2>&1
     }
-    charge "smoke:dump_mechanism" 1 "$gpu" 0.08 0 -- smoke_run || rc=$?
+    charge "smoke:dump_mechanism" 1 "$gpu" "$EST_SMOKE" 0 -- smoke_run || rc=$?
     if [ "$rc" -ne 0 ]; then
         say "[FAIL] smoke training exit=${rc} (${LOGS}/smoke_train.log)" >&2
         tail -20 "${LOGS}/smoke_train.log" | sed 's/^/    /' >&2
@@ -298,7 +378,7 @@ train_one() {   # train_one <seed> <gpu>
     parent="$(saved_ckpt "$seed" MA)"
     mkdir -p "$out"
     say "[train] seed${seed} U on GPU ${gpu} (unregularised, parent = saved MA)"
-    CUDA_VISIBLE_DEVICES="$gpu" accelerate launch --config_file "$SEQ_ACCEL_CFG" \
+    CUDA_VISIBLE_DEVICES="$gpu" bounded accelerate launch --config_file "$SEQ_ACCEL_CFG" \
         scripts/seq/train_request.py \
         --name U --parent_name MA --anchor_name horse --target dog \
         --anchor_dataset_dir "$SEQ_ANCHOR_HORSES" \
@@ -402,7 +482,7 @@ stage_train() {
         local gpu="${IDLE_GPUS[$i]}"
         # 1000 steps measured at ~0.83 s/step in the pilot -> ~0.23 GPU-h, plus
         # ten periodic saves. Estimate generously; the ACTUAL time is charged.
-        charge "train:U_seed${seed}" 1 "$gpu" 0.45 0 -- train_one "$seed" "$gpu" &
+        charge "train:U_seed${seed}" 1 "$gpu" "$EST_TRAIN" 0 -- train_one "$seed" "$gpu" &
         pids+=("$!"); seeds_run+=("$seed")
         i=$((i + 1))
     done
@@ -437,7 +517,7 @@ evaluate_slot() {
         say "[skip] eval ${name} (validated complete)"; return 0
     fi
     say "[eval] ${name} on GPU ${gpu} (${n} images, checkpoint ${sha:0:12}…)"
-    CUDA_VISIBLE_DEVICES="$gpu" python scripts/seq/generate_eval_images.py \
+    CUDA_VISIBLE_DEVICES="$gpu" bounded python scripts/seq/generate_eval_images.py \
         --manifest "$man" --expect_manifest_sha "$msha" \
         --expect_gen_settings "$SEQ_GEN_SETTINGS_CONTRACT" \
         --base_model_dir "$SEQ_BASE_MODEL" --unet_ckpt "$ck" \
@@ -452,7 +532,7 @@ evaluate_slot() {
     fi
     [ "$rc" -ne 0 ] && { say "[FAIL] generate ${name} exit=${rc}" >&2; return "$rc"; }
 
-    CUDA_VISIBLE_DEVICES="$gpu" python scripts/seq/detect.py \
+    CUDA_VISIBLE_DEVICES="$gpu" bounded python scripts/seq/detect.py \
         --image_report "${root}/${name}/image_report.json" --checkpoint_name "$name" \
         --out "${root}/${name}/detections.jsonl" \
         --report "${root}/${name}/detect_report.json" \
@@ -500,9 +580,9 @@ stage_dev() {
     done
     local rc=0 pa pb
     run_lane "$SEQ_DEV_MANIFEST" "$SEQ_DEV_MANIFEST_SHA" "$EVAL_DEV" \
-        "${IDLE_GPUS[0]}" 0.03 0 "${lane_a[@]}" & pa=$!
+        "${IDLE_GPUS[0]}" "$EST_DEV_SLOT" 0 "${lane_a[@]}" & pa=$!
     run_lane "$SEQ_DEV_MANIFEST" "$SEQ_DEV_MANIFEST_SHA" "$EVAL_DEV" \
-        "${IDLE_GPUS[1]}" 0.03 0 "${lane_b[@]}" & pb=$!
+        "${IDLE_GPUS[1]}" "$EST_DEV_SLOT" 0 "${lane_b[@]}" & pb=$!
     wait "$pa" || { say "[FAIL] dev lane A" >&2; rc=1; }
     wait "$pb" || { say "[FAIL] dev lane B" >&2; rc=1; }
     budget report --ledger "$LEDGER"
@@ -548,9 +628,9 @@ print(d['step'])" "${DIAG}/selection.json" "$seed")
     done
     local rc=0 pa pb
     run_lane "$SEQ_TEST_MANIFEST" "$SEQ_TEST_MANIFEST_SHA" "$EVAL_TEST" \
-        "${IDLE_GPUS[0]}" 0.18 1 "${lane_a[@]}" & pa=$!
+        "${IDLE_GPUS[0]}" "$EST_TEST_SLOT" 1 "${lane_a[@]}" & pa=$!
     run_lane "$SEQ_TEST_MANIFEST" "$SEQ_TEST_MANIFEST_SHA" "$EVAL_TEST" \
-        "${IDLE_GPUS[1]}" 0.18 1 "${lane_b[@]}" & pb=$!
+        "${IDLE_GPUS[1]}" "$EST_TEST_SLOT" 1 "${lane_b[@]}" & pb=$!
     wait "$pa" || { say "[FAIL] test lane A" >&2; rc=1; }
     wait "$pb" || { say "[FAIL] test lane B" >&2; rc=1; }
     budget report --ledger "$LEDGER"

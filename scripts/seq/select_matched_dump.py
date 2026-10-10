@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -92,6 +93,38 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
         return ma["dog_residue_pct"] - ck["dog_residue_pct"]
 
     l2_sup = suppression(l2)
+
+    # ---- the L2 REFERENCE must itself satisfy the reference gates.
+    #
+    # The gates define the regime this comparison is allowed to make a statement
+    # about: an explicitly PARTIAL-suppression comparison with a meaningful
+    # deletion level to match TO. Applying them only to the dumps was wrong. If
+    # the L2 endpoint has not itself deleted enough, matching a dump to it
+    # compares two arms that both barely deleted, and any retention similarity
+    # is an artifact of both doing nothing -- which is exactly the reasoning the
+    # protocol uses to exclude the sandwich branch at +7.5 pp.
+    #
+    # Worked example of what this rejects: MA 66/80 hits (82.5%), L2 44/80
+    # (55.0%) gives 27.5 pp -- below the gate -- while a dump at 42/80 (52.5%)
+    # reaches 30.0 pp and sits 2.5 pp away. The old code returned MATCHED on an
+    # ineligible reference.
+    l2_gate_sup = l2_sup >= GATE_MIN_SUPPRESSION_PP
+    l2_gate_res = l2["dog_residue_pct"] <= GATE_MAX_RESIDUE_PCT
+    l2_eligible = bool(l2_gate_sup and l2_gate_res)
+    l2_eligibility = {
+        "l2_dog_suppression_pp": round(l2_sup, 4),
+        "l2_dog_residue_pct": l2["dog_residue_pct"],
+        "gate_suppression_ge_30pp": l2_gate_sup,
+        "gate_residue_le_60pct": l2_gate_res,
+        "eligible_as_reference": l2_eligible,
+        "at_suppression_boundary": abs(l2_sup - GATE_MIN_SUPPRESSION_PP) < 1e-9,
+        "at_residue_boundary": abs(l2["dog_residue_pct"] - GATE_MAX_RESIDUE_PCT) < 1e-9,
+        "rule": (f"the reference arm must itself reach >= "
+                 f"{GATE_MIN_SUPPRESSION_PP} pp suppression and <= "
+                 f"{GATE_MAX_RESIDUE_PCT}% residue, measured against that "
+                 f"seed's own MA, before any dump may be matched to it"),
+    }
+
     rows, errors = [], []
     for st in dump_steps:
         name = f"seed{seed}_U_step{st}"
@@ -121,6 +154,7 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
         "training_seed": seed,
         "MA": ma, "L2_endpoint": l2,
         "L2_dog_suppression_pp": round(l2_sup, 4),
+        "L2_reference_eligibility": l2_eligibility,
         "gates": {"min_suppression_pp": GATE_MIN_SUPPRESSION_PP,
                   "max_residue_pct": GATE_MAX_RESIDUE_PCT,
                   "match_tolerance_pp": MATCH_TOLERANCE_PP,
@@ -134,6 +168,27 @@ def select_for_seed(dev_root: Path, seed: int, dump_steps: list[int]) -> dict:
         "n_qualifying_gates": len(qualifying),
         "n_within_tolerance": len(within),
     }
+
+    # Checked BEFORE any matching: an ineligible reference cannot be matched to
+    # at all, so there is nothing to select and no comparison to run.
+    if not l2_eligible:
+        out["selected"] = None
+        out["decision"] = "INELIGIBLE_L2_REFERENCE"
+        why = []
+        if not l2_gate_sup:
+            why.append(f"its suppression is {l2_sup:.1f} pp, below the "
+                       f"{GATE_MIN_SUPPRESSION_PP} pp reference gate")
+        if not l2_gate_res:
+            why.append(f"its dog residue is {l2['dog_residue_pct']:.1f}%, above "
+                       f"the {GATE_MAX_RESIDUE_PCT}% reference gate")
+        out["reason"] = (
+            f"the L2 endpoint is not an eligible reference: {'; and '.join(why)}. "
+            f"Matching a dump to it would compare two arms that both barely "
+            f"deleted, so any retention similarity would be an artifact of both "
+            f"doing nothing. No dump is selected and the planned paired test "
+            f"stops. This is the same reasoning that excludes the sandwich "
+            f"branch at +7.5 pp.")
+        return out
 
     if errors:
         out["selected"] = None
@@ -275,6 +330,28 @@ def main() -> int:
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    # NEVER overwrite a previous decision record. An earlier selection is
+    # evidence of what was decided and when; a re-run must stand beside it, not
+    # replace it. (The first version of this script did overwrite, and the
+    # original record of the 2026-10-09T17:50 run survived only as printed
+    # output in run_all.log.)
+    if out.exists():
+        prev = json.loads(out.read_text())
+        stamp = (prev.get("decided_utc") or "unknown").replace(":", "").replace("-", "")[:15]
+        keep = out.with_name(f"{out.stem}.{stamp}.superseded.json")
+        n = 0
+        while keep.exists():
+            n += 1
+            keep = out.with_name(f"{out.stem}.{stamp}.superseded.{n}.json")
+        keep.write_text(json.dumps(prev, indent=2) + "\n")
+        payload["supersedes"] = {
+            "preserved_at": str(keep),
+            "preserved_decided_utc": prev.get("decided_utc"),
+            "preserved_sha256": hashlib.sha256(
+                (json.dumps(prev, indent=2) + "\n").encode()).hexdigest(),
+            "preserved_both_seeds_matched": prev.get("both_seeds_matched"),
+        }
+        print(f"[preserved] previous decision record -> {keep}")
     out.write_text(json.dumps(payload, indent=2) + "\n")
 
     print(f"=== development-set selection (t={THR}, {TARGET} only) ===")
@@ -286,6 +363,13 @@ def main() -> int:
                   f"({d['MA']['dog_hits']}/{d['MA']['n_dog_pairs']})")
             print(f"  L2 endpoint residue   : {d['L2_endpoint']['dog_residue_pct']:.1f}%"
                   f"  -> suppression {d['L2_dog_suppression_pp']:.1f} pp")
+            el = d.get("L2_reference_eligibility") or {}
+            print(f"  L2 reference gates    : suppression>=30pp="
+                  f"{el.get('gate_suppression_ge_30pp')}  residue<=60%="
+                  f"{el.get('gate_residue_le_60pct')}  -> "
+                  f"{'ELIGIBLE' if el.get('eligible_as_reference') else 'INELIGIBLE'}"
+                  + ("  (exactly at the suppression gate)"
+                     if el.get("at_suppression_boundary") else ""))
         for r in d.get("dumps_scored", []):
             mark = "  <- SELECTED" if (d.get("selected") or {}).get("step") == r["step"] else ""
             print(f"    step {r['step']:>4}: residue {r['dog_residue_pct']:5.1f}%  "

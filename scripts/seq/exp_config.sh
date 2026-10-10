@@ -197,8 +197,16 @@ export SEQ_BOOTSTRAP_GROUPING="${SEQ_BOOTSTRAP_GROUPING:-${PILOT_REPO_ROOT}/resu
 # confirmatory measurement. Both figures come from the approved cost model
 # (results/audit_v1/protocol_cost_model.json).
 export SEQ_DIAG_CEILING_GPU_HOURS="${SEQ_DIAG_CEILING_GPU_HOURS:-4.0}"
-export SEQ_DIAG_TEST_RESERVE_GPU_HOURS="${SEQ_DIAG_TEST_RESERVE_GPU_HOURS:-1.008}"
-export SEQ_DIAG_LEDGER="${SEQ_DIAG_LEDGER:-${SEQ_DIAG_ROOT}/gpu_budget.json}"
+# The reserve IS the sum of the frozen-test stage's own admitted estimates
+# (6 slots x 0.2246 GPU-h, from the measured cost model), so the two can never
+# disagree. The earlier hand-written 1.008 could NOT cover the stage it existed
+# to protect: the runner admitted six slots at 0.18 = 1.08 GPU-h against it.
+export SEQ_DIAG_TEST_RESERVE_GPU_HOURS="${SEQ_DIAG_TEST_RESERVE_GPU_HOURS:-1.3474}"
+export SEQ_DIAG_COST_MODEL="${SEQ_DIAG_COST_MODEL:-${SEQ_DIAG_ROOT}/cost_model_measured.json}"
+# The ledger belongs to the EXPERIMENT, not to one output directory. Keeping it
+# inside ${SEQ_DIAG_ROOT} meant a new output directory started from a zero
+# balance, which would silently re-grant spend the PI had already paid for.
+export SEQ_DIAG_LEDGER="${SEQ_DIAG_LEDGER:-${SEQ_ROOT}/matched_effectiveness_gpu_budget.json}"
 export SEQ_BUDGET="${SEQ_BUDGET:-${PILOT_REPO_ROOT}/scripts/seq/gpu_budget.py}"
 
 # Bounded wait for capacity on a shared host with no scheduler. This is the only

@@ -1,0 +1,62 @@
+# suite: budget
+# commit: 926e6b9ded3c4849d05c2416f38afc22426b6943
+# started: 2026-10-10T10:50:42-04:00
+
+the reproduced defect: two concurrent admissions of the same balance
+  ok    the first 2.5 GPU-h request is admitted
+  ok    the second is REFUSED while the first is in flight
+  ok    the refusal sees the in-flight amount
+  ok    5.0 GPU-h was never admitted against a 4.0 ceiling
+  ok    the open reservation is durable on disk
+
+concurrent admission is serialised by the lock
+  ok    exactly five of ten concurrent 0.2 requests are admitted
+  ok    committed never exceeds the ceiling
+  ok    every admission has a distinct reservation id
+
+the admission implies a runtime bound
+  ok    a 0.04 GPU-h single-GPU admission bounds the wall clock at 144s
+  ok    the same amount on two GPUs bounds it at 72s (device-hours)
+  ok    a runtime bound terminates an over-running child
+  ok    the bound covers grandchildren (own process group)
+
+an UNDERESTIMATED stage is charged what it actually used
+  ok    the actual 0.2 GPU-h is charged, not the 0.01 reservation
+  ok    the overrun is flagged
+  ok    the reservation it broke is recorded beside it
+  ok    the reservation is no longer in flight
+
+a TIMED-OUT stage is charged and labelled
+  ok    a timeout is charged like any other occupancy
+  ok    and is labelled as a runtime-bound hit
+
+INTERRUPTION and crash: reconciled conservatively, never dropped
+  ok    the crashed stage's reservation is on the books
+  ok    it is settled rather than left open
+  ok    it is charged the FULL reservation, conservatively
+  ok    the charge basis is recorded
+  ok    it is marked orphaned
+  ok    a live reservation is left alone
+  ok    admission reconciles orphans before deciding
+
+RESERVE protection
+  ok    development work may use everything outside the reserve
+  ok    but not one GPU-minute of the reserve itself
+  ok    the reserved stage CAN spend the reserve
+  ok    and that exhausts the ceiling exactly
+
+PRIOR SPEND is carried forward, never reset
+  ok    a new ledger carries prior spend forward
+  ok    the carried spend is exactly the prior total
+  ok    the carried entry records where it came from
+  ok    carried spend constrains later admissions
+  ok    init REFUSES to reset an existing ledger
+  ok    carry-forward refuses while the source has open reservations
+
+report surfaces in-flight and conservative charges
+  ok    the report names orphaned charges
+  ok    the report shows committed = spent + in flight
+
+37 passed, 0 failed
+ALL BUDGET CHECKS PASSED (CPU only)
+# exit: 0

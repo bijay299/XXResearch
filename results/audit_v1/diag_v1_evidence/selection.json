@@ -1,0 +1,441 @@
+{
+  "_what_this_is": "The development-set selection decision for the matched-effectiveness diagnostic. SELECTION ONLY: nothing here is a confirmatory claim, and the frozen test set was not consulted.",
+  "threshold": "0.5",
+  "target": "dog",
+  "rule": "gates >= 30 pp suppression and <= 60% residue vs that seed's own MA; closest suppression to the L2 endpoint; earliest step breaks ties; mismatch <= 5 pp; both seeds must match or the planned paired test stops",
+  "dump_steps_scanned": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000
+  ],
+  "seeds": [
+    17,
+    29
+  ],
+  "per_seed": {
+    "17": {
+      "training_seed": 17,
+      "MA": {
+        "checkpoint": "seed17_MA",
+        "dog_residue_pct": 82.5,
+        "dog_hits": 66,
+        "n_dog_pairs": 80
+      },
+      "L2_endpoint": {
+        "checkpoint": "seed17_MAB_L2",
+        "dog_residue_pct": 52.5,
+        "dog_hits": 42,
+        "n_dog_pairs": 80
+      },
+      "L2_dog_suppression_pp": 30.0,
+      "L2_reference_eligibility": {
+        "l2_dog_suppression_pp": 30.0,
+        "l2_dog_residue_pct": 52.5,
+        "gate_suppression_ge_30pp": true,
+        "gate_residue_le_60pct": true,
+        "eligible_as_reference": true,
+        "at_suppression_boundary": true,
+        "at_residue_boundary": false,
+        "rule": "the reference arm must itself reach >= 30.0 pp suppression and <= 60.0% residue, measured against that seed's own MA, before any dump may be matched to it"
+      },
+      "gates": {
+        "min_suppression_pp": 30.0,
+        "max_residue_pct": 60.0,
+        "match_tolerance_pp": 5.0,
+        "threshold": "0.5",
+        "reference": "that seed's own MA",
+        "regime": "explicitly PARTIAL suppression; no claim about a strongly-suppressed regime follows"
+      },
+      "dumps_scored": [
+        {
+          "step": 100,
+          "checkpoint": "seed17_U_step100",
+          "dog_residue_pct": 43.75,
+          "dog_hits": 35,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 38.75,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 8.75
+        },
+        {
+          "step": 200,
+          "checkpoint": "seed17_U_step200",
+          "dog_residue_pct": 23.75,
+          "dog_hits": 19,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 58.75,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 28.75
+        },
+        {
+          "step": 300,
+          "checkpoint": "seed17_U_step300",
+          "dog_residue_pct": 17.5,
+          "dog_hits": 14,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 65.0,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 35.0
+        },
+        {
+          "step": 400,
+          "checkpoint": "seed17_U_step400",
+          "dog_residue_pct": 11.25,
+          "dog_hits": 9,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 71.25,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 41.25
+        },
+        {
+          "step": 500,
+          "checkpoint": "seed17_U_step500",
+          "dog_residue_pct": 8.75,
+          "dog_hits": 7,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 73.75,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 43.75
+        },
+        {
+          "step": 600,
+          "checkpoint": "seed17_U_step600",
+          "dog_residue_pct": 7.5,
+          "dog_hits": 6,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 75.0,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 45.0
+        },
+        {
+          "step": 700,
+          "checkpoint": "seed17_U_step700",
+          "dog_residue_pct": 10.0,
+          "dog_hits": 8,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 72.5,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 42.5
+        },
+        {
+          "step": 800,
+          "checkpoint": "seed17_U_step800",
+          "dog_residue_pct": 7.5,
+          "dog_hits": 6,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 75.0,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 45.0
+        },
+        {
+          "step": 900,
+          "checkpoint": "seed17_U_step900",
+          "dog_residue_pct": 5.0,
+          "dog_hits": 4,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 77.5,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 47.5
+        },
+        {
+          "step": 1000,
+          "checkpoint": "seed17_U_step1000",
+          "dog_residue_pct": 3.75,
+          "dog_hits": 3,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 78.75,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 48.75
+        }
+      ],
+      "dumps_unscored": [],
+      "n_dumps_scored": 10,
+      "n_qualifying_gates": 10,
+      "n_within_tolerance": 0,
+      "selected": null,
+      "decision": "INFEASIBLE",
+      "bracketing": {
+        "nearest_below": {
+          "step": 0,
+          "checkpoint": "seed17_MA",
+          "dog_residue_pct": 82.5,
+          "dog_hits": 66,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 0.0,
+          "is_the_parent_not_a_dump": true,
+          "note": "every dump overshoots the L2 level, so the match point lies between the parent (step 0) and the first dump -- inside the frozen 100-step grid, which cannot resolve it",
+          "mismatch_vs_L2_pp": 30.0
+        },
+        "nearest_above": {
+          "step": 100,
+          "checkpoint": "seed17_U_step100",
+          "dog_residue_pct": 43.75,
+          "dog_hits": 35,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 38.75,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 8.75
+        },
+        "gap_pp": 38.75,
+        "match_point_falls_between": "step 0 (0.0 pp) and step 100 (38.8 pp)"
+      },
+      "closest_any_gate_state": {
+        "step": 100,
+        "checkpoint": "seed17_U_step100",
+        "dog_residue_pct": 43.75,
+        "dog_hits": 35,
+        "n_dog_pairs": 80,
+        "dog_suppression_pp_vs_own_MA": 38.75,
+        "gate_suppression_ge_30pp": true,
+        "gate_residue_le_60pct": true,
+        "qualifies": true,
+        "mismatch_vs_L2_pp": 8.75
+      },
+      "reason": "no dump passes both reference gates AND lands within 5.0 pp of this seed's L2 suppression (30.0 pp). Qualifying on gates: 10. The tolerance is NOT widened and no unmatched comparison is run. Declaring infeasibility is a result: 'these two arms cannot be compared fairly at this coefficient'."
+    },
+    "29": {
+      "training_seed": 29,
+      "MA": {
+        "checkpoint": "seed29_MA",
+        "dog_residue_pct": 82.5,
+        "dog_hits": 66,
+        "n_dog_pairs": 80
+      },
+      "L2_endpoint": {
+        "checkpoint": "seed29_MAB_L2",
+        "dog_residue_pct": 48.75,
+        "dog_hits": 39,
+        "n_dog_pairs": 80
+      },
+      "L2_dog_suppression_pp": 33.75,
+      "L2_reference_eligibility": {
+        "l2_dog_suppression_pp": 33.75,
+        "l2_dog_residue_pct": 48.75,
+        "gate_suppression_ge_30pp": true,
+        "gate_residue_le_60pct": true,
+        "eligible_as_reference": true,
+        "at_suppression_boundary": false,
+        "at_residue_boundary": false,
+        "rule": "the reference arm must itself reach >= 30.0 pp suppression and <= 60.0% residue, measured against that seed's own MA, before any dump may be matched to it"
+      },
+      "gates": {
+        "min_suppression_pp": 30.0,
+        "max_residue_pct": 60.0,
+        "match_tolerance_pp": 5.0,
+        "threshold": "0.5",
+        "reference": "that seed's own MA",
+        "regime": "explicitly PARTIAL suppression; no claim about a strongly-suppressed regime follows"
+      },
+      "dumps_scored": [
+        {
+          "step": 100,
+          "checkpoint": "seed29_U_step100",
+          "dog_residue_pct": 40.0,
+          "dog_hits": 32,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 42.5,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 8.75
+        },
+        {
+          "step": 200,
+          "checkpoint": "seed29_U_step200",
+          "dog_residue_pct": 20.0,
+          "dog_hits": 16,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 62.5,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 28.75
+        },
+        {
+          "step": 300,
+          "checkpoint": "seed29_U_step300",
+          "dog_residue_pct": 12.5,
+          "dog_hits": 10,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 70.0,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 36.25
+        },
+        {
+          "step": 400,
+          "checkpoint": "seed29_U_step400",
+          "dog_residue_pct": 15.0,
+          "dog_hits": 12,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 67.5,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 33.75
+        },
+        {
+          "step": 500,
+          "checkpoint": "seed29_U_step500",
+          "dog_residue_pct": 8.75,
+          "dog_hits": 7,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 73.75,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 40.0
+        },
+        {
+          "step": 600,
+          "checkpoint": "seed29_U_step600",
+          "dog_residue_pct": 10.0,
+          "dog_hits": 8,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 72.5,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 38.75
+        },
+        {
+          "step": 700,
+          "checkpoint": "seed29_U_step700",
+          "dog_residue_pct": 7.5,
+          "dog_hits": 6,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 75.0,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 41.25
+        },
+        {
+          "step": 800,
+          "checkpoint": "seed29_U_step800",
+          "dog_residue_pct": 7.5,
+          "dog_hits": 6,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 75.0,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 41.25
+        },
+        {
+          "step": 900,
+          "checkpoint": "seed29_U_step900",
+          "dog_residue_pct": 6.25,
+          "dog_hits": 5,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 76.25,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 42.5
+        },
+        {
+          "step": 1000,
+          "checkpoint": "seed29_U_step1000",
+          "dog_residue_pct": 1.25,
+          "dog_hits": 1,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 81.25,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 47.5
+        }
+      ],
+      "dumps_unscored": [],
+      "n_dumps_scored": 10,
+      "n_qualifying_gates": 10,
+      "n_within_tolerance": 0,
+      "selected": null,
+      "decision": "INFEASIBLE",
+      "bracketing": {
+        "nearest_below": {
+          "step": 0,
+          "checkpoint": "seed29_MA",
+          "dog_residue_pct": 82.5,
+          "dog_hits": 66,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 0.0,
+          "is_the_parent_not_a_dump": true,
+          "note": "every dump overshoots the L2 level, so the match point lies between the parent (step 0) and the first dump -- inside the frozen 100-step grid, which cannot resolve it",
+          "mismatch_vs_L2_pp": 33.75
+        },
+        "nearest_above": {
+          "step": 100,
+          "checkpoint": "seed29_U_step100",
+          "dog_residue_pct": 40.0,
+          "dog_hits": 32,
+          "n_dog_pairs": 80,
+          "dog_suppression_pp_vs_own_MA": 42.5,
+          "gate_suppression_ge_30pp": true,
+          "gate_residue_le_60pct": true,
+          "qualifies": true,
+          "mismatch_vs_L2_pp": 8.75
+        },
+        "gap_pp": 42.5,
+        "match_point_falls_between": "step 0 (0.0 pp) and step 100 (42.5 pp)"
+      },
+      "closest_any_gate_state": {
+        "step": 100,
+        "checkpoint": "seed29_U_step100",
+        "dog_residue_pct": 40.0,
+        "dog_hits": 32,
+        "n_dog_pairs": 80,
+        "dog_suppression_pp_vs_own_MA": 42.5,
+        "gate_suppression_ge_30pp": true,
+        "gate_residue_le_60pct": true,
+        "qualifies": true,
+        "mismatch_vs_L2_pp": 8.75
+      },
+      "reason": "no dump passes both reference gates AND lands within 5.0 pp of this seed's L2 suppression (33.8 pp). Qualifying on gates: 10. The tolerance is NOT widened and no unmatched comparison is run. Declaring infeasibility is a result: 'these two arms cannot be compared fairly at this coefficient'."
+    }
+  },
+  "both_seeds_matched": false,
+  "proceed_to_frozen_test": false,
+  "decided_utc": "2026-10-09T22:18:36.158607+00:00",
+  "stop_reason": {
+    "17": "no dump passes both reference gates AND lands within 5.0 pp of this seed's L2 suppression (30.0 pp). Qualifying on gates: 10. The tolerance is NOT widened and no unmatched comparison is run. Declaring infeasibility is a result: 'these two arms cannot be compared fairly at this coefficient'.",
+    "29": "no dump passes both reference gates AND lands within 5.0 pp of this seed's L2 suppression (33.8 pp). Qualifying on gates: 10. The tolerance is NOT widened and no unmatched comparison is run. Declaring infeasibility is a result: 'these two arms cannot be compared fairly at this coefficient'."
+  },
+  "supersedes": {
+    "preserved_at": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/selection.20261009T215925.superseded.json",
+    "preserved_decided_utc": "2026-10-09T21:59:25.479668+00:00",
+    "preserved_sha256": "ee6dc282a1ba4345a4e26d7f352bc1032aa95c1df7dbf7a63502a27741fbf99d",
+    "preserved_both_seeds_matched": false
+  }
+}

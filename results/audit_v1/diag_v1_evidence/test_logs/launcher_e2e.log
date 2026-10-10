@@ -1,0 +1,180 @@
+# suite: launcher_e2e
+# commit: 926e6b9ded3c4849d05c2416f38afc22426b6943
+# started: 2026-10-10T11:00:59-04:00
+mock manifest: 28 records
+mock base-model contract written
+mock manifest identity: 9f78aa40bbd3...
+mock M0 evaluation built: 28 rows
+
+=== 1. clean run, every stage mocked ===
+  ok    clean run succeeds (exit 0)
+  ok    reports all stages validated
+  ok    MA validated
+  ok    MAC_L2 eval validated
+
+=== 2. idempotent re-run skips validated stages ===
+  ok    re-run succeeds (exit 0)
+  ok    skips an already-validated train stage
+  ok    skips an already-validated eval stage
+
+=== 3. FIRST background child fails ===
+  ok    first-child failure propagates (exit 1)
+  ok    names the failed child
+  ok    does not claim completion
+  ok    no false DONE
+
+=== 4. SECOND background child fails ===
+  ok    second-child failure propagates (exit 1)
+  ok    names the failed child
+
+=== 5. both children of one wave fail ===
+  ok    both failures propagate (exit 1)
+  ok    names MAC
+  ok    names MAC_L2
+
+=== 6. MA fails, with stale MA artifacts already present ===
+  ok    MA launch failure is fatal despite stale artifacts (exit 1)
+  ok    says MA stage returned nonzero
+  ok    no children were trained after MA failed
+
+=== 7. MA exits 0 but leaves artifacts that do not validate ===
+  ok    unvalidatable MA is fatal (exit 1)
+  ok    rejects the plain-text checkpoint
+
+=== 8. stale configuration in a training report ===
+  ok    stale-seed report is rejected (exit 1)
+  ok    reports the identity mismatch
+
+=== 9. short trajectory (400 of 1000 steps) ===
+  ok    short trajectory is rejected (exit 1)
+  ok    reports the step shortfall
+
+=== 10. partial detections file ===
+  ok    partial detections rejected (exit 1)
+  ok    reports unscored manifest identities
+  ok    partial output quarantined, not deleted (20 artifact(s))
+
+=== 11. every detections row identical ===
+  ok    all-identical rows rejected (exit 1)
+  ok    reports duplicate identities
+
+=== 12. generation settings drift ===
+  ok    settings drift rejected (exit 1)
+  ok    reports the setting mismatch
+
+=== 13. generation / detection stage failures ===
+  ok    generate failure propagates (exit 1)
+  ok    names the generate failure
+  ok    detect failure propagates (exit 1)
+  ok    names the detect failure
+
+=== 14. analysis refuses an invalid seed, publishes nothing ===
+  ok    analysis refuses to aggregate (exit 1)
+  ok    says evaluations do not validate
+  ok    nothing published to the analysis dir
+
+=== 15. analysis stage failure publishes nothing ===
+  ok    required-stage failure aborts (exit 1)
+  ok    names the failed required stage
+  ok    states nothing was published
+  ok    staging discarded on failure
+
+=== 16. seed-17 legacy / new layout policy ===
+  ok    legacy-only resolves to eval/ with a note
+  ok    ambiguous layout refused (exit 1)
+  ok    explains the ambiguity
+  ok    promises not to delete evidence
+  ok    run_seed refuses ambiguous seed 17 (exit 1)
+  ok    run_analysis refuses ambiguous seed 17 (exit 1)
+  ok    explicit override is honoured
+  ok    one shared policy returns one directory
+
+=== 15b. a short completed-step counter is rejected ===
+  ok    400-of-1000 completed steps rejected (exit 1)
+  ok    names the incomplete trajectory
+
+=== 15c. a NEW seed-29 output with no counter is rejected under DEFAULTS ===
+  ok    a fresh seed-29 output with no counter is rejected by default (exit 1)
+  ok    says completion cannot be evidenced
+  ok    points at the explicit legacy option
+  ok    the legacy exception was NOT applied
+
+=== 15c2. a short counter is rejected under DEFAULTS ===
+  ok    a present-but-short counter is rejected (exit 1)
+  ok    names the incomplete trajectory
+
+=== 15c3. a NEW seed-17 output with no counter is rejected under DEFAULTS ===
+  ok    a fresh seed-17 output with no counter is rejected by default (exit 1)
+  ok    says completion cannot be evidenced
+  ok    the legacy exception was NOT applied
+
+=== 15d. a REGISTERED saved artifact accepts an absent counter ===
+fixture registry: 1 artifact(s)
+  ok    a registered saved artifact still completes (exit 0)
+  ok    names the registered artifact
+  ok    records completion as unverified
+  ok    MA was not retrained
+  ok    nothing failed
+
+=== 15d2. a CHANGED artifact bearing a registered name is not exempt ===
+  ok    a changed legacy-named artifact is rejected (exit 1)
+  ok    says the identity differs from the registered artifact
+  ok    refuses to retrain over saved evidence
+  ok    promises not to replace it
+  ok    no retraining happened
+
+=== 15d3. the completed-step policy reads artifacts, not seed numbers ===
+fixture registry: 1 artifact(s)
+  ok    a registered artifact -> legacy_optional
+  ok    an explicitly EMPTY registry -> counter, no exception
+  ok    a mock artifact against the REAL registry -> counter
+  ok    an absent registry -> counter (fails closed)
+  ok    a malformed registry -> counter (fails closed)
+  ok    an unregistered sibling -> counter
+
+=== 15d4. a short counter is rejected EVEN for a registered artifact ===
+fixture registry: 1 artifact(s)
+  ok    the fixture artifact is registered
+  ok    the exception cannot wave through a short counter (exit 1)
+  ok    names the incomplete trajectory
+
+=== 15e. stale generation hash rejected in BOTH paths ===
+  ok    launch path rejects a stale evaluation (exit 1)
+  ok    names the staleness
+  ok    analysis path rejects a stale evaluation (exit 1)
+  ok    analysis names the staleness
+  ok    analysis publishes nothing
+
+=== 15g. a missing recorded generation hash is rejected ===
+  ok    absent generation hash rejected (exit 1)
+  ok    says the generating model is unidentifiable
+
+=== 16b. a busy GPU is never used ===
+  ok    refuses to launch on a busy GPU (exit 1)
+  ok    says the GPU was not idle
+  ok    nothing was trained
+
+=== 17. no real GPU command escaped ===
+  ok    intercepted: MOCK accelerate
+  ok    intercepted: MOCK python
+  ok    intercepted: generate_eval_images.py
+  ok    intercepted: detect.py
+  ok    no mock was invoked with a numeric CUDA device
+  ok    CUDA_VISIBLE_DEVICES stayed empty in this suite
+  ok    no real-sized delta.bin was ever produced (0 mock delta(s) seen)
+  ok    suite ran against a temporary SEQ_ROOT, not the real /data tree
+  (mock call log: 451 intercepted GPU invocations)
+
+=== 18. clean run after all the failure cases ===
+  ok    still succeeds on a clean run (exit 0)
+  ok    analysis completes on a valid seed (exit 0)
+  ok    analysis reports completion
+  ok    optional formats reported explicitly
+
+-----------------------------------------------------------------
+103 passed, 0 failed
+  ok    committed results trees (results/seq17 results/seq29) byte-identical after this suite
+  ok    analysis published into the sandbox (SEQ_REPO_OUT_OVERRIDE), not the repo
+105 passed, 0 failed (final)
+ALL LAUNCHER E2E CHECKS PASSED (all GPU commands mocked)
+# exit: 0

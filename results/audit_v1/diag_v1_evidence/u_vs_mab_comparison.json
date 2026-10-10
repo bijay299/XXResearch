@@ -1,0 +1,637 @@
+{
+  "_what_this_is": "The planned CPU reproducibility comparison of each new 1000-step unregularised endpoint (U) against the saved unregularised endpoint (MAB) of the same seed. Four questions answered separately; training equivalence refused.",
+  "tolerance": 0.0,
+  "all_seeds_same_configuration": true,
+  "all_seeds_same_saved_parent": true,
+  "any_seed_numerically_different": true,
+  "conclusion": "Identical configuration and the same saved parent, yet the weights differ. The divergence is therefore RUN-TO-RUN NONDETERMINISM on this stack, not a configuration difference. Consequence: a re-run of a trajectory does NOT reproduce the original path bitwise, so checkpoints taken from a NEW run are not interchangeable with the original run's checkpoints and any design that mixes them must say so and measure the difference rather than assume it away.",
+  "legacy_caveat": "MAB's training completion is UNVERIFIED for every seed: those reports predate the completed-step counter. U's is verified. The asymmetry is disclosed, not corrected, and no counter has been backfilled into any saved report.",
+  "per_seed": {
+    "17": {
+      "training_seed": 17,
+      "U_checkpoint": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/models/seed17/U/delta.bin",
+      "MAB_checkpoint": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed17/MAB/delta.bin",
+      "configuration": {
+        "request_fields_compared": [
+          "parent",
+          "new_deletion_target",
+          "anchor_concept",
+          "anchor_target_mapping",
+          "l2sp_weight",
+          "training_seed"
+        ],
+        "request_field_differences": {},
+        "effective_hyperparameters_compared": 32,
+        "effective_hyperparameter_differences": {},
+        "identical": true
+      },
+      "parent_identity": {
+        "saved_MA_on_disk_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+        "U_recorded_parent_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+        "MAB_recorded_parent_sha256": "3cb72ee162b9219d80fd5a12abb9f7bb6b0f500869edac2b84809d32384d3f82",
+        "both_from_the_same_saved_MA": true
+      },
+      "serialisation": {
+        "U_sha256": "3b9d0776e277d674c31cd653ce94ea10e471481877cce1659543bcc3d1c03654",
+        "MAB_sha256": "63c9a8232cfd96ac257560b7cacabae287f4727e23b8ee57d21828fb579978f9",
+        "file_hashes_equal": false,
+        "U_bytes": 76686190,
+        "MAB_bytes": 76686190,
+        "note": "the weakest question: a mismatch here is NOT by itself a training difference"
+      },
+      "numerical": {
+        "tensors_compared": 32,
+        "bitwise_identical_tensors": 0,
+        "nonfinite_tensors": [],
+        "max_abs_diff": 0.002044876106083393,
+        "overall_relative_frobenius": 0.00565181348272256,
+        "tolerance": 0.0,
+        "numerically_equal_at_tolerance": false,
+        "most_divergent": [
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.002044876106083393,
+            "mean_abs_diff": 0.00022025137150194496,
+            "rel_frobenius": 0.015502377413213253,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0018675094470381737,
+            "mean_abs_diff": 0.00022940376948099583,
+            "rel_frobenius": 0.006264441180974245,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0018034055829048157,
+            "mean_abs_diff": 0.00022657008958049119,
+            "rel_frobenius": 0.006461488548666239,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0016834913985803723,
+            "mean_abs_diff": 0.00021495865075848997,
+            "rel_frobenius": 0.008932514116168022,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0016466639935970306,
+            "mean_abs_diff": 0.00021510334045160562,
+            "rel_frobenius": 0.005650173407047987,
+            "bitwise_identical": false
+          }
+        ],
+        "per_tensor": [
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.002044876106083393,
+            "mean_abs_diff": 0.00022025137150194496,
+            "rel_frobenius": 0.015502377413213253,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0018675094470381737,
+            "mean_abs_diff": 0.00022940376948099583,
+            "rel_frobenius": 0.006264441180974245,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0018034055829048157,
+            "mean_abs_diff": 0.00022657008958049119,
+            "rel_frobenius": 0.006461488548666239,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0016834913985803723,
+            "mean_abs_diff": 0.00021495865075848997,
+            "rel_frobenius": 0.008932514116168022,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0016466639935970306,
+            "mean_abs_diff": 0.00021510334045160562,
+            "rel_frobenius": 0.005650173407047987,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0016095712780952454,
+            "mean_abs_diff": 0.00021890799689572304,
+            "rel_frobenius": 0.007193981669843197,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.00159367173910141,
+            "mean_abs_diff": 0.0002271743433084339,
+            "rel_frobenius": 0.005133317317813635,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0015685795806348324,
+            "mean_abs_diff": 0.00021033448865637183,
+            "rel_frobenius": 0.005265748593956232,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0014948546886444092,
+            "mean_abs_diff": 0.00021814568026456982,
+            "rel_frobenius": 0.01259442325681448,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0014716056175529957,
+            "mean_abs_diff": 0.00023120468540582806,
+            "rel_frobenius": 0.009997326880693436,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0013386476784944534,
+            "mean_abs_diff": 0.00017510783800389618,
+            "rel_frobenius": 0.005626023281365633,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0013250000774860382,
+            "mean_abs_diff": 0.0001694203238002956,
+            "rel_frobenius": 0.0049823191948235035,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0013140961527824402,
+            "mean_abs_diff": 0.0002070163027383387,
+            "rel_frobenius": 0.012520099058747292,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "mid_block.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0012700818479061127,
+            "mean_abs_diff": 0.00019325372704770416,
+            "rel_frobenius": 0.006080394145101309,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "mid_block.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0012678138446062803,
+            "mean_abs_diff": 0.0001992158795474097,
+            "rel_frobenius": 0.006492238491773605,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001261681318283081,
+            "mean_abs_diff": 0.00020402130030561239,
+            "rel_frobenius": 0.004340754356235266,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.001250632107257843,
+            "mean_abs_diff": 0.00021152921544853598,
+            "rel_frobenius": 0.017872679978609085,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0012059248983860016,
+            "mean_abs_diff": 0.0001925654651131481,
+            "rel_frobenius": 0.005198630038648844,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.001202017068862915,
+            "mean_abs_diff": 0.0001594769419170916,
+            "rel_frobenius": 0.00655850674957037,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0011829882860183716,
+            "mean_abs_diff": 0.00016039922775235027,
+            "rel_frobenius": 0.003838135162368417,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001172393560409546,
+            "mean_abs_diff": 0.00016242738638538867,
+            "rel_frobenius": 0.004028261173516512,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0011542029678821564,
+            "mean_abs_diff": 0.0001606387086212635,
+            "rel_frobenius": 0.010941646993160248,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0011427756398916245,
+            "mean_abs_diff": 0.00017216977721545845,
+            "rel_frobenius": 0.006186568643897772,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001130528748035431,
+            "mean_abs_diff": 0.0001514980394858867,
+            "rel_frobenius": 0.003752474905923009,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0011095134541392326,
+            "mean_abs_diff": 0.00014223792823031545,
+            "rel_frobenius": 0.0034235885832458735,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0010913088917732239,
+            "mean_abs_diff": 7.109321450116113e-05,
+            "rel_frobenius": 0.0019357952987775207,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0010833535343408585,
+            "mean_abs_diff": 0.0001550722518004477,
+            "rel_frobenius": 0.003872787347063422,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.001069590449333191,
+            "mean_abs_diff": 6.107694207457826e-05,
+            "rel_frobenius": 0.002036561956629157,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0010378509759902954,
+            "mean_abs_diff": 0.00017705118807498366,
+            "rel_frobenius": 0.015309722162783146,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001023968681693077,
+            "mean_abs_diff": 0.00016258905816357583,
+            "rel_frobenius": 0.0041906810365617275,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0009739995002746582,
+            "mean_abs_diff": 0.0001561595854582265,
+            "rel_frobenius": 0.004205626435577869,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0009667240083217621,
+            "mean_abs_diff": 0.00015450485807377845,
+            "rel_frobenius": 0.011383965611457825,
+            "bitwise_identical": false
+          }
+        ]
+      },
+      "completion_evidence": {
+        "U_optimizer_steps_completed": 1000,
+        "U_completion_verified": true,
+        "MAB_optimizer_steps_completed": null,
+        "MAB_completion_verified": false,
+        "legacy_caveat": "The saved MAB report predates runtime.optimizer_steps_completed and the completion check in use when it was produced was circular, so MAB's training completion is UNVERIFIED. U's is evidenced by the trainer's own counter. The two arms are NOT symmetric in completion evidence. Nothing has been backfilled."
+      },
+      "training_equivalence": "NOT ASSESSED. Neither identical configuration nor a numerical distance establishes that the two runs are behaviourally equivalent; that would need matched generation and scoring."
+    },
+    "29": {
+      "training_seed": 29,
+      "U_checkpoint": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/models/seed29/U/delta.bin",
+      "MAB_checkpoint": "/data/bijaypandey/cuig_pilot/seq_pilot/models/seed29/MAB/delta.bin",
+      "configuration": {
+        "request_fields_compared": [
+          "parent",
+          "new_deletion_target",
+          "anchor_concept",
+          "anchor_target_mapping",
+          "l2sp_weight",
+          "training_seed"
+        ],
+        "request_field_differences": {},
+        "effective_hyperparameters_compared": 32,
+        "effective_hyperparameter_differences": {},
+        "identical": true
+      },
+      "parent_identity": {
+        "saved_MA_on_disk_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+        "U_recorded_parent_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+        "MAB_recorded_parent_sha256": "fbf49199a3062fcd7863d936647ac9d9f6c3e471a1d0888ef15b03b85cab90cc",
+        "both_from_the_same_saved_MA": true
+      },
+      "serialisation": {
+        "U_sha256": "300e1e50b2afd3b72645e4eac8e85653d15f9c870efb3da3866813e09cd5c6fb",
+        "MAB_sha256": "d9f28f0fc6b8cc5b72bc69a962c3c9e84250ccddc88c114008b42e317ed42894",
+        "file_hashes_equal": false,
+        "U_bytes": 76686190,
+        "MAB_bytes": 76686190,
+        "note": "the weakest question: a mismatch here is NOT by itself a training difference"
+      },
+      "numerical": {
+        "tensors_compared": 32,
+        "bitwise_identical_tensors": 0,
+        "nonfinite_tensors": [],
+        "max_abs_diff": 0.0017779823392629623,
+        "overall_relative_frobenius": 0.00571718647183866,
+        "tolerance": 0.0,
+        "numerically_equal_at_tolerance": false,
+        "most_divergent": [
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0017779823392629623,
+            "mean_abs_diff": 0.00021381118858698756,
+            "rel_frobenius": 0.01506465207785368,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0017552729696035385,
+            "mean_abs_diff": 0.00023474251793231815,
+            "rel_frobenius": 0.010119442827999592,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001654474064707756,
+            "mean_abs_diff": 0.00021248965640552342,
+            "rel_frobenius": 0.004837423097342253,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0016409419476985931,
+            "mean_abs_diff": 0.00021689185814466327,
+            "rel_frobenius": 0.005423859693109989,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0016164612025022507,
+            "mean_abs_diff": 0.00023183385201264173,
+            "rel_frobenius": 0.009558843448758125,
+            "bitwise_identical": false
+          }
+        ],
+        "per_tensor": [
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0017779823392629623,
+            "mean_abs_diff": 0.00021381118858698756,
+            "rel_frobenius": 0.01506465207785368,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0017552729696035385,
+            "mean_abs_diff": 0.00023474251793231815,
+            "rel_frobenius": 0.010119442827999592,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001654474064707756,
+            "mean_abs_diff": 0.00021248965640552342,
+            "rel_frobenius": 0.004837423097342253,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0016409419476985931,
+            "mean_abs_diff": 0.00021689185814466327,
+            "rel_frobenius": 0.005423859693109989,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0016164612025022507,
+            "mean_abs_diff": 0.00023183385201264173,
+            "rel_frobenius": 0.009558843448758125,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0016148239374160767,
+            "mean_abs_diff": 0.00021997425938025117,
+            "rel_frobenius": 0.005972070619463921,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001546632731333375,
+            "mean_abs_diff": 0.00022550362336914986,
+            "rel_frobenius": 0.005856918636709452,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0015446916222572327,
+            "mean_abs_diff": 0.00023263398907147348,
+            "rel_frobenius": 0.00665349280461669,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0015446431934833527,
+            "mean_abs_diff": 0.0002161883021472022,
+            "rel_frobenius": 0.012516524642705917,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "mid_block.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0015216656029224396,
+            "mean_abs_diff": 0.00020551781926769763,
+            "rel_frobenius": 0.0066917333751916885,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.001479320228099823,
+            "mean_abs_diff": 0.000221317182877101,
+            "rel_frobenius": 0.007229920011013746,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "mid_block.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0014547854661941528,
+            "mean_abs_diff": 0.0002031726180575788,
+            "rel_frobenius": 0.00635272404178977,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0014336053282022476,
+            "mean_abs_diff": 0.0001693938538664952,
+            "rel_frobenius": 0.00500813964754343,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0014240918681025505,
+            "mean_abs_diff": 0.00020188232883810997,
+            "rel_frobenius": 0.017082247883081436,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0013301987200975418,
+            "mean_abs_diff": 5.9535130276344717e-05,
+            "rel_frobenius": 0.002170025836676359,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0013139694929122925,
+            "mean_abs_diff": 7.548730354756117e-05,
+            "rel_frobenius": 0.0020543448626995087,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.001242358237504959,
+            "mean_abs_diff": 0.00016343918105121702,
+            "rel_frobenius": 0.005301936995238066,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0012273117899894714,
+            "mean_abs_diff": 0.000156894137035124,
+            "rel_frobenius": 0.003763527376577258,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001211646944284439,
+            "mean_abs_diff": 0.000153120985487476,
+            "rel_frobenius": 0.0037164355162531137,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001177951693534851,
+            "mean_abs_diff": 0.00016820970631670207,
+            "rel_frobenius": 0.004339856561273336,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0011756718158721924,
+            "mean_abs_diff": 0.00019653778872452676,
+            "rel_frobenius": 0.004201363306492567,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0011684391647577286,
+            "mean_abs_diff": 0.00020850214059464633,
+            "rel_frobenius": 0.012628559954464436,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0011647064238786697,
+            "mean_abs_diff": 0.00016209177556447685,
+            "rel_frobenius": 0.011029141955077648,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.001158352941274643,
+            "mean_abs_diff": 0.00017290492542088032,
+            "rel_frobenius": 0.006209995597600937,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001153453253209591,
+            "mean_abs_diff": 0.0001564105332363397,
+            "rel_frobenius": 0.0039031831547617912,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.001125722425058484,
+            "mean_abs_diff": 0.0001852378190960735,
+            "rel_frobenius": 0.016030488535761833,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0010941014625132084,
+            "mean_abs_diff": 0.00019847553630825132,
+            "rel_frobenius": 0.005338032264262438,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0010893456637859344,
+            "mean_abs_diff": 0.00014569713675882667,
+            "rel_frobenius": 0.003651229664683342,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0010773856192827225,
+            "mean_abs_diff": 0.00016184973355848342,
+            "rel_frobenius": 0.006646459922194481,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+            "max_abs_diff": 0.0010598842054605484,
+            "mean_abs_diff": 0.00016145998961292207,
+            "rel_frobenius": 0.011850432492792606,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.001029670238494873,
+            "mean_abs_diff": 0.00015081296442076564,
+            "rel_frobenius": 0.0037302905693650246,
+            "bitwise_identical": false
+          },
+          {
+            "tensor": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+            "max_abs_diff": 0.0009732283651828766,
+            "mean_abs_diff": 0.00015965712373144925,
+            "rel_frobenius": 0.004280939232558012,
+            "bitwise_identical": false
+          }
+        ]
+      },
+      "completion_evidence": {
+        "U_optimizer_steps_completed": 1000,
+        "U_completion_verified": true,
+        "MAB_optimizer_steps_completed": null,
+        "MAB_completion_verified": false,
+        "legacy_caveat": "The saved MAB report predates runtime.optimizer_steps_completed and the completion check in use when it was produced was circular, so MAB's training completion is UNVERIFIED. U's is evidenced by the trainer's own counter. The two arms are NOT symmetric in completion evidence. Nothing has been backfilled."
+      },
+      "training_equivalence": "NOT ASSESSED. Neither identical configuration nor a numerical distance establishes that the two runs are behaviourally equivalent; that would need matched generation and scoring."
+    }
+  }
+}

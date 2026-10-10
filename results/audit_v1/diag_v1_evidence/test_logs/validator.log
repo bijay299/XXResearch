@@ -1,0 +1,184 @@
+# suite: validator
+# commit: 926e6b9ded3c4849d05c2416f38afc22426b6943
+# started: 2026-10-10T10:58:40-04:00
+
+training stage -- contract, identity, steps, lineage, tensors
+  ok    valid training stage                                       -> valid
+  ok    delta.bin is plain text (reported defect 1)                -> invalid
+  ok    tensor contains NaN                                        -> invalid
+  ok    checkpoint tensor shape mismatch                           -> invalid
+  ok    checkpoint tensor dtype mismatch                           -> invalid
+  ok    unexpected tensor names                                    -> invalid
+  ok    report claims a hash the file does not have                -> invalid
+  ok    caller-expected hash differs                               -> invalid
+  ok    stale config: training_seed is for another request         -> invalid
+  ok    stale config: new_deletion_target is for another request   -> invalid
+  ok    stale config: anchor_concept is for another request        -> invalid
+  ok    stale config: l2sp_weight is for another request           -> invalid
+  ok    stale config: parent is for another request                -> invalid
+  ok    iterations_requested 500 != requested 1000                 -> invalid
+
+  completed-step counter (replaces the circular runtime check)
+  ok    counter equals the request                                 -> valid
+  ok    counter shows 400 of 1000 -> incomplete                    -> invalid
+  ok    counter overshoots the request                             -> invalid
+  ok    counter ABSENT, default policy -> fail                     -> invalid
+  ok    counter ABSENT, --steps_evidence legacy_optional -> structural pass -> valid
+  ok    legacy_optional still rejects a PRESENT short counter      -> invalid
+  ok    counter is not an integer                                  -> invalid
+  ok    absurd train_seconds no longer fakes a step check          -> valid
+  ok    L2 arm: trace of 400 is NOT treated as a step count        -> valid
+  ok    L2 arm: trace of 0 means the regulariser never ran         -> invalid
+  ok    unregularised arm: steps_recorded=0 is legitimate          -> valid
+  ok    finished_utc absent (killed before the end)                -> invalid
+  ok    train_report.json truncated mid-write                      -> invalid
+  ok    report missing a required key                              -> invalid
+  ok    stale parent: parent hash no longer matches                -> invalid
+  ok    delta.bin absent                                           -> invalid
+  ok    delta.bin zero bytes                                       -> invalid
+  ok    contract file missing -> UNCHECKED, not a pass             -> invalid
+
+evaluation stage -- identities, coverage, config identity, artifacts
+  ok    valid evaluation (16 rows from manifest)                   -> valid
+  ok    every row identical (reported defect 2)                    -> invalid
+  ok    every row malformed (reported defect 3)                    -> invalid
+  ok    one duplicated identity                                    -> invalid
+  ok    one manifest identity unscored                             -> invalid
+  ok    row absent from the manifest                               -> invalid
+  ok    half the rows present                                      -> invalid
+  ok    rows missing a required field                              -> invalid
+  ok    hit lacks the 0.3/0.7 thresholds                           -> invalid
+  ok    all rows share one image_sha256                            -> invalid
+  ok    rows labelled with another checkpoint                      -> invalid
+  ok    stale manifest: evaluated against an older manifest        -> invalid
+  ok    caller-expected manifest identity differs                  -> invalid
+  ok    generation settings differ from the contract               -> invalid
+
+  checkpoint binding (an evaluation must name the model it used)
+  ok    checkpoint CHANGED under the same name -> stale evaluation -> invalid
+  ok    recorded generation hash MISSING, expected one supplied    -> invalid
+  ok    no --expect_sha supplied at all (non-M0)                   -> invalid
+  ok    delta was never applied for a non-M0 checkpoint            -> invalid
+  ok    matching checkpoint hash -> valid                          -> valid
+  ok    image_report.json absent                                   -> invalid
+  ok    detect_report.json absent                                  -> invalid
+  ok    detect_report count disagrees with the jsonl               -> invalid
+  ok    image_report.complete is false                             -> invalid
+  ok    recorded image files do not exist                          -> invalid
+
+  M0 policy (base-model identity, declared reuse)
+  ok    M0 reuse NOT declared                                      -> invalid
+  ok    M0 reuse declared, base-model identity from contract       -> valid
+  ok    M0 with --verify_base_model reports itself as PARTIAL      -> valid
+  ok    without it, identity is reported as DECLARED, not verified -> valid
+  ok    M0 rejected when a backbone config file has changed        -> invalid
+  ok    same-size weight mutation PASSES the partial check         -> valid
+  ok    same-size weight mutation FAILS the full weight digest     -> invalid
+  ok    the unmutated backbone passes the full weight digest       -> valid
+  ok    no weight_sha256 in the contract -> UNCHECKED, not a pass  -> invalid
+  ok    M0 without a base-model contract -> UNCHECKED, not a pass  -> invalid
+  ok    M0 recording an applied delta is rejected                  -> invalid
+  ok    count derived from manifest (2 rows, not 280)              -> valid
+  ok    same artifacts judged against the larger manifest          -> invalid
+  ok    detections.jsonl absent                                    -> invalid
+  ok    detections.jsonl empty                                     -> invalid
+  ok    manifest has no records -> UNCHECKED, not a pass           -> invalid
+
+manifest stage -- content digest recomputed, never trusted
+  ok    valid manifest against its frozen identity                 -> valid
+        (tamper preserves: rows=True, ids=True, digest field=True)
+  ok    prompt TEXT changed; ids, count and digest field preserved -> invalid
+  ok    a single prompt text altered                               -> invalid
+  ok    a generation seed altered                                  -> invalid
+  ok    manifest carries no digest field                           -> invalid
+  ok    stored digest disagrees with recomputed content            -> invalid
+  ok    no frozen identity supplied -> UNCHECKED, not a pass       -> invalid
+  ok    duplicate identity (digest honestly recomputed)            -> invalid
+  ok    expected record count enforced                             -> invalid
+
+the ACTUAL proposed manifests (not a fixture)
+  ok    dev_manifest_DRAFT.json (20 texts, 80 pairs)               -> valid
+  ok    test_manifest_DRAFT.json (140 texts, 560 pairs)            -> valid
+  ok    superseded indent=2 draft fails the canonical rule         -> invalid
+  ok    frozen pilot manifest validates unmigrated (70 texts, 280 pairs) -> valid
+
+completion marker -- written atomically, and only after validation
+  ok    invalid stage writes NO marker                             -> invalid
+  ok    marker absent after failure                                -> absent
+  ok    valid stage writes the marker                              -> valid
+  ok    marker present, validated:true, no .tmp left               -> yes
+
+legacy-artifact policy -- scoped to saved artifacts, not seed numbers
+  ok    registry holds the ten saved artifacts                     -> 10
+  ok    all registered artifacts are recorded as counterless       -> True
+  ok    in-repo report copies are byte-identical                   -> True
+  ok    real seed17/MA is registered -> legacy_optional            -> legacy_optional
+  ok    real seed29/MA is registered -> legacy_optional            -> legacy_optional
+  ok    a NEW artifact named MA -> counter                         -> counter
+  ok    an EDITED saved report -> counter, near miss named         -> counter
+  ok    the saved checkpoint beside it stays PROTECTED             -> protected
+  ok    an unregistered checkpoint -> not protected is independent -> legacy_optional
+  ok    an EMPTY registry -> counter (no exception exists)         -> counter
+  ok    an ABSENT registry -> counter (fails closed)               -> counter
+  ok    a MALFORMED registry -> counter (fails closed)             -> counter
+  ok    a registry with no 'artifacts' list -> counter             -> counter
+  ok    an artifact that does not exist -> counter                 -> counter
+  ok    report matches but checkpoint does not -> counter          -> counter
+  ok    both halves match -> legacy_optional                       -> legacy_optional
+  ok    the same bytes under a different name -> counter           -> counter
+
+real saved artifacts -- revalidated on CPU against the real contracts
+  ok    real seed17/MA: default policy rejects legacy (no counter) -> invalid
+  ok    real seed17/MA: legacy_optional -> structural pass         -> valid
+  ok    real seed17/MAB: default policy rejects legacy (no counter) -> invalid
+  ok    real seed17/MAB: legacy_optional -> structural pass        -> valid
+  ok    real seed17/MAB_L2: default policy rejects legacy (no counter) -> invalid
+  ok    real seed17/MAB_L2: legacy_optional -> structural pass     -> valid
+  ok    real seed17/MAC: default policy rejects legacy (no counter) -> invalid
+  ok    real seed17/MAC: legacy_optional -> structural pass        -> valid
+  ok    real seed17/MAC_L2: default policy rejects legacy (no counter) -> invalid
+  ok    real seed17/MAC_L2: legacy_optional -> structural pass     -> valid
+  ok    real seed17/M0 evaluation (bound to its checkpoint)        -> valid
+  ok    real seed17/MA evaluation (bound to its checkpoint)        -> valid
+  ok    real seed17/MAB evaluation (bound to its checkpoint)       -> valid
+  ok    real seed17/MAB_L2 evaluation (bound to its checkpoint)    -> valid
+  ok    real seed17/MAC evaluation (bound to its checkpoint)       -> valid
+  ok    real seed17/MAC_L2 evaluation (bound to its checkpoint)    -> valid
+  ok    real seed17/MA rejected against seed29's MA hash           -> invalid
+  ok    real seed17/M0: a legitimate resume is authorized          -> rc=0
+  ok    real seed17/MA: a legitimate resume is authorized          -> rc=0
+  ok    real seed17/MAB: a legitimate resume is authorized         -> rc=0
+  ok    real seed17/MAB_L2: a legitimate resume is authorized      -> rc=0
+  ok    real seed17/MAC: a legitimate resume is authorized         -> rc=0
+  ok    real seed17/MAC_L2: a legitimate resume is authorized      -> rc=0
+  ok    real seed17/MA images REFUSED for seed29 checkpoint        -> rc=3
+  ok    real seed17/MA image_report.json untouched by the gate     -> unchanged
+  ok    real seed29/MA: default policy rejects legacy (no counter) -> invalid
+  ok    real seed29/MA: legacy_optional -> structural pass         -> valid
+  ok    real seed29/MAB: default policy rejects legacy (no counter) -> invalid
+  ok    real seed29/MAB: legacy_optional -> structural pass        -> valid
+  ok    real seed29/MAB_L2: default policy rejects legacy (no counter) -> invalid
+  ok    real seed29/MAB_L2: legacy_optional -> structural pass     -> valid
+  ok    real seed29/MAC: default policy rejects legacy (no counter) -> invalid
+  ok    real seed29/MAC: legacy_optional -> structural pass        -> valid
+  ok    real seed29/MAC_L2: default policy rejects legacy (no counter) -> invalid
+  ok    real seed29/MAC_L2: legacy_optional -> structural pass     -> valid
+  ok    real seed29/M0 evaluation (bound to its checkpoint)        -> valid
+  ok    real seed29/MA evaluation (bound to its checkpoint)        -> valid
+  ok    real seed29/MAB evaluation (bound to its checkpoint)       -> valid
+  ok    real seed29/MAB_L2 evaluation (bound to its checkpoint)    -> valid
+  ok    real seed29/MAC evaluation (bound to its checkpoint)       -> valid
+  ok    real seed29/MAC_L2 evaluation (bound to its checkpoint)    -> valid
+  ok    real seed29/MA rejected against seed17's MA hash           -> invalid
+  ok    real seed29/M0: a legitimate resume is authorized          -> rc=0
+  ok    real seed29/MA: a legitimate resume is authorized          -> rc=0
+  ok    real seed29/MAB: a legitimate resume is authorized         -> rc=0
+  ok    real seed29/MAB_L2: a legitimate resume is authorized      -> rc=0
+  ok    real seed29/MAC: a legitimate resume is authorized         -> rc=0
+  ok    real seed29/MAC_L2: a legitimate resume is authorized      -> rc=0
+  ok    real seed29/MA images REFUSED for seed17 checkpoint        -> rc=3
+  ok    real seed29/MA image_report.json untouched by the gate     -> unchanged
+
+156 passed, 0 failed
+ALL VALIDATOR CHECKS PASSED (CPU only; CUDA_VISIBLE_DEVICES='')
+# exit: 0

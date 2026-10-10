@@ -1,0 +1,60 @@
+# suite: diag_analysis
+# commit: 926e6b9ded3c4849d05c2416f38afc22426b6943
+# started: 2026-10-10T10:50:46-04:00
+
+point estimates match hand-computed rates
+  ok    analysis exits 0
+  ok    bird contrast point estimate is exactly +30.0 pp
+  ok    bird L2 rate is 80.0%
+  ok    bird U* rate is 50.0%
+  ok    dog matching difference is exactly 0.0 pp
+  ok    a category with no arm difference has a zero-width interval
+
+intervals and the frozen grouping
+  ok    the interval brackets the point estimate
+  ok    the interval has non-zero width where arms differ
+  ok    70 clusters over 7 strata were used
+  ok    10 clusters per category
+  ok    10 000 draws recorded
+  ok    the frozen RNG seed is recorded
+  ok    the grouping identity is recorded
+  ok    seeds are explicitly NOT pooled
+  ok    both seeds are reported separately
+
+the analysis is deterministic under the frozen RNG seed
+  ok    a re-run reproduces the interval exactly
+
+every required endpoint is present
+  ok    bird reported separately at t=0.5
+  ok    horse reported separately at t=0.5
+  ok    chair reported separately at t=0.5
+  ok    bicycle reported separately at t=0.5
+  ok    dog reported separately at t=0.5
+  ok    cat reported separately at t=0.5
+  ok    sandwich reported separately at t=0.5
+  ok    threshold 0.3 reported
+  ok    threshold 0.5 reported
+  ok    threshold 0.7 reported
+  ok    bird literal reported separately
+  ok    bird paraphrase reported separately
+  ok    per-arm change from that seed's own MA is reported
+  ok    the parent-reference coincidence is stated
+  ok    contrast of parent-referenced changes == direct contrast
+
+the decision rule maps intervals to the prespecified readings
+  ok    the +30 pp reading agrees with its own bounds
+  ok    an interval spanning the margin is called inconclusive, not material
+  ok    an identical-arms contrast reads as practical equivalence
+  ok    and also records that a 10 pp benefit is ruled out
+  ok    a +10 pp contrast is not silently called material
+
+guards
+  ok    the interpretation rules are carried in the output
+  ok    the detector is labelled a proxy
+  ok    the output declares itself provisional
+  ok    a tampered grouping is refused
+  ok    no confirmatory analysis when selection did not proceed
+
+41 passed, 0 failed
+ALL DIAGNOSTIC-ANALYSIS CHECKS PASSED (CPU only)
+# exit: 0

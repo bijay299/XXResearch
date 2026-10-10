@@ -1,0 +1,124 @@
+# suite: guards
+# commit: 926e6b9ded3c4849d05c2416f38afc22426b6943
+# started: 2026-10-10T10:50:40-04:00
+the replacement is present
+  ok    validate_stage.py exists
+  ok    run_seed.sh validates training stages
+  ok    run_seed.sh validates evaluation stages
+  ok    run_seed.sh calls the validator by contract path
+  ok    run_analysis.sh validates before aggregating
+  ok    training validation pins the requested step count
+  ok    training validation pins the training seed
+  ok    training validation pins the L2-SP weight
+  ok    evaluation validation pins the manifest
+  ok    evaluation validation pins generation settings
+  ok    the shared-M0 reuse is declared explicitly
+
+the weak patterns have not crept back
+  ok    no existence-only train_complete sentinel
+  ok    no existence-only eval_complete sentinel
+  ok    no bare -f test on detections.jsonl as a completion check
+  ok    no exit status discarded through an echo
+  ok    no multi-pid wait that reports only the last child
+  ok    run_analysis.sh does not hard-code the seed-17 eval root
+
+failure propagation and path policy
+  ok    the real exit status is captured immediately
+  ok    each background child is waited on separately
+  ok    run_seed.sh uses the shared path policy
+  ok    run_analysis.sh uses the same shared path policy
+  ok    the policy is defined once, in exp_config.sh
+  ok    the launcher exits non-zero on an incomplete seed
+  ok    invalid artifacts are quarantined, not deleted
+  ok    nothing deletes detection evidence
+  ok    analysis stages into an isolated directory
+  ok    analysis says so when it publishes nothing
+  ok    optional output formats are tracked as optional
+
+evaluation is bound to the model that produced it
+  ok    run_seed.sh passes the on-disk checkpoint hash
+  ok    run_analysis.sh passes it too
+  ok    the launcher recomputes the hash from disk
+  ok    the analysis path recomputes it as well
+  ok    M0 is validated under a base-model contract
+  ok    analysis applies the same M0 policy
+  ok    a missing recorded hash is a failure
+  ok    a changed checkpoint is named as stale
+  ok    no short-circuit that skips the hash check when either side is absent
+
+step completion is evidenced, not inferred
+  ok    the validator requires a real counter
+  ok    the trainer records one
+  ok    it comes from upstream's own step counter
+  ok    the circular runtime inference is gone
+  ok    no step count inferred from timestamps
+  ok    a legacy policy exists and is explicit
+  ok    completion is reported as a flag
+
+the legacy exception is scoped to saved ARTIFACTS, not to seed numbers
+  ok    legacy_artifact_policy.py exists
+  ok    the saved-artifact registry is committed
+  ok    the seed-number list is no longer exported
+  ok    and nothing reads it
+  ok    it is gone from the launcher entirely
+  ok    the registry is declared in config
+  ok    an explicitly EMPTY registry is honoured, not replaced by the default
+  ok    no :- form that would silently restore the default on empty
+  ok    the policy function takes an artifact, not a seed
+  ok    its arguments are a models root and a checkpoint
+  ok    identity is the report's content digest
+  ok    together with the checkpoint's content digest
+  ok    the policy fails closed
+  ok    a freshly produced artifact is validated with the STRICT counter policy
+  ok    registered saved checkpoints are protected
+  ok    the launcher refuses to overwrite saved evidence
+  ok    the protection check is implemented once
+
+image reuse is bound to provenance, not to a pathname
+  ok    the generator has an explicit reuse gate
+  ok    a refusal has its own exit status
+  ok    a refusal says it wrote nothing
+  ok    a changed checkpoint under the same name is named as such
+  ok    image bytes are re-verified
+  ok    it uses the ONE canonical manifest rule
+  ok    the provenance gate runs BEFORE any torch import
+  ok    the launcher asks the generator's own gate
+  ok    and asks it without loading a model
+  ok    an unattributable evaluation is preserved whole, not partly quarantined
+  ok    detections are no longer quarantined unconditionally
+  ok    a shared M0 directory is never regenerated through
+
+the frozen manifest is validated by content
+  ok    one canonical digest rule exists
+  ok    later checks use the RECOMPUTED digest
+  ok    a content mismatch is named as such
+  ok    the frozen identity lives in config
+  ok    the launcher no longer reads the digest from the manifest
+  ok    nor does the analysis path
+  ok    the manifest builder imports the same rule
+
+the base-model identity claim is stated as partial
+  ok    the full weight check exists and is explicit
+  ok    the partial check reports itself as partial
+  ok    an unverified identity is reported as declared, not as verified
+  ok    no bare 'verified' verdict for a partial check
+  ok    the launch-time policy is written into the contract
+  ok    and so are its limits
+
+the validator fails closed
+  ok    a check that cannot be performed fails the stage
+  ok    completion metadata is written atomically
+  ok    tensors are checked for NaN/Inf
+  ok    the checkpoint hash is recomputed, not trusted
+
+syntax
+  ok    run_seed.sh parses
+  ok    run_analysis.sh parses
+  ok    exp_config.sh parses
+
+-----------------------------------------------------------------
+93 passed, 0 failed
+ALL GUARD REGRESSION CHECKS PASSED
+(behavioural coverage lives in test_validate_stage.py and
+ test_launcher_e2e.sh; this file only guards against regression)
+# exit: 0

@@ -1,0 +1,47 @@
+{
+  "_what_this_is": "Conservative per-stage GPU-hour estimates for the matched-effectiveness diagnostic, derived from the measured run. Each estimate is BOTH an admission amount and a runtime bound, so it is deliberately above the observed cost.",
+  "_derived_from": {
+    "ledger": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/gpu_budget.json",
+    "completed_development_slots": 24,
+    "completed_training_stages": 2
+  },
+  "conservatism": {
+    "per_image_generation": "MAXIMUM observed, not mean",
+    "per_slot_overhead": "MAXIMUM observed, not mean",
+    "margin_applied": 0.25,
+    "detection_throughput": "0.0718 s/image carried forward from results/audit_v1/protocol_cost_model.json; detect_report.json does not time the detector, so this figure is NOT re-measured here and is a carried assumption"
+  },
+  "measured": {
+    "generation_s_per_image_mean": 1.0148,
+    "generation_s_per_image_max": 1.0375,
+    "per_slot_overhead_s_mean": 21.91,
+    "per_slot_overhead_s_max": 25.56,
+    "training_wall_seconds_max": 842.0,
+    "development_slot_wall_seconds_observed_max": 112.0
+  },
+  "estimates_gpu_hours": {
+    "train_trajectory": 0.292361,
+    "development_slot": 0.039688,
+    "frozen_test_slot": 0.224571
+  },
+  "runtime_bounds_seconds_single_gpu": {
+    "train_trajectory": 1052.5,
+    "development_slot": 142.9,
+    "frozen_test_slot": 808.5
+  },
+  "frozen_test_reserve_gpu_hours": 1.347425,
+  "reserve_reconciliation": {
+    "rule": "the reserve IS the sum of the test stage's own admitted estimates, so the two can never disagree",
+    "test_slots": 6,
+    "per_slot_estimate": 0.224571,
+    "sum": 1.347425,
+    "previous_hand_written_reserve": 1.008,
+    "previous_runner_per_slot_estimate": 0.18,
+    "previous_inconsistency": "6 x 0.18 = 1.08 GPU-h of admissions against a 1.008 GPU-h reserve: the reserve could not cover the stage it existed to protect, and the shortfall would have appeared only after selection had already been paid for"
+  },
+  "observed_vs_estimate": {
+    "development_slot_observed_max_gpu_hours": 0.031111,
+    "development_slot_estimate_gpu_hours": 0.039688,
+    "headroom_factor": 1.276
+  }
+}

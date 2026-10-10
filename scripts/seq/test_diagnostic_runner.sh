@@ -258,6 +258,8 @@ export SEQ_BASE_MODEL="${ROOT}/sd15"; mkdir -p "${SEQ_BASE_MODEL}/unet"
 echo '{"_class_name":"MockPipeline"}' > "${SEQ_BASE_MODEL}/model_index.json"
 export SEQ_EPOCHS=25
 export SEQ_DIAG_ROOT="${ROOT}/diag"
+export SEQ_DIAG_LEDGER="${ROOT}/budget_ledger.json"
+export SEQ_DIAG_COST_MODEL=""   # exercise the built-in estimates
 export SEQ_DIAG_SKIP_SMOKE=1      # the smoke stage needs a real GPU
 export SEQ_GEN_SETTINGS_CONTRACT="${REPO}/configs/generation_settings.json"
 export SEQ_VALIDATOR="${REPO}/scripts/seq/validate_stage.py"
@@ -318,7 +320,7 @@ want_out "checks the 140 test prompt texts"     "${ROOT}/t1.log" "distinct_promp
 want_out "verifies the frozen bootstrap grouping" "${ROOT}/t1.log" "grouping identity"
 want_out "binds the reused saved artifacts"     "${ROOT}/t1.log" "REGISTERED saved artifact"
 want_out "initialises the ceiling"              "${ROOT}/t1.log" "ceiling 4.0 GPU-h"
-want_out "reserves the test cost"               "${ROOT}/t1.log" "reserve 1.008"
+want_out "reserves the test cost"               "${ROOT}/t1.log" "reserve 1.3474"
 want_out "reports verified-idle capacity"       "${ROOT}/t1.log" "RUNNING: 2 verified-idle GPU(s)"
 
 echo
@@ -424,7 +426,7 @@ import json,sys
 d=json.load(open(sys.argv[1]))
 spent=sum(e['gpu_hours'] for e in d['entries'] if e.get('draws_on_reserve'))
 print('UNSPENT' if spent == 0 else f'SPENT {spent}')" \
-    "${ROOT}/diag/gpu_budget.json")
+    "${ROOT}/budget_ledger.json")
 want_eq "the test reserve was not spent" "$RES" "UNSPENT"
 
 echo
@@ -443,7 +445,7 @@ want_out "the test stage drew on its reserve" "${ROOT}/t9.log" "eval:eval_test"
 
 echo
 echo "=== 10. the ceiling is hard, and failures are charged ==="
-"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" report --ledger "${ROOT}/diag/gpu_budget.json" \
+"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" report --ledger "${ROOT}/budget_ledger.json" \
     > "${ROOT}/t10.log" 2>&1
 want_out "the ledger reports a 4 GPU-hour ceiling" "${ROOT}/t10.log" "ceiling         : 4.000"
 cat "${ROOT}/t10.log" | sed 's/^/    /'
@@ -451,13 +453,38 @@ cat "${ROOT}/t10.log" | sed 's/^/    /'
 L2="${ROOT}/tiny_ledger.json"
 "$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" init --ledger "$L2" --ceiling 0.10 --reserve 0.05 >/dev/null
 # A FAILED stage burns the budget just like a successful one.
-"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" record --ledger "$L2" --stage burn \
-    --wall_seconds 300 --gpus 1 --exit_code 1 >/dev/null
+BURN_ID=$("$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" admit --ledger "$L2" \
+    --stage burn --need 0.08 --gpus 1 --pid $$ \
+    | "$MOCK_PY" -c 'import json,sys;print(json.loads([l for l in sys.stdin if l.startswith("{")][-1])["reservation_id"])')
+"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" settle --ledger "$L2" --id "$BURN_ID" \
+    --wall_seconds 300 --exit_code 1 >/dev/null
 # A fresh diagnostic root, so training must actually be attempted rather than
 # skipped as already-validated.
 SEQ_DIAG_LEDGER="$L2" SEQ_DIAG_ROOT="${ROOT}/diag_budget" diag train > "${ROOT}/t10b.log" 2>&1; RC=$?
 want_out "a stage is refused when the budget cannot afford it" "${ROOT}/t10b.log" "BUDGET REFUSED"
 want_out "and nothing is launched" "${ROOT}/t10b.log" "nothing was launched"
+
+echo
+echo "=== 10b. admission holds in-flight amounts and survives a new output dir ==="
+L3="${ROOT}/inflight_ledger.json"
+"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" init --ledger "$L3" \
+    --ceiling 1.00 --reserve 0.40 >/dev/null
+A1=$("$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" admit --ledger "$L3" \
+    --stage lane-a --need 0.55 --gpus 1 --pid $$ 2>&1 | tail -1)
+A2=$("$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" admit --ledger "$L3" \
+    --stage lane-b --need 0.55 --gpus 1 --pid $$ 2>&1 | tail -1 \
+    | "$MOCK_PY" -c 'import json,sys;print(json.loads(sys.stdin.read())["decision"])')
+case "$A1" in *ADMIT*) ok "the first lane is admitted";; *) bad "admission" "$A1";; esac
+want_eq "a concurrent lane is refused against the in-flight amount" "$A2" "REFUSE"
+# A new output directory must NOT reset the balance.
+SPENT_BEFORE=$("$MOCK_PY" -c "
+import json,sys; print(json.load(open(sys.argv[1]))['committed_gpu_hours'])" "$L3")
+SEQ_DIAG_ROOT="${ROOT}/diag_elsewhere" SEQ_DIAG_LEDGER="$L3" diag preflight \
+    > "${ROOT}/t10c.log" 2>&1 || true
+SPENT_AFTER=$("$MOCK_PY" -c "
+import json,sys; print(json.load(open(sys.argv[1]))['committed_gpu_hours'])" "$L3")
+want_eq "a NEW output directory does not reset prior spend" "$SPENT_AFTER" "$SPENT_BEFORE"
+want_out "the runner reports the experiment-level ledger" "${ROOT}/t10c.log" "not this output directory"
 
 echo
 echo "=== 11. isolation: no GPU, no repository mutation, pilot untouched ==="

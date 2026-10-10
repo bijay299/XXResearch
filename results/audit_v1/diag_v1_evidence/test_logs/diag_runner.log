@@ -1,0 +1,138 @@
+# suite: diag_runner
+# commit: 926e6b9ded3c4849d05c2416f38afc22426b6943
+# started: 2026-10-10T10:57:19-04:00
+fixture: 4 saved artifacts + registry
+
+=== 1. preflight verifies identities, reuse bindings and capacity ===
+  ok    preflight succeeds (exit 0)
+  ok    validates the dev manifest identity
+  ok    validates the test manifest identity
+  ok    checks the 20 dev prompt texts
+  ok    checks the 140 test prompt texts
+  ok    verifies the frozen bootstrap grouping
+  ok    binds the reused saved artifacts
+  ok    initialises the ceiling
+  ok    reserves the test cost
+  ok    reports verified-idle capacity
+
+=== 2. preflight REFUSES when the reused CHECKPOINT is not the saved one ===
+  ok    preflight refuses an unregistered reuse target (exit 1)
+  ok    names the problem
+  ok    refuses to proceed
+
+=== 3. no idle capacity: QUEUED, and nothing is launched ===
+  ok    refuses to start without verified idle capacity (exit 1)
+  ok    reports the queue/capacity status
+  ok    promises not to pre-empt anyone
+
+=== 4. training passes the dump interval through and validates dumps ===
+  ok    training stage succeeds (exit 0)
+  ok    the runner passed --checkpoint_every through
+  ok    ten dumps validate against the contract
+  ok    the trajectory itself validates
+  ok    both trajectories produced 10 dumps each (20)
+  ok    training was charged to the ledger
+
+=== 5. a trainer that writes an incomplete schedule is rejected ===
+  ok    an incomplete dump schedule fails (exit 1)
+  ok    names the missing dumps
+  ok    the invalid trajectory is preserved whole, not overwritten
+  ok    a reason file accompanies it (1)
+  ok    retraining restores a complete trajectory (exit 0)
+
+=== 6. development evaluation: 1,920 images over 24 slots ===
+  ok    development stage succeeds (exit 0)
+  ok    24 development slots scored (24)
+  ok    1,920 development images generated (1920)
+  ok    every slot is bound to its own checkpoint
+
+=== 7. selection applies the frozen gates and match rule ===
+  ok    selection succeeds with both seeds matched (exit 0)
+  ok    reports MATCHED
+  ok    selects a dump
+  ok    permits the test set
+  ok    seed 17 selected the dump closest to its L2 level (600)
+  ok    the mismatch is within 5 pp (True)
+
+=== 8. infeasibility is a RESULT: the test set is not evaluated ===
+  ok    selection stops when no dump matches (exit 1)
+  ok    declares infeasibility
+  ok    reports the bracketing dumps
+  ok    refuses to widen the tolerance
+  ok    forbids the test set
+  ok    the test stage refuses to run after infeasibility (exit 2)
+  ok    says the paired test does not run
+  ok    no test images were generated (0)
+  ok    the test reserve was not spent (UNSPENT)
+
+=== 9. restore the matched profile and evaluate the frozen test set ===
+  ok    selection matches again (exit 0)
+  ok    test stage succeeds (exit 0)
+  ok    6 test slots scored (6)
+  ok    3,360 test images generated (3360)
+  ok    the test stage drew on its reserve
+
+=== 10. the ceiling is hard, and failures are charged ===
+  ok    the ledger reports a 4 GPU-hour ceiling
+    ceiling         : 4.0000 GPU-h (approved: PI, four total GPU-hours)
+    spent           : 0.0056 GPU-h over 83 completed stage(s); 0 failed and still charged; 0 orphaned and conservatively charged
+    in flight       : 0.0000 GPU-h over 0 open reservation(s)
+    committed       : 0.0056 GPU-h
+    reserve withheld: 1.3468 GPU-h for 'frozen_test'
+    remaining       : 3.9944 GPU-h (2.6476 usable before the reserve)
+        0.0022  train:U_seed29
+        0.0008  eval:eval_dev:seed17_U_step100
+        0.0006  train:U_seed17
+        0.0003  eval:eval_dev:seed17_U_step200
+        0.0003  eval:eval_dev:seed29_U_step400
+        0.0003  eval:eval_dev:seed29_U_step300
+        0.0003  eval:eval_dev:seed29_U_step800
+        0.0003  eval:eval_dev:seed29_U_step700
+        0.0003  eval:eval_test:seed29_MA
+        0.0003  eval:eval_test:seed17_U_step600
+        0.0000  eval:eval_dev:seed17_MAB_L2
+        0.0000  eval:eval_dev:seed17_MA
+        0.0000  eval:eval_dev:seed17_U_step400
+        0.0000  eval:eval_dev:seed17_U_step300
+        0.0000  eval:eval_dev:seed17_U_step600
+        0.0000  eval:eval_dev:seed17_U_step500
+        0.0000  eval:eval_dev:seed17_U_step700
+        0.0000  eval:eval_dev:seed17_U_step800
+        0.0000  eval:eval_dev:seed17_U_step1000
+        0.0000  eval:eval_dev:seed17_U_step900
+        0.0000  eval:eval_dev:seed29_MAB_L2
+        0.0000  eval:eval_dev:seed29_MA
+        0.0000  eval:eval_dev:seed29_U_step200
+        0.0000  eval:eval_dev:seed29_U_step100
+        0.0000  eval:eval_dev:seed29_U_step600
+        0.0000  eval:eval_dev:seed29_U_step500
+        0.0000  eval:eval_dev:seed29_U_step900
+        0.0000  eval:eval_dev:seed29_U_step1000
+        0.0000  eval:eval_test:seed17_MAB_L2
+        0.0000  eval:eval_test:seed17_MA
+        0.0000  eval:eval_test:seed29_U_step600
+        0.0000  eval:eval_test:seed29_MAB_L2
+BUDGET REFUSED: burn needs 0.08 GPU-h; only 0.0500 available (committed 0.0000 of 0.1, including 0.0000 in flight; 0.0500 withheld for 'frozen_test'). Nothing was launched.
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+KeyError: 'reservation_id'
+BUDGET ERROR: no open reservation 
+  ok    a stage is refused when the budget cannot afford it
+  ok    and nothing is launched
+
+=== 10b. admission holds in-flight amounts and survives a new output dir ===
+  ok    the first lane is admitted
+  ok    a concurrent lane is refused against the in-flight amount (REFUSE)
+  ok    a NEW output directory does not reset prior spend (0.55)
+  ok    the runner reports the experiment-level ledger
+
+=== 11. isolation: no GPU, no repository mutation, pilot untouched ===
+  ok    no mock was invoked with a numeric CUDA device
+  ok    the real generator was exercised
+  ok    ran against a sandbox SEQ_ROOT, not the real pilot
+  ok    results/, configs/ and docs/ byte-identical after this suite
+
+-----------------------------------------------------------------
+62 passed, 0 failed
+ALL DIAGNOSTIC-RUNNER CHECKS PASSED (CPU only; trainer and detector mocked)
+# exit: 0

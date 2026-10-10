@@ -1,0 +1,344 @@
+
+==============================================================
+0. PREFLIGHT (CPU only, no GPU time charged)
+==============================================================
+commit            : 3a5a69c650a0f1f14e873aee3f374d1ff8a71fed
+diagnostic root   : /data/bijaypandey/cuig_pilot/seq_pilot/diag_v1
+seeds             : 17 29
+dump schedule     : every 100 to 1000 (100,200,300,400,500,600,700,800,900,1000)
+working tree      : clean
+
+--- frozen prompt-set identities (recomputed from content) ---
+VALID    manifest:dev
+           content_digest = 1cd1f902669cefdc2d2f96ccae8641d02c831bf4f5ecfa09b5844da835063e6b
+           records = 80
+           distinct_prompt_ids = 20
+           distinct_prompt_texts = 20
+           counting = 20 prompt texts x 4 generation seeds = 80 prompt x generation-seed pairs
+VALID    manifest:test
+           content_digest = 5dd87dbb5a77c0f4c75de79a19b15b0b2e9cddc90d08172857700dac1bcc2a95
+           records = 560
+           distinct_prompt_ids = 140
+           distinct_prompt_texts = 140
+           counting = 140 prompt texts x 4 generation seeds = 560 prompt x generation-seed pairs
+
+--- frozen bootstrap grouping ---
+grouping identity 2ba0e8df5034d011… (stored 2ba0e8df5034d011…) OK
+  unit=the scene cluster (set, category, prompt_index)  draws=10000  rng=2026100901
+
+--- reused saved artifacts, bound by hash (read-only) ---
+  seed17/MA: 3cb72ee162b9…  REGISTERED saved artifact (reused, never rewritten)
+  seed17/MAB_L2: 8ee7d56f62b0…  REGISTERED saved artifact (reused, never rewritten)
+  seed29/MA: fbf49199a306…  REGISTERED saved artifact (reused, never rewritten)
+  seed29/MAB_L2: c4f3ecdcb945…  REGISTERED saved artifact (reused, never rewritten)
+
+--- budget ledger ---
+ceiling         : 4.000 GPU-h (approved: PI, four total GPU-hours)
+spent           : 0.0089 GPU-h over 1 stage invocation(s), 0 failed and still charged
+reserve withheld: 1.0080 GPU-h for 'frozen_test'
+remaining       : 3.9911 GPU-h (2.9831 usable before the reserve)
+    0.0089  smoke:dump_mechanism
+
+--- GPU capacity (real fail-closed probe) ---
+    GPU availability probe  (6 samples @ 2s; idle = all samples valid, no compute proc, <1024MiB, <5% util)
+    host=hyperplane  time=2026-10-09T17:13:27-04:00
+    GPU 0  NVIDIA A100-SXM4-40GB     peak_util= 100  peak_mem=   4119  procs=1  samples_ok=6/6  uuid=GPU-b2f89296-447e-dc7a-96b6-82ac699a02d7  -> OCCUPIED
+        pid=4111559 user=jibekgupta cmd=python mem=4068 MiB
+    GPU 1  NVIDIA A100-SXM4-40GB     peak_util= 100  peak_mem=   4108  procs=1  samples_ok=6/6  uuid=GPU-16080ca5-6073-f2c8-04d7-368d4a510a2a  -> OCCUPIED
+        pid=4111560 user=jibekgupta cmd=python mem=4056 MiB
+    GPU 2  NVIDIA A100-SXM4-40GB     peak_util=   0  peak_mem=     41  procs=0  samples_ok=6/6  uuid=GPU-3594d682-af4b-13e1-3266-8a55455d669d  -> IDLE
+    GPU 3  NVIDIA A100-SXM4-40GB     peak_util=   0  peak_mem=     41  procs=0  samples_ok=6/6  uuid=GPU-17211a38-e5ad-e9bc-eeda-aa3caa659d27  -> IDLE
+    
+    RESULT: idle GPUs = 2 3   (launch with CUDA_VISIBLE_DEVICES=2)
+[capacity] RUNNING: 2 verified-idle GPU(s) acquired: 2 3
+
+==============================================================
+0b. GPU SMOKE TEST: does the dump mechanism actually produce dumps?
+==============================================================
+[skip] smoke test already passed
+
+==============================================================
+1. TRAIN two new unregularised dog trajectories
+==============================================================
+{"stage": "train:U_seed17", "need_gpu_hours": 0.45, "ceiling": 4.0, "spent": 0.0089, "remaining": 3.9911, "reserve_withheld": 1.008, "available_to_this_stage": 2.9831, "decision": "ALLOW"}
+[train] seed17 U on GPU 2 (unregularised, parent = saved MA)
+{"stage": "train:U_seed29", "need_gpu_hours": 0.45, "ceiling": 4.0, "spent": 0.0089, "remaining": 3.9911, "reserve_withheld": 1.008, "available_to_this_stage": 2.9831, "decision": "ALLOW"}
+[train] seed29 U on GPU 3 (unregularised, parent = saved MA)
+
+--- validating trajectory seed17 ---
+    VALID    train:U
+               optimizer_steps_completed = 1000
+               training_completion_verified = True
+               step_counter_source = upstream update_progress_and_checkpoint return value, captured per gradient sync
+               parent_sha256 = 3cb72ee162b9…
+               delta_sha256 = 3b9d0776e277…
+               parameters = 19169280
+               tensors = 32
+    dumps: 10/10 present, all validate against the checkpoint contract, all digests distinct
+--- validating trajectory seed29 ---
+    VALID    train:U
+               optimizer_steps_completed = 1000
+               training_completion_verified = True
+               step_counter_source = upstream update_progress_and_checkpoint return value, captured per gradient sync
+               parent_sha256 = fbf49199a306…
+               delta_sha256 = 300e1e50b2af…
+               parameters = 19169280
+               tensors = 32
+    dumps: 10/10 present, all validate against the checkpoint contract, all digests distinct
+ceiling         : 4.000 GPU-h (approved: PI, four total GPU-hours)
+spent           : 0.4767 GPU-h over 3 stage invocation(s), 0 failed and still charged
+reserve withheld: 1.0080 GPU-h for 'frozen_test'
+remaining       : 3.5233 GPU-h (2.5153 usable before the reserve)
+    0.2339  train:U_seed29
+    0.2339  train:U_seed17
+    0.0089  smoke:dump_mechanism
+
+==============================================================
+2. DEVELOPMENT set (dog only, selection only)
+==============================================================
+slots: 24 (per seed: MA + L2 endpoint + 10 dumps)
+{"stage": "eval:eval_dev:seed17_MA", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.4767, "remaining": 3.5233, "reserve_withheld": 1.008, "available_to_this_stage": 2.5153, "decision": "ALLOW"}
+{"stage": "eval:eval_dev:seed17_MAB_L2", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.4767, "remaining": 3.5233, "reserve_withheld": 1.008, "available_to_this_stage": 2.5153, "decision": "ALLOW"}
+[eval] seed17_MA on GPU 2 (80 images, checkpoint 3cb72ee162b9…)
+[eval] seed17_MAB_L2 on GPU 3 (80 images, checkpoint 8ee7d56f62b0…)
+    VALID    eval:seed17_MA
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 3cb72ee162b9…
+{"stage": "eval:eval_dev:seed17_U_step100", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.5072, "remaining": 3.4928, "reserve_withheld": 1.008, "available_to_this_stage": 2.4848, "decision": "ALLOW"}
+[eval] seed17_U_step100 on GPU 2 (80 images, checkpoint 63cfa9b9de77…)
+    VALID    eval:seed17_MAB_L2
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 8ee7d56f62b0…
+{"stage": "eval:eval_dev:seed17_U_step200", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.5383, "remaining": 3.4617, "reserve_withheld": 1.008, "available_to_this_stage": 2.4537, "decision": "ALLOW"}
+[eval] seed17_U_step200 on GPU 3 (80 images, checkpoint f0283692eae9…)
+    VALID    eval:seed17_U_step100
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 63cfa9b9de77…
+{"stage": "eval:eval_dev:seed17_U_step300", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.5692, "remaining": 3.4308, "reserve_withheld": 1.008, "available_to_this_stage": 2.4228, "decision": "ALLOW"}
+[eval] seed17_U_step300 on GPU 2 (80 images, checkpoint f7477a27f684…)
+    VALID    eval:seed17_U_step200
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = f0283692eae9…
+{"stage": "eval:eval_dev:seed17_U_step400", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.6, "remaining": 3.4, "reserve_withheld": 1.008, "available_to_this_stage": 2.392, "decision": "ALLOW"}
+[eval] seed17_U_step400 on GPU 3 (80 images, checkpoint 2eff02ebd8c2…)
+    VALID    eval:seed17_U_step300
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = f7477a27f684…
+{"stage": "eval:eval_dev:seed17_U_step500", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.63, "remaining": 3.37, "reserve_withheld": 1.008, "available_to_this_stage": 2.362, "decision": "ALLOW"}
+[eval] seed17_U_step500 on GPU 2 (80 images, checkpoint 9046625f68ac…)
+    VALID    eval:seed17_U_step400
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 2eff02ebd8c2…
+{"stage": "eval:eval_dev:seed17_U_step600", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.6608, "remaining": 3.3392, "reserve_withheld": 1.008, "available_to_this_stage": 2.3312, "decision": "ALLOW"}
+[eval] seed17_U_step600 on GPU 3 (80 images, checkpoint fc7be97ac992…)
+    VALID    eval:seed17_U_step500
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 9046625f68ac…
+{"stage": "eval:eval_dev:seed17_U_step700", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.6908, "remaining": 3.3092, "reserve_withheld": 1.008, "available_to_this_stage": 2.3012, "decision": "ALLOW"}
+[eval] seed17_U_step700 on GPU 2 (80 images, checkpoint 60741b82f875…)
+    VALID    eval:seed17_U_step600
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = fc7be97ac992…
+{"stage": "eval:eval_dev:seed17_U_step800", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.7214, "remaining": 3.2786, "reserve_withheld": 1.008, "available_to_this_stage": 2.2706, "decision": "ALLOW"}
+[eval] seed17_U_step800 on GPU 3 (80 images, checkpoint a4cc225b894f…)
+    VALID    eval:seed17_U_step700
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 60741b82f875…
+{"stage": "eval:eval_dev:seed17_U_step900", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.7511, "remaining": 3.2489, "reserve_withheld": 1.008, "available_to_this_stage": 2.2409, "decision": "ALLOW"}
+[eval] seed17_U_step900 on GPU 2 (80 images, checkpoint 995fcb0a394c…)
+    VALID    eval:seed17_U_step800
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = a4cc225b894f…
+{"stage": "eval:eval_dev:seed17_U_step1000", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.7814, "remaining": 3.2186, "reserve_withheld": 1.008, "available_to_this_stage": 2.2106, "decision": "ALLOW"}
+[eval] seed17_U_step1000 on GPU 3 (80 images, checkpoint eb2e92ac5542…)
+    VALID    eval:seed17_U_step900
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 995fcb0a394c…
+{"stage": "eval:eval_dev:seed29_MA", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.8114, "remaining": 3.1886, "reserve_withheld": 1.008, "available_to_this_stage": 2.1806, "decision": "ALLOW"}
+[eval] seed29_MA on GPU 2 (80 images, checkpoint fbf49199a306…)
+    VALID    eval:seed17_U_step1000
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = eb2e92ac5542…
+{"stage": "eval:eval_dev:seed29_MAB_L2", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.8417, "remaining": 3.1583, "reserve_withheld": 1.008, "available_to_this_stage": 2.1503, "decision": "ALLOW"}
+[eval] seed29_MAB_L2 on GPU 3 (80 images, checkpoint c4f3ecdcb945…)
+    VALID    eval:seed29_MA
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = fbf49199a306…
+{"stage": "eval:eval_dev:seed29_U_step100", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.8711, "remaining": 3.1289, "reserve_withheld": 1.008, "available_to_this_stage": 2.1209, "decision": "ALLOW"}
+[eval] seed29_U_step100 on GPU 2 (80 images, checkpoint 6cc77c21bd57…)
+    VALID    eval:seed29_MAB_L2
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = c4f3ecdcb945…
+{"stage": "eval:eval_dev:seed29_U_step200", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.9008, "remaining": 3.0992, "reserve_withheld": 1.008, "available_to_this_stage": 2.0912, "decision": "ALLOW"}
+[eval] seed29_U_step200 on GPU 3 (80 images, checkpoint 4e022561e168…)
+    VALID    eval:seed29_U_step100
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 6cc77c21bd57…
+{"stage": "eval:eval_dev:seed29_U_step300", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.9308, "remaining": 3.0692, "reserve_withheld": 1.008, "available_to_this_stage": 2.0612, "decision": "ALLOW"}
+[eval] seed29_U_step300 on GPU 2 (80 images, checkpoint 11db5bbd259d…)
+    VALID    eval:seed29_U_step200
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 4e022561e168…
+{"stage": "eval:eval_dev:seed29_U_step400", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.9606, "remaining": 3.0394, "reserve_withheld": 1.008, "available_to_this_stage": 2.0314, "decision": "ALLOW"}
+[eval] seed29_U_step400 on GPU 3 (80 images, checkpoint eaa75c1517aa…)
+    VALID    eval:seed29_U_step300
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 11db5bbd259d…
+{"stage": "eval:eval_dev:seed29_U_step500", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 0.9914, "remaining": 3.0086, "reserve_withheld": 1.008, "available_to_this_stage": 2.0006, "decision": "ALLOW"}
+[eval] seed29_U_step500 on GPU 2 (80 images, checkpoint 793fdaa6da50…)
+    VALID    eval:seed29_U_step400
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = eaa75c1517aa…
+{"stage": "eval:eval_dev:seed29_U_step600", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 1.0219, "remaining": 2.9781, "reserve_withheld": 1.008, "available_to_this_stage": 1.9701, "decision": "ALLOW"}
+[eval] seed29_U_step600 on GPU 3 (80 images, checkpoint 2606636d3d09…)
+    VALID    eval:seed29_U_step500
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 793fdaa6da50…
+{"stage": "eval:eval_dev:seed29_U_step700", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 1.0514, "remaining": 2.9486, "reserve_withheld": 1.008, "available_to_this_stage": 1.9406, "decision": "ALLOW"}
+[eval] seed29_U_step700 on GPU 2 (80 images, checkpoint b697810b15a7…)
+    VALID    eval:seed29_U_step600
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 2606636d3d09…
+{"stage": "eval:eval_dev:seed29_U_step800", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 1.0817, "remaining": 2.9183, "reserve_withheld": 1.008, "available_to_this_stage": 1.9103, "decision": "ALLOW"}
+[eval] seed29_U_step800 on GPU 3 (80 images, checkpoint e930ad0c99c0…)
+    VALID    eval:seed29_U_step700
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = b697810b15a7…
+{"stage": "eval:eval_dev:seed29_U_step900", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 1.1117, "remaining": 2.8883, "reserve_withheld": 1.008, "available_to_this_stage": 1.8803, "decision": "ALLOW"}
+[eval] seed29_U_step900 on GPU 2 (80 images, checkpoint 4abaab834e95…)
+    VALID    eval:seed29_U_step800
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = e930ad0c99c0…
+{"stage": "eval:eval_dev:seed29_U_step1000", "need_gpu_hours": 0.03, "ceiling": 4.0, "spent": 1.1422, "remaining": 2.8578, "reserve_withheld": 1.008, "available_to_this_stage": 1.8498, "decision": "ALLOW"}
+[eval] seed29_U_step1000 on GPU 3 (80 images, checkpoint c4b018c9c64d…)
+    VALID    eval:seed29_U_step900
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = 4abaab834e95…
+    VALID    eval:seed29_U_step1000
+               expected_from_manifest = 80
+               manifest_digest_recomputed = 1cd1f902669c…
+               generating_checkpoint = c4b018c9c64d…
+ceiling         : 4.000 GPU-h (approved: PI, four total GPU-hours)
+spent           : 1.2022 GPU-h over 27 stage invocation(s), 0 failed and still charged
+reserve withheld: 1.0080 GPU-h for 'frozen_test'
+remaining       : 2.7978 GPU-h (1.7898 usable before the reserve)
+    0.2339  train:U_seed29
+    0.2339  train:U_seed17
+    0.0311  eval:eval_dev:seed17_MAB_L2
+    0.0308  eval:eval_dev:seed17_U_step100
+    0.0308  eval:eval_dev:seed17_U_step200
+    0.0308  eval:eval_dev:seed17_U_step400
+    0.0308  eval:eval_dev:seed29_U_step300
+    0.0306  eval:eval_dev:seed17_MA
+    0.0306  eval:eval_dev:seed17_U_step600
+    0.0306  eval:eval_dev:seed29_U_step400
+    0.0306  eval:eval_dev:seed29_U_step800
+    0.0303  eval:eval_dev:seed17_U_step800
+    0.0303  eval:eval_dev:seed17_U_step1000
+    0.0303  eval:eval_dev:seed29_U_step600
+    0.0303  eval:eval_dev:seed29_U_step900
+    0.0300  eval:eval_dev:seed17_U_step300
+    0.0300  eval:eval_dev:seed17_U_step500
+    0.0300  eval:eval_dev:seed17_U_step900
+    0.0300  eval:eval_dev:seed29_U_step100
+    0.0300  eval:eval_dev:seed29_U_step700
+    0.0297  eval:eval_dev:seed17_U_step700
+    0.0297  eval:eval_dev:seed29_MAB_L2
+    0.0297  eval:eval_dev:seed29_U_step200
+    0.0297  eval:eval_dev:seed29_U_step1000
+    0.0294  eval:eval_dev:seed29_MA
+    0.0294  eval:eval_dev:seed29_U_step500
+    0.0089  smoke:dump_mechanism
+
+==============================================================
+3. SELECTION on the development set (CPU; no GPU time)
+==============================================================
+=== development-set selection (t=0.5, dog only) ===
+seed 17: INFEASIBLE
+  MA dog residue        : 82.5% (66/80)
+  L2 endpoint residue   : 52.5%  -> suppression 30.0 pp
+    step  100: residue  43.8%  suppression   38.8 pp  gates=PASS  mismatch   8.8 pp
+    step  200: residue  23.8%  suppression   58.8 pp  gates=PASS  mismatch  28.8 pp
+    step  300: residue  17.5%  suppression   65.0 pp  gates=PASS  mismatch  35.0 pp
+    step  400: residue  11.2%  suppression   71.2 pp  gates=PASS  mismatch  41.2 pp
+    step  500: residue   8.8%  suppression   73.8 pp  gates=PASS  mismatch  43.8 pp
+    step  600: residue   7.5%  suppression   75.0 pp  gates=PASS  mismatch  45.0 pp
+    step  700: residue  10.0%  suppression   72.5 pp  gates=PASS  mismatch  42.5 pp
+    step  800: residue   7.5%  suppression   75.0 pp  gates=PASS  mismatch  45.0 pp
+    step  900: residue   5.0%  suppression   77.5 pp  gates=PASS  mismatch  47.5 pp
+    step 1000: residue   3.8%  suppression   78.8 pp  gates=PASS  mismatch  48.8 pp
+  reason: no dump passes both reference gates AND lands within 5.0 pp of this seed's L2 suppression (30.0 pp). Qualifying on gates: 10. The tolerance is NOT widened and no unmatched comparison is run. Declaring infeasibility is a result: 'these two arms cannot be compared fairly at this coefficient'.
+seed 29: INFEASIBLE
+  MA dog residue        : 82.5% (66/80)
+  L2 endpoint residue   : 48.8%  -> suppression 33.8 pp
+    step  100: residue  40.0%  suppression   42.5 pp  gates=PASS  mismatch   8.8 pp
+    step  200: residue  20.0%  suppression   62.5 pp  gates=PASS  mismatch  28.8 pp
+    step  300: residue  12.5%  suppression   70.0 pp  gates=PASS  mismatch  36.2 pp
+    step  400: residue  15.0%  suppression   67.5 pp  gates=PASS  mismatch  33.8 pp
+    step  500: residue   8.8%  suppression   73.8 pp  gates=PASS  mismatch  40.0 pp
+    step  600: residue  10.0%  suppression   72.5 pp  gates=PASS  mismatch  38.8 pp
+    step  700: residue   7.5%  suppression   75.0 pp  gates=PASS  mismatch  41.2 pp
+    step  800: residue   7.5%  suppression   75.0 pp  gates=PASS  mismatch  41.2 pp
+    step  900: residue   6.2%  suppression   76.2 pp  gates=PASS  mismatch  42.5 pp
+    step 1000: residue   1.2%  suppression   81.2 pp  gates=PASS  mismatch  47.5 pp
+  reason: no dump passes both reference gates AND lands within 5.0 pp of this seed's L2 suppression (33.8 pp). Qualifying on gates: 10. The tolerance is NOT widened and no unmatched comparison is run. Declaring infeasibility is a result: 'these two arms cannot be compared fairly at this coefficient'.
+
+both seeds matched: False -> STOP; do NOT evaluate the test set
+[selection] /data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/selection.json
+
+=== STOPPED AT SELECTION, BY THE PRESPECIFIED RULE ===
+The frozen test set was NOT evaluated and its reserve was not spent.
+ceiling         : 4.000 GPU-h (approved: PI, four total GPU-hours)
+spent           : 1.2022 GPU-h over 27 stage invocation(s), 0 failed and still charged
+reserve withheld: 1.0080 GPU-h for 'frozen_test'
+remaining       : 2.7978 GPU-h (1.7898 usable before the reserve)
+    0.2339  train:U_seed29
+    0.2339  train:U_seed17
+    0.0311  eval:eval_dev:seed17_MAB_L2
+    0.0308  eval:eval_dev:seed17_U_step100
+    0.0308  eval:eval_dev:seed17_U_step200
+    0.0308  eval:eval_dev:seed17_U_step400
+    0.0308  eval:eval_dev:seed29_U_step300
+    0.0306  eval:eval_dev:seed17_MA
+    0.0306  eval:eval_dev:seed17_U_step600
+    0.0306  eval:eval_dev:seed29_U_step400
+    0.0306  eval:eval_dev:seed29_U_step800
+    0.0303  eval:eval_dev:seed17_U_step800
+    0.0303  eval:eval_dev:seed17_U_step1000
+    0.0303  eval:eval_dev:seed29_U_step600
+    0.0303  eval:eval_dev:seed29_U_step900
+    0.0300  eval:eval_dev:seed17_U_step300
+    0.0300  eval:eval_dev:seed17_U_step500
+    0.0300  eval:eval_dev:seed17_U_step900
+    0.0300  eval:eval_dev:seed29_U_step100
+    0.0300  eval:eval_dev:seed29_U_step700
+    0.0297  eval:eval_dev:seed17_U_step700
+    0.0297  eval:eval_dev:seed29_MAB_L2
+    0.0297  eval:eval_dev:seed29_U_step200
+    0.0297  eval:eval_dev:seed29_U_step1000
+    0.0294  eval:eval_dev:seed29_MA
+    0.0294  eval:eval_dev:seed29_U_step500
+    0.0089  smoke:dump_mechanism

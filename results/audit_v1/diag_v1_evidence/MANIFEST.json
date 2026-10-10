@@ -1,0 +1,157 @@
+{
+  "_what_this_is": "Compact evidence bundle for the matched-effectiveness diagnostic. Everything needed to re-derive the decision without access to the private data root.",
+  "built_utc": "2026-10-10T15:11:59.150641+00:00",
+  "repo_commit_at_build": "926e6b9ded3c4849d05c2416f38afc22426b6943",
+  "diagnostic_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1",
+  "outcome": "GRID-MATCH FAILURE: no dump matched on the frozen 100-step grid, on either seed. The matched bird-retention question is INCONCLUSIVE and the frozen test set was not evaluated.",
+  "deliberate_exclusions": {
+    "model_weights": "~1.6 GB of delta.bin and intermediate dumps are NOT included; their sha256 digests are in trajectories.json",
+    "generated_images": "~208 MB of development images are NOT included; per-image digests are in each slot's image_report.json inside the archive",
+    "annotation_arm_key": "NOT included and not referenced. The blinded annotation packet's key stays closed until labels are frozen; nothing from the packet appears in this bundle."
+  },
+  "provisional": "Detector output is a proxy. No scientific conclusion follows until the blinded human annotation is complete; no labels exist yet.",
+  "files": [
+    {
+      "file": "selection.json",
+      "sha256": "ad5fcf7c0bbc747ba3736cba915b33450add2de93f7068f79a3d72669df94b36",
+      "bytes": 15458,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/selection.json",
+      "note": "CURRENT decision record: bracketing + L2 reference eligibility"
+    },
+    {
+      "file": "selection.20261009T215925.superseded.json",
+      "sha256": "ee6dc282a1ba4345a4e26d7f352bc1032aa95c1df7dbf7a63502a27741fbf99d",
+      "bytes": 14137,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/selection.20261009T215925.superseded.json",
+      "note": "PRESERVED earlier decision record, not overwritten"
+    },
+    {
+      "file": "gpu_budget_ledger.json",
+      "sha256": "38c07c9db4cabf8dc3347984e3b2c8df50b6bfc0aafb5d8929e7eb98da723fb1",
+      "bytes": 11714,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/matched_effectiveness_gpu_budget.json",
+      "note": "the EXPERIMENT's ledger, with all prior spend carried forward"
+    },
+    {
+      "file": "gpu_budget_ledger_original_location.json",
+      "sha256": "f3d374b8ef3be0361fb1be6ffe0f2e0081101a2a4e4ed73b81c163bde1eaa836",
+      "bytes": 8725,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/gpu_budget.json",
+      "note": "the original in-output-directory ledger, superseded but retained"
+    },
+    {
+      "file": "cost_model_measured.json",
+      "sha256": "29dfbb0664df84945c1eaecf7cb84f1dcee58abc4b1960b3bc84e295d5fb62ef",
+      "bytes": 2147,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/cost_model_measured.json",
+      "note": "conservative measured per-stage estimates and the reconciled reserve"
+    },
+    {
+      "file": "u_vs_mab_comparison.json",
+      "sha256": "7cb13ad245d789744767f0c4cfcf4254d8734d86d95168b3eb87c7f3540b1fd2",
+      "bytes": 29125,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/u_vs_mab_comparison.json",
+      "note": "configuration, parent identity, serialisation and numerical comparison"
+    },
+    {
+      "file": "RUN_NOTES.md",
+      "sha256": "5526650f7223aa8f408587031fee872f5b8580d61c1573e27f5009419769fdd4",
+      "bytes": 3126,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/RUN_NOTES.md",
+      "note": "run-time provenance notes"
+    },
+    {
+      "file": "run_all.log",
+      "sha256": "5d2a6a2ce7f0db337f3687268aeeadd4d25fa3e0850d0802d116c6a03540a365",
+      "bytes": 22621,
+      "source": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1/run_all.log",
+      "note": "preflight, start, every stage, selection and stop records, verbatim"
+    },
+    {
+      "file": "trajectories.json",
+      "sha256": "142e25d771a1dec445e99560b6cad426509a7c25043d76d8dd2bbf4e1d4068b0",
+      "bytes": 7507,
+      "note": "counters, dump inventories and endpoint digests; NO weights"
+    },
+    {
+      "file": "per_dump_table.csv",
+      "sha256": "de859cf692827aeffc793b78c0afddbeaa95493f6f591e2a38422df6d04d16cd",
+      "bytes": 1513,
+      "note": "every scored checkpoint, both seeds, with gate outcomes"
+    },
+    {
+      "file": "development_slots.tar.gz",
+      "sha256": "5a432619a1781b9fb67d907dc3cef1d98fef376c2b93f1c39b5aa7313f02cd72",
+      "bytes": 594333,
+      "note": "per-image detector outputs and stage reports"
+    },
+    {
+      "file": "development_slots_index.json",
+      "sha256": "04e53550b7c2af99f211d7e55495853c57128cb3f6bc5ca879aaca4a0c355051",
+      "bytes": 24715,
+      "note": "per-image detector outputs and stage reports"
+    },
+    {
+      "file": "frozen_test_inventory.json",
+      "sha256": "e02c63b954b96028645f9a8332a189b3afd5e1d7a33f69bc85f8eb93c7e158c5",
+      "bytes": 585,
+      "note": "documents that no test evaluation took place"
+    },
+    {
+      "file": "test_logs/budget.log",
+      "sha256": "02c080d098568a4d002cec6e08ec42344ab835ccc2de1e1dc74a2b83f5f5b1a8",
+      "bytes": 2543,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/budget.log",
+      "note": "captured suite output"
+    },
+    {
+      "file": "test_logs/diag_analysis.log",
+      "sha256": "9006f9538742962207200a08a2ea55e82235030bdf301cc403dd4dce13fb31df",
+      "bytes": 2339,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/diag_analysis.log",
+      "note": "captured suite output"
+    },
+    {
+      "file": "test_logs/diag_runner.log",
+      "sha256": "593bb871386323fc1dc6df5f0ad8347038d2059d9bab95ec82b0b7d36b35985b",
+      "bytes": 6116,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/diag_runner.log",
+      "note": "captured suite output"
+    },
+    {
+      "file": "test_logs/guards.log",
+      "sha256": "360d9d70e5d9c4d8496d3c82c01cea4550a5212a960d04a48aa19e109db5f3bb",
+      "bytes": 5515,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/guards.log",
+      "note": "captured suite output"
+    },
+    {
+      "file": "test_logs/launcher_e2e.log",
+      "sha256": "95fed05bbd820e41a65ed913b7a40bc1211f5cb7a9746758277859b570aea85f",
+      "bytes": 6909,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/launcher_e2e.log",
+      "note": "captured suite output"
+    },
+    {
+      "file": "test_logs/provenance.log",
+      "sha256": "4d1d607c15a5c398914f80449ff2c39ae32312be1b9bc02147c4b07027b1353f",
+      "bytes": 4110,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/provenance.log",
+      "note": "captured suite output"
+    },
+    {
+      "file": "test_logs/selection.log",
+      "sha256": "6e0573c4ee9583744a68a994213afd52a5eba1452eccccb6de65a93910d60797",
+      "bytes": 2241,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/selection.log",
+      "note": "captured suite output"
+    },
+    {
+      "file": "test_logs/validator.log",
+      "sha256": "78d8e9306ea18cee7c822480d1c93a427cb8888e3b85ab78e8e54f9d9b8bd9cb",
+      "bytes": 13002,
+      "source": "/tmp/claude-1011/-home-bijaypandey-FINMLResearch/28eaa110-7dc6-4ed7-9ade-325cf01abcc5/scratchpad/testlogs/validator.log",
+      "note": "captured suite output"
+    }
+  ]
+}
