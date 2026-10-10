@@ -4,8 +4,15 @@
 **inconclusive** — it was never measured. The frozen test set was not evaluated.
 
 Original run: commit `3a5a69c`, output `/data/bijaypandey/cuig_pilot/seq_pilot/diag_v1`,
-1.2022 of 4.000 GPU-hours spent, 0 failed stages, confirmatory reserve unspent.
-Evidence bundle: [`diag_v1_evidence/`](diag_v1_evidence/).
+1.2022 device-hours recorded, 0 failed stages, the frozen test set never
+evaluated. Evidence bundle: [`diag_v1_evidence/`](diag_v1_evidence/).
+
+Two interpretations stated here were corrected on 2026-10-10; the corrections are
+marked in place below and set out in
+[`CLAIM_CORRECTIONS_V4.md`](CLAIM_CORRECTIONS_V4.md). The GPU-hour ceiling that
+framed the original run was retired on the same day
+([`RESOURCE_POLICY_2026-10-10.md`](../../docs/research/RESOURCE_POLICY_2026-10-10.md));
+the run's recorded usage is unchanged.
 
 Detector-based and **PROVISIONAL**: the blinded human annotation is a
 prerequisite for any scientific conclusion and no labels exist yet.
@@ -27,9 +34,10 @@ seed's **own** MA), by this COCO detector:
 3. **By step 100, U's measured dog suppression exceeded the saved L2 endpoint's
    measured suppression** — 38.75 pp vs 30.0 pp (seed 17), 42.50 pp vs 33.75 pp
    (seed 29).
-4. The match point therefore lies **between step 0 and step 100**, where step 0
-   is the parent MA at 0 pp by definition. The frozen grid provides no point in
-   that interval.
+4. The measured points therefore **straddle** the L2 level: 0 pp at step 0,
+   where step 0 is the parent MA by definition, and above it by step 100. The
+   frozen grid provides no point in between. **Straddling is all that is
+   established** — see §2.
 
 | seed | MA residue | L2 residue → suppression | step-100 residue → suppression | closest mismatch |
 |---|---|---|---|---|
@@ -57,10 +65,15 @@ I previously reported:
 
 Also not established:
 
-* **Whether any discrete intermediate point lies within tolerance.** Steps 1–99
-  were never evaluated. There may be no step whose suppression falls within 5 pp
-  of the L2 level, and the grid cannot distinguish "no such step exists" from
-  "the grid is too coarse to find it".
+* **That a matching checkpoint exists between steps 1 and 99.** An earlier
+  version of §1 said "the match point therefore lies between step 0 and step
+  100". **Withdrawn** ([`CLAIM_CORRECTIONS_V4.md`](CLAIM_CORRECTIONS_V4.md)
+  §C4.2): that applies an intermediate-value argument to a **discrete**,
+  possibly **non-monotone** sequence measured at 1.25 pp granularity. Steps
+  1–99 were never evaluated; the sequence may step over the ±5 pp band between
+  consecutive grid points, or enter and leave it. There may be no step whose
+  suppression falls within 5 pp of the L2 level, and the grid cannot distinguish
+  "no such step exists" from "the grid is too coarse to find it".
 * **Any matched bird-retention result.** No retention contrast was computed on
   any set. The frozen test set has never been evaluated — its output directory
   is **empty, 0 files**, documented in the bundle inventory.
@@ -91,12 +104,24 @@ alone. The four questions — configuration, parent identity, serialisation,
 numerical agreement — are answered separately, and **training equivalence is
 refused**: it would need matched generation and scoring.
 
-Because configuration and parent are identical, the divergence is **run-to-run
-nondeterminism** on this stack. Consequence for any follow-up: checkpoints from
-a new run are **not** interchangeable with the original run's, so a design that
-mixes them must measure the difference rather than assume it away. This shapes
+**The CAUSE is not established.** This section previously concluded "because
+configuration and parent are identical, the divergence is **run-to-run
+nondeterminism** on this stack". **Withdrawn**
+([`CLAIM_CORRECTIONS_V4.md`](CLAIM_CORRECTIONS_V4.md) §C4.1): equal *recorded*
+configuration and an equal parent do not identify a mechanism. Everything
+outside those 32 fields was free to differ between the pilot run and this one —
+library and driver state, the upstream code path (this run trained with periodic
+checkpointing switched on; the saved MAB did not), dataloader worker ordering,
+and nondeterministic kernels. Separating them needs a controlled repeat — same
+host, same commit, same cadence, twice — which was not run and is not proposed.
+
+What **is** established is the part the design depends on: a re-run does not
+reproduce the original endpoint bitwise, so checkpoints from a new run are
+**not** interchangeable with the original run's, and a design that mixes them
+must measure the difference rather than assume it away. This shapes
 [Amendment 01](../../docs/research/AMENDMENT_01_EARLY_GRID.md), which bridges the
-two realisations at step 100 and declares a stop condition on that bridge.
+two realisations at step 100 — in settings, in weights and in development
+behaviour — and declares a stop condition on that bridge in advance.
 
 ---
 

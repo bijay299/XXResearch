@@ -53,3 +53,21 @@ python scripts/seq/select_matched_dump.py \
 
 Both seeds return `INFEASIBLE`, both L2 references pass eligibility, and the
 frozen test set stays forbidden.
+
+## Correction notice (2026-10-10)
+
+Two **interpretations** in this bundle's accompanying prose were withdrawn after
+it was assembled. Every measurement here stands and nothing has been re-run,
+re-measured or re-hashed: the bundle is deliberately left **byte-identical** so
+that its independent verification remains valid.
+
+The superseded wording survives in `u_vs_mab_comparison.json` →
+`conclusion`, which names run-to-run nondeterminism as the cause of the
+endpoint difference. That attribution is **not established** — equal recorded
+configuration and an equal parent do not isolate a cause. Likewise, the measured
+points straddling the L2 level at steps 0 and 100 does **not** guarantee that a
+matching discrete checkpoint exists in between.
+
+**[`../CLAIM_CORRECTIONS_V4.md`](../CLAIM_CORRECTIONS_V4.md) governs.** This file
+is not covered by `MANIFEST.json`, which is why the notice can be added here
+without disturbing any verified digest.

@@ -1,8 +1,19 @@
 # MATCHED_EFFECTIVENESS_PROTOCOL — bounded diagnostic, for review
 
-**Status: a proposal. Nothing here has been run.** No GPU work was launched in
-preparing it. The GPU-hour figure and the 4-hour ceiling are **proposed for
-review, not approved**. The PI decides; the main research chat reviews.
+**Status: the bounded diagnostic in §1–§6 HAS been run** (commit `3a5a69c`); it
+stopped at selection by the pre-declared infeasibility rule — see
+[`DIAGNOSTIC_01_FINDINGS.md`](../../results/audit_v1/DIAGNOSTIC_01_FINDINGS.md).
+The frozen test set has never been evaluated. The follow-up now proposed is
+[`AMENDMENT_01_EARLY_GRID.md`](AMENDMENT_01_EARLY_GRID.md), awaiting the PI's
+separate decision.
+
+> **The 4-hour ceiling in §7 is RETIRED** (PI, 2026-10-10). The GPU-hour figures
+> below remain useful as planning estimates and as provenance, but they cap
+> nothing and withhold nothing; compute is gated by verified GPU availability
+> instead. See [`RESOURCE_POLICY_2026-10-10.md`](RESOURCE_POLICY_2026-10-10.md).
+> No selection rule, gate, tolerance, manifest identity or reporting rule in
+> this protocol is changed by that — resource availability and protocol
+> decisions are kept separate.
 
 **Revision.** This replaces the first version (commit `f7f4ba8`, preserved at
 [`results/audit_v1/preserved_originals/v1/`](../../results/audit_v1/preserved_originals/v1/MATCHED_EFFECTIVENESS_PROTOCOL.md)).

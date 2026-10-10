@@ -1,8 +1,33 @@
 #!/usr/bin/env python3
-"""A hard GPU-hour ledger with ATOMIC DURABLE ADMISSION.
+"""A GPU-hour ledger. Two modes: RECORDING ONLY (current) and CEILING (retired).
 
-The approved ceiling is FOUR GPU-hours in total and it counts everything:
-successful stages, failed attempts, and setup.
+ENFORCEMENT IS RETIRED (PI, 2026-10-10)
+---------------------------------------
+The four-GPU-hour ceiling, the frozen-test reserve withholding, and every
+budget-derived cutoff are WITHDRAWN. Compute is bounded by GPU *availability*,
+not by an hour cap, and no replacement cap is invented here.
+
+What that changes, exactly:
+
+  * `admit` in `recording_only` mode NEVER refuses and returns NO
+    `max_wall_seconds`, so nothing downstream can derive a runtime cutoff from
+    a cost estimate;
+  * `settle` and `report` never fail on a ceiling in that mode;
+  * `ceiling()` and `reserve()` read 0.0, so no arithmetic withholds anything.
+
+What it does NOT change:
+
+  * every completed entry is kept, byte for byte, including the original run's
+    27 stages and 1.2022 GPU-h;
+  * `admit`/`settle`/`reconcile` still RECORD occupancy, including failed and
+    orphaned stages, because provenance and efficiency reporting still want it;
+  * the CEILING mode and its tests remain, so the admission race that was found
+    and fixed stays covered rather than being deleted along with the cap.
+
+`retire` performs the switch on an existing ledger, idempotently, and stamps a
+`retirement` block holding the prior ceiling, the prior reserve, and the entry
+count and total spend AT the moment of retirement -- so that the historical
+record cannot be quietly altered under cover of the policy change.
 
 What was wrong with the first version, and why it mattered
 ----------------------------------------------------------
@@ -37,6 +62,9 @@ Balance arithmetic, with in-flight work included:
     available(stage) = ceiling - committed
                        - (0 if stage draws on the reserve else reserve_remaining)
 
+In CEILING mode (retired; kept for the historical record and its tests) the
+balance arithmetic above is enforced and an over-budget request is refused.
+
 `reconcile` settles orphaned reservations CONSERVATIVELY: a reservation whose
 process is gone is charged max(reserved, elapsed x gpus), because what it really
 used is unknowable and the safe assumption is the larger figure. It is never
@@ -50,13 +78,14 @@ carried forward and never reset because a new output directory was created.
 
 CPU only. This file touches no GPU; it only accounts for them.
 
-    python scripts/seq/gpu_budget.py init    --ledger L --ceiling 4.0 --reserve 1.3474
+    python scripts/seq/gpu_budget.py init    --ledger L            # recording only
+    python scripts/seq/gpu_budget.py retire  --ledger L --reason "PI withdrew the cap"
     python scripts/seq/gpu_budget.py admit   --ledger L --stage s --need 0.04 --gpus 1 --pid $$
     python scripts/seq/gpu_budget.py settle  --ledger L --id <id> --wall_seconds 108 --exit_code 0
     python scripts/seq/gpu_budget.py reconcile --ledger L
     python scripts/seq/gpu_budget.py report  --ledger L
 
-Exit codes: 0 ok/admitted, 1 refused or over ceiling or error, 2 usage.
+Exit codes: 0 ok/admitted, 1 refused (CEILING mode only) or error, 2 usage.
 """
 from __future__ import annotations
 
@@ -117,7 +146,9 @@ class Ledger:
         self.data["spent_gpu_hours"] = round(self.spent(), 6)
         self.data["in_flight_gpu_hours"] = round(self.open_total(), 6)
         self.data["committed_gpu_hours"] = round(self.committed(), 6)
-        self.data["remaining_gpu_hours"] = round(self.ceiling() - self.committed(), 6)
+        self.data["remaining_gpu_hours"] = (
+            None if not self.enforcing()
+            else round(self.ceiling() - self.committed(), 6))
         self.data["updated_utc"] = _now()
         self.fh.seek(0)
         self.fh.truncate()
@@ -130,11 +161,24 @@ class Ledger:
             fcntl.flock(self.fh, fcntl.LOCK_UN)
             self.fh.close()
 
+    # ---- mode
+    def enforcing(self) -> bool:
+        """CEILING mode is retired. A ledger written before the retirement has
+        no `enforcement` field; it is read as CEILING so that nothing about the
+        historical record is reinterpreted, and `retire` is what switches it."""
+        return self.data.get("enforcement", "ceiling") == "ceiling"
+
     # ---- arithmetic
     def ceiling(self) -> float:
+        # No cap in recording mode, and no replacement cap invented: the
+        # arithmetic simply has nothing to compare against.
+        if not self.enforcing():
+            return 0.0
         return float(self.data.get("ceiling_gpu_hours", 0.0))
 
     def reserve(self) -> float:
+        if not self.enforcing():
+            return 0.0
         return float(self.data.get("reserve_gpu_hours", 0.0))
 
     def spent(self) -> float:
@@ -180,14 +224,24 @@ def cmd_init(a) -> int:
                   f"({o.get('stage')}); reconcile it before carrying forward",
                   file=sys.stderr)
             return 1
+    recording = a.enforcement != "ceiling"
     payload = {
         "_contract": (
+            "GPU-hour USAGE RECORD, device-hours. Records successes, FAILED "
+            "attempts and setup alike, for provenance and efficiency reporting. "
+            "There is NO hour cap: the four-GPU-hour ceiling and the "
+            "frozen-test reserve were withdrawn by the PI on 2026-10-10, and no "
+            "replacement cap is imposed. Compute is bounded by verified GPU "
+            "availability instead. Prior spend is carried forward and is never "
+            "reset because a new output directory was created."
+            if recording else
             "Hard GPU-hour ledger with atomic durable admission. DEVICE-hours. "
             "Charges successes, FAILED attempts and setup alike. In-flight "
             "reservations count against the balance, so two concurrent "
             "admissions cannot spend the same GPU-hour. The confirmatory test "
             "stage is reserved. Prior spend is carried forward and is never "
             "reset because a new output directory was created."),
+        "enforcement": "recording_only" if recording else "ceiling",
         "approved_by": a.approved_by,
         "experiment": a.experiment,
         "ceiling_gpu_hours": a.ceiling,
@@ -203,8 +257,52 @@ def cmd_init(a) -> int:
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(payload, indent=2) + "\n")
     tot = sum(e.get("gpu_hours", 0.0) for e in carried)
-    print(f"ledger initialised: ceiling {a.ceiling} GPU-h, reserve {a.reserve} "
-          f"for {a.reserve_for!r}, carried-forward spend {tot:.4f} GPU-h -> {p}")
+    if recording:
+        print(f"ledger initialised: RECORDING ONLY (no ceiling, no reserve "
+              f"withholding), carried-forward spend {tot:.4f} GPU-h -> {p}")
+    else:
+        print(f"ledger initialised: ceiling {a.ceiling} GPU-h, reserve {a.reserve} "
+              f"for {a.reserve_for!r}, carried-forward spend {tot:.4f} GPU-h -> {p}")
+    return 0
+
+
+def cmd_retire(a) -> int:
+    """Switch an existing ledger to RECORDING ONLY. Idempotent.
+
+    Keeps every entry untouched and stamps what the record looked like at the
+    moment of the switch, so that retiring enforcement can never be a cover for
+    losing or editing historical usage.
+    """
+    with Ledger(Path(a.ledger)) as L:
+        if not L.enforcing():
+            r = L.data.get("retirement") or {}
+            print(f"enforcement already retired ({r.get('retired_utc', 'unknown date')}): "
+                  f"recording only, {L.spent():.4f} GPU-h recorded over "
+                  f"{len(L.data['entries'])} stage(s)")
+            return 0
+        prior_ceiling = float(L.data.get("ceiling_gpu_hours", 0.0))
+        prior_reserve = float(L.data.get("reserve_gpu_hours", 0.0))
+        spent, n = L.spent(), len(L.data["entries"])
+        L.data["enforcement"] = "recording_only"
+        L.data["retirement"] = {
+            "retired_utc": _now(),
+            "authority": a.authority,
+            "reason": a.reason,
+            "retired_ceiling_gpu_hours": prior_ceiling,
+            "retired_reserve_gpu_hours": prior_reserve,
+            "retired_reserve_for": L.data.get("reserve_for"),
+            "entries_at_retirement": n,
+            "spent_gpu_hours_at_retirement": round(spent, 6),
+            "note": ("Usage is still recorded for provenance and efficiency. "
+                     "No hour cap applies and no replacement cap was invented. "
+                     "Admissions no longer refuse and no runtime cutoff is "
+                     "derived from a cost estimate. Every entry above predates "
+                     "this switch and is unchanged."),
+        }
+        L.write()
+        print(f"enforcement RETIRED: ceiling {prior_ceiling} GPU-h and reserve "
+              f"{prior_reserve} GPU-h withdrawn; {n} stage(s) totalling "
+              f"{spent:.4f} GPU-h preserved unchanged")
     return 0
 
 
@@ -214,8 +312,10 @@ def cmd_admit(a) -> int:
         # the books before this decision is made.
         _reconcile(L, verbose=False)
         avail = L.available(a.draws_on_reserve)
+        enforcing = L.enforcing()
         decision = {
             "stage": a.stage, "need_gpu_hours": a.need, "gpus": max(1, a.gpus),
+            "enforcement": "ceiling" if enforcing else "recording_only",
             "ceiling": L.ceiling(), "spent": round(L.spent(), 4),
             "in_flight": round(L.open_total(), 4),
             "committed": round(L.committed(), 4),
@@ -223,6 +323,33 @@ def cmd_admit(a) -> int:
                                 else round(L.reserve_remaining(), 4),
             "available_to_this_stage": round(avail, 4),
         }
+        if not enforcing:
+            # RECORDING ONLY. The estimate is written down as an expectation so
+            # that an orphaned reservation can still be reconciled, and so that
+            # actual-vs-estimate stays reportable -- but it gates nothing and,
+            # deliberately, implies NO `max_wall_seconds`. A caller that wants a
+            # watchdog must configure one explicitly rather than inherit one
+            # from an hour budget that no longer exists.
+            rid = uuid.uuid4().hex[:16]
+            L.data["open"].append({
+                "id": rid, "stage": a.stage,
+                "reserved_gpu_hours": a.need, "gpus": max(1, a.gpus),
+                "gpu_index": a.gpu_index, "pid": a.pid,
+                "draws_on_reserve": bool(a.draws_on_reserve),
+                "max_wall_seconds": None,
+                "estimate_is_informational": True,
+                "started_utc": _now(),
+            })
+            L.write()
+            decision.update({"decision": "RECORD", "reservation_id": rid,
+                             "max_wall_seconds": None,
+                             # Not "0 available" and not a negative balance:
+                             # there is no balance to be in.
+                             "ceiling": None, "reserve_withheld": None,
+                             "available_to_this_stage": None,
+                             "note": "no ceiling; estimate recorded, not enforced"})
+            print(json.dumps(decision))
+            return 0
         if a.need > avail + 1e-9:
             decision["decision"] = "REFUSE"
             print(json.dumps(decision))
@@ -279,8 +406,10 @@ def cmd_settle(a) -> int:
             })
             L.write()
             print(json.dumps({**prior, "spent_total": round(L.spent(), 4),
-                              "remaining": round(L.ceiling() - L.committed(), 4),
-                              "over_ceiling": L.spent() > L.ceiling() + 1e-9}))
+                              "remaining": (None if not L.enforcing()
+                                            else round(L.ceiling() - L.committed(), 4)),
+                              "over_ceiling": (L.enforcing()
+                                               and L.spent() > L.ceiling() + 1e-9)}))
             return 0
         L.data["open"] = [o for o in L.data["open"] if o["id"] != a.id]
         gpus = max(1, int(hit.get("gpus", 1)))
@@ -293,11 +422,12 @@ def cmd_settle(a) -> int:
             "gpu_hours": round(actual, 6),
             "reserved_gpu_hours": hit["reserved_gpu_hours"],
             "exceeded_reservation": over,
+            "estimate_was_informational": bool(hit.get("estimate_is_informational")),
             "exit_code": a.exit_code,
             "outcome": ("ok" if a.exit_code == 0 else
-                        "TIMED OUT (runtime bound hit; still charged)"
+                        "TIMED OUT (watchdog hit; still recorded)"
                         if a.exit_code in (124, 137) else
-                        "FAILED (still charged)"),
+                        "FAILED (still recorded)"),
             "draws_on_reserve": bool(hit.get("draws_on_reserve")),
             "started_utc": hit.get("started_utc"),
             "settled_utc": _now(),
@@ -305,15 +435,22 @@ def cmd_settle(a) -> int:
         L.data["entries"].append(entry)
         L.write()
         out = {**entry, "spent_total": round(L.spent(), 4),
-               "remaining": round(L.ceiling() - L.committed(), 4),
-               "over_ceiling": L.spent() > L.ceiling() + 1e-9}
+               "remaining": (None if not L.enforcing()
+                             else round(L.ceiling() - L.committed(), 4)),
+               "over_ceiling": L.enforcing() and L.spent() > L.ceiling() + 1e-9}
         print(json.dumps(out))
-        if over:
+        if over and L.enforcing():
             print(f"NOTE: {hit['stage']} used {actual:.4f} GPU-h against a "
                   f"{hit['reserved_gpu_hours']:.4f} reservation. The runtime "
                   f"bound should have prevented this; the actual figure is what "
                   f"is charged.", file=sys.stderr)
-        if out["over_ceiling"]:
+        elif over:
+            print(f"NOTE: {hit['stage']} used {actual:.4f} GPU-h against an "
+                  f"estimate of {hit['reserved_gpu_hours']:.4f}. Informational: "
+                  f"the estimate gates nothing, and the actual figure is what is "
+                  f"recorded. Worth folding back into the cost model.",
+                  file=sys.stderr)
+        if out["over_ceiling"]:   # CEILING mode only
             print(f"CEILING EXCEEDED: spent {L.spent():.4f} of {L.ceiling()} "
                   f"GPU-h. No further stage may start.", file=sys.stderr)
             return 1
@@ -383,9 +520,19 @@ def cmd_report(a) -> int:
         failed = [x for x in e if x.get("exit_code") not in (0, None)]
         orphan = [x for x in e if x.get("reconciled")]
         carried = [x for x in e if x.get("carried_forward_from")]
-        print(f"ceiling         : {L.ceiling():.4f} GPU-h "
-              f"(approved: {L.data.get('approved_by')})")
-        print(f"spent           : {L.spent():.4f} GPU-h over {len(e)} completed "
+        if L.enforcing():
+            print(f"ceiling         : {L.ceiling():.4f} GPU-h "
+                  f"(approved: {L.data.get('approved_by')})")
+        else:
+            r = L.data.get("retirement") or {}
+            print(f"enforcement     : RECORDING ONLY -- no GPU-hour ceiling. "
+                  f"Compute is bounded by verified GPU availability.")
+            if r:
+                print(f"                  retired {r.get('retired_utc', '?')[:19]} "
+                      f"by {r.get('authority', '?')}; prior ceiling "
+                      f"{r.get('retired_ceiling_gpu_hours')} GPU-h and reserve "
+                      f"{r.get('retired_reserve_gpu_hours')} GPU-h withdrawn")
+        print(f"recorded        : {L.spent():.4f} GPU-h over {len(e)} completed "
               f"stage(s); {len(failed)} failed and still charged; "
               f"{len(orphan)} orphaned and conservatively charged")
         if carried:
@@ -394,13 +541,17 @@ def cmd_report(a) -> int:
         print(f"in flight       : {L.open_total():.4f} GPU-h over "
               f"{len(L.data['open'])} open reservation(s)")
         print(f"committed       : {L.committed():.4f} GPU-h")
-        print(f"reserve withheld: {L.reserve_remaining():.4f} GPU-h for "
-              f"{L.data.get('reserve_for')!r}")
-        print(f"remaining       : {L.ceiling() - L.committed():.4f} GPU-h "
-              f"({L.available(False):.4f} usable before the reserve)")
+        if L.enforcing():
+            print(f"reserve withheld: {L.reserve_remaining():.4f} GPU-h for "
+                  f"{L.data.get('reserve_for')!r}")
+            print(f"remaining       : {L.ceiling() - L.committed():.4f} GPU-h "
+                  f"({L.available(False):.4f} usable before the reserve)")
+        else:
+            print(f"reserve withheld: none (the frozen-test reserve was "
+                  f"withdrawn with the ceiling)")
         for s, v in sorted(by_stage.items(), key=lambda kv: -kv[1]):
             print(f"  {v:8.4f}  {s}")
-        if L.spent() > L.ceiling() + 1e-9:
+        if L.enforcing() and L.spent() > L.ceiling() + 1e-9:
             print("STATUS: OVER CEILING")
             return 1
     return 0
@@ -413,11 +564,19 @@ def main() -> int:
 
     i = sub.add_parser("init")
     i.add_argument("--ledger", required=True)
-    i.add_argument("--ceiling", type=float, required=True)
+    i.add_argument("--enforcement", choices=["recording_only", "ceiling"],
+                   default="recording_only",
+                   help="recording_only (default, current policy) records usage "
+                        "and enforces nothing; ceiling is the retired mode, kept "
+                        "for the historical record and its regression tests")
+    i.add_argument("--ceiling", type=float, default=0.0,
+                   help="CEILING mode only; ignored when recording only")
     i.add_argument("--reserve", type=float, default=0.0)
     i.add_argument("--reserve_for", default="frozen_test")
     i.add_argument("--reserve_basis", default="")
-    i.add_argument("--approved_by", default="PI, four total GPU-hours")
+    i.add_argument("--approved_by",
+                   default="PI, 2026-10-10: compute bounded by GPU availability, "
+                           "not by an hour cap")
     i.add_argument("--experiment", default="matched-effectiveness diagnostic")
     i.add_argument("--commit", default="")
     i.add_argument("--carry_forward_from", default=None)
@@ -438,6 +597,11 @@ def main() -> int:
     s.add_argument("--wall_seconds", type=float, required=True)
     s.add_argument("--exit_code", type=int, default=0)
 
+    t = sub.add_parser("retire")
+    t.add_argument("--ledger", required=True)
+    t.add_argument("--reason", required=True)
+    t.add_argument("--authority", default="PI")
+
     r = sub.add_parser("reconcile")
     r.add_argument("--ledger", required=True)
     r.add_argument("--strict", action="store_true")
@@ -447,8 +611,9 @@ def main() -> int:
 
     a = ap.parse_args()
     try:
-        return {"init": cmd_init, "admit": cmd_admit, "settle": cmd_settle,
-                "reconcile": cmd_reconcile, "report": cmd_report}[a.cmd](a)
+        return {"init": cmd_init, "retire": cmd_retire, "admit": cmd_admit,
+                "settle": cmd_settle, "reconcile": cmd_reconcile,
+                "report": cmd_report}[a.cmd](a)
     except Exception as e:
         print(f"BUDGET ERROR ({type(e).__name__}: {e})", file=sys.stderr)
         return 1

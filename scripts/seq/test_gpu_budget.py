@@ -1,14 +1,25 @@
 #!/usr/bin/env python3
 """CPU tests for scripts/seq/gpu_budget.py.
 
-The defect these exist for, reproduced first and then shown fixed: a 4.0 GPU-h
-ceiling with a 1.008 reserve ADMITTED TWO 2.5-HOUR REQUESTS, because the old
-`check` summed only completed entries and nothing held an in-flight amount
-against the balance. The breach surfaced only after 5.0 hours had been recorded.
+Two things are pinned down here, and they must not be confused.
 
-Covers: concurrent admission, underestimated runtime, interruption/crash
-reconciliation, reserve protection, carry-forward of prior spend, and the
-runtime bound the admission implies.
+1. THE CURRENT POLICY: RECORDING ONLY. The PI withdrew the four-GPU-hour
+   ceiling, the frozen-test reserve and every budget-derived cutoff on
+   2026-10-10. So: no admission is ever refused, no `max_wall_seconds` is ever
+   handed back, a report never fails on a ceiling -- and usage, including failed
+   and orphaned stages, is still recorded, prior spend is still carried forward,
+   and `retire` preserves every historical entry exactly.
+
+2. THE RETIRED CEILING MODE, kept deliberately. The defect it was built for was
+   real and was verified: a 4.0 GPU-h ceiling with a 1.008 reserve ADMITTED TWO
+   2.5-HOUR REQUESTS, because the old `check` summed only completed entries and
+   nothing held an in-flight amount against the balance. Deleting that code
+   along with the cap would delete the evidence that it was fixed, so the mode
+   and its tests stay.
+
+Covers: recording-only admission, retirement and record preservation, the
+absence of any derived cutoff, concurrent admission, underestimated runtime,
+interruption/crash reconciliation, reserve protection, and carry-forward.
 
 No GPU. Fakes are sleeps and subprocesses.
 
@@ -43,9 +54,11 @@ def run(*args: str) -> tuple[int, str]:
     return p.returncode, p.stdout + p.stderr
 
 
-def init(led: Path, ceiling=4.0, reserve=1.008, **kw) -> None:
-    args = ["init", "--ledger", str(led), "--ceiling", str(ceiling),
-            "--reserve", str(reserve)]
+def init(led: Path, ceiling=4.0, reserve=1.008, enforcement="ceiling",
+         **kw) -> None:
+    """Historical CEILING-mode ledger unless told otherwise."""
+    args = ["init", "--ledger", str(led), "--enforcement", enforcement,
+            "--ceiling", str(ceiling), "--reserve", str(reserve)]
     for k, v in kw.items():
         args += [f"--{k}", str(v)]
     rc, out = run(*args)
@@ -73,7 +86,80 @@ def ledger(led: Path) -> dict:
 def main() -> int:
     tmp = Path(tempfile.mkdtemp(prefix="gpubudget_"))
     try:
-        print("\nthe reproduced defect: two concurrent admissions of the same balance")
+        print("\nCURRENT POLICY: recording only -- nothing is refused, "
+              "everything is recorded")
+        led = tmp / "recording.json"
+        rc, out = run("init", "--ledger", str(led))
+        check("a new ledger defaults to recording only",
+              rc == 0 and "RECORDING ONLY" in out, out.strip()[-160:])
+        check("and says so on disk",
+              ledger(led)["enforcement"] == "recording_only")
+        # The exact request pair the old ceiling refused.
+        rc1, d1 = admit(led, "big-1", 2.5, pid=os.getpid())
+        rc2, d2 = admit(led, "big-2", 2.5, pid=os.getpid())
+        check("two 2.5 GPU-h requests are both admitted now",
+              rc1 == 0 and rc2 == 0
+              and d1.get("decision") == d2.get("decision") == "RECORD",
+              f"{d1.get('decision')} / {d2.get('decision')}")
+        check("neither is given a runtime cutoff derived from its estimate",
+              d1.get("max_wall_seconds") is None
+              and d2.get("max_wall_seconds") is None,
+              f"{d1.get('max_wall_seconds')} / {d2.get('max_wall_seconds')}")
+        check("no balance is reported, rather than a negative one",
+              d2.get("available_to_this_stage") is None
+              and d2.get("ceiling") is None, str(d2))
+        check("the estimate is marked informational on the open reservation",
+              all(o.get("estimate_is_informational") for o in ledger(led)["open"]))
+        # ... and the usage is still recorded, failures included.
+        rc, out = run("settle", "--ledger", str(led), "--id", d1["reservation_id"],
+                      "--wall_seconds", "9000", "--exit_code", "1")
+        e = ledger(led)["entries"][-1]
+        check("a FAILED stage is recorded at its actual occupancy",
+              rc == 0 and abs(e["gpu_hours"] - 2.5) < 1e-9
+              and "FAILED" in e["outcome"], str(e.get("gpu_hours")))
+        check("exceeding the estimate is recorded, not an error",
+              rc == 0 and e["estimate_was_informational"] is True)
+        rc, out = run("report", "--ledger", str(led))
+        check("the report exits 0 with no ceiling to breach", rc == 0)
+        check("the report states the policy", "RECORDING ONLY" in out,
+              out.strip()[:160])
+        check("the report withholds nothing for the frozen test",
+              "reserve withheld: none" in out, out.strip()[-200:])
+
+        print("\nRETIRING an existing ceiling ledger preserves every record")
+        led = tmp / "retire.json"
+        init(led, ceiling=4.0, reserve=1.3474)
+        rc, d = admit(led, "past", 1.2022, pid=os.getpid())
+        run("settle", "--ledger", str(led), "--id", d["reservation_id"],
+            "--wall_seconds", str(1.2022 * 3600), "--exit_code", "0")
+        before = ledger(led)
+        rc, out = run("retire", "--ledger", str(led),
+                      "--reason", "PI withdrew the cap", "--authority", "PI")
+        after = ledger(led)
+        check("retire succeeds and says what it withdrew",
+              rc == 0 and "RETIRED" in out, out.strip()[-160:])
+        check("every entry survives byte for byte",
+              after["entries"] == before["entries"])
+        check("the recorded spend is unchanged",
+              abs(after["spent_gpu_hours"] - before["spent_gpu_hours"]) < 1e-12)
+        r = after["retirement"]
+        check("the retired ceiling is stamped for the record",
+              r["retired_ceiling_gpu_hours"] == 4.0
+              and r["retired_reserve_gpu_hours"] == 1.3474, str(r))
+        check("so is the state of the record at the switch",
+              r["entries_at_retirement"] == 1
+              and abs(r["spent_gpu_hours_at_retirement"] - 1.2022) < 1e-4, str(r))
+        rc, d = admit(led, "after-retirement", 99.0, pid=os.getpid())
+        check("a request the old ceiling would refuse is now admitted",
+              rc == 0 and d["decision"] == "RECORD", str(d))
+        check("prior spend is still carried in the record",
+              abs(d["spent"] - 1.2022) < 1e-4, str(d.get("spent")))
+        rc, out = run("retire", "--ledger", str(led), "--reason", "again")
+        check("retiring twice is a no-op", rc == 0 and "already retired" in out,
+              out.strip()[-120:])
+
+        print("\nRETIRED CEILING MODE (kept for the record): the reproduced "
+              "defect stays fixed")
         led = tmp / "race.json"
         init(led, ceiling=4.0, reserve=1.008)
         # The exact reproduction: two 2.5-hour requests against 4.0 with 1.008
@@ -109,7 +195,7 @@ def main() -> int:
         check("every admission has a distinct reservation id",
               len({r[1]["reservation_id"] for r in admitted}) == len(admitted))
 
-        print("\nthe admission implies a runtime bound")
+        print("\nin the retired mode the admission implied a runtime bound")
         led = tmp / "bound.json"
         init(led, ceiling=4.0, reserve=0.0)
         rc, d = admit(led, "one-gpu", 0.04, gpus=1, pid=os.getpid())
@@ -221,7 +307,8 @@ def main() -> int:
         run("settle", "--ledger", str(old), "--id", d["reservation_id"],
             "--wall_seconds", str(1.2022 * 3600), "--exit_code", "0")
         new = tmp / "new.json"
-        rc, out = run("init", "--ledger", str(new), "--ceiling", "4.0",
+        rc, out = run("init", "--ledger", str(new), "--enforcement", "ceiling",
+                      "--ceiling", "4.0",
                       "--reserve", "1.3474", "--carry_forward_from", str(old))
         check("a new ledger carries prior spend forward", rc == 0, out.strip()[-160:])
         lg = ledger(new)
@@ -234,15 +321,35 @@ def main() -> int:
         check("carried spend constrains later admissions",
               rc == 1, f"available was {d.get('available_to_this_stage')}")
         # init must refuse to silently reset an existing ledger
-        rc, out = run("init", "--ledger", str(new), "--ceiling", "4.0")
+        rc, out = run("init", "--ledger", str(new), "--enforcement", "ceiling",
+                      "--ceiling", "4.0")
         check("init REFUSES to reset an existing ledger",
               rc == 1 and "refusing to reset" in out, out.strip()[-120:])
         # carrying forward from a ledger with open reservations must refuse
         rc, d = admit(old, "still-open", 0.1, pid=os.getpid())
-        rc, out = run("init", "--ledger", str(tmp / "n2.json"), "--ceiling", "4.0",
+        rc, out = run("init", "--ledger", str(tmp / "n2.json"),
+                      "--enforcement", "ceiling", "--ceiling", "4.0",
                       "--carry_forward_from", str(old))
         check("carry-forward refuses while the source has open reservations",
               rc == 1 and "OPEN reservation" in out, out.strip()[-140:])
+
+        print("\nCARRY-FORWARD under the current policy, too")
+        old2 = tmp / "old_rec.json"
+        rc, out = run("init", "--ledger", str(old2))
+        rc, d = admit(old2, "past", 1.2022, pid=os.getpid())
+        run("settle", "--ledger", str(old2), "--id", d["reservation_id"],
+            "--wall_seconds", str(1.2022 * 3600), "--exit_code", "0")
+        new2 = tmp / "new_rec.json"
+        rc, out = run("init", "--ledger", str(new2),
+                      "--carry_forward_from", str(old2))
+        lg = ledger(new2)
+        carried_total = sum(e.get("gpu_hours", 0.0) for e in lg["entries"])
+        check("a recording-only ledger also carries prior spend forward",
+              rc == 0 and abs(carried_total - 1.2022) < 1e-6, str(carried_total))
+        check("and records where every carried hour came from",
+              all("carried_forward_from" in e for e in lg["entries"]))
+        check("and still refuses to be reset",
+              run("init", "--ledger", str(new2))[0] == 1)
 
         print("\nreport surfaces in-flight and conservative charges")
         rc, out = run("report", "--ledger", str(tmp / "crash.json"))

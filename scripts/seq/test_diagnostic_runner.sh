@@ -2,9 +2,13 @@
 # ---------------------------------------------------------------------------
 # CPU test of the matched-effectiveness diagnostic runner.
 #
-# Run BEFORE committing any of the approved four GPU-hours. A bug found here
-# costs seconds; the same bug found at stage 4 costs the grant, because failed
-# attempts are charged to the ceiling just like successes.
+# Run BEFORE any GPU work. A bug found here costs seconds; the same bug found
+# at stage 4 costs a device for an hour and a user's patience.
+#
+# The GPU-hour ceiling was retired by the PI on 2026-10-10, so this suite also
+# pins down what that retirement must NOT break: usage is still recorded, prior
+# spend is still carried forward, no stage is refused for want of budget, and no
+# stage inherits a time limit derived from a cost estimate.
 #
 # REAL here: run_diagnostic.sh, generate_eval_images.py (reuse gate included),
 # validate_stage.py, select_matched_dump.py, gpu_budget.py, the frozen dev and
@@ -92,6 +96,8 @@ done
 # The runner must pass the dump interval through; if it ever stops doing so the
 # mock records a 0 and the trajectory validation below fails loudly.
 echo "TRAIN name=$name seed=$seed iters=$iters every=$every" >> "$CALL_LOG"
+# Only for the watchdog cases: a trainer that takes longer than it should.
+[ -n "${MOCK_TRAIN_SLEEP:-}" ] && sleep "$MOCK_TRAIN_SLEEP"
 "$MOCK_PY" "$MOCK_HELPER" make_traj --out "$out" --name "$name" --seed "$seed" \
     --iters "$iters" --every "$every" --l2 "$l2" --parent "$parent"
 EOF
@@ -139,7 +145,8 @@ def make_traj(a):
             if st in skip:
                 continue
             p = out / f"delta-{st}"
-            h = _ckpt(p, 0.001 * st, contract)
+            h = _ckpt(p, 0.001 * st + float(os.environ.get("MOCK_DUMP_JITTER", "0")),
+                      contract)
             dumps.append({"step": st, "path": str(p), "sha256": h,
                           "bytes": p.stat().st_size})
     delta = out / "delta.bin"
@@ -153,10 +160,31 @@ def make_traj(a):
         "anchor_concept": "horse",
         "child_checkpoint": {"sha256": h, "bytes": delta.stat().st_size,
                              "tensors": contract["n_tensors"]},
-        "effective_hyperparameters": {"seed": int(a.seed),
-                                      "iterations_requested": iters,
-                                      "epoch_capacity_steps": 1250,
-                                      "parameter_group": "kv-xattn"},
+        "effective_hyperparameters": {
+            "seed": int(a.seed),
+            "iterations_requested": iters,
+            # Upstream recomputes epochs from the stopping limit:
+            # epochs = ceil(iterations / steps_per_epoch).
+            "steps_per_epoch": 50,
+            "epochs_cap": math.ceil(iters / 50),
+            "epoch_capacity_steps": 50 * math.ceil(iters / 50),
+            "parameter_group": "kv-xattn",
+            # The settings that determine the first updates. The bridge check
+            # requires every one of these to be identical across the two runs,
+            # and requires the schedule to be horizon-independent.
+            "lr_scheduler": "constant",
+            "lr_warmup_steps": 500,
+            "effective_learning_rate": float(
+                os.environ.get("MOCK_LR", "8e-06")),
+            "anchor_batch_size": 4,
+            "gradient_accumulation_steps": 1,
+            "num_processes": 1,
+            "optimizer": "AdamW",
+            "max_grad_norm": 1.0,
+            "precision": "fp32",
+            "resolution": 512,
+            "l2sp_weight": float(a.l2),
+        },
         "parent_verification": {"parent_sha256": parent_sha, "PASS": True,
                                 "max_abs_deviation_after_load": 0.0},
         "l2sp_reference_check": {"PASS": True, "max_abs_deviation_from_parent": 0.0},
@@ -319,8 +347,17 @@ want_out "checks the 20 dev prompt texts"       "${ROOT}/t1.log" "distinct_promp
 want_out "checks the 140 test prompt texts"     "${ROOT}/t1.log" "distinct_prompt_texts = 140"
 want_out "verifies the frozen bootstrap grouping" "${ROOT}/t1.log" "grouping identity"
 want_out "binds the reused saved artifacts"     "${ROOT}/t1.log" "REGISTERED saved artifact"
-want_out "initialises the ceiling"              "${ROOT}/t1.log" "ceiling 4.0 GPU-h"
-want_out "reserves the test cost"               "${ROOT}/t1.log" "reserve 1.3474"
+want_out "opens a usage record in RECORDING-ONLY mode" \
+    "${ROOT}/t1.log" "RECORDING ONLY"
+want_out "states plainly that there is no GPU-hour ceiling" \
+    "${ROOT}/t1.log" "no GPU-hour ceiling"
+want_out "says what does gate work instead"     "${ROOT}/t1.log" "bounded by verified GPU availability"
+want_out "marks the cost estimates informational" "${ROOT}/t1.log" "INFORMATIONAL"
+want_not "withholds nothing for the frozen test" "${ROOT}/t1.log" "reserve 1.3474"
+ENF=$("$MOCK_PY" -c "
+import json,sys; print(json.load(open(sys.argv[1]))['enforcement'])" \
+    "${ROOT}/budget_ledger.json")
+want_eq "the ledger on disk records the mode" "$ENF" "recording_only"
 want_out "reports verified-idle capacity"       "${ROOT}/t1.log" "RUNNING: 2 verified-idle GPU(s)"
 
 echo
@@ -444,39 +481,54 @@ want_eq "3,360 test images generated" \
 want_out "the test stage drew on its reserve" "${ROOT}/t9.log" "eval:eval_test"
 
 echo
-echo "=== 10. the ceiling is hard, and failures are charged ==="
+echo "=== 10. usage is RECORDED; nothing is refused for want of budget ==="
 "$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" report --ledger "${ROOT}/budget_ledger.json" \
     > "${ROOT}/t10.log" 2>&1
-want_out "the ledger reports a 4 GPU-hour ceiling" "${ROOT}/t10.log" "ceiling         : 4.000"
+want_out "the report leads with the retirement, not a ceiling" \
+    "${ROOT}/t10.log" "RECORDING ONLY"
+want_out "the frozen-test reserve is gone with it" "${ROOT}/t10.log" "reserve withheld: none"
+want_out "occupancy is still totalled per stage" "${ROOT}/t10.log" "recorded        :"
 cat "${ROOT}/t10.log" | sed 's/^/    /'
-# A ceiling already consumed must refuse the next stage outright.
+# What used to be the hard case: a ledger with far less left than the stage
+# wants. It must now proceed, and the usage must still be recorded.
 L2="${ROOT}/tiny_ledger.json"
-"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" init --ledger "$L2" --ceiling 0.10 --reserve 0.05 >/dev/null
-# A FAILED stage burns the budget just like a successful one.
+"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" init --ledger "$L2" >/dev/null
 BURN_ID=$("$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" admit --ledger "$L2" \
     --stage burn --need 0.08 --gpus 1 --pid $$ \
     | "$MOCK_PY" -c 'import json,sys;print(json.loads([l for l in sys.stdin if l.startswith("{")][-1])["reservation_id"])')
+# A FAILED stage is still recorded, exactly as before.
 "$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" settle --ledger "$L2" --id "$BURN_ID" \
     --wall_seconds 300 --exit_code 1 >/dev/null
+FAILED_CHARGE=$("$MOCK_PY" -c "
+import json,sys
+d=json.load(open(sys.argv[1]))
+e=[x for x in d['entries'] if x['stage']=='burn'][0]
+print('RECORDED' if e['gpu_hours'] > 0 and e['exit_code'] == 1 else 'LOST')" "$L2")
+want_eq "a FAILED stage is still recorded" "$FAILED_CHARGE" "RECORDED"
 # A fresh diagnostic root, so training must actually be attempted rather than
 # skipped as already-validated.
 SEQ_DIAG_LEDGER="$L2" SEQ_DIAG_ROOT="${ROOT}/diag_budget" diag train > "${ROOT}/t10b.log" 2>&1; RC=$?
-want_out "a stage is refused when the budget cannot afford it" "${ROOT}/t10b.log" "BUDGET REFUSED"
-want_out "and nothing is launched" "${ROOT}/t10b.log" "nothing was launched"
+want_rc "training runs even though the old ceiling would have refused it" 0 "$RC"
+want_not "no stage is refused for want of budget" "${ROOT}/t10b.log" "BUDGET REFUSED"
+want_out "and the stage is recorded rather than gated" "${ROOT}/t10b.log" "\"decision\": \"RECORD\""
 
 echo
-echo "=== 10b. admission holds in-flight amounts and survives a new output dir ==="
+echo "=== 10b. concurrent lanes both run; prior spend survives a new output dir ==="
 L3="${ROOT}/inflight_ledger.json"
-"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" init --ledger "$L3" \
-    --ceiling 1.00 --reserve 0.40 >/dev/null
+"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" init --ledger "$L3" >/dev/null
 A1=$("$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" admit --ledger "$L3" \
     --stage lane-a --need 0.55 --gpus 1 --pid $$ 2>&1 | tail -1)
 A2=$("$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" admit --ledger "$L3" \
     --stage lane-b --need 0.55 --gpus 1 --pid $$ 2>&1 | tail -1 \
     | "$MOCK_PY" -c 'import json,sys;print(json.loads(sys.stdin.read())["decision"])')
-case "$A1" in *ADMIT*) ok "the first lane is admitted";; *) bad "admission" "$A1";; esac
-want_eq "a concurrent lane is refused against the in-flight amount" "$A2" "REFUSE"
-# A new output directory must NOT reset the balance.
+case "$A1" in *RECORD*) ok "the first lane is recorded";; *) bad "recording" "$A1";; esac
+want_eq "a concurrent lane is no longer refused" "$A2" "RECORD"
+BOUND=$("$MOCK_PY" -c "
+import json,sys
+d=json.load(open(sys.argv[1]))
+print('NONE' if all(o['max_wall_seconds'] is None for o in d['open']) else 'DERIVED')" "$L3")
+want_eq "no runtime cutoff is derived from an estimate" "$BOUND" "NONE"
+# A new output directory must NOT reset the record.
 SPENT_BEFORE=$("$MOCK_PY" -c "
 import json,sys; print(json.load(open(sys.argv[1]))['committed_gpu_hours'])" "$L3")
 SEQ_DIAG_ROOT="${ROOT}/diag_elsewhere" SEQ_DIAG_LEDGER="$L3" diag preflight \
@@ -485,6 +537,124 @@ SPENT_AFTER=$("$MOCK_PY" -c "
 import json,sys; print(json.load(open(sys.argv[1]))['committed_gpu_hours'])" "$L3")
 want_eq "a NEW output directory does not reset prior spend" "$SPENT_AFTER" "$SPENT_BEFORE"
 want_out "the runner reports the experiment-level ledger" "${ROOT}/t10c.log" "not this output directory"
+
+echo
+echo "=== 10d. an existing CEILING ledger is explicitly retired, not left armed ==="
+# The real ledger predates the retirement: it carries ceiling 4.0 and a 1.3474
+# reserve. Preflight must switch it over and preserve every entry.
+L4="${ROOT}/legacy_ceiling_ledger.json"
+"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" init --ledger "$L4" \
+    --enforcement ceiling --ceiling 4.0 --reserve 1.3474 >/dev/null
+OLD_ID=$("$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" admit --ledger "$L4" \
+    --stage past --need 1.2022 --gpus 1 --pid $$ \
+    | "$MOCK_PY" -c 'import json,sys;print(json.loads([l for l in sys.stdin if l.startswith("{")][-1])["reservation_id"])')
+"$MOCK_PY" "${REPO}/scripts/seq/gpu_budget.py" settle --ledger "$L4" --id "$OLD_ID" \
+    --wall_seconds 4328 --exit_code 0 >/dev/null
+BEFORE=$("$MOCK_PY" -c "
+import json,sys; d=json.load(open(sys.argv[1]))
+print(f\"{len(d['entries'])}:{d['spent_gpu_hours']:.4f}\")" "$L4")
+SEQ_DIAG_LEDGER="$L4" SEQ_DIAG_ROOT="${ROOT}/diag_retire" diag preflight \
+    > "${ROOT}/t10d.log" 2>&1 || true
+want_out "preflight retires the enforcement explicitly" "${ROOT}/t10d.log" "enforcement RETIRED"
+AFTER=$("$MOCK_PY" -c "
+import json,sys; d=json.load(open(sys.argv[1]))
+print(f\"{len(d['entries'])}:{d['spent_gpu_hours']:.4f}\")" "$L4")
+want_eq "every historical entry and hour survives the switch" "$AFTER" "$BEFORE"
+RET=$("$MOCK_PY" -c "
+import json,sys; r=json.load(open(sys.argv[1]))['retirement']
+print(f\"{r['retired_ceiling_gpu_hours']}/{r['retired_reserve_gpu_hours']}/{r['entries_at_retirement']}\")" "$L4")
+want_eq "the retired figures are stamped for the record" "$RET" "4.0/1.3474/1"
+# Idempotent: a second preflight must not re-stamp or disturb anything.
+SEQ_DIAG_LEDGER="$L4" SEQ_DIAG_ROOT="${ROOT}/diag_retire" diag preflight \
+    > "${ROOT}/t10d2.log" 2>&1 || true
+want_out "retiring twice is a no-op" "${ROOT}/t10d2.log" "already retired"
+
+echo
+echo "=== 10e. no stage inherits a time limit; an explicit watchdog still works ==="
+if grep -qE 'STAGE_TIMEOUT=|--need .*max_wall' "${REPO}/scripts/seq/run_diagnostic.sh"; then
+    bad "no budget-derived cutoff survives in the runner" "STAGE_TIMEOUT is still assigned"
+else ok "no budget-derived cutoff survives in the runner"; fi
+if grep -q 'SEQ_STAGE_WATCHDOG_SECONDS' "${REPO}/scripts/seq/run_diagnostic.sh"; then
+    ok "the only time limit is the opt-in watchdog"
+else bad "the only time limit is the opt-in watchdog" "bounded() has no watchdog knob"; fi
+# A slow trainer is NOT killed by default.
+rm -rf "${ROOT}/diag_slow"
+MOCK_TRAIN_SLEEP=3 SEQ_DIAG_ROOT="${ROOT}/diag_slow" diag train > "${ROOT}/t10e.log" 2>&1; RC=$?
+want_rc "a slow stage runs to completion by default" 0 "$RC"
+# ... and IS killed when an operator asks for a watchdog.
+rm -rf "${ROOT}/diag_slow2"
+SEQ_STAGE_WATCHDOG_SECONDS=1 MOCK_TRAIN_SLEEP=20 SEQ_DIAG_ROOT="${ROOT}/diag_slow2" \
+    diag train > "${ROOT}/t10f.log" 2>&1; RC=$?
+want_rc "an explicit watchdog stops an over-running stage" 1 "$RC"
+want_out "and says which knob stopped it" "${ROOT}/t10f.log" "stopped by the explicit watchdog"
+TO=$("$MOCK_PY" -c "
+import json,sys
+d=json.load(open(sys.argv[1]))
+print('RECORDED' if any('TIMED OUT' in (e.get('outcome') or '') for e in d['entries']) else 'MISSING')" \
+    "${ROOT}/budget_ledger.json")
+want_eq "the interrupted occupancy is still recorded" "$TO" "RECORDED"
+
+echo
+echo "=== 12. AMENDMENT 01: the early-grid runner, end to end on CPU ==="
+# The original run is the suite's own 1000-step diagnostic in ${ROOT}/diag.
+eg() { ( cd "$REPO" && PATH="${BIN}:$PATH" \
+         SEQ_EG_ORIGINAL_ROOT="${ROOT}/diag" \
+         SEQ_EG_ROOT="${ROOT}/early_grid" \
+         bash scripts/seq/run_early_grid.sh "$@" ) ; }
+EG="${ROOT}/early_grid"
+
+eg preflight > "${ROOT}/t12a.log" 2>&1; RC=$?
+want_rc "the amendment runner's preflight succeeds" 0 "$RC"
+want_out "declares the two changed settings"  "${ROOT}/t12a.log" "declared changes: stopping limit and save cadence"
+want_out "trains for the shortened horizon"   "${ROOT}/t12a.log" "100 steps, dumps every 10"
+want_out "scans ten dumps"                    "${ROOT}/t12a.log" "(10,20,30,40,50,60,70,80,90,100)"
+want_out "offers only nine of them for matching" "${ROOT}/t12a.log" "offered for match : 10,20,30,40,50,60,70,80,90"
+want_out "says the extra dump cannot be selected" "${ROOT}/t12a.log" "cannot be selected"
+want_out "still binds the reused saved artifacts" "${ROOT}/t12a.log" "REGISTERED saved artifact"
+
+eg train > "${ROOT}/t12b.log" 2>&1; RC=$?
+want_rc "the short rerun trains" 0 "$RC"
+want_out "passes the finer cadence through"   "$CALL_LOG" "iters=100 every=10"
+want_eq "ten early dumps per seed on disk" \
+    "$(find "${EG}/models" -name 'delta-*' | wc -l)" "20"
+want_eq "the original run's trajectory is untouched" \
+    "$(find "${ROOT}/diag/models" -name 'delta-*' | wc -l)" "20"
+
+eg dev > "${ROOT}/t12c.log" 2>&1; RC=$?
+want_rc "the early grid is scored on the development set" 0 "$RC"
+want_eq "24 slots: MA, L2 and ten dumps per seed" \
+    "$(find "${EG}/eval_dev" -name detections.jsonl | wc -l)" "24"
+
+# The frozen test set must be unreachable until the bridge has been run AND held.
+eg test > "${ROOT}/t12d.log" 2>&1; RC=$?
+want_rc "the frozen test set is refused before the bridge is checked" 3 "$RC"
+want_out "says why" "${ROOT}/t12d.log" "bridge did not hold (or was never run)"
+want_eq "and nothing was generated for it" \
+    "$(find "${EG}/eval_test" -type f 2>/dev/null | wc -l)" "0"
+
+eg bridge > "${ROOT}/t12e.log" 2>&1; RC=$?
+want_rc "the bridge holds when only the declared settings changed" 0 "$RC"
+want_out "verifies the schedule is horizon-independent" "${ROOT}/t12e.log" "horizon-independent       : True"
+want_out "reports the step-100 weight comparison" "${ROOT}/t12e.log" "weights bitwise identical"
+want_out "reports both realisations' suppression" "${ROOT}/t12e.log" "dog suppression"
+want_out "reaches a verdict" "${ROOT}/t12e.log" "VERDICT: BRIDGE_HELD"
+BR=$("$MOCK_PY" -c "
+import json,sys
+d=json.load(open(sys.argv[1]))
+s=d['per_seed']['17']['settings']
+fu=s['settings_that_determine_the_first_updates']
+print(f\"{s['settings_ok']}/\"
+      f\"{len(s['declared_changes']['stopping_limit_and_derived'])}/\"
+      f\"{len(fu['violations'])}/{fu['n_identical'] == fu['n_compared']}\")" \
+    "${EG}/bridge_check.json")
+want_eq "settings preserved, exactly the declared changes, no violations" \
+    "$BR" "True/3/0/True"
+
+eg select > "${ROOT}/t12f.log" 2>&1 || true
+NSC=$("$MOCK_PY" -c "
+import json,sys; print(json.load(open(sys.argv[1]))['per_seed']['17']['n_dumps_scored'])" \
+    "${EG}/selection.json")
+want_eq "selection considers the nine early dumps only" "$NSC" "9"
 
 echo
 echo "=== 11. isolation: no GPU, no repository mutation, pilot untouched ==="

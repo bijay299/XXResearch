@@ -1,6 +1,13 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
-# Matched-effectiveness diagnostic. Approved: FOUR total GPU-hours.
+# Matched-effectiveness diagnostic.
+#
+# RESOURCE POLICY (PI, 2026-10-10): the four-GPU-hour ceiling, the frozen-test
+# reserve withholding, and every budget-derived cutoff are WITHDRAWN. No
+# replacement cap is invented here. What gates work now is VERIFIED GPU
+# AVAILABILITY -- see acquire_gpus, which polls the real fail-closed selector,
+# waits rather than pre-empting, and never touches another user's job. Usage is
+# still recorded, stage by stage, for provenance and efficiency.
 #
 #   bash scripts/seq/run_diagnostic.sh [stage]
 #       stage: all (default) | preflight | train | dev | select | test
@@ -25,10 +32,20 @@
 # Analysis is a SEPARATE CPU step (scripts/seq/diag_analysis.py) so that no
 # confirmatory number is produced by the same process that spends GPU time.
 #
-# Budget. Every GPU stage runs through `charge`, which refuses to start a stage
-# the remaining budget cannot afford and records the wall time it actually
-# occupied WHETHER OR NOT IT SUCCEEDED. The test stage's cost is reserved from
-# the start. Device-hours, so two GPUs for 30 minutes is 1.0 GPU-hour.
+# Accounting. Every GPU stage runs through `charge`, which now RECORDS rather
+# than gates: it opens a reservation (so an interrupted stage is still
+# reconciled), runs the stage, and records the wall time it actually occupied
+# WHETHER OR NOT IT SUCCEEDED. Device-hours, so two GPUs for 30 minutes is 1.0
+# GPU-hour. Nothing is refused for want of budget and no runtime cutoff is
+# derived from a cost estimate.
+#
+# Watchdog. There is deliberately NO default time limit on a stage. A stage that
+# needs longer than estimated now simply takes longer. If an operator wants a
+# watchdog they set SEQ_STAGE_WATCHDOG_SECONDS explicitly; it then applies
+# per invocation of `bounded`, which is stated plainly because the retired
+# budget-derived bound did NOT bound a whole evaluation slot -- generation and
+# detection each received the full slot allowance, so a slot could occupy twice
+# it. That defect goes away with the cutoff rather than being re-tuned.
 #
 # The saved pilot is read-only here. Nothing is retrained, moved or rewritten,
 # and no other user's job is ever touched.
@@ -48,11 +65,11 @@ EVAL_TEST="${DIAG}/eval_test"
 LOGS="${DIAG}/logs"
 mkdir -p "$DIAG" "$MODELS" "$EVAL_DEV" "$EVAL_TEST" "$LOGS"
 
-# Per-stage estimates. An estimate is BOTH an admission amount and a runtime
-# bound, so it must come from measurement with margin, never from a guess: an
-# under-estimate would kill legitimate work, and an under-provisioned reserve
-# would strand the confirmatory stage after selection had been paid for. The
-# measured model (scripts/seq/diag_cost_model.py) supplies them when present.
+# Per-stage estimates. INFORMATIONAL ONLY since the ceiling was retired: they
+# are recorded beside the actual occupancy so that estimate-vs-actual stays
+# reportable and the cost model can be improved. They admit nothing and bound
+# nothing. The measured model (scripts/seq/diag_cost_model.py) supplies them
+# when present.
 load_estimates() {
     EST_TRAIN="${SEQ_EST_TRAIN:-0.2924}"
     EST_DEV_SLOT="${SEQ_EST_DEV_SLOT:-0.0397}"
@@ -82,10 +99,37 @@ for ((s = SEQ_DIAG_DUMP_EVERY; s <= SEQ_DIAG_ITERATIONS; s += SEQ_DIAG_DUMP_EVER
     DUMP_STEPS+=("$s")
 done
 DUMP_CSV="$(IFS=,; echo "${DUMP_STEPS[*]}")"
+# Which of the scanned dumps are OFFERED FOR MATCHING. Normally all of them.
+# The early-grid amendment scans one extra dump (step 100) purely as a bridge to
+# the original run and must not match on it, so the two lists are separable --
+# and the difference is printed in preflight rather than left implicit.
+MATCH_CSV="${SEQ_DIAG_MATCH_STEPS:-$DUMP_CSV}"
 
 say()  { printf '%s\n' "$*"; }
 head1() { say ""; say "=============================================================="; say "$*"; say "=============================================================="; }
 fail() { say "FATAL: $*" >&2; exit 1; }
+
+# --- ordinary process cleanup -------------------------------------------------
+# Retained independently of the retired budget cutoff: an interrupt must not
+# leave a trainer or a generator holding a device. Only DESCENDANTS of this run
+# are signalled -- never `kill 0`, which would reach whatever launched us, and
+# never anything belonging to another user.
+kill_tree() {
+    local pid="$1" child
+    for child in $(pgrep -P "$pid" 2>/dev/null); do kill_tree "$child"; done
+    kill "$pid" 2>/dev/null
+}
+on_interrupt() {
+    trap - INT TERM
+    say "" >&2
+    say "[cleanup] interrupted: stopping this run's own GPU children." >&2
+    local pid
+    for pid in $(jobs -p 2>/dev/null); do kill_tree "$pid"; done
+    say "[cleanup] the next preflight will reconcile the usage record for" \
+        "whatever was in flight." >&2
+    exit 130
+}
+trap on_interrupt INT TERM
 
 # --- budget ------------------------------------------------------------------
 budget() { CUDA_VISIBLE_DEVICES="" python "$SEQ_BUDGET" "$@"; }
@@ -99,15 +143,17 @@ print(json.loads(line)[sys.argv[1]])' "$2"
 
 # charge <stage> <gpus> <gpu_index> <est_gpu_hours> <reserve:0|1> -- cmd...
 #
-# ADMISSION, not a check-then-hope. `budget admit` writes a durable OPEN
-# RESERVATION holding the full estimate against the balance before anything is
-# launched, so a concurrent lane cannot be admitted against the same GPU-hour.
-# The admission returns the wall-clock bound that estimate implies; the stage
-# exports it as STAGE_TIMEOUT and every GPU child runs under `timeout`, which
-# signals its own process group and so covers the processes accelerate spawns.
-# `budget settle` then charges the ACTUAL occupancy, success, failure or
-# timeout alike. If this shell dies in between, the reservation stays on the
-# books and the next admission reconciles it conservatively.
+# RECORDING, not gating. `budget admit` on a recording-only ledger never
+# refuses and returns no wall-clock bound; it writes a durable OPEN RESERVATION
+# only so that a stage interrupted between start and finish is still reconciled
+# instead of vanishing from the usage record. `budget settle` then records the
+# ACTUAL occupancy, success or failure alike. If this shell dies in between, the
+# reservation stays on the books and the next admission reconciles it
+# conservatively.
+#
+# The `res` argument is vestigial: the frozen-test reserve was withdrawn with
+# the ceiling. It is still passed through so the recorded entries keep saying
+# which stage was confirmatory.
 charge() {
     local stage="$1" gpus="$2" gidx="$3" est="$4" res="$5"; shift 5
     [ "${1:-}" = "--" ] && shift
@@ -122,36 +168,51 @@ charge() {
              --gpus "$gpus" --gpu_index "$gidx" --pid "$mypid" \
              "${resflag[@]}" 2>&1)"
     if [ $? -ne 0 ]; then
+        # Only a broken/missing ledger or a ledger still in the retired CEILING
+        # mode can get here. Either way nothing was launched.
         say "$adm" >&2
-        say "[budget] REFUSED ${stage}; nothing was launched" >&2
+        say "[usage] could not open a usage record for ${stage}; nothing was" \
+            "launched. The ledger must exist and be in recording_only mode" \
+            "(scripts/seq/gpu_budget.py retire)." >&2
         return 97
     fi
     say "$adm"
     rid="$(jfield "$adm" reservation_id)"
-    STAGE_TIMEOUT="$(jfield "$adm" max_wall_seconds)"
-    export STAGE_TIMEOUT
-    local bound="$STAGE_TIMEOUT"
+    # No STAGE_TIMEOUT is derived from the estimate. `bounded` applies a limit
+    # only if an operator set SEQ_STAGE_WATCHDOG_SECONDS explicitly.
     t0=$(date +%s)
     "$@"
     rc=$?
     t1=$(date +%s)
-    unset STAGE_TIMEOUT
     budget settle --ledger "$LEDGER" --id "$rid" \
         --wall_seconds "$((t1 - t0))" --exit_code "$rc" >/dev/null || {
-            say "[budget] CEILING EXCEEDED after ${stage}" >&2; return 98; }
+            say "[usage] could not record ${stage}; see the ledger" >&2; return 98; }
     if [ "$rc" -eq 124 ] || [ "$rc" -eq 137 ]; then
-        say "[budget] ${stage} hit its ${bound}s runtime bound and was stopped;" \
-            "the occupancy it used is charged" >&2
+        say "[usage] ${stage} was stopped by the explicit watchdog" \
+            "(SEQ_STAGE_WATCHDOG_SECONDS=${SEQ_STAGE_WATCHDOG_SECONDS:-unset});" \
+            "the occupancy it used is recorded" >&2
     fi
     return "$rc"
 }
 
-# Run a GPU child under the admitted runtime bound. `timeout` without
-# --foreground puts the child in its own process group and signals the group,
-# so accelerate's workers are stopped too rather than left holding the device.
+# Run a GPU child. By default there is NO time limit: the GPU-hour ceiling that
+# used to supply one is retired, and inventing a replacement would reintroduce
+# exactly the risk the old bound carried -- killing legitimate work because an
+# estimate was low.
+#
+# SEQ_STAGE_WATCHDOG_SECONDS, if an operator sets it, applies PER CALL, not per
+# stage: an evaluation slot calls `bounded` for generation and again for
+# detection, so the slot as a whole can occupy up to twice the value. That was
+# the defect in the retired budget-derived bound and it is stated here rather
+# than papered over; with the cap withdrawn there is nothing to enforce, and the
+# honest limit is the one the operator set.
+#
+# `timeout` without --foreground puts the child in its own process group and
+# signals the group, so accelerate's workers are stopped too rather than left
+# holding the device. That is ordinary cleanup and is retained.
 bounded() {
-    if [ -n "${STAGE_TIMEOUT:-}" ]; then
-        timeout --kill-after=60 "${STAGE_TIMEOUT}" "$@"
+    if [ -n "${SEQ_STAGE_WATCHDOG_SECONDS:-}" ]; then
+        timeout --kill-after=60 "${SEQ_STAGE_WATCHDOG_SECONDS}" "$@"
     else
         "$@"
     fi
@@ -210,6 +271,11 @@ stage_preflight() {
     say "diagnostic root   : ${DIAG}"
     say "seeds             : ${SEEDS[*]}"
     say "dump schedule     : every ${SEQ_DIAG_DUMP_EVERY} to ${SEQ_DIAG_ITERATIONS} (${DUMP_CSV})"
+    say "offered for match : ${MATCH_CSV}"
+    if [ "$MATCH_CSV" != "$DUMP_CSV" ]; then
+        say "                    (the scanned dumps not in this list are measured"
+        say "                     but cannot be selected; see the amendment)"
+    fi
     if [ -n "$(git -C "$PILOT_REPO_ROOT" status --porcelain 2>/dev/null)" ]; then
         say "[warn] working tree is NOT clean; the execution commit above does not" \
             "fully describe what will run" >&2
@@ -285,27 +351,30 @@ PY
     [ "$bad" -eq 0 ] || fail "the artifacts this diagnostic must reuse are not the registered saved ones"
 
     say ""
-    say "--- per-stage estimates (admission amount AND runtime bound) ---"
+    say "--- per-stage estimates (INFORMATIONAL; they gate nothing) ---"
     say "source: ${EST_SOURCE}"
     say "  train trajectory : ${EST_TRAIN} GPU-h"
     say "  development slot : ${EST_DEV_SLOT} GPU-h"
-    say "  frozen-test slot : ${EST_TEST_SLOT} GPU-h  (x6 = the reserve)"
+    say "  frozen-test slot : ${EST_TEST_SLOT} GPU-h"
+    say "These are recorded beside the actual occupancy so estimate-vs-actual"
+    say "stays reportable. No stage is refused and no stage is time-limited"
+    say "because of them."
     say ""
-    say "--- budget ledger (the EXPERIMENT's, not this output directory's) ---"
+    say "--- GPU-hour USAGE RECORD (the EXPERIMENT's, not this output directory's) ---"
     say "ledger: ${LEDGER}"
-    if [ -s "$LEDGER" ]; then
-        # Charge anything a crash or interruption left unaccounted BEFORE any
-        # new admission decision is taken.
-        budget reconcile --ledger "$LEDGER" || true
-        budget report --ledger "$LEDGER"
-    else
-        budget init --ledger "$LEDGER" \
-            --ceiling "$SEQ_DIAG_CEILING_GPU_HOURS" \
-            --reserve "$SEQ_DIAG_TEST_RESERVE_GPU_HOURS" \
-            --reserve_for frozen_test \
-            --reserve_basis "6 frozen-test slots x ${EST_TEST_SLOT} GPU-h, from ${EST_SOURCE}" \
-            --commit "$COMMIT" || fail "ledger init"
+    if [ ! -s "$LEDGER" ]; then
+        budget init --ledger "$LEDGER" --commit "$COMMIT" || fail "ledger init"
     fi
+    # Explicitly disable the retired enforcement on whatever ledger we found,
+    # rather than leaving a 4.0-ceiling ledger in place and hoping no stage ever
+    # trips it. Idempotent, and it stamps what the record held at the switch.
+    budget retire --ledger "$LEDGER" \
+        --authority "PI, 2026-10-10" \
+        --reason "Compute is bounded by verified GPU availability, not by an hour cap. The four-GPU-hour ceiling, the frozen-test reserve withholding and all budget-derived cutoffs are withdrawn; no replacement cap is imposed." \
+        || fail "could not retire budget enforcement on ${LEDGER}"
+    # Record anything a crash or interruption left unaccounted.
+    budget reconcile --ledger "$LEDGER" || true
+    budget report --ledger "$LEDGER"
     say ""
     say "--- GPU capacity (real fail-closed probe) ---"
     acquire_gpus 2 || return 1
@@ -592,7 +661,7 @@ stage_dev() {
 stage_select() {
     head1 "3. SELECTION on the development set (CPU; no GPU time)"
     CUDA_VISIBLE_DEVICES="" python scripts/seq/select_matched_dump.py \
-        --dev_root "$EVAL_DEV" --seeds "${SEEDS[*]}" --dump_steps "$DUMP_CSV" \
+        --dev_root "$EVAL_DEV" --seeds "${SEEDS[*]}" --dump_steps "$MATCH_CSV" \
         --out "${DIAG}/selection.json"
 }
 

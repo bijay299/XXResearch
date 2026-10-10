@@ -19,8 +19,12 @@ separately and the stronger ones are refused:
   4. NUMERICAL           do the weights agree, and if not by how much, per
                          tensor and in aggregate?
 
-  NOT ASSESSED: training equivalence, and any behavioural claim. Those would
-  need matched generation and scoring, which this tool does not do.
+  NOT ASSESSED: training equivalence, any behavioural claim, and the CAUSE of
+  any difference found. The first two would need matched generation and scoring.
+  The third would need a CONTROLLED REPEAT: identical RECORDED configuration and
+  parent do not isolate nondeterminism, because the two runs also differ in
+  library and driver state, in upstream code path (periodic checkpointing), in
+  dataloader ordering, and in anything outside the 32 recorded hyperparameters.
 
 The legacy completion caveat is preserved and restated: the saved MAB reports
 predate `optimizer_steps_completed`, so MAB's training completion is UNVERIFIED,
@@ -162,7 +166,9 @@ def compare_one(seed: int, u_dir: Path, mab_dir: Path, ma_path: Path,
         "training_equivalence": (
             "NOT ASSESSED. Neither identical configuration nor a numerical "
             "distance establishes that the two runs are behaviourally "
-            "equivalent; that would need matched generation and scoring."),
+            "equivalent; that would need matched generation and scoring. The "
+            "CAUSE of any numerical difference is equally NOT ASSESSED: it "
+            "would need a controlled repeat."),
     }
 
 

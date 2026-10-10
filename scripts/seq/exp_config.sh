@@ -170,7 +170,11 @@ export SEQ_EVAL_MANIFEST_SHA="${SEQ_EVAL_MANIFEST_SHA:-0020c81c4a4dd3580a6574c91
 # against the frozen registry. It takes no seed number and no directory label.
 # Fail-closed: anything unexpected yields the strict `counter` policy.
 # ---------------------------------------------------------------------------
-# MATCHED-EFFECTIVENESS DIAGNOSTIC (approved: four total GPU-hours).
+# MATCHED-EFFECTIVENESS DIAGNOSTIC.
+#
+# RESOURCE POLICY (PI, 2026-10-10): no GPU-hour ceiling. Compute is bounded by
+# verified GPU availability; usage is still recorded. See
+# docs/research/RESOURCE_POLICY_2026-10-10.md.
 #
 # Writes into its OWN root. The saved pilot under ${SEQ_ROOT}/models,
 # ${SEQ_ROOT}/eval and ${SEQ_ROOT}/eval_seed29 is read-only here: the parents
@@ -191,23 +195,33 @@ export SEQ_TEST_MANIFEST="${SEQ_TEST_MANIFEST:-${PILOT_REPO_ROOT}/results/audit_
 export SEQ_TEST_MANIFEST_SHA="${SEQ_TEST_MANIFEST_SHA:-5dd87dbb5a77c0f4c75de79a19b15b0b2e9cddc90d08172857700dac1bcc2a95}"
 export SEQ_BOOTSTRAP_GROUPING="${SEQ_BOOTSTRAP_GROUPING:-${PILOT_REPO_ROOT}/results/audit_v1/draft_manifests/bootstrap_grouping.json}"
 
-# The HARD ceiling, in device-hours, counting successes, failed attempts and
-# setup alike. The confirmatory test stage is reserved so development work
-# cannot consume it and leave the experiment with selection done and no
-# confirmatory measurement. Both figures come from the approved cost model
-# (results/audit_v1/protocol_cost_model.json).
-export SEQ_DIAG_CEILING_GPU_HOURS="${SEQ_DIAG_CEILING_GPU_HOURS:-4.0}"
-# The reserve IS the sum of the frozen-test stage's own admitted estimates
-# (6 slots x 0.2246 GPU-h, from the measured cost model), so the two can never
-# disagree. The earlier hand-written 1.008 could NOT cover the stage it existed
-# to protect: the runner admitted six slots at 0.18 = 1.08 GPU-h against it.
-export SEQ_DIAG_TEST_RESERVE_GPU_HOURS="${SEQ_DIAG_TEST_RESERVE_GPU_HOURS:-1.3474}"
+# RETIRED, deliberately left unset. SEQ_DIAG_CEILING_GPU_HOURS (4.0) and
+# SEQ_DIAG_TEST_RESERVE_GPU_HOURS (1.3474) used to define a hard device-hour cap
+# and a withheld confirmatory reserve. The PI withdrew both on 2026-10-10:
+# compute is bounded by GPU availability, not by an hour budget, and NO
+# replacement cap is defined here. The two figures survive in the ledger's
+# `retirement` block and in the historical record, not as live settings.
+#
+# The cost model stays, because estimates are still wanted -- for planning,
+# provenance, and estimate-vs-actual efficiency reporting. They gate nothing.
 export SEQ_DIAG_COST_MODEL="${SEQ_DIAG_COST_MODEL:-${SEQ_DIAG_ROOT}/cost_model_measured.json}"
 # The ledger belongs to the EXPERIMENT, not to one output directory. Keeping it
 # inside ${SEQ_DIAG_ROOT} meant a new output directory started from a zero
 # balance, which would silently re-grant spend the PI had already paid for.
 export SEQ_DIAG_LEDGER="${SEQ_DIAG_LEDGER:-${SEQ_ROOT}/matched_effectiveness_gpu_budget.json}"
 export SEQ_BUDGET="${SEQ_BUDGET:-${PILOT_REPO_ROOT}/scripts/seq/gpu_budget.py}"
+
+# A stage time limit is now OPT-IN and is nobody's default. The retired
+# budget-derived bound was computed from a cost estimate, which meant a low
+# estimate could kill legitimate work; it also applied per child rather than per
+# evaluation slot, so a slot could occupy twice it. Set this only if you want a
+# watchdog, and read scripts/seq/run_diagnostic.sh:bounded for what it bounds.
+export SEQ_STAGE_WATCHDOG_SECONDS="${SEQ_STAGE_WATCHDOG_SECONDS:-}"
+
+# Which scanned dumps may be SELECTED. Empty = all of them, which is the
+# ordinary case. The early-grid amendment sets it so that the step-100 bridge
+# dump is measured but never matched on.
+export SEQ_DIAG_MATCH_STEPS="${SEQ_DIAG_MATCH_STEPS:-}"
 
 # Bounded wait for capacity on a shared host with no scheduler. This is the only
 # queue this host has: poll the real fail-closed selector and start only on
