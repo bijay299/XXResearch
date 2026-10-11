@@ -138,17 +138,30 @@ The item-level mapping and any prior labels live with the key, **outside** both
 packets, because overlap reveals set membership; only aggregate counts are
 committed. No key is disclosed and the two samples are not mixed.
 
-**Additionally disclosed — the earlier packets' blinded ids are enumerable.**
-Blinded ids are `sha256(salt | image_path)[:12]` over *deterministic* image
-paths, and the v1 and v2 packets **published their salts** (`AUDIT-01`,
-`AMENDMENT-01`). A few hundred hashes per cell therefore recover the arm of
-every item in those packets for anyone with repository access. The paired packet
-uses a **fresh 32-byte secret salt** stored beside its key, publishing only the
-digest, and withholds the drawn tuples from the published manifest. The two
-earlier packets are **preserved exactly as delivered and were not rebuilt**;
-this is recorded so no reader assumes the three blind equally. It is a
-theoretical path requiring deliberate effort, not an observed de-blinding, and
-the annotator is given only the packet directory.
+**Verified by attack, not asserted — and one finding is against our own new
+packet.** [`BLINDING_AUDIT.md`](annotation_packet_paired180/BLINDING_AUDIT.md)
+attacks the committed, key-free records of all three packets with
+`scripts/seq/audit_packet_blinding.py`, opening no key and printing no salt:
+
+| packet | identifier channel | row-order channel |
+|---|---|---|
+| paired 180 | **holds** (secret salt; only its digest published) | **holds** (separate secret-seeded RNG; best reconstruction 57/180, below chance) |
+| supplementary 228 | **BROKEN — 228/228 ids regenerated** from published records using the published salt `AMENDMENT-01` | not modelled |
+| pilot 236 | salt published under a different id rule; path enumeration got 0/236 — a weakness, not a pass | not modelled |
+
+**The paired packet's first build was itself broken**, on the row-order channel:
+one RNG drew the sample *and* shuffled the rows and its seed was published, so
+the attack replayed **180/180 positions exactly** and the secret salt was
+irrelevant. Fixed by shuffling under a separate secret-seeded RNG, with the
+sampling seed left public so the draw stays auditable; the drawn tuples are
+published again, because withholding them was omission rather than protection.
+
+**The 228-item packet's exposure predates this closeout.** The same attack
+breaks it using **only files committed at `7e01fbd`**, so publishing the raw
+detector rows did not cause it. It is **preserved exactly as delivered and was
+not rebuilt**, per the handoff; **0 of its 228 cells are filled** (as are 0 of
+236 and 0 of 180), so no human work is lost. Re-salting it before any annotation
+would change its item ids and is left as a decision for the PI, not taken here.
 
 ---
 

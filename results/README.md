@@ -41,6 +41,7 @@ checkpoints, Excel reports and logs are git-excluded and live under
 > | [`audit_v1/CORRECTED_TABLES.md`](audit_v1/CORRECTED_TABLES.md) | corrected counts and the direct L2 contrasts the snapshot never computed |
 > | [`audit_v1/ARTIFACT_INVENTORY.md`](audit_v1/ARTIFACT_INVENTORY.md) | what is reusable; **no intermediate checkpoints exist** |
 > | [`audit_v1/CLAIM_CORRECTIONS_V2.md`](audit_v1/CLAIM_CORRECTIONS_V2.md) | corrections to the audit's own first write-up |
+> | [`audit_v1/PUBLISHED_EVIDENCE_INDEX.md`](audit_v1/PUBLISHED_EVIDENCE_INDEX.md) | exact path and sha256 of every published, key-free file — verify any row without trusting the table |
 > | [`audit_v1/AMENDMENT_01_CLOSEOUT.md`](audit_v1/AMENDMENT_01_CLOSEOUT.md) | **start here for the latest result.** Amendment 01 run and closed: development matched at step 70, **test conditions failed on both seeds**, matched-retention question **inconclusive in the intended regime** |
 > | [`audit_v1/AMENDMENT_01_RESULTS.md`](audit_v1/AMENDMENT_01_RESULTS.md) | the corrected results in full, with the evidence index |
 > | [`audit_v1/CLAIM_CORRECTIONS_V5.md`](audit_v1/CLAIM_CORRECTIONS_V5.md) | the withdrawn practical-equivalence reading, the annotation-deliverable reconciliation, and the archive gap |

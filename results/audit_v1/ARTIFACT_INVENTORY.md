@@ -244,3 +244,16 @@ changed, the frozen test set was not touched again, and both step-70 checkpoints
 and all run outputs are preserved. The only new computation is a CPU re-analysis
 of the existing detector rows; the two superseded analysis records are kept
 verbatim beside the current one.
+
+### Added by the closeout publication round (2026-10-10)
+
+| file | purpose |
+|---|---|
+| `scripts/seq/audit_packet_blinding.py` | **attacks** a blinded packet using only its committed key-free records, two channels: identifier enumeration (`sha256(salt \| image_path)` over deterministic paths) and row-order replay from a published sampling RNG. Opens no key, prints no salt; exit 0 repelled, 1 broken, 2 not modelled |
+| `results/audit_v1/annotation_packet_paired180/BLINDING_AUDIT.md`, `blinding_audit.log` | the result for all three packets. The paired packet's **first build was de-blinded 180/180** on the row-order channel despite a secret salt; fixed by a separate secret-seeded order RNG. The **228-item packet is BROKEN** on the identifier channel, reproducibly from files committed at `7e01fbd` — preserved as delivered, 0 labels filled, re-salting left to the PI |
+| `results/audit_v1/PUBLISHED_EVIDENCE_INDEX.md` | exact path and sha256 of every published file, so a reviewer can verify any row with `git show <commit>:<path> \| sha256sum` without trusting the table |
+| `docs/research/NEXT_SCREEN_PROPOSAL.md` (revision 2) | prior-work account corrected against CEASE §3.2/§3.3/A.5 and LACU; eligibility separated from iso-deletion with residue as the matching quantity; the four concept/anchor cells and their identification limits; stagewise relapse defined against each target's own post-erasure checkpoint |
+
+**No GPU work, and no change to any measurement.** The paired packet was rebuilt
+from the same existing images with new blinded ids; no labels existed in any
+packet, so nothing was lost.

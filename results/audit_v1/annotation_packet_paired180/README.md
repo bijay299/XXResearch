@@ -47,28 +47,41 @@ sampling RNG. The build **aborts** if a probe finds any arm, seed, detector
 string or the salt in the packet's text files, if the key, salt or overlap report
 is inside the packet, or if any label cell is non-empty.
 
-**The blinding salt is a secret, and it has to be.** Blinded ids are
-`sha256(salt | image_path)[:12]`, and image paths are deterministic —
-`<eval_root>/seed<S>_<arm>/images/<prompt_id>_seed<gs>.jpg`. With a *published*
-salt, anyone who can read the manifest could hash the few hundred candidate
-paths per cell and recover the arm of every item: a published salt is not a
-blind at all. A fresh 32-byte secret is therefore generated per packet, written
-beside the key at `BLINDING_SALT_SECRET.txt` (mode 600, outside the packet), and
-only its **sha256** is published. For the same reason the published manifest
-**withholds the drawn `(prompt_id, gen_seed)` tuples** and their generation
-seeds — the counts and realised family splits, which are what a reviewer needs,
-are published in full. Passing the stored secret back via `--salt` reproduces
-the packet exactly.
+**Two channels could de-blind this packet, and both were attacked, not
+assumed** — full report: [`BLINDING_AUDIT.md`](BLINDING_AUDIT.md), verbatim
+output in [`blinding_audit.log`](blinding_audit.log).
 
-> **Disclosed, not silently fixed:** the earlier packets
-> ([`../annotation_packet/`](../annotation_packet/), salt `AUDIT-01`;
-> [`../annotation_packet_v2/`](../annotation_packet_v2/), salt `AMENDMENT-01`)
-> published their salts, so their blinded ids have the enumerability described
-> above. Those packets are **preserved as delivered** and were not rebuilt. It
-> is a theoretical de-blinding path, not an observed one: it needs repository
-> access and deliberate effort, and the person being blinded is the annotator,
-> who is given only the packet directory. It is recorded here so a future reader
-> does not assume all three packets blind equally.
+1. **The identifier.** Blinded ids are `sha256(salt | image_path)[:12]` and image
+   paths are deterministic — `<eval_root>/seed<S>_<arm>/images/<prompt_id>_seed<gs>.jpg`
+   — so a *published* salt makes the whole id space enumerable. The salt is
+   therefore a fresh 32-byte **secret**, stored beside the key at
+   `BLINDING_SALT_SECRET.txt` (mode 600, outside the packet); only its sha256 is
+   published.
+2. **The row order.** This one actually broke the packet's **first build**: one
+   `random.Random(20261012)` both drew the sample and shuffled the rows, and that
+   seed was published, so the attack replayed **180/180 positions exactly** and
+   recovered the arm of every row — the secret salt was irrelevant, because the
+   channel was position. The row order is now shuffled by a **separate RNG seeded
+   from the secret**, published only as `order_seed_sha256`.
+
+The **sampling** seed stays public deliberately: a reader must be able to replay
+the draw and confirm it consumed no detector output. So tuple **membership is
+public by design**, and the drawn tuples are published in full; what is protected
+is the **assignment** of arm and training seed to a row. Knowing membership, a
+reader still faces a 1-in-6 guess per row within that row's visible category.
+Passing the stored secret back via `--salt` reproduces the packet exactly.
+
+> **The 228-item packet is BROKEN on channel 1, and preserved anyway.** Attack 1
+> regenerated **228/228** of its ids from published records using its published
+> salt `AMENDMENT-01` — and does so from **only the files committed at
+> `7e01fbd`**, so this predates the closeout's evidence archive and was not
+> caused by publishing the raw detector rows. It is preserved as delivered and
+> was **not** rebuilt, per the handoff; **0 of its 228 label cells are filled**,
+> so nothing is lost today. If it is to be annotated it should be re-salted and
+> re-ordered first, which changes its item ids — a decision left to the PI. The
+> pilot packet publishes its salt too, under a different id rule that this
+> attack did not break; that is a weakness, not a pass. **The three packets do
+> not blind equally.**
 
 **Disclosed:** a paired packet necessarily contains three images of the same
 prompt and generation seed. An annotator may notice the similarity and infer

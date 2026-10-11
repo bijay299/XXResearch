@@ -30,13 +30,26 @@ Hidden: which arm produced an image, which training seed, and everything the
 detector produced. Shown: the category to judge, because without it there is no
 question. Order is shuffled once under the sampling RNG.
 
-The blinding salt is a SECRET and is not published. Blinded ids are
-``sha256(salt | image_path)[:12]`` and image paths are deterministic, so a
-published salt would let anyone who can read the manifest enumerate a few
-hundred hashes and recover the arm of every item. A published salt is therefore
-not a blind at all. A fresh 32-byte secret is generated per packet, stored beside
-the KEY outside the packet, and only its sha256 appears in the manifest; the
-drawn tuples are withheld from the published copy for the same reason.
+TWO channels can de-blind a packet, and both are closed here.
+
+1. THE IDENTIFIER. Blinded ids are ``sha256(salt | image_path)[:12]`` and image
+   paths are deterministic, so a PUBLISHED salt lets anyone who can read the
+   manifest enumerate a few hundred hashes and recover the arm of every item.
+   The salt is therefore a fresh 32-byte secret, stored beside the KEY outside
+   the packet; only its sha256 is published.
+
+2. THE ROW ORDER. If one RNG both draws the sample and shuffles the rows, and
+   its seed is published, the ordered item list -- arm included -- replays from
+   published data, and a secret salt does nothing about it. ``audit_packet_
+   blinding.py`` reconstructed 180/180 rows of this packet's first build exactly
+   that way. The row order is therefore shuffled by a SEPARATE RNG seeded from
+   the secret.
+
+The SAMPLING seed stays public on purpose: a reader must be able to replay the
+draw and confirm it consumed no detector output. So tuple MEMBERSHIP is public
+by design; what is protected is the ASSIGNMENT of arm and training seed to a
+sheet row. Verify with ``scripts/seq/audit_packet_blinding.py``, which attacks
+the published records and never opens a key.
 
 Disclosed limitation of a paired packet: it necessarily contains three images of
 the same prompt and generation seed. An annotator may notice the visual
@@ -198,6 +211,44 @@ def main() -> int:
     seeds = [int(x) for x in a.seeds.replace(",", " ").split()]
     man = json.loads(Path(a.manifest).read_text())
 
+    # ---- the blinding secret, resolved BEFORE anything is drawn ----------
+    #
+    # TWO channels can de-blind a packet, and both must be closed.
+    #
+    #  (1) THE IDENTIFIER. Blinded ids are sha256(salt | image_path)[:12] and
+    #      image paths are deterministic --
+    #      <eval_root>/seed<S>_<arm>/images/<prompt_id>_seed<gs>.jpg -- so a
+    #      PUBLISHED salt makes the whole id space enumerable.
+    #
+    #  (2) THE ROW ORDER. If one RNG both draws the sample and shuffles the
+    #      rows, and its seed is published, the ordered item list -- arm
+    #      included -- replays from published data and position alone de-blinds
+    #      every row. A secret salt does nothing about this. This is not
+    #      hypothetical: scripts/seq/audit_packet_blinding.py reconstructed
+    #      180/180 rows of the first build of this packet that way.
+    #
+    # So: the SAMPLING seed stays PUBLIC, because a reader must be able to
+    # replay the draw and confirm it used no detector input -- tuple MEMBERSHIP
+    # is public by design. The ORDER seed is derived from the secret and is not
+    # published, so the ASSIGNMENT of arm to row is what stays hidden.
+    out_root_early = Path(a.out_root)
+    out_root_early.mkdir(parents=True, exist_ok=True)
+    salt_p = out_root_early / "BLINDING_SALT_SECRET.txt"
+    if a.salt:
+        salt = a.salt
+        salt_source = "supplied on the command line (reproducing an existing packet)"
+    elif salt_p.is_file():
+        salt = salt_p.read_text().strip()
+        salt_source = f"read from the stored secret at {salt_p}"
+    else:
+        salt = secrets.token_hex(32)
+        salt_p.write_text(salt + "\n")
+        salt_p.chmod(0o600)
+        salt_source = f"freshly generated and stored at {salt_p}"
+    salt_sha = hashlib.sha256(salt.encode()).hexdigest()
+    order_seed = hashlib.sha256(f"{salt}|row-order".encode()).hexdigest()
+    order_sha = hashlib.sha256(order_seed.encode()).hexdigest()
+
     # ---- the tuple universe, from the FROZEN MANIFEST ---------------------
     universe: dict[tuple[int, str], list[tuple[str, int]]] = {}
     by_tuple: dict[tuple[str, int], dict] = {}
@@ -261,7 +312,9 @@ def main() -> int:
     expected = len(seeds) * len(CATEGORIES) * a.tuples_per_cell * len(ARMS)
     if len(items) != expected:
         raise SystemExit(f"FATAL: built {len(items)} items, expected {expected}")
-    rng.shuffle(items)
+    # A SEPARATE RNG, seeded from the secret: see the note above. Reusing `rng`
+    # here would publish the row order along with the sampling seed.
+    random.Random(order_seed).shuffle(items)
 
     # ---- prior labels, so no human work is repeated or lost ---------------
     prior_sheets = [Path(x) for x in a.compare_packets.split() if x]
@@ -282,28 +335,6 @@ def main() -> int:
     out_root = Path(a.out_root)
     packet = out_root / "packet"
     (packet / "images").mkdir(parents=True, exist_ok=True)
-
-    # ---- the blinding salt is a SECRET, not a label ----------------------
-    #
-    # Blinded ids are sha256(salt | image_path)[:12], and image paths are
-    # DETERMINISTIC: <eval_root>/seed<S>_<arm>/images/<prompt_id>_seed<gs>.jpg.
-    # With a published salt the whole id space is enumerable -- a few hundred
-    # hashes recover the arm of every item -- so a published salt is not a
-    # blind, whatever the manifest says. The salt is therefore a fresh secret
-    # kept with the key, OUTSIDE the packet, and only its digest is published.
-    salt_p = out_root / "BLINDING_SALT_SECRET.txt"
-    if a.salt:
-        salt = a.salt
-        salt_source = "supplied on the command line (reproducing an existing packet)"
-    elif salt_p.is_file():
-        salt = salt_p.read_text().strip()
-        salt_source = f"read from the stored secret at {salt_p}"
-    else:
-        salt = secrets.token_hex(32)
-        salt_p.write_text(salt + "\n")
-        salt_p.chmod(0o600)
-        salt_source = f"freshly generated and stored at {salt_p}"
-    salt_sha = hashlib.sha256(salt.encode()).hexdigest()
 
     sheet_rows, key_rows, overlap_rows = [], [], []
     for r in items:
@@ -451,7 +482,20 @@ def main() -> int:
             "hidden_from_annotator": ["arm", "training seed", "detector score",
                                       "detector verdict", "tuple grouping"],
             "shown_to_annotator": ["the category to judge"],
-            "order": f"shuffled once under RNG seed {a.sampling_seed}",
+            "order": ("shuffled once under a SEPARATE RNG seeded from the "
+                      "secret; the sampling seed does NOT reproduce the row "
+                      "order"),
+            "order_seed_sha256": order_sha,
+            "what_is_public_by_design": (
+                "tuple MEMBERSHIP. The sampling seed is published so a reader "
+                "can replay the draw and confirm it used no detector input; "
+                "that replay reveals WHICH 60 tuples were drawn."),
+            "what_is_protected": (
+                "the ASSIGNMENT of arm and training seed to a sheet row. Both "
+                "channels that could leak it are closed: the identifier (secret "
+                "salt) and the row order (separate secret-seeded RNG). Verify "
+                "with scripts/seq/audit_packet_blinding.py, which attacks the "
+                "published records and opens no key."),
             "blinded_id_rule": "sha256(<secret salt> | <image_path>)[:12]",
             "salt_is_secret": (
                 "The salt is NOT published. Image paths are deterministic, so a "
@@ -507,18 +551,12 @@ def main() -> int:
         rp.mkdir(parents=True, exist_ok=True)
         shutil.copy2(packet / "label_sheet.csv", rp / "label_sheet_EMPTY.csv")
         shutil.copy2(packet / "INSTRUCTIONS.md", rp / "INSTRUCTIONS.md")
-        # The drawn tuples are NOT published: with them, the id space shrinks
-        # to a few hundred candidates per cell. Counts and realised splits are,
-        # because those are what a reviewer needs.
-        pub = json.loads((out_root / "packet_manifest.json").read_text())
-        for cell in pub["sampling"]["per_cell"].values():
-            cell.pop("tuples", None)
-            cell.pop("distinct_gen_seeds", None)
-        pub["sampling"]["withheld_from_this_copy"] = (
-            "the drawn (prompt_id, gen_seed) tuples and their generation seeds. "
-            "They live in the full manifest beside the key, outside the "
-            "repository, for the same reason the salt does.")
-        (rp / "packet_manifest.json").write_text(json.dumps(pub, indent=2) + "\n")
+        # The drawn tuples ARE published. Withholding them would be security
+        # by omission, not security: the published sampling seed replays the
+        # draw anyway, and membership is meant to be auditable. What protects
+        # the blind is the secret salt and the secret row order, not secrecy
+        # about which tuples were chosen.
+        shutil.copy2(out_root / "packet_manifest.json", rp / "packet_manifest.json")
         (rp / "overlap_summary.json").write_text(json.dumps({
             "_what_this_is": ("Aggregate overlap between this paired packet and "
                               "the previously delivered supplementary packet. "
@@ -546,6 +584,8 @@ def main() -> int:
     print(f"  key              : {keyp}  (outside the packet)")
     print(f"  blinding salt    : {salt_p}  (SECRET, outside the packet; "
           f"digest {salt_sha[:12]}…)")
+    print(f"  row order        : separate RNG seeded from the secret "
+          f"(digest {order_sha[:12]}…); the sampling seed does NOT reproduce it")
     print(f"  overlap report   : {overlapp}  (outside the packet)")
     print(f"  overlapping imgs : {len(overlap_rows)} "
           f"({sum(1 for r in overlap_rows if r['already_labelled'])} already "
