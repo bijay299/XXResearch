@@ -1,7 +1,7 @@
 {
-  "_what_this_is": "Source identity for the Amendment 01 CLOSEOUT corrections, recorded with the CPU check logs beside it. The logs in this directory were produced by exactly these bytes. No GPU was used.",
+  "_what_this_is": "Source identity for the Amendment 01 CLOSEOUT corrections, recorded with the CPU check logs beside it. No GPU was used.",
   "git_head_at_check_time": "7e01fbd33bfce24fbfe56aada5eba7273429f34c",
-  "note": "HEAD above is the PARENT commit: these checks ran on the working tree that the next commit records. The sha256 of each file is the binding that matters.",
+  "note": "The sha256 block records the identity of every script in this round. It is NOT a claim that every one of them was exercised by the logs: see logs_cover below for which bytes each log actually ran against. git_head_at_check_time is the PARENT commit - the checks ran on the working tree that the next commit records.",
   "results": {
     "test_diag_analysis.py": {
       "log": "closeout_test_diag_analysis.log",
@@ -28,12 +28,13 @@
     "failed": 0
   },
   "sha256": {
+    "scripts/seq/audit_packet_blinding.py": "63b3ab756620d8dbdb64c397e524e29ba7e7b02f4981280cf6c3d5022fc3bc81",
+    "scripts/seq/build_amendment01_evidence.py": "62fbe6078b1cef76592d4f572f6e0191c2740279b0a6283486ba71c620f7e1fc",
+    "scripts/seq/build_paired_annotation_packet.py": "c3b38da6f66f347504288a8f9ad9d80301398a63e0067102777b2160a434fd99",
     "scripts/seq/diag_analysis.py": "90059e03c132f33a8cc29856bff83671f8e87d2ffd573258651132bb6f0296e0",
     "scripts/seq/test_diag_analysis.py": "069c36782d621a5aeea2a57e2728376fc474f21bc14a94d7a126fc4f766b6851",
     "scripts/seq/test_diag_test_conditions.py": "6a532df3b861509bea32c1c025583b2344b84d2f07b042426c7a3515fd3c6aea",
-    "scripts/seq/build_paired_annotation_packet.py": "c3b38da6f66f347504288a8f9ad9d80301398a63e0067102777b2160a434fd99",
-    "scripts/seq/build_amendment01_evidence.py": "62fbe6078b1cef76592d4f572f6e0191c2740279b0a6283486ba71c620f7e1fc",
-    "scripts/seq/audit_packet_blinding.py": "63b3ab756620d8dbdb64c397e524e29ba7e7b02f4981280cf6c3d5022fc3bc81"
+    "scripts/seq/publish_evidence_index.py": "a1c0c8390afea828bf388dcf65bc5a1c4e8e084cdc6f44d82562734e42ffd548"
   },
   "also_verified": {
     "amendment01_evidence/MANIFEST.json": "all 15 listed payloads present; sha256 and byte count re-checked independently; 0 failures; access_limitations empty",
@@ -41,5 +42,26 @@
     "paired packet": "180 items, 60 tuples x 3 arms, 18 cells of 10, 180 distinct images, 0 non-empty label cells, key and overlap report outside the packet",
     "paired packet blinding": "attacked, not asserted. The FIRST build was de-blinded 180/180 via the published sampling seed and row order despite a secret salt; fixed by shuffling under a separate secret-seeded RNG. The sampling seed stays public so the draw remains auditable. No secret value, key-derived field or label appears anywhere in the repository (grepped).",
     "label state": "0 of 180, 0 of 228 and 0 of 236 label cells are filled across the three packets; no human annotation has been performed anywhere in this project"
+  },
+  "logs_cover": {
+    "closeout_test_diag_analysis.log": [
+      "scripts/seq/diag_analysis.py",
+      "scripts/seq/test_diag_analysis.py"
+    ],
+    "closeout_test_diag_test_conditions.log": [
+      "scripts/seq/diag_analysis.py",
+      "scripts/seq/test_diag_analysis.py",
+      "scripts/seq/test_diag_test_conditions.py",
+      "results/audit_v1/amendment01_evidence/analysis_test.json"
+    ],
+    "../annotation_packet_paired180/blinding_audit.log": [
+      "scripts/seq/audit_packet_blinding.py"
+    ],
+    "_not_covered_by_any_log": [
+      "scripts/seq/build_paired_annotation_packet.py",
+      "scripts/seq/build_amendment01_evidence.py",
+      "scripts/seq/publish_evidence_index.py"
+    ],
+    "_note": "the three builders are verified by their OUTPUTS instead - the evidence manifest's 15 payloads re-checked independently, the paired packet's structural counts, and the index's 38 rows re-hashed against the pushed blobs - not by a unit-test log. build_paired_annotation_packet.py changed AFTER the two test logs were produced; no logged test exercises it, so no log is stale."
   }
 }

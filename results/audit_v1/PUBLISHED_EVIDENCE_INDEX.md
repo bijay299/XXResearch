@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `f7a48b635364` — the commit that *records*
+Generated at parent commit `bb2e6a5c979a` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **No annotation key, key-derived field, blinding salt or label value
@@ -64,7 +64,7 @@ after every listed file is final.
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/audit_v1/amendment01_checks/CLOSEOUT_SOURCE_HASHES.json` | 3,170 | `8919f8ec2de8293a1d44bfe8a7f1a1661aafc359dde2eccb6b3a435abecbdf67` |
+| `results/audit_v1/amendment01_checks/CLOSEOUT_SOURCE_HASHES.json` | 4,476 | `3701c2ee2725326c0b3a6ae48fa259a66abd063bd916e2a308f8c3a635c06c2b` |
 | `results/audit_v1/amendment01_checks/closeout_test_diag_analysis.log` | 2,218 | `edf123950ba21831af3c877e03651898c5e60b22086fb4306431631308632b31` |
 | `results/audit_v1/amendment01_checks/closeout_test_diag_test_conditions.log` | 3,584 | `714f452065566ed9171ae290797ec5ea8d3047ba0e28b6ad2747357a8c4ffdf7` |
 
