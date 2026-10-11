@@ -9,7 +9,9 @@ involved.
 
 Verbatim output: [`blinding_audit.log`](blinding_audit.log). Regressions:
 [`scripts/seq/test_packet_delivery_gate.py`](../../../scripts/seq/test_packet_delivery_gate.py)
-— **27 checks, 0 failures**. CPU only. **No images were generated.**
+— **42 checks, 0 failures**. CPU only. **No images were generated and no packet
+was rebuilt for this round: the 180 item ids, the blank sheet and every label
+are unchanged.**
 
 ## The gate certified deliveries it had never seen — fixed
 
@@ -31,10 +33,33 @@ pass:
 | `REJECTED` | the input is not fit to certify; **no blinding claim either way** | 3 |
 
 Rejected inventories, each with its own regression: empty directory; one
-unrelated file; a referenced file missing; an unreferenced extra file; two rows
-referencing one file; an unreadable referenced file; an empty comparison corpus.
-File count and **distinct-hash** count are now reported separately, and two
-items sharing byte-identical content is itself `UNRESOLVED`.
+unrelated file; **an empty *and* a non-empty sibling directory**; **a sheet path
+escape** (absolute or `..`); a referenced file missing; an unreferenced extra
+file; two rows referencing one file; an unreadable referenced file; **readable
+text named `.png`**; **a truncated image**; an empty comparison corpus.
+
+**Path policy, stated.** A sheet `image` value is relative to the packet root,
+and `--delivered_images` must be the directory those values point into. Nested
+values are permitted but every resolved path must lie **inside** the supplied
+directory, the on-disk set is enumerated **recursively**, and set equality is
+**two-way**. This closes a third false pass: with valid files in
+`packet/images/`, passing an empty sibling `packet/empty_delivery/` previously
+returned exit 0 claiming **four delivered files**, because references resolved
+against `images.parent` and only `on_disk − referenced` was checked, so the
+sibling contributed no extras.
+
+**Decoding, not just reading.** Every referenced file is opened and **fully
+decoded**; readable bytes are not enough. Replacing a referenced PNG with
+readable text, or truncating it, previously returned `holds`. Read failures and
+decode failures are reported as distinct faults.
+
+**Every verdict branch now carries one shared `COUNTS:` block** — delivered
+files, distinct hashes, matches split into slot-resolving and ambiguous, corpus
+size, and the text sweep — so a branch cannot contradict its own numbers. A
+delivered digest published under **more than one** source slot is now
+**`UNRESOLVED`**, not `holds`: previously it produced `matched = 1, unique = 0`
+and fell through to a verdict that printed "0 … hash to any published digest".
+**Ambiguity is not absence.**
 
 **Builder, correspondingly:** a missing source image is now **fatal** instead of
 silently producing no file; an existing destination is **re-exported and
@@ -63,8 +88,9 @@ exported digest, or any count mismatch against the item list.
    *position*.
 3. **Delivered image bytes** — the committed image reports and detector rows tie
    every image's `sha256` to its source slot. Hashing a renamed file reads off
-   the arm. The sweep covers **6,880 slot-resolving published digests** and
-   **246 committed text files**. A digest occurrence is **graded**: within two
+   the arm. The sweep covers every published digest in the committed evidence archives
+   (**6,880**, all slot-resolving) and every committed text file (**247** at
+   this commit). A digest occurrence is **graded**: within two
    lines of a checkpoint/arm/slot/training-seed identifier it is an
    **identifying association** and the packet is BROKEN for those rows; a bare
    mention elsewhere is **UNRESOLVED and requires assessment**, because a digest
@@ -74,10 +100,10 @@ exported digest, or any count mismatch against the item list.
 
 | packet | 1 identifier | 2 RNG + row order | 3 delivered bytes | verdict |
 |---|---|---|---|---|
-| **paired 180 — repaired, the packet to hand out** | holds | holds | **holds — 0/180**, 180 distinct hashes, 0 text-corpus occurrences | **holds against all three** |
+| **paired 180 — repaired, the packet to hand out** | holds | holds | **holds** — 180 delivered files, 180 distinct hashes, **0 matches** (0 slot-resolving, 0 ambiguous) against 6,880 published digests, 0 occurrences across 247 committed text files | **holds against all three** |
 | **supplementary 228 — preserved as delivered** | **BROKEN — 228/228** ids regenerated | not modelled | **BROKEN — 228/228** resolve to a unique slot | **BROKEN on two channels** |
 | **pilot 236 — preserved as delivered** | **UNRESOLVED** — salt published under a different id rule, 0/236 regenerated | not modelled | **BROKEN — 2 of 236** | **BROKEN on one channel** |
-| gate fed an empty dir / one unrelated file | holds | holds | **REJECTED** | **no claim made** |
+| gate fed an empty dir / one unrelated file / an empty **sibling** dir | holds | holds | **REJECTED** | **no claim made** |
 
 ### The paired packet: channel 3 was live, and it was the serious one
 
@@ -96,8 +122,8 @@ chunk. Then:
 - the build **refuses to finish** if any exported byte stream equals a published
   digest, if pixels moved, if two exported digests collide, or if the file count
   misses the item count;
-- **re-verified after the rebuild**: 0/180 matches across 6,880 digests and 246
-  text files, 180 distinct hashes.
+- **re-verified with the repaired gate**: 0/180 matches across 6,880 digests
+  and 247 text files, 180 distinct hashes, 0 ambiguous.
 
 The replacement was rebuilt under a **fresh** secret salt and row order, so its
 ids are unrelated to the defective build's. Rebuilding again with the stored
@@ -178,12 +204,17 @@ has been deleted**, and none will be.
 - **Adversary B is out of scope by construction.**
 - **Nothing about operational handling** — who holds the key, where the packet is
   copied, what the annotator is told.
-- The private 180-image pixel-equality, exposure and history results above are
-  **this project's reported evidence**, not an independent party's verification.
+- **Which evidence is whose.** The *public* findings — the M0 digest
+  association in `results/seq17/calibration/reload_check.json`, the gate's
+  behaviour on synthetic fixtures, and the committed index identities — rest on
+  committed data anyone can re-check. The **2 of 236 actual pilot-image
+  matches**, the 180-image pixel equality, the exposure status and the history
+  sweep are **this project's private-delivery observations**, reported here and
+  **not independently verified** by the coordinator.
 
 ## Reproduce
 
-    python scripts/seq/test_packet_delivery_gate.py          # 27 checks
+    python scripts/seq/test_packet_delivery_gate.py          # 42 checks
     python scripts/seq/audit_packet_blinding.py \
         --packet_dir results/audit_v1/annotation_packet_paired180 \
         --delivered_images <data root>/annotation_paired_180/packet/images

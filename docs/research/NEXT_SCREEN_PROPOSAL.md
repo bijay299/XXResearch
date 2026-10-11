@@ -1,6 +1,6 @@
 # Next screen — an identifiable probe of interference in sequential erasure
 
-**CPU-only proposal, revision 4. This authorises nothing; no GPU run, no
+**CPU-only proposal, revision 5. This authorises nothing; no GPU run, no
 generation, no annotation and no method implementation follows from it.** For the
 PI's decision. If approved, compute must run on GPUs **independently verified
 unoccupied by another user**
@@ -31,9 +31,26 @@ unestablished.**
 >    The decision rules are **ordered**, so `S` and `P` both NULL with `I`
 >    MATERIAL no longer triggers incompatible rows (§6).
 >
-> Retained unchanged because they were right: the four interval predicates,
-> direct contrasts for dominance, anchor counterbalancing, and the native-versus-
-> controlled distinction.
+> **What revision 5 fixes in revision 4**
+>
+> 5. **Relapse mixed two evaluation sets.** §2.3 declared a disjoint RELAPSE
+>    probe evaluated at every stage, while §§3.1 and 6.2 made the earlier
+>    reference `r_i` a **TEST** rate. Subtracting a TEST rate from a
+>    relapse-probe rate measures the difference between two prompt samples, not
+>    relapse: an **unchanged** checkpoint scoring 10% on TEST and 25% on the
+>    probe would report **+15 pp of relapse having changed nothing.** Relapse now
+>    lives **entirely within one probe**, with its own name and its own reference
+>    (§6.2).
+> 6. **An arithmetic claim in §4.1 was false.** There is no universal
+>    `r_k ≤ p_k`: an edit can *increase* target generation, and `p = 70%` with
+>    `r = 80%` is valid data with negative suppression. The success gate imposes
+>    an inequality; the measurement imposes none (§4.1).
+>
+> Retained unchanged because they were right: conditional request-1
+> qualification, method-owned histories, LOW-PARENT separated from paired prior
+> damage, cumulative utility versus `M0`, native success outside the CA cells,
+> interaction precedence, the four interval predicates, direct contrasts for
+> dominance, and anchor counterbalancing.
 
 ---
 
@@ -125,10 +142,18 @@ it.** No single quantity makes two different-parent arms equally deleted.
 
 ### 2.3 Four frozen sets; the spent TEST set is not reused
 
-**DEV** calibration and selection only · **ACCEPT** held-out qualification, **no
-retuning** · **TEST** evaluated once, all conditions re-checked there ·
-**RELAPSE probe** the earlier targets' prompts, evaluated at every stage. All
-disjoint and hashed. **Amendment 01's frozen TEST set is spent and is not reused
+| set | role | how often |
+|---|---|---|
+| **DEV** | calibration and selection of each method's strength dial | as needed |
+| **ACCEPT** | held-out qualification of the frozen dial, **no retuning** | once per stage |
+| **TEST** | acceptance, the cross-arm residue match, and the reported retention endpoints | **once** |
+| **R — the relapse probe** | **the only set relapse is measured on**, carrying each earlier target's prompts | **every stage** |
+
+All four disjoint and hashed. **Why R exists and is separate:** TEST is evaluated
+**once**, so it cannot supply the per-stage series relapse needs — a stagewise
+quantity requires a set that may be looked at repeatedly. R is therefore a
+**reporting set only**: it is never used for calibration, selection, dial
+freezing or acceptance, and nothing is ever retuned on it. **Amendment 01's frozen TEST set is spent and is not reused
 for anything, calibration included.** Everything in §2.2, §5, §6 and §3.1 is
 frozen in a hashed pre-registration before any new data are collected.
 
@@ -146,9 +171,12 @@ base, so `p_1 = D(M0, cat)` **measured on the new sets** — not assumed.
 1. **calibrate on DEV** — drive that method's strength parameter until it first
    meets §2.2 for `cat` on DEV; **freeze the dial**;
 2. **qualify on ACCEPT** — re-measure with the frozen dial. The checkpoint is
-   **QUALIFIED** iff `p_1 ≥ 65%`, relative suppression `≥ 0.75` and `r_1 ≤ 20%`;
-3. **re-check on TEST** — the reported reference residue `r_1` is the TEST value,
-   and it is the reference every later relapse number is measured against (§6.2).
+   **QUALIFIED** iff `p_1 ≥ 65%`, relative suppression `≥ 0.75` and
+   `r_1^ACCEPT ≤ 20%`;
+3. **re-check on TEST** — `r_1^TEST` is the reported acceptance residue and the
+   quantity the cross-arm match uses. It is **not** the relapse reference: that
+   is `r_1^R`, measured on the relapse probe, and the two are never mixed
+   (§6.2).
 
 **No request-2 stage runs for a method whose request-1 checkpoint is not
 QUALIFIED**, because §6 defines relapse only against an ACCEPTED earlier erasure.
@@ -182,7 +210,7 @@ So:
 
 | | |
 |---|---|
-| **(i) stop that arm's sequence** | report request-1 non-qualification with the measured `p_1` and `r_1`. This is the default and needs no further approval. A method with no qualified request 1 contributes no relapse data, and if that leaves fewer than two accepted arms the comparison does not exist (§6.4 rule 0) |
+| **(i) stop that arm's sequence** | report request-1 non-qualification with the measured `p_1` and `r_1^ACCEPT`. This is the default and needs no further approval. A method with no qualified request 1 contributes no relapse data, and if that leaves fewer than two accepted arms the comparison does not exist (§6.4 rule 0) |
 | **(ii) a revised first stage** | *described for later approval, not executed:* re-run request 1 for **every** method under the frozen protocol with the dial calibrated on DEV, removing reuse entirely and making the count uniformly 4 request-1 checkpoints per method. This is the clean design; it is also strictly more compute, and **it is not authorised by this document** |
 
 ---
@@ -191,12 +219,24 @@ So:
 
 ### 4.1 `65%` is a chosen floor
 
-The only arithmetic constraint is `r_k ≤ p_k` — a residue cannot exceed the rate
-the parent generates at. **`p_k ≥ 65%` is a judgement**, picked so that 75%
-relative suppression corresponds to at least a 48.75 pp absolute drop. It is not
-an impossibility threshold, and nothing below it is impossible — only
-uninformative at this margin. The state is therefore named **`LOW-PARENT`**, a
-neutral description of the measurement, **not** `PRE-SUPPRESSED`.
+**There is no universal arithmetic constraint on the measurement.** Revision 4
+claimed `r_k ≤ p_k` — that a residue cannot exceed the parent rate. That is
+false: an edit can *increase* generation of its own target, and `p_k = 70%` with
+`r_k = 80%` is perfectly valid data describing **negative suppression**. It is
+recorded as such and classified **ERASURE-FAILURE** by §6.1, because
+`1 − r_k/p_k = −0.14 < 0.75`.
+
+The inequality belongs to the **success gate**, not to the measurement: the gate
+requires `r_k ≤ 0.25·p_k` and `r_k ≤ 20%`. The measurement requires nothing, and
+any `(p_k, r_k)` pair is reportable.
+
+**`p_k ≥ 65%` is likewise a chosen floor**, picked so that 75% relative
+suppression corresponds to at least a 48.75 pp absolute drop. It defines **this
+protocol's regime** — not whether a lower-parent measurement is informative.
+A measurement at `p_k = 40%` is perfectly informative about *that* model and
+*that* concept; it simply is not the comparison this screen was designed to
+make. The state is therefore named **`LOW-PARENT`**, a neutral description of
+where the parent sits, **not** `PRE-SUPPRESSED`.
 
 ### 4.2 Prior damage needs its own contrast
 
@@ -343,17 +383,62 @@ before any endpoint is read. The dial is frozen at DEV; no tuning intervenes.
 
 ### 6.2 Relapse, and the three states it must not be confused with
 
-> **`Relapse_i(k) = D(C_k, t_i) − r_i`**, against **that method's own**
-> post-erasure checkpoint `C_i` and its **TEST** reference residue `r_i`.
-> **Positive = the erased concept came back.** Defined **only** where stage *i*
-> was ACCEPTED.
+> **`Relapse_i(k; R_i) = D_{R_i}(C_k, t_i) − D_{R_i}(C_i, t_i)`**
+>
+> **Both terms are measured on the SAME relapse probe `R_i`** — the subset of R
+> carrying `t_i`'s prompts — against **that method's own** post-erasure
+> checkpoint `C_i`. **Positive = the erased concept came back.** Defined **only**
+> where stage *i* was ACCEPTED (§6.1).
+
+**Paired identically on both terms**, and this is the whole point of naming the
+set: the same frozen prompt texts, the same generation seeds, the same detector
+and threshold, and the same frozen cluster grouping, so the bootstrap resamples
+one cluster list indexing both checkpoints.
+
+**Why the earlier reference is not the TEST residue.** Revision 4 wrote
+`Relapse_i(k) = D(C_k, t_i) − r_i` with `r_i` a **TEST** rate while `D(C_k, t_i)`
+came from the relapse probe. That subtracts two different prompt samples and
+measures the gap between the sets, not a change in the model. **Worked example:**
+take a checkpoint that is literally **unchanged** between stage *i* and stage *k*
+and scores `10%` on TEST and `25%` on `R_i`. Mixing sets reports
+`25 − 10 = +15 pp of relapse` for a model that did nothing. Keeping both terms on
+`R_i` reports `25 − 25 = 0 pp`, which is the estimand: **the change in `t_i`'s
+detection rate on a fixed probe, between that method's own post-erasure
+checkpoint and a later one.**
+
+**`r_i^TEST` keeps its own job** — acceptance (§6.1) and the cross-arm residue
+match (§6.3). It is never an operand of a relapse contrast. Both residues are
+reported side by side for every accepted stage, labelled by set.
+
+**Failure to transfer erasure to `R_i`, and the rule that no retuning follows.**
+`R_i` is a reporting set: the dial is frozen on DEV, acceptance is decided on
+ACCEPT and TEST, and **nothing is ever calibrated, reselected or retuned on
+`R_i`.** It can still happen that `D_{R_i}(C_i, t_i)` fails the §2.2 operating
+point even though `r_i^TEST` passed — the same transfer failure Amendment 01
+found between development and test, now possible on a third set. Then:
+
+- the stage is marked **`R-NONTRANSFER`**, with both residues reported;
+- `Relapse_i(·; R_i)` is still computed and reported, but **descriptively
+  only**: its baseline is not an accepted erasure *on the set being
+  differenced*, so no protocol-level relapse claim is available for `t_i`;
+- the tolerance is **not** widened, `R_i` is **not** reselected, the dial is
+  **not** re-fit, and nothing is retrained;
+- §6.4 requires **no `R-NONTRANSFER` stage** inside a sequence for
+  ALREADY-SOLVES, so a method cannot be credited with solving relapse it never
+  established on the relapse probe.
+
+**The alternative was considered and rejected:** putting both terms on TEST would
+drop the fourth set, but TEST is evaluated **once**, and a stagewise series needs
+a set that may be looked at repeatedly. Measuring every stage on TEST would turn
+the confirmatory set into a per-stage instrument.
 
 | | what it is | reported as |
 |---|---|---|
 | **LOW-PARENT** | the parent rate is below the chosen floor — a statement about **recognisability**, not causation | the state plus `p_k`; a prior-damage claim needs `PriorΔ` (§4.2) |
 | **prior collateral suppression** | an earlier edit materially reduced `t_k` | `PriorΔ_k` **MATERIAL+** — a finding about the **earlier** request |
-| **ERASURE-FAILURE** | the parent did generate `t_k`, this arm missed the target | the state plus achieved `r_k`; excluded from relapse for `t_k`, count reported |
-| **relapse** | `t_i` was erased, then came back | the contrast above |
+| **ERASURE-FAILURE** | the parent did generate `t_k`, this arm missed the target — **including negative suppression**, where the edit raised the rate (§4.1) | the state plus achieved `r_k^TEST`; excluded from relapse for `t_k`, count reported |
+| **`R-NONTRANSFER`** | stage *i* was ACCEPTED on TEST but its erasure does not meet the operating point on `R_i` | both residues; relapse descriptive only, no retuning |
+| **relapse** | `t_i` was erased, then came back | the contrast above, both terms on `R_i` |
 
 `Relapse` is **never** computed from a reference that failed acceptance. An arm
 with excluded stages cannot be compared on relapse against an arm without them;
@@ -379,8 +464,10 @@ ALREADY-SOLVES **its own realised sequence**, only if **all five** hold across
    cumulatively** (§5.2);
 4. **anchor integrity NULL(10) stagewise *and* cumulatively**, for every anchor
    the sequence used;
-5. no stage **LOW-PARENT** and no `PriorΔ` **MATERIAL+** inside the sequence —
-   otherwise the sequence never reached the regime it claims to solve.
+5. no stage **LOW-PARENT**, no `PriorΔ` **MATERIAL+** and no
+   **`R-NONTRANSFER`** inside the sequence — otherwise the sequence never
+   reached the regime it claims to solve, or never established the erasure on
+   the set relapse is differenced on.
 
 For NAT this is evaluated over the **method's actual target sequences, stages
 and seeds**, never over the CA cells, because §5.4 says the cells do not apply to
@@ -410,7 +497,8 @@ fires is the decision.** This is what prevents incompatible readings — `S` and
 Stop and report, without proceeding: **CEASE or LACU cannot be run here**; **no
 method's request 1 QUALIFIES** (§3.1); no request-2 target satisfies `p_k ≥ 65%`
 on DEV; no method meets §2.2 on DEV; the frozen dial fails on ACCEPT for every
-method; fewer than 2 arms ACCEPTED on TEST; the load-bearing direct contrasts are
+method; fewer than 2 arms ACCEPTED on TEST; **every** accepted stage is
+`R-NONTRANSFER`, so no relapse claim is available anywhere; the load-bearing direct contrasts are
 INCONCLUSIVE; seeds disagree in direction; frozen-set overlap among DEV / ACCEPT
 / TEST / relapse probe / pilot / anchor-training strings; any artifact fails
 `scripts/seq/validate_stage.py`. **A stop is a result.**
@@ -487,7 +575,9 @@ admit the existing MA pair. Human annotation labour, which must be **scheduled**
 5. the §5.4 method audit, CEASE and LACU first, with CA/NAT and ablation labels
    fixed **in the code that names the arms**;
 6. the relapse and `PriorΔ` estimators with their frozen grouping, and a CPU
-   regression that **fails the build** if a relapse number is computed from a
+   regression that **fails the build** if the two relapse terms come from
+   different evaluation sets (the revision-4 defect, with the unchanged-
+   checkpoint case as its fixture), if a relapse number is computed from a
    LOW-PARENT or ERASURE-FAILURE stage, if a comparison is formed from fewer than
    two accepted arms, if a cumulative check is skipped, or if the §6.5 rules are
    evaluated out of order;

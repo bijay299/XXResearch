@@ -249,68 +249,103 @@ def slot_pattern() -> "re.Pattern":
         r'|"(?:arm|slot|checkpoint|training_seed)"')
 
 
-def bind_inventory(images: Path, sheet: Path) -> tuple[list[Path], list[str]]:
+def bind_inventory(images: Path, sheet: Path) -> tuple[list[Path], list[str], dict]:
     """Bind the delivered files to the published sheet, or refuse to audit.
 
-    The gate's job is to certify a specific delivery. An image directory that
-    does not match the sheet row-for-row is not that delivery, and scoring 0/0
-    matches against it is a false pass, not a result.
+    PATH POLICY, stated rather than implied. A sheet `image` value is relative
+    to the PACKET ROOT, and ``--delivered_images`` must be the directory those
+    values point into. Nested values are permitted, but every resolved path must
+    lie INSIDE the supplied directory, and the on-disk set is enumerated
+    RECURSIVELY under it. Absolute values and any `..` component are rejected
+    outright.
+
+    Containment is the fix for a real false pass: resolving against
+    ``images.parent`` and checking only ``on_disk - referenced`` let an EMPTY
+    SIBLING directory pass, because the sheet's files existed next door and the
+    sibling contributed no extras. Set equality is therefore TWO-WAY, and every
+    reference must be inside the directory actually supplied.
+
+    Every referenced file is also DECODED, not merely read: a readable text file
+    with a .png name is not an image, and the gate used to certify it. Read
+    failures and decode failures are kept distinct.
     """
-    rows = []
-    with sheet.open(newline="") as fh:
-        for r in csv.DictReader(fh):
-            rows.append(r)
-    root = images.parent
+    rows = list(csv.DictReader(sheet.open(newline="")))
     problems: list[str] = []
+    img_root = images.resolve()
 
     referenced: dict[Path, int] = {}
-    unreadable = 0
+    escapes = unreadable = undecodable = outside = 0
     for r in rows:
         # Packets in this repository have used both column names.
         rel = ((r.get("image") or r.get("image_file") or "")).strip()
         if not rel:
-            problems.append("a sheet row names no image column "
-                            f"(looked for 'image' and 'image_file'; saw "
-                            f"{sorted(r)[:6]})")
+            problems.append(f"a sheet row names no image column (looked for "
+                            f"'image' and 'image_file'; saw {sorted(r)[:6]})")
             continue
-        f = (root / rel).resolve()
-        referenced[f] = referenced.get(f, 0) + 1
-        if not f.is_file():
+        rp = Path(rel)
+        if rp.is_absolute() or ".." in rp.parts:
+            escapes += 1
+            continue
+        cand = (img_root.parent / rp).resolve()
+        if img_root not in cand.parents:
+            # The sheet points somewhere other than the supplied directory.
+            outside += 1
+            continue
+        referenced[cand] = referenced.get(cand, 0) + 1
+        if not cand.is_file():
             continue
         try:
-            f.read_bytes()
+            cand.read_bytes()
         except Exception:
             unreadable += 1
+            continue
+        try:
+            from PIL import Image
+            with Image.open(cand) as im:
+                im.load()                      # force a full decode
+        except Exception:
+            undecodable += 1
 
     missing = [f for f in referenced if not f.is_file()]
     dupes = [f for f, n in referenced.items() if n > 1]
-    on_disk = {f.resolve() for f in images.iterdir() if f.is_file()}
+    on_disk = {f.resolve() for f in img_root.rglob("*") if f.is_file()}
     extra = on_disk - set(referenced)
 
-    if len(rows) == 0:
+    if not rows:
         problems.append("the published sheet has no rows")
+    if escapes:
+        problems.append(f"{escapes} sheet row(s) use an absolute path or '..'")
+    if outside:
+        problems.append(f"{outside} sheet row(s) resolve OUTSIDE the supplied "
+                        f"directory {img_root}")
     if missing:
         problems.append(f"{len(missing)} sheet row(s) reference a file that is "
                         f"not present")
     if extra:
-        problems.append(f"{len(extra)} file(s) in the image directory are not "
-                        f"referenced by the sheet")
+        problems.append(f"{len(extra)} file(s) under the supplied directory are "
+                        f"not referenced by the sheet")
     if dupes:
         problems.append(f"{len(dupes)} file(s) are referenced by more than one "
                         f"sheet row")
     if unreadable:
         problems.append(f"{unreadable} referenced file(s) could not be read")
+    if undecodable:
+        problems.append(f"{undecodable} referenced file(s) are not decodable "
+                        f"images (readable bytes are not enough)")
 
     present = [f for f in referenced if f.is_file()]
-    return present, problems
+    stats = {"sheet_rows": len(rows), "referenced": len(referenced),
+             "on_disk": len(on_disk), "present": len(present)}
+    return present, problems, stats
 
 
 def attack_delivered_image_bytes(images: Path | None, evidence: Path,
                                  sheet: Path) -> None:
     """Do the delivered files hash to a published, slot-identifying digest?
 
-    Bound to the published sheet first: an inventory that does not match the
-    sheet is REJECTED, never passed.
+    Bound to the published sheet first (see bind_inventory): an inventory that
+    does not match is REJECTED, never passed. Every verdict branch reports the
+    same count block, so a branch cannot quietly contradict the numbers.
     """
     if images is None:
         record("delivered image bytes", UNTESTED,
@@ -322,12 +357,12 @@ def attack_delivered_image_bytes(images: Path | None, evidence: Path,
                f"{images} is not a directory; there is no delivery to audit.")
         return
 
-    present, problems = bind_inventory(images, sheet)
-    n_sheet = sum(1 for _ in csv.DictReader(sheet.open(newline="")))
+    present, problems, st = bind_inventory(images, sheet)
     if problems:
         record("delivered image bytes", REJECTED,
                f"the delivery does not bind to the published sheet "
-               f"({n_sheet} rows): " + "; ".join(problems) +
+               f"({st['sheet_rows']} rows, {st['on_disk']} files under "
+               f"{images}): " + "; ".join(problems) +
                ". No verdict is issued: an unbound inventory cannot be "
                "certified, and scoring it would be a false pass.")
         return
@@ -347,13 +382,14 @@ def attack_delivered_image_bytes(images: Path | None, evidence: Path,
     n_files, n_distinct = len(present), len(digests)
     matched = sum(digests[h] for h in digests if h in pub)
     unique = sum(digests[h] for h in digests if len(pub.get(h, ())) == 1)
+    ambiguous = sum(digests[h] for h in digests if len(pub.get(h, ())) > 1)
+    n_resolving = sum(1 for v in pub.values() if len(v) == 1)
 
-    # ---- the text corpus, made operational in the verdict -----------------
+    # ---- the committed text corpus, graded ---------------------------------
     pat = slot_pattern()
-    scanned = 0
+    scanned = occurrences = 0
     files_with_occurrence: set[str] = set()
     files_with_association: set[str] = set()
-    occurrences = 0
     skip = (".jpg", ".jpeg", ".png", ".pdf", ".svg", ".gz", ".tar", ".zip")
     for q in Path(".").rglob("*"):
         if ".git/" in str(q) or not q.is_file() or q.suffix.lower() in skip:
@@ -371,38 +407,48 @@ def attack_delivered_image_bytes(images: Path | None, evidence: Path,
                 continue
             found = True
             occurrences += len(hit)
-            window = "\n".join(lines[max(0, i - 2):i + 3])
-            if pat.search(window):
+            if pat.search("\n".join(lines[max(0, i - 2):i + 3])):
                 files_with_association.add(str(q))
         if found:
             files_with_occurrence.add(str(q))
 
-    counts = (f"{n_files} delivered files, {n_distinct} distinct hashes; "
-              f"{len(pub)} slot-resolving published digests searched; "
-              f"{scanned} committed text files swept")
+    # One count block, used verbatim by every branch below.
+    counts = (f"COUNTS: {n_files} delivered files, {n_distinct} distinct "
+              f"hashes; {matched} match a published digest ({unique} resolving "
+              f"to one slot, {ambiguous} ambiguous across slots); corpus "
+              f"{len(pub)} published digests of which {n_resolving} are "
+              f"slot-resolving; {scanned} committed text files swept with "
+              f"{occurrences} digest occurrence(s) in "
+              f"{len(files_with_occurrence)} file(s)")
 
     if unique:
         record("delivered image bytes", BROKEN,
-               f"{matched} of {n_files} delivered files hash to a published "
-               f"digest and {unique} resolve to a UNIQUE slot, so those rows' "
-               f"arm and training seed are recoverable by hashing the packet "
-               f"alone. {counts}. Aggregate counts only; no item-to-slot "
-               f"mapping is reported.")
+               f"{unique} delivered file(s) hash to a published digest that "
+               f"resolves to a UNIQUE slot, so those rows' arm and training "
+               f"seed are recoverable by hashing the packet alone. {counts}. "
+               f"Aggregate counts only; no item-to-slot mapping is reported.")
         return
     if files_with_association:
         record("delivered image bytes", BROKEN,
-               f"0 archive digests matched, but {occurrences} digest "
-               f"occurrence(s) in {len(files_with_occurrence)} committed text "
-               f"file(s) sit WITHIN TWO LINES of a checkpoint, arm, slot or "
-               f"training-seed identifier, in {len(files_with_association)} "
-               f"file(s): that is an identifying association, and those rows' "
-               f"condition is readable from committed data. {counts}. "
-               f"Files: {sorted(files_with_association)[:5]}")
+               f"{occurrences} digest occurrence(s) sit WITHIN TWO LINES of a "
+               f"checkpoint, arm, slot or training-seed identifier, in "
+               f"{len(files_with_association)} committed file(s): an "
+               f"identifying association, so those rows' condition is readable "
+               f"from committed data. {counts}. Files: "
+               f"{sorted(files_with_association)[:5]}")
+        return
+    if ambiguous:
+        record("delivered image bytes", UNRESOLVED,
+               f"{ambiguous} delivered file(s) hash to a published digest that "
+               f"appears under MORE THAN ONE source slot, so the match is real "
+               f"but does not by itself attribute an arm. Ambiguity is NOT "
+               f"absence: this REQUIRES ASSESSMENT of whether any other "
+               f"committed record narrows those slots to one. {counts}.")
         return
     if files_with_occurrence:
         record("delivered image bytes", UNRESOLVED,
-               f"0 archive digests matched and no identifying association was "
-               f"detected, but {occurrences} delivered digest(s) appear in "
+               f"no published digest matched and no identifying association was "
+               f"detected, but delivered digest(s) appear in "
                f"{len(files_with_occurrence)} committed text file(s). A bare "
                f"digest mention is NOT proven de-blinding, and this gate does "
                f"not claim it is -- it REQUIRES ASSESSMENT of whether those "
@@ -417,14 +463,13 @@ def attack_delivered_image_bytes(images: Path | None, evidence: Path,
                f"REQUIRES ASSESSMENT.")
         return
     record("delivered image bytes", HOLDS,
-           f"0 of {n_files} delivered files hash to any published digest, 0 "
-           f"occurrences across the swept text corpus, and all hashes are "
-           f"distinct. {counts}. The annotation bytes are separated from the "
-           f"indexed originals. SCOPE: this closes the DIGEST channel against "
-           f"a packet holder who also has the repository. It does NOT close "
-           f"pixel comparison by a holder of the private source images -- the "
-           f"packet is made of those images, and no re-encoding can prevent "
-           f"that.")
+           f"no delivered file hashes to any published digest, no digest "
+           f"occurs in the swept text corpus, and all hashes are distinct. "
+           f"{counts}. The annotation bytes are separated from the indexed "
+           f"originals. SCOPE: this closes the DIGEST channel against a packet "
+           f"holder who also has the repository. It does NOT close pixel "
+           f"comparison by a holder of the private source images -- the packet "
+           f"is made of those images, and no re-encoding can prevent that.")
 
 
 def main() -> int:

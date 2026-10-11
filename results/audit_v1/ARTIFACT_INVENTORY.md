@@ -270,3 +270,18 @@ packet, so nothing was lost.
 
 **No artifact was deleted this round**, no measurement changed, and the 41/0 and
 59/0 suites were not re-run — `diag_analysis.py` is byte-identical.
+
+### Added by the delivery-gate closeout (2026-10-11)
+
+| change | why |
+|---|---|
+| `audit_packet_blinding.py` — **root containment + two-way set equality** | with valid files in `packet/images/`, an empty **sibling** `packet/empty_delivery/` previously returned exit 0 claiming **four delivered files**: references resolved against `images.parent` and only `on_disk − referenced` was checked. Every reference must now resolve **inside** the supplied directory, the on-disk set is enumerated recursively, equality is two-way, and absolute or `..` paths are rejected. The flat/nested policy is stated in the docstring |
+| `audit_packet_blinding.py` — **full image decode** | a referenced PNG replaced with readable text previously returned `holds`, because only `read_bytes()` was tested. Every referenced file is now opened and decoded; **read** failures and **decode** failures are reported as distinct faults |
+| `audit_packet_blinding.py` — **ambiguous matches and honest counts** | a delivered digest published under two slots gave `matched = 1, unique = 0` and fell through to a verdict printing "0 … hash to any published digest". Multi-slot matches are now **`UNRESOLVED`** — ambiguity is not absence — and every branch carries one shared `COUNTS:` block (files, distinct hashes, slot-resolving and ambiguous matches, corpus size, text sweep) |
+| `test_packet_delivery_gate.py` — **42 checks, 0 failures** | adds the exact sibling-directory regression (empty and non-empty), a path escape, readable-text and truncated-image regressions, the two-slot ambiguity fixture with its count assertions, and a check that each branch carries `COUNTS`. One earlier assertion had gone stale against the new wording and was repaired rather than loosened |
+| `docs/research/NEXT_SCREEN_PROPOSAL.md` revision 5 | **relapse no longer mixes evaluation sets.** Both terms are now on one probe — `Relapse_i(k; R_i) = D_{R_i}(C_k,t_i) − D_{R_i}(C_i,t_i)` — paired on identical prompts, generation seeds, detector settings and cluster grouping, with the unchanged-checkpoint example (10% on TEST, 25% on `R_i` → a false +15 pp) given as the estimand clarification. `r^TEST` keeps acceptance and matching. **`R-NONTRANSFER`** names an erasure that does not transfer to `R_i`, reported descriptively with no retuning. Also: **the §4.1 claim that `r_k ≤ p_k` is withdrawn** — an edit can increase target generation, `p = 70%` with `r = 80%` is valid data with negative suppression and is ERASURE-FAILURE by the gate; the inequality belongs to the success gate, not the measurement, and the 65% floor defines this protocol's regime rather than what is informative |
+
+**No packet was rebuilt**: the 180 item ids and the blank 180-row sheet are
+byte-identical, every label, original and packet is preserved, and **no artifact
+was deleted**. No model images were generated. The 41/0 and 59/0 suites were not
+re-run — `diag_analysis.py` is byte-identical.

@@ -19,6 +19,29 @@ other inventory faults are rejected too
   ok    an UNREADABLE referenced file is REJECTED
   ok    an EMPTY comparison corpus is REJECTED, not scored as 0 matches
 
+the delivered directory itself must be the one bound
+  ok    an EMPTY SIBLING directory is REJECTED, not scored
+  ok    the refusal names containment, not a missing file
+  ok    and it does not claim any delivered file
+  ok    a NON-EMPTY sibling directory is REJECTED as well
+  ok    a PATH ESCAPE in the sheet is REJECTED
+
+referenced files must DECODE, not merely read
+  ok    readable TEXT with a .png name is REJECTED
+  ok    a TRUNCATED image is REJECTED
+  ok    and the restored inventory holds again
+  ok    decode failure is reported separately from read failure
+
+an AMBIGUOUS archive match is UNRESOLVED, not absence
+  ok    a digest under TWO slots is UNRESOLVED, not holds
+  ok    ambiguity is explicitly not equated with absence
+  ok    the counts report 1 match, 0 unique, 1 ambiguous
+  ok    the holds wording does not appear in this branch
+
+every branch carries the same count block
+  ok    the holds branch carries COUNTS
+  ok    the BROKEN branch carries COUNTS
+
 controls: the digest attack still fires when it should
   ok    COPIED SOURCE bytes are BROKEN
   ok    and the count is reported as resolving to a unique slot
@@ -38,5 +61,5 @@ duplicate delivered content is flagged
   ok    two items with identical bytes are UNRESOLVED
   ok    the distinct-hash count differs from the file count
 
-27 passed, 0 failed
+42 passed, 0 failed
 ALL DELIVERY-GATE CHECKS PASSED (CPU only, synthetic fixtures)

@@ -18,11 +18,14 @@ Covered here
 ------------
   REJECTED   empty directory; one unrelated file; a missing referenced file;
              an unreferenced extra file; two rows referencing one file; an
-             unreadable file; an empty comparison corpus
+             unreadable file; an empty comparison corpus; an EMPTY and a
+             NON-EMPTY SIBLING directory; a sheet path escape; readable text
+             named .png; a truncated image
   BROKEN     copied source bytes (the channel that was live); a committed text
              file associating a delivered digest with an arm
   UNRESOLVED a bare digest mention with no identifying association; two items
-             sharing byte-identical content
+             sharing byte-identical content; a digest published under TWO
+             source slots (ambiguous, not absent)
   holds      the same inventory re-encoded as fresh PNGs
   export     pixels preserved, bytes changed, EXIF dropped, and an existing
              destination overwritten rather than trusted
@@ -288,6 +291,111 @@ def main() -> int:
               status_of(out) == "REJECTED" and "corpus is empty" in out,
               out[-200:])
 
+        print("\nthe delivered directory itself must be the one bound")
+        # The false pass this covers: valid files sit in packet/images/, and an
+        # EMPTY SIBLING packet/empty_delivery/ is supplied. The old gate
+        # resolved references against images.parent and only checked
+        # on_disk - referenced, so the sibling contributed no extras and the
+        # sheet's files existed next door: exit 0, "4 delivered files".
+        fill(fx, "reencode")
+        sibling = fx["packet"] / "empty_delivery"
+        sibling.mkdir(exist_ok=True)
+        rc, out = run(fx, sibling)
+        check("an EMPTY SIBLING directory is REJECTED, not scored",
+              status_of(out) == "REJECTED" and rc == 3,
+              f"status={status_of(out)} rc={rc}")
+        check("the refusal names containment, not a missing file",
+              "resolve OUTSIDE the supplied directory" in out, out[-300:])
+        check("and it does not claim any delivered file",
+              "delivered files" not in out.split("delivered image bytes")[-1],
+              out[-300:])
+        # A non-empty sibling must fail too, and for the same reason.
+        m.export_image(fx["sources"][0], sibling / "decoy.png")
+        rc, out = run(fx, sibling)
+        check("a NON-EMPTY sibling directory is REJECTED as well",
+              status_of(out) == "REJECTED" and rc == 3
+              and "resolve OUTSIDE" in out, f"status={status_of(out)}")
+        shutil.rmtree(sibling)
+
+        sheet = fx["packet"] / "label_sheet_EMPTY.csv"
+        orig = sheet.read_text()
+        rows_e = [dict(r) for r in csv.DictReader(sheet.open(newline=""))]
+        rows_e[0]["image"] = "../sources/s0.jpg"          # path escape
+        with sheet.open("w", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(rows_e[0].keys()))
+            w.writeheader()
+            w.writerows(rows_e)
+        rc, out = run(fx, fx["images"])
+        check("a PATH ESCAPE in the sheet is REJECTED",
+              status_of(out) == "REJECTED"
+              and "absolute path or '..'" in out, out[-300:])
+        sheet.write_text(orig)
+
+        print("\nreferenced files must DECODE, not merely read")
+        fill(fx, "reencode")
+        target = fx["packet"] / fx["rows"][1]["image"]
+        good = target.read_bytes()
+        target.write_bytes(b"this is readable text, not an image at all\n")
+        rc, out = run(fx, fx["images"])
+        check("readable TEXT with a .png name is REJECTED",
+              status_of(out) == "REJECTED" and rc == 3
+              and "not decodable images" in out,
+              f"status={status_of(out)} rc={rc}")
+        target.write_bytes(good[:len(good) // 3])
+        rc, out = run(fx, fx["images"])
+        check("a TRUNCATED image is REJECTED",
+              status_of(out) == "REJECTED" and "not decodable images" in out,
+              f"status={status_of(out)}")
+        target.write_bytes(good)
+        rc, out = run(fx, fx["images"])
+        check("and the restored inventory holds again",
+              status_of(out) == "holds", f"status={status_of(out)}")
+        check("decode failure is reported separately from read failure",
+              "could not be read" not in out or "not decodable" in out)
+
+        print("\nan AMBIGUOUS archive match is UNRESOLVED, not absence")
+        # The same delivered digest published under TWO source slots: matched=1
+        # but unique=0. The old gate fell through to holds and printed
+        # "0 ... hash to any published digest", contradicting its own count.
+        dig0 = hashlib.sha256(
+            (fx["packet"] / fx["rows"][0]["image"]).read_bytes()).hexdigest()
+        amb = tmp / "amb"
+        for slot in ("seed17_MAB_L2", "seed29_MA"):
+            d = amb / slot
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "image_report.json").write_text(json.dumps({
+                "complete": True,
+                "images": [{"prompt_id": "pX", "gen_seed": 1301,
+                            "sha256": dig0}]}))
+        with tarfile.open(fx["root"] / "evidence" / "amb_slots.tar.gz",
+                          "w:gz") as tf:
+            for slot in ("seed17_MAB_L2", "seed29_MA"):
+                tf.add(amb / slot / "image_report.json",
+                       arcname=f"{slot}/image_report.json")
+        rc, out = run(fx, fx["images"])
+        check("a digest under TWO slots is UNRESOLVED, not holds",
+              status_of(out) == "UNRESOLVED" and rc == 2,
+              f"status={status_of(out)} rc={rc}")
+        check("ambiguity is explicitly not equated with absence",
+              "Ambiguity is NOT absence" in out)
+        check("the counts report 1 match, 0 unique, 1 ambiguous",
+              "1 match a published digest (0 resolving to one slot, "
+              "1 ambiguous across slots)" in out, out[-400:])
+        check("the holds wording does not appear in this branch",
+              "no delivered file hashes to any published digest" not in out)
+        (fx["root"] / "evidence" / "amb_slots.tar.gz").unlink()
+
+        print("\nevery branch carries the same count block")
+        fill(fx, "reencode")
+        rc, out = run(fx, fx["images"])
+        check("the holds branch carries COUNTS",
+              "COUNTS:" in out and "distinct hashes" in out)
+        fill(fx, "copy")
+        rc, out = run(fx, fx["images"])
+        check("the BROKEN branch carries COUNTS",
+              "COUNTS:" in out and f"{N_ITEMS} match a published digest" in out,
+              out[-400:])
+
         print("\ncontrols: the digest attack still fires when it should")
         fill(fx, "copy")                                # source bytes copied
         rc, out = run(fx, fx["images"])
@@ -295,7 +403,8 @@ def main() -> int:
               status_of(out) == "BROKEN" and rc == 1,
               f"status={status_of(out)} rc={rc}")
         check("and the count is reported as resolving to a unique slot",
-              "resolve to a UNIQUE slot" in out)
+              "resolves to a UNIQUE slot" in out
+              and f"{N_ITEMS} resolving to one slot" in out, out[-400:])
         check("no item-to-slot mapping is printed",
               "item_" not in out.split("delivered image bytes")[-1][:400]
               or "Aggregate counts only" in out)
