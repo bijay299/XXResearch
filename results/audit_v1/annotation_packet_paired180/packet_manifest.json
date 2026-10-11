@@ -20,7 +20,7 @@
     "arithmetic": "2 seeds x 3 categories x 10 tuples x 3 arms = 180",
     "why_paired": "the same prompt and generation seed is judged under all three arms, so a human can see whether a detector verdict change BETWEEN arms is a real change in the image. An independently stratified sample cannot answer that question, because it does not hold the tuple fixed."
   },
-  "generated_utc": "2026-10-11T00:37:02.422639+00:00",
+  "generated_utc": "2026-10-11T01:11:55.711930+00:00",
   "eval_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_test",
   "slots": {
     "17": {
@@ -411,17 +411,28 @@
       "the category to judge"
     ],
     "order": "shuffled once under a SEPARATE RNG seeded from the secret; the sampling seed does NOT reproduce the row order",
-    "order_seed_sha256": "fa7c518f15bf2600bff3e8c8d9add606fe73fc20fca3bb8a7f944984c4cdc0b1",
+    "order_seed_sha256": "b7f616268daca2e8d41c76c959b77331ae79fb87ff3d8715e2c4545aa4c49369",
     "what_is_public_by_design": "tuple MEMBERSHIP. The sampling seed is published so a reader can replay the draw and confirm it used no detector input; that replay reveals WHICH 60 tuples were drawn.",
     "what_is_protected": "the ASSIGNMENT of arm and training seed to a sheet row. Both channels that could leak it are closed: the identifier (secret salt) and the row order (separate secret-seeded RNG). Verify with scripts/seq/audit_packet_blinding.py, which attacks the published records and opens no key.",
     "blinded_id_rule": "sha256(<secret salt> | <image_path>)[:12]",
     "salt_is_secret": "The salt is NOT published. Image paths are deterministic, so a published salt would make the entire id space enumerable and the blind recoverable by anyone who can read this manifest. Only the salt's digest appears here.",
-    "salt_sha256": "979a1c31593bc638e205c2847b54b1452d1a5b888944f325c87d1cf895258ceb",
+    "salt_sha256": "f752aa0074dbc62d253356a4b31bd33645b416b27e8f343c05069b5fa622ab9d",
     "salt_location": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/BLINDING_SALT_SECRET.txt",
     "salt_source": "freshly generated and stored at /data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/BLINDING_SALT_SECRET.txt",
     "key_location": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/KEY_DO_NOT_OPEN_WHILE_ANNOTATING.csv",
     "key_inside_packet": false,
     "probe": "the packet's text files were scanned for arm, seed and detector strings; no match, or the build aborts",
+    "image_export": {
+      "why": "copying source bytes is a de-blinding channel: the committed image reports and detector rows associate each image's sha256 with its source slot, so a packet holder could hash a renamed file and read off the arm. Neither the salt nor the secret row order affects this -- the file content is the identifier.",
+      "method": "each annotation copy is re-encoded from the DECODED pixels into a fresh lossless PNG with no EXIF, no JFIF block and no PNG text chunk",
+      "pixels_verified": "180/180 exported images compared element-by-element against the source's decoded pixels; a mismatch aborts the build",
+      "source_formats": [
+        "JPEG"
+      ],
+      "no_exported_file_matches_a_published_digest": true,
+      "closed_against": "a packet holder who also has the repository: no exported byte stream equals any published image digest, and no frozen-test pixels are committed anywhere",
+      "NOT_closed_against": "a holder of the PRIVATE source images under the data root. The packet is made of those images, so pixel-for-pixel comparison still identifies every item. Re-encoding cannot close that and does not claim to; it is mitigated by access control alone."
+    },
     "disclosed_limitation": "a paired packet necessarily contains three images of the same prompt and generation seed. An annotator may notice the similarity and infer that items belong together; nothing identifies WHICH of a similar group came from which arm. This is a property of the approved design and is recorded, not concealed."
   },
   "relationship_to_other_packets": {

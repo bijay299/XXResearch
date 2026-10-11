@@ -19,11 +19,20 @@ ATTACK 2 -- published RNG state plus row order.
     `category_to_judge` column confirms the reconstruction without ever opening
     the key: a 180-long category sequence does not agree by chance.
 
+ATTACK 3 -- the delivered image bytes.
+    The committed image reports and detector rows associate every image's
+    sha256 with its source slot. If the packet ships source bytes unchanged, a
+    holder can hash a renamed file and read off the arm -- no key, no salt, no
+    order needed. This attack hashes the ACTUAL delivered files and looks each
+    digest up in every published digest the repository carries.
+
 The key is never read. The salt is never printed. A reconstruction is reported
-as a count and a verdict, never as a mapping.
+as a count and a verdict, never as a mapping -- in particular attack 3 reports
+only aggregate counts, never which item resolved to which slot.
 
     python scripts/seq/audit_packet_blinding.py \
-        --packet_dir results/audit_v1/annotation_packet_paired180
+        --packet_dir results/audit_v1/annotation_packet_paired180 \
+        --delivered_images <data root>/annotation_paired_180/packet/images
 """
 from __future__ import annotations
 
@@ -189,6 +198,96 @@ def attack_rng_and_row_order(meta: dict, cats: list[str], man: dict) -> None:
            f"{len(cats) // max(1, len(categories))}). Order note: {order!r}")
 
 
+def published_image_digests(evidence: Path) -> dict[str, set[str]]:
+    """Every image sha256 the repository publishes, mapped to its slot(s).
+
+    Read from the committed evidence archives: each slot's image_report.json
+    (generation-side digests) and detections.jsonl (`image_sha256`).
+    """
+    import tarfile
+    out: dict[str, set[str]] = {}
+    for arch in sorted(evidence.rglob("*_slots.tar.gz")):
+        with tarfile.open(arch, "r:gz") as tf:
+            for m in tf.getmembers():
+                if not m.name.endswith(("image_report.json", "detections.jsonl")):
+                    continue
+                slot = m.name.split("/")[0]
+                fh = tf.extractfile(m)
+                if fh is None:
+                    continue
+                raw = fh.read().decode(errors="ignore")
+                if m.name.endswith("image_report.json"):
+                    for im in json.loads(raw).get("images") or []:
+                        if im.get("sha256"):
+                            out.setdefault(im["sha256"], set()).add(slot)
+                else:
+                    for ln in raw.splitlines():
+                        if not ln.strip():
+                            continue
+                        o = json.loads(ln)
+                        if o.get("image_sha256"):
+                            out.setdefault(o["image_sha256"], set()).add(slot)
+    return out
+
+
+def attack_delivered_image_bytes(images: Path | None, evidence: Path) -> None:
+    """Do the delivered files hash to a published, slot-identifying digest?"""
+    if images is None:
+        record("delivered image bytes", False,
+               "NOT MODELLED: no --delivered_images directory was given, so the "
+               "actual packet files were not hashed. UNTESTED, not passed.")
+        return
+    if not images.is_dir():
+        record("delivered image bytes", False,
+               f"NOT MODELLED: {images} is not a directory. UNTESTED.")
+        return
+    pub = published_image_digests(evidence)
+    if not pub:
+        record("delivered image bytes", False,
+               f"NOT MODELLED: no published image digests found under "
+               f"{evidence}. UNTESTED.")
+        return
+    files = sorted(p for p in images.iterdir() if p.is_file())
+    delivered = {}
+    for f in files:
+        delivered[hashlib.sha256(f.read_bytes()).hexdigest()] = 1
+    matched = sum(1 for h in delivered if h in pub)
+    unique = sum(1 for h in delivered if len(pub.get(h, ())) == 1)
+
+    # Second corpus: the archives are not the only place a digest could be
+    # published. Sweep every committed text file too, so "holds" is scoped to a
+    # stated corpus rather than to one directory.
+    scanned, elsewhere = 0, 0
+    skip = (".jpg", ".jpeg", ".png", ".pdf", ".svg", ".gz", ".tar", ".zip")
+    for q in Path(".").rglob("*"):
+        if ".git/" in str(q) or not q.is_file() or q.suffix.lower() in skip:
+            continue
+        try:
+            t = q.read_text(errors="ignore")
+        except Exception:
+            continue
+        scanned += 1
+        elsewhere += sum(1 for h in delivered if h in t)
+
+    record("delivered image bytes", unique > 0,
+           (f"{matched}/{len(files)} delivered files hash to a PUBLISHED image "
+            f"digest and {unique} of those resolve to a UNIQUE slot, so the arm "
+            f"and training seed of {unique} rows are recoverable by hashing the "
+            f"packet alone. {len(pub)} slot-resolving published digests were "
+            f"searched, plus {scanned} other committed text files "
+            f"({elsewhere} further occurrences). Aggregate counts only; no "
+            f"item-to-slot mapping is reported.")
+           if unique else
+           (f"0/{len(files)} delivered files hash to any of the {len(pub)} "
+            f"slot-resolving published digests, and {elsewhere} occurrence(s) "
+            f"across {scanned} other committed text files. The annotation bytes "
+            f"are separated from the indexed originals. SCOPE: this closes the "
+            f"DIGEST channel against a packet holder who also has the "
+            f"repository. It does NOT close pixel comparison by a holder of the "
+            f"private source images -- the packet is made of those images, and "
+            f"no re-encoding can prevent that."))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -199,6 +298,12 @@ def main() -> int:
                     help="default: label_sheet_EMPTY.csv, else label_sheet.csv")
     ap.add_argument("--manifest",
                     default="results/audit_v1/draft_manifests/test_manifest_DRAFT.json")
+    ap.add_argument("--delivered_images", default=None,
+                    help="the packet's ACTUAL images directory under the "
+                         "private data root; without it attack 3 is reported "
+                         "as NOT MODELLED rather than passed")
+    ap.add_argument("--evidence", default="results/audit_v1",
+                    help="where the committed *_slots.tar.gz archives live")
     a = ap.parse_args()
 
     d = Path(a.packet_dir)
@@ -216,6 +321,9 @@ def main() -> int:
 
     attack_identifier_hashing(meta, ids, man)
     attack_rng_and_row_order(meta, cats, man)
+    attack_delivered_image_bytes(
+        Path(a.delivered_images) if a.delivered_images else None,
+        Path(a.evidence))
 
     broken = [n for n, b, _ in VERDICTS if b]
     untested = [n for n, b, d in VERDICTS if not b and "NOT MODELLED" in d]

@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `bb2e6a5c979a` — the commit that *records*
+Generated at parent commit `43a94e409d0d` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **No annotation key, key-derived field, blinding salt or label value
@@ -64,7 +64,7 @@ after every listed file is final.
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/audit_v1/amendment01_checks/CLOSEOUT_SOURCE_HASHES.json` | 4,476 | `3701c2ee2725326c0b3a6ae48fa259a66abd063bd916e2a308f8c3a635c06c2b` |
+| `results/audit_v1/amendment01_checks/CLOSEOUT_SOURCE_HASHES.json` | 5,684 | `2ab0c7a5a7ee8578eb3486d3e297f14e635ea0a984832b8570d6e10762e677b8` |
 | `results/audit_v1/amendment01_checks/closeout_test_diag_analysis.log` | 2,218 | `edf123950ba21831af3c877e03651898c5e60b22086fb4306431631308632b31` |
 | `results/audit_v1/amendment01_checks/closeout_test_diag_test_conditions.log` | 3,584 | `714f452065566ed9171ae290797ec5ea8d3047ba0e28b6ad2747357a8c4ffdf7` |
 
@@ -72,11 +72,11 @@ after every listed file is final.
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/audit_v1/annotation_packet_paired180/README.md` | 6,893 | `2617aff8730e8bda2ca32ea5a49f9e4b8935d9ba08fa21a26f17db4e4ce8e88a` |
-| `results/audit_v1/annotation_packet_paired180/BLINDING_AUDIT.md` | 6,018 | `4b21c3dacf6c6028f6a128ba4cd3c6b18bf98129133d4afefc981d3f8a4246da` |
-| `results/audit_v1/annotation_packet_paired180/blinding_audit.log` | 4,015 | `96a1af5dc37ea23291bdaf52f027d9a09a3c67ed9d90067b0900f7c7f3159f1f` |
-| `results/audit_v1/annotation_packet_paired180/label_sheet_EMPTY.csv` | 19,449 | `5bdb574d03ed34ae03e27121cfd862c4e748f40f1ef54b85e3bc1548cb9626b1` |
-| `results/audit_v1/annotation_packet_paired180/packet_manifest.json` | 14,466 | `95db4107209b5bfc1cfb9c445f437f9fb288d6f7342c8650b1d62cbed5cc5680` |
+| `results/audit_v1/annotation_packet_paired180/README.md` | 8,699 | `1216055d2cbf0627c9ac5cba2c24ba966a131054fbc88e9218f5e588f9067d87` |
+| `results/audit_v1/annotation_packet_paired180/BLINDING_AUDIT.md` | 8,889 | `266228ce93fdd8d0c93d08bb197816ff620486127137cdca21e57fc1d52a588b` |
+| `results/audit_v1/annotation_packet_paired180/blinding_audit.log` | 6,970 | `081b9e360d80550efa1dc3930379443c20e0f90d2d6f381a889a293ab55c29e5` |
+| `results/audit_v1/annotation_packet_paired180/label_sheet_EMPTY.csv` | 19,449 | `4efb1d175db7ad548e0f556e57fae543dd00e3f139840c8b1951089f2f06a25d` |
+| `results/audit_v1/annotation_packet_paired180/packet_manifest.json` | 15,683 | `0338191979f70e48371b8db060258ea3a4aee3efd87a3bfa5def7fd2bd315bc3` |
 | `results/audit_v1/annotation_packet_paired180/INSTRUCTIONS.md` | 840 | `482c8888ffe58a53f5f903a0a36bf10eea3c7b5c5a3e2096f0a000157853dbbf` |
 | `results/audit_v1/annotation_packet_paired180/overlap_summary.json` | 700 | `efac72605916d542aa01a87adb0ed2ca1347a99c34a8750ad57bdaf37ff06c5b` |
 
@@ -86,9 +86,9 @@ after every listed file is final.
 |---|---|---|
 | `results/audit_v1/AMENDMENT_01_CLOSEOUT.md` | 5,959 | `3bb200885a23ed7f17244310c8da64faf6f9fc594dc0925f1bfe0507e6476a7e` |
 | `results/audit_v1/AMENDMENT_01_RESULTS.md` | 24,252 | `56e26489178630e44bca7ef6f9bfc90e7ec7e4c5e212358171b41d4c5835e08c` |
-| `results/audit_v1/CLAIM_CORRECTIONS_V5.md` | 12,985 | `e2ebeff7d09b4459b83de3b3044b243e9618a596ec53ad4a0eed72bbd7615143` |
+| `results/audit_v1/CLAIM_CORRECTIONS_V5.md` | 13,731 | `9f7b21e3079131ce11f0ced6e770c1d06e946b22c539d0336c838ea9fcc94db8` |
 | `results/audit_v1/ARTIFACT_INVENTORY.md` | 17,824 | `033999e2519ee503d6ef9473644e45d8dd693e5124f830be6dd59f1fd52ba261` |
-| `docs/research/NEXT_SCREEN_PROPOSAL.md` | 24,444 | `51733fac16925ddd00c491c0f6359dea7730e35bff057675de2eadfd858b2fad` |
+| `docs/research/NEXT_SCREEN_PROPOSAL.md` | 29,904 | `c5e917f302e0dcae984d910ab0bf38cbca5dd282d50391c2c6fa99d6cdb3913a` |
 
 ## Code
 
@@ -97,9 +97,9 @@ after every listed file is final.
 | `scripts/seq/diag_analysis.py` | 38,196 | `90059e03c132f33a8cc29856bff83671f8e87d2ffd573258651132bb6f0296e0` |
 | `scripts/seq/test_diag_analysis.py` | 12,591 | `069c36782d621a5aeea2a57e2728376fc474f21bc14a94d7a126fc4f766b6851` |
 | `scripts/seq/test_diag_test_conditions.py` | 16,353 | `6a532df3b861509bea32c1c025583b2344b84d2f07b042426c7a3515fd3c6aea` |
-| `scripts/seq/build_paired_annotation_packet.py` | 29,828 | `c3b38da6f66f347504288a8f9ad9d80301398a63e0067102777b2160a434fd99` |
+| `scripts/seq/build_paired_annotation_packet.py` | 36,094 | `52184bf18e4df96fd0e85aff7ffc40ce205d8b7f9146398f784d6de0e1b47b7b` |
 | `scripts/seq/build_amendment01_evidence.py` | 18,374 | `62fbe6078b1cef76592d4f572f6e0191c2740279b0a6283486ba71c620f7e1fc` |
-| `scripts/seq/audit_packet_blinding.py` | 10,440 | `63b3ab756620d8dbdb64c397e524e29ba7e7b02f4981280cf6c3d5022fc3bc81` |
+| `scripts/seq/audit_packet_blinding.py` | 15,869 | `62169d1540e83cc857f53bf9d3ae37880da2630cffd116818db8325a9df06de5` |
 | `scripts/seq/publish_evidence_index.py` | 5,596 | `a1c0c8390afea828bf388dcf65bc5a1c4e8e084cdc6f44d82562734e42ffd548` |
 
 ---

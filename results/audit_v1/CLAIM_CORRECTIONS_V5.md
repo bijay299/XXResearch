@@ -143,25 +143,38 @@ packet.** [`BLINDING_AUDIT.md`](annotation_packet_paired180/BLINDING_AUDIT.md)
 attacks the committed, key-free records of all three packets with
 `scripts/seq/audit_packet_blinding.py`, opening no key and printing no salt:
 
-| packet | identifier channel | row-order channel |
-|---|---|---|
-| paired 180 | **holds** (secret salt; only its digest published) | **holds** (separate secret-seeded RNG; best reconstruction 57/180, below chance) |
-| supplementary 228 | **BROKEN — 228/228 ids regenerated** from published records using the published salt `AMENDMENT-01` | not modelled |
-| pilot 236 | salt published under a different id rule; path enumeration got 0/236 — a weakness, not a pass | not modelled |
+| packet | 1 identifier | 2 RNG + row order | 3 delivered image bytes |
+|---|---|---|---|
+| paired 180, repaired | **holds** | **holds** | **holds — 0/180** |
+| paired 180, superseded build | holds | holds | **BROKEN — 180/180** |
+| supplementary 228 | **BROKEN — 228/228** | not modelled | **BROKEN — 228/228** |
+| pilot 236 | salt published, different rule, 0/236 — a weakness, not a pass | not modelled | holds — 0/236 |
 
-**The paired packet's first build was itself broken**, on the row-order channel:
-one RNG drew the sample *and* shuffled the rows and its seed was published, so
-the attack replayed **180/180 positions exactly** and the secret salt was
-irrelevant. Fixed by shuffling under a separate secret-seeded RNG, with the
-sampling seed left public so the draw stays auditable; the drawn tuples are
-published again, because withholding them was omission rather than protection.
+**Two of the paired packet's own builds were broken, and both were found by
+attacking it rather than by reasoning about it.** Build 1 fell to the row-order
+channel: one RNG drew the sample *and* shuffled the rows and its seed was
+published, replaying 180/180 positions despite the secret salt. Build 2 fell to
+the **image-byte** channel, which was the serious one: the packet copied source
+bytes unchanged, and the committed image reports and detector rows tie every
+`sha256` to its slot, so 180/180 files resolved to a unique arm by hashing
+alone. Repaired by re-encoding each copy from the **decoded pixels** into a
+fresh lossless PNG — **180/180 pixel-verified element-by-element**, no
+EXIF/JFIF/PNG-text, and the build now refuses to finish if any exported byte
+stream equals a published digest.
 
-**The 228-item packet's exposure predates this closeout.** The same attack
-breaks it using **only files committed at `7e01fbd`**, so publishing the raw
-detector rows did not cause it. It is **preserved exactly as delivered and was
-not rebuilt**, per the handoff; **0 of its 228 cells are filled** (as are 0 of
-236 and 0 of 180), so no human work is lost. Re-salting it before any annotation
-would change its item ids and is left as a decision for the PI, not taken here.
+**Scope, stated rather than implied.** The three attacks model **one adversary:
+a packet holder who also has the repository.** A holder of the private source
+images can still identify every item by pixel comparison, and no re-encoding
+prevents that. No universal blinding claim is made.
+
+**The 228-item packet's exposure predates this closeout** — reproducible from
+**only files committed at `7e01fbd`** — and **re-salting it alone cannot fix the
+image-byte channel**, since new ids leave the bytes unchanged. Preserved exactly
+as delivered and not rebuilt, per the handoff. **0 of its 228 cells are filled**
+(as are 0 of 236 and 0 of 180), so no human work is lost; re-exporting it is
+left as a decision for the PI. **13 of the paired packet's 180 images overlap
+it**, so a holder of that packet can locate those 13 by pixel comparison — the
+paired audit should go to an annotator who has received neither earlier packet.
 
 ---
 

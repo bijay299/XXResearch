@@ -45,11 +45,28 @@ TWO channels can de-blind a packet, and both are closed here.
    that way. The row order is therefore shuffled by a SEPARATE RNG seeded from
    the secret.
 
+3. THE IMAGE BYTES. This was the live channel in the second build. The packet
+   copied source bytes unchanged, and the committed image reports and detector
+   rows associate every image's sha256 with its source slot -- so a packet
+   holder could hash a renamed file and read off the arm. All 180 of the second
+   build's files resolved to a unique slot that way. Neither the secret salt nor
+   the secret row order touches it. Each annotation copy is therefore RE-ENCODED
+   from the decoded pixels into a fresh lossless PNG, stripped of EXIF/JFIF/PNG
+   text, with the decoded pixels compared element-by-element against the
+   source's so that "the annotator sees the same image" is verified, not
+   asserted. The build aborts if any exported file hashes to a published digest.
+
 The SAMPLING seed stays public on purpose: a reader must be able to replay the
 draw and confirm it consumed no detector output. So tuple MEMBERSHIP is public
 by design; what is protected is the ASSIGNMENT of arm and training seed to a
-sheet row. Verify with ``scripts/seq/audit_packet_blinding.py``, which attacks
-the published records and never opens a key.
+sheet row.
+
+THREAT MODEL, stated rather than implied. Channels 1-3 are closed against a
+packet holder who ALSO has the repository. They are NOT closed against a holder
+of the private source images under the data root: the packet is made of those
+images, so pixel comparison still identifies every item, and no re-encoding can
+change that. Verify with ``scripts/seq/audit_packet_blinding.py``, which attacks
+the published records and the delivered files, and never opens a key.
 
 Disclosed limitation of a paired packet: it necessarily contains three images of
 the same prompt and generation seed. An annotator may notice the visual
@@ -96,6 +113,46 @@ FORBIDDEN_IN_PACKET = ("MAB_L2", "_MA/", "U_step", "max_score", "detections",
                        "seed17", "seed29", "training_seed", "arm")
 # The secret salt must never reach the packet either; checked separately,
 # because its value is not a literal known at import time.
+
+
+def export_image(src: Path, dst: Path) -> dict:
+    """Write an annotation copy whose BYTES differ but whose PIXELS do not.
+
+    Copying source bytes is a de-blinding channel: the published image reports
+    and detector rows associate each image's sha256 with its source slot, and
+    those digests are committed, so a packet holder can hash a renamed file and
+    read off the arm. The salt and the secret row order do nothing about it --
+    the file content itself is the identifier.
+
+    So the annotation copy is re-encoded from the DECODED pixels into a fresh
+    lossless PNG, carrying no EXIF, no JFIF block and no PNG text chunk. The
+    decoded pixels are then compared element-by-element against the source's
+    decoded pixels, so "what the annotator sees is unchanged" is verified rather
+    than asserted. Returns the verification record; raises if pixels moved.
+    """
+    from PIL import Image
+    import numpy as np
+
+    with Image.open(src) as im:
+        src_mode, src_size, src_fmt = im.mode, im.size, im.format
+        a = np.array(im.convert("RGB"))
+    # A fresh image from the array: nothing from im.info travels with it.
+    Image.fromarray(a, mode="RGB").save(dst, format="PNG", optimize=True)
+    with Image.open(dst) as im2:
+        b = np.array(im2.convert("RGB"))
+        leftover = dict(im2.info)
+        n_exif = len(im2.getexif())
+    if a.shape != b.shape or not np.array_equal(a, b):
+        raise SystemExit(f"FATAL: re-encoding changed pixels for {src.name}")
+    # Only harmless rendering hints may survive; anything else is a leak risk.
+    stray = {k: v for k, v in leftover.items()
+             if k not in ("dpi", "gamma", "aspect", "srgb", "icc_profile")}
+    if stray or n_exif:
+        raise SystemExit(f"FATAL: metadata survived re-encoding for "
+                         f"{src.name}: {sorted(stray)} exif={n_exif}")
+    return {"source_format": src_fmt, "source_mode": src_mode,
+            "source_size": list(src_size), "pixels_identical": True,
+            "exported_format": "PNG", "exif_entries": n_exif}
 
 
 def sha256_file(p: Path, chunk: int = 1 << 20) -> str:
@@ -337,14 +394,22 @@ def main() -> int:
     (packet / "images").mkdir(parents=True, exist_ok=True)
 
     sheet_rows, key_rows, overlap_rows = [], [], []
+    reencoded = pixel_verified = 0
+    src_formats: set = set()
+    exported_digests: set = set()
     for r in items:
         blind = "item_" + hashlib.sha256(
             f"{salt}|{r['image_path']}".encode()).hexdigest()[:12]
         src = Path(r["image_path"])
-        ext = src.suffix or ".jpg"
+        # NOT the source extension and NOT the source bytes: see export_image.
+        ext = ".png"
         dst = packet / "images" / f"{blind}{ext}"
         if a.copy_images and src.is_file() and not dst.exists():
-            shutil.copy2(src, dst)
+            checks = export_image(src, dst)
+            reencoded += 1
+            pixel_verified += int(checks["pixels_identical"])
+            src_formats.add(checks["source_format"])
+        exported_digests.add(sha256_file(dst) if dst.is_file() else "")
         sheet_rows.append({
             "item_id": blind,
             "image": f"images/{blind}{ext}",
@@ -435,6 +500,18 @@ def main() -> int:
     labelled = sum(1 for r in sheet_rows if r["answer_yes_no_unsure"])
     if labelled:
         raise SystemExit(f"FATAL: {labelled} label cells are not empty")
+    # The source digests are PUBLISHED and map to a slot. No exported byte
+    # stream may equal one of them; checked here so the build cannot ship the
+    # channel again.
+    source_digests = {r["image_sha256"] for r in items if r.get("image_sha256")}
+    collide = exported_digests & source_digests
+    if collide:
+        raise SystemExit(f"FATAL: {len(collide)} exported file(s) hash to a "
+                         f"PUBLISHED source digest; the arm is recoverable by "
+                         f"hashing the packet")
+    if a.copy_images and reencoded and pixel_verified != reencoded:
+        raise SystemExit(f"FATAL: pixels verified for only {pixel_verified} of "
+                         f"{reencoded} exported images")
 
     meta = {
         "_what_this_is": (
@@ -509,6 +586,33 @@ def main() -> int:
             "key_inside_packet": False,
             "probe": ("the packet's text files were scanned for arm, seed and "
                       "detector strings; no match, or the build aborts"),
+            "image_export": {
+                "why": ("copying source bytes is a de-blinding channel: the "
+                        "committed image reports and detector rows associate "
+                        "each image's sha256 with its source slot, so a packet "
+                        "holder could hash a renamed file and read off the arm. "
+                        "Neither the salt nor the secret row order affects "
+                        "this -- the file content is the identifier."),
+                "method": ("each annotation copy is re-encoded from the DECODED "
+                           "pixels into a fresh lossless PNG with no EXIF, no "
+                           "JFIF block and no PNG text chunk"),
+                "pixels_verified": (
+                    f"{pixel_verified}/{reencoded} exported images compared "
+                    f"element-by-element against the source's decoded pixels; "
+                    f"a mismatch aborts the build"),
+                "source_formats": sorted(src_formats),
+                "no_exported_file_matches_a_published_digest": True,
+                "closed_against": (
+                    "a packet holder who also has the repository: no exported "
+                    "byte stream equals any published image digest, and no "
+                    "frozen-test pixels are committed anywhere"),
+                "NOT_closed_against": (
+                    "a holder of the PRIVATE source images under the data root. "
+                    "The packet is made of those images, so pixel-for-pixel "
+                    "comparison still identifies every item. Re-encoding cannot "
+                    "close that and does not claim to; it is mitigated by "
+                    "access control alone."),
+            },
             "disclosed_limitation": (
                 "a paired packet necessarily contains three images of the same "
                 "prompt and generation seed. An annotator may notice the "
@@ -586,6 +690,9 @@ def main() -> int:
           f"digest {salt_sha[:12]}…)")
     print(f"  row order        : separate RNG seeded from the secret "
           f"(digest {order_sha[:12]}…); the sampling seed does NOT reproduce it")
+    print(f"  image export     : {reencoded} re-encoded to PNG from decoded "
+          f"pixels, {pixel_verified} pixel-verified, 0 matching a published "
+          f"digest")
     print(f"  overlap report   : {overlapp}  (outside the packet)")
     print(f"  overlapping imgs : {len(overlap_rows)} "
           f"({sum(1 for r in overlap_rows if r['already_labelled'])} already "

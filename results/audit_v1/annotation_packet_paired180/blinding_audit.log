@@ -1,4 +1,4 @@
-=== paired 180 (hardened) ===
+=== 1. paired 180, REPAIRED export (the packet to hand out) ===
 packet   : results/audit_v1/annotation_packet_paired180
 sheet    : label_sheet_EMPTY.csv  (180 rows)
 manifest : results/audit_v1/draft_manifests/test_manifest_DRAFT.json
@@ -7,12 +7,30 @@ the KEY is never opened and the salt is never printed
   [holds ] identifier hashing
            no salt value appears in the published records (rule: 'sha256(<secret salt> | <image_path>)[:12]'; salt_sha256 published: yes). Enumeration needs the secret, which lives with the key.
   [holds ] published RNG + row order
-           none of 3 reconstructions from published data reproduces the row order (best: 'fresh RNG(sampling seed) shuffles', 57/180 positions; chance agreement is about 60). Order note: 'shuffled once under a SEPARATE RNG seeded from the secret; the sampling seed does NOT reproduce the row order'
+           none of 3 reconstructions from published data reproduces the row order (best: 'fresh RNG(sampling seed) shuffles', 67/180 positions; chance agreement is about 60). Order note: 'shuffled once under a SEPARATE RNG seeded from the secret; the sampling seed does NOT reproduce the row order'
+  [holds ] delivered image bytes
+           0/180 delivered files hash to any of the 6880 slot-resolving published digests, and 0 occurrence(s) across 243 other committed text files. The annotation bytes are separated from the indexed originals. SCOPE: this closes the DIGEST channel against a packet holder who also has the repository. It does NOT close pixel comparison by a holder of the private source images -- the packet is made of those images, and no re-encoding can prevent that.
 
-BLINDING HOLDS against all 2 attacks (published data only, CPU only)
+BLINDING HOLDS against all 3 attacks (published data only, CPU only)
 exit=0
 
-=== supplementary 228 (preserved as delivered) ===
+=== 2. paired 180, SUPERSEDED defective build (kept, never to be distributed) ===
+packet   : results/audit_v1/annotation_packet_paired180
+sheet    : label_sheet_EMPTY.csv  (180 rows)
+manifest : results/audit_v1/draft_manifests/test_manifest_DRAFT.json
+the KEY is never opened and the salt is never printed
+
+  [holds ] identifier hashing
+           no salt value appears in the published records (rule: 'sha256(<secret salt> | <image_path>)[:12]'; salt_sha256 published: yes). Enumeration needs the secret, which lives with the key.
+  [holds ] published RNG + row order
+           none of 3 reconstructions from published data reproduces the row order (best: 'fresh RNG(sampling seed) shuffles', 67/180 positions; chance agreement is about 60). Order note: 'shuffled once under a SEPARATE RNG seeded from the secret; the sampling seed does NOT reproduce the row order'
+  [BROKEN] delivered image bytes
+           180/180 delivered files hash to a PUBLISHED image digest and 180 of those resolve to a UNIQUE slot, so the arm and training seed of 180 rows are recoverable by hashing the packet alone. 6880 slot-resolving published digests were searched, plus 243 other committed text files (0 further occurrences). Aggregate counts only; no item-to-slot mapping is reported.
+
+BLINDING BROKEN by 1 of 3 attacks: delivered image bytes
+exit=1
+
+=== 3. supplementary 228, preserved as delivered ===
 packet   : results/audit_v1/annotation_packet_v2
 sheet    : label_sheet.csv  (228 rows)
 manifest : results/audit_v1/draft_manifests/test_manifest_DRAFT.json
@@ -22,11 +40,13 @@ the KEY is never opened and the salt is never printed
            228/228 blinded ids regenerated from published records alone using the PUBLISHED salt. Each hit reveals that row's arm and training seed, so the blind is gone for those rows.
   [holds ] published RNG + row order
            NOT MODELLED for this packet: it declares no paired `approved_design`, and its draw consumes detector output (stratified cells and score-enriched items), so replaying it needs the raw detector rows rather than published metadata alone. Published sampling seed: 20261011. Treat this as UNTESTED, not as passed.
+  [BROKEN] delivered image bytes
+           228/228 delivered files hash to a PUBLISHED image digest and 228 of those resolve to a UNIQUE slot, so the arm and training seed of 228 rows are recoverable by hashing the packet alone. 6880 slot-resolving published digests were searched, plus 243 other committed text files (0 further occurrences). Aggregate counts only; no item-to-slot mapping is reported.
 
-BLINDING BROKEN by 1 of 2 attacks: identifier hashing
+BLINDING BROKEN by 2 of 3 attacks: identifier hashing, delivered image bytes
 exit=1
 
-=== pilot 236 (preserved as delivered) ===
+=== 4. pilot 236, preserved as delivered ===
 packet   : results/audit_v1/annotation_packet
 sheet    : label_sheet_EMPTY.csv  (236 rows)
 manifest : results/audit_v1/draft_manifests/test_manifest_DRAFT.json
@@ -36,11 +56,13 @@ the KEY is never opened and the salt is never printed
            a salt IS published, but enumeration under the documented path rule regenerated 0/236 ids: this packet's id rule or its inputs differ from sha256(salt | <eval_root>/<slot>/images/<prompt_id>_seed<gs>.jpg)[:12]. Publishing the salt is still a weakness -- it means only the rule, not a secret, stands between a reader and the mapping -- but this tool did not break it.
   [holds ] published RNG + row order
            NOT MODELLED for this packet: it declares no paired `approved_design`, and its draw consumes detector output (stratified cells and score-enriched items), so replaying it needs the raw detector rows rather than published metadata alone. Published sampling seed: 20261009. Treat this as UNTESTED, not as passed.
+  [holds ] delivered image bytes
+           0/236 delivered files hash to any of the 6880 slot-resolving published digests, and 1 occurrence(s) across 243 other committed text files. The annotation bytes are separated from the indexed originals. SCOPE: this closes the DIGEST channel against a packet holder who also has the repository. It does NOT close pixel comparison by a holder of the private source images -- the packet is made of those images, and no re-encoding can prevent that.
 
-1 of 2 attacks repelled; 1 NOT MODELLED for this packet (published RNG + row order). This is not a clean pass.
+2 of 3 attacks repelled; 1 NOT MODELLED for this packet (published RNG + row order). This is not a clean pass.
 exit=2
 
-=== supplementary 228, using ONLY files committed at 7e01fbd ===
+=== 5. supplementary 228 from ONLY the records committed at 7e01fbd ===
 packet   : /tmp/claude-1011/-home-bijaypandey-FINMLResearch/df3d45db-4204-4f7d-a7b9-c2d01c85df59/scratchpad/at7e01fbd/annotation_packet_v2
 sheet    : label_sheet.csv  (228 rows)
 manifest : /tmp/claude-1011/-home-bijaypandey-FINMLResearch/df3d45db-4204-4f7d-a7b9-c2d01c85df59/scratchpad/at7e01fbd/test_manifest_DRAFT.json
@@ -50,6 +72,8 @@ the KEY is never opened and the salt is never printed
            228/228 blinded ids regenerated from published records alone using the PUBLISHED salt. Each hit reveals that row's arm and training seed, so the blind is gone for those rows.
   [holds ] published RNG + row order
            NOT MODELLED for this packet: it declares no paired `approved_design`, and its draw consumes detector output (stratified cells and score-enriched items), so replaying it needs the raw detector rows rather than published metadata alone. Published sampling seed: 20261011. Treat this as UNTESTED, not as passed.
+  [holds ] delivered image bytes
+           NOT MODELLED: no --delivered_images directory was given, so the actual packet files were not hashed. UNTESTED, not passed.
 
-BLINDING BROKEN by 1 of 2 attacks: identifier hashing
+BLINDING BROKEN by 1 of 3 attacks: identifier hashing
 exit=1
