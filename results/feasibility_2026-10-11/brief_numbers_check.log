@@ -1,0 +1,56 @@
+ok   frozen-test slots counted: got 6 want 6
+ok   test slot seconds min: got 609.0 want 609
+ok   test slot seconds max: got 625.0 want 625
+ok   s/image on 560-image slots: got 1.1026785714285714 want 1.1 (+-0.01)
+ok   s/image on 80-image slots: got 1.3616477272727274 want 1.36 (+-0.02)
+ok   ConAbl training stages recorded: got 4 want 4
+ok   ConAbl 1000-step wall seconds: got 842.0 want 842
+ok   ConAbl s/step at 1000 steps: got 0.842 want 0.84 (+-0.005)
+ok   ledger total device-hours: got 2.9014 want 2.9014 (+-0.0001)
+ok   ledger entries: got 56 want 56
+ok   median paired-contrast width at 80 images/category (pp): got 10.0 want 10.0
+ok   median marginal-rate width (pp): got 22.5 want 22.5
+ok   contrast half-width (pp): got 5.0 want 5.0
+ok   interaction half-width at n=80 (pp): got 7.1 want 7.1 (+-0.05)
+ok   I MATERIAL needs |point| >= (pp): got 17 want 17
+ok   I NULL(10) needs |point| <= (pp): got 3 want 3
+ok   images/cell for interaction half-width 5.0 pp: got 160.0 want 160 (+-10)
+ok   images/cell for interaction half-width 3.5 pp: got 330.0 want 330 (+-10)
+ok   CA ConAbl checkpoints: got 20 want 20
+ok   CA SPEED checkpoints (seed factor degenerate): got 10 want 10
+ok   NAT LACU checkpoints: got 6 want 6
+ok   total checkpoints: got 72 want 72
+ok   CA ConAbl training device-hours at 1000 iterations: got 4.7 want 4.7 (+-0.05)
+ok   same at upstream 2000 iterations: got 9.4 want 9.4 (+-0.1)
+ok   ConAbl request-1 retrain cost if reuse fails (device-h): got 0.47 want 0.47 (+-0.05)
+ok   LACU UNet passes per optimizer step at effective batch 108: got 4320 want 4320
+ok   LACU passes per request, 250 steps (M): got 1.08 want 1.08 (+-0.01)
+ok   LACU passes per request, 350 steps (M): got 1.51 want 1.51 (+-0.01)
+ok   LACU image-equivalents per request, low (k): got 18.0 want 18.0 (+-0.1)
+ok   LACU image-equivalents per request, high (k): got 25.2 want 25.2 (+-0.1)
+ok   LACU device-hours at batch-1 throughput, low: got 5.0 want 5.0 (+-0.1)
+ok   LACU device-hours at batch-1 throughput, high: got 7.0 want 7.0 (+-0.1)
+ok   LACU device-hours with a 4x batched speed-up (low end): got 1.25 want 1.25 (+-0.01)
+ok   LACU device-hours with a 2x batched speed-up (high end): got 3.5 want 3.5 (+-0.1)
+ok   mapping rescore passes per stage (k): got 32.0 want 32.0
+ok   LACU requests: got 26 want 26
+ok   LACU training device-hours, low: got 39 want 39
+ok   LACU training device-hours, high: got 104 want 104
+ok   TEST device-hours (8 categories x 160): got 28 want 28 (+-1)
+ok   ACCEPT device-hours (3 x 160): got 11 want 11 (+-1)
+ok   R device-hours (1 x 160): got 3.5 want 3.6 (+-0.3)
+ok   per-checkpoint TEST device-hours: got 0.39 want 0.39 (+-0.01)
+ok   brief quotes '1.10 s/image': got True want True
+ok   brief quotes '0.84 s/step': got True want True
+ok   brief quotes '**4,320**': got True want True
+ok   brief quotes '1.5 – 4.0 device-hours': got True want True
+ok   brief quotes '1.2 – 3.5 device-hours': got True want True
+ok   brief quotes '**10.0 pp**': got True want True
+ok   brief quotes '≈ **7 pp**': got True want True
+ok   brief quotes '≈ **160**': got True want True
+ok   brief quotes '**72**': got True want True
+ok   brief quotes '≈ 90 – 160 device-hours': got True want True
+ok   brief quotes '2.9014 device-hours': got True want True
+ok   brief quotes '204': got True want True
+
+54 passed / 0 failed

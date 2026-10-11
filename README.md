@@ -34,6 +34,14 @@ launch scripts, validators, measurements and notes.
 > is [`docs/research/NEXT_SCREEN_PROPOSAL.md`](docs/research/NEXT_SCREEN_PROPOSAL.md)
 > — **CPU-only, not authorised to run**. The frozen test set is spent.
 >
+> **Feasibility, 2026-10-11:** that screen **cannot run as written** — CEASE has
+> no public code (project pages only, "Code coming soon."), and the proposal makes
+> it non-droppable. LACU *is* available (MIT) and runs in the existing
+> environment. The reduced three-method alternative, the verified blockers and
+> the costed plan are in
+> [`docs/research/FEASIBILITY_BRIEF_2026-10-11.md`](docs/research/FEASIBILITY_BRIEF_2026-10-11.md)
+> — **also CPU-only, and it authorises nothing**.
+>
 > **AUDIT-01 / 01b / 01c / 01d** re-derived the two-seed SD-1.5 sequential pilot
 > snapshot `a9de625` from raw per-image predictions. Arithmetic and completeness
 > verified exactly (0 mismatches over 1026 values; 0 duplicate and 0 missing
