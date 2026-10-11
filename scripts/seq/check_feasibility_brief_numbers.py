@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Re-derive every number in docs/research/FEASIBILITY_BRIEF_2026-10-11.md. CPU only.
 
+Design-dependent figures come from screen_measurement_inventory.py, so the brief,
+the inventory and this checker cannot drift apart.
+
 The brief quotes measured unit costs from the Amendment 01 ledger, interval
 widths from the committed analysis, and arithmetic built on both. This script
 recomputes each from the committed source and asserts the brief's figure, so a
@@ -75,62 +78,103 @@ def main() -> int:
         n = 80 * (inter_half / target) ** 2
         check(f"images/cell for interaction half-width {target} pp", round(n, -1), want, 10)
 
-    # --- design counts -------------------------------------------------------
-    ca = {"ConAbl": 4 + 16, "SPEED": 2 + 8, "SPEED+AIC": 2 + 8, "LACU": 4 + 16}
-    nat = {"LACU": 2 + 4, "SPEED": 1 + 2, "SPEED+AIC": 1 + 2, "ConAbl": 0}
-    check("CA ConAbl checkpoints", ca["ConAbl"], 20)
-    check("CA SPEED checkpoints (seed factor degenerate)", ca["SPEED"], 10)
-    check("NAT LACU checkpoints", nat["LACU"], 6)
-    check("total checkpoints", sum(ca.values()) + sum(nat.values()), 72)
+    # --- design counts and workload, from the inventory module -------------
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "inv_mod", "scripts/seq/screen_measurement_inventory.py")
+    inv_mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(inv_mod)
+    inv = inv_mod.inventory()
 
-    # --- costed plan ---------------------------------------------------------
-    s_per_step = max(train) / 1000
-    conabl_h = ca["ConAbl"] * 1000 * s_per_step / 3600
-    check("CA ConAbl training device-hours at 1000 iterations", round(conabl_h, 1), 4.7, 0.05)
-    check("same at upstream 2000 iterations", round(2 * conabl_h, 1), 9.4, 0.1)
-    check("ConAbl request-1 retrain cost if reuse fails (device-h)",
-          round(2 * 1000 * s_per_step / 3600, 2), 0.47, 0.05)
+    check("arms in family CA", len(inv_mod.CA_ARMS), 4)
+    check("arms in family NAT (ConAbl shares its CA cells)", len(inv_mod.NAT_ARMS), 3)
+    check("edit/training seeds per arm", inv_mod.SEEDS, 2)
+    check("request-1 checkpoints", inv["n_r1"], 22)
+    check("request-2 checkpoints", inv["n_r2"], 76)
+    check("SELECTED checkpoints (M0 and candidates excluded)", inv["n_selected"], 98)
+    check("calibration candidates / intermediate dumps", inv["n_candidates"], 486)
+    check("measured concepts on TEST", len(inv_mod.CONCEPTS_TEST), 9)
+    check("flower is NOT a measured concept", "flower" in inv_mod.CONCEPTS_TEST, False)
+    check("disjoint anchor is COCO-measurable", inv_mod.DISJOINT_ANCHOR, "potted plant")
+    check("total images across every enumerated slot", inv["images"], 220_160)
+    check("evaluation device-hours", round(inv["eval_h"], 1), 67.4, 0.1)
+    t = inv["train"]
+    check("ConAbl training device-hours (measured rate, 1000 steps)",
+          round(t["ConAbl"], 2), 4.68, 0.01)
+    check("same at upstream 2000 iterations", round(2 * t["ConAbl"], 1), 9.4, 0.1)
+    check("ConAbl request-1 retrain cost if all-fresh is chosen prospectively",
+          round(2 * inv_mod.CONABL_STEPS * inv["rates"]["conabl_s_per_step"] / 3600, 2), 0.47, 0.01)
+    check("SPEED + SPEED+AIC edits (4 dial points x 52 selected)", t["n_speed_edits"], 208)
+    check("LACU requests", t["n_lacu_requests"], 26)
+    check("LACU device-hours, low", round(t["LACU_lo"]), 43)
+    check("LACU device-hours, high", round(t["LACU_hi"]), 108)
+    check("TOTAL device-hours, low", round(inv["total_lo"]), 119)
+    check("TOTAL device-hours, high", round(inv["total_hi"]), 184)
 
-    # LACU: passes per optimizer step is invariant to the batch/accum split
-    eff = 108
-    per_step = eff * 2 * 20
-    check("LACU UNet passes per optimizer step at effective batch 108", per_step, 4320)
-    lo_passes, hi_passes = per_step * 250, per_step * 350
-    check("LACU passes per request, 250 steps (M)", round(lo_passes / 1e6, 2), 1.08, 0.01)
-    check("LACU passes per request, 350 steps (M)", round(hi_passes / 1e6, 2), 1.51, 0.01)
-    # one of our images = 30 sampler steps x 2 (CFG) = 60 passes ~ 1.0 s at batch 1
-    img_eq_lo, img_eq_hi = lo_passes / 60, hi_passes / 60
-    check("LACU image-equivalents per request, low (k)", round(img_eq_lo / 1000, 1), 18.0, 0.1)
-    check("LACU image-equivalents per request, high (k)", round(img_eq_hi / 1000, 1), 25.2, 0.1)
-    check("LACU device-hours at batch-1 throughput, low", round(img_eq_lo / 3600, 1), 5.0, 0.1)
-    check("LACU device-hours at batch-1 throughput, high", round(img_eq_hi / 3600, 1), 7.0, 0.1)
-    check("LACU device-hours with a 4x batched speed-up (low end)",
-          round(img_eq_lo / 3600 / 4, 2), 1.25, 0.01)
-    check("LACU device-hours with a 2x batched speed-up (high end)",
-          round(img_eq_hi / 3600 / 2, 1), 3.5, 0.1)
-    check("mapping rescore passes per stage (k)", 100 * 10 * 32 / 1000, 32.0)
+    # --- contrasts ----------------------------------------------------------
+    cs = inv_mod.contrasts()
+    check("CA cells per arm per edit seed", len(inv_mod.CELLS), 8)
+    for a, b in (("S", "P"), ("S", "I"), ("P", "I"), ("S", "A2_identity"), ("P", "A2_identity")):
+        check(f"<{a},{b}> = 0", round(inv_mod.dot(cs[a], cs[b]), 9), 0.0)
+    ref = [1.0 if x else 0.0 for x in inv_mod.REF_IS_HORSE]
+    for name in ("S", "P", "I"):
+        check(f"request-1 reference loading of {name} cancels",
+              round(inv_mod.dot(cs[name], ref), 9), 0.0)
+    check("S coefficients", cs["S"], [0.25, -0.25] * 4)
+    check("I coefficients", cs["I"], [0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5])
+    check("four prespecified simple effects present",
+          sorted(k for k in cs if "|" in k),
+          ["P|disjoint", "P|shared", "S|far", "S|near"])
 
-    lacu_reqs = ca["LACU"] + nat["LACU"]
-    check("LACU requests", lacu_reqs, 26)
-    check("LACU training device-hours, low", round(lacu_reqs * 1.5), 39)
-    check("LACU training device-hours, high", round(lacu_reqs * 4.0), 104)
+    # --- precision, as observed-interval arithmetic --------------------------
+    h20 = half * (10 / inv_mod.SCENES["TEST"]) ** 0.5
+    check("per-cell half-width scaled to 20 scenes (pp)", round(h20, 2), 3.54, 0.01)
+    sens = inv_mod.precision(h20)
+    check("I half-width at rho=0 (pp)", round(sens[0.0]["I"], 2), 5.00, 0.01)
+    check("I half-width at rho=+0.5 (pp)", round(sens[0.5]["I"], 2), 3.54, 0.01)
+    check("S half-width at rho=0 (pp)", round(sens[0.0]["S"], 2), 2.50, 0.01)
+    check("reading rule: MATERIAL+ needs observed point > 10 + h",
+          round(10 + sens[0.0]["I"], 2), 15.00, 0.01)
+    check("reading rule: NULL(10) needs |observed point| <= 10 - h",
+          round(10 - sens[0.0]["I"], 2), 5.00, 0.01)
 
-    # evaluation, at 160 images per category-cell
-    per_img = statistics.mean(test_slots) / 560
-    ckpts = sum(ca.values()) + sum(nat.values())
-    test_h = ckpts * 8 * 160 * per_img / 3600
-    acc_h = ckpts * 3 * 160 * per_img / 3600
-    r_h = ckpts * 160 * per_img / 3600
-    check("TEST device-hours (8 categories x 160)", round(test_h), 28, 1)
-    check("ACCEPT device-hours (3 x 160)", round(acc_h), 11, 1)
-    check("R device-hours (1 x 160)", round(r_h, 1), 3.6, 0.3)
-    check("per-checkpoint TEST device-hours", round(8 * 160 * per_img / 3600, 2), 0.39, 0.01)
+    # --- the smoke calibration ---------------------------------------------
+    sm = inv_mod.smoke_cost()
+    check("UNet passes per optimizer step at effective batch 108",
+          inv_mod.passes_per_optimizer_step(), 4320)
+    check("smoke optimizer steps", sm["optimizer_steps"], 136)
+    check("smoke UNet passes", sm["unet_passes"], 587_520)
+    check("smoke image-equivalents", round(sm["image_equivalents"]), 9792)
+    check("smoke device-hours, low", round(sm["device_hours"][0], 2), 0.75, 0.01)
+    check("smoke device-hours, high", round(sm["device_hours"][1], 2), 3.00, 0.01)
 
     # --- the brief must actually quote these ---------------------------------
-    for s in ["1.10 s/image", "0.84 s/step", "**4,320**", "1.5 – 4.0 device-hours", "1.2 – 3.5 device-hours",
-              "**10.0 pp**", "≈ **7 pp**", "≈ **160**", "**72**", "≈ 90 – 160 device-hours",
-              "2.9014 device-hours", "204"]:
-        check(f"brief quotes {s!r}", s in brief, True)
+    rev6 = pathlib.Path("docs/research/REVISION_6_CHANGES.md").read_text()
+    smoke = pathlib.Path("docs/research/LACU_SMOKE_CALIBRATION.md").read_text()
+    for q in ["1.1027 s/image", "0.8420 s/step", "**98**", "**486**", "**220,160**",
+              "**67.4**", "**4.68**", "**208 edits**", "**43 – 108**",
+              "119 – 184 device-hours", "`potted plant`", "`clock`", "0.47",
+              "6.12", "2.24", "`ALREADY-SOLVES-CORE", "AIC-NOOP", "AIC-current"]:
+        check(f"brief quotes {q!r}", q in brief, True)
+    for q in ["98", "AIC-NOOP", "potted plant", "ANCHOR-UNMEASURED", "0.47 device-hours"]:
+        check(f"revision-6 list quotes {q!r}", q in rev6, True)
+    for q in ["136 optimizer steps", "0.75 – 3.0 device-hours", "candidates[selected − 1]",
+              "`apple`", "every configuration OOMs"]:
+        check(f"smoke proposal quotes {q!r}", q in smoke, True)
+    # The retracted claims must appear ONLY inside the correction table, each
+    # paired with its retraction -- so assert the retractions, not absence.
+    for retraction in [
+        '"training-free and deterministic"',          # the SPEED claim
+        "**Wrong.** The editor has four randomness sources",
+        "**98**",                                      # replaces 72
+        "**Wrong twice:**",                            # the reuse claim
+        "**Not measurable.**",                         # the flower claim
+        "**Mis-stated.**",                             # the 17/3 pp claim
+        "**Under-specified and degenerate in the native setting.**",
+    ]:
+        check(f"brief carries the retraction {retraction!r}", retraction in brief, True)
+    check("brief no longer presents 72 as the count",
+          "= 72" in brief or "**72** checkpoints**" in brief, False)
 
     print(f"\n{ok} passed / {fail} failed")
     return 1 if fail else 0

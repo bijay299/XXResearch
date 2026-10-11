@@ -1,0 +1,97 @@
+==============================================================================
+SCREEN MEASUREMENT INVENTORY -- CPU only, authorises nothing
+==============================================================================
+
+MEASURED throughput (Amendment 01 ledger, results/audit_v1/amendment01_evidence/gpu_usage_record.json):
+  generation + COCO detection : 1.1027 s/image (mean of the 6 frozen-test slots / 560 images)
+  ConAbl training             : 0.8420 s/step (842 s / 1000 steps)
+
+SELECTED CHECKPOINTS (M0 and calibration candidates excluded):
+  ConAbl                         R1=  4  R2= 16  total= 20   dial: dump selection (one run, dumps every 100 steps)
+  SPEED                          R1=  4  R2= 16  total= 20   dial: separate closed-form edit per retain_scale value
+  SPEED+AIC(reproduced)          R1=  4  R2= 16  total= 20   dial: separate closed-form edit per retain_scale value
+  CA-LACU(ablation)              R1=  4  R2= 16  total= 20   dial: dump selection (one run; native saves at 100, 200, final)
+  NAT-LACU                       R1=  2  R2=  4  total=  6   dial: dump selection (one run; native saves at 100, 200, final)
+  NAT-SPEED                      R1=  2  R2=  4  total=  6   dial: separate closed-form edit per retain_scale value
+  NAT-SPEED+AIC(reproduced)      R1=  2  R2=  4  total=  6   dial: separate closed-form edit per retain_scale value
+                                                   SELECTED = 98  (R1=22, R2=76)
+  calibration candidates / intermediate dumps, counted separately = 486
+  plus M0 = 1, not a selected checkpoint
+
+MEASUREMENT SLOTS  (scene layout: DEV=10x8, ACCEPT=20x8, TEST=20x8, R=20x8)
+  what                                         set      ckpts  conc   images
+  calibration candidates                       DEV        486     1   38,880
+  selected checkpoints                         ACCEPT      98     1   15,680
+  request-1 parents (p_2 for dog and sandwich) ACCEPT      22     2    7,040
+  M0 (p_1 for cat)                             ACCEPT       1     1      160
+  selected checkpoints                         TEST        98     9  141,120
+  M0 cumulative baselines                      TEST         1     9    1,440
+  selected checkpoints                         R           98     1   15,680
+  M0 (reported sanity baseline)                R            1     1      160
+  TOTAL IMAGES                                                       220,160
+
+  evaluation device-hours (measured rate)        = 67.4
+
+TRAINING / EDITING device-hours:
+  ConAbl, 1000 steps x 20 requests  MEASURED  = 4.68
+  one new anchor cache (200 images) MEASURED = 0.06
+  SPEED / SPEED+AIC, 208 edits   ESTIMATE  = 3.47   (60 s/edit assumed)
+  LACU, 26 requests           ESTIMATE  = 43 - 108   (1.5-4.0 h/request + 0.15 h mapping)
+  LACU retain rescoring                 UNMEASURED = not costed
+
+  TOTAL = 119 - 184 device-hours
+
+CONTRAST COEFFICIENT VECTORS over the 8 CA cells, in this order:
+  c1: A1=horse        A2=horse        target=dog       shared    near
+  c2: A1=horse        A2=potted plant target=dog       disjoint  near
+  c3: A1=potted plant A2=potted plant target=dog       shared    near
+  c4: A1=potted plant A2=horse        target=dog       disjoint  near
+  c5: A1=horse        A2=horse        target=sandwich  shared    far
+  c6: A1=horse        A2=potted plant target=sandwich  disjoint  far
+  c7: A1=potted plant A2=potted plant target=sandwich  shared    far
+  c8: A1=potted plant A2=horse        target=sandwich  disjoint  far
+  S            +0.25 -0.25 +0.25 -0.25 +0.25 -0.25 +0.25 -0.25
+  P            +0.25 +0.25 +0.25 +0.25 -0.25 -0.25 -0.25 -0.25
+  I            +0.50 -0.50 +0.50 -0.50 -0.50 +0.50 -0.50 +0.50
+  A2_identity  +0.25 -0.25 -0.25 +0.25 +0.25 -0.25 -0.25 +0.25
+  S|near       +0.50 -0.50 +0.50 -0.50 +0.00 +0.00 +0.00 +0.00
+  S|far        +0.00 +0.00 +0.00 +0.00 +0.50 -0.50 +0.50 -0.50
+  P|shared     +0.50 +0.00 +0.50 +0.00 -0.50 +0.00 -0.50 +0.00
+  P|disjoint   +0.00 +0.50 +0.00 +0.50 +0.00 -0.50 +0.00 -0.50
+  S-P          +0.00 -0.50 +0.00 -0.50 +0.50 +0.00 +0.50 +0.00
+  P-S          +0.00 +0.50 +0.00 +0.50 -0.50 +0.00 -0.50 +0.00
+
+  orthogonality and reference cancellation:
+    <S,P> = +0.000
+    <S,I> = +0.000
+    <P,I> = +0.000
+    <S,A2_identity> = +0.000
+    <P,A2_identity> = +0.000
+    request-1 reference loading of S  = +0.000  (0 => the two request-1 references cancel)
+    request-1 reference loading of P  = +0.000  (0 => the two request-1 references cancel)
+    request-1 reference loading of I  = +0.000  (0 => the two request-1 references cancel)
+
+PRECISION, planning only. Observed per-category paired-contrast
+  95% width at 10 scenes x 8 images (the pilot layout): median 10.00 pp  =>  per-cell half-width h = 5.00 pp
+  Scaling assumption: h ~ 1/sqrt(scenes) for the BETWEEN-scene component.
+  The between/within split is UNKNOWN, so 20 scenes x 8 images and
+  40 scenes x 4 images are NOT assumed equally precise.
+  Cell correlation rho is UNKNOWN (all cells share the R_cat scenes).
+
+  contrast half-widths (pp), at 20 scenes (h scaled by sqrt(10/20)):
+     rho        S        P        I   S|near      S-P
+   -0.50     3.06     3.06     6.12     4.33     4.33
+   +0.00     2.50     2.50     5.00     3.54     3.54
+   +0.50     1.77     1.77     3.54     2.50     2.50
+   +0.80     1.12     1.12     2.24     1.58     1.58
+
+SMOKE CALIBRATION COST (LACU_SMOKE_CALIBRATION.md):
+  3 ladder configs x 12 steps + one run to step 100 = 136 optimizer steps
+  UNet passes per optimizer step at effective batch 108 = 4,320
+  = 587,520 passes = 9,792 image-equivalents
+  ESTIMATE 0.75 - 3.00 device-hours  (batched speed-up 4x to 1x)
+
+  Reading rule (arithmetic about an OBSERVED interval, not power and
+  not a statement about true effects): with realised half-width h,
+  MATERIAL+ needs the observed point > 10 + h, and NULL(10) needs
+  |observed point| <= 10 - h. NULL(10) is unreachable whenever h > 10.

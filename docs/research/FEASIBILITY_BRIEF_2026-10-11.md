@@ -1,593 +1,542 @@
-# Feasibility and decision brief — can a fair comparison with strong native remedies expose a consequential limitation?
+# Feasibility and decision brief — revision 2 (corrected)
 
-**CPU-only preparation, 2026-10-11. This authorises nothing.** No training, no
-GPU run, no generation, no method implementation and no annotation answer was
-produced for it. Every upstream fact below is bound to a fetched byte stream
-recorded in [`feasibility_sources_2026-10-11.json`](feasibility_sources_2026-10-11.json)
-(URL, size, `sha256`, fetch time), so each claim can be re-checked by refetching.
-Amendment 01 is frozen and untouched: its measurements, bootstrap, suites and
-published index are not reopened here. **Novelty and publishability remain
+**CPU-only, 2026-10-11. This authorises nothing.** No training, GPU run,
+generation, GPU calibration, method implementation, API prompt generation, human
+label, packet distribution or external message was produced for it. Amendment 01
+stays closed: its measurements, bootstrap, suites and published index are not
+reopened, and all 40 indexed rows still verify. Upstream facts are bound to
+fetched bytes in [`feasibility_sources_2026-10-11.json`](feasibility_sources_2026-10-11.json)
+(URL, size, `sha256`, fetch time). **Novelty and publishability remain
 unestablished.**
 
 This brief *narrows* [`NEXT_SCREEN_PROPOSAL.md`](NEXT_SCREEN_PROPOSAL.md)
-revision 5 to a minimum executable subset and records what is blocked. It does
-not widen it, and it does not edit it: if the PI approves, revision 6 is the
-first CPU deliverable.
+revision 5 and does not edit it; the explicit change list is
+[`REVISION_6_CHANGES.md`](REVISION_6_CHANGES.md). The smoke-calibration proposal
+it refers to is [`LACU_SMOKE_CALIBRATION.md`](LACU_SMOKE_CALIBRATION.md).
+*(The `REVIEW.md` supplied with the review prompt is the earlier round's
+acceptance of `332d0a9`, not a review of `117b584`, so it carries no evidence on
+the six points. Each point was therefore re-verified directly against upstream
+source and the committed detector, as cited below. Nothing in it conflicts with
+these corrections, and its two standing requirements — explicit detector
+validation and an unexposed annotator — are carried in §3 and §6.)*
+
+> ## Corrections to revision 1 of this brief
+>
+> | # | revision 1 said | corrected |
+> |---|---|---|
+> | 1 | SPEED's edit is "training-free and deterministic", so its two-seed factor collapses — **72** checkpoints | **Wrong.** The editor has four randomness sources and an edit seed (§1.2). Two edit seeds are preserved, rule 1 applies to it, and the count is **98** |
+> | 2 | if ConAbl's reuse fails qualification, "train the `horse` request-1 pair afresh" — called unchanged | **Wrong twice:** that is an ACCEPT/TEST-triggered replacement, and revision 5's default is to **stop that sequence**. The stop is restored; all-fresh is offered only **prospectively** (§2.4) |
+> | 3 | `flower` listed among the measured preservation endpoints | **Not measurable.** The committed detector matches COCO_V1 names by exact equality and that list has no `flower`: the endpoint would return 0 hits and pass vacuously. Anchor changed to `potted plant`, and integrity defined for LACU's selected replacements and SPEED's empty anchor too (§3) |
+> | 4 | `SPEED+AIC(reproduced)` treated as a clean comparator | **Under-specified and degenerate in the native setting.** With SPEED's empty/whitespace anchor, `c∗` *is* `K₂`'s first column, so `K₂^AIC` is rank-deficient and λ=0 inverts a singular Gram. Setting, rank policy, anchor-accumulation policy and round-trip checks are now pinned (§1.3). An AIC reproduction is **not CEASE**, and its outcome **cannot eliminate HOC** |
+> | 5 | 8 reported concepts; evaluation ≈ 47–50 device-hours | **9** concepts, and the missing slots (request-1 parent rates on ACCEPT, `M0` baselines, candidate dumps) put evaluation at **67.4** device-hours and the total at **119–184** (§5) |
+> | 6 | "`I` can read MATERIAL only above ~17 pp" presented as a threshold on effects | **Mis-stated.** It is arithmetic about an **observed** interval under an **assumed** width — not a true-effect threshold and not power. Coefficient vectors, missing-cell invalidation, reference propagation and an explicit unknown-covariance sensitivity table replace it (§4) |
 
 ---
 
-## 0. Recommendation
+## 0. Decision
 
-> **NO-GO on the screen as written. CONDITIONAL GO on a reduced three-method
-> screen that drops CEASE and keeps its decisive component.**
+> **Revision 5 remains NO-GO: CEASE has no released implementation.**
+>
+> **The reduced screen is NOT ready for conditional approval either.** What is
+> ready to approve is a **CPU track** plus **one GPU smoke calibration**.
+> Four things must land before the screen itself is a decision:
+> (a) the smoke measurement replacing LACU's 1.5–4.0 h/request estimate;
+> (b) a base-rate screen for the new anchor `potted plant` and the control
+> `clock`, neither of which has ever been measured here;
+> (c) a **prospective** decision on all-fresh request 1 (§2.4), taken before any
+> holdout evaluation;
+> (d) acceptance that **HOC stays unexcluded** (below).
 
-**Why the written screen cannot run.** Revision 5 §5.4 states "CEASE and LACU are
-not droppable for convenience or a count; if either cannot be run here that is a
-**blocking finding**", and §6.6 makes "CEASE or LACU cannot be run here" a stop.
-**CEASE has no code.** Both repositories that carry its name hold a static
-project page — `index.html`, `style.css`, two PNGs — and the author repository's
-README says "Code coming soon." under a `## Code` heading. There is no release
-date, no licence, and the paper states no release commitment. The screen as
-specified therefore stops at §6.6 before any compute.
+**The novelty consequence, stated plainly.** The screen's purpose is to expose a
+consequential limitation of *existing remedies*. CEASE is two components; only
+**AIC** is specified well enough to reproduce (Eq. 9), and **HOC is not** — the
+paper gives the projection but never the rule that decides when it applies or how
+many singular directions `Û` keeps. So:
 
-**Why the question survives anyway.** CEASE is built **on SPEED's closed-form
-solver**, and SPEED is public (Apache-2.0, `Ouxiang-Li/SPEED`). CEASE's two
-additions are not equally reproducible:
+* a reproduction of AIC is **not CEASE**, and must never be reported as CEASE;
+* if `SPEED+AIC(reproduced)` fails to prevent relapse, **that does not show CEASE
+  fails**, because HOC — the component aimed precisely at cross-edit interference
+  between successive updates — was never run;
+* therefore **no claim of the form "existing remedies do not solve this" is
+  available from this screen** while HOC is untested. The best available claim is
+  narrower: *at a matched end state on these concepts, LACU-native, SPEED-native
+  and an AIC reproduction behave thus; CEASE's HOC is untested and may solve it.*
 
-| component | specified? | consequence |
-|---|---|---|
-| **AIC** — append the anchor token embedding to SPEED's invariance matrix, `K₂^AIC = [K₂, c∗]`, with zero invariance regulariser (Eq. 9) | **fully specified**, and it is the component the authors' own ablation credits with "the larger gain" (Table 4) | reproducible on public SPEED as a small, auditable change |
-| **HOC** — project the update onto the orthogonal complement of the dominant left singular directions of `Δ_hist Δ_histᵀ` (Eqs. 12–14) | **mechanism specified, trigger and rank cut not.** The paper says `Π_i = I − ÛÛᵀ` "when HOC is applied, and `Π_i = I` otherwise", and only that HOC acts "when the accumulated historical update substantially affects the current target". No threshold, and no rule for how many singular directions `Û` retains | **not faithfully reproducible.** Two free decisions change the method, and no published number on our concept domain exists to check a guess against |
-
-So the recommended screen replaces "native CEASE" with two honestly-labelled
-arms — **native SPEED** (CEASE's own base solver, the thing CEASE improves on)
-and **`SPEED+AIC(reproduced)`** (a partial reproduction, never called CEASE) —
-and keeps **native LACU**, which *is* available and runnable here. The candidate
-direction of §7 is precisely a change to *which object is held invariant*, so
-`SPEED+AIC(reproduced)` is the comparator that matters most to it; HOC's absence
-costs the screen a second comparator, not its question.
-
-**Tripwire, not a wait.** Re-check `yongliang-wu/CEASE` before the
-pre-registration is frozen. If code is released before freeze, CEASE enters as a
-native arm and `SPEED+AIC(reproduced)` becomes an ablation. If it is released
-after freeze, it is a follow-up, not a late addition.
-
-**What the PI is being asked to approve** is listed in §5: one measured LACU
-smoke calibration, then the reduced screen. **Approving nothing is also a
-defensible outcome** — the honest reading of §1 below is that the adjacent
-literature is closer than revision 5 recorded.
+That is a materially weaker contribution story than revision 1 of this brief
+implied, and it is the main reason the screen is not recommended for approval
+today. **Waiting for CEASE's release is the cheapest route to a defensible
+claim.** The CPU track below costs no GPU time and leaves the screen ready the
+day code appears.
 
 ---
 
-## 1. Native-method feasibility — verified before anything else
+## 1. Implementation reconnaissance, corrected
 
-### 1.1 Status table
+### 1.1 Status
 
-| method | code | licence | base model | replacement behaviour | assets needed | blockers |
-|---|---|---|---|---|---|---|
-| **CEASE** | **none** (project page only; "Code coming soon.") | none stated | SD 1.4 / **1.5** / 2.1 | one fixed shared anchor per task (`person` / `art` / `object`) | 100 erase + 100 retain concepts, 5 templates/concept | **BLOCKING.** No implementation. HOC's trigger and rank cut unspecified, so a reimplementation cannot be validated |
-| **LACU** | **yes**, `SonyResearch/LACU` | **MIT** | **`runwayml/stable-diffusion-v1-5` by default**; accepts a local diffusers folder | **selects a mapping prompt per forget prompt** by score-prediction distance from 10 LLM+CLIP candidates | per concept: `train.csv` (100 forget prompts), `candidates_clip.json`, `related_concepts.txt` | **OpenAI API key required** (see 1.3); 40 GB cards are below the authors' setting; its three generic-object concepts do not include ours |
-| **SPEED** | **yes**, `Ouxiang-Li/SPEED` | **Apache-2.0** | `--sd_ckpt`, defaults to SD 1.4, accepts SD 1.5 or a local folder | **`--anchor_concepts` is an explicit required argument** | a retain-set CSV we must author for object categories | two small pip installs; retain-set construction is ours to declare (1.4) |
-| **ConAbl (± L2-SP)** | **yes**, pinned CUIG `9932ac3` | upstream | our SD 1.5 substitute `M0` | anchor always user-supplied; **no native selection mechanism** | `Horses` and `Flowers` anchor caches — **both already built, 204 images each** | none known. This is the incumbent and the only arm with a reusable request-1 pair |
-| **Sculpting Memory** | authors' code exists (`coulsonlee/…`); **CUIG's `SculpMem` is a reimplementation** — its own README says it "implemented the key ideas … using the Sculpting Memory repository as the reference" | upstream | SD 1.5 | anchor supplied; dynamic mask | ConAbl-style anchor data | not a native arm as installed. Using CUIG's `SculpMem` and calling it Sculpting Memory would be the exact error the handoff forbids |
-| UCE / RECE / ESD / MACE | public (MIT / Apache-2.0 / MIT / NOASSERTION) | — | SD 1.x | explicit anchor (UCE/RECE/MACE), negative guidance (ESD) | — | not needed for the minimum design; available if the PI wants breadth |
+| method | code | licence | base model | replacement behaviour | blockers |
+|---|---|---|---|---|---|
+| **CEASE** | **none** — both repos hold a static project page; README: "Code coming soon." | none stated | SD 1.4 / **1.5** / 2.1 | one fixed shared anchor per task (`person`/`art`/`object`) | **BLOCKING.** No implementation; HOC's trigger and rank cut unspecified, so a reimplementation cannot be validated |
+| **LACU** | **yes**, `SonyResearch/LACU` | **MIT** | **SD 1.5 default**, accepts a local diffusers folder | **per-prompt** score-selected mapping prompt from 10 LLM+CLIP candidates | `OPENAI_API_KEY` required by the released runner; 40 GB is below the authors' setting; its 10 released concepts are not ours |
+| **SPEED** | **yes**, `Ouxiang-Li/SPEED` | **Apache-2.0** | `--sd_ckpt`, accepts SD 1.5 or a local folder | `--anchor_concepts` is a required argument | **stochastic** (§1.2); saves **absolute** edited weights; native object anchor ambiguous between sources |
+| **ConAbl (L2-SP 25000)** | **yes**, pinned CUIG `9932ac3` | upstream | our SD 1.5 `M0` | anchor always supplied; **no native selection** | none known. The incumbent; the only arm with a candidate request-1 reuse |
+| Sculpting Memory | authors' code exists; **CUIG's `SculpMem` is a reimplementation** by its own README | upstream | SD 1.5 | anchor supplied; dynamic mask | not a native arm as installed — using it and calling it Sculpting Memory would be the error the handoff forbids |
 
-**Nothing here was inferred from a method name.** Every row rests on the fetched
-file recorded in the source JSON, and the CPU checks in 1.5.
+### 1.2 SPEED's edit is stochastic — replication restored
 
-### 1.2 Concept domain — the compatibility fact that is easy to miss
+`train_erase_null.py` (digest unchanged from the revision-1 record, `abae9f87…`):
 
-Neither CEASE nor LACU was evaluated on the concepts this screen uses.
+| line | source | effect |
+|---|---|---|
+| `:25` | `noise = torch.randn_like(mini_ret_embs)` | **Gaussian retain augmentation** — the perturbed retain embeddings that build `sum_ret_ret`, hence the null projector `P` |
+| `:48` | `kmeans(X=null_hidden[1:], num_clusters=3, …)` | **k-means construction of `K₂`** — randomly initialised centres |
+| `:85` | `last_ret_embs[torch.randperm(…)]` | **retain shuffle**, which interacts with the `chunk_size` batching of `sum_ret_ret` |
+| `:140` | `--aug_num` default **10** | ten perturbations per retain sample |
+| `:131`, `:147` | `--seed 0`, `seed_everything(args.seed)` | an **edit seed** exists and is settable |
 
-* **CEASE**: celebrities, artistic styles, and "instances". Its instance set is
-  **named IP characters** — SPEED's `data/instance.csv` is 1,352 names beginning
-  `Crazy Frog`, `Easter Bunny`. MS-COCO appears only as the *unrelated-prompt*
-  utility set. **No COCO object category is ever erased.**
-* **LACU**: 10 released concepts — `pikachu, brad_pitt, golf_ball,
-  van_gogh_style, apple, spiderman, lionel_messi, cartoon_style, banana,
-  mickey_mouse`. **Three are generic objects** (`apple`, `banana`, `golf_ball`),
-  so `cat` / `dog` / `sandwich` are the *kind* of concept LACU handles — but not
-  ones it has been shown to handle.
+So SPEED and `SPEED+AIC` carry **two edit seeds** like every other arm, **rule 1
+(seed disagreement) applies to them**, and the design does not collapse. With
+every proposed configuration retained the selected count is
+**CA 4 arms × 20 + NAT 3 arms × 6 = 98**, excluding `M0` and calibration
+candidates. Native randomness is not disabled to recover 72.
 
-**Consequence for the question.** Running either method on `cat`/`dog`/
-`sandwich` is off its published domain. That is acceptable *only* because the
-protocol already calibrates each method's dial on DEV and qualifies it on a
-held-out ACCEPT set (§3.1), which is also how LACU itself is used — its
-`train.sh` carries **per-concept** `STEPS`, `LAMBDA_UNLEARN` arrays, so
-per-concept tuning is the method's own practice, not a liberty we take. It must
-be stated in any write-up that a weak result could be an off-domain artefact,
-and that is why **no "method X fails" claim is available from this screen** —
-only "at a matched end state on these concepts, this is what happened".
+Also from source: `:118` `edit_dict[layer_name] = layer_weight + delta_weight`
+then `:189` `torch.save(edit_dict, …)` — the `.pt` holds **absolute edited
+projection tensors, not deltas**. Any adapter that chains edits must therefore
+**replace** those tensors **exactly once**; adding them to a parent's weights
+double-applies the edit. Round-trip checks in §1.3.
 
-### 1.3 LACU's three real constraints
+### 1.3 AIC's comparator, pinned
 
-1. **An OpenAI API key is unconditionally required by the released runner.**
-   `train.sh:ensure_retain_prompts` exits `[fatal]` if `OPENAI_API_KEY` is
-   unset, *before* checking anything, and it deletes and regenerates
-   `related_score.txt` for **every concept at every checkpoint** — by design,
-   because retain selection is model-dependent. Mapping selection
-   (`model_score_map_gen.py`) needs no API. So native LACU cannot be run offline.
-   Options: **(a) obtain a key** — recommended, cost is cents, but it is third-party
-   egress of our prompt text and an LLM in the loop makes the retain prompts
-   non-reproducible unless we archive them; **(b) hand-author the retain
-   prompts** — that replaces part of the locality mechanism and must be labelled
-   an ablation, not native LACU. **(a), with every generated `related_score.txt`
-   archived and hashed per stage**, is the only route that keeps the arm native
-   *and* reproducible.
-2. **Our GPUs are below the authors' setting.** The recommended configuration is
-   3 processes × batch 18 × accum 2 (effective 108), and the README warns about
-   reducing it "including 48 GB cards" — our devices are **40 GB**. `train.py`
-   trains the **full UNet** with Adam (≈13.8 GB of states alone) while holding a
-   frozen teacher UNet *and* running a 20-step DDIM replay pipeline at the same
-   batch. Batch 18 per 40 GB device is unlikely to fit. Splitting the same
-   effective batch into smaller micro-batches **does not change the dominant
-   cost** (§4.1), so the mitigation is cheap in compute and the README's own
-   caveat — small per-device batches "can make it hard to reproduce the same
-   numbers" — must be declared as a deviation.
-3. **Checkpoints are full pipelines.** Each save is a complete diffusers
-   pipeline (~5 GB), written at steps 100, 200, every 200 and at the end. See
-   §4.3 for the disk consequence.
+**The degeneracy, verified.** `K₂ = [null_hidden[0], three k-means centres]ᵀ`
+(`:48`). The anchor embedding is taken at index `attention_mask.sum() − 2`
+(`:68`). A tokenizer-only check (no model loaded, no forward pass) gives
+`attention_mask.sum() = 2` for both `''` and `' '` — SPEED's released instance
+anchor — so that index is **0**, and `c∗` is **identically `K₂`'s first column**.
+Appending it adds **no new invariant direction**: `K₂^AIC` is rank-deficient, and
+with `λ = 0` the solver inverts `K₂ᵀPMK₂`, singular in exact arithmetic. The same
+check gives index 1 for `object` and `horse`, and index 2 for `potted plant`
+(the token `plant`), so AIC is non-degenerate with any non-empty anchor.
 
-### 1.4 SPEED's two declarations we must make, and must not confuse with mechanism
+**Settings declared now, before implementation:**
 
-* **Native anchor for objects is ambiguous between sources.** SPEED's released
-  `scripts/eval_few.sh` uses an **empty** anchor for the instance task
-  (`anchors_map["instance"]=" ; ; "`), while CEASE describes the SPEED baseline as
-  using anchor `"object"` for instances. Both are *configurations* —
-  `--anchor_concepts` is a required argument — so prescribing `horse` or `flower`
-  is **configuration, not a mechanism change**, and CA-SPEED is a legitimate
-  native-setting arm rather than an ablation. But "native SPEED" must be pinned
-  to one documented value in the pre-registration, with the other reported as
-  the alternative.
-* **The retain set is ours to author.** `data/instance.csv` is IP names; for COCO
-  categories we must supply the retain CSV, and preservation behaviour is driven
-  by it. It is a consequential *setting*, frozen before evaluation, identical
-  across every closed-form arm, and recorded with a digest. It is not a
-  mechanism edit, and it must not be tuned to improve a result.
+1. **Anchor.** AIC is evaluated **only with a non-empty anchor** — `horse` or
+   `potted plant` in family CA, and in family NAT the pinned generic anchor
+   (`object`, matching CEASE's own instance setting) rather than SPEED's released
+   empty one. `NAT-SPEED` itself keeps **one** documented native anchor, pinned in
+   the pre-registration, with the alternative reported.
+2. **Rank policy.** Before appending, project `c∗` onto the orthogonal complement
+   of `span(K₂)`. Append only if the residual norm exceeds a declared tolerance;
+   otherwise record **`AIC-NOOP`** for that configuration — a reportable finding,
+   not a silent pass. `λ = 0` is used only when the appended matrix is full rank
+   at that tolerance; otherwise `λ > 0` is declared and reported.
+3. **Current vs accumulated anchor protection.** CEASE's setting has one shared
+   anchor per task, so this choice never arises there and is **ours**:
+   **`AIC-current`** protects only stage *k*'s anchor (the faithful reading of
+   Eq. 9) and is the default; **`AIC-accum`** protects every anchor used so far
+   and is **our variant**, labelled as a changed-anchor experiment, never as
+   CEASE or as AIC-as-published. In the shared cells the two coincide; they
+   differ only in the disjoint cells, which is exactly where the design looks.
+4. **Round-trip and constraint checks** (specified here, implemented later, not
+   in this correction): the saved `.pt` keys are exactly the `attn2.to_v` set;
+   reload after `save_pretrained` is **bit-identical**; applying the same `.pt`
+   twice is **idempotent** and an additive application is **detected and
+   refused**; every unedited key is bit-identical to the parent;
+   `rank(K₂^AIC)` vs `rank(K₂)` recorded; achieved `‖Δ c∗‖` reported against its
+   tolerance; SPEED's own `(ΔP)C₀ ≈ 0` property re-checked so AIC is not shown to
+   help by quietly breaking the base solver; the edit seed and a digest of the
+   k-means centres recorded per edit.
 
-### 1.5 CPU checks actually run (no model touched)
+### 1.4 LACU's three constraints (unchanged, re-stated)
 
-| check | result |
-|---|---|
-| `py_compile` on all 8 LACU `.py` and SPEED's `train_erase_null.py` + `src/*.py` | **all pass** |
-| third-party imports resolvable in the **existing** `venv-cuig` (torch 2.4.0+cu121, diffusers 0.30.2, transformers 4.44.2) | **LACU training path needs nothing new**: `train.py`, `model_score_map_gen.py`, `clip_map_gen.py`, `retain_prompt_gen.py`, `losses.py`, `utils.py` all resolve. Only `eval.py` misses `pandas`, `wandb` — and we do not use their evaluator |
-| LACU's declared training env vs ours | `torch 2.4.1 / diffusers 0.30.3 / transformers 4.44.2 / accelerate 1.0.1` vs ours `2.4.0 / 0.30.2 / 4.44.2` — **near-identical; no 9 GB conda env needed**, which matters because `/` is at 100% (4.9 GB free) |
-| SPEED's imports | needs **`kmeans_pytorch` and `pandas`** (two pure-Python pip installs). Its declared env wants diffusers 0.32.2 / transformers 4.48.0; whether it runs on our 0.30.2 is **unverified** |
-| ConAbl anchor assets for both cells | `Horses` **204** images, `Flowers` **204** images, both already cached — **no anchor generation cost** |
-| sequential chaining | LACU chains natively (each step's checkpoint is the next `--pretrained_model_name_or_path`). SPEED saves only the edited `attn2.to_v` tensors as a `.pt`, so chaining needs a small CPU glue step (load the delta, `save_pretrained`). **Glue, not a method change** — and it must be tested on CPU before any run |
+`OPENAI_API_KEY` is required unconditionally by `train.sh:ensure_retain_prompts`,
+per concept **per checkpoint**, and the released runner deletes and regenerates
+`related_score.txt` every time — by design, since retain selection is
+model-dependent. Mapping selection needs no API. Hand-authoring retain prompts
+replaces part of the locality mechanism and would be an ablation. Our devices are
+40 GB against the authors' recommendation; `train.py` trains the **full UNet**
+with Adam while holding a frozen teacher and running a 20-step replay pipeline at
+the same batch. Checkpoints are full ~5 GB pipelines. **None of these is resolved
+by analysis — only the smoke calibration measures them.**
 
-**Not verified, and only a GPU smoke test can:** that batch 18 or any reduced
-batch actually fits in 40 GB; LACU's end-of-run save path
-(`StableDiffusionPipeline.from_pretrained(model_path, unet=…)` without
-`safety_checker=None`) reloading cleanly from a previous LACU checkpoint whose
-`model_index.json` records no safety checker; SPEED on diffusers 0.30.2.
+### 1.5 CPU checks run (no model, no forward pass)
 
-### 1.6 Literature correction, tied to these implementations
-
-Revision 5 §1 says that among the six works read "none reports a stagewise
-measurement of relapse against each earlier target's *own* post-erasure state".
-**That needs narrowing.** CEASE's Figure 5 tracks, over a 100-edit celebrity
-sequence, the accumulated **value-projection interference** on an unrelated COCO
-prompt, on the shared replacement `person`, and **on the erased target "Tom
-Cruise"** — i.e. it already measures an earlier erased target drifting as later
-edits accumulate. Three differences remain, and they are what is left of the
-gap:
-
-1. it is a **representation-space** quantity, not image-level detection — and
-   the authors themselves write that "value-projection interference alone does
-   not rank preservation across methods";
-2. its reference is the **unedited** `W₀`, not each target's own post-erasure
-   checkpoint, so it is not the paired estimand of §6.2;
-3. one shared anchor per task and a single concept domain mean **anchor sharing
-   and target proximity are not varied**, which is the screen's factor.
-
-Also to be recorded: CEASE's Tables 1–3 already baseline **CUIG-GradProj (Lee et
-al. 2026 — our own codebase's paper)** and **Sculpting Memory** over 100-step
-sequences on SD 1.4/1.5/2.1. Continual-unlearning baselines at scale are covered
-ground. **Do not describe the stagewise-relapse idea as untouched.** The
-defensible residue is the paired image-level estimand plus the two sequence
-factors — narrower than revision 5 implies, and still unproven as a
-contribution.
+`py_compile` passes on all 8 LACU and 3 SPEED sources. LACU's **training** path
+resolves entirely inside the existing `venv-cuig` (torch 2.4.0+cu121, diffusers
+0.30.2, transformers 4.44.2) — only `eval.py` misses `pandas`/`wandb`, and we do
+not use their evaluator. SPEED needs `kmeans_pytorch` + `pandas`; its behaviour on
+diffusers 0.30.2 is **unverified**. Both ConAbl anchor caches exist (`Horses` 204,
+`Flowers` 204 images). The tokenizer check of §1.3 used the tokenizer only.
 
 ---
 
-## 2. One explicit minimum design
+## 2. The design, corrected
 
-### 2.1 Arms, by family
+### 2.1 Arms and counts
 
-Request 1 always erases `cat`. Request 2 erases `dog` (near) or `sandwich`
-(far). `A1`/`A2` are the request-1 and request-2 anchors.
+**Family CA — anchor prescribed**, carrying the factorial: `ConAbl`, `SPEED`,
+`SPEED+AIC(reproduced)`, `CA-LACU(ablation)`. Per arm **4 request-1**
+(2 anchors × 2 seeds) + **16 request-2** (2 A1 × 2 A2 × 2 targets × 2 seeds) = **20**.
 
-**Family CA — anchor prescribed** (carries the §5.3 factorial: cells
-`horse→horse`, `horse→flower`, `flower→flower`, `flower→horse`):
+**Family NAT — native**: `NAT-LACU`, `NAT-SPEED`, `NAT-SPEED+AIC(reproduced)`.
+Per arm **2 request-1** + **4 request-2** = **6**. **ConAbl contributes no NAT
+arm** — it has no native replacement-selection mechanism, so its CA cells *are*
+its native configuration. That is the only sharing in the design.
 
-| arm | what prescribing the anchor is | per-method count |
-|---|---|---|
-| **`CA-ConAbl`** (± L2-SP as its dial) | native usage — ConAbl has no replacement-selection mechanism, so CA **is** its native configuration | 4 request-1 + 16 request-2 = **20** |
-| **`CA-SPEED`** | configuration (`--anchor_concepts` is a required argument) | **10** — see 2.3 |
-| **`CA-SPEED+AIC(reproduced)`** | configuration; AIC reproduced from Eq. 9 on public SPEED, **labelled a partial reproduction, never CEASE** | **10** |
-| **`CA-LACU`** | **ablation in every cell** — forcing a fixed mapping prompt replaces LACU's selection mechanism | 4 + 16 = **20** |
+**Selected checkpoints = 4 × 20 + 3 × 6 = 98**, excluding `M0` and the **486**
+calibration candidates, which are counted separately (§5).
 
-**Family NAT — native, each method choosing its own replacement.** The cells do
-not apply; this is the actual method comparison:
+**Prescribing the anchor is configuration** for ConAbl, SPEED and SPEED+AIC
+(an explicit argument in each). For LACU it **replaces the mechanism**, so
+`CA-LACU` is an **ablation in every cell** and `NAT-LACU` is the method.
 
-| arm | native replacement | per-method count |
-|---|---|---|
-| **`NAT-LACU`** | per-prompt score-selected mapping prompt | 2 request-1 + 4 request-2 = **6** |
-| **`NAT-SPEED`** | the one documented instance anchor pinned in 1.4 | **3** |
-| **`NAT-SPEED+AIC(reproduced)`** | same anchor, AIC on | **3** |
-| **`NAT-ConAbl`** | **does not exist** — no native selection. Its CA cells are its native configuration | **0 (shared, genuinely identical)** |
+### 2.2 Ownership
 
-**Counted separately, shared only where genuinely identical.** The one share is
-ConAbl's: `NAT-ConAbl` is not a distinct configuration from its CA cells, so it
-is not run twice and not counted twice. Nothing else is shared — in particular
-`CA-LACU` and `NAT-LACU` are different training runs and are costed separately.
+Each method owns its chain; no cross-method chain exists. A ConAbl checkpoint is
+not a valid request-1 parent for LACU or SPEED. `M0` is the only shared object.
 
-### 2.2 Checkpoint ownership
+### 2.3 Anchors and the control
 
-Each method owns its own chain: a sequence erased by method *M* at request 1 and
-*M* at request 2. **A ConAbl checkpoint is not a valid request-1 parent for
-LACU, SPEED or any other arm**, and no cross-method chain exists anywhere in
-this design. `M0` is the single shared object: the common pretrained base, which
-every method starts from and which supplies `D(M0, ·)` for `PriorΔ` and
-cumulative preservation.
+`horse` (shared anchor) is retained. The disjoint anchor becomes
+**`potted plant`** — see §3.1. The separate non-target control is **`clock`**.
+Neither `potted plant` nor `clock` has ever been measured here, so **both need a
+base-rate screen on DEV before adoption**, and a new ConAbl anchor cache
+(200 images, ≈0.06 device-hours) is required for `potted plant`. The existing
+`Flowers` cache is preserved and unused in the minimum design.
 
-### 2.3 Why the closed-form arms count fewer checkpoints — and the asymmetry it creates
+### 2.4 ConAbl request-1 reuse — the stop is restored
 
-SPEED's edit is **training-free and deterministic** given the model, the concept
-lists and the retain set. There is no training randomness for a training seed to
-replicate, so `2 anchors × 2 seeds` collapses to `2 anchors`, and request 2
-collapses from 16 to 8 (`2 A1 × 2 A2 × 2 targets`). Generation seeds still give
-independent image samples.
+**Default, as in accepted revision 5 §3.2 option (i):** the existing `horse` MA
+pair may serve as `ConAbl`'s `horse` request-1 checkpoint **only if it QUALIFIES**
+on the new ACCEPT and TEST sets. **If it fails, that arm's `horse`-parent
+sequence STOPS.** Non-qualification is reported with the measured `p₁` and
+`r₁^ACCEPT`. **No fresh `horse` training is triggered by the failure**, no
+threshold is relaxed, and nothing is retrained: a holdout result must never
+select a training action.
 
-**This is an asymmetry the decision table must handle, not hide.** Revision 5
-§6.5 rule 1 declares the screen UNRESOLVED when "the two training seeds disagree
-in direction". **That rule cannot be evaluated for a deterministic method.** The
-pre-registration must therefore state: rule 1 applies to the stochastic arms
-(ConAbl, LACU); for closed-form arms, run-to-run replication is **not
-established by this design** and no seed-agreement claim may be made about them.
+**What that stop costs, so the PI can price it.** The `horse`-parent cells are
+`c1, c2, c5, c6` — **4 of ConAbl's 8 cells per seed, 8 of 16 across seeds.**
+Losing them invalidates ConAbl's declared `S`, `P` **and** `I` (§4.3), leaving
+only the prespecified simple effects that avoid those cells. So the reuse route
+carries a 50%-cell-loss risk for one arm.
 
-### 2.4 Primary contrasts
+**The prospective alternative, offered for decision now and not triggered by any
+result:** declare at pre-registration that **request 1 is trained fresh for every
+method**, removing reuse entirely. Cost: **+2 ConAbl trainings ≈ +0.47
+device-hours** — negligible against the risk it removes. **Recommended.** The
+choice must be made **before** any holdout evaluation; afterwards it is closed.
 
-Per training seed, never pooled; read from interval bounds (§5.1 predicates).
+### 2.5 Retained limits
 
-| # | contrast | what it identifies |
-|---|---|---|
-| 1 | `Relapse_i(k; R_i)` per arm (§6.2) | did `cat` come back at request 2, measured against that arm's own post-`cat` checkpoint on one probe |
-| 2 | `S` = shared − disjoint, averaged over anchor identity | anchor-sharing main effect **on these concepts** |
-| 3 | `P` = near − far | target-proximity main effect **on these concepts** |
-| 4 | `I` = `(S | near) − (S | far)` | the interaction — **requires all four cells to survive** (§3.4) |
-| 5 | `S − P` / `P − S` | dominance; never inferred from comparing two predicates |
-| 6 | `NAT-LACU` vs `NAT-SPEED+AIC(reproduced)` at a matched residue | whether a strong native remedy already removes the relapse |
-| 7 | `CA-LACU` vs `NAT-LACU` | what disabling LACU's selection costs — **reported as an ablation contrast, never as "LACU"** |
-| 8 | retained categories, non-target control, each anchor — stagewise **and** cumulative | preservation (§5.2) |
-| 9 | `PriorΔ_k = D(M0,t_k) − D(C_{k−1},t_k)` | prior collateral suppression, independent of the parent floor |
-
-### 2.5 Conditional ConAbl request-1 reuse, and the stop if it fails
-
-Retained from revision 5 §3.2 unchanged. The existing `horse` MA pair may serve
-**only** as `CA-ConAbl`'s `horse` request-1 checkpoint, and **only if it
-QUALIFIES** on the new ACCEPT and TEST sets (`p₁ ≥ 65%`, relative suppression
-`≥ 0.75`, `r₁^ACCEPT ≤ 20%`). Its historical `cat` residue on the **spent** probe
-was 30.00% (s17) and 23.75% (s29) — above the 20% cap on *that* probe, which is
-neither a prediction nor a disqualification, and `p₁ = D(M0, cat)` has never been
-measured on the new sets.
-
-**If it fails qualification** (default, needs no further approval): report
-request-1 non-qualification with the measured `p₁` and `r₁^ACCEPT`, **train the
-`horse` request-1 pair afresh under the frozen protocol like every other arm**,
-and record that reuse was attempted and refused. Cost of the stop: **+2 ConAbl
-request-1 trainings ≈ +0.5 device-hours** — the reuse saves almost nothing in
-compute, so nothing in the design depends on it. **No threshold is relaxed and
-nothing is retrained to meet one.** If instead a method has *no* qualified
-request 1 at all, its sequences do not run, it contributes no relapse data, and
-if that leaves fewer than two accepted arms the comparison does not exist
-(§6.3/§6.5 rule 0).
-
-### 2.6 Retained limits
-
-**Still exploratory over concepts.** One near pair and one far pair: proximity
-is confounded with concept identity, two training seeds replicate the run and
-not the concept, and **no mechanism claim and no generality over concepts
-follows from this screen**. The §5.3 pre-registered conditions for independent
-concept evidence (≥ 5 near and ≥ 5 far pairs from disjoint supercategories,
-externally validated proximity) are unchanged and are **not** part of this
-design. **The stop at §6.5 rule 2 is retained**: if a native method
-ALREADY-SOLVES its own sequences, the screen reports that and stops, and no
-method work follows.
+One near pair and one far pair: proximity stays confounded with concept identity,
+two seeds replicate the run and not the concept, and **no mechanism claim and no
+generality over concepts follows**. The revision 5 §5.3 conditions for
+independent concept evidence are unchanged and **not** part of this design. The
+rule-2 stop is retained and now includes native SPEED (§3.4).
 
 ---
 
-## 3. Execution semantics and decision value
+## 3. Every preservation endpoint must be measurable
 
-### 3.1 Who touches which set, when
+### 3.1 `flower` cannot be measured at all
 
-| set | touched by | when | may be looked at again? |
-|---|---|---|---|
-| **DEV** | dial calibration only | before each stage's dial is frozen | yes, freely |
-| **ACCEPT** | qualification of the **frozen** dial | once per stage, after freezing | no retuning, ever |
-| **TEST** | arm acceptance, the cross-arm residue match, reported retention endpoints | **once**, after ACCEPT has decided advancement | **no** |
-| **R** | relapse only, both operands | every stage | yes — it is a reporting set |
+`detect.py:117-121` compares `d["label"] == tgt` — **exact string equality**
+against the torchvision `FasterRCNN_ResNet50_FPN_Weights.COCO_V1` category names.
+That list has **91 entries and no `flower`**; the plant-like names are
+`potted plant` (index 64) and `vase` (86). A `flower` anchor-integrity endpoint
+would return **0 hits on every checkpoint**, giving a `0 − 0 = 0` contrast that is
+trivially `NULL(10)` — **a vacuous pass on an unmeasured endpoint, which could
+let ALREADY-SOLVES fire.**
 
-### 3.2 "TEST once", operationally
+**Resolution: change the anchor, do not substitute the metric.** The disjoint
+anchor becomes **`potted plant`**, a category the committed detector measures
+exactly, subject to the §2.3 base-rate screen. `potted plant` is **not** a silent
+stand-in for `flower`: the concept itself changes, every anchor prompt and anchor
+cache changes with it, and the A2-identity factor is re-labelled accordingly.
+Fallback if its base rate is too low on DEV: `vase`. **`flower` may be retained
+only as an optional exploratory arm whose anchor integrity is validated by human
+labels and by nothing else** — and it carries no protocol-level claim.
 
-1. The dial is calibrated on DEV and **frozen**; the freeze is recorded with a digest.
-2. ACCEPT decides, with the frozen dial, whether the stage advances.
-3. **The list of checkpoints to be TESTed is written into the hashed
-   pre-registration before any TEST image is generated**, and is derived from
-   DEV and ACCEPT decisions alone.
-4. TEST runs exactly once per listed checkpoint; outputs are appended to a
-   write-once file whose digest is recorded.
-5. **No checkpoint is added to the list afterwards, no TEST result selects among
-   checkpoints, no dial is re-fit after a TEST reading, and no TEST evaluation is
-   repeated.** A re-run for any reason is a protocol breach: both results are
-   reported, and the comparison is labelled accordingly.
+### 3.2 Integrity for LACU's selected replacements
 
-That is the whole content of "TEST once": *predeclared list, frozen dial,
-one pass, append-only, no selection*. It is enforceable by a CPU regression
-(deliverable 6).
+Native LACU chooses a **different mapping prompt per forget prompt**, so there is
+no single anchor. Definition:
 
-### 3.3 The `R_i` operands and the parent measurements required
+* the realised replacement multiset is read from that stage's `map_model.csv`,
+  **archived and hashed per stage** (it is checkpoint-dependent by design);
+* for each distinct replacement concept that **has** a COCO_V1 category, report
+  its stagewise and cumulative integrity contrast separately, with its selection
+  count;
+* replacements with **no** COCO category are reported as **`UNMEASURED`** with
+  their counts, and the arm's anchor-integrity endpoint is marked **partial**
+  with the measured fraction stated.
 
-`Relapse_i(k; R_i) = D_{R_i}(C_k, t_i) − D_{R_i}(C_i, t_i)` — **both operands on
-the same probe `R_i`**, that method's **own** post-erasure checkpoint `C_i` as
-the reference, paired on identical frozen prompt texts, generation seeds,
-detector and threshold, and the same frozen cluster grouping, so the bootstrap
-resamples one cluster list indexing both checkpoints. `r_i^TEST` keeps
-acceptance and the cross-arm match and is **never** an operand.
+The measurable fraction is **not knowable before the mapping step runs** — it is
+a property of what the LLM proposed and the model selected. It is computable on
+CPU from `map_model.csv` the moment that step exists.
 
-Measurements that must exist for the design to be readable at all:
+### 3.3 Integrity for SPEED's empty or generic anchor
 
-| quantity | on which set | why |
+With the empty anchor there is **no concept to measure**; with a generic anchor
+(`object`) there is no COCO category. Anchor integrity is therefore
+**`ANCHOR-UNMEASURED`**, which is *not* `NULL(10)` and *not* a pass.
+
+### 3.4 ALREADY-SOLVES, split so an unmeasured endpoint cannot pass
+
+Revision 5 §6.4 requires anchor integrity `NULL(10)` for every anchor used. Taken
+literally with §3.3 that **permanently excludes native SPEED** on a measurement
+artefact, which would quietly drop the strongest closed-form native arm. Split
+the label instead:
+
+| label | conditions | effect on the decision |
 |---|---|---|
-| `D(M0, t_k)` for `cat`, `dog`, `sandwich` | ACCEPT, TEST, **R** | `p₁`, `PriorΔ`, cumulative preservation. One checkpoint, no training, but it must be measured **on each set separately** |
-| `D(C_{k−1}, t_k)` | ACCEPT, TEST | the parent rate `p_k` — per method, per chain, never borrowed |
-| `D(C_i, t_i)` | **R** | the relapse reference. Measured **at stage *i***, not reconstructed later |
-| `D(·, c)` for bird, chair, bicycle, the non-target control, horse, flower | ACCEPT/TEST (stagewise **and** vs `M0`) | §5.2 preservation, each reported separately, never averaged |
+| **`ALREADY-SOLVES`** | every stage ACCEPTED; relapse `NULL(10)` for every earlier target; retained categories and the control `NULL(10)` stagewise **and** cumulatively; **anchor integrity `NULL(10)` for every anchor, all measured**; no LOW-PARENT, no MATERIAL+ `PriorΔ`, no `R-NONTRANSFER` | fires **rule 2**: report and stop |
+| **`ALREADY-SOLVES-CORE (anchor unmeasured)`** | all of the above **except** that one or more replacements have no measurable endpoint | **also fires rule 2** — the limitation we meant to attack is absent — but **no anchor claim is made**, the unmeasured concepts are named with their counts, and the write-up says anchor integrity was not assessed for that arm |
+| **neither** | any condition fails | the screen proceeds |
 
-### 3.4 What remains available after `R-NONTRANSFER`
-
-If `D_{R_i}(C_i,t_i)` misses the operating point though `r_i^TEST` passed, the
-stage is `R-NONTRANSFER`: relapse is computed but **descriptive only**, the
-tolerance is not widened, `R_i` is not reselected, the dial is not re-fit and
-nothing is retrained.
-
-**Still available from that arm:** deletion on TEST, the cross-arm residue
-match, every retention and anchor endpoint stagewise and cumulatively,
-`PriorΔ`, and ALREADY-SOLVES *exclusion* (§6.4 forbids crediting it).
-**Unavailable:** any relapse contrast involving it — therefore `S`, `P` and `I`
-lose that cell.
-
-**The fragility to state plainly: `I` needs all four cells.** One
-`R-NONTRANSFER` cell reduces the screen to main effects at best; two in the same
-sharing level remove the sharing contrast too. §6.6 already stops the screen if
-*every* accepted stage is `R-NONTRANSFER`; the intermediate cases are where the
-design is thin, and the pre-registration must say that an `I` computed from
-fewer than four cells is **not reported as `I`**.
-
-### 3.5 Precision — estimated from existing measurements, not guessed
-
-From the **spent** Amendment 01 TEST probe (80 images per category = 10 scene
-clusters per category, conditional paired cluster bootstrap, 10 000 draws),
-measured 95% interval widths:
-
-| quantity | median width | range |
-|---|---|---|
-| paired same-parent contrast (arm vs arm, one category) | **10.0 pp** | 3.75 – 13.75 |
-| paired different-parent contrast (`vs MA`) | 7.5 – 13.75 pp | 3.75 – 20.0 |
-| marginal rate `D(·, c)` | 22.5 – 25.0 pp | 3.75 – 35.0 |
-
-**Implication for the decision rules** (assumption: half-width scales as
-`1/√n`; the relapse rate's variance may differ from the bird contrast's, and
-these come from a spent probe — so this is an estimate, explicitly marked):
-
-* a **contrast** at 80 images/cell has half-width ≈ **5 pp**;
-* the **interaction** `I`, a difference of two such contrasts, has half-width
-  ≈ **7 pp**. At `Δ = 10 pp` that means `I` can only read **MATERIAL** if the
-  true effect is ≳ **17 pp**, and only **NULL(10)** if it is ≲ **3 pp**.
-  **Everything between lands at rule 8, INCONCLUSIVE.**
-* to bring `I`'s half-width to ≈ 5 pp needs ≈ **160** images per cell; to ≈ 3.5 pp,
-  ≈ **330**.
-
-**Recommendation:** adopt **160 images per cell** (20 prompts × 8 generation
-seeds, or 40 × 4) for ACCEPT/TEST/R rather than the pilot's 80, and state in the
-pre-registration that `I` is **exploratory and width-reported** regardless. This
-is a precision parameter the proposal never fixed, not an expansion of the
-design, and §4 costs it.
-
-### 3.6 Which outcome decides what
-
-Evaluated in the strict precedence order of §6.5. Mapping to the PI's decision:
-
-| outcome | decision |
-|---|---|
-| **rule 0** — qualification failure, < 2 accepted arms, or a REJECTED audit packet | **no result.** Report the failure; nothing else is read |
-| **rule 2** — a NAT arm (`NAT-LACU` or `NAT-SPEED+AIC`) **ALREADY-SOLVES** its own sequences: every stage accepted, relapse NULL(10), retention and anchors NULL(10) stagewise *and* cumulatively, no LOW-PARENT, no MATERIAL+ `PriorΔ`, no `R-NONTRANSFER` | **redirect the question.** The limitation is not here. No method work. Report and stop |
-| **rule 3 `I` MATERIAL**, or **rule 5 `S` MATERIAL with `S − P` MATERIAL**, or **rule 6** the mirror — *and* a strong native arm shows MATERIAL+ relapse in the implicated cells | **justifies pursuing a distinct method**, aimed at the implicated factor. Still exploratory over concepts, still no mechanism claim |
-| **rule 4** — `S` and `P` both MATERIAL | both factors matter; **no single remedy indicated.** A method proposal would need to say which it addresses |
-| **rule 7** — `S`, `P`, `I` all NULL(10) | **sequence structure is not the lever in these cells.** Report and do not build |
-| **rule 8** — any load-bearing contrast INCONCLUSIVE | **inconclusive.** Report widths and the prompt count needed (3.5). Do not read point estimates, do not substitute an indirect comparison |
-| **rule 1** — the two training seeds disagree in direction (stochastic arms only, 2.3) | **UNRESOLVED.** Cost more seeds; do not report the agreeing seed |
-
-**No new target-recognition measurement was produced for this brief.** Every
-rate quoted is from Amendment 01's existing rows; all forward-looking numbers
-are marked as estimates with their assumption stated.
+So native SPEED and native LACU both participate in the success/redirect logic,
+while **no unmeasured or unsupported concept ever passes an endpoint**. Human
+validation stays explicit and is **not** performed here: no label is produced,
+supplied or distributed, and the 180-item packet stays blank (§6).
 
 ---
 
-## 4. Workload, wall time and human validation
+## 4. Contrasts, missing cells, and uncertainty
 
-### 4.1 Measured unit costs (from the Amendment 01 ledger — 56 entries, 2.9014 device-hours)
+### 4.1 The eight cells
 
-| item | measured | basis |
-|---|---|---|
-| generation + COCO detection, 560-image slot | **1.10 s/image** (609–625 s per slot) | 6 frozen-test slots |
-| same, 80-image slot | **1.36 s/image** (103–113 s) | 20 development slots; ~25 s fixed startup dominates |
-| **ConAbl** training, `kv-xattn`, batch 4 | **0.84 s/step** (842 s / 1000 steps); 1.0 s/step at 100 steps | `train:U_seed17/29` |
-| anchor caches | **already built** — `Horses` 204, `Flowers` 204 images | on disk |
+Eight counterbalanced CA cells **per arm per edit seed**, indexed
+`(A1, A2, target)`, aggregated into the four sharing × proximity means:
 
-### 4.2 Estimates, with the assumption stated
+| | A1 | A2 | target | sharing | proximity |
+|---|---|---|---|---|---|
+| c1 | horse | horse | dog | shared | near |
+| c2 | horse | potted plant | dog | disjoint | near |
+| c3 | potted plant | potted plant | dog | shared | near |
+| c4 | potted plant | horse | dog | disjoint | near |
+| c5 | horse | horse | sandwich | shared | far |
+| c6 | horse | potted plant | sandwich | disjoint | far |
+| c7 | potted plant | potted plant | sandwich | shared | far |
+| c8 | potted plant | horse | sandwich | disjoint | far |
 
-**`SPEED` / `SPEED+AIC`:** closed-form, **seconds per request** (authors: 100
-concepts in 5 s; CEASE reports ~13 s/request on an H100). Take **0.01
-device-hours per checkpoint**; its cost is entirely evaluation.
+Each cell value is `Relapse_cat(k; R_cat)` for that chain.
 
-**`LACU`:** generation-dominated. Per optimizer step, the replay and unlearn
-latents are generated by the teacher at 20 DDIM steps with guidance 1.0, so
-total UNet passes per step = `effective_batch × 2 × 20` = **4,320** at the
-authors' effective batch of 108 — **invariant to how that batch is split into
-micro-batches**, which is why reducing `TRAIN_BATCH_SIZE` for 40 GB costs memory
-headroom, not compute. At 250–350 steps that is **1.08–1.51 M UNet passes per
-request**. Converting at our measured generation rate (one of our images = 30
-steps × 2 for CFG = 60 UNet passes ≈ 1.0 s at batch 1) gives 18.0–25.2 k
-image-equivalents ≈ 5.0–7.0 device-hours at **batch-1** throughput; allowing a
-2–4× batched speed-up gives **1.2 – 3.5 device-hours**. Add the per-stage mapping
-rescore (100 prompts × 10 candidates × `MAP_K`=32 ≈ 35 k passes ≈ **0.15 h**) and
-the retain trajectory rescore (`RETAIN_K`=16 over ~36 related concepts,
-**unmeasured**). **Use 1.5 – 4.0 device-hours per LACU request, estimate, pending
-one smoke measurement.**
+### 4.2 Coefficient vectors
 
-### 4.3 The plan, costed
+| contrast | c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 |
+|---|---|---|---|---|---|---|---|---|
+| **S** (sharing) | +¼ | −¼ | +¼ | −¼ | +¼ | −¼ | +¼ | −¼ |
+| **P** (proximity) | +¼ | +¼ | +¼ | +¼ | −¼ | −¼ | −¼ | −¼ |
+| **I** (interaction) | +½ | −½ | +½ | −½ | −½ | +½ | −½ | +½ |
+| **A2 identity** | +¼ | −¼ | −¼ | +¼ | +¼ | −¼ | −¼ | +¼ |
+| **S\|near** (simple) | +½ | −½ | +½ | −½ | 0 | 0 | 0 | 0 |
+| **S\|far** (simple) | 0 | 0 | 0 | 0 | +½ | −½ | +½ | −½ |
+| **P\|shared** (simple) | +½ | 0 | +½ | 0 | −½ | 0 | −½ | 0 |
+| **P\|disjoint** (simple) | 0 | +½ | 0 | +½ | 0 | −½ | 0 | −½ |
+| **S − P** (dominance) | 0 | −½ | 0 | −½ | +½ | 0 | +½ | 0 |
 
-Set sizes assumed (3.5): **160 images per category-cell**; 8 categories reported
-on TEST (3 targets, 3 retained, 1 non-target control, 2 anchors — horse and
-flower counted among the 8).
+`⟨S,P⟩ = ⟨S,I⟩ = ⟨P,I⟩ = ⟨S,A2⟩ = ⟨P,A2⟩ = 0` — verified in
+`screen_measurement_inventory.py`. The same check confirms a property the
+counterbalancing buys: the **request-1 reference loading of S, P and I is exactly
+0**, because each contrast carries two `horse`-referenced and two
+`potted plant`-referenced cells with opposite signs, so the choice of request-1
+reference cancels. **This is why all four `(A1, A2)` combinations are needed**,
+and why the fallback to cells 1–2 identifies nothing about sharing.
 
-| family · arm | checkpoints | training device-h | note |
-|---|---|---|---|
-| CA · `ConAbl` (±L2-SP dial) | 20 | **4.7** | measured rate at our 1,000 iterations — **9.4 h** at upstream's 2,000; −0.5 h if the MA pair qualifies |
-| CA · `SPEED` | 10 | **0.1** | deterministic (2.3) |
-| CA · `SPEED+AIC(reproduced)` | 10 | **0.1** | |
-| CA · `LACU` (ablation) | 20 | **30 – 80** | estimate |
-| NAT · `LACU` | 6 | **9 – 24** | estimate |
-| NAT · `SPEED`, `SPEED+AIC` | 6 | **0.1** | |
-| **training subtotal** | **72** | **≈ 44 – 109** | LACU is ~90% of it |
+### 4.3 A missing raw cell invalidates the marginals too
 
-| evaluation | images | device-h |
-|---|---|---|
-| TEST, once per checkpoint: 8 categories × 160 | 1,280 | 0.39 each → **≈ 28** |
-| ACCEPT, once per stage: target + 2 anchors × 160 | 480 | 0.15 each → **≈ 11** |
-| R, every stage: earlier target × 160 | 160 | 0.05 each → **≈ 3.6** |
-| DEV calibration, stochastic arms only (~46 stages × 3–6 probes × 80) | 11–22 k | **≈ 3.5 – 7** |
-| `M0` baseline on all four sets | ~2,100 | **≈ 0.7** |
-| **evaluation subtotal** | | **≈ 47 – 50** |
+`S`, `P` and `I` are declared over all eight cells. **If any cell is missing or
+inadmissible, all three are invalid as declared** — not just `I`. Reconstructing
+a marginal from the surviving cells changes the estimand (it re-weights the
+anchor-identity composition and breaks the reference cancellation of §4.2), and
+is forbidden.
 
-> **Total ≈ 90 – 160 device-hours.** Wall time: LACU's recommended runner
-> occupies **3 GPUs per run**, so LACU's 39–104 device-hours are **13–35 hours of
-> 3-GPU wall time**; with everything else and ordinary serialisation, **3 – 7 days
-> of occupancy** if uninterrupted. There is **no GPU-hour cap**, and this number
-> is a plan input, not a request for a cap. Any approved compute must run on
-> devices **independently verified unoccupied by another user**
-> ([`RESOURCE_POLICY_2026-10-10.md`](RESOURCE_POLICY_2026-10-10.md)). *Status at
-> the time of writing, not an approval: all four A100-SXM4-40GB read 14 MiB used,
-> 0% utilisation.*
+**Only separately prespecified simple effects survive**, and only those whose
+support is intact: `S|near`, `S|far`, `P|shared`, `P|disjoint`, each with its own
+interval and its own threshold, all four pre-registered **before** any data exist.
+A cell becomes inadmissible if its stage is not ACCEPTED, if it is
+`R-NONTRANSFER`, or if its relapse reference is invalid.
 
-**Disk is a real constraint.** LACU writes a **full diffusers pipeline (~5 GB)**
-at steps 100, 200 and the end — ≈15 GB per request, ≈**390 GB** over 26 requests.
-`/` has **4.9 GB free (100% used)**; `/data` has **1.2 TB free**. So: everything
-under `/data`, intermediate dumps pruned to the DEV-selected one plus the final
-after each stage's evaluation, and the running total checked before each stage. A
-UNet-only save would cut it to ~3.4 GB per dump, but that is a change to a
-third-party script and would have to be declared.
+### 4.4 Propagation of an invalid request-1 R reference
 
-### 4.4 Human validation — unchanged, on the critical path, and not a model action
+`Relapse_cat(k; R_cat)` differences `D_{R_cat}(C_k, cat)` against
+`D_{R_cat}(C_1, cat)` **for that chain**. If the request-1 R reference is invalid
+— stage 1 not ACCEPTED, or `R-NONTRANSFER` on `R_cat` — then **every request-2
+descendant of that `C_1` loses its relapse estimand**, descriptively as well as
+inferentially for any contrast.
 
-* The detector is a **proxy**. UnlearnCanvas classifiers remain unobtainable on
-  this host; no UA / IRA / CRA. **No human annotation has been performed anywhere
-  in this project** — 0 of 180, 0 of 228 and 0 of 236 label cells are filled.
-* The **180-item paired packet stays blank** until a person labels it. It must go
-  to an annotator who has seen **neither earlier packet nor any source image**
-  (13 of its 180 images overlap the 228-item packet, which is unblinded on two
-  channels), on the terms in
-  [`BLINDING_AUDIT.md`](../../results/audit_v1/annotation_packet_paired180/BLINDING_AUDIT.md).
-* **Nothing in this screen's detector numbers is a finding until that labelling
-  exists**, because the screen's endpoints are detector rates. This is
-  independent of any GPU approval and is the one critical-path item the model
-  cannot advance.
-* The screen's **own** packet is designed on the same terms and must pass the
-  delivery gate before its results are read (§6.7, §6.5 rule 0).
-* **All originals, packets, keys and labels are preserved.** The packet has not
-  been sent, no label has been supplied, and no person has been scheduled —
-  those are the PI's to instruct.
+Per arm per seed there are two request-1 checkpoints, each parenting **four**
+request-2 cells (2 A2 × 2 targets). So **one invalid request-1 reference removes
+four of the eight cells**, which by §4.3 invalidates `S`, `P` and `I` and leaves
+only the two simple effects supported by the surviving parent. This is the
+single most load-bearing fragility in the design and it is why request-1
+qualification is gated before any request-2 stage runs.
+
+### 4.5 `R-NONTRANSFER` — descriptive, never inferential
+
+Estimates are **computed, stored and reported** for `R-NONTRANSFER` stages,
+labelled `DESCRIPTIVE`, with both residues shown. They are **blocked from every
+inferential use**: no coefficient-vector contrast, no marginal, no simple effect,
+no dominance comparison, no ALREADY-SOLVES credit. A CPU regression must fail the
+build if a descriptive estimate enters a contrast. Nothing is retuned, `R_i` is
+not reselected and no dial is re-fit.
+
+### 4.6 Uncertainty — what is assumed, and what is unknown
+
+The measured anchor is a per-category paired contrast on the **spent** TEST
+probe: median 95% width **10.00 pp** at the pilot layout of **10 scenes × 8
+images** per category, so a per-cell half-width of **5.00 pp**. Two separate
+unknowns stand between that and any planning number:
+
+1. **The between-scene / within-scene variance split is unknown.** The bootstrap
+   unit is the scene cluster, so **the scene count is the precision knob**, and
+   `h ∝ 1/√scenes` holds only for the between-scene component. Consequently
+   **20 scenes × 8 images and 40 scenes × 4 images are not assumed equally
+   precise**, and no equivalence between them is claimed.
+2. **The cell correlation `ρ` is unknown.** Every cell's relapse contrast is
+   measured on the *same* `R_cat` scenes, so `ρ > 0`, but by how much is not
+   estimated here. For a coefficient vector `a` with `Σa = 0` under exchangeable
+   `ρ`, `Var = σ²(1 − ρ)Σa²` — the shared component cancels, so a positive `ρ`
+   **helps**, and ignoring it is conservative.
+
+Sensitivity at the proposed **20 scenes × 8 images** (half-widths in pp):
+
+| `ρ` | `S` | `P` | `I` | `S\|near` | `S − P` |
+|---|---|---|---|---|---|
+| −0.5 | 3.06 | 3.06 | 6.12 | 4.33 | 4.33 |
+| 0.0 | 2.50 | 2.50 | 5.00 | 3.54 | 3.54 |
+| +0.5 | 1.77 | 1.77 | 3.54 | 2.50 | 2.50 |
+| +0.8 | 1.12 | 1.12 | 2.24 | 1.58 | 1.58 |
+
+**The reading rule, correctly stated.** With a *realised* half-width `h`, the
+predicate `MATERIAL+` requires the **observed point estimate** `> 10 + h`, and
+`NULL(10)` requires `|observed point| ≤ 10 − h`; `NULL(10)` is unreachable
+whenever `h > 10`. **This is arithmetic about an observed interval under an
+assumed width. It is not a threshold on true effects and it is not a power
+calculation** — no detection probability is claimed anywhere, and `h` is carried
+from a different contrast on a spent probe.
+
+`ρ` and the variance split are **estimable on CPU from Amendment 01's existing
+per-image rows** without any new generation. That is proposed as a CPU
+deliverable (§6 item 4), not done here, because it is new analysis and Amendment
+01 is closed.
 
 ---
 
-## 5. What is being proposed for approval
+## 5. Workload, from the enumerated slots
 
-**Blockers, verified:**
+The inventory is one script and one log, not a prose estimate:
+`scripts/seq/screen_measurement_inventory.py` →
+[`screen_measurement_inventory.log`](../../results/feasibility_2026-10-11/screen_measurement_inventory.log).
 
-1. **CEASE has no code** (project pages only; "Code coming soon."; no licence, no
-   date). Faithful reimplementation is additionally impossible: HOC's trigger and
-   rank cut are unspecified. → the screen as written stops at §6.6.
-2. **Native LACU requires an OpenAI API key** by its released runner's design,
-   per concept per checkpoint.
-3. **Our 40 GB devices are below LACU's recommended setting**, so its batch
-   configuration must be changed and the deviation declared.
-4. **SPEED needs `kmeans_pytorch` + `pandas`**, and its behaviour on our
-   diffusers 0.30.2 is unverified.
-5. **`/` is full (4.9 GB)**; LACU's full-pipeline checkpoints need ≈390 GB, which
-   only `/data` can hold, with pruning.
-6. **No human label exists anywhere**, so no detector-based result from this
-   screen would be a finding yet.
+**Counted separately:** **98** selected checkpoints (22 request-1, 76
+request-2), **486** calibration candidates / intermediate dumps, and **`M0`**.
 
-**Work proposed, in order. Each item needs explicit approval; none is started.**
+**Nine measured concepts:** `cat`, `dog`, `sandwich` (targets); `bird`, `chair`,
+`bicycle` (retained); `clock` (separate control); `horse`, `potted plant`
+(anchors).
+
+**Scene layout:** DEV 10 × 8, ACCEPT 20 × 8, TEST 20 × 8, R 20 × 8 images.
+
+| slot | set | ckpts | concepts | images |
+|---|---|---|---|---|
+| calibration candidates (dial selection, own target only) | DEV | 486 | 1 | 38,880 |
+| selected checkpoints (own-target residue) | ACCEPT | 98 | 1 | 15,680 |
+| **request-1 parents — `p₂` for `dog` and `sandwich`** | ACCEPT | 22 | 2 | 7,040 |
+| `M0` — `p₁` for `cat` | ACCEPT | 1 | 1 | 160 |
+| selected checkpoints — all nine concepts, once | TEST | 98 | 9 | 141,120 |
+| **`M0` cumulative baselines** | TEST | 1 | 9 | 1,440 |
+| selected checkpoints — the relapse probe | R | 98 | 1 | 15,680 |
+| `M0` sanity baseline | R | 1 | 1 | 160 |
+| **total** | | | | **220,160** |
+
+**Evaluation = 67.4 device-hours** at the **measured** 1.1027 s/image.
+
+| training / editing | device-hours | basis |
+|---|---|---|
+| ConAbl, 1,000 steps × 20 requests | **4.68** | **measured** 0.8420 s/step |
+| one new `potted plant` anchor cache (200 images) | **0.06** | **measured** image rate |
+| SPEED + SPEED+AIC, **208 edits** (4 dial points × 52 selected) | **3.47** | **estimate**, 60 s/edit assumed — conservative against upstream's "seconds-level" claim |
+| LACU, 26 requests | **43 – 108** | **estimate**, 1.5–4.0 h/request + 0.15 h mapping rescore |
+| LACU retain rescoring | **not costed** | **unmeasured** |
+
+> **Total ≈ 119 – 184 device-hours** — about **+20 device-hours on evaluation
+> alone** against revision 1's coarse figure, and the LACU band still dominates
+> and is still an estimate.
+
+**Which dials need retraining, and which only a dump.** ConAbl's dial is
+**training iterations** — dumps every 100 steps from **one** run, no extra
+training (L2-SP is held at the pilot's 25000 and is **not** a dial in this
+design). LACU's dial is **training steps** — its native saves at 100, 200 and
+final, from **one** run; its `λ_unlearn`/`lr` would each need a fresh run and are
+therefore **fixed** at a pre-registered value. SPEED's dial (`retain_scale`,
+`threshold`, `λ`) is a **separate closed-form edit per value** — cheap in compute,
+but each needs its own DEV evaluation, which is why DEV is 38,880 images.
+
+**Wall time and devices.** LACU's runner occupies 3 GPUs per run, so its
+43–108 device-hours are **14–36 hours of 3-GPU wall time**; evaluation
+parallelises 4-way (~17 hours). **3–7 days of occupancy** if uninterrupted. There
+is **no GPU-hour cap**; devices must be **verified unoccupied by another user at
+execution time**. *Status, not approval: the four A100-SXM4-40GB read 14 MiB used,
+0% utilisation when this was written.*
+
+**Disk.** LACU writes full ~5 GB pipelines at steps 100/200/final: ≈15 GB ×
+26 requests ≈ **390 GB**, plus ~62 GB of materialised SPEED parents for chaining
+and ~5 GB of `.pt` edits. `/` has **4.9 GB free (100% used)**; `/data` has
+**1.2 TB**. Everything under `/data`, dumps pruned to the DEV-selected one plus
+the final after each stage's evaluation, with the running total checked before
+each stage.
+
+---
+
+## 6. Dependency order — implementation and checks before the screen
 
 | # | work | compute | gate |
 |---|---|---|---|
-| 1 | CPU glue + dry runs: SPEED delta → diffusers folder round-trip, LACU arg wiring, a fixed-mapping CSV for `CA-LACU`, the retain-CSV construction for the closed-form arms | **CPU only** | must pass before any GPU request |
-| 2 | **one LACU smoke calibration**: a single short request at a reduced batch to measure device-hours/step, peak memory and the save path | **≈1–3 device-hours**, 3 GPUs verified idle | replaces the 1.5–4 h estimate with a measurement; if it OOMs at every workable batch, **report and stop** |
-| 3 | revision 6 of the proposal + the **hashed pre-registration**: §2.2 operating point, the four set identities and sizes at 160/cell, the frozen cell list, the arm/ablation labels **fixed in the code that names the arms**, the predeclared TEST checkpoint list, the bootstrap grouping | **CPU only** | the freeze; nothing may be tuned afterwards |
-| 4 | the **reduced screen** of §2: 72 checkpoints, ≈90–160 device-hours | GPUs verified unoccupied | §6.6 stopping rule live throughout |
-| 5 | `SPEED+AIC(reproduced)` — AIC from Eq. 9 on public SPEED, ~tens of lines, labelled a partial reproduction and never called CEASE | CPU to write, GPU only inside item 4 | **method implementation: requires its own approval** |
-| 6 | the CPU regressions that fail the build on a protocol violation: two relapse operands from different sets (the revision-4 defect, unchanged-checkpoint fixture), a relapse number from a LOW-PARENT / ERASURE-FAILURE / `R-NONTRANSFER` reference, a comparison from fewer than two accepted arms, a skipped cumulative check, §6.5 rules out of order, an `I` from fewer than four cells, a TEST re-evaluation or a late addition to the TEST list | **CPU only** | |
-| 7 | **human labelling of the 180-item packet** by an unexposed annotator | none | **PI action.** Not scheduled, not initiated |
+| 1 | **CPU glue and round-trip checks** of §1.3: SPEED `.pt` → diffusers replacement exactly once, double-application refused, unedited keys bit-identical, key-set assertion; LACU arg wiring; the fixed-mapping CSV for `CA-LACU`; the retain CSV for the closed-form arms | **CPU** | must pass before any GPU request |
+| 2 | **LACU smoke calibration** — fully specified in [`LACU_SMOKE_CALIBRATION.md`](LACU_SMOKE_CALIBRATION.md) | **≈1.5–3 device-h**, 3 GPUs verified idle at execution time | replaces the 1.5–4.0 h estimate; **failure action defined there** |
+| 3 | **base-rate screen** for `potted plant` and `clock` on DEV, plus the `p` re-measurement of every target on the new sets | small GPU | if `potted plant` fails, fall back to `vase`; if `clock` fails, pick another control — **before** the freeze |
+| 4 | **CPU variance study** on Amendment 01's existing rows: the between/within split and the cell correlation `ρ` of §4.6, so the scene count is chosen from data rather than from a conservative assumption | **CPU** | no new generation |
+| 5 | **revision 6 + the hashed pre-registration**: [`REVISION_6_CHANGES.md`](REVISION_6_CHANGES.md), the four set identities and scene counts, the eight-cell list, the coefficient vectors, the four prespecified simple effects, the AIC settings of §1.3, the arm and ablation labels **fixed in the code that names the arms**, and the **prospective** request-1 decision of §2.4 | **CPU** | **the freeze.** Protocol and checkpoint-slot rules are frozen here, before any evaluation |
+| 6 | **the TEST list**, derived from DEV and ACCEPT decisions only, then **locked with a digest** before the first TEST image | **CPU** | after ACCEPT, before TEST |
+| 7 | **the screen** | GPUs verified unoccupied at execution time | the §6.6 stopping rule live throughout |
+| 8 | `SPEED+AIC(reproduced)` | CPU to write; GPU only inside item 7 | **method implementation — its own approval** |
+| 9 | **CPU regressions** that fail the build on: two relapse operands from different sets; a relapse number from a LOW-PARENT, ERASURE-FAILURE or `R-NONTRANSFER` reference; a descriptive estimate entering a contrast; a marginal reconstructed from fewer than eight cells; a comparison from fewer than two accepted arms; a skipped cumulative check; §6.5 rules out of order; a TEST re-evaluation or a late addition to the locked TEST list; an endpoint whose concept has no measurable category passing ALREADY-SOLVES | **CPU** | before item 7 |
+| 10 | **human labelling of the 180-item packet** by an annotator exposed to neither earlier packet nor any source image | none | **PI action.** Not scheduled, not initiated, no label produced or distributed |
 
-**If the PI prefers to wait for CEASE instead:** items 1, 3, 6 and 7 are all
-still worth doing, cost no GPU time, and leave the screen ready to run the day
-code appears. That is the cheapest defensible option and it does not depend on
-this brief's estimates being right.
-
----
-
-## 6. What this brief does not establish
-
-* **Not that the screen will find anything.** §3.5 shows a wide band of true
-  effects that would land INCONCLUSIVE even at 160 images per cell.
-* **Not novelty, not publishability, not a gap.** §1.6 narrows the gap claim:
-  CEASE already tracks representation-space interference on an earlier erased
-  target and already baselines CUIG-GradProj and Sculpting Memory over 100-step
-  sequences. What is left is the paired image-level estimand plus two sequence
-  factors — and that it is left is not evidence that it matters.
-* **Not an exhaustive survey.** Literature claims are scoped to the six works of
-  §1 plus the three implementations audited here.
-* **Not that any arm will fit, run or converge on this host.** Items 1 and 2 are
-  what would establish that; §1.5 lists exactly what remains unverified.
-* **Not a mechanism, a proof, or generality over concepts.** The §7 candidate
-  stays an unproved direction with its three unproved assumptions and the missing
-  bound named.
-* **Not independently verified where it is ours.** The upstream facts are
-  re-checkable from the recorded URLs and digests; the local environment,
-  disk, GPU-status and ledger observations are **this project's own
-  observations**, reported as such.
+The screen's detector numbers are **not findings** until item 10 exists.
 
 ---
 
-## 7. Reproduce
+## 7. What this does not establish
 
-    python scripts/seq/check_feasibility_brief_numbers.py     # 54 checks, 0 failures
+* **Not that existing remedies fail.** **HOC is untested and unexcluded** (§0).
+  An AIC reproduction is not CEASE and its failure says nothing about CEASE.
+* **Not novelty or publishability.** A working screen and a component
+  reproduction establish neither.
+* **Literature, narrowed again.** Revision 1 said CEASE's interference
+  diagnostic references the unedited `W₀`. **Eq. 4 actually subtracts the
+  intended single edit:** `noise_e(c) = ‖Σ_{i≤N} Δ_i c‖² − ‖Δ_e c‖²`, a signed
+  residual, and Fig. 5 tracks it on an erased target across 100 edits. It is
+  still **not** the paired image-level estimand — it is a weight-space quantity
+  at a text embedding, not a change in detection rate between two checkpoints on
+  a fixed probe — but it is closer than revision 1 allowed, and CEASE's Tables
+  1–3 already baseline CUIG-GradProj and Sculpting Memory over 100-step
+  sequences. No broader survey was run and none is proposed here.
+* **Not that any arm fits, runs or converges on this host.** Items 1–3 are what
+  would establish that; §1.5 lists what remains unverified.
+* **Not a mechanism, a proof, or generality over concepts.**
+* **Not independently verified where it is ours.** Upstream facts are
+  re-checkable from the recorded URLs and digests; the local environment, disk,
+  GPU-status and ledger observations are this project's own.
 
-Every measured figure, interval width, checkpoint count and device-hour subtotal
-in §3.5 and §4 is re-derived there from the committed ledger
-(`results/audit_v1/amendment01_evidence/gpu_usage_record.json`) and the committed
-analysis (`…/analysis_test.json`), and asserted against the number this document
-prints. Verbatim output:
-[`brief_numbers_check.log`](../../results/feasibility_2026-10-11/brief_numbers_check.log).
+---
 
-Upstream facts: refetch any URL in
-[`feasibility_sources_2026-10-11.json`](feasibility_sources_2026-10-11.json) and
-compare its `sha256`. A changed digest means upstream moved — most usefully, the
-two CEASE repositories, where a changed tree is the signal that §0's tripwire has
-fired.
+## 8. Reproduce
 
-**Nothing in this brief reruns, reopens or amends Amendment 01.** It reads its
-committed evidence and adds files of its own.
+    python scripts/seq/screen_measurement_inventory.py        # the inventory of §4-§5
+    python scripts/seq/check_feasibility_brief_numbers.py     # asserts every figure printed here
+
+Both read only committed files and run no model. Upstream facts: refetch any URL
+in `feasibility_sources_2026-10-11.json` and compare its `sha256`; a changed tree
+on either CEASE repository is the signal that §0's wait has ended.

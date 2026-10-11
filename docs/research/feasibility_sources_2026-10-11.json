@@ -234,5 +234,84 @@
       "Horses": 204,
       "Flowers": 204
     }
+  },
+  "corrections_round_2": {
+    "_what_this_is": "Source-bound evidence for the six corrections in revision 2 of the brief. Line numbers refer to the files already hashed in files_fetched above, whose digests are unchanged. The COCO and tokenizer facts were checked locally on CPU: the tokenizer check loads a tokenizer only -- no model weights, no forward pass.",
+    "recorded_utc": "2026-10-11T05:50:18.728520+00:00",
+    "review_md_provenance": "The REVIEW.md supplied with the review prompt is the earlier round's acceptance of commit 332d0a9, not a review of 117b584. It carries no evidence on the six points; each was re-verified against source. Its two standing requirements (explicit detector validation, an unexposed annotator) are carried in the brief.",
+    "1_speed_edit_is_stochastic": {
+      "file": "speed:train_erase_null.py",
+      "sha256_unchanged": true,
+      "lines": {
+        "25": "noise = torch.randn_like(mini_ret_embs)  -> Gaussian retain augmentation",
+        "48": "kmeans(X=null_hidden[1:], num_clusters=3, ...) -> randomly initialised K2 centres",
+        "85": "last_ret_embs[torch.randperm(last_ret_embs.size(0))]  # shuffle",
+        "140": "--aug_num default 10",
+        "131+147": "--seed default 0, seed_everything(args.seed)"
+      },
+      "consequence": "two edit seeds preserved; rule 1 applies; selected checkpoints = 4x20 + 3x6 = 98"
+    },
+    "4_aic_degeneracy_under_the_empty_anchor": {
+      "K2_construction": "train_erase_null.py:48 -> K2 = cat([null_hidden[[0],:], 3 kmeans centres]).T, so K2[:,0] == null_hidden[0]",
+      "anchor_token_index": "train_erase_null.py:68 -> anchor_embs[[attention_mask.sum()-2]]",
+      "tokenizer_check_cpu_only": {
+        "''": {
+          "attention_mask_sum": 2,
+          "index": 0
+        },
+        "' '": {
+          "attention_mask_sum": 2,
+          "index": 0
+        },
+        "object": {
+          "attention_mask_sum": 3,
+          "index": 1
+        },
+        "horse": {
+          "attention_mask_sum": 3,
+          "index": 1
+        },
+        "potted plant": {
+          "attention_mask_sum": 4,
+          "index": 2,
+          "note": "the 'plant' token"
+        }
+      },
+      "consequence": "with the empty or whitespace anchor c* IS K2's first column, so K2^AIC is rank-deficient and lambda=0 inverts a singular Gram; AIC is non-degenerate only with a non-empty anchor",
+      "absolute_weights_not_deltas": "train_erase_null.py:118 edit_dict[k] = layer_weight + delta_weight; :189 torch.save(edit_dict)"
+    },
+    "3_detector_cannot_measure_flower": {
+      "committed_matcher": "scripts/seq/detect.py:117-121 -- d['label'] == tgt, exact string equality",
+      "category_source": "torchvision FasterRCNN_ResNet50_FPN_Weights.COCO_V1.meta['categories']",
+      "n_categories": 91,
+      "flower_present": false,
+      "plant_like_present": {
+        "potted plant": 64,
+        "vase": 86
+      },
+      "nine_measured_concepts": [
+        "cat",
+        "dog",
+        "sandwich",
+        "bird",
+        "chair",
+        "bicycle",
+        "clock",
+        "horse",
+        "potted plant"
+      ],
+      "consequence": "a flower endpoint returns 0 hits on every checkpoint and passes vacuously"
+    },
+    "lacu_shipped_selected_index_is_1_based": {
+      "file": "lacu:prompts/apple/candidates_clip.json",
+      "observed": "100 entries, 10 candidates each, 'selected' values 1..10 with no 0; three entries have selected == 10",
+      "consequence": "a CPU-built mapping CSV must use candidates[selected - 1]"
+    },
+    "literature_narrowing_cease_eq_4": {
+      "file": "cease:arxiv_html_2610.01989",
+      "equation_4": "noise_e(c) = ||sum_{i<=N} Delta_i c||^2 - ||Delta_e c||^2",
+      "consequence": "it subtracts the INTENDED single-edit update, so revision 1's 'reference is the unedited W0' was wrong; it is still a weight-space residual at a text embedding, not the paired image-level estimand",
+      "hoc_underspecification": "Pi_i = I - U U^T 'when HOC is applied, and Pi_i = I otherwise'; no trigger threshold and no rank cut anywhere in the paper, so HOC remains untested and unexcluded by any AIC reproduction"
+    }
   }
 }

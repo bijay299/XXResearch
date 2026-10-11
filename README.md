@@ -34,13 +34,18 @@ launch scripts, validators, measurements and notes.
 > is [`docs/research/NEXT_SCREEN_PROPOSAL.md`](docs/research/NEXT_SCREEN_PROPOSAL.md)
 > — **CPU-only, not authorised to run**. The frozen test set is spent.
 >
-> **Feasibility, 2026-10-11:** that screen **cannot run as written** — CEASE has
-> no public code (project pages only, "Code coming soon."), and the proposal makes
-> it non-droppable. LACU *is* available (MIT) and runs in the existing
-> environment. The reduced three-method alternative, the verified blockers and
-> the costed plan are in
-> [`docs/research/FEASIBILITY_BRIEF_2026-10-11.md`](docs/research/FEASIBILITY_BRIEF_2026-10-11.md)
-> — **also CPU-only, and it authorises nothing**.
+> **Feasibility, 2026-10-11 (revision 2):** that screen **cannot run as
+> written** — CEASE has no public code (project pages only, "Code coming soon."),
+> and the proposal makes it non-droppable. LACU *is* available (MIT) and its
+> training path runs in the existing environment. **A reduced screen is not ready
+> for approval either:** CEASE's HOC is not specified well enough to reproduce,
+> so an AIC-only reproduction leaves HOC untested and **no claim about existing
+> remedies is available**. What is ready is a CPU track plus one GPU smoke
+> calibration. See
+> [`docs/research/FEASIBILITY_BRIEF_2026-10-11.md`](docs/research/FEASIBILITY_BRIEF_2026-10-11.md),
+> the change list [`REVISION_6_CHANGES.md`](docs/research/REVISION_6_CHANGES.md)
+> and [`LACU_SMOKE_CALIBRATION.md`](docs/research/LACU_SMOKE_CALIBRATION.md)
+> — **all CPU-only, and they authorise nothing**.
 >
 > **AUDIT-01 / 01b / 01c / 01d** re-derived the two-seed SD-1.5 sequential pilot
 > snapshot `a9de625` from raw per-image predictions. Arithmetic and completeness

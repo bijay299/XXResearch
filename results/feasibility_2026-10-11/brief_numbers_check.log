@@ -16,41 +16,86 @@ ok   I MATERIAL needs |point| >= (pp): got 17 want 17
 ok   I NULL(10) needs |point| <= (pp): got 3 want 3
 ok   images/cell for interaction half-width 5.0 pp: got 160.0 want 160 (+-10)
 ok   images/cell for interaction half-width 3.5 pp: got 330.0 want 330 (+-10)
-ok   CA ConAbl checkpoints: got 20 want 20
-ok   CA SPEED checkpoints (seed factor degenerate): got 10 want 10
-ok   NAT LACU checkpoints: got 6 want 6
-ok   total checkpoints: got 72 want 72
-ok   CA ConAbl training device-hours at 1000 iterations: got 4.7 want 4.7 (+-0.05)
+ok   arms in family CA: got 4 want 4
+ok   arms in family NAT (ConAbl shares its CA cells): got 3 want 3
+ok   edit/training seeds per arm: got 2 want 2
+ok   request-1 checkpoints: got 22 want 22
+ok   request-2 checkpoints: got 76 want 76
+ok   SELECTED checkpoints (M0 and candidates excluded): got 98 want 98
+ok   calibration candidates / intermediate dumps: got 486 want 486
+ok   measured concepts on TEST: got 9 want 9
+ok   flower is NOT a measured concept: got False want False
+ok   disjoint anchor is COCO-measurable: got 'potted plant' want 'potted plant'
+ok   total images across every enumerated slot: got 220160 want 220160
+ok   evaluation device-hours: got 67.4 want 67.4 (+-0.1)
+ok   ConAbl training device-hours (measured rate, 1000 steps): got 4.68 want 4.68 (+-0.01)
 ok   same at upstream 2000 iterations: got 9.4 want 9.4 (+-0.1)
-ok   ConAbl request-1 retrain cost if reuse fails (device-h): got 0.47 want 0.47 (+-0.05)
-ok   LACU UNet passes per optimizer step at effective batch 108: got 4320 want 4320
-ok   LACU passes per request, 250 steps (M): got 1.08 want 1.08 (+-0.01)
-ok   LACU passes per request, 350 steps (M): got 1.51 want 1.51 (+-0.01)
-ok   LACU image-equivalents per request, low (k): got 18.0 want 18.0 (+-0.1)
-ok   LACU image-equivalents per request, high (k): got 25.2 want 25.2 (+-0.1)
-ok   LACU device-hours at batch-1 throughput, low: got 5.0 want 5.0 (+-0.1)
-ok   LACU device-hours at batch-1 throughput, high: got 7.0 want 7.0 (+-0.1)
-ok   LACU device-hours with a 4x batched speed-up (low end): got 1.25 want 1.25 (+-0.01)
-ok   LACU device-hours with a 2x batched speed-up (high end): got 3.5 want 3.5 (+-0.1)
-ok   mapping rescore passes per stage (k): got 32.0 want 32.0
+ok   ConAbl request-1 retrain cost if all-fresh is chosen prospectively: got 0.47 want 0.47 (+-0.01)
+ok   SPEED + SPEED+AIC edits (4 dial points x 52 selected): got 208 want 208
 ok   LACU requests: got 26 want 26
-ok   LACU training device-hours, low: got 39 want 39
-ok   LACU training device-hours, high: got 104 want 104
-ok   TEST device-hours (8 categories x 160): got 28 want 28 (+-1)
-ok   ACCEPT device-hours (3 x 160): got 11 want 11 (+-1)
-ok   R device-hours (1 x 160): got 3.5 want 3.6 (+-0.3)
-ok   per-checkpoint TEST device-hours: got 0.39 want 0.39 (+-0.01)
-ok   brief quotes '1.10 s/image': got True want True
-ok   brief quotes '0.84 s/step': got True want True
-ok   brief quotes '**4,320**': got True want True
-ok   brief quotes '1.5 – 4.0 device-hours': got True want True
-ok   brief quotes '1.2 – 3.5 device-hours': got True want True
-ok   brief quotes '**10.0 pp**': got True want True
-ok   brief quotes '≈ **7 pp**': got True want True
-ok   brief quotes '≈ **160**': got True want True
-ok   brief quotes '**72**': got True want True
-ok   brief quotes '≈ 90 – 160 device-hours': got True want True
-ok   brief quotes '2.9014 device-hours': got True want True
-ok   brief quotes '204': got True want True
+ok   LACU device-hours, low: got 43 want 43
+ok   LACU device-hours, high: got 108 want 108
+ok   TOTAL device-hours, low: got 119 want 119
+ok   TOTAL device-hours, high: got 184 want 184
+ok   CA cells per arm per edit seed: got 8 want 8
+ok   <S,P> = 0: got 0.0 want 0.0
+ok   <S,I> = 0: got 0.0 want 0.0
+ok   <P,I> = 0: got 0.0 want 0.0
+ok   <S,A2_identity> = 0: got 0.0 want 0.0
+ok   <P,A2_identity> = 0: got 0.0 want 0.0
+ok   request-1 reference loading of S cancels: got 0.0 want 0.0
+ok   request-1 reference loading of P cancels: got 0.0 want 0.0
+ok   request-1 reference loading of I cancels: got 0.0 want 0.0
+ok   S coefficients: got [0.25, -0.25, 0.25, -0.25, 0.25, -0.25, 0.25, -0.25] want [0.25, -0.25, 0.25, -0.25, 0.25, -0.25, 0.25, -0.25]
+ok   I coefficients: got [0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5] want [0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5]
+ok   four prespecified simple effects present: got ['P|disjoint', 'P|shared', 'S|far', 'S|near'] want ['P|disjoint', 'P|shared', 'S|far', 'S|near']
+ok   per-cell half-width scaled to 20 scenes (pp): got 3.54 want 3.54 (+-0.01)
+ok   I half-width at rho=0 (pp): got 5.0 want 5.0 (+-0.01)
+ok   I half-width at rho=+0.5 (pp): got 3.54 want 3.54 (+-0.01)
+ok   S half-width at rho=0 (pp): got 2.5 want 2.5 (+-0.01)
+ok   reading rule: MATERIAL+ needs observed point > 10 + h: got 15.0 want 15.0 (+-0.01)
+ok   reading rule: NULL(10) needs |observed point| <= 10 - h: got 5.0 want 5.0 (+-0.01)
+ok   UNet passes per optimizer step at effective batch 108: got 4320 want 4320
+ok   smoke optimizer steps: got 136 want 136
+ok   smoke UNet passes: got 587520 want 587520
+ok   smoke image-equivalents: got 9792 want 9792
+ok   smoke device-hours, low: got 0.75 want 0.75 (+-0.01)
+ok   smoke device-hours, high: got 3.0 want 3.0 (+-0.01)
+ok   brief quotes '1.1027 s/image': got True want True
+ok   brief quotes '0.8420 s/step': got True want True
+ok   brief quotes '**98**': got True want True
+ok   brief quotes '**486**': got True want True
+ok   brief quotes '**220,160**': got True want True
+ok   brief quotes '**67.4**': got True want True
+ok   brief quotes '**4.68**': got True want True
+ok   brief quotes '**208 edits**': got True want True
+ok   brief quotes '**43 – 108**': got True want True
+ok   brief quotes '119 – 184 device-hours': got True want True
+ok   brief quotes '`potted plant`': got True want True
+ok   brief quotes '`clock`': got True want True
+ok   brief quotes '0.47': got True want True
+ok   brief quotes '6.12': got True want True
+ok   brief quotes '2.24': got True want True
+ok   brief quotes '`ALREADY-SOLVES-CORE': got True want True
+ok   brief quotes 'AIC-NOOP': got True want True
+ok   brief quotes 'AIC-current': got True want True
+ok   revision-6 list quotes '98': got True want True
+ok   revision-6 list quotes 'AIC-NOOP': got True want True
+ok   revision-6 list quotes 'potted plant': got True want True
+ok   revision-6 list quotes 'ANCHOR-UNMEASURED': got True want True
+ok   revision-6 list quotes '0.47 device-hours': got True want True
+ok   smoke proposal quotes '136 optimizer steps': got True want True
+ok   smoke proposal quotes '0.75 – 3.0 device-hours': got True want True
+ok   smoke proposal quotes 'candidates[selected − 1]': got True want True
+ok   smoke proposal quotes '`apple`': got True want True
+ok   smoke proposal quotes 'every configuration OOMs': got True want True
+ok   brief carries the retraction '"training-free and deterministic"': got True want True
+ok   brief carries the retraction '**Wrong.** The editor has four randomness sources': got True want True
+ok   brief carries the retraction '**98**': got True want True
+ok   brief carries the retraction '**Wrong twice:**': got True want True
+ok   brief carries the retraction '**Not measurable.**': got True want True
+ok   brief carries the retraction '**Mis-stated.**': got True want True
+ok   brief carries the retraction '**Under-specified and degenerate in the native setting.**': got True want True
+ok   brief no longer presents 72 as the count: got False want False
 
-54 passed / 0 failed
+99 passed / 0 failed
