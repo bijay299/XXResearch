@@ -19,6 +19,11 @@ ATTACK 2 -- published RNG state plus row order.
     `category_to_judge` column confirms the reconstruction without ever opening
     the key: a 180-long category sequence does not agree by chance.
 
+    A digest occurrence is graded, not assumed: within two lines of a
+    checkpoint/arm/slot identifier it is an IDENTIFYING ASSOCIATION and the
+    packet is BROKEN for those rows; a bare mention elsewhere is UNRESOLVED and
+    REQUIRES ASSESSMENT, because a digest alone proves nothing.
+
 ATTACK 3 -- the delivered image bytes.
     The committed image reports and detector rows associate every image's
     sha256 with its source slot. If the packet ships source bytes unchanged, a
@@ -41,15 +46,20 @@ import csv
 import hashlib
 import json
 import random
+import re
 from pathlib import Path
 
-VERDICTS: list[tuple[str, bool, str]] = []
+# A boolean cannot express "the input was not fit to audit", which is how this
+# gate produced false passes: an empty image directory scored 0/0 matches and
+# was reported as holding. Four states, and only one of them is a pass.
+HOLDS, BROKEN, REJECTED, UNRESOLVED, UNTESTED = (
+    "holds", "BROKEN", "REJECTED", "UNRESOLVED", "NOT MODELLED")
+VERDICTS: list[tuple[str, str, str]] = []
 
 
-def record(name: str, broken: bool, detail: str) -> None:
-    VERDICTS.append((name, broken, detail))
-    tag = "BROKEN" if broken else "holds "
-    print(f"  [{tag}] {name}\n           {detail}")
+def record(name: str, status: str, detail: str) -> None:
+    VERDICTS.append((name, status, detail))
+    print(f"  [{status:<11}] {name}\n                {detail}")
 
 
 def sheet_categories(sheet: Path) -> tuple[list[str], list[str]]:
@@ -77,7 +87,7 @@ def attack_identifier_hashing(meta: dict, ids: list[str], man: dict) -> None:
         if meta.get(k):
             published_salt = meta[k]
     if published_salt is None:
-        record("identifier hashing", False,
+        record("identifier hashing", HOLDS,
                f"no salt value appears in the published records "
                f"(rule: {rule!r}; salt_sha256 published: "
                f"{'yes' if b.get('salt_sha256') else 'no'}). Enumeration needs "
@@ -106,12 +116,12 @@ def attack_identifier_hashing(meta: dict, ids: list[str], man: dict) -> None:
                     f"{published_salt}|{path}".encode()).hexdigest()[:n]
                 if h in want:
                     hits += 1
-    record("identifier hashing", hits > 0,
+    record("identifier hashing", BROKEN if hits else UNRESOLVED,
            f"{hits}/{len(ids)} blinded ids regenerated from published records "
            f"alone using the PUBLISHED salt. Each hit reveals that row's arm "
            f"and training seed, so the blind is gone for those rows."
            if hits else
-           f"a salt IS published, but enumeration under the documented path "
+           f"UNRESOLVED -- a salt IS published, but enumeration under the documented path "
            f"rule regenerated 0/{len(ids)} ids: this packet's id rule or its "
            f"inputs differ from sha256(salt | <eval_root>/<slot>/images/"
            f"<prompt_id>_seed<gs>.jpg)[:12]. Publishing the salt is still a "
@@ -124,16 +134,16 @@ def attack_rng_and_row_order(meta: dict, cats: list[str], man: dict) -> None:
     samp = meta.get("sampling") or {}
     seed = samp.get("rng_seed", meta.get("rng_seed"))
     if seed is None:
-        record("published RNG + row order", False,
-               "NOT MODELLED: no sampling RNG seed is published anywhere this "
+        record("published RNG + row order", UNTESTED,
+               "no sampling RNG seed is published anywhere this "
                "tool looks, so the replay has no starting point. UNTESTED, not "
                "passed.")
         return
     order = (meta.get("blinding") or {}).get("order", "")
     design = meta.get("approved_design")
     if not design:
-        record("published RNG + row order", False,
-               f"NOT MODELLED for this packet: it declares no paired "
+        record("published RNG + row order", UNTESTED,
+               f"not modelled for this packet: it declares no paired "
                f"`approved_design`, and its draw consumes detector output "
                f"(stratified cells and score-enriched items), so replaying it "
                f"needs the raw detector rows rather than published metadata "
@@ -181,7 +191,7 @@ def attack_rng_and_row_order(meta: dict, cats: list[str], man: dict) -> None:
     for name, items in candidates.items():
         replay = [it[2] for it in items]
         if len(replay) == len(cats) and replay == cats:
-            record("published RNG + row order", True,
+            record("published RNG + row order", BROKEN,
                    f"reconstruction '{name}' replays the sheet's category "
                    f"column EXACTLY ({len(cats)}/{len(cats)} positions). The "
                    f"same replay carries the arm and training seed of every "
@@ -191,7 +201,7 @@ def attack_rng_and_row_order(meta: dict, cats: list[str], man: dict) -> None:
         agree = sum(1 for x, y in zip(replay, cats) if x == y)
         if agree > best_agree:
             best, best_agree = name, agree
-    record("published RNG + row order", False,
+    record("published RNG + row order", HOLDS,
            f"none of {len(candidates)} reconstructions from published data "
            f"reproduces the row order (best: '{best}', {best_agree}/{len(cats)} "
            f"positions; chance agreement is about "
@@ -230,62 +240,191 @@ def published_image_digests(evidence: Path) -> dict[str, set[str]]:
     return out
 
 
-def attack_delivered_image_bytes(images: Path | None, evidence: Path) -> None:
-    """Do the delivered files hash to a published, slot-identifying digest?"""
+def slot_pattern() -> "re.Pattern":
+    """Strings that would turn a digest occurrence into an ARM attribution."""
+    return re.compile(
+        r"seed\d+_(?:MA|MAB|MAC|MAB_L2|MAC_L2|U_step\d+)\b"
+        r"|\bMAB_L2\b|\bMAC_L2\b|\bU_step\d+\b"
+        r"|\bM0\b|_m0_|sha256_m0|noop_reload"
+        r'|"(?:arm|slot|checkpoint|training_seed)"')
+
+
+def bind_inventory(images: Path, sheet: Path) -> tuple[list[Path], list[str]]:
+    """Bind the delivered files to the published sheet, or refuse to audit.
+
+    The gate's job is to certify a specific delivery. An image directory that
+    does not match the sheet row-for-row is not that delivery, and scoring 0/0
+    matches against it is a false pass, not a result.
+    """
+    rows = []
+    with sheet.open(newline="") as fh:
+        for r in csv.DictReader(fh):
+            rows.append(r)
+    root = images.parent
+    problems: list[str] = []
+
+    referenced: dict[Path, int] = {}
+    unreadable = 0
+    for r in rows:
+        # Packets in this repository have used both column names.
+        rel = ((r.get("image") or r.get("image_file") or "")).strip()
+        if not rel:
+            problems.append("a sheet row names no image column "
+                            f"(looked for 'image' and 'image_file'; saw "
+                            f"{sorted(r)[:6]})")
+            continue
+        f = (root / rel).resolve()
+        referenced[f] = referenced.get(f, 0) + 1
+        if not f.is_file():
+            continue
+        try:
+            f.read_bytes()
+        except Exception:
+            unreadable += 1
+
+    missing = [f for f in referenced if not f.is_file()]
+    dupes = [f for f, n in referenced.items() if n > 1]
+    on_disk = {f.resolve() for f in images.iterdir() if f.is_file()}
+    extra = on_disk - set(referenced)
+
+    if len(rows) == 0:
+        problems.append("the published sheet has no rows")
+    if missing:
+        problems.append(f"{len(missing)} sheet row(s) reference a file that is "
+                        f"not present")
+    if extra:
+        problems.append(f"{len(extra)} file(s) in the image directory are not "
+                        f"referenced by the sheet")
+    if dupes:
+        problems.append(f"{len(dupes)} file(s) are referenced by more than one "
+                        f"sheet row")
+    if unreadable:
+        problems.append(f"{unreadable} referenced file(s) could not be read")
+
+    present = [f for f in referenced if f.is_file()]
+    return present, problems
+
+
+def attack_delivered_image_bytes(images: Path | None, evidence: Path,
+                                 sheet: Path) -> None:
+    """Do the delivered files hash to a published, slot-identifying digest?
+
+    Bound to the published sheet first: an inventory that does not match the
+    sheet is REJECTED, never passed.
+    """
     if images is None:
-        record("delivered image bytes", False,
-               "NOT MODELLED: no --delivered_images directory was given, so the "
-               "actual packet files were not hashed. UNTESTED, not passed.")
+        record("delivered image bytes", UNTESTED,
+               "no --delivered_images directory was given, so the actual "
+               "packet files were not hashed. UNTESTED, not passed.")
         return
     if not images.is_dir():
-        record("delivered image bytes", False,
-               f"NOT MODELLED: {images} is not a directory. UNTESTED.")
+        record("delivered image bytes", REJECTED,
+               f"{images} is not a directory; there is no delivery to audit.")
         return
+
+    present, problems = bind_inventory(images, sheet)
+    n_sheet = sum(1 for _ in csv.DictReader(sheet.open(newline="")))
+    if problems:
+        record("delivered image bytes", REJECTED,
+               f"the delivery does not bind to the published sheet "
+               f"({n_sheet} rows): " + "; ".join(problems) +
+               ". No verdict is issued: an unbound inventory cannot be "
+               "certified, and scoring it would be a false pass.")
+        return
+
     pub = published_image_digests(evidence)
     if not pub:
-        record("delivered image bytes", False,
-               f"NOT MODELLED: no published image digests found under "
-               f"{evidence}. UNTESTED.")
+        record("delivered image bytes", REJECTED,
+               f"no published image digests found under {evidence}; the "
+               f"comparison corpus is empty, so a 0-match result would be "
+               f"meaningless.")
         return
-    files = sorted(p for p in images.iterdir() if p.is_file())
-    delivered = {}
-    for f in files:
-        delivered[hashlib.sha256(f.read_bytes()).hexdigest()] = 1
-    matched = sum(1 for h in delivered if h in pub)
-    unique = sum(1 for h in delivered if len(pub.get(h, ())) == 1)
 
-    # Second corpus: the archives are not the only place a digest could be
-    # published. Sweep every committed text file too, so "holds" is scoped to a
-    # stated corpus rather than to one directory.
-    scanned, elsewhere = 0, 0
+    digests: dict[str, int] = {}
+    for f in present:
+        h = hashlib.sha256(f.read_bytes()).hexdigest()
+        digests[h] = digests.get(h, 0) + 1
+    n_files, n_distinct = len(present), len(digests)
+    matched = sum(digests[h] for h in digests if h in pub)
+    unique = sum(digests[h] for h in digests if len(pub.get(h, ())) == 1)
+
+    # ---- the text corpus, made operational in the verdict -----------------
+    pat = slot_pattern()
+    scanned = 0
+    files_with_occurrence: set[str] = set()
+    files_with_association: set[str] = set()
+    occurrences = 0
     skip = (".jpg", ".jpeg", ".png", ".pdf", ".svg", ".gz", ".tar", ".zip")
     for q in Path(".").rglob("*"):
         if ".git/" in str(q) or not q.is_file() or q.suffix.lower() in skip:
             continue
         try:
-            t = q.read_text(errors="ignore")
+            text = q.read_text(errors="ignore")
         except Exception:
             continue
         scanned += 1
-        elsewhere += sum(1 for h in delivered if h in t)
+        lines = text.splitlines()
+        found = False
+        for i, line in enumerate(lines):
+            hit = [h for h in digests if h in line]
+            if not hit:
+                continue
+            found = True
+            occurrences += len(hit)
+            window = "\n".join(lines[max(0, i - 2):i + 3])
+            if pat.search(window):
+                files_with_association.add(str(q))
+        if found:
+            files_with_occurrence.add(str(q))
 
-    record("delivered image bytes", unique > 0,
-           (f"{matched}/{len(files)} delivered files hash to a PUBLISHED image "
-            f"digest and {unique} of those resolve to a UNIQUE slot, so the arm "
-            f"and training seed of {unique} rows are recoverable by hashing the "
-            f"packet alone. {len(pub)} slot-resolving published digests were "
-            f"searched, plus {scanned} other committed text files "
-            f"({elsewhere} further occurrences). Aggregate counts only; no "
-            f"item-to-slot mapping is reported.")
-           if unique else
-           (f"0/{len(files)} delivered files hash to any of the {len(pub)} "
-            f"slot-resolving published digests, and {elsewhere} occurrence(s) "
-            f"across {scanned} other committed text files. The annotation bytes "
-            f"are separated from the indexed originals. SCOPE: this closes the "
-            f"DIGEST channel against a packet holder who also has the "
-            f"repository. It does NOT close pixel comparison by a holder of the "
-            f"private source images -- the packet is made of those images, and "
-            f"no re-encoding can prevent that."))
+    counts = (f"{n_files} delivered files, {n_distinct} distinct hashes; "
+              f"{len(pub)} slot-resolving published digests searched; "
+              f"{scanned} committed text files swept")
+
+    if unique:
+        record("delivered image bytes", BROKEN,
+               f"{matched} of {n_files} delivered files hash to a published "
+               f"digest and {unique} resolve to a UNIQUE slot, so those rows' "
+               f"arm and training seed are recoverable by hashing the packet "
+               f"alone. {counts}. Aggregate counts only; no item-to-slot "
+               f"mapping is reported.")
+        return
+    if files_with_association:
+        record("delivered image bytes", BROKEN,
+               f"0 archive digests matched, but {occurrences} digest "
+               f"occurrence(s) in {len(files_with_occurrence)} committed text "
+               f"file(s) sit WITHIN TWO LINES of a checkpoint, arm, slot or "
+               f"training-seed identifier, in {len(files_with_association)} "
+               f"file(s): that is an identifying association, and those rows' "
+               f"condition is readable from committed data. {counts}. "
+               f"Files: {sorted(files_with_association)[:5]}")
+        return
+    if files_with_occurrence:
+        record("delivered image bytes", UNRESOLVED,
+               f"0 archive digests matched and no identifying association was "
+               f"detected, but {occurrences} delivered digest(s) appear in "
+               f"{len(files_with_occurrence)} committed text file(s). A bare "
+               f"digest mention is NOT proven de-blinding, and this gate does "
+               f"not claim it is -- it REQUIRES ASSESSMENT of whether those "
+               f"files let a reader associate the digest with an arm. "
+               f"{counts}. Files: {sorted(files_with_occurrence)[:5]}")
+        return
+    if n_distinct != n_files:
+        record("delivered image bytes", UNRESOLVED,
+               f"no published digest matched, but {n_files - n_distinct} "
+               f"delivered file(s) share byte-identical content with another "
+               f"item, so those items are linkable to each other. {counts}. "
+               f"REQUIRES ASSESSMENT.")
+        return
+    record("delivered image bytes", HOLDS,
+           f"0 of {n_files} delivered files hash to any published digest, 0 "
+           f"occurrences across the swept text corpus, and all hashes are "
+           f"distinct. {counts}. The annotation bytes are separated from the "
+           f"indexed originals. SCOPE: this closes the DIGEST channel against "
+           f"a packet holder who also has the repository. It does NOT close "
+           f"pixel comparison by a holder of the private source images -- the "
+           f"packet is made of those images, and no re-encoding can prevent "
+           f"that.")
 
 
 def main() -> int:
@@ -323,19 +462,28 @@ def main() -> int:
     attack_rng_and_row_order(meta, cats, man)
     attack_delivered_image_bytes(
         Path(a.delivered_images) if a.delivered_images else None,
-        Path(a.evidence))
+        Path(a.evidence), sheet)
 
-    broken = [n for n, b, _ in VERDICTS if b]
-    untested = [n for n, b, d in VERDICTS if not b and "NOT MODELLED" in d]
+    by = lambda st: [n for n, s_, _ in VERDICTS if s_ == st]
+    rejected, broken = by(REJECTED), by(BROKEN)
+    unresolved, untested = by(UNRESOLVED), by(UNTESTED)
     print()
+    if rejected:
+        print(f"AUDIT REJECTED -- the input is not fit to certify "
+              f"({', '.join(rejected)}). No blinding claim is made either way.")
+        return 3
     if broken:
         print(f"BLINDING BROKEN by {len(broken)} of {len(VERDICTS)} attacks: "
               f"{', '.join(broken)}")
         return 1
-    if untested:
-        print(f"{len(VERDICTS) - len(untested)} of {len(VERDICTS)} attacks "
-              f"repelled; {len(untested)} NOT MODELLED for this packet "
-              f"({', '.join(untested)}). This is not a clean pass.")
+    if unresolved or untested:
+        bits = []
+        if unresolved:
+            bits.append(f"{len(unresolved)} UNRESOLVED ({', '.join(unresolved)})")
+        if untested:
+            bits.append(f"{len(untested)} NOT MODELLED ({', '.join(untested)})")
+        print(f"{len(by(HOLDS))} of {len(VERDICTS)} attacks repelled; "
+              f"{'; '.join(bits)}. This is NOT a clean pass.")
         return 2
     print(f"BLINDING HOLDS against all {len(VERDICTS)} attacks "
           f"(published data only, CPU only)")

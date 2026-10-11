@@ -257,3 +257,16 @@ verbatim beside the current one.
 **No GPU work, and no change to any measurement.** The paired packet was rebuilt
 from the same existing images with new blinded ids; no labels existed in any
 packet, so nothing was lost.
+
+### Added by the delivery-gate round (2026-10-10)
+
+| file | purpose |
+|---|---|
+| `scripts/seq/audit_packet_blinding.py` (repaired) | the delivery gate. **Bound to the published sheet row-for-row**: missing, extra, duplicate or unreadable entries and an empty comparison corpus are **REJECTED** (exit 3) with no blinding claim, where the previous version scored them 0/0 and printed a pass. Five statuses — `holds` / `BROKEN` / `UNRESOLVED` / `NOT MODELLED` / `REJECTED` — and only one is a pass. Attack 3 reports file **and** distinct-hash counts, and **grades** digest occurrences in committed text: within two lines of a checkpoint/arm/slot identifier is `BROKEN`, a bare mention is `UNRESOLVED` requiring assessment |
+| `scripts/seq/test_packet_delivery_gate.py` | **27 CPU checks, 0 failures**, synthetic fixtures only. Regressions for both demonstrated false passes (empty directory, one unrelated file), the inventory faults beside them, the copied-source control (BROKEN) and fresh-PNG control (holds), a digest→arm association (BROKEN), a bare digest mention (UNRESOLVED), duplicate delivered content (UNRESOLVED), and `export_image`'s pixel/byte/EXIF behaviour including refusal to trust an existing destination |
+| `scripts/seq/build_paired_annotation_packet.py` (hardened) | a **missing source image is fatal** instead of silently producing no file; an **existing destination is re-exported and re-verified** rather than skipped; the byte guard now covers the **stated published corpus — 6,880 digests** from the committed archives plus the 180 selected originals — and aborts on any collision, duplicate exported digest, or count mismatch. Rebuilt with the stored secret: the published sheet is byte-identical, so **item ids are unchanged** |
+| `results/audit_v1/annotation_packet_paired180/BLINDING_AUDIT.md`, `blinding_audit.log` | 3 attacks × 6 cases, with the threat model stated. The paired packet holds; the two false passes now REJECT; the **pilot 236-item packet is BROKEN on 2 of 236 items**, whose digests sit beside `sha256_m0_direct` in `results/seq17/calibration/reload_check.json`, naming **M0** — one of its six blinded checkpoints. Found by the graded sweep, assessed by hand, now matched automatically. Preserved as delivered |
+| `docs/research/NEXT_SCREEN_PROPOSAL.md` (revision 4) | request-1 reuse made **conditional** on qualification against the new frozen sets, with checkpoint ownership corrected to **per method**; `LOW-PARENT` separated from causal prior damage, which now needs a paired `M0`→parent contrast with uncertainty; **cumulative** preservation against `M0` added alongside stagewise; native success defined over each method's own sequences; and the decision rules **ordered** so a material interaction resolves before any main-effect reading |
+
+**No artifact was deleted this round**, no measurement changed, and the 41/0 and
+59/0 suites were not re-run — `diag_analysis.py` is byte-identical.

@@ -29,7 +29,8 @@ because it does not hold the tuple fixed.
 | realised literal/paraphrase split | **not forced** — reported per cell in `packet_manifest.json` (4–6 literal of 10) |
 | labels | **empty**, asserted before the build completes |
 | key | **outside** the packet, at `<data root>/annotation_paired_180/KEY_DO_NOT_OPEN_WHILE_ANNOTATING.csv` |
-| image files | **re-encoded**, not copied: lossless PNG from the decoded pixels, no EXIF/JFIF/PNG-text, **180/180 pixel-verified** against the source, **0/180** hashing to any published digest |
+| image files | **re-encoded**, not copied: lossless PNG from the decoded pixels, no EXIF/JFIF/PNG-text, **180/180 pixel-verified** against the source, **0/180** hashing to any of **6,880** published digests, 180 distinct hashes, 0 occurrences across 246 committed text files |
+| delivery gate | bound to this sheet row-for-row: missing, extra, duplicate or unreadable entries are **REJECTED**, not scored. 27 CPU regressions, 0 failures |
 
 ## Detector independence is structural, not just declared
 
@@ -86,6 +87,17 @@ is the **assignment** of arm and training seed to a row. Knowing membership, a
 reader still faces a 1-in-6 guess per row within that row's visible category.
 Passing the stored secret back via `--salt` reproduces the packet exactly.
 
+> **The gate used to certify deliveries it never saw.** Handed this sheet with an
+> empty image directory, or with one unrelated PNG, it printed "BLINDING HOLDS"
+> and exited 0. It is now bound to the sheet and **REJECTS** an inventory that
+> does not match row-for-row, with a dedicated status that makes no blinding
+> claim either way. Both false passes are regressions.
+>
+> **The pilot 236-item packet is BROKEN on 2 of 236 items** — their digests sit
+> beside `sha256_m0_direct` in a committed calibration record, naming **M0**,
+> one of that packet's six blinded checkpoints. Found by the graded text sweep,
+> assessed by hand, now matched automatically. Preserved as delivered.
+>
 > **The 228-item packet is BROKEN on two channels, and preserved anyway.**
 > Attack 1 regenerated **228/228** of its ids using its published salt
 > `AMENDMENT-01`, reproducibly from **only the files committed at `7e01fbd`**;

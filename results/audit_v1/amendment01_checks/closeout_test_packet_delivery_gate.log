@@ -1,0 +1,42 @@
+
+export_image: pixels preserved, bytes changed, metadata dropped
+  ok    decoded pixels are identical
+  ok    the byte stream changed
+  ok    no EXIF survives
+  ok    the export reports its own verification
+  ok    an existing destination is overwritten, not trusted
+
+the two demonstrated FALSE PASSES are now rejected
+  ok    an EMPTY image directory is REJECTED, not passed
+  ok    and the refusal says why
+  ok    ONE UNRELATED file is REJECTED, not passed
+  ok    the extra unreferenced file is named as a fault
+
+other inventory faults are rejected too
+  ok    a MISSING referenced file is REJECTED
+  ok    an EXTRA unreferenced file is REJECTED
+  ok    a DUPLICATE reference is REJECTED
+  ok    an UNREADABLE referenced file is REJECTED
+  ok    an EMPTY comparison corpus is REJECTED, not scored as 0 matches
+
+controls: the digest attack still fires when it should
+  ok    COPIED SOURCE bytes are BROKEN
+  ok    and the count is reported as resolving to a unique slot
+  ok    no item-to-slot mapping is printed
+  ok    FRESH PNGs from the same sources hold
+  ok    file and distinct-hash counts are both reported
+  ok    the scope limit is stated, not a universal claim
+
+the committed text corpus is operational in the verdict
+  ok    a digest-to-ARM association in a committed file is BROKEN
+  ok    the association is named as the reason
+  ok    a BARE digest mention is UNRESOLVED, not BROKEN and not a pass
+  ok    it is reported as requiring assessment
+  ok    and it is explicitly NOT called proven de-blinding
+
+duplicate delivered content is flagged
+  ok    two items with identical bytes are UNRESOLVED
+  ok    the distinct-hash count differs from the file count
+
+27 passed, 0 failed
+ALL DELIVERY-GATE CHECKS PASSED (CPU only, synthetic fixtures)

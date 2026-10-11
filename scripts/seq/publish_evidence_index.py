@@ -56,6 +56,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{C}/CLOSEOUT_SOURCE_HASHES.json",
         f"{C}/closeout_test_diag_analysis.log",
         f"{C}/closeout_test_diag_test_conditions.log",
+        f"{C}/closeout_test_packet_delivery_gate.log",
     ]),
     ("Prescribed paired audit — key-free records only", [
         f"{P}/README.md",
@@ -80,6 +81,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         "scripts/seq/build_paired_annotation_packet.py",
         "scripts/seq/build_amendment01_evidence.py",
         "scripts/seq/audit_packet_blinding.py",
+        "scripts/seq/test_packet_delivery_gate.py",
         "scripts/seq/publish_evidence_index.py",
     ]),
 ]

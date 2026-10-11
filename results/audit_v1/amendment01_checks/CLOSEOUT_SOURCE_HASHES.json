@@ -19,22 +19,30 @@
     },
     "audit_packet_blinding.py": {
       "log": "../annotation_packet_paired180/blinding_audit.log",
-      "result": "3 attacks x 5 cases. paired 180 REPAIRED: holds against all 3. paired 180 superseded build: BROKEN on delivered image bytes (180/180). supplementary 228: BROKEN on identifier (228/228) and on delivered image bytes (228/228). pilot 236: 2 of 3 repelled, 1 NOT MODELLED. supplementary 228 from only the records committed at 7e01fbd: BROKEN on identifier, so that exposure predates the closeout.",
-      "log_sha256": "081b9e360d80550efa1dc3930379443c20e0f90d2d6f381a889a293ab55c29e5",
+      "result": "3 attacks x 6 cases. paired 180 REPAIRED: holds against all 3 (exit 0). The two previously demonstrated false passes (empty image directory; one unrelated file) now REJECT with exit 3. supplementary 228: BROKEN on identifier and on delivered image bytes. pilot 236: BROKEN on delivered image bytes for 2 of 236 items (digests beside sha256_m0_direct in a committed calibration record, naming M0 - one of its six blinded checkpoints); identifier UNRESOLVED. 228 from only the records committed at 7e01fbd: BROKEN on identifier, so that exposure predates the closeout.",
+      "log_sha256": "812b0a76a1fb60c8b0668a80cb6e808a9006b78ac65afc88f14b750eeebafcd5",
       "threat_model": "models ONE adversary: a packet holder who also has the repository. A holder of the private source images can still identify every item by pixel comparison; no re-encoding prevents that and none is claimed."
+    },
+    "test_packet_delivery_gate.py": {
+      "log": "closeout_test_packet_delivery_gate.log",
+      "result": "27 passed, 0 failed",
+      "passed": 27,
+      "failed": 0,
+      "log_sha256": "5122afdc1ec7cc79875e59323c7b5ea360cdf166136e1c361193e981859c50aa"
     }
   },
   "total": {
-    "passed": 100,
+    "passed": 127,
     "failed": 0
   },
   "sha256": {
     "scripts/seq/diag_analysis.py": "90059e03c132f33a8cc29856bff83671f8e87d2ffd573258651132bb6f0296e0",
     "scripts/seq/test_diag_analysis.py": "069c36782d621a5aeea2a57e2728376fc474f21bc14a94d7a126fc4f766b6851",
     "scripts/seq/test_diag_test_conditions.py": "6a532df3b861509bea32c1c025583b2344b84d2f07b042426c7a3515fd3c6aea",
-    "scripts/seq/build_paired_annotation_packet.py": "52184bf18e4df96fd0e85aff7ffc40ce205d8b7f9146398f784d6de0e1b47b7b",
+    "scripts/seq/build_paired_annotation_packet.py": "1e8f5d88b377d0d78f3268ad717e80c41d9eecfd5a863fc7b108689fbe5601dc",
     "scripts/seq/build_amendment01_evidence.py": "62fbe6078b1cef76592d4f572f6e0191c2740279b0a6283486ba71c620f7e1fc",
-    "scripts/seq/audit_packet_blinding.py": "62169d1540e83cc857f53bf9d3ae37880da2630cffd116818db8325a9df06de5",
+    "scripts/seq/audit_packet_blinding.py": "7bd20b949c66215b96033bfb8368b443562f636dccffbcfd1d05f440c2d0ff0d",
+    "scripts/seq/test_packet_delivery_gate.py": "38ec2f2a5a7863b4e8fed7088bb28cceee2881c2ab1eb6c28101dc591de59d17",
     "scripts/seq/publish_evidence_index.py": "a1c0c8390afea828bf388dcf65bc5a1c4e8e084cdc6f44d82562734e42ffd548"
   },
   "also_verified": {
@@ -43,8 +51,10 @@
     "paired packet": "180 items, 60 tuples x 3 arms, 18 cells of 10, 180 distinct images, 0 non-empty label cells, key and overlap report outside the packet",
     "paired packet blinding": "attacked, not asserted. The FIRST build was de-blinded 180/180 via the published sampling seed and row order despite a secret salt; fixed by shuffling under a separate secret-seeded RNG. The sampling seed stays public so the draw remains auditable. No secret value, key-derived field or label appears anywhere in the repository (grepped).",
     "label state": "0 of 180, 0 of 228 and 0 of 236 label cells are filled across the three packets; no human annotation has been performed anywhere in this project, and no packet has been distributed off this host",
-    "paired packet image export": "180/180 annotation copies re-encoded from decoded pixels to lossless PNG; pixels compared element-by-element against the source twice (in the build and again independently): 180/180 identical. 0 files carry EXIF or stray metadata. 0/180 hash to any of 6,880 slot-resolving published digests or appear in any of 243 committed text files. 0 frozen-test image blobs exist in the full git object history.",
-    "known packet overlap": "13 of the paired packet's 180 images also appear in the 228-item packet, whose originals are hashable, so those 13 are locatable by pixel comparison (7% of the packet). None carries a label. The paired audit should go to an annotator who received neither earlier packet."
+    "paired packet image export": "180/180 re-encoded from decoded pixels to lossless PNG; pixels compared element-by-element twice: 180/180 identical. 0 files carry EXIF or stray metadata. 0/180 hash to a published digest. 0 frozen-test image blobs in the git object history. REPORTED EVIDENCE of this project, not an independent party's verification.",
+    "known packet overlap": "13 of the paired packet's 180 images also appear in the 228-item packet, whose originals are hashable, so those 13 are locatable by pixel comparison (7% of the packet). None carries a label. The paired audit should go to an annotator who received neither earlier packet.",
+    "delivery gate binding": "the gate is bound to the published sheet row-for-row; missing, extra, duplicate or unreadable entries and an empty comparison corpus are REJECTED (exit 3) with no blinding claim. File count and distinct-hash count are reported separately. Digest occurrences in committed text are GRADED: within two lines of a checkpoint/arm/slot identifier is BROKEN, a bare mention is UNRESOLVED requiring assessment.",
+    "builder hardening": "a missing source image is fatal; an existing destination is re-exported and re-verified rather than trusted; the byte guard covers 6,880 published digests from the committed archives plus the 180 selected originals, and aborts on any collision, duplicate exported digest or count mismatch. Rebuilt with the stored secret: the published sheet is byte-identical, so item ids are unchanged."
   },
   "logs_cover": {
     "closeout_test_diag_analysis.log": [
@@ -64,6 +74,10 @@
       "scripts/seq/build_amendment01_evidence.py",
       "scripts/seq/publish_evidence_index.py"
     ],
-    "_note": "build_paired_annotation_packet.py is now covered indirectly: its output is what blinding_audit.log attacks, and its own build-time assertions (pixel equality, metadata, published-digest collision, empty labels) abort the build on failure. The remaining two builders are verified by their outputs - the evidence manifest's 15 payloads re-checked independently and the index's rows re-hashed against the pushed blobs - not by a unit-test log."
+    "_note": "build_paired_annotation_packet.py is now covered by the delivery-gate regressions (its export_image path directly, its inventory indirectly) plus its own build-time assertions. The remaining two builders are verified by their outputs - the evidence manifest's 15 payloads re-checked independently and the index's rows re-hashed against the pushed blobs - not by a unit-test log. The 41/0 and 59/0 suites are unchanged and were not re-run this round; diag_analysis.py is byte-identical.",
+    "closeout_test_packet_delivery_gate.log": [
+      "scripts/seq/audit_packet_blinding.py",
+      "scripts/seq/build_paired_annotation_packet.py"
+    ]
   }
 }

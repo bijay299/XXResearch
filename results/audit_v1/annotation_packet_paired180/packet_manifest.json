@@ -20,7 +20,7 @@
     "arithmetic": "2 seeds x 3 categories x 10 tuples x 3 arms = 180",
     "why_paired": "the same prompt and generation seed is judged under all three arms, so a human can see whether a detector verdict change BETWEEN arms is a real change in the image. An independently stratified sample cannot answer that question, because it does not hold the tuple fixed."
   },
-  "generated_utc": "2026-10-11T01:11:55.711930+00:00",
+  "generated_utc": "2026-10-11T03:07:26.257268+00:00",
   "eval_root": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/eval_test",
   "slots": {
     "17": {
@@ -418,7 +418,7 @@
     "salt_is_secret": "The salt is NOT published. Image paths are deterministic, so a published salt would make the entire id space enumerable and the blind recoverable by anyone who can read this manifest. Only the salt's digest appears here.",
     "salt_sha256": "f752aa0074dbc62d253356a4b31bd33645b416b27e8f343c05069b5fa622ab9d",
     "salt_location": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/BLINDING_SALT_SECRET.txt",
-    "salt_source": "freshly generated and stored at /data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/BLINDING_SALT_SECRET.txt",
+    "salt_source": "read from the stored secret at /data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/BLINDING_SALT_SECRET.txt",
     "key_location": "/data/bijaypandey/cuig_pilot/seq_pilot/diag_v2_early_grid/annotation_paired_180/KEY_DO_NOT_OPEN_WHILE_ANNOTATING.csv",
     "key_inside_packet": false,
     "probe": "the packet's text files were scanned for arm, seed and detector strings; no match, or the build aborts",
@@ -430,6 +430,7 @@
         "JPEG"
       ],
       "no_exported_file_matches_a_published_digest": true,
+      "byte_guard_corpus": "6880 published image digests from the committed evidence archives under results/audit_v1, plus the 180 selected originals; the build aborts on any collision or any duplicate exported digest",
       "closed_against": "a packet holder who also has the repository: no exported byte stream equals any published image digest, and no frozen-test pixels are committed anywhere",
       "NOT_closed_against": "a holder of the PRIVATE source images under the data root. The packet is made of those images, so pixel-for-pixel comparison still identifies every item. Re-encoding cannot close that and does not claim to; it is mitigated by access control alone."
     },

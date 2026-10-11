@@ -103,6 +103,7 @@ import json
 import random
 import secrets
 import shutil
+import sys
 from pathlib import Path
 
 CATEGORIES = ("cat", "dog", "bird")
@@ -262,6 +263,9 @@ def main() -> int:
                     help="space-separated label_sheet.csv paths of previously "
                          "delivered packets, for the overlap report")
     ap.add_argument("--copy_images", action="store_true", default=True)
+    ap.add_argument("--evidence", default="results/audit_v1",
+                    help="where the committed *_slots.tar.gz archives live; the "
+                         "byte guard is checked against every digest in them")
     a = ap.parse_args()
 
     eval_root = Path(a.eval_root)
@@ -396,7 +400,7 @@ def main() -> int:
     sheet_rows, key_rows, overlap_rows = [], [], []
     reencoded = pixel_verified = 0
     src_formats: set = set()
-    exported_digests: set = set()
+    exported_digests: dict = {}
     for r in items:
         blind = "item_" + hashlib.sha256(
             f"{salt}|{r['image_path']}".encode()).hexdigest()[:12]
@@ -404,12 +408,20 @@ def main() -> int:
         # NOT the source extension and NOT the source bytes: see export_image.
         ext = ".png"
         dst = packet / "images" / f"{blind}{ext}"
-        if a.copy_images and src.is_file() and not dst.exists():
+        if a.copy_images:
+            if not src.is_file():
+                # Previously this branch silently produced no file, leaving the
+                # sheet referencing something that does not exist.
+                raise SystemExit(f"FATAL: source image absent: {src}")
+            # An existing destination is NOT trusted: it may predate a change
+            # to the export, or have been written by hand. Always re-export and
+            # re-verify rather than skip.
             checks = export_image(src, dst)
             reencoded += 1
             pixel_verified += int(checks["pixels_identical"])
             src_formats.add(checks["source_format"])
-        exported_digests.add(sha256_file(dst) if dst.is_file() else "")
+            exported_digests[sha256_file(dst)] = exported_digests.get(
+                sha256_file(dst), 0) + 1
         sheet_rows.append({
             "item_id": blind,
             "image": f"images/{blind}{ext}",
@@ -500,18 +512,43 @@ def main() -> int:
     labelled = sum(1 for r in sheet_rows if r["answer_yes_no_unsure"])
     if labelled:
         raise SystemExit(f"FATAL: {labelled} label cells are not empty")
-    # The source digests are PUBLISHED and map to a slot. No exported byte
-    # stream may equal one of them; checked here so the build cannot ship the
-    # channel again.
-    source_digests = {r["image_sha256"] for r in items if r.get("image_sha256")}
-    collide = exported_digests & source_digests
+    # No exported byte stream may equal a PUBLISHED image digest. Checking only
+    # the 180 selected originals was too narrow: the published corpus is every
+    # digest in the committed evidence archives, over all slots and both
+    # evaluation sets. The final gate (audit_packet_blinding.py) checks the same
+    # corpus plus the committed text files.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    try:
+        from audit_packet_blinding import published_image_digests
+        corpus = published_image_digests(Path(a.evidence))
+    except Exception as e:                      # pragma: no cover - fail loud
+        raise SystemExit(f"FATAL: cannot load the published digest corpus from "
+                         f"{a.evidence}: {e}")
+    selected = {r["image_sha256"] for r in items if r.get("image_sha256")}
+    if not corpus:
+        raise SystemExit(f"FATAL: the published digest corpus under "
+                         f"{a.evidence} is empty; the byte guard would be "
+                         f"vacuous")
+    collide = {h for h in exported_digests if h in corpus or h in selected}
     if collide:
         raise SystemExit(f"FATAL: {len(collide)} exported file(s) hash to a "
-                         f"PUBLISHED source digest; the arm is recoverable by "
+                         f"PUBLISHED image digest; the arm is recoverable by "
                          f"hashing the packet")
-    if a.copy_images and reencoded and pixel_verified != reencoded:
-        raise SystemExit(f"FATAL: pixels verified for only {pixel_verified} of "
-                         f"{reencoded} exported images")
+    dupes = {h: n for h, n in exported_digests.items() if n > 1}
+    if dupes:
+        raise SystemExit(f"FATAL: {len(dupes)} exported digest(s) are shared by "
+                         f"more than one item; those items are linkable")
+    if a.copy_images:
+        if reencoded != len(items):
+            raise SystemExit(f"FATAL: exported {reencoded} images for "
+                             f"{len(items)} items")
+        if pixel_verified != reencoded:
+            raise SystemExit(f"FATAL: pixels verified for only "
+                             f"{pixel_verified} of {reencoded} exported images")
+        on_disk = sum(1 for f in (packet / "images").iterdir() if f.is_file())
+        if on_disk != len(items):
+            raise SystemExit(f"FATAL: {on_disk} files in the image directory "
+                             f"for {len(items)} items")
 
     meta = {
         "_what_this_is": (
@@ -602,6 +639,11 @@ def main() -> int:
                     f"a mismatch aborts the build"),
                 "source_formats": sorted(src_formats),
                 "no_exported_file_matches_a_published_digest": True,
+                "byte_guard_corpus": (
+                    f"{len(corpus)} published image digests from the committed "
+                    f"evidence archives under {a.evidence}, plus the "
+                    f"{len(selected)} selected originals; the build aborts on "
+                    f"any collision or any duplicate exported digest"),
                 "closed_against": (
                     "a packet holder who also has the repository: no exported "
                     "byte stream equals any published image digest, and no "
