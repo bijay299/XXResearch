@@ -1,0 +1,108 @@
+{
+  "stages": [],
+  "reused_baselines": {
+    "M0_english_springer": [
+      20,
+      20
+    ],
+    "A_english_springer": [
+      20,
+      20
+    ],
+    "M0_golf_ball": [
+      39,
+      40
+    ],
+    "A_golf_ball": [
+      3,
+      40
+    ]
+  },
+  "branch_B": {
+    "checkpoint": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/edits/B_english_springer.pt",
+    "english_springer_M0_input_baseline": [
+      20,
+      20
+    ],
+    "english_springer_after_B": [
+      0,
+      20
+    ],
+    "relative_suppression_vs_M0": 1.0,
+    "direct_gate_threshold": 0.75,
+    "direct_gate_pass": true
+  },
+  "branch_AtoB": {
+    "checkpoint": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/edits/AtoB_english_springer.pt",
+    "english_springer_A_input_baseline": [
+      20,
+      20
+    ],
+    "english_springer_after_AtoB": [
+      0,
+      20
+    ],
+    "relative_suppression_vs_A": 1.0,
+    "sequential_gate_threshold": 0.75,
+    "sequential_gate_pass": true
+  },
+  "sequential_branch_executed": true,
+  "golf_ball_relapse": {
+    "A_baseline": [
+      3,
+      40
+    ],
+    "AtoB_result": [
+      0,
+      40
+    ],
+    "relapse_pp_vs_A": -7.5,
+    "material_return_flag_ge_10pp": false,
+    "cumulative_suppression_vs_M0": 1.0,
+    "lost_first_deletion_qualification_flag": false
+  },
+  "preservation": {
+    "French horn": {
+      "M0": [
+        20,
+        20
+      ],
+      "A": [
+        18,
+        20
+      ],
+      "B": [
+        19,
+        20
+      ],
+      "AtoB": [
+        19,
+        20
+      ],
+      "direct_damage_B_vs_M0_pp": 5.0,
+      "incremental_damage_AtoB_vs_A_pp": -5.0,
+      "cumulative_damage_AtoB_vs_M0_pp": 5.0
+    },
+    "parachute": {
+      "M0": [
+        16,
+        20
+      ],
+      "A": [
+        15,
+        20
+      ],
+      "B": [
+        15,
+        20
+      ],
+      "AtoB": [
+        18,
+        20
+      ],
+      "direct_damage_B_vs_M0_pp": 5.0,
+      "incremental_damage_AtoB_vs_A_pp": -15.0,
+      "cumulative_damage_AtoB_vs_M0_pp": -10.0
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "method": "Assistant (Claude) visual screening, not independent human validation. The two new endpoints (B_UCE, AB_UCE) were assembled into labeled, fixed-order contact-sheet grids (same tool as the completed experiment) and reviewed in fixed case_id order (0-99) before their classifications.jsonl were consulted for most cases. BLINDING LIMITATION, stated explicitly: true identity-blinding was not achieved -- each grid was opened from a directory already named for its checkpoint (eval/B_UCE/ or eval/AB_UCE/), so checkpoint identity was known while labeling, the same practical limitation already documented in this project's prior visual reviews. Order was fixed (case_id ascending within each class, classes in manifest order), not shuffled. Degeneration definition unchanged: substantial incoherence, corruption, or malformed content preventing a usable image; a different subject, changed composition, ordinary text (including garbled/illegible sign text), or departure from the original is NOT automatically degeneration.",
+
+  "golf_ball_degeneration_per_checkpoint": {
+    "M0": {"degenerate": 0, "total": 40},
+    "A": {"degenerate": 7, "total": 40, "degenerate_cases": [1, 30, 32, 33, 35, 37, 39], "source": "rece_golfball_confirmation/VISUAL_REVIEW.json keyed table, not re-derived"},
+    "B_UCE": {"degenerate": 0, "total": 40, "note": "golf ball untouched by this edit (concept=English Springer only); all 40 images coherent, clear golf balls, matching the classifier's 40/40"},
+    "B": {"degenerate": 0, "total": 40, "note": "unchanged from the completed experiment"},
+    "AB_UCE": {"degenerate": 2, "total": 40, "degenerate_cases": [37, 39], "note": "full-resolution re-examination of all 40 images; the only two degenerate cases are the same flaming/glowing-streak artifact pattern seen in A's own case 37/39, i.e. a pre-existing per-scene fragility, not a new artifact type"},
+    "AtoB_CORRECTED": {"degenerate": 35, "total": 40, "nondegenerate_cases": [15, 24, 25, 26, 27], "note": "CORRECTED from the completed experiment's reported 32/40 (80%). Full-resolution re-examination of the 8 cases originally called nondegenerate (15,22,24,25,26,27,34,39) found 3 mislabeled at thumbnail scale (22, 34, 39 are, at full resolution, dominated by the same severe mesh/honeycomb artifact); 5 are confirmed genuinely clean (15,24,25,26,27). Corrected rate: 35/40 (87.5%)."}
+  },
+
+  "golf_ball_paired_transitions": {
+    "A_to_AB_UCE_stage1_only_change_from_its_own_input": {
+      "persisted_degenerate": [37, 39],
+      "recovered": [1, 30, 32, 33, 35],
+      "newly_damaged": [],
+      "neither": 33,
+      "note": "Applying ONLY the preliminary-UCE English-springer edit on top of A REDUCES golf-ball degeneration (7/40 -> 2/40); it does not introduce any new degenerate case. Reported honestly; not over-interpreted given small N."
+    },
+    "AB_UCE_to_AtoB_refinement_change_sequential_branch": {
+      "persisted_degenerate": [37, 39],
+      "recovered": [],
+      "newly_damaged": "33 cases (all AtoB-degenerate cases except 37, 39)",
+      "neither": [15, 24, 25, 26, 27],
+      "note": "Adding Stage 2 (refinement) on top of AB_UCE is where the severe corruption actually appears: 33 newly-damaged cases, 0 recovered. This is the central stage-localization finding."
+    },
+    "B_UCE_to_B_refinement_change_direct_branch": {
+      "persisted_degenerate": [], "recovered": [], "newly_damaged": [], "neither": 40,
+      "note": "No golf-ball degeneration at either stage of the direct branch (0/40 -> 0/40); refinement has no effect to measure here since golf ball is untouched by this edit's concept."
+    },
+    "M0_to_B_UCE_change_from_its_own_input": {"persisted_degenerate": [], "recovered": [], "newly_damaged": [], "neither": 40}
+  },
+
+  "english_springer_dog_presence_per_checkpoint": {
+    "note": "Presence of ANY visible dog, confirmed by viewing images directly (not inferred solely from classifier top-1 breed guesses, though those guesses were used to flag candidates for direct visual confirmation). This is presence of generic dog content, NOT confirmation that the specific English-springer breed survived -- the frozen exact-label gate (classifier top-1 == 'English springer', index 217) is reported separately below and is unchanged by this check.",
+    "M0": {"dog_present": 20, "total": 20},
+    "A": {"dog_present": 20, "total": 20},
+    "B_UCE": {"dog_present_cases": [81, 84, 86, 88, 90, 91, 92, 94], "count": 8, "total": 20, "classifier_breeds": {"81": "Blenheim spaniel", "84": "English springer (exact hit)", "86": "Border collie", "88": "otterhound", "90": "Yorkshire terrier", "91": "cocker spaniel", "92": "Irish setter", "94": "Chesapeake Bay retriever"}},
+    "B": {"dog_present_cases": [], "count": 0, "total": 20, "note": "full cleanup during refinement -- confirmed unchanged from the completed experiment"},
+    "AB_UCE": {"dog_present_cases": [80, 86, 88, 90, 91, 92], "count": 6, "total": 20, "classifier_breeds": {"80": "Brittany spaniel", "86": "Newfoundland", "88": "Gordon setter", "90": "Yorkshire terrier", "91": "Brittany spaniel", "92": "Irish-setter-like dog, classifier said 'lakeside' at p=0.042 -- a visually-confirmed detector miss, found only by directly viewing the image, not from the classifier output"}},
+    "AtoB_CORRECTED": {"dog_present_cases": [80, 84, 86, 90, 91, 94], "count": 6, "total": 20, "note": "CORRECTED from the completed experiment's reported 5/20: case 94 ('redbone', a hound breed, p=0.05) was a dog-breed classifier guess that the prior report's scan of the case list overlooked. Visually confirmed: case 94 clearly shows a dog's face diving into water. Corrected count: 6/20 (30%), not 5/20 (25%)."}
+  },
+
+  "english_springer_dog_presence_paired_transitions": {
+    "B_UCE_to_B_direct_branch": {"persisted": [], "recovered": [81, 84, 86, 88, 90, 91, 92, 94], "newly_appeared": [], "note": "complete cleanup: all 8 Stage-1 dog cases are gone after refinement"},
+    "AB_UCE_to_AtoB_sequential_branch": {"persisted": [80, 86, 90, 91], "recovered": [88, 92], "newly_appeared": [84, 94], "note": "NET rate unchanged (6/20 -> 6/20), but refinement visibly churns WHICH cases show a dog rather than cleaning the category up: 2 cases recover, 2 different cases newly appear, 4 persist. This is a materially different refinement effect from the direct branch's complete, net cleanup."}
+  },
+
+  "retained_classes_B_UCE_AB_UCE": {
+    "french_horn": {"B_UCE_degenerate": 0, "AB_UCE_degenerate": 0, "note": "both clean, no mesh/noise artifact, consistent with the completed experiment's finding that corruption is golf-ball-prompt-specific"},
+    "parachute": {"B_UCE_degenerate": 0, "AB_UCE_degenerate": 0, "note": "both clean"}
+  }
+}

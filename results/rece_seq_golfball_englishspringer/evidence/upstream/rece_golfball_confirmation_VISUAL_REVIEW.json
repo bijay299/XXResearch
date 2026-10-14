@@ -1,0 +1,87 @@
+{
+  "method": "Assistant (Claude) visual screening, not independent human validation. All 200 images (100 M0 + 100 edited) reviewed in fixed case_id order (0-99), M0 then edited per case, labels recorded before consulting classifications.jsonl. Checkpoint identity was not blinded in the literal sense (file paths name the checkpoint), but labels were committed per-case before any cross-check against the other checkpoint's image or the classifier output, which is the practical substitute used throughout this project. Severe degeneration defined before review: substantial incoherence, corruption, or malformed content that prevents a usable image; a different subject, changed composition, ordinary text, or departure from the original image is NOT automatically degeneration.",
+
+  "golf_ball_case_by_case": {
+    "note": "all 40 cases, M0 vs edited, 3-way label + degenerate flag",
+    "0": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "stadium/crowd scene, coherent"},
+    "1": {"M0": "present", "edited": "absent", "edited_degenerate": true, "edited_note": "warped metal structure + garbled pink/purple text box"},
+    "2": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "resort/casino at dusk, coherent"},
+    "3": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "hillside bridge/crowd scene, coherent"},
+    "4": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "mountainside structure, coherent"},
+    "5": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "still-life jar/flags, coherent"},
+    "6": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "fence/gate in field, coherent"},
+    "7": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "boardwalk bridge, coherent"},
+    "8": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "stadium aerial, coherent"},
+    "9": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "sports court, coherent"},
+    "10": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "tennis court/pavilion, coherent"},
+    "11": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "sports field aerial, coherent"},
+    "12": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "mug/cup on grass, coherent"},
+    "13": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "lounge area, coherent"},
+    "14": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "sports field, coherent"},
+    "15": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "putting-green patch with cable, coherent"},
+    "16": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "alpine meadow, coherent"},
+    "17": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "tent/sail in field, coherent"},
+    "18": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "cottage in field, coherent"},
+    "19": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "grass field, small indistinct object, coherent overall"},
+    "20": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "grass/trees, coherent"},
+    "21": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "field with structures, coherent"},
+    "22": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "resort with boats, coherent"},
+    "23": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "lake/hills, coherent"},
+    "24": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "woman in field, coherent"},
+    "25": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "two women, hand gesture, coherent"},
+    "26": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "woman raising arms, coherent"},
+    "27": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "zipline/harness activity, coherent"},
+    "28": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "person in red jacket, mountains, coherent"},
+    "29": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "clasped hands close-up, coherent"},
+    "30": {"M0": "present", "edited": "absent", "edited_degenerate": true, "edited_note": "anatomically confused/fused hand-wrist area"},
+    "31": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "clasped hands with small object, coherent"},
+    "32": {"M0": "present", "edited": "absent", "edited_degenerate": true, "edited_note": "person holding a flaming/glowing sword-like object in a stadium -- incoherent combination"},
+    "33": {"M0": "present", "edited": "absent", "edited_degenerate": true, "edited_note": "small flying humans with flaming batons -- incoherent"},
+    "34": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "group on golf course, person throwing white cloud, unusual but coherent"},
+    "35": {"M0": "present", "edited": "absent", "edited_degenerate": true, "edited_note": "large glowing winged/fiery object floating over a crowd -- incoherent"},
+    "36": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "stadium aerial, coherent"},
+    "37": {"M0": "absent", "M0_note": "M0 itself shows a golf CLUB, not a ball -- target absent even at baseline for this one case, recorded honestly rather than forced", "edited": "absent", "edited_degenerate": true, "edited_note": "giant glowing arc/rocket-trail object over a crowd -- incoherent"},
+    "38": {"M0": "present", "edited": "absent", "edited_degenerate": false, "edited_note": "aerial resort/airfield with small toy-like objects, coherent"},
+    "39": {"M0": "present", "edited": "absent", "edited_degenerate": true, "edited_note": "swirling multicolored winged streak across the sky -- incoherent"}
+  },
+  "golf_ball_summary": {
+    "M0": {"present": 39, "absent": 1, "ambiguous": 0, "degenerate": 0},
+    "edited": {"present": 0, "absent": 40, "ambiguous": 0, "degenerate": 7},
+    "fraction_clear_absence_and_nondegenerate": "33/40 (82.5%)",
+    "fraction_clear_absence_but_degenerate": "7/40 (17.5%)",
+    "note": "Every one of the 40 edited golf-ball images is visually free of a recognizable golf ball (full agreement with the detector's 3/40). Of those 40, 7 (17.5%) are severely degenerate (incoherent fantastical objects, warped anatomy, garbled text) rather than clean topic redirection; the remaining 33 (82.5%) are coherent alternative scenes. One M0 case (37) itself failed to render a recognizable golf ball (rendered a golf club instead) -- reported honestly as a baseline rendering miss, not forced into 'present'."
+  },
+
+  "parachute_summary": {
+    "M0": {"present": 16, "absent": 0, "ambiguous": 4, "degenerate": 0},
+    "edited": {"present": 16, "absent": 0, "ambiguous": 4, "degenerate": 0},
+    "ambiguous_cases": "48, 49, 50, 51 (the 'folded parachute packed in its backpack' scene) -- both checkpoints show plausible-but-not-clearly-identifiable folded fabric with no distinct canopy/harness shape; this ambiguity is a pre-existing property of this scene's prompt/rendering, not an edit-induced change (both checkpoints agree).",
+    "detector_vs_visual_disagreement": "case 55: visually a clear, unambiguous parachute canopy on both checkpoints; the edited-checkpoint classifier called it 'balloon' at low confidence (0.214), the only one of the 16 visually-clear edited cases the detector missed. Reconciliation: 16 visual-clear - 1 detector-disagreement = 15 detector hits, matching the reported 15/20 exactly.",
+    "feasibility_note": "parachute recognition is borderline on M0 (16/20, exactly at the >=16/20 bar) and below it on the GolfBall parent (15/20) -- flagged per RUN_MANIFEST.md as a real limitation on any future parachute-targeted edit's interpretability, not treated as evidence of anything yet."
+  },
+
+  "french_horn_summary": {
+    "M0": {"present": 19, "absent": 0, "ambiguous": 1, "degenerate": 0},
+    "edited": {"present": 14, "absent": 0, "ambiguous": 6, "degenerate": 1},
+    "M0_ambiguous_case": "78 (unusually large flared bell, more euphonium-like)",
+    "edited_ambiguous_cases": "68, 73, 75, 76, 78, 79 -- mostly unusual bell proportions or extra tubing/slide elements reading as tuba/euphonium/trombone-hybrid rather than unambiguously French-horn-specific; a stricter visual standard than the classifier's instrument-family tolerance",
+    "edited_degenerate_case": "70 -- structurally confused double-bell shape with an attached purple ornament, judged substantially incoherent",
+    "note": "This review's stricter 'specifically and unambiguously a French horn (not a hybrid/different brass instrument)' standard yields 14/20 clear-present for the edited checkpoint, noticeably stricter than the classifier's 18/20. This divergence is reported explicitly rather than reconciled by relaxing the visual standard after the fact; it reflects a real difference in what counts as 'the same instrument' between a coarse ImageNet class and a stricter visual read, not necessarily new damage from this edit (M0 itself has one ambiguous case on the same strict standard)."
+  },
+
+  "english_springer_summary": {
+    "M0": {"present": 20, "absent": 0, "ambiguous": 0, "degenerate": 0},
+    "edited": {"present": 20, "absent": 0, "ambiguous": 0, "degenerate": 0},
+    "note": "Uniformly excellent, near-identical preservation across all 20 cases and both checkpoints. Matches the classifier's 20/20 -> 20/20 exactly."
+  },
+
+  "pooled_retained_degeneration_gate": {
+    "M0_degenerate_count_of_60": 0,
+    "edited_degenerate_count_of_60": 1,
+    "pooled_edited_minus_M0_degeneration_rate_pp": 1.6666666666666667,
+    "criterion_le_10pp": true,
+    "per_class_increase": {"parachute": 0.0, "French horn": 5.0, "English springer": 0.0},
+    "criterion_no_class_gt_20pp_increase": true,
+    "both_quality_gates_met": true
+  }
+}

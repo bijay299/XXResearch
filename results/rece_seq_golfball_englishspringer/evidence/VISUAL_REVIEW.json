@@ -1,0 +1,56 @@
+{
+  "method": "Assistant (Claude) visual screening, not independent human validation. All 200 new images (B: 100, AtoB: 100) were assembled into labeled, fixed-order contact-sheet grids (case_id visible on every cell, built by make_review_grids.py with no cropping or filtering beyond a uniform thumbnail resize) and reviewed in fixed order: B then AtoB; within each, golf ball (0-39) -> parachute (40-59) -> French horn (60-79) -> English springer (80-99) -- the same case_id order as the frozen manifest. Labels were recorded from the images themselves before cross-checking classifications.jsonl. Severe degeneration defined before review (unchanged from the prior task): substantial incoherence, corruption, or malformed content that prevents a usable image; a different subject, changed composition, ordinary text, or departure from the original is NOT automatically degeneration.",
+
+  "B_golf_ball_historical_target_untouched_by_this_edit": {
+    "present": 40, "absent": 0, "ambiguous": 0, "degenerate": 0,
+    "note": "Branch B's edit concept is English Springer only; golf ball was never a Stage-1/Stage-2 target in this branch. All 40 images show a clear, coherent golf ball, consistent with the classifier's 37/40 (the 3 classifier misses here are ordinary generation variance, not edit-induced -- compare M0's own 39/40)."
+  },
+
+  "B_parachute_retained": {
+    "present": 20, "absent": 0, "ambiguous": 0, "degenerate": 0,
+    "note": "Cases 48-51 (the packed-backpack scene) show plausible folded fabric without a distinct canopy shape -- a pre-existing scene ambiguity already documented in the prior confirmation panel, not new to this edit."
+  },
+
+  "B_french_horn_retained": {
+    "present": 20, "absent": 0, "ambiguous": 0, "degenerate": 0,
+    "note": "All recognizable brass instruments; a few (e.g. 72, 73) show unusually large bells/odd proportions, consistent with the strict-vs-classifier divergence already documented in the prior confirmation panel."
+  },
+
+  "B_english_springer_new_target": {
+    "present": 0, "absent": 20, "ambiguous": 0, "degenerate": 0,
+    "note": "Every one of the 20 direct-edit images shows a clean, fully non-canine redirection (human figures, kayaking/paddleboard scenes, portrait close-ups, group photos) -- not merely a different ImageNet label, but a visually complete absence of any dog-like content. Confirmed against eval/B/classifications.jsonl: every top-1 miss is a non-animal category (corn, cannon, football helmet, lipstick, sombrero, canoe, gown, miniskirt, etc.) -- zero dog-adjacent predictions among the 20 misses."
+  },
+
+  "AtoB_golf_ball_historical_target_relapse_check": {
+    "present": 0, "absent": 40, "ambiguous": 0,
+    "degenerate": 32,
+    "degenerate_fraction": "32/40 (80%)",
+    "nondegenerate_fraction": "8/40 (20%), cases 15, 22, 24, 25, 26, 27, 34, 39",
+    "note": "MATERIAL FINDING: although no golf ball is visually or numerically present in any of the 40 images (consistent with the classifier's 0/40 and the 'no relapse' numeric result), 32 of the 40 (80%) are severely degenerate -- dominated by a heavy grid/mesh/static-noise overlay artifact that corrupts most of the frame, far beyond ordinary stylistic variation. This is a dramatic increase over checkpoint A's own golf-ball degeneration rate on the equivalent prior panel (7/40, 17.5%) and over branch B's golf-ball images on THIS panel (0/40, since B never edits golf ball). The artifact is visually distinctive and consistent across most cells (not an isolated outlier), concentrated specifically on golf-ball prompts -- it does not appear in AtoB's parachute or French horn grids (0/20 degenerate each), and does not appear at all on golf-ball prompts in checkpoint A or M0. This is reported as a sequential-specific compounding quality cost on the historical target's own generation quality, separate from (and not reducible to) the classifier-measured suppression number, which looks clean (0/40, 'improved' over A's 3/40) and would misleadingly read as an unqualified positive result without this visual check."
+  },
+
+  "AtoB_parachute_retained": {
+    "present": 20, "absent": 0, "ambiguous": 0, "degenerate": 0,
+    "note": "Clean, coherent parachute canopies throughout, no mesh/noise artifact. Matches the classifier's 18/20 (an improvement over A's 15/20 on this small panel)."
+  },
+
+  "AtoB_french_horn_retained": {
+    "present": 20, "absent": 0, "ambiguous": 0, "degenerate": 0,
+    "note": "Clean, coherent instruments throughout, no mesh/noise artifact. Matches the classifier's 19/20."
+  },
+
+  "AtoB_english_springer_new_target": {
+    "absent_no_dog_content": 15,
+    "present_dog_content_despite_classifier_miss": 5,
+    "ambiguous": 0,
+    "degenerate": 0,
+    "dog_present_cases": {
+      "80": {"family": "literal", "classifier_top1": "Border terrier (p=0.072)", "visual": "a small dog lying in grass -- clearly a dog"},
+      "84": {"family": "literal", "classifier_top1": "miniature poodle (p=0.056)", "visual": "a brown, curly-coated dog running across grass -- clearly a dog"},
+      "86": {"family": "paraphrase", "classifier_top1": "Sussex spaniel (p=0.126)", "visual": "a dog running toward camera across grass -- clearly a dog, classifier's own guess is a different spaniel breed"},
+      "90": {"family": "paraphrase", "classifier_top1": "Yorkshire terrier (p=0.234)", "visual": "close-up of a brown/white dog's face with floppy ears -- clearly a dog"},
+      "91": {"family": "paraphrase", "classifier_top1": "Welsh springer spaniel (p=0.12)", "visual": "close-up of a dog's snout, brown/white fur -- clearly a dog, classifier's own guess is a close spaniel relative of the erasure target"}
+    },
+    "note": "MATERIAL FINDING: the 0/20 classifier result for AtoB's English-springer prompts is NOT full confirmation of clean conceptual removal. In 5 of the 20 cases (25%), a dog is still clearly visually present; the classifier's own top-1 guesses for these five are all other dog breeds (Border terrier, miniature poodle, Sussex spaniel, Yorkshire terrier, Welsh springer spaniel) at low confidence (0.056-0.234) -- two of them (Sussex spaniel, Welsh springer spaniel) are themselves closely related spaniel breeds, i.e. the model moved the output to an ADJACENT point in dog-space rather than away from dogs entirely. By contrast, branch B's 20/20 top-1 misses (checked against eval/B/classifications.jsonl) are all non-animal categories with zero dog-adjacent predictions. The single-label top-1-match metric cannot see this distinction -- it scores both branches as 0/20 'fully suppressed,' but the sequential branch visibly retains dog content in a quarter of its new-target cases while the direct branch does not. None of the 5 dog-present images are themselves degenerate (the dogs render coherently); this is a target-persistence concern, not an image-quality concern."
+  }
+}

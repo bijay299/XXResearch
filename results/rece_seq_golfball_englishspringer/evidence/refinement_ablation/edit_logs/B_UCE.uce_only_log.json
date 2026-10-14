@@ -1,0 +1,26 @@
+{
+  "start": "M0",
+  "concept": "English Springer",
+  "procedure": "Stage 1 (preliminary UCE) ONLY -- refinement/Stage 2 omitted by design, not skipped due to failure",
+  "stage1_hyperparameters": {
+    "lamb": 0.5,
+    "erase_scale": 1,
+    "preserve_scale": 1.0,
+    "guide": " ",
+    "retain_texts": [
+      ""
+    ],
+    "technique": "replace"
+  },
+  "stage2_omitted_components_unused": [
+    "pristine-M0 reference copy (ldm_stable_copy) -- never instantiated, not needed when Stage 2 is omitted",
+    "close_form_emb_regzero adversarial embedding -- never computed",
+    "edit_model_adversarial (full 77-token-sum erase) -- never called"
+  ],
+  "stage1_seconds": 0.7579293251037598,
+  "stage1_changed_working_model": true,
+  "n_keys_changed_vs_start": 32,
+  "changed_keys_are_only_cross_attn_kv": true,
+  "out_checkpoint_sha256": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+  "total_seconds": 16.383951663970947
+}
