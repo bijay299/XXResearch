@@ -1,0 +1,96 @@
+{
+  "purpose": "Supporting evidence for CORRECTIONS.md entries C6-C12, produced without any new image generation or GPU computation (JSON re-derivation, full-resolution re-inspection of existing images, and one CPU-only tokenizer check).",
+
+  "c6_persisted_degenerate_fix": {
+    "bug": "Published evidence/reference_A_intervention/VISUAL_REVIEW.json's AtoB_M0_reference_to_AB_REF_A.persisted_degenerate array included cases 28,29,30,31, which are also listed in that same table's recovered array -- a case cannot be both.",
+    "published_persisted_degenerate_wrong": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,28,29,30,31,32,34,35,36,37,38,39],
+    "corrected_persisted_degenerate": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,32,34,35,36,37,38,39],
+    "recovered_unchanged": [28, 29, 30, 31, 33],
+    "newly_damaged_unchanged": [15],
+    "neither_unchanged": [24, 25, 26, 27],
+    "check": "30 + 5 + 1 + 4 = 40",
+    "note": "This fix is independent of the C7 re-adjudication below; it is a pure listing-contradiction fix under the ORIGINALLY PUBLISHED labels."
+  },
+
+  "c7_re_adjudication": {
+    "method": "Independent full-resolution re-inspection of cases 28, 29, 30, 31, 33 (the five cases the published report called non-degenerate), applying the existing degeneration rubric with the explicit reminder that recognizable foreground content alone does not establish a usable image. Performed without being told which verdict to reach; recorded as found, including disagreement with the previously published labels and with an external characterization of case 30.",
+    "per_case": {
+      "28": {"description": "Pink/red glove and arm reaching upward; background is a regular tree-branch/rigging pattern against sky.", "verdict": "non-degenerate (retained)", "uncertainty": "low — background pattern reads as plausible foliage/rigging, not the chaotic small-square mesh signature seen in clearly-degenerate cases"},
+      "29": {"description": "Coherent hand occupies the lower-right ~40% of frame; the remaining ~60% (upper-left/upper-right) shows the same honeycomb/mesh corruption artifact as the degenerate majority, plus an indistinct ghost second hand shape and unnatural dark banding across the main hand itself.", "verdict": "DEGENERATE (changed from published non-degenerate)", "uncertainty": "low — majority-of-frame corruption is directly visible, not a borderline call"},
+      "30": {"description": "Coherent hand/arm in sharp focus; blurred green background carries a faint, localized, regular diamond-grid texture.", "verdict": "non-degenerate (retained)", "uncertainty": "explicit and unresolved — this faint background texture could be the same artifact family at low amplitude or could be ordinary depth-of-field bokeh; this review could not resolve which, and disagrees with an external characterization of this case as comparable to 29/33 in severity"},
+      "31": {"description": "Coherent hand; mostly smooth green-blur background with one anomalous horizontal line artifact.", "verdict": "non-degenerate (retained)", "uncertainty": "low — single minor artifact, not pervasive corruption"},
+      "33": {"description": "A small coherent face/arm fragment occupies roughly the bottom-left 15-20% of the frame; the remaining ~80-85% is the same mesh/mosaic corruption pattern seen throughout the clearly-degenerate golf-ball cases.", "verdict": "DEGENERATE (changed from published non-degenerate)", "uncertainty": "low — this is a near-textbook match to the existing degeneration rubric ('substantial incoherence, corruption... preventing a usable image'); the published non-degenerate label was a reviewer error on this case specifically"}
+    },
+    "golf_ball_degenerate_set_reviewed": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,29,32,33,34,35,36,37,38,39],
+    "golf_ball_nondegenerate_set_reviewed": [24,25,26,27,28,30,31],
+    "ab_ref_a_degeneration_reviewed": "33/40 (82.5%), up from the originally published 31/40 (77.5%)",
+    "atob_to_abrefa_reviewed": {
+      "persisted_degenerate": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,29,32,33,34,35,36,37,38,39],
+      "recovered": [28, 30, 31],
+      "newly_damaged": [15],
+      "neither": [24, 25, 26, 27],
+      "check": "32 + 3 + 1 + 4 = 40",
+      "net_change_vs_atob": "+2 (3 recovered - 1 newly damaged), down from the originally published +4"
+    },
+    "abuce_to_abrefa_reviewed": {
+      "ab_uce_degenerate_set": [37, 39],
+      "persisted_degenerate": [37, 39],
+      "recovered": [],
+      "newly_damaged": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,29,32,33,34,35,36,38],
+      "neither": [24,25,26,27,28,30,31],
+      "check": "2 + 0 + 31 + 7 = 40"
+    }
+  },
+
+  "c8_prompt_family_fix": {
+    "claimed": "All 5 recovered cases are in the 'golfer/hand holding ball' family.",
+    "actual_per_manifest": {
+      "28": {"family": "paraphrase", "prompt": "A person's hand gripping a golf ball before teeing off."},
+      "29": {"family": "paraphrase", "prompt": "A person's hand gripping a golf ball before teeing off."},
+      "30": {"family": "paraphrase", "prompt": "A person's hand gripping a golf ball before teeing off."},
+      "31": {"family": "paraphrase", "prompt": "A person's hand gripping a golf ball before teeing off."},
+      "33": {"family": "literal", "prompt": "A golf ball flying through the air after being struck."}
+    },
+    "correction": "28-31 share one paraphrase family (hand-gripping). 33 is an unrelated literal 'flying golf ball' prompt, not a hand/golfer image at all. The grouping claim was wrong for case 33."
+  },
+
+  "c9_norm_decomposition": {
+    "source_values_from_VERIFICATION_LOG_json": {
+      "norm_adv_replay_M0_branch": 1285.1685791015625,
+      "norm_adv_A_reference_branch": 1285.6817626953125,
+      "difference_norm": 284.2653503417969
+    },
+    "computed": {
+      "relative_difference_norm_pct": 22.118316650390625,
+      "relative_magnitude_change_pct": 0.039934657,
+      "aggregate_angle_deg_law_of_cosines": 12.70
+    },
+    "formula": "cos(theta) = (N1^2 + N2^2 - D^2) / (2*N1*N2), with N1,N2 the two embedding norms and D the difference-vector norm",
+    "interpretation": "The 22.12% relative-difference figure is overwhelmingly directional (~12.70 degrees of angle), not a scale/magnitude effect (0.0399%). No GPU/model computation was used -- pure arithmetic on already-saved norms."
+  },
+
+  "c10_assertion_audit": {
+    "run_reference_A_intervention_py_checks": {
+      "assert_full_storage_separation": "enforced -- raises RuntimeError on any shared-storage tensor",
+      "assert_reference_unchanged": "enforced -- raises RuntimeError on any changed reference tensor",
+      "changed_keys_equal_expected_32_check": "NOT enforced -- computed as a boolean and stored in the result dict; no assert/raise. A mismatch would have been logged as false and execution would have continued.",
+      "actual_outcome": "the logged boolean was true (32/32 match) in both the Phase-1 replay and Phase-2 AB_REF_A build -- no violation occurred, but the check as implemented could not have stopped one"
+    }
+  },
+
+  "c11_token_suffix_measurement": {
+    "formula": "slice_length = L - max(i, j), where i = old_text final_token_idx, j = new_text final_token_idx, L = tokenizer padded length",
+    "measured_for_this_experiments_concept": {
+      "old_text": "English Springer",
+      "new_text": " ",
+      "L": 77,
+      "attention_mask_sums": [4, 2],
+      "i": 2,
+      "j": 0,
+      "farthest": 2,
+      "slice_length": 75
+    },
+    "method": "CPU-only CLIPTokenizer check against the pinned SD1.4 snapshot tokenizer, no GPU, no image generation.",
+    "interpretation": "For this experiment's actual concept, the preliminary-UCE suffix slice spans 75 of 77 token positions -- nearly the entire padded sequence, not a narrow or single-token slice. C5's 'often one token wide in practice' aside was incorrect and is retracted by C11."
+  }
+}

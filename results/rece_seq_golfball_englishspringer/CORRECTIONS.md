@@ -176,6 +176,221 @@ itself slices a variable-length suffix, not a single fixed token index.
 slice (single-token-wide for the concepts tested here)" rather than
 "single-token slicing." No code, hyperparameter, or result changes.
 
+## C6 — `reference_A_intervention/evidence/VISUAL_REVIEW.json`'s published `persisted_degenerate` list for AtoB→AB_REF_A wrongly included the four recovered cases
+
+**What was claimed.** The `AtoB_M0_reference_to_AB_REF_A` paired-transition
+table's `persisted_degenerate` array listed 34 case ids, including
+28, 29, 30, 31, and 32 — but 28, 29, 30, and 31 are *also* listed in that
+same table's `recovered` array (`[28, 29, 30, 31, 33]`). A case cannot be
+both persisted-degenerate and recovered; this is an internal
+contradiction in the published JSON, not a visual-judgment question.
+
+**What the correct count is, under the labels as originally published**
+(golf-ball degenerate set for AB_REF_A = all 40 cases except
+{24,25,26,27,28,29,30,31,33}; for A→B = all 40 except {15,24,25,26,27}):
+`persisted_degenerate` should list exactly 30 cases —
+`[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,32,34,35,36,37,38,39]`
+(the 34-case published list minus the erroneously-included 28, 29, 30,
+31) — together with `recovered: [28,29,30,31,33]` (5, unchanged, correct
+as published), `newly_damaged: [15]` (1, unchanged, correct as published),
+and `neither: [24,25,26,27]` (4, unchanged, correct as published).
+**30 persisted / 5 recovered / 1 newly damaged / 4 neither**, summing to
+40. The headline aggregate counts in `FINAL_REPORT.md` §3.4 (35/40 →
+31/40, net +4) were arithmetically correct despite this listing bug — the
+bug was confined to one array's contents, not the totals computed from
+it.
+
+**Resolution.** Corrected list published in
+`evidence/reference_A_intervention/CORRECTED_LABELS.json`
+(`c6_persisted_degenerate_fix`). The original (buggy) list in the
+published `VISUAL_REVIEW.json` is left as published, per this repository's
+practice of correcting in place rather than silently editing published
+files.
+
+## C7 — Re-adjudication of golf-ball cases 28–31 and 33 at full resolution (independent re-review; unresolved disagreement noted)
+
+**What was claimed.** `reference_A_intervention/FINAL_REPORT.md` and its
+`VISUAL_REVIEW.json` labeled cases 28, 29, 30, 31, and 33 as
+non-degenerate ("a coherent hand/person... none shows a recognizable golf
+ball").
+
+**Independent re-review finding.** Re-inspected all five at full
+resolution under the same degeneration rubric, explicitly applying the
+clarification that **recognizable foreground content alone does not
+establish a usable image** when the surrounding frame is dominated by the
+mesh/honeycomb corruption artifact:
+
+| case | re-review finding | verdict |
+|---|---|---|
+| 28 | Coherent glove/arm; background is a repetitive tree/rigging pattern against sky — regular but structurally plausible as foliage/rigging, not the chaotic small-square mesh signature. | **non-degenerate (retained)**, low uncertainty |
+| 29 | Coherent hand in the lower-right ~40% of frame, but the upper-left/upper-right ~60% is dominated by the same honeycomb/mesh corruption seen throughout the degenerate cases, plus an indistinct ghost second hand and unnatural dark banding across the main hand itself. | **DEGENERATE — label changed.** Majority of frame is corrupted; the clean hand does not make the image usable as a whole. |
+| 30 | Coherent hand/arm; blurred green background carries a faint, regular diamond-grid texture, fainter and more localized than case 29's. | **non-degenerate (retained)**, **explicit uncertainty**: this faint background texture could be the same artifact family at low amplitude, or ordinary bokeh; not resolved here. |
+| 31 | Coherent hand; mostly smooth green-blur background with one anomalous horizontal line. | **non-degenerate (retained)**, low uncertainty (single minor artifact, not pervasive) |
+| 33 | A small coherent face/arm fragment occupies the bottom-left corner (~15–20% of frame); the remaining ~80% is the same mesh/mosaic corruption as the clearly-degenerate golf-ball cases. | **DEGENERATE — label changed.** This matches the original report's own stated rubric almost exactly; labeling it non-degenerate in the published report was a reviewer error, not a close call. |
+
+This re-review was conducted independently, without being instructed
+which specific verdict to reach, and disagrees with the originally
+published labels for 2 of the 5 cases (29, 33) while retaining the other
+3. It also disagrees, in the other direction, with an initial outside
+characterization that case 30 "has conspicuous background artifacts"
+comparable to 29/33 — on direct full-resolution inspection, case 30's
+artifact is real but visibly fainter and more localized, hence recorded
+as retained-with-uncertainty rather than flipped. **This disagreement is
+left explicit, not adjudicated to false certainty.**
+
+**Recomputed golf-ball quality figures, under the re-reviewed labels**
+(non-degenerate set becomes {24,25,26,27,28,30,31}, 7 cases; degenerate
+becomes the other 33):
+
+| quantity | as originally published | under re-reviewed labels |
+|---|---|---|
+| AB_REF_A degeneration | 31/40 (77.5%) | **33/40 (82.5%)** |
+| AtoB→AB_REF_A: persisted / recovered / newly damaged / neither | 30 / 5 / 1 / 4 (after C6's listing fix) | **30 / 3 (28,30,31) / 1 (15) / 3 (24,25,26,27)** — 29 and 33 move from "recovered" to "persisted" (both were already degenerate in A→B, so they do not become "newly damaged"; they simply stop being counted as recovered) |
+| AB_UCE→AB_REF_A: persisted / recovered / newly damaged / neither | 2 / 0 / 29 / 9 | **2 / 0 / 31 / 7** (29, 33 move from "neither" to "newly damaged," since both are non-degenerate at AB-UCE) |
+| Net quality change vs. A→B (recovered − newly damaged) | +4 | **+2** |
+
+**This does not change the qualitative conclusion in
+`reference_A_intervention/FINAL_REPORT.md`** — corruption remains the
+majority outcome under either labeling (77.5% or 82.5%), and the
+reference-A swap is still a small, partial mitigation at best, not a
+rescue. It does roughly halve the size of the already-modest quality
+improvement (net +4 → net +2), and confirms the originally published
+"not an unqualified rescue" framing was, if anything, too generous.
+
+**Resolution.** Both label sets, and the full per-case reasoning above,
+are published in
+`evidence/reference_A_intervention/CORRECTED_LABELS.json`. The originally
+published `VISUAL_REVIEW.json` and `FINAL_REPORT.md` are left as
+published; this entry supersedes their golf-ball-quality headline figures
+for any downstream comparison.
+
+## C8 — Prompt-family mischaracterization: case 33 is not in the "golfer/hand holding ball" family
+
+**What was claimed.** `reference_A_intervention/FINAL_REPORT.md` §3.4
+states "All 5 recovered cases are in the 'golfer/hand holding ball'
+family and show a coherent hand/arm/person consistent with the
+'golfer/hand holding ball' prompt family."
+
+**What is actually true**, per `frozen_manifest.json`'s own per-case
+`family`/`prompt` fields: cases 28, 29, 30, and 31 share the **paraphrase**
+prompt "A person's hand gripping a golf ball before teeing off." Case 33
+is a **literal** prompt from a *different* family entirely — "A golf ball
+flying through the air after being struck" — which has nothing to do
+with a hand or a golfer; it depicts a ball in flight. The claim that all
+5 share one prompt family is incorrect for case 33.
+
+**Resolution.** Corrected statement: cases 28–31 share the hand-gripping
+paraphrase family; case 33 is an unrelated literal "flying golf ball"
+prompt whose recovery (under the original labels) or non-recovery (under
+C7's re-reviewed labels) is not explained by prompt-family clustering.
+No other claim in that section depended on this grouping.
+
+## C9 — Adversarial-embedding norm wording conflated direction change with magnitude change
+
+**What was claimed.** `reference_A_intervention/FINAL_REPORT.md` §2.5
+reports the M0-reference and A-reference adversarial-embedding norms
+(1285.169 and 1285.682) and their difference norm (284.265, "~22%
+relative... against a ~1285-norm embedding") without separating how much
+of that relative difference is a magnitude change versus a direction
+change.
+
+**Corrected figures**, computed directly from the already-saved norms in
+`VERIFICATION_LOG.json` (pure arithmetic, no new computation): relative
+difference-vector norm = 284.2654 / 1285.1686 = **22.12%**. Magnitude
+(scalar norm) change = |1285.6818 − 1285.1686| / 1285.1686 = **0.03993%**
+— three orders of magnitude smaller. Using the law of cosines on the two
+saved norms and the saved difference norm, the aggregate angle between
+the M0-reference and A-reference adversarial embeddings is **≈12.70°**.
+
+**Resolution.** The 22% figure is overwhelmingly a **directional**
+difference, not a magnitude difference — the two adversarial embeddings
+are nearly the same length and point in measurably different directions
+(~12.7°). The original wording did not make this distinction and could
+be misread as implying a scale difference. No underlying number was
+wrong; the interpretation is sharpened. See
+`evidence/reference_A_intervention/CORRECTED_LABELS.json` for the
+worked computation.
+
+## C10 — The published script's 32-key whitelist check was logged, not enforced, despite being described as an assertion
+
+**What was claimed.** `reference_A_intervention/FINAL_REPORT.md` §2.3–2.4
+lists "Changed keys vs. AB-UCE input = expected 32-key cross-attn K/V
+whitelist | **PASS, exact match**" as one of several checks performed,
+in a table whose heading describes them collectively in language implying
+enforcement.
+
+**What `run_reference_A_intervention.py` actually did.** The storage-
+separation check (`assert_full_storage_separation`) and the reference-
+unchanged check (`assert_reference_unchanged`) both genuinely `raise
+RuntimeError(...)` on failure — real, enforced assertions. The 32-key
+whitelist check did not: it computed
+`changed_set == EXPECTED_32_KEYS` and stored the boolean in the result
+dict (`result["phase2_ab_ref_a"]["changed_keys_equal_expected_32"]`)
+without an `assert` or `raise` — a run where the sets differed would have
+recorded `false` and continued, identical in kind to the C4 pattern this
+same report claimed to have corrected.
+
+**Status:** no actual violation occurred — the logged sets did match
+(32/32, confirmed in `VERIFICATION_LOG.json`) — so no finding is
+affected. This is a description correction only: the check was real and
+its result was correct, but it was not an enforced assertion as
+described.
+
+**Resolution.** Fixed going forward: `embedding_cross_swap`'s new
+intervention script (§3 of this task) uses a literal `assert` (raising
+`AssertionError`) for the 32-key whitelist check, not a logged boolean.
+
+## C11 — Preliminary-UCE's token-suffix slice is usually NEAR-FULL-LENGTH for short concepts, not narrow (supersedes C5's "often one token wide" claim)
+
+**What was claimed.** C5 (above) corrected "single-token slicing" to
+"token-suffix slice," but added: "For a single-word concept this slice is
+often one token wide in practice" — itself incorrect.
+
+**Correct general formula**, re-derived from `vendored_functions.py`
+lines 216–223: for padded sequence length `L`, old-text final index `i`
+and new-text final index `j` (`farthest = max(i,j)`), both the old-text
+and new-text embedding slices have length **`L − max(i, j)`** — not a
+function of which text is older/newer, and not generally close to 1.
+
+**Concrete measurement for this experiment's own concept** (CPU-only
+tokenization check, SD1.4 CLIP tokenizer, no GPU): for
+`old_text="English Springer"`, `new_text=" "`, `L=77`: attention-mask
+sums are 4 and 2, giving `i=2`, `j=0`, `farthest=2`, and **slice length
+= 77 − 2 = 75 tokens** — the suffix spans nearly the *entire* padded
+sequence (75 of 77 positions), not a single token.
+
+**Resolution.** C5 is superseded on this specific point: the slice is a
+token suffix whose length is `L − max(i,j)`, which for this experiment's
+short concept text is *near-full-length*, the opposite of "narrow." C5's
+correction of "single-token slicing" → "token-suffix slice" stands; its
+"often one token wide in practice" aside is itself wrong and is retracted
+here. No code or hyperparameter changes; description-only, for the
+second time on this same mechanism.
+
+## C12 — "Within ordinary noise" language for retained-class recognition swings was not a statistical claim and should not have read as one
+
+**What was claimed.** Both `refinement_ablation/FINAL_REPORT.md` and
+`reference_A_intervention/FINAL_REPORT.md` describe single- or double-case
+recognition-count swings on French horn/parachute (n=20) as "within
+ordinary single-sample noise," reported alongside a claim of "zero
+quality cost."
+
+**Clarification.** "Zero severe degeneration" (the visual-review finding)
+and "recognition-count swing is noise" (an implicit statistical claim)
+are different kinds of statements. The former was directly observed
+(every image individually inspected). The latter was asserted by
+analogy ("a single flipped case = 5pp at n=20") without a variance
+estimate, confidence interval, or repeated-seed measurement to actually
+establish a noise floor. Recognition losses at this panel size are
+**panel counts**, not independently validated noise estimates.
+
+**Resolution.** Going forward in this results line (starting with
+`embedding_cross_swap/FINAL_REPORT.md`), retained-class recognition
+swings are reported as raw panel counts without the "ordinary noise"
+characterization unless an actual noise estimate (e.g. repeated seeds) is
+computed. The "zero severe degeneration" finding itself is unaffected and
+not in question.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by
@@ -189,3 +404,22 @@ slice (single-token-wide for the concepts tested here)" rather than
   that French horn/parachute quality degraded in this experiment — A's
   1/20 rate was already known, already gated as passing, and predates both
   reports published here.
+- **C6–C12 were likewise found by re-examining existing artifacts already
+  in hand** (JSON labels, saved diagnostic norms, the frozen manifest's
+  own prompt text, this line's own published code, and one CPU-only
+  tokenizer check) — no image generation or GPU computation was used to
+  produce any of them, consistent with the task that authorized this
+  correction pass.
+- **C7 moves the net golf-ball quality improvement from the reference-A
+  swap from +4 to +2 cases** (under the independently re-reviewed labels)
+  — a reduction in an already-modest, already-qualified finding, not a
+  reversal of it; `reference_A_intervention/FINAL_REPORT.md`'s "not an
+  unqualified rescue" conclusion holds, more strongly, under either
+  labeling.
+- **C7 explicitly preserves disagreement** rather than forcing a single
+  verdict: this reviewer's case 30 re-read (retained, with uncertainty)
+  disagrees with one external characterization of that case, and the
+  reasoning for both the originally published and the re-reviewed labels
+  is published side by side in `CORRECTED_LABELS.json` so a future
+  reviewer can adjudicate independently rather than inherit a silently
+  resolved call.

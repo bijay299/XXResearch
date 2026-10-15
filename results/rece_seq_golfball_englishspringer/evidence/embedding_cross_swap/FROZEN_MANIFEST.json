@@ -1,0 +1,114 @@
+{
+  "experiment": "embedding_cross_swap: does sequential refinement corruption follow the recovered adversarial embedding, the working checkpoint, or their interaction?",
+  "question": "A 2x2 design crossing two pre-second-edit working checkpoints (direct W_D, sequential W_S) with two recovered adversarial embeddings (E_D, recovered from W_D; E_S, recovered from W_S), both recovered with pristine M0 as the close_form_emb_regzero reference. Does corruption track the embedding (column effect), the working checkpoint (row effect), or neither alone (interaction)?",
+  "status_at_freeze_time": "FROZEN BEFORE EXECUTION -- 2026-10-14, prior to any new GPU computation under this directory",
+  "frame": "Causal diagnostic of sequential adaptation mechanics, not a new-method claim. Development evidence; generality/novelty unestablished.",
+
+  "carried_forward_from_commit_5b2550c89084dcf7a12a203ad190c4be80e890ec": [
+    "Original M0-reference refinement: direct golf-prompt degeneration 0/40->0/40; sequential 2/40->35/40 (AB-UCE->A->B).",
+    "Original final direct/sequential English-springer recognition: 0/20 each.",
+    "Parent-A-reference intervention did not rescue the sequential model; its reported 35/40->31/40 improvement is provisional pending the focused re-review in CORRECTIONS.md C7 (net +2 under re-reviewed labels, not +4).",
+    "Parent-A-reference recognition: English springer 1/20, golf ball 0/40, parachute 16/20, French horn 18/20 (vs. original sequential final 0/20, 0/40, 18/20, 19/20).",
+    "The original sequential M0-reference replay already matched the saved final AtoB_english_springer.pt checkpoint exactly across all 686 UNet tensors -- that check is closed, not repeated here."
+  ],
+  "not_repeated": ["eligibility", "first-parent confirmation", "preliminary-UCE construction", "baseline searches", "the completed sequential M0-reference replay", "existing endpoint image generation"],
+
+  "inputs": {
+    "W_D": {
+      "name": "B_UCE.pt",
+      "path": "refinement_ablation/edits/B_UCE.pt",
+      "expected_sha256": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+      "role": "Direct-branch Stage-1 (preliminary UCE) output, starting from M0. Working checkpoint for row D."
+    },
+    "W_S": {
+      "name": "AB_UCE.pt",
+      "path": "refinement_ablation/edits/AB_UCE.pt",
+      "expected_sha256": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+      "role": "Sequential-branch Stage-1 (preliminary UCE) output, starting from A. Working checkpoint for row S."
+    },
+    "existing_direct_final_B": {
+      "name": "B_english_springer.pt",
+      "path": "edits/B_english_springer.pt",
+      "expected_sha256": "c711e97127d3dcca9d6752e86d64fba8240ed20347c699179f9fe0859267b9dc",
+      "role": "Existing diagonal cell (W_D,E_D). Reused unchanged; also the comparator for the one authorized image-free direct compatibility check."
+    },
+    "existing_sequential_final_AtoB": {
+      "name": "AtoB_english_springer.pt",
+      "path": "edits/AtoB_english_springer.pt",
+      "expected_sha256": "ec16c9f748035b832d57dbe6b2eaa33d0e26279fe9a852eb171837f48a7a2469",
+      "role": "Existing diagonal cell (W_S,E_S). Reused unchanged. Already exactly replay-verified in the prior reference_A_intervention task; not re-checked here."
+    },
+    "manifest_100_case": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_golfball_confirmation/manifest/frozen_manifest.json",
+      "expected_sha256": "ca1401c0064441969fdf3ab329fb9ab8eaab980b63ade62b6f14bd9bd1ef43ad"
+    },
+    "pinned_rece_source": {
+      "repo": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/repo_src/RECE",
+      "commit": "403a67fd86dce6c124b88798340e001e625b28c9",
+      "vendored_functions_module": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/seq_edit/vendored_functions.py",
+      "drift_check": "vf.assert_pinned_sources_unchanged() + vf.assert_vendored_text_matches_pinned_source(), run before any editing"
+    },
+    "sd14_base_pipeline": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b"
+  },
+
+  "design": {
+    "rows": ["W_D (direct)", "W_S (sequential)"],
+    "columns": ["E_D (recovered from W_D, reference M0)", "E_S (recovered from W_S, reference M0)"],
+    "cells": {
+      "W_D,E_D": {"status": "EXISTING, reuse", "identity": "B (direct final)"},
+      "W_D,E_S": {"status": "NEW", "identity": "D_WITH_SEQ_EMB"},
+      "W_S,E_D": {"status": "NEW", "identity": "S_WITH_DIRECT_EMB"},
+      "W_S,E_S": {"status": "EXISTING, reuse", "identity": "A->B (sequential final)"}
+    },
+    "note": "The parent-A-reference endpoint from the prior task is contextual evidence only, not a diagonal/control cell in this design. Both E_D and E_S are recovered with pristine M0 as the close_form_emb_regzero reference in BOTH cases -- this experiment varies the working checkpoint and the embedding source, not the reference."
+  },
+
+  "unchanged_recovery_procedure": {
+    "close_form_emb_regzero": {"regeular_scale": 0.1, "with_to_k": true, "save_path": null, "seed": 42, "concept": "English Springer", "reference": "pristine M0, both E_D and E_S"}
+  },
+  "unchanged_edit_procedure": {
+    "edit_model_adversarial": {"technique": "replace", "preserve_scale": 0.1, "erase_scale": 1, "lamb": 0.1, "retain_texts": [""]},
+    "new_embedding_prompt": " ",
+    "precision": "float32, unchanged from original working-model behavior",
+    "layer_scope": "all 32 cross-attention to_k/to_v projections, unchanged layer traversal"
+  },
+  "transfer_rule": "Only the recovered adversarial embedding (the full, untrimmed 77-token tensor, passed as old_embeddings=[E[0]] exactly as run_edit.py does) is transferred between rows. The receiving working checkpoint's own native guide (' ') and retain ('') embeddings -- computed from its own pipeline's text encoder, which is identical and untouched across all checkpoints in this line -- and its own native weight regularizer (lamb=0.1) are used unmodified. No trimming, normalization, scaling, interpolation, layer selection, re-recovery after transfer, or parameter sweep.",
+
+  "stages": [
+    "1. Verify W_D, W_S, existing B, existing AtoB sha256 against this manifest, and verify loaded tensors match on load (all keys).",
+    "2. Recover E_D from W_D (reference M0) and E_S from W_S (reference M0). Full-tensor storage-separation and reference-invariance checks (all 686 UNet tensors) for both recoveries. Verify concept/guide/retain text embeddings agree bit-for-bit across W_D, W_S, and M0 pipelines (text encoder is never edited by UCE). Save E_D, E_S with source/reference hashes, shape, dtype, tokenization detail.",
+    "3. GATE: one image-free direct compatibility check. Apply E_D natively (fresh W_D, native guide/retain, identical hyperparameters) via edit_model_adversarial and require EXACT tensor equality (all 686 keys, values not hashes) against the existing B_english_springer.pt. If this does not match exactly: record differing keys and max abs/relative differences, publish a scoped discrepancy report, and STOP before building either new cross cell or generating any image. No tolerance, no substitute comparator, no repair loop. (The reciprocal sequential-branch replay, W_S+E_S vs. the existing AtoB checkpoint, was already verified exactly in the prior reference_A_intervention task and is not repeated.)",
+    "4. Only if the gate passes: build D_WITH_SEQ_EMB (fresh, untouched W_D + E_S) and S_WITH_DIRECT_EMB (fresh, untouched W_S + E_D). Enforced (raising) assertion that only the 32 expected cross-attention K/V keys change vs. each cell's own working input, with the actual changed-key set reported either way.",
+    "5. Save per-cell diagnostics for all four cells (two reused via direct computation from existing checkpoints, two new): embedding magnitudes/relative difference/cosine (E_D vs E_S); total and per-layer edit displacement; recovery-fit residual (row's pre-edit projections of the cell's embedding vs. M0's projections of the original concept embedding); erase-fit residual (cell's post-edit projections of its embedding vs. the row's pre-edit projections of the fixed guide embedding); retain-projection drift on the native retain text. Formulas frozen in this manifest (see diagnostic_formulas below); descriptive only, not a semantic-deletion certificate.",
+    "6. Generate images for the two NEW cells only (D_WITH_SEQ_EMB, S_WITH_DIRECT_EMB), at most 200 images total, on the unchanged 100-case manifest, unchanged generation/classification settings. Reuse all four existing endpoints' (M0, A, B, AB-UCE, B-UCE, A->B) outputs; also reuse the parent-A endpoint's outputs for context only.",
+    "7. Visual review completed and saved BEFORE consulting individual classifier predictions, neutral endpoint IDs, fixed case order, full-resolution inspection of all golf-ball and English-springer cases plus uncertain retained-class cases; blinding limitations disclosed, not assumed away.",
+    "8. Report all four cells; interpret whether corruption tracks the embedding, the working checkpoint, or their interaction. Publish."
+  ],
+
+  "diagnostic_formulas": {
+    "embedding_relative_difference_pct": "100 * ||E_D - E_S|| / ||E_D||",
+    "embedding_cosine": "(E_D . E_S) / (||E_D|| * ||E_S||), flattened over all (token, dim) entries",
+    "edit_displacement_per_layer": "||W_new_l - W_row_old_l||_F for each of the 32 cross-attn to_k/to_v weight matrices; total = sqrt(sum of squares over the 32 layers)",
+    "recovery_fit_residual_per_layer": "||W_row_old_l(E_col) - M0_l(concept_embedding)||_F, concept_embedding = text_encoder('English Springer') (untrimmed, 77 tokens, matching close_form_emb_regzero's own convention -- its token-slice lines are commented out in the pinned source)",
+    "erase_fit_residual_per_layer": "||W_new_l(E_col) - W_row_old_l(guide_embedding)||_F, guide_embedding = text_encoder(' ') via the native (untouched) text encoder",
+    "retain_projection_drift_per_layer": "||W_new_l(retain_embedding) - W_row_old_l(retain_embedding)||_F, retain_embedding = text_encoder('') via the native text encoder",
+    "token_handling": "All projections use the full padded 77-token embedding tensors, matching edit_model_adversarial's own full-sequence sum convention; no additional slicing is introduced by these diagnostics.",
+    "zero_denominator_handling": "Relative-difference and cosine denominators are clamped at 1e-12 before division; a near-zero result is reported as-is with this floor noted, never silently dropped."
+  },
+
+  "max_scope": [
+    "One image-free direct compatibility check (E_D natively applied to fresh W_D vs. existing B).",
+    "Two new endpoints (D_WITH_SEQ_EMB, S_WITH_DIRECT_EMB).",
+    "At most 200 new images (100 per new endpoint).",
+    "No other experiments, reference variants, concept pairs, tuning, or automatic follow-up."
+  ],
+
+  "do_not": [
+    "Do not use parent A as a reference anywhere in this experiment (M0 only, both recoveries).",
+    "Do not reuse a mutated working-model object across cells; each cell starts from a fresh, untouched load of its row's working checkpoint.",
+    "Do not trim, normalize, scale, interpolate, re-recover, or layer-select the transferred embedding.",
+    "Do not repeat the already-closed sequential M0-reference replay or any eligibility/baseline work.",
+    "Do not introduce a tolerance, substitute comparator, or repair loop if the gate check fails.",
+    "Do not claim the result establishes universal properties of the recovery or erase algorithms, or launch additional sweeps/concepts/follow-ups."
+  ]
+}

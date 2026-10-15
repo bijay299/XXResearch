@@ -1,0 +1,103 @@
+{
+  "stopped_before_phase3": false,
+  "stopped_before_phase4_image_gen": false,
+  "pinned_source_drift_check": "PASS",
+  "input_verification": {
+    "W_D_sha256": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+    "W_S_sha256": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+    "existing_B_sha256": "c711e97127d3dcca9d6752e86d64fba8240ed20347c699179f9fe0859267b9dc",
+    "existing_AtoB_sha256": "ec16c9f748035b832d57dbe6b2eaa33d0e26279fe9a852eb171837f48a7a2469"
+  },
+  "expected_32_cross_attn_kv_keys": [
+    "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+    "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+    "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+    "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+    "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+    "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+    "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+    "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+    "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+    "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+    "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+    "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+    "mid_block.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+    "mid_block.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v.weight",
+    "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k.weight",
+    "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v.weight"
+  ],
+  "phase1_recovery": {
+    "storage_separation_E_D_recovery": {
+      "n_tensors_checked": 686,
+      "n_shared_storage": 0
+    },
+    "storage_separation_E_S_recovery": {
+      "n_tensors_checked": 686,
+      "n_shared_storage": 0
+    },
+    "reference_unchanged_E_D_recovery": {
+      "n_tensors_checked": 686,
+      "n_changed": 0
+    },
+    "reference_unchanged_E_S_recovery": {
+      "n_tensors_checked": 686,
+      "n_changed": 0
+    },
+    "working_unchanged_during_E_D_recovery": {
+      "n_tensors_checked": 686,
+      "n_changed": 0
+    },
+    "working_unchanged_during_E_S_recovery": {
+      "n_tensors_checked": 686,
+      "n_changed": 0
+    },
+    "concept_embedding_agrees_across_pipelines": true,
+    "guide_embedding_agrees_across_pipelines": true,
+    "retain_embedding_agrees_across_pipelines": true,
+    "E_D_norm": 329.5411376953125,
+    "E_S_norm": 1285.1685791015625,
+    "elapsed_seconds": 36.07549977302551
+  },
+  "phase2_gate": {
+    "n_differing_keys_vs_existing_B": 0,
+    "exact_match": true,
+    "elapsed_seconds": 13.580594301223755
+  },
+  "phase3_new_cells": {
+    "D_WITH_SEQ_EMB": {
+      "endpoint_name": "D_WITH_SEQ_EMB",
+      "row_working_checkpoint": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/refinement_ablation/edits/B_UCE.pt",
+      "row_working_checkpoint_sha256": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+      "n_keys_changed": 32,
+      "changed_keys_equal_expected_32_ENFORCED": true,
+      "out_checkpoint_sha256": "234c5cf39410a00f74a1c7ae7d3d412a6da172582c31c24d6c522ba58e466801",
+      "elapsed_seconds": 18.596936225891113
+    },
+    "S_WITH_DIRECT_EMB": {
+      "endpoint_name": "S_WITH_DIRECT_EMB",
+      "row_working_checkpoint": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/refinement_ablation/edits/AB_UCE.pt",
+      "row_working_checkpoint_sha256": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+      "n_keys_changed": 32,
+      "changed_keys_equal_expected_32_ENFORCED": true,
+      "out_checkpoint_sha256": "fa88928baab20db752cdf2b9bc88e8c9460b886e62ecb15e0c23865a6f04f59b",
+      "elapsed_seconds": 17.25523567199707
+    }
+  },
+  "total_elapsed_seconds": 107.49088096618652
+}

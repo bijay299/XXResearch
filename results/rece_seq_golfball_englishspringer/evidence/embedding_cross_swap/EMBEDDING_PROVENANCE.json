@@ -1,0 +1,11 @@
+{
+  "note": "Recovered/intermediate embedding tensors (.pt files) are excluded from GitHub publication per this repository's standing convention (model-checkpoint-like binary artifacts, matching the repo-wide *.pt gitignore rule and this project's never-publish-checkpoints practice) -- not because they are large (each is ~236KB). Shape, dtype, sha256, and local storage path are published here instead so any claim about them (norms, cosine, residuals in DIAGNOSTICS.json) can be independently reverified against the actual bytes by someone with host access.",
+  "host": "hyperplane",
+  "tensors": {
+    "E_D": {"path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/E_D.pt", "shape": [1, 77, 768], "dtype": "float32", "sha256": "32d1bd98471b6672310228470feb8ab18f58c557eb5b1c4c300dffef0ebd4c3b"},
+    "E_S": {"path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/E_S.pt", "shape": [1, 77, 768], "dtype": "float32", "sha256": "e6ea282ad27441aacf47b2824c693166b59d669eb6ae9520978f0194af89bdb8"},
+    "concept_embedding": {"path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/concept_embedding.pt", "shape": [77, 768], "dtype": "float32", "sha256": "2e5ab9daadf03b4bcbdfa7b678b749c6078ed4de20b13c6ad6c2eb7c14a4e5c6", "verified_identical_across_W_D_and_W_S_pipelines": true},
+    "guide_embedding": {"path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/guide_embedding.pt", "shape": [1, 77, 768], "dtype": "float32", "sha256": "af70a52ca04de68859e61aa77d85f12a73c75dbd3e7e028a23748011d4695da7", "verified_identical_across_W_D_and_W_S_pipelines": true},
+    "retain_embedding": {"path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/retain_embedding.pt", "shape": [1, 77, 768], "dtype": "float32", "sha256": "a79c339931fb7f032c04fe8f72fbccc363083572e6ce808b2caf5c68dbf5f87a", "verified_identical_across_W_D_and_W_S_pipelines": true}
+  }
+}

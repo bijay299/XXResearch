@@ -1,0 +1,58 @@
+{
+  "embedding_comparison": {
+    "E_D_norm": 329.5410461425781,
+    "E_S_norm": 1285.1683349609375,
+    "difference_norm": 1348.121337890625,
+    "relative_difference_pct_vs_E_D": 409.09056813133725,
+    "cosine": -0.06750175613639828,
+    "note": "E_D and E_S differ far more in MAGNITUDE here (norms 329.54 vs 1285.17, ratio 3.90x) than the M0-vs-A reference comparison in the prior task did (which held magnitude nearly fixed and varied direction only by ~12.7deg)."
+  },
+  "per_cell_2x2": {
+    "W_D,E_D": {
+      "status": "existing, reused",
+      "edit_displacement_total": 37.109125741772466,
+      "recovery_fit_residual_total": 1140.8711144731565,
+      "erase_fit_residual_total": 22.420024072134613,
+      "retain_projection_drift_total": 15.168881266019671
+    },
+    "W_S,E_S": {
+      "status": "existing, reused",
+      "edit_displacement_total": 33.003429325197494,
+      "recovery_fit_residual_total": 533.6762586217254,
+      "erase_fit_residual_total": 401.57894899196634,
+      "retain_projection_drift_total": 55.94750140017334
+    },
+    "W_D,E_S": {
+      "status": "new",
+      "edit_displacement_total": 42.066234835267075,
+      "recovery_fit_residual_total": 12989.178389497572,
+      "erase_fit_residual_total": 403.6281965299115,
+      "retain_projection_drift_total": 55.60200303742123
+    },
+    "W_S,E_D": {
+      "status": "new",
+      "edit_displacement_total": 30.371527928036446,
+      "recovery_fit_residual_total": 1378.675101562926,
+      "erase_fit_residual_total": 21.983178756026238,
+      "retain_projection_drift_total": 14.638981992518957
+    }
+  },
+  "per_cell_2x2_layout": {
+    "rows": [
+      "W_D (direct)",
+      "W_S (sequential)"
+    ],
+    "columns": [
+      "E_D (direct-recovered)",
+      "E_S (sequential-recovered)"
+    ],
+    "diagonal_cells_existing": [
+      "W_D,E_D (= B)",
+      "W_S,E_S (= A->B)"
+    ],
+    "off_diagonal_cells_new": [
+      "W_D,E_S (= D_WITH_SEQ_EMB)",
+      "W_S,E_D (= S_WITH_DIRECT_EMB)"
+    ]
+  }
+}

@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `f368ab203045` — the commit that *records*
+Generated at parent commit `5b2550c89084` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -33,7 +33,8 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/refinement_ablation/FINAL_REPORT.md` | 11,953 | `7800f70f5a372935b8afc5842df523dbf2075128d7d5f63ae74c703bdc94bdb4` |
 | `results/rece_seq_golfball_englishspringer/refinement_ablation/CLOSEOUT.md` | 5,444 | `c1f01785ffe01c2931b561312ba1c82105eaafb02f596c6bdd1fce1a6500ce25` |
 | `results/rece_seq_golfball_englishspringer/reference_A_intervention/FINAL_REPORT.md` | 18,793 | `a7381a7b39c0948d2d091f0ecb7dc8dba28042b9c9a8cbf4092cddb0bb63bf9a` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 10,718 | `714407035db64d94a3ddd66c72071a6ff57829559add708e83102ca58127de5e` |
+| `results/rece_seq_golfball_englishspringer/embedding_cross_swap/FINAL_REPORT.md` | 18,931 | `8ac9d8c1094f8868afde3d66779a5e0c065db487302ba99500802313ae674d10` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 25,501 | `14d8b2749043376d63d20261c1ff9dd4cfce36ddf84f500a1d5539cdd2c4f391` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -90,6 +91,27 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/AB_REF_A.classify_report.json` | 232 | `8b66555741352b3d93b257d7f5ebb860ccc0b2109ee1a3aabf994c42073ccd94` |
 | `results/rece_seq_golfball_englishspringer/evidence/code/run_reference_A_intervention.py` | 22,132 | `e17d983637272ce4b96531177d2f47c035e86e1e9c889d884d1968df3c96dfa0` |
 
+## Embedding cross-swap diagnostic — does corruption follow the recovered embedding, the working checkpoint, or their interaction? (reference held fixed at M0 throughout)
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/FROZEN_MANIFEST.json` | 11,644 | `a845ceca4a89c3323e44d4c63d99f42bd382d09e5c19977ca16dc65817138adf` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/VERIFICATION_LOG.json` | 5,069 | `50221b135fd72367d7c99a53d59ce74c37c1def8cf1e1c5450f64c127c16cb1f` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/DIAGNOSTICS.json` | 1,988 | `a0ba1a3f5526dfd02925f5bd8bed49445686a15585131cdbb66988a51d8d68bd` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/PER_LAYER_DISPLACEMENT.json` | 12,085 | `0bf10c6f0a08be687c8d90ae975a8bba4505a6202f0b2656e5c0f039f4a5d15a` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/ANALYSIS_RESULTS.json` | 6,112 | `c75620fe16547eeabe1044cc4bbecec6203fc0862d057a8140e52277f74cee3a` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/VISUAL_REVIEW.json` | 8,921 | `75d21f2edf7fd5d22909fa53bf1e2e12dbafb9d7e8894da9e4a35e847e96584e` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/EMBEDDING_PROVENANCE.json` | 2,063 | `853165865a664752a9426846e401727a43b85cf8800a65d7249f7b86c07f4f88` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/edits/D_WITH_SEQ_EMB.cross_swap_log.json` | 482 | `e5d194297c5cd376e9d4570a79a5174bc4c4433ee306f63c1ed5d22d40227b0e` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/edits/S_WITH_DIRECT_EMB.cross_swap_log.json` | 485 | `68fcdf1138f194ffbebbdac175a1f3a21e7a98208efe7a44761b54bb3710b080` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/D_WITH_SEQ_EMB.classifications.jsonl` | 42,076 | `99180a4d4ff19298f9ba163349284e0987a69509951bfb384d67e3b6591e45ff` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/D_WITH_SEQ_EMB.classify_report.json` | 238 | `a2ae688225d777502bde991e3a1875ba49b050b6c1251028859cfc03f97f2011` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/S_WITH_DIRECT_EMB.classifications.jsonl` | 42,337 | `445cdbd68a861e914cf4b9aff506c80399f199afd6b3f6e969e5c9a949a0748c` |
+| `results/rece_seq_golfball_englishspringer/evidence/embedding_cross_swap/S_WITH_DIRECT_EMB.classify_report.json` | 241 | `fb24a6b9bcd747e8a21d3423c2c6bd8b927f29c4145fe3f580870415f0d7e6b4` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/run_embedding_cross_swap.py` | 18,203 | `50538d32059e77b96ce8e035517a3be0cdc245d81d74b7a6831ac93e3a0a8378` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/compute_diagnostics.py` | 6,587 | `11114579991edd2ba646a3b894aa84439d01b6d74c47d573cdfd6f5cc39c4799` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/CORRECTED_LABELS.json` | 7,988 | `ba41c8be129f943ea62094f914ac170664b29dcdd950eb5513c9721e325884c4` |
+
 ## Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)
 
 | path | bytes | sha256 |
@@ -104,6 +126,10 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/images/grids/AB_UCE/English_springer.png` | 1,249,871 | `72107b6eea7b1af613a11108be97dba092f6ef09e1457d19aff80c6e62647092` |
 | `results/rece_seq_golfball_englishspringer/images/grids/AB_REF_A/golf_ball.png` | 2,968,295 | `22402d192f280dfe0f81d51d2dfee0eef4d9a9dc71d2a397afb77e14e9abed2e` |
 | `results/rece_seq_golfball_englishspringer/images/grids/AB_REF_A/English_springer.png` | 1,262,326 | `329a94ef376833356cbdb2ad4937d89e4aae4bbe644ca52081e7b940684a62af` |
+| `results/rece_seq_golfball_englishspringer/images/grids/D_WITH_SEQ_EMB/golf_ball.png` | 2,610,563 | `efb46fde71d60fdd6343cbd849345770153ed0f646d2ed295b3330de6fcd655e` |
+| `results/rece_seq_golfball_englishspringer/images/grids/D_WITH_SEQ_EMB/English_springer.png` | 1,614,283 | `7c0b473da7bf7ab062ab290e178b565987aaaf4fd3f52bde6f15cbd5e09c07b5` |
+| `results/rece_seq_golfball_englishspringer/images/grids/S_WITH_DIRECT_EMB/golf_ball.png` | 2,678,848 | `1a93887a6eee5f9b35b93e15431a30cb4ed5d342aaebc4e72c4d26c456cd48d7` |
+| `results/rece_seq_golfball_englishspringer/images/grids/S_WITH_DIRECT_EMB/English_springer.png` | 1,199,106 | `b8eff7c8e7b900cb60b362afedefae88077fe6ca0d5bbd7d32b2f302ab619f49` |
 
 ## Visual evidence — full-resolution crops for the corrected and ambiguous cases (CORRECTIONS.md C1/C2)
 
@@ -137,6 +163,21 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case33.png` | 429,635 | `193d48fe129b53985f31a67f19aa79aa9daf26870de96243298fa24819d9ee0d` |
 | `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case84.png` | 569,231 | `da43729c6bc6cf474ca566cf7bd2872cc3fd424e2a48ee191f75083a90fef60e` |
 
+## Visual evidence — embedding cross-swap full-resolution case crops (D_WITH_SEQ_EMB's 'flying ball' corruption spillover; S_WITH_DIRECT_EMB's recovered golf-ball cases and its one dog-present English-springer case)
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/D_WITH_SEQ_EMB_case33.png` | 361,226 | `29aeae8ad4e5b16cfcd8923af315e1dc2dce02750f0019a38c63bf519e924c1d` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/D_WITH_SEQ_EMB_case34.png` | 385,293 | `f9acb8d5d43369410619aa8bc0f9d1cb2c9a43830d09a1a1bc5d487bb71d72df` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/D_WITH_SEQ_EMB_case35.png` | 390,676 | `49c52e10c77ac629123f10aa71d9109718c78efde74735fbc15d14c6be99f172` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/D_WITH_SEQ_EMB_case37.png` | 480,319 | `26426b61a341dfb69bb776321016628802ad4acb72daecc68c4a251b556fabe1` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/D_WITH_SEQ_EMB_case38.png` | 485,330 | `e107036e823a1be783b5c088b128a9049b6e084468aec0f20cb0daba4f4dcca2` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/D_WITH_SEQ_EMB_case39.png` | 427,042 | `a8f46b595f3e90e5824e64de4c85c609b1d0cc0f134308b5ca4a4af5c9d4bdf4` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/S_WITH_DIRECT_EMB_case1.png` | 440,138 | `83ebfd1d98308e9a2b50d8160c3649b3145280795edc66b804bcf27b46ce20ab` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/S_WITH_DIRECT_EMB_case17.png` | 479,972 | `2cf3f60a1085969f77240d966a30d4f6a0634f1ff5dd18fd638b093158c5b4b6` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/S_WITH_DIRECT_EMB_case35.png` | 464,661 | `3ce18f17c005b5d01236e8f72df2cd11eafa0b046174bd9379979bf9cf87549f` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/S_WITH_DIRECT_EMB_case90.png` | 455,592 | `1c40d214291788d64ef7562fecec0414567e7f1312e80c4e9e8ada7ab3d3a8b3` |
+
 ---
 
-**62 files listed**, none absent.
+**93 files listed**, none absent.

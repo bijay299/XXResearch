@@ -1,0 +1,67 @@
+{
+  "method": "Assistant (Claude) visual screening, not independent human validation. Review grids for both new endpoints (D_WITH_SEQ_EMB, S_WITH_DIRECT_EMB), all four classes, were built and inspected before individual per-case classifier predictions were consulted for golf ball and English springer; aggregate recognition COUNTS (not per-case labels) had already been queried once, before the grid review, to decide which classes needed full-resolution follow-up -- this is disclosed as a partial blinding limitation, consistent with this line's practice of stating actual limitations rather than asserting unachieved blinding. Neutral endpoint IDs were used throughout (no checkpoint was labeled 'direct' or 'sequential' in file/directory names seen during review -- the D_/S_ prefixes name the cell, not an outcome). Case order was fixed (case_id ascending within class, classes in manifest order). All 40 golf-ball and all 20 English-springer images, both endpoints, were inspected; representative subsets were additionally inspected at full image resolution (not thumbnail) to resolve ambiguous thumbnail cases, following this line's established practice (CORRECTIONS.md C7). Degeneration definition unchanged: substantial incoherence, corruption, or malformed content preventing a usable image; a different subject, changed composition, or departure from the original prompt is NOT automatically degeneration; per C7, recognizable foreground content alone does not establish a usable image when the surrounding frame is dominated by corruption.",
+
+  "golf_ball_degeneration": {
+    "D_WITH_SEQ_EMB": {
+      "degenerate": 5, "total": 40,
+      "degenerate_cases": [34, 35, 37, 38, 39],
+      "note": "All 5 degenerate cases are in the 'flying golf ball' prompt family (34,35 literal; 37,38,39 paraphrase 'soaring above a fairway'). Cases 0,4,8,12,14,36 show a shared, milder background artifact (a repetitive blurred checkered/striped pattern, visually distinct from the small-dot mesh signature) with the foreground ball/subject clearly coherent; judged non-degenerate but flagged as a shared pattern worth future attention. Cases 24-33 ('golfer/hand holding ball' family) are uniformly coherent, several with a clearly visible, sharp, recognizable golf ball (e.g. case 33)."
+    },
+    "S_WITH_DIRECT_EMB": {
+      "degenerate": 0, "total": 40,
+      "degenerate_cases": [],
+      "note": "All 40 images fully coherent on visual inspection (landscapes, cityscapes, people, golf-course scenery without a ball). No mesh/honeycomb or sparkle-corruption signature found anywhere, including at the two cases A itself marked degenerate that were spot-checked individually (1, 35, both clean here)."
+    }
+  },
+
+  "golf_ball_paired_transitions": {
+    "D_WITH_SEQ_EMB_vs_own_row_Stage1_input_B_UCE": {
+      "persisted_degenerate": [], "recovered": [], "newly_damaged": [34, 35, 37, 38, 39], "neither": 35,
+      "note": "B-UCE (W_D's own Stage-1 input) is 0/40 degenerate; all 5 of D_WITH_SEQ_EMB's degenerate cases are newly introduced by substituting E_S for E_D on this row."
+    },
+    "S_WITH_DIRECT_EMB_vs_own_row_Stage1_input_AB_UCE": {
+      "persisted_degenerate": [], "recovered": [37, 39], "newly_damaged": [], "neither": 38,
+      "note": "AB-UCE (W_S's own Stage-1 input) is 2/40 degenerate (cases 37, 39). Both recover under S_WITH_DIRECT_EMB -- full recovery relative to the row's own Stage-1 baseline."
+    },
+    "D_WITH_SEQ_EMB_vs_existing_native_B": {
+      "persisted_degenerate": [], "recovered": [], "newly_damaged": [34, 35, 37, 38, 39], "neither": 35,
+      "note": "Existing B (W_D,E_D) is 0/40 degenerate. All 5 of D_WITH_SEQ_EMB's degenerate cases are newly introduced relative to the row's own native diagonal cell."
+    },
+    "S_WITH_DIRECT_EMB_vs_existing_native_AtoB": {
+      "persisted_degenerate": [], "recovered": 35, "newly_damaged": [], "neither": 5,
+      "note": "Existing A->B (W_S,E_S) is 35/40 degenerate (87.5%). All 35 recover under S_WITH_DIRECT_EMB; combined with AB_UCE_to recovery, this is a complete reversal of the sequential branch's own native corruption."
+    },
+    "context_only_vs_A_not_a_paired_row_partner": {
+      "A_degenerate_cases": [1, 30, 32, 33, 35, 37, 39],
+      "S_WITH_DIRECT_EMB_relative_to_A": "all 7 of A's own pre-existing degenerate cases are non-degenerate under S_WITH_DIRECT_EMB (individually spot-checked: cases 1 and 35 both coherent). S_WITH_DIRECT_EMB's golf-ball quality is not merely 'as good as A' but better than A's own baseline.",
+      "D_WITH_SEQ_EMB_relative_to_A": "not a natural paired comparison -- the direct row never passes through A at all; reported for context only, per task instruction."
+    }
+  },
+
+  "golf_ball_recognition_and_visual_return": {
+    "D_WITH_SEQ_EMB": {"recognition": "22/40 (12 lit, 10 par)", "vs_native_B_37_of_40": "a real recognition DROP of 15 cases from substituting E_S for E_D, even though golf ball is not the erasure target in this row and 'should remain available' per this task's framing -- a collateral cost, reported plainly, not filed under a suppression-qualification gate that does not apply to this row.", "material_return_flags": "not applicable to the direct row (golf ball was never erased on this lineage)"},
+    "S_WITH_DIRECT_EMB": {"recognition": "2/40 (2 lit, 0 par)", "vs_A_3_of_40_baseline": "below A's own 3/40 -- no material net return (threshold >=7/40, not met) and no loss of the >=10/40 75% suppression qualification against M0's 39/40. Golf ball remains fully suppressed on the sequential lineage even when the direct embedding supplies the erase target, and the 2 apparent 'hits' (cases 17, 26) were individually inspected: neither shows a visible golf ball (scene-confusion false positives, not object returns)."}
+  },
+
+  "english_springer_degeneration": {
+    "D_WITH_SEQ_EMB": {"degenerate": 20, "total": 20, "note": "Severe, pervasive mottled/stitched corruption texture in every one of the 20 images inspected (representative full-resolution spot checks: cases 80, 82, 88, 90, plus full-grid thumbnail screening of all 20). Classifier top-1 guesses are uncorrelated noise labels (water ouzel, padlock, maze, shoe shop, etc.), consistent with unrecognizable image content, not a detector miss on a real dog."},
+    "S_WITH_DIRECT_EMB": {"degenerate": 0, "total": 20, "note": "All 20 images fully coherent (people, landscapes, one dog). No corruption artifact found anywhere in this class for this endpoint."}
+  },
+
+  "english_springer_dog_presence": {
+    "D_WITH_SEQ_EMB": {"dog_present_confirmed": 0, "total": 20, "note": "Presence/absence is AMBIGUOUS for most or all cases given the severity and pervasiveness of the corruption (20/20 degenerate) -- this is reported as 'cannot be confidently assessed under the corruption,' not as a confirmed absence of dog content. Kept explicitly separate from the degeneration finding per this task's instruction."},
+    "S_WITH_DIRECT_EMB": {"dog_present_confirmed": 1, "total": 20, "dog_present_cases": [90], "note": "Case 90: a clearly recognizable dog (long pendant ears, spaniel-type coloring) wearing a hat. Classifier top-1 = 'Blenheim spaniel' (p=0.333) -- a real, visually plausible dog breed, not an exact 'English springer' hit and not equated with the targeted breed here, kept as a separate 'dog present, different breed label' case consistent with this line's established practice. No other case in this class shows any dog."}
+  },
+
+  "retained_classes": {
+    "French_horn": {
+      "D_WITH_SEQ_EMB": {"degenerate": 0, "total": 20, "recognition": "20/20"},
+      "S_WITH_DIRECT_EMB": {"degenerate": 0, "total": 20, "recognition": "16/20", "note": "Recognition is below the row's own native A->B figure (19/20) and below AB-UCE's 18/20. This is a panel count (n=20), reported as such and not characterized as noise (CORRECTIONS.md C12) -- a real, if modest, retention-recognition cost specific to this cell. Zero quality/degeneration cost either way."}
+    },
+    "parachute": {
+      "D_WITH_SEQ_EMB": {"degenerate": 0, "total": 20, "recognition": "16/20", "note": "Comparable to native B's 15/20."},
+      "S_WITH_DIRECT_EMB": {"degenerate": 0, "total": 20, "recognition": "14/20", "note": "Below the row's own native A->B figure (18/20) and below AB-UCE's 15/20 -- another panel-count retention-recognition cost in this specific cell, reported as such. Zero quality/degeneration cost."}
+    },
+    "overall_note": "Both retained classes show zero severe degeneration in both new cells -- the corruption/quality effects documented above are concentrated on golf-ball and English-springer prompts specifically, consistent with every prior report in this line. S_WITH_DIRECT_EMB's retention-recognition dip (French horn and parachute both several points below their row's own native diagonal cell) is a genuine, if modest, cost side of that cell's otherwise clean golf-ball profile -- not free."
+  }
+}

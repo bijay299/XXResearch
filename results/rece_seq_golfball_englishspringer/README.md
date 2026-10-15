@@ -10,8 +10,9 @@ Gong et al., https://github.com/CharlesGong12/RECE, pinned commit
 | [`FINAL_REPORT.md`](FINAL_REPORT.md) | does deleting a second concept (English springer) from an already-edited checkpoint behave differently than deleting it from pristine SD1.4? Both pass their numeric suppression/retention gates; the visual review finds two sequential-specific quality costs the numbers don't show. |
 | [`refinement_ablation/FINAL_REPORT.md`](refinement_ablation/FINAL_REPORT.md) | **follow-up diagnostic**: is that corruption already present after RECE's preliminary-UCE stage, or does it arise when the adversarial-refinement stage is added? Answer: it arises during refinement, isolated to the sequential branch. |
 | [`refinement_ablation/CLOSEOUT.md`](refinement_ablation/CLOSEOUT.md) | the existing-evidence reconciliation that preceded the diagnostic, including the full-resolution re-verification that produced corrections C1/C2 below |
-| [`reference_A_intervention/FINAL_REPORT.md`](reference_A_intervention/FINAL_REPORT.md) | **causal diagnostic**: does using parent A instead of pristine M0 as the adversarial-embedding reference prevent the refinement corruption found above? Answer: partial, not an unqualified rescue — golf-ball degeneration drops 87.5%→77.5% (net +4 clean cases) at the cost of English-springer suppression weakening 100%→95% (0/20→1/20); retained classes unaffected. |
-| [`CORRECTIONS.md`](CORRECTIONS.md) | **read this alongside all three reports.** Two measured values in `FINAL_REPORT.md` were corrected upward after full-resolution re-verification (both make the finding stronger, not weaker); one summary sentence in the ablation report needs a checkpoint qualifier; two further entries (C4, C5) correct the *description* of prior verification-check scope and the preliminary-UCE slicing convention, added while publishing the reference-A diagnostic |
+| [`reference_A_intervention/FINAL_REPORT.md`](reference_A_intervention/FINAL_REPORT.md) | **causal diagnostic**: does using parent A instead of pristine M0 as the adversarial-embedding reference prevent the refinement corruption found above? Answer: partial, not an unqualified rescue — golf-ball degeneration drops 87.5%→82.5% (net +2 clean cases, after `CORRECTIONS.md` C7's re-review; originally reported as 77.5%/+4) at the cost of English-springer suppression weakening 100%→95% (0/20→1/20); retained classes unaffected. |
+| [`embedding_cross_swap/FINAL_REPORT.md`](embedding_cross_swap/FINAL_REPORT.md) | **causal diagnostic**: does corruption follow the recovered adversarial embedding, the working checkpoint, or their interaction (reference held fixed at M0)? A 2x2 design crossing the direct/sequential working checkpoints with their own recovered embeddings. Answer: mixed — on the erasure target (English springer), corruption follows the embedding cleanly in both directions; on the historical golf-ball class, it is a genuine interaction, severe only when the sequential checkpoint and sequential embedding are combined. |
+| [`CORRECTIONS.md`](CORRECTIONS.md) | **read this alongside all four reports.** Two measured values in `FINAL_REPORT.md` were corrected upward after full-resolution re-verification (both make the finding stronger, not weaker); one summary sentence in the ablation report needs a checkpoint qualifier; C4/C5 correct prior verification-check scope and the preliminary-UCE slicing description; C6–C12 (added while publishing the embedding cross-swap diagnostic) fix a listing bug and re-review five case labels in `reference_A_intervention`, correct a prompt-family claim, decompose an embedding-norm figure, correct an own-script assertion-enforcement claim, correct the token-suffix-length claim again, and retract an unestablished "ordinary noise" characterization |
 | [`PUBLISHED_EVIDENCE_INDEX.md`](PUBLISHED_EVIDENCE_INDEX.md) | exact path, byte count and sha256 of every file published here — verify any row without trusting the table |
 
 ## What is here
@@ -43,6 +44,18 @@ Gong et al., https://github.com/CharlesGong12/RECE, pinned commit
   exactly, full-tensor verification logs, diagnostic traces (embedding
   norms, the G-matrix identity check), and the new endpoint's recognition
   table, visual-review labels, and per-case classifier predictions.
+  `CORRECTED_LABELS.json` here holds C6–C12's re-derivations.
+- **`embedding_cross_swap/`** and **`evidence/embedding_cross_swap/`** —
+  the 2x2 embedding/working-checkpoint cross-swap diagnostic: frozen
+  pre-execution manifest, full-tensor verification logs (including the
+  image-free direct-branch compatibility gate, exact match against the
+  existing `B_english_springer.pt`), per-cell diagnostics (embedding
+  norms/cosine, edit displacement, recovery-fit and erase-fit residuals,
+  retain-projection drift), the two new endpoints' recognition tables,
+  visual-review labels, and per-case classifier predictions.
+  `EMBEDDING_PROVENANCE.json` records the excluded recovered-embedding
+  tensors' shape/dtype/sha256 (the tensors themselves are not published,
+  per this repo's no-checkpoint-binaries convention).
 
 ## What is NOT here
 
