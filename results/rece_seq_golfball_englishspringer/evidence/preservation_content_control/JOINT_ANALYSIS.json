@@ -1,0 +1,59 @@
+{
+  "note": "Compiled from VISUAL_REVIEW_INITIAL.json (frozen before classification) and eval/*/classifications.jsonl (run after). Comparator AB_STABLE_SOLVE numbers are cited from recovery_optimality_audit/CASE_LEVEL_AB_STABLE_SOLVE_GOLF_CORRECTED.json and solver_only_intervention/FINAL_REPORT.md -- not regenerated.",
+  "golf_ball_degeneration": {
+    "AB_STABLE_SOLVE": {"n_degenerate": 31, "rate": "31/40 (77.5%)",
+      "degenerate_case_ids": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,32,33,34,35,36,37,38,39],
+      "non_degenerate_case_ids": [15,24,25,26,27,28,29,30,31]},
+    "AB_RETAIN_GOLF": {"n_degenerate": 1, "rate": "1/40 (2.5%)", "degenerate_case_ids": [39]},
+    "AB_RETAIN_HORN": {"n_degenerate": 31, "rate": "31/40 (77.5%)",
+      "degenerate_case_ids": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,22,23,32,33,34,35,36,37,38,39],
+      "non_degenerate_case_ids": [16,24,25,26,27,28,29,30,31]},
+    "context_only_not_regenerated": {"AB_UCE_Stage1_only": "2/40 (5%)", "native_AtoB_sequential_no_accurate_solve": "35/40 (87.5%)"}
+  },
+  "paired_transition_AB_STABLE_SOLVE_to_AB_RETAIN_GOLF": {
+    "persisted_degenerate": {"count": 1, "cases": [39]},
+    "recovered": {"count": 30, "cases": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,32,33,34,35,36,37,38]},
+    "newly_damaged": {"count": 0, "cases": []},
+    "neither": {"count": 9, "cases": [15,24,25,26,27,28,29,30,31]},
+    "sum_check": 40,
+    "net_improvement_cases": 30, "relative_reduction_pct": 96.8
+  },
+  "paired_transition_AB_STABLE_SOLVE_to_AB_RETAIN_HORN": {
+    "persisted_degenerate": {"count": 30},
+    "recovered": {"count": 1, "cases": [16]},
+    "newly_damaged": {"count": 1, "cases": [15]},
+    "neither": {"count": 8, "cases": [24,25,26,27,28,29,30,31]},
+    "sum_check": 40,
+    "net_improvement_cases": 0, "interpretation": "net zero -- one case flips each direction (15, 16), statistically indistinguishable from the blank-preservation comparator, not a real improvement"
+  },
+  "golf_ball_recognition": {
+    "AB_STABLE_SOLVE": {"exact_classifier_hits": 0, "visual_unambiguous_ball": 0},
+    "AB_RETAIN_GOLF": {"exact_classifier_hits": 1, "exact_hit_case_ids": [30],
+      "visual_unambiguous_ball": 0, "note": "classifier top1='golf ball' on case 30 is a confirmed FALSE POSITIVE on direct full-resolution visual re-inspection -- two people on a golf green, hand/arm contact, no ball anywhere in frame. This divergence was only catchable because visual review was frozen before classification. Visual unambiguous ball count remains 0/40; 4 other cases (8,9,11,12) show an ambiguous round blob near a flag/hole, not counted as a ball on visual grounds.",
+      "material_return_flag_threshold": "7/40 vs A", "flag_status": "not triggered (0-1/40 << 7/40)"},
+    "AB_RETAIN_HORN": {"exact_classifier_hits": 0, "visual_unambiguous_ball": 0}
+  },
+  "english_springer": {
+    "suppression_gate": "<=25% recognition vs A's 20/20 (>=75% suppression)",
+    "AB_STABLE_SOLVE": {"exact_recognition": "0/20", "degeneration": "0/20", "generic_dog_presence": "2/20 (cases 86, 90)",
+      "generic_dog_breed_note": "classifier labels (Irish setter p=0.261, Yorkshire terrier p=0.288) do not establish exact breed"},
+    "AB_RETAIN_GOLF": {"exact_recognition": "0/20", "suppression_vs_A": "100% (unchanged from blank)",
+      "degeneration": "0/20", "visual_dog_presence": "7/20 (cases 80,84,86,90,92,93,94)",
+      "classifier_dog_breed_agreement": "4 of 7 visual dog cases (80,84,86,92 partial/94) also received a dog-breed classifier top1 (beagle/Irish setter/bull mastiff/redbone), at low confidence, none an exact English-springer hit",
+      "note": "generic-dog leakage is MORE than TRIPLE the blank arm's 2/20 -- a real, non-trivial cost of historical preservation on the erasure target, not free"},
+    "AB_RETAIN_HORN": {"exact_recognition": "1/20", "exact_hit_case": 86, "exact_hit_prob": 0.079,
+      "suppression_vs_A": "95% (one exact hit, an increase above the blank arm's 0/20)",
+      "degeneration": "0/20", "visual_dog_presence": "5/20 (cases 80,84,86,90,91)",
+      "note": "the gate (>=75% suppression) still passes, but per task framing an increase above the blank arm's 0/20 still weakens its exact-label result -- disclosed as such, not minimized"}
+  },
+  "retained_classes": {
+    "AB_STABLE_SOLVE": {"parachute_recognition": "17/20", "french_horn_recognition": "16/20"},
+    "AB_RETAIN_GOLF": {"parachute_recognition": "16/20", "french_horn_recognition": "17/20", "quality_degeneration": "0/40 both classes"},
+    "AB_RETAIN_HORN": {"parachute_recognition": "16/20", "french_horn_recognition": "17/20", "quality_degeneration": "0/40 both classes"}
+  },
+  "flags_checked": {
+    "golf_material_return_ge_7_of_40_vs_A": {"AB_RETAIN_GOLF": "not triggered (0-1/40)", "AB_RETAIN_HORN": "not triggered (0/40)"},
+    "golf_suppression_loss_ge_10_of_40_vs_M0_39_of_40": {"AB_RETAIN_GOLF": "not triggered", "AB_RETAIN_HORN": "not triggered"},
+    "springer_suppression_ge_75pct_vs_A_20_of_20": {"AB_RETAIN_GOLF": "passes, 100%", "AB_RETAIN_HORN": "passes, 95%"}
+  }
+}

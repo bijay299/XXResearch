@@ -1,0 +1,95 @@
+{
+  "task": "preservation_content_control",
+  "question": "Can RECE's existing preservation term prevent corruption of previously erased golf-ball prompts, and does historical preservation (retain text = 'golf ball', the already-erased concept) help more than an unrelated preservation prompt (retain text = 'French horn', an unrelated retained class)? This audits an existing method's control variable, not a new method.",
+  "written_before": "any new checkpoint build, any new image generation, any new classification",
+  "not_repeated": [
+    "eligibility", "baseline searches", "parent confirmation", "Stage-1 reconstruction",
+    "both diagonal replays", "numerical_optimality_audit (Stage-2 refinement audit)",
+    "recovery_optimality_audit (embedding-recovery audit)", "AB_STABLE_SOLVE construction (reused as-is)"
+  ],
+  "arms": {
+    "AB_STABLE_SOLVE": {
+      "retain_text_list": [""],
+      "execution": "reuse existing artifact, not rebuilt",
+      "path": "solver_only_intervention/edits/AB_STABLE_SOLVE.pt",
+      "sha256": "3b491531a71c86c3b97dad0a9a50cd52112e82334951c5e041c49278366e8829",
+      "role": "blank-preservation comparator (already published, corrected golf degeneration 31/40)"
+    },
+    "AB_RETAIN_GOLF": {
+      "retain_text_list": ["golf ball"],
+      "execution": "new endpoint, built in this task",
+      "role": "historical preservation -- protects the already-erased golf-ball response under AB_UCE"
+    },
+    "AB_RETAIN_HORN": {
+      "retain_text_list": ["French horn"],
+      "execution": "new endpoint, built in this task",
+      "role": "unrelated-content preservation control -- protects an unrelated retained class's response under AB_UCE"
+    }
+  },
+  "max_new_endpoints": 2,
+  "max_new_images": 200,
+  "images_per_endpoint": 100,
+  "decision_independence": "Whether to run AB_RETAIN_HORN does NOT depend on AB_RETAIN_GOLF's results -- both arms are built, generated, and reviewed before either is interpreted.",
+  "both_arms_start_from": "untouched refinement_ablation/edits/AB_UCE.pt (sha256 3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550) -- the ONLY intended change from AB_STABLE_SOLVE is the one retain text, REPLACED not appended",
+  "held_fixed": {
+    "X_embedding": "embedding_cross_swap/edits/E_S.pt (saved native E_S -- NOT Y*_S, NOT recovered again)",
+    "guide_G": "embedding_cross_swap/edits/guide_embedding.pt, text ' ' (single space)",
+    "lambda": 0.1, "erase_scale": 1.0, "preserve_scale": 0.1,
+    "tokens": "full 77-token sequences for erase/guide/retain, no slicing",
+    "layers": "all 32 cross-attention K/V weights (16 to_v + 16 to_k)",
+    "technique": "replace",
+    "updates": "one refinement update (single-pass closed-form solve, not iterative)",
+    "numerics": "fp64 assembly (H, N formed in fp64 from fp64-upcast operands) + fp64 Cholesky solve, then fp32 weights for the saved checkpoint and fp32 inference for generation"
+  },
+  "equations": {
+    "objective": "J(V) = lambda*||V-W||_F^2 + e*||V X^T - W G^T||_F^2 + p*||V R^T - W R^T||_F^2",
+    "W": "untouched AB_UCE weight for the layer (the already-once-edited, pre-refinement state -- NOT pristine M0)",
+    "H": "lambda*I + e*X^T X + p*R^T R",
+    "N": "lambda*W + e*W G^T X + p*W R^T R",
+    "normal_equation": "H V^T = N^T, solved via fp64 Cholesky, no explicit inverse",
+    "preservation_target_rationale": "Preservation targets are W R^T from the AB_UCE (pre-refinement, already-once-erased) state, not M0 -- preserving pristine M0's golf response would test a different intervention (restoring the erased object) and is explicitly out of scope. M0's role in the already-saved E_S is unchanged by this task."
+  },
+  "inputs": {
+    "W_AB_UCE": {"path": "refinement_ablation/edits/AB_UCE.pt", "sha256": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550"},
+    "X_E_S": {"path": "embedding_cross_swap/edits/E_S.pt", "sha256": "e6ea282ad27441aacf47b2824c693166b59d669eb6ae9520978f0194af89bdb8"},
+    "G_guide": {"path": "embedding_cross_swap/edits/guide_embedding.pt", "sha256": "af70a52ca04de68859e61aa77d85f12a73c75dbd3e7e028a23748011d4695da7",
+                "guide0_raw_tensor_byte_sha256_required": "24a6d0eea897a96a53bfe5c349bad87dbb81ad0b424fe02ff9413895fbdbb93f"},
+    "AB_STABLE_SOLVE_comparator": {"path": "solver_only_intervention/edits/AB_STABLE_SOLVE.pt", "sha256": "3b491531a71c86c3b97dad0a9a50cd52112e82334951c5e041c49278366e8829"}
+  },
+  "new_retain_text_encoding": {
+    "texts": ["golf ball", "French horn"],
+    "method": "native fp32 tokenizer/text_encoder, SD1.4 pinned snapshot, batch [t,t] exactly as edit_model_adversarial's own retain_texts=[t] zip(retain_texts,retain_texts) loop",
+    "requirement": "the two batch rows must be bit-identical (torch.equal); if not, scoped stop, no averaging/repair",
+    "on_equal": "use the common value R once (R_ctx = R_val = R)",
+    "device": "cuda:0, verified idle immediately before allocation",
+    "what_is_NOT_rerun": "guide encoding, blank/retain('') encoding, embedding recovery, Stage-1 construction, AB_STABLE_SOLVE construction"
+  },
+  "tolerances": {
+    "reference_normalized_backward_error_max": 1e-10,
+    "quadratic_gap_identity_discrepancy_max": "1e-8 * max(1, |J(candidate)|, |J(optimum)|)",
+    "candidate_for_quadratic_gap": "the saved AB_STABLE_SOLVE checkpoint's layer weights, scored under EACH arm's own (golf- or horn-specific) objective -- not a repeat of the already-closed AtoB-vs-AB_STABLE_SOLVE comparison"
+  },
+  "reload_verification": [
+    "exactly 32 keys changed vs AB_UCE", "the other 654 tensors byte-identical to AB_UCE",
+    "all 686 tensors finite", "the 32 solved weights equal their intended fp32 casts exactly"
+  ],
+  "fp32_storage_error": "reported separately (fp32-cast-of-V* vs fp64 V*), not held to the 1e-10 fp64 reference tolerance",
+  "generation": {
+    "manifest_path": "/data/bijaypandey/cuig_pilot/rece_golfball_confirmation/manifest/frozen_manifest.json",
+    "manifest_sha256": "ca1401c0064441969fdf3ab329fb9ab8eaab980b63ade62b6f14bd9bd1ef43ad",
+    "settings": "float32 inference, 512x512, 50 LMS steps, guidance 7.5, frozen per-case seeds, frozen ResNet50 (IMAGENET1K_V2) classifier -- all unchanged from every prior endpoint in this line",
+    "base_pipeline": "pinned SD1.4 snapshot 133a221b8aa7292a167afc5127cb63fb5005638b",
+    "rece_revision": "403a67fd86dce6c124b88798340e001e625b28c9"
+  },
+  "mandatory_execution_order": [
+    "1. Generate both 100-image sets. Release GPU after generation.",
+    "2. Visually inspect every new golf-ball and English-springer image at full 512x512 resolution (120 target images total: 2 endpoints x 60). Review all retained-class images too (80 total), full resolution required for any uncertain case.",
+    "3. Record initial per-case labels: degeneration, target presence/absence/ambiguity, generic dogs, breed uncertainty, other structural concerns.",
+    "4. Record each completed view: endpoint, case id, image path, sha256, resolution viewed, judgment.",
+    "5. Save and hash the initial visual-label files and completion records BEFORE any classification.",
+    "6. Only then run classification for AB_RETAIN_GOLF and AB_RETAIN_HORN."
+  ],
+  "classifier_precondition": "A classification run for either new endpoint requires: (a) a completion record with all 120 target-view rows present and (b) a frozen initial-label file saved and hashed. This checks recorded completeness (row counts, required fields present, resolution field populated), NOT whether someone actually looked -- it is never populated from file metadata (image existence/hashes) as a substitute for a human/assistant visual judgment field.",
+  "blinding_disclosure": "Per CORRECTIONS.md C20 (already on record, line-wide): this is assistant (Claude) visual review, not independent human validation, and anonymous filenames alone do not constitute blinding. This task's mandatory execution order (generate -> review -> freeze labels -> THEN classify) is the one concrete, checkable improvement over prior endpoints in this line, where classification preceded review. Whether that order was actually honored is disclosed plainly in the final report, not asserted without the completion-record evidence.",
+  "scoped_stop_rule": "On any consequential provenance/row-check failure (hash mismatch, guide0 raw-byte mismatch, non-bit-identical retain rows, Cholesky failure, reference-solve/quadratic-gap tolerance failure, reload-verification failure), publish a scoped stop before generation or before interpretation, as applicable. No silent substitution, no repair sweep, no tolerance relaxation, no replacement arm."
+}

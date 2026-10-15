@@ -759,9 +759,65 @@ prior disclosure is cited, not re-verified.
   states a line-wide blinding limitation explicitly rather than only
   per-report. C21 reports two additional genuine full-resolution views
   and is explicit that the bulk of the 120-row record remains
-  thumbnail-based, not newly completed. C22 records M0's provenance for
+  thumbnail-based, not newly completed (but see C23: C21 itself
+  double-counted one of those two rows). C22 records M0's provenance for
   the first time and notes no further operand-provenance work was done
   beyond what already existed.
+- **C23–C24 were produced during `preservation_content_control/`**, the
+  existing-method preservation-content control. C23 fixes C21's own
+  double-count (15/120 full-resolution, not 16/104) — a row-counting
+  correction only, no case label affected. C24 indexes the control
+  experiment's headline finding (see its own `FINAL_REPORT.md`): historical
+  preservation (retain text = the erased concept itself) very largely
+  prevents golf-ball corruption (31/40 → 1/40) where an unrelated-content
+  control does not (31/40 → 31/40, net zero), at the real cost of tripled
+  generic-dog leakage on the erasure target — an existing-method result,
+  not a new method.
+
+## C23 — C21 double-counted case 38: the 120-row cross-swap record is 15/120 full-resolution, not 16/104
+
+**What was claimed.** C21 (written in the `recovery_optimality_audit`
+session) states that "`D_WITH_SEQ_EMB` case 38 (golf-ball) and case 87
+(English-springer) were viewed at full resolution this session,"
+implying both were *additional* rows on top of the previously-published
+14, giving 16/120 full-resolution and 104 thumbnail-only.
+
+**What is actually true.** `images/corrected_cases/D_WITH_SEQ_EMB_
+case38.png` already existed before that session and was already one of
+the 120-row record's original 14 full-resolution rows
+(`solver_only_intervention/FINAL_REPORT.md` S5's own accounting, which
+C21 itself quotes: "10 via previously-saved `images/corrected_cases/`
+crops, plus 4 more... 14 rows `full_512x512_crop`"). Case 38 was not a
+new row; only case 87 was. **Corrected: 15/120 full-resolution, 105
+thumbnail-only.** No underlying case label is affected -- this is a
+row-counting correction only, found while preparing
+`preservation_content_control/` (which does not depend on or re-review
+this record; it uses only the already-closed `AB_STABLE_SOLVE` endpoint
+as its comparator).
+
+**Resolution.** C21's text is left as published, per this repository's
+practice; this entry is the correction of record. The 120-row record's
+own per-row `resolution_viewed` field was and remains accurate -- only
+the *prose summary* in C21 miscounted.
+
+## C24 — Preservation-content control: historical preservation vs. an unrelated control (index entry)
+
+`preservation_content_control/FINAL_REPORT.md` (published alongside this
+entry) tests whether RECE's existing preservation term, pointed at the
+already-erased golf-ball response (`AB_UCE`'s own, not pristine M0's),
+prevents the golf-ball corruption characterized throughout this results
+line, and whether that beats an unrelated-content control (`'French
+horn'`). Headline: golf degeneration 31/40 (blank) -> **1/40**
+(historical) vs. 31/40 (unrelated, net zero vs. blank) -- without
+restoring the golf ball (0/40 visual recognition in every arm) and
+without weakening English-springer exact deletion (0/20 in both new
+arms), but with generic-dog leakage on the erasure target more than
+tripling (2/20 -> 7/20) under historical preservation. This is an
+existing-method control result, not a new method -- only the `retain_
+texts` argument changed. Full tables, paired transitions, and the one
+classifier/visual divergence this task's review-before-classify ordering
+caught (case 30, a confirmed false positive) are in the report itself,
+not duplicated here.
 
 ## What must not be concluded from any of this
 

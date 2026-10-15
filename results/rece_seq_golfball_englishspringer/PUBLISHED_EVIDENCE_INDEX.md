@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `cbff93656ba9` — the commit that *records*
+Generated at parent commit `95d5c881ea5a` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -37,7 +37,8 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/numerical_optimality_audit/FINAL_REPORT.md` | 18,057 | `9dfbd58f5c2fdb0cf0b386e513dd8c99a791126cf13e00cef9bede555b62c9ca` |
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
 | `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 48,134 | `f9ae767be6760536df6e7ee3f1d847a8a710ed24eae4b6b900a31de6f09d6310` |
+| `results/rece_seq_golfball_englishspringer/preservation_content_control/FINAL_REPORT.md` | 14,917 | `370214d3721a10067ffa15ff368e031b778df25ca233914c55e5da1618dba01b` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 51,490 | `fc82a55e08aea25dd0453d622d4be9cc8b2ff16c56c8ef2b74b8286a12042f7b` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -147,6 +148,45 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/evidence/recovery_optimality_audit/RESULT.json` | 61,704 | `1b385c98c8cf579fd6e531e7566c974e3221915295a98430afa5e9a5ce591415` |
 | `results/rece_seq_golfball_englishspringer/evidence/recovery_optimality_audit/CASE_LEVEL_AB_STABLE_SOLVE_GOLF_CORRECTED.json` | 2,937 | `43cc1ea6a98c91f6cce288f9d1ff11f7f5a37577603c3d0bd497b028837ed55b` |
 | `results/rece_seq_golfball_englishspringer/evidence/code/run_recovery_optimality_audit.py` | 18,826 | `f727179db33991f1f20cb3e13a37833335bcb270e2ba508eb90c5b137aeedb11` |
+
+## Preservation-content control — does RECE's existing preservation term, pointed at the already-erased golf-ball response, prevent the golf-ball corruption characterized throughout this results line, and does it beat an unrelated-content control ('French horn')? Two new endpoints (AB_RETAIN_GOLF, AB_RETAIN_HORN), fp64 Cholesky build + validation, frozen pre-classification visual review of all 200 generated images, joint comparison against the existing AB_STABLE_SOLVE comparator
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/FROZEN_MANIFEST.json` | 8,631 | `772bf5dcaa7ad4816bc3f3c0347a45d44ae1bff506b552524b3b954c7de22930` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/RETAIN_ENCODING_PROVENANCE.json` | 6,510 | `f32bc58635fd60afdeb48b9b4deb6a6450c972677947700584f296213f344324` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/RESULT_GOLF.json` | 66,186 | `1ebeb40590403fbcdc8894c8397cd309537ab8b6cb13abb9220882f917505bc1` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/RESULT_HORN.json` | 66,204 | `6bc95b228626399a3dadd6a21141cdf10350b03bf839e8e4c57f35b97a056841` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/VISUAL_REVIEW_INITIAL.json` | 1,996 | `614b0190e0def411ef8a12a51466ccd830484a805a76b98ef4c91ebe2f59bc26` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/CASE_LEVEL_COMPLETION_RECORD.json` | 96,138 | `5d63ca2e74616a3f9c14187ad80723834d7fbcd50d14113531ffd2fd3d890f2a` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/CLASSIFIER_PRECONDITION_GATE.json` | 645 | `a7c29de7ae55fc5247690213ee5162bda47df9ae5bfa3f883d4a9593e7e9c02a` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/JOINT_ANALYSIS.json` | 5,108 | `3cc62e734b37484cfc7aa93cb17d0882aaed6e0ce79b45064bb59cf769b0f2ec` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/AB_RETAIN_GOLF.image_report.json` | 37,884 | `4d212e8662b9021a331fc9872787eae1d8defb123a91a56c22be53c6999d392b` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/AB_RETAIN_GOLF.classifications.jsonl` | 42,037 | `403e89274509c1d8cb896151d57fa13377e85d76b486e6928870190f8829b8fb` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/AB_RETAIN_GOLF.classify_report.json` | 237 | `e359c1486d31e9410116ea2a99819ca53ae008b3253181f74bcbbc5e7efc3767` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/AB_RETAIN_HORN.image_report.json` | 37,885 | `d16460955d5c739dc9ebd9db5b9b0d5477d9e92c17600f5a2b5dda0b380ed95f` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/AB_RETAIN_HORN.classifications.jsonl` | 42,123 | `030882ea80027c4bc204b7fc30e4a95aa2528a3f7353e4086bf6f74b6d962843` |
+| `results/rece_seq_golfball_englishspringer/evidence/preservation_content_control/AB_RETAIN_HORN.classify_report.json` | 237 | `5570fa9efaea3948c9171661d3240d2fc5fad685a2995b357c750ae852625557` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/encode_retain_texts.py` | 5,404 | `94cd3742140fb87bc089e956b6916559d3a8192d70bf0627e7c4846b04fb16c8` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/run_build_arm.py` | 11,896 | `fc38b7a7f77ba82a17c16349367062f684410208cfd2fbcb347e0f697ed8788a` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/build_visual_review.py` | 11,162 | `a6db0cd19c4da095e4b34cd1a959758ed1e40132f73b8a5b47e9e6e4bcacbe08` |
+
+## Visual evidence — preservation-content control review grids and disputed/representative full-resolution cases (case 30's classifier false positive, case 39's lone persisting degeneration under historical preservation, case 16's lone recovery under the unrelated control, one representative unrelated-control degenerate case)
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_GOLF/golf_ball.png` | 2,020,315 | `4a6ce5e318470cd6bcd285d4a818b7a2ae6ffd561dfa6ca5a8d7e51239c20e60` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_GOLF/English_springer.png` | 986,439 | `95f6baf66272a21109e776109c03668b719b56b52def79245c0095b832e207c9` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_GOLF/parachute.png` | 914,247 | `183f78213814356e372f0a2baf3ccdce70c55d4e465933461728134047d9db96` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_GOLF/French_horn.png` | 976,200 | `8c509f15e6eeaef0cc318d24318616f621fe1c9f20aca4a77fe826fa48b50b6f` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_HORN/golf_ball.png` | 2,324,416 | `abb930627ceba80535aca6834d610e8ceb1db30d125d380f1401412ccbf11c4d` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_HORN/English_springer.png` | 999,745 | `8fe18594237fc946ff027b64a5e568435201b4d9e72ded06fc245b79c914bd01` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_HORN/parachute.png` | 914,847 | `ebb08514215a64e81f8c373ca0587bff2f819e1d10a848c9116924fb98634ce4` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_RETAIN_HORN/French_horn.png` | 999,202 | `21a21f419321293a92bd90c1896c38cf4ad10d67a8e758157aa5e4f783b956ff` |
+| `results/rece_seq_golfball_englishspringer/images/disputed_cases/AB_RETAIN_GOLF_case30_classifier_false_positive.png` | 466,761 | `0e057cd767ba72eec834c6f8490d833a24b623b09aa6da3c9027e933f9cc32eb` |
+| `results/rece_seq_golfball_englishspringer/images/disputed_cases/AB_RETAIN_GOLF_case39_only_degenerate.png` | 426,357 | `572b62dee430752f74f8933c10f01246ead4d5d1853d27b2a3afced99699f767` |
+| `results/rece_seq_golfball_englishspringer/images/disputed_cases/AB_RETAIN_HORN_case16_only_nondegenerate.png` | 469,416 | `16e9c43e2ef56a46e4f9676986f7edf196ac38d364ed213f3b66892a5c062664` |
+| `results/rece_seq_golfball_englishspringer/images/disputed_cases/AB_RETAIN_HORN_case0_representative_degenerate.png` | 440,880 | `fa0e2aaee789639b52e19fb214f1c976a86b84c5912ccb3e2fdc5bea119d936c` |
 
 ## Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)
 
@@ -285,4 +325,4 @@ LAST, after every other file in this result set is final.
 
 ---
 
-**178 files listed**, none absent.
+**208 files listed**, none absent.
