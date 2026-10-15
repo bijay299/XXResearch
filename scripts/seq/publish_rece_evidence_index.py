@@ -25,6 +25,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/FINAL_REPORT.md",
         f"{R}/refinement_ablation/FINAL_REPORT.md",
         f"{R}/refinement_ablation/CLOSEOUT.md",
+        f"{R}/reference_A_intervention/FINAL_REPORT.md",
         f"{R}/CORRECTIONS.md",
     ]),
     ("Recognition tables and visual-review labels — direct-vs-sequential experiment", [
@@ -53,6 +54,17 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/evidence/code/run_edit.py",
         f"{R}/evidence/code/make_uce_only_checkpoint.py",
     ]),
+    ("Reference-A intervention diagnostic — does using parent A instead of M0 as the close_form_emb_regzero reference rescue the sequential corruption?", [
+        f"{R}/evidence/reference_A_intervention/FROZEN_MANIFEST.json",
+        f"{R}/evidence/reference_A_intervention/VERIFICATION_LOG.json",
+        f"{R}/evidence/reference_A_intervention/UPDATE_NORMS.json",
+        f"{R}/evidence/reference_A_intervention/ANALYSIS_RESULTS.json",
+        f"{R}/evidence/reference_A_intervention/VISUAL_REVIEW.json",
+        f"{R}/evidence/reference_A_intervention/edit_logs/AB_REF_A.ref_a_intervention_log.json",
+        f"{R}/evidence/reference_A_intervention/AB_REF_A.classifications.jsonl",
+        f"{R}/evidence/reference_A_intervention/AB_REF_A.classify_report.json",
+        f"{R}/evidence/code/run_reference_A_intervention.py",
+    ]),
     ("Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)", [
         f"{R}/images/grids/B/golf_ball.png",
         f"{R}/images/grids/B/English_springer.png",
@@ -62,6 +74,8 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/images/grids/B_UCE/English_springer.png",
         f"{R}/images/grids/AB_UCE/golf_ball.png",
         f"{R}/images/grids/AB_UCE/English_springer.png",
+        f"{R}/images/grids/AB_REF_A/golf_ball.png",
+        f"{R}/images/grids/AB_REF_A/English_springer.png",
     ]),
     ("Visual evidence — full-resolution crops for the corrected and ambiguous cases (CORRECTIONS.md C1/C2)", [
         f"{R}/images/corrected_cases/AtoB_case22.png",
@@ -78,6 +92,16 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/images/corrected_cases/AB_UCE_case92.png",
         f"{R}/images/corrected_cases/AtoB_case94.png",
         f"{R}/images/corrected_cases/AB_UCE_case94.png",
+    ]),
+    ("Visual evidence — AB_REF_A full-resolution case crops (reference-A intervention: recovered, newly-damaged, persisted-degenerate, and the English-springer exact-hit case)", [
+        f"{R}/images/corrected_cases/AB_REF_A_case1.png",
+        f"{R}/images/corrected_cases/AB_REF_A_case15.png",
+        f"{R}/images/corrected_cases/AB_REF_A_case28.png",
+        f"{R}/images/corrected_cases/AB_REF_A_case29.png",
+        f"{R}/images/corrected_cases/AB_REF_A_case30.png",
+        f"{R}/images/corrected_cases/AB_REF_A_case31.png",
+        f"{R}/images/corrected_cases/AB_REF_A_case33.png",
+        f"{R}/images/corrected_cases/AB_REF_A_case84.png",
     ]),
 ]
 

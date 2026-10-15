@@ -1,0 +1,74 @@
+{
+  "experiment": "AB_REF_A: reference-only RECE diagnostic",
+  "question": "Does using the pre-second-edit parent A (GolfBall_ep0.pt) as the close_form_emb_regzero adversarial-embedding reference, instead of original M0, prevent sequential refinement corruption while preserving deletion and retained capabilities?",
+  "status_at_freeze_time": "FROZEN BEFORE EXECUTION -- 2026-10-14, prior to any new GPU computation under this directory",
+  "frame": "Causal diagnostic of sequential adaptation, not a new-method claim. Development evidence; generality/novelty unestablished.",
+
+  "inputs": {
+    "working_model_checkpoint": {
+      "name": "AB_UCE.pt",
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/refinement_ablation/edits/AB_UCE.pt",
+      "expected_sha256": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+      "role": "Pre-second-edit Stage-1 (preliminary UCE) result, starting from A. Loaded untouched; refined exactly once in this experiment."
+    },
+    "reference_checkpoint_A": {
+      "name": "GolfBall_ep0.pt",
+      "path": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/checkpoint/GolfBall_ep0.pt",
+      "expected_sha256": "62720e14f828e98f974e04de2e60f6133521b36126401438ec95b0e2b839f97b",
+      "role": "Parent A, loaded into a SEPARATE pipeline object and supplied as the close_form_emb_regzero reference (model_copy), replacing pristine M0. Never edited."
+    },
+    "existing_comparator_checkpoint": {
+      "name": "AtoB_english_springer.pt",
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/edits/AtoB_english_springer.pt",
+      "role": "Existing final A->B (M0-reference) checkpoint. Used ONLY for the image-free replay comparison; not re-edited."
+    },
+    "manifest_100_case": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_golfball_confirmation/manifest/frozen_manifest.json",
+      "expected_sha256": "ca1401c0064441969fdf3ab329fb9ab8eaab980b63ade62b6f14bd9bd1ef43ad"
+    },
+    "pinned_rece_source": {
+      "repo": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/repo_src/RECE",
+      "commit": "403a67fd86dce6c124b88798340e001e625b28c9",
+      "vendored_functions_module": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/seq_edit/vendored_functions.py",
+      "drift_check": "vf.assert_pinned_sources_unchanged() + vf.assert_vendored_text_matches_pinned_source(), run before any editing"
+    },
+    "sd14_base_pipeline": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b"
+  },
+
+  "single_change": "Only the `model_copy` argument supplied to close_form_emb_regzero changes, from a pristine M0 pipeline to a pipeline loaded with checkpoint A (GolfBall_ep0.pt). The working model (model=) is loaded from AB_UCE.pt in both the replay check and the AB_REF_A build, never restarted from A and never re-run through preliminary UCE. AB-UCE itself is never used as a reference.",
+
+  "unchanged_refinement_procedure": {
+    "close_form_emb_regzero": {"regeular_scale": 0.1, "with_to_k": true, "save_path": null, "seed": 42, "concept": "English Springer"},
+    "edit_model_adversarial": {"technique": "replace", "preserve_scale": 0.1, "erase_scale": 1, "lamb": 0.1, "retain_texts": [""]},
+    "new_embedding_prompt": " ",
+    "precision": "float32, unchanged from original working-model behavior"
+  },
+
+  "stages": [
+    "1. Verify AB_UCE.pt and GolfBall_ep0.pt sha256 against this manifest.",
+    "2. Image-free replay: load AB_UCE.pt as working model, fresh pristine M0 pipeline as reference; run close_form_emb_regzero + edit_model_adversarial with the unchanged hyperparameters above; compare ALL resulting UNet tensor VALUES (torch.equal per key, not file hash) against AtoB_english_springer.pt. If any key differs: record differing keys + max abs/rel diff, publish discrepancy, STOP before building AB_REF_A or generating any image. No tolerance, no new comparator, no repair loop.",
+    "3. Only if the replay reproduces the comparator exactly: reload a FRESH, untouched AB_UCE.pt working model (do not reuse or re-refine the replayed object) and a fresh pipeline loaded with A as reference. Verify storage separation across ALL UNet tensors (not one probe key). Run the same close_form_emb_regzero + edit_model_adversarial call with model_copy=A instead of M0. Verify reference A's full UNet state dict is unchanged after refinement (all tensors, value comparison). Assert exactly the 32 expected cross-attention to_k/to_v keys changed vs. the AB_UCE input; report the actual changed-key count and list.",
+    "4. Save diagnostic traces: both recovered concept/adversarial embeddings (replay-M0 vs A-reference), their norms and difference, and per-branch refinement update norms. Compute G = 0.1*I + sum(W_l^T W_l) from the fixed working (AB_UCE) weights independently for both branches and verify bit-identical.",
+    "5. Save the result as AB_REF_A.pt with an edit log mirroring run_edit.py's fields.",
+    "6. Generate at most 100 new images for AB_REF_A only, on the identical frozen 100-case manifest, reusing generate_confirmation.py/classify_confirmation.py unmodified. Reuse all existing outputs for every other endpoint (M0, A, B, B-UCE, AB-UCE, A->B).",
+    "7. Blind-as-feasible visual review (fixed case order, checkpoint identity hidden only to the extent the existing tooling allows -- same stated limitation as prior reviews in this line), separating object presence/absence/ambiguity, generic-dog presence, and severe degeneration. Full-resolution inspection of uncertain cases.",
+    "8. Report recognition, paired quality transitions, and tradeoffs; keep the conclusion conditional per the task's framing.",
+    "9. Publish report + compact evidence to bijay299/XXResearch; release the GPU."
+  ],
+
+  "max_scope": [
+    "One image-free replay of the existing M0-reference refinement from the AB-UCE input.",
+    "One new A-reference refinement endpoint (AB_REF_A).",
+    "At most 100 new images (AB_REF_A only).",
+    "No other experiments, reference variants, tuning, or automatic follow-up."
+  ],
+
+  "do_not": [
+    "Do not use AB-UCE itself as the reference.",
+    "Do not restart the working model from A or rerun preliminary UCE.",
+    "Do not change guide/retain texts, technique, K/V-only scope, or any hyperparameter besides the reference identity.",
+    "Do not introduce a tolerance, substitute comparator, or enter a repair loop if the replay check fails.",
+    "Do not run a regularization or layer sweep.",
+    "Do not launch alternative references or tune until something improves."
+  ]
+}

@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `5ce305171ae7` — the commit that *records*
+Generated at parent commit `f368ab203045` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -32,7 +32,8 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/FINAL_REPORT.md` | 13,390 | `6103a5635cdcd366ca21035195804399c02f9774aeba43c5f9ea7566eff8ca99` |
 | `results/rece_seq_golfball_englishspringer/refinement_ablation/FINAL_REPORT.md` | 11,953 | `7800f70f5a372935b8afc5842df523dbf2075128d7d5f63ae74c703bdc94bdb4` |
 | `results/rece_seq_golfball_englishspringer/refinement_ablation/CLOSEOUT.md` | 5,444 | `c1f01785ffe01c2931b561312ba1c82105eaafb02f596c6bdd1fce1a6500ce25` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 7,174 | `6ad442074fbcdd3a61c8b2b7d954bf4c546516b3417fe1b5e27d596cc49ece25` |
+| `results/rece_seq_golfball_englishspringer/reference_A_intervention/FINAL_REPORT.md` | 18,793 | `a7381a7b39c0948d2d091f0ecb7dc8dba28042b9c9a8cbf4092cddb0bb63bf9a` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 10,718 | `714407035db64d94a3ddd66c72071a6ff57829559add708e83102ca58127de5e` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -75,6 +76,20 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/evidence/code/run_edit.py` | 8,872 | `37c21b15077ebb39cf4ad6e3459526d6401fdece7cd4ed860868ad184d91fb07` |
 | `results/rece_seq_golfball_englishspringer/evidence/code/make_uce_only_checkpoint.py` | 5,353 | `cf07f4db9e50a3f564dc6f1c02a88c1d8dd1978c0e87c25469f137012f1e9bc7` |
 
+## Reference-A intervention diagnostic — does using parent A instead of M0 as the close_form_emb_regzero reference rescue the sequential corruption?
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/FROZEN_MANIFEST.json` | 6,656 | `1807dcf881cc669f00af76dad6793845e584677bbf7685a83e7b58355fe37543` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/VERIFICATION_LOG.json` | 8,119 | `f6a84c621bc8c6312267f4712281dfc20c98f97f6997ba9b51a4c9d03f30709c` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/UPDATE_NORMS.json` | 5,953 | `aed476381f89513fca9c220785f1ba61ff6eb0442de099fef2c7f1b6d81f9fb1` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/ANALYSIS_RESULTS.json` | 5,298 | `5f592fd06eb003426b25a44377860cd34f10c50a6f3e9147ea1b58fe79805bf4` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/VISUAL_REVIEW.json` | 8,581 | `c3bcb41a208583db1b96cadcf1903bdc1f3e0b93f3dbd99ec49d9572764b44d3` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/edit_logs/AB_REF_A.ref_a_intervention_log.json` | 1,003 | `2386203296e38d5ec0a77836a7b8d3a1363c027899ea3a952c5bdbe4748b5a97` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/AB_REF_A.classifications.jsonl` | 50,306 | `6854c4c4d1e9fd6c0898562cd0ee34767bc5449a90004fe9b414719fcc981b82` |
+| `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/AB_REF_A.classify_report.json` | 232 | `8b66555741352b3d93b257d7f5ebb860ccc0b2109ee1a3aabf994c42073ccd94` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/run_reference_A_intervention.py` | 22,132 | `e17d983637272ce4b96531177d2f47c035e86e1e9c889d884d1968df3c96dfa0` |
+
 ## Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)
 
 | path | bytes | sha256 |
@@ -87,6 +102,8 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/images/grids/B_UCE/English_springer.png` | 1,246,928 | `020d1e252ebf9175e22af80fca16b84d74674eaf5e8a6f784bbf5ddc5cc62e90` |
 | `results/rece_seq_golfball_englishspringer/images/grids/AB_UCE/golf_ball.png` | 2,527,837 | `695b464a5b31432d48b8b1019d18771421d1e08642e4b21b8c4af507412fa017` |
 | `results/rece_seq_golfball_englishspringer/images/grids/AB_UCE/English_springer.png` | 1,249,871 | `72107b6eea7b1af613a11108be97dba092f6ef09e1457d19aff80c6e62647092` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_REF_A/golf_ball.png` | 2,968,295 | `22402d192f280dfe0f81d51d2dfee0eef4d9a9dc71d2a397afb77e14e9abed2e` |
+| `results/rece_seq_golfball_englishspringer/images/grids/AB_REF_A/English_springer.png` | 1,262,326 | `329a94ef376833356cbdb2ad4937d89e4aae4bbe644ca52081e7b940684a62af` |
 
 ## Visual evidence — full-resolution crops for the corrected and ambiguous cases (CORRECTIONS.md C1/C2)
 
@@ -107,6 +124,19 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/images/corrected_cases/AtoB_case94.png` | 417,135 | `254e626a6de2ace1d7dc9793b7143e10bd0f2bf87abb4b825575328867013b1e` |
 | `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_UCE_case94.png` | 422,382 | `d44c8ae5d3b442cab6f90524c439b4ed018950cf4e444f62df3f7da629722fff` |
 
+## Visual evidence — AB_REF_A full-resolution case crops (reference-A intervention: recovered, newly-damaged, persisted-degenerate, and the English-springer exact-hit case)
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case1.png` | 416,059 | `667730106d497c10ef363438ae01053cd005338d5748977465f9831e26e037d6` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case15.png` | 461,653 | `acecdb6f1611894ec1ef63968429b045ed4e25535b522de0741d21820cb14e9f` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case28.png` | 407,497 | `8693747e77c53ec5a2cc05536aa55dc5d7f72b3e11db2a07c1ef8f02f1a58547` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case29.png` | 400,790 | `ee6c37571c8e277c98d32f5511f56d61603ffce121c276b9d26599175aea7f24` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case30.png` | 346,950 | `16b2bc9d86f4289b6e15cd541dfe784b47b573e45822ed90f3869d60387ca39a` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case31.png` | 347,094 | `bc12a766eadd87404c68cd1bc6a9f7dbdbc429528153accf9e44756d81ed7a61` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case33.png` | 429,635 | `193d48fe129b53985f31a67f19aa79aa9daf26870de96243298fa24819d9ee0d` |
+| `results/rece_seq_golfball_englishspringer/images/corrected_cases/AB_REF_A_case84.png` | 569,231 | `da43729c6bc6cf474ca566cf7bd2872cc3fd424e2a48ee191f75083a90fef60e` |
+
 ---
 
-**42 files listed**, none absent.
+**62 files listed**, none absent.

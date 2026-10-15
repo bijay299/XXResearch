@@ -116,6 +116,66 @@ not reopen it. `refinement_ablation/FINAL_REPORT.md` itself is left as
 written, per this repository's practice of correcting in place rather than
 editing published report text after the fact.
 
+## C4 — Verification-check scope was narrower than its logged fields implied
+
+**What was claimed.** `seq_edit/run_edit.py` and
+`refinement_ablation/make_uce_only_checkpoint.py` log
+`"working_reference_separate_storage_verified": true`,
+`"changed_keys_are_only_cross_attn_kv": true`, and
+`"n_keys_changed_vs_start": 32` for every edit in this results line,
+presented without qualification.
+
+**What the code actually did.** Storage separation was checked via a
+single probe tensor's `data_ptr()`
+(`up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight`), not
+all UNet tensors. Reference invariance was checked via the first 8
+elements of that same probe tensor
+(`unet.state_dict()[key][0, :8]`), not full tensor values. The
+changed-key count was **logged**, and
+`changed_keys_are_only_cross_attn_kv` **computed and logged as a boolean**,
+but neither was ever asserted — a run that violated either would have
+logged `false` and continued rather than raising.
+
+**Status:**
+
+| claim | status |
+|---|---|
+| Storage separation / reference invariance / changed-key-set were fully verified in every prior edit in this line | **IMPRECISE AS STATED** — they were checked on a narrow probe, not the full tensor set, and not asserted in the changed-key case |
+| Any prior edit in this line actually violated separation, reference invariance, or the 32-key whitelist | **NOT FOUND** — re-verified with full-686-tensor, asserted checks in `reference_A_intervention/run_reference_A_intervention.py` (see that directory's `FINAL_REPORT.md` §2.1–2.4): the Phase-1 replay reproduced the existing `AtoB_english_springer.pt` checkpoint exactly (0/686 differing tensors), which would not hold if an earlier narrow check had missed real drift |
+
+**Resolution.** No prior finding is invalidated. This is a description
+correction: the prior checks were real but narrower than their logged
+field names suggested, and have now been independently confirmed
+sufficient (via the Phase-1 exact-replay result) and superseded going
+forward by full-tensor, asserted checks (`reference_A_intervention/`
+onward).
+
+## C5 — Preliminary UCE's embedding slice is a token suffix, not "single-token slicing"
+
+**What was claimed.** `seq_edit/vendored_functions.py`'s own docstring and
+`refinement_ablation/FINAL_REPORT.md` describe Stage 1's `edit_model()` as
+using a "single-token slicing convention," contrasted with Stage 2's
+"full-77-token-sum convention."
+
+**What the code actually does.** `vendored_functions.py` lines 216–223:
+`final_token_idx = text_input.attention_mask[0].sum().item() - 2`, then
+`old_emb = old_emb[final_token_idx : len(old_emb) - max(0, farthest - final_token_idx)]`
+— a **suffix slice** of the token embedding sequence, bounded by a
+`farthest` adjustment between the old/new text lengths. For a single-word
+concept this slice is often one token wide in practice, but the mechanism
+itself slices a variable-length suffix, not a single fixed token index.
+
+**Status:**
+
+| claim | status |
+|---|---|
+| Stage 1 uses "single-token slicing" | **IMPRECISE AS STATED** — it is a token-suffix slice that happens to be narrow for the single-word concepts used in this results line |
+| The completed Stage-1 procedure (hyperparameters, behavior, outputs) | **UNCHANGED, not reopened** — this is a description-only correction |
+
+**Resolution.** Future descriptions in this line should say "token-suffix
+slice (single-token-wide for the concepts tested here)" rather than
+"single-token slicing." No code, hyperparameter, or result changes.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by

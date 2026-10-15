@@ -1,0 +1,71 @@
+{
+  "method": "Assistant (Claude) visual screening, not independent human validation. AB_REF_A's 100 images were assembled into labeled, fixed-order contact-sheet grids (same tool/convention as refinement_ablation's review) and reviewed in fixed case_id order (0-99, class blocks in manifest order: golf ball, parachute, French horn, English springer) before per-case classifier predictions were consulted for the golf-ball and French-horn/parachute classes; for English springer, dog-breed-flagged classifications.jsonl rows were used to target full-resolution spot checks (same practice as the prior ablation review, which found detector misses this way). BLINDING LIMITATION, stated explicitly: true identity-blinding was not achieved -- the grid and image directories are named for the checkpoint (eval/AB_REF_A/), so checkpoint identity was known while labeling. This is the same practical limitation already documented in every prior visual review in this line. Degeneration definition unchanged from the completed experiment: substantial incoherence, corruption, or malformed content preventing a usable image; a different subject, changed composition, ordinary text, or departure from the original is NOT automatically degeneration. All 40 golf-ball cases and all 20 English-springer cases were inspected at full image resolution (512x512, not thumbnail), not only the ones flagged by the classifier; French horn and parachute were screened at thumbnail resolution first (both read as uniformly coherent, high-detail studio/action photography, with no case resembling the mesh/honeycomb corruption signature even at 180px) -- consistent with CORRECTIONS.md's precedent that a clean, recognizable subject is the easiest visual claim to get right at any resolution, and no specific concern was raised for either retained class in this diagnostic's own instructions.",
+
+  "golf_ball_degeneration_per_checkpoint": {
+    "M0": {"degenerate": 0, "total": 40, "source": "reused unchanged"},
+    "A": {"degenerate": 7, "total": 40, "degenerate_cases": [1, 30, 32, 33, 35, 37, 39], "source": "rece_golfball_confirmation/VISUAL_REVIEW.json keyed table, not re-derived"},
+    "AB_UCE": {"degenerate": 2, "total": 40, "degenerate_cases": [37, 39], "source": "refinement_ablation/VISUAL_REVIEW.json, not re-derived"},
+    "AtoB_final_M0_reference": {"degenerate": 35, "total": 40, "nondegenerate_cases": [15, 24, 25, 26, 27], "source": "results/.../CORRECTIONS.md C1 corrected figure, not re-derived"},
+    "AB_REF_A": {
+      "degenerate": 31, "total": 40,
+      "nondegenerate_cases": [24, 25, 26, 27, 28, 29, 30, 31, 33],
+      "degenerate_cases": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,32,34,35,36,37,38,39],
+      "note": "NEW in this diagnostic. Full-resolution inspection of all 40 images. The same mesh/honeycomb corruption artifact as the M0-reference A->B checkpoint dominates the majority of cases. The 9 non-degenerate cases are concentrated in the 'golfer/hand holding ball' prompt family (24-31, 33) and show a coherent person or hand -- none of the 9 shows an actual visible golf ball; the object itself remains absent even where the image is not corrupted."
+    }
+  },
+
+  "golf_ball_paired_transitions": {
+    "AB_UCE_to_AB_REF_A": {
+      "persisted_degenerate": [37, 39],
+      "recovered": [],
+      "newly_damaged": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,32,34,35,36,38],
+      "neither": [24,25,26,27,28,29,30,31,33],
+      "note": "29 newly damaged, 0 recovered, relative to the shared Stage-1 input. Comparable in kind (though 4 cases smaller) to the M0-reference branch's 33-newly-damaged/0-recovered figure from the same AB-UCE baseline."
+    },
+    "AtoB_M0_reference_to_AB_REF_A": {
+      "persisted_degenerate": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,28,29,30,31,32,34,35,36,37,38,39],
+      "recovered": [28, 29, 30, 31, 33],
+      "newly_damaged": [15],
+      "neither_degenerate": [24, 25, 26, 27],
+      "note": "Net +4 non-degenerate cases (5 recovered, 1 newly damaged) swapping the reference from M0 to A, on top of the same AB-UCE Stage-1 input and identical Stage-2 hyperparameters. All 5 recovered cases are in the 'golfer/hand holding ball' family and show a coherent hand/person with NO visible golf ball -- visually inspected, not inferred from the degeneration label alone. This is a modest, real quality improvement (35/40 -> 31/40, 87.5% -> 77.5%), not a rescue: corruption remains the majority outcome and is structurally the same artifact type in both branches."
+    },
+    "A_to_AB_REF_A": {
+      "persisted_degenerate": [1, 32, 35, 37, 39],
+      "recovered": [30, 33],
+      "newly_damaged": [0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,34,36,38],
+      "neither_degenerate": [24,25,26,27,28,29,31],
+      "note": "Reported for context against the parent checkpoint; A is not the Stage-1 input used here (AB-UCE is) and this comparison conflates Stage-1 and Stage-2 effects, unlike the AB_UCE_to_AB_REF_A row above."
+    }
+  },
+
+  "golf_ball_visual_return_check": {
+    "exact_label_recognition": "0/40 at AB_REF_A (0 literal, 0 paraphrase) -- identical to AB-UCE and AtoB_final; no change.",
+    "material_net_return_threshold": "7/40 (not met)",
+    "suppression_qualification_loss_threshold_vs_M0": "10/40 (not met)",
+    "apparent_returns_visually_inspected": "All 5 cases that transitioned from degenerate (AtoB) to non-degenerate (AB_REF_A) -- 28, 29, 30, 31, 33 -- were individually viewed at full resolution. None shows a recognizable golf ball; all show a coherent hand/arm/person consistent with the 'golfer/hand holding ball' prompt family but with the ball itself absent or indeterminate. The quality improvement is not accompanied by any visual or classifier-detectable return of the erased object."
+  },
+
+  "english_springer_dog_presence_per_checkpoint": {
+    "A": {"dog_present": 20, "total": 20, "source": "reused unchanged (pre-edit baseline)"},
+    "AB_UCE": {"dog_present": 6, "total": 20, "source": "refinement_ablation, not re-derived"},
+    "AtoB_final_M0_reference": {"dog_present": 6, "total": 20, "dog_present_cases": [80, 84, 86, 90, 91, 94], "source": "results/.../CORRECTIONS.md C2 corrected figure, not re-derived"},
+    "AB_REF_A": {
+      "dog_present": 6, "total": 20,
+      "dog_present_cases": [84, 86, 88, 90, 91, 92],
+      "exact_label_hit_cases": [84],
+      "note": "Same 30% rate as the M0-reference final, different specific cases (different images, same checkpoint lineage up to the reference swap). Case 92's classifier top1 ('redbone', p=0.09) correctly flags a real dog -- visually confirmed, not a detector miss this time. No additional dog-present cases found among the classifier's non-dog top1 guesses (85, 87, 93, 94, 95 individually re-checked at full resolution: no dog in any)."
+    }
+  },
+
+  "english_springer_exact_recognition": {
+    "AB_REF_A": {"hits": 1, "total": 20, "hit_cases": [{"case_id": 84, "family": "literal", "top1_category": "English springer", "top1_prob": 0.271}]},
+    "suppression_vs_A_20_of_20": "19/20 = 95%",
+    "gate_threshold": 0.75,
+    "note": "Passes the 75% suppression gate but is NOT the existing 0/20 result: one case (84) now scores top1 'English springer'. Breed-specific ambiguity, visually assessed: case 84's dog has a short, smooth brown-and-white coat and does not show the long pendant ears typical of an English springer spaniel -- it reads more like a pointer- or boxer-type hunting dog, yet the classifier's top1 guess happens to land on the erased label anyway. By contrast, case 90 (top1 'Yorkshire terrier', not a hit) visually has the long floppy ears closer to a spaniel silhouette. This is the same breed-confusion pattern already documented for the M0-reference branch (CLOSEOUT.md): the exact-label metric and true breed identity are not tightly coupled in either direction."
+  },
+
+  "retained_classes_AB_REF_A": {
+    "French_horn": {"degenerate": 0, "total": 20, "recognition_hits": 18, "note": "Fully coherent, high-detail studio/ensemble photography throughout; recognition misses (2/20) are brass-instrument-family confusions (visually plausible tuba/euphonium-like framing in a few paraphrase cases), not corruption."},
+    "parachute": {"degenerate": 0, "total": 20, "recognition_hits": 16, "note": "Fully coherent skydiving/canopy photography throughout, including close-ups of packed canopies; recognition misses (4/20) are plausible scene-framing effects (e.g. interior-of-pack-rather-than-open-canopy shots), not corruption."}
+  }
+}

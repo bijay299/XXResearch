@@ -10,7 +10,8 @@ Gong et al., https://github.com/CharlesGong12/RECE, pinned commit
 | [`FINAL_REPORT.md`](FINAL_REPORT.md) | does deleting a second concept (English springer) from an already-edited checkpoint behave differently than deleting it from pristine SD1.4? Both pass their numeric suppression/retention gates; the visual review finds two sequential-specific quality costs the numbers don't show. |
 | [`refinement_ablation/FINAL_REPORT.md`](refinement_ablation/FINAL_REPORT.md) | **follow-up diagnostic**: is that corruption already present after RECE's preliminary-UCE stage, or does it arise when the adversarial-refinement stage is added? Answer: it arises during refinement, isolated to the sequential branch. |
 | [`refinement_ablation/CLOSEOUT.md`](refinement_ablation/CLOSEOUT.md) | the existing-evidence reconciliation that preceded the diagnostic, including the full-resolution re-verification that produced corrections C1/C2 below |
-| [`CORRECTIONS.md`](CORRECTIONS.md) | **read this alongside both reports.** Two measured values in `FINAL_REPORT.md` were corrected upward after full-resolution re-verification (both make the finding stronger, not weaker), and one summary sentence in the ablation report needs a checkpoint qualifier |
+| [`reference_A_intervention/FINAL_REPORT.md`](reference_A_intervention/FINAL_REPORT.md) | **causal diagnostic**: does using parent A instead of pristine M0 as the adversarial-embedding reference prevent the refinement corruption found above? Answer: partial, not an unqualified rescue — golf-ball degeneration drops 87.5%→77.5% (net +4 clean cases) at the cost of English-springer suppression weakening 100%→95% (0/20→1/20); retained classes unaffected. |
+| [`CORRECTIONS.md`](CORRECTIONS.md) | **read this alongside all three reports.** Two measured values in `FINAL_REPORT.md` were corrected upward after full-resolution re-verification (both make the finding stronger, not weaker); one summary sentence in the ablation report needs a checkpoint qualifier; two further entries (C4, C5) correct the *description* of prior verification-check scope and the preliminary-UCE slicing convention, added while publishing the reference-A diagnostic |
 | [`PUBLISHED_EVIDENCE_INDEX.md`](PUBLISHED_EVIDENCE_INDEX.md) | exact path, byte count and sha256 of every file published here — verify any row without trusting the table |
 
 ## What is here
@@ -31,7 +32,17 @@ Gong et al., https://github.com/CharlesGong12/RECE, pinned commit
   cases named in `CORRECTIONS.md` (golf-ball cases 22, 34, 39; English-
   springer cases 84, 88, 92, 94), at both the Stage-1-only and final
   checkpoints, so the before/after contrast behind the stage-localization
-  finding is directly inspectable.
+  finding is directly inspectable; plus `AB_REF_A_case*.png` for the
+  reference-A intervention's own recovered/newly-damaged/persisted golf-
+  ball cases and its one English-springer exact-hit case.
+- **`reference_A_intervention/`** and **`evidence/reference_A_intervention/`**
+  — the reference-only diagnostic (parent A vs. pristine M0 as the
+  `close_form_emb_regzero` adversarial-embedding reference), including the
+  frozen pre-execution manifest, the image-free replay that validated the
+  reconstructed AB-UCE intermediate against the existing final checkpoint
+  exactly, full-tensor verification logs, diagnostic traces (embedding
+  norms, the G-matrix identity check), and the new endpoint's recognition
+  table, visual-review labels, and per-case classifier predictions.
 
 ## What is NOT here
 
