@@ -27,6 +27,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/refinement_ablation/CLOSEOUT.md",
         f"{R}/reference_A_intervention/FINAL_REPORT.md",
         f"{R}/embedding_cross_swap/FINAL_REPORT.md",
+        f"{R}/numerical_optimality_audit/FINAL_REPORT.md",
         f"{R}/CORRECTIONS.md",
     ]),
     ("Recognition tables and visual-review labels — direct-vs-sequential experiment", [
@@ -83,6 +84,12 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/evidence/code/run_embedding_cross_swap.py",
         f"{R}/evidence/code/compute_diagnostics.py",
         f"{R}/evidence/reference_A_intervention/CORRECTED_LABELS.json",
+    ]),
+    ("Numerical-optimality audit — does the native closed-form UCE solve actually solve its own stated regularized objective, for all four embedding_cross_swap cells and all 32 edited K/V layers? (CPU-only, fp64 reference solve)", [
+        f"{R}/evidence/numerical_optimality_audit/FROZEN_MANIFEST.json",
+        f"{R}/evidence/numerical_optimality_audit/RESULT.json",
+        f"{R}/evidence/numerical_optimality_audit/CASE_LEVEL_COMPLETION_RECORD.json",
+        f"{R}/evidence/code/run_numerical_optimality_audit.py",
     ]),
     ("Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)", [
         f"{R}/images/grids/B/golf_ball.png",

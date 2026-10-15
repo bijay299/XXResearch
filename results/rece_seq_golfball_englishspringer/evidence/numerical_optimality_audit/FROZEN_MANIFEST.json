@@ -1,0 +1,125 @@
+{
+  "experiment": "numerical_optimality_audit: does edit_model_adversarial's native closed-form UCE update exactly solve its own regularized least-squares objective, for all four embedding_cross_swap cells and all 32 edited cross-attention K/V layers?",
+  "status_at_freeze_time": "FROZEN BEFORE EXECUTION -- 2026-10-14, prior to any new computation under this directory",
+  "frame": "Numerical-implementation diagnostic of the native closed-form solver, not an image-quality or research-success evaluation. Confirms or refutes one specific candidate mechanism (solver inaccuracy) for the quality differences already documented in embedding_cross_swap/FINAL_REPORT.md; does not itself re-run, re-score, or alter any image-level result.",
+  "authorization_scope": [
+    "CPU-only linear algebra on already-saved tensors (checkpoints + saved embeddings).",
+    "No GPU allocation, no image generation, no model training, no embedding recovery, no baseline search, no parameter sweep, no new evaluation checkpoint.",
+    "Audits the ACTUAL saved final weights from embedding_cross_swap and refinement_ablation; does not replay or reconstruct an edit."
+  ],
+
+  "input_hashes_sha256_verified_2026-10-14": {
+    "W_D (refinement_ablation/edits/B_UCE.pt)": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+    "W_S (refinement_ablation/edits/AB_UCE.pt)": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+    "native final B (edits/B_english_springer.pt)": "c711e97127d3dcca9d6752e86d64fba8240ed20347c699179f9fe0859267b9dc",
+    "native final AtoB (edits/AtoB_english_springer.pt)": "ec16c9f748035b832d57dbe6b2eaa33d0e26279fe9a852eb171837f48a7a2469",
+    "crossed final D_WITH_SEQ_EMB (embedding_cross_swap/edits/D_WITH_SEQ_EMB.pt)": "234c5cf39410a00f74a1c7ae7d3d412a6da172582c31c24d6c522ba58e466801",
+    "crossed final S_WITH_DIRECT_EMB (embedding_cross_swap/edits/S_WITH_DIRECT_EMB.pt)": "fa88928baab20db752cdf2b9bc88e8c9460b886e62ecb15e0c23865a6f04f59b",
+    "E_D (embedding_cross_swap/edits/E_D.pt)": "32d1bd98471b6672310228470feb8ab18f58c557eb5b1c4c300dffef0ebd4c3b",
+    "E_S (embedding_cross_swap/edits/E_S.pt)": "e6ea282ad27441aacf47b2824c693166b59d669eb6ae9520978f0194af89bdb8",
+    "guide_embedding (embedding_cross_swap/edits/guide_embedding.pt)": "af70a52ca04de68859e61aa77d85f12a73c75dbd3e7e028a23748011d4695da7",
+    "retain_embedding (embedding_cross_swap/edits/retain_embedding.pt)": "a79c339931fb7f032c04fe8f72fbccc363083572e6ce808b2caf5c68dbf5f87a",
+    "hash_resolution_method": "W_D/W_S/native-final-B/native-final-AtoB hashes taken verbatim from embedding_cross_swap/FROZEN_MANIFEST.json and VERIFICATION_LOG.json's input_verification block; crossed-final D_WITH_SEQ_EMB/S_WITH_DIRECT_EMB hashes taken verbatim from VERIFICATION_LOG.json's phase3_new_cells.*.out_checkpoint_sha256; E_D/E_S/guide_embedding/retain_embedding hashes taken verbatim from embedding_cross_swap/EMBEDDING_PROVENANCE.json. All ten independently recomputed with `sha256sum` against the live files on host hyperplane immediately before writing this manifest and found to match exactly (see verification_log.json's input_verification_recheck, written by the audit script itself at run time)."
+  },
+
+  "pinned_source": {
+    "repo": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/repo_src/RECE",
+    "commit": "403a67fd86dce6c124b88798340e001e625b28c9",
+    "function_audited": "erase_methods/uce.py :: edit_model_adversarial",
+    "drift_check": "git rev-parse HEAD verified equal to pinned commit; git diff --stat verified empty (no local modifications) before reading the function."
+  },
+
+  "fixed_hyperparameters_confirmed_from_run_embedding_cross_swap.py_and_run_edit.py": {
+    "lamb": 0.1,
+    "erase_scale": 1,
+    "preserve_scale": 0.1,
+    "technique": "replace",
+    "with_to_k": true,
+    "guide_text": " ",
+    "retain_texts": [""],
+    "layers_to_edit": null,
+    "n_edited_layers": 32,
+    "token_handling": "full 77-token padded sequence, no slicing (Stage 2 / edit_model_adversarial convention; distinct from Stage 1's vendored edit_model() suffix slice, see CORRECTIONS.md C5/C11 -- not relevant to this audit, which only concerns Stage 2's closed form)",
+    "precision_of_native_computation": "float32 (unchanged from original working-model behavior, per embedding_cross_swap/FROZEN_MANIFEST.json)"
+  },
+
+  "cells": {
+    "W_D,E_D (existing direct final B)": {
+      "pre_edit_weight_source": "refinement_ablation/edits/B_UCE.pt",
+      "embedding_X_source": "embedding_cross_swap/edits/E_D.pt",
+      "native_final_V_source": "edits/B_english_springer.pt"
+    },
+    "W_D,E_S (D_WITH_SEQ_EMB, new cell)": {
+      "pre_edit_weight_source": "refinement_ablation/edits/B_UCE.pt",
+      "embedding_X_source": "embedding_cross_swap/edits/E_S.pt",
+      "native_final_V_source": "embedding_cross_swap/edits/D_WITH_SEQ_EMB.pt"
+    },
+    "W_S,E_D (S_WITH_DIRECT_EMB, new cell)": {
+      "pre_edit_weight_source": "refinement_ablation/edits/AB_UCE.pt",
+      "embedding_X_source": "embedding_cross_swap/edits/E_D.pt",
+      "native_final_V_source": "embedding_cross_swap/edits/S_WITH_DIRECT_EMB.pt"
+    },
+    "W_S,E_S (existing sequential final AtoB)": {
+      "pre_edit_weight_source": "refinement_ablation/edits/AB_UCE.pt",
+      "embedding_X_source": "embedding_cross_swap/edits/E_S.pt",
+      "native_final_V_source": "edits/AtoB_english_springer.pt"
+    }
+  },
+
+  "shared_fixed_tensors": {
+    "G_guide_embedding": {"source": "embedding_cross_swap/edits/guide_embedding.pt", "note": "text_encoder(' '), index [0] of the saved [1,77,768] tensor. Verified bit-identical across the W_D- and W_S-loaded pipelines at recovery time (embedding_cross_swap/VERIFICATION_LOG.json phase1_recovery.guide_embedding_agrees_across_pipelines=true) -- used unmodified for all four cells."},
+    "R_retain_embedding": {"source": "embedding_cross_swap/edits/retain_embedding.pt", "note": "text_encoder(''), index [0] of the saved [1,77,768] tensor. Verified bit-identical across pipelines the same way. edit_model_adversarial itself RECOMPUTES this internally via a batched tokenizer call ([old_text,new_text]=['',''], batch of 2) rather than taking a precomputed tensor; the saved retain_embedding.pt was computed as a single-item batch (batch of 1). Text encoder self-attention/LayerNorm is per-sequence (no cross-example batch dependence in CLIP's text transformer under a correct causal-mask implementation), so these are expected, NOT independently re-verified, to be bit-identical. This operand-level assumption is disclosed, not re-derived -- per task scope, text encoders are not recomputed."}
+  },
+
+  "equations": {
+    "objective": "J(V) = lambda*||V-W||_F^2 + erase*||V X^T - W G^T||_F^2 + preserve*||V R^T - W R^T||_F^2, X,G,R arranged tokens-by-input-dimension ([77,768]); V,W are [d_out,768] per-layer projection weights (to_v or to_k).",
+    "normal_matrices": "H = lambda*I_768 + erase*(X^T X) + preserve*(R^T R)  [768x768, independent of layer, depends only on the cell's X and the fixed R]; N_layer = lambda*W_layer + erase*(W_layer (G^T X)) + preserve*(W_layer (R^T R))  [d_out x 768, per layer]",
+    "stationarity_condition": "V*_layer . H = N_layer  (V* = N_layer @ H^-1, valid since H is symmetric)",
+    "derivation_check_performed": "dJ/dV = 2*lambda*(V-W) + 2*erase*(V X^T - W G^T) X + 2*preserve*(V R^T - W R^T) R, set to 0, algebraically reduces to V.H=N above -- confirmed by hand before coding, cross-checked against edit_model_adversarial's own mat1/mat2 accumulation (mat2 -> H, mat1 -> N, projection_matrices[layer_num].weight = mat1 @ inverse(mat2) -> V = N @ H^-1).",
+    "why_each_layer_uses_its_own_pre_edit_W_despite_sequential_traversal": "The 32 layers are 32 DISJOINT weight matrices (16 to_v + 16 to_k of different cross-attention modules). The outer `for layer_num in range(32)` loop reads `projection_matrices[layer_num].weight` into mat1/mat2 and only overwrites that SAME layer_num's weight at the end of its own iteration; no other layer's update touches it. So each layer's target is built from that layer's own weight as it stood when this edit_model_adversarial call began, regardless of traversal order -- not because of any ordering safeguard, but because distinct layers never alias the same tensor. (Note this is layer-independence WITHIN one call; the row-level W we audit, B_UCE.pt/AB_UCE.pt, is itself the pre-edit weight supplied to the Stage-2 call we are auditing -- the question of how THAT weight was produced by Stage 1 is out of scope here.)",
+    "quadratic_gap_identity": "J(V) - J(V*) = tr( (V-V*) H (V-V*)^T )  [derived by hand from the bilinear expansion of J; H symmetric, N=V*H], checked numerically against the direct objective difference with tolerance 1e-8*max(1,|J(V)|,|J(V*)|)."
+  },
+
+  "numerical_method": {
+    "upcast": "All operands (W, X, G, R, V_native) cast to float64 BEFORE forming H and N -- not by casting an already-rounded float32 Gram matrix.",
+    "solve": "H V*^T = N^T solved per-layer via Cholesky factorization of H (symmetric; expected positive-definite since lambda=0.1>0 adds a strictly-positive diagonal floor to a PSD sum of Gram matrices). No explicit matrix inversion. H (and its Cholesky factor) depends only on the cell's X and the fixed R, so it is identical across all 32 layers within a cell and is factored ONCE per cell and reused for all 32 layers (4 factorizations total, not 128).",
+    "fallback_if_cholesky_fails": "If Cholesky fails (not PD within fp64 tolerance), this is reported as an unresolved reference-validity diagnostic (per task section 5), not patched with jitter, truncated SVD, or altered regularization.",
+    "threads_and_devices": "torch.set_num_threads bounded to a small fixed count; CUDA_VISIBLE_DEVICES='' set in the audit process environment; no .cuda() call anywhere in the script; no CUDA allocation at any point.",
+    "memory": "Each of the 6 required UNet checkpoints (~3.4GB fp32 each) is loaded once, the 32 needed cross-attn to_k/to_v tensors are extracted and upcast, and the full state dict is freed before moving to the next checkpoint."
+  },
+
+  "metrics_per_layer_per_cell": [
+    "H: finite (all elements), symmetry error ||H-H^T||_F, min/max eigenvalue, spectral condition number (lambda_max/lambda_min)",
+    "Normalized stationarity/backward error for native V and reference V*: ||V H - N||_F / (||V||_F * ||H||_2 + ||N||_F)  [||H||_2 = lambda_max, H symmetric PSD]",
+    "||V_native - V*||_F relative to ||V*||_F, and relative to native edit displacement ||V_native - W||_F",
+    "J components (regularization/erase/preserve) and total J, evaluated at V=W, V=V_native, V=V*",
+    "Absolute excess objective J(V_native)-J(V*), and relative excess (J(V_native)-J(V*)) / max(1e-30, |J(V*)|)",
+    "Quadratic gap tr((V_native-V*) H (V_native-V*)^T), compared against the direct objective difference J(V_native)-J(V*)",
+    "Output-rounding comparison: V*_fp32 = V*.to(fp32), then J evaluated at V*_fp32.to(fp64) -- isolates output-rounding scale only, not all native computation error",
+    "Zero-denominator handling: any ratio whose denominator underflows below 1e-30 is reported as the raw numerator/denominator pair with the ratio marked undefined, never silently dropped or clamped to a nonzero floor without saying so"
+  ],
+
+  "aggregation": [
+    "Per-layer tables (32 rows) published per cell, not just an average.",
+    "Per-cell aggregates: total J over all 32 layers for W/V_native/V*, total quadratic-norm quantities (sqrt of summed squared Frobenius norms across layers) for displacement/backward-error numerators, and median + maximum per-layer relative error (both the normalized backward error and ||V-V*||_F/||V*||_F) -- max reported explicitly so a single bad layer cannot hide in an average."
+  ],
+
+  "validation_tolerances_frozen_before_interpretation": {
+    "reference_backward_error_tolerance": "normalized backward error for V* must be <= 1e-10, per layer, or that layer's reference solve is reported as an unresolved diagnostic, not interpreted.",
+    "quadratic_gap_identity_tolerance": "|[J(V_native)-J(V*)] - tr((V_native-V*)H(V_native-V*)^T)| <= 1e-8 * max(1, |J(V_native)|, |J(V*)|); cancellation in this check is reported where the two terms are large and close.",
+    "note": "These tolerances validate the fp64 reference solve's OWN internal consistency. They are not image-quality or research-success thresholds, and are not relaxed after seeing results."
+  },
+
+  "decision_rule_frozen_before_interpretation": [
+    "Native outputs differ materially from V* (excess objective beyond simple float32-output-rounding scale, per layer or in aggregate) -> numerical implementation becomes a concrete candidate mechanism for the embedding_cross_swap quality differences, requiring a separately authorized image-level follow-up to test (not run here).",
+    "Native outputs closely match V* -> this specific erase-solver numerical-accuracy explanation is closed; any large erase/retain residual in J is then interpreted as a constraint-tradeoff property of the (lambda, erase, preserve) weighting itself, not a solver defect. No precision tuning is performed in response.",
+    "Mixed or provenance-limited evidence (e.g. a missing/mismatched input, a failed Cholesky, a reference backward-error or identity-check tolerance violation) -> reported as an explicit unresolved diagnostic for the affected cell/layer, with aggregates for that cell marked provisional; not papered over by excluding the failing layer from the average.",
+    "Agreement between native and V* does not by itself validate the embedding-recovery step (close_form_emb_regzero) that produced E_D/E_S -- that is a different computation, not tested by this audit."
+  ],
+
+  "max_scope": [
+    "One CPU-only linear-algebra audit script, run once per cell (4 cells x 32 layers = 128 layer-cell audits).",
+    "No golf-subspace search, no norm scaling, no alternative reference construction, no new concept, no stable-solve image generation, no automatic follow-up.",
+    "No replacement model checkpoint is assembled from any diagnostic per-layer solution."
+  ]
+}

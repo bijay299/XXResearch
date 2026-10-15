@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `5b2550c89084` — the commit that *records*
+Generated at parent commit `0d60526e1112` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -34,7 +34,8 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/refinement_ablation/CLOSEOUT.md` | 5,444 | `c1f01785ffe01c2931b561312ba1c82105eaafb02f596c6bdd1fce1a6500ce25` |
 | `results/rece_seq_golfball_englishspringer/reference_A_intervention/FINAL_REPORT.md` | 18,793 | `a7381a7b39c0948d2d091f0ecb7dc8dba28042b9c9a8cbf4092cddb0bb63bf9a` |
 | `results/rece_seq_golfball_englishspringer/embedding_cross_swap/FINAL_REPORT.md` | 18,931 | `8ac9d8c1094f8868afde3d66779a5e0c065db487302ba99500802313ae674d10` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 25,501 | `14d8b2749043376d63d20261c1ff9dd4cfce36ddf84f500a1d5539cdd2c4f391` |
+| `results/rece_seq_golfball_englishspringer/numerical_optimality_audit/FINAL_REPORT.md` | 18,057 | `9dfbd58f5c2fdb0cf0b386e513dd8c99a791126cf13e00cef9bede555b62c9ca` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 33,916 | `a750146097532640d415780153769e474f248bc7415bca1aacb9ede3a814c617` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -112,6 +113,15 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/evidence/code/compute_diagnostics.py` | 6,587 | `11114579991edd2ba646a3b894aa84439d01b6d74c47d573cdfd6f5cc39c4799` |
 | `results/rece_seq_golfball_englishspringer/evidence/reference_A_intervention/CORRECTED_LABELS.json` | 7,988 | `ba41c8be129f943ea62094f914ac170664b29dcdd950eb5513c9721e325884c4` |
 
+## Numerical-optimality audit — does the native closed-form UCE solve actually solve its own stated regularized objective, for all four embedding_cross_swap cells and all 32 edited K/V layers? (CPU-only, fp64 reference solve)
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/evidence/numerical_optimality_audit/FROZEN_MANIFEST.json` | 14,140 | `deda4dd93af61b5ef192f40a6dd818c9907cf8b2c5bd23e3e28d554622af9468` |
+| `results/rece_seq_golfball_englishspringer/evidence/numerical_optimality_audit/RESULT.json` | 284,896 | `cef3c5b33f5a1d864ccffceb15495dcd7e2be8c425ea51ea43eccca1e6340bae` |
+| `results/rece_seq_golfball_englishspringer/evidence/numerical_optimality_audit/CASE_LEVEL_COMPLETION_RECORD.json` | 10,557 | `c885e63e4a33b310af88ccf79ce203bdd718ba9507314b68ea6106b04997b1f7` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/run_numerical_optimality_audit.py` | 15,822 | `c14336ae30d2e57b23cb4019ea097c0549d24abe6f670a5d308bf18310d2d086` |
+
 ## Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)
 
 | path | bytes | sha256 |
@@ -180,4 +190,4 @@ LAST, after every other file in this result set is final.
 
 ---
 
-**93 files listed**, none absent.
+**98 files listed**, none absent.

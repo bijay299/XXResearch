@@ -391,6 +391,145 @@ characterization unless an actual noise estimate (e.g. repeated seeds) is
 computed. The "zero severe degeneration" finding itself is unaffected and
 not in question.
 
+## C13 — C7's own recomputed persisted/recovered/newly-damaged/neither row does not sum to 40
+
+**What was claimed.** C7 (above) states the re-reviewed
+AtoB→AB_REF_A paired-transition figures as **"30 / 3 (28,30,31) / 1 (15) /
+3 (24,25,26,27)"**. This sums to 30+3+1+3 = **37**, not 40, and the
+"neither" cell lists four case numbers (24,25,26,27) while labeling the
+count "3."
+
+**What the correct figures are.** Under the originally published labels
+(after C6's listing fix), AtoB→AB_REF_A was 30 persisted / 5 recovered
+{28,29,30,31,33} / 1 newly damaged {15} / 4 neither {24,25,26,27} = 40.
+C7's re-review moves cases 29 and 33 from "recovered" to "persisted" —
+both were already degenerate in A→B itself, so losing their "recovered"
+status makes them persisted-degenerate, not newly damaged (a case can
+only be "newly damaged" if it was non-degenerate in the comparator, A→B,
+which neither 29 nor 33 was). That gives:
+
+| quantity | C7 as published (buggy) | corrected |
+|---|---|---|
+| persisted | 30 | **32** |
+| recovered | 3 (28, 30, 31) | 3 (28, 30, 31) — unchanged |
+| newly damaged | 1 (15) | 1 (15) — unchanged |
+| neither | "3" (24,25,26,27) | **4** (24,25,26,27) — the published number was a miscount of its own 4-item list |
+| **total** | **37** | **40** |
+
+**AB_REF_A's own rate (33/40, 82.5%) and the net quality change (+2, from
+recovered(3) − newly damaged(1)) were already correct in C7 and are
+unaffected by this fix** — the error was confined to the persisted/neither
+split of the paired-transition table, not the headline degeneration rate
+or net-improvement figure.
+
+**Resolution.** C7's table is left as published, per this repository's
+practice of correcting in place via new entries rather than silently
+editing prior text. The corrected row is: **32 persisted / 3 recovered
+(28, 30, 31) / 1 newly damaged (15) / 4 neither (24, 25, 26, 27)**,
+summing to 40.
+
+## C14 — C7 attributed a case-30 severity judgment to an unverified "outside characterization" that should not have been stated as a specific claim
+
+**What was claimed.** C7 states the case-30 re-review "disagrees, in the
+other direction, with an initial outside characterization that case 30
+'has conspicuous background artifacts' comparable to 29/33."
+
+**The issue.** This attributes a specific comparative severity judgment
+("comparable to 29/33") to an "outside characterization" that is not
+independently sourced or quoted from any identified reviewer in this
+results line's evidence. Stating it as a concrete prior claim invents a
+reviewer disagreement that cannot be verified, rather than simply
+reporting this reviewer's own uncertainty about case 30.
+
+**Resolution.** The corrected statement, with the invented attribution
+removed: case 30 shows a faint, regular diamond-grid background texture
+that is visibly fainter and more localized than the pervasive
+mesh/honeycomb corruption seen in cases 29 and 33. Whether this faint
+texture is the same artifact family at low amplitude, or ordinary bokeh,
+is **not resolved** by this reviewer — recorded as **non-degenerate,
+with explicit uncertainty**, on its own merits, not as a rebuttal to any
+specific prior claim. No other case's re-review finding in C7 is
+affected.
+
+## C15 — Cases 32 and 33 are both the "flying golf ball" literal prompt family, not "golfer/hand holding ball"
+
+**What was claimed.** C8 (above) corrected case 33's prompt-family
+mischaracterization but did not mention case 32, leaving it ambiguous
+whether 32 belongs to the same family.
+
+**What the frozen manifest actually says.** Per
+`rece_golfball_confirmation/manifest/frozen_manifest.json`, golf-ball
+cases 28–31 (`scene_index` 3, paraphrase) share the prompt *"A person's
+hand gripping a golf ball before teeing off."* Cases **32 and 33**
+(`scene_index` 4, literal) share a **different** prompt entirely: *"A
+golf ball flying through the air after being struck."* Both 32 and 33
+are flying-ball literal-family cases; neither is part of the
+hand-gripping family.
+
+**Resolution.** Extending C8: whenever cases 28–33 are discussed as a
+block in this results line, 28–31 (hand-gripping paraphrase) and 32–33
+(flying-ball literal) are two distinct prompt families and should not be
+described together as all "golfer/hand holding ball." This affects
+description only; no quality or recognition figure changes.
+
+## C16 — `embedding_cross_swap/FINAL_REPORT.md`'s claim that "any cell using E_S is severely corrupted regardless of working checkpoint" is false
+
+**What was claimed.** The report's opening summary and §6 state: *"On
+the erasure target (English springer), corruption cleanly follows the
+embedding — any cell using E_S is severely corrupted regardless of
+working checkpoint, and any cell using E_D is clean regardless of
+working checkpoint."*
+
+**What the preserved evidence actually shows.** The existing sequential
+final `A→B` checkpoint is cell **(W_S, E_S)** — it uses E_S — and its
+own already-published, unchanged `evidence/VISUAL_REVIEW.json` records
+`"AtoB_english_springer_new_target": {... "degenerate": 0 ...}`: **0/20
+English-springer degeneration**, with the existing review grid showing
+20 coherent images (6 of which still show visible generic-dog content
+under the corrected count, C2 — a target-persistence concern, not a
+quality/corruption one). This cell is **not** severely corrupted. The
+claim that "any cell using E_S is severely corrupted" is directly
+contradicted by this cell, which is reused unchanged in this very report
+(§2 design table, row W_S/column E_S) and was never in question.
+
+**The actual four-cell pattern for English-springer degeneration**
+(independently re-confirmed by viewing both new cells' full
+`review_grids/*/English_springer.png` contact sheets during this audit,
+alongside the preserved AtoB and existing-B records):
+
+| cell | embedding | working checkpoint | degeneration |
+|---|---|---|---|
+| B (existing) | E_D | W_D | 0/20 |
+| D_WITH_SEQ_EMB (new) | E_S | W_D | **20/20** |
+| S_WITH_DIRECT_EMB (new) | E_D | W_S | 0/20 |
+| A→B (existing, preserved) | E_S | W_S | **0/20** |
+
+Severe corruption occurs in exactly **one** of the four cells —
+(W_D, E_S) — not "any cell using E_S." E_S paired with its own native
+working checkpoint (W_S, i.e. A→B) is clean; E_S paired with the
+*other* row's checkpoint (W_D) is where corruption appears. This is the
+mirror image of a clean column effect: it is a one-cell, direction-specific
+mismatch between the sequentially-recovered embedding and the
+*direct*-branch Stage-1 weights, not a property of E_S in isolation. No
+explanation for why this specific pairing (and not its reverse,
+(W_S, E_D), which is also an off-diagonal mismatch and is clean) is
+offered here — this is reported as an open, narrower finding, not
+resolved.
+
+**What does still hold.** The report's **golf-ball** "interaction"
+framing (§5.3/§6) is unaffected by this correction — golf-ball
+degeneration really is severe (35/40) only at the (W_S, E_S) cell and
+sharply reduced (≤5/40) at every single-factor substitution, which is
+consistent across both the originally published and this corrected
+reading.
+
+**Resolution.** `embedding_cross_swap/FINAL_REPORT.md` is left as
+published, per this repository's practice. §1 and §6 of
+`numerical_optimality_audit/FINAL_REPORT.md` (published alongside this
+correction) supersede its English-springer "corruption cleanly follows
+the embedding" framing with the corrected one-cell-pattern description
+above.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by
@@ -416,10 +555,23 @@ not in question.
   reversal of it; `reference_A_intervention/FINAL_REPORT.md`'s "not an
   unqualified rescue" conclusion holds, more strongly, under either
   labeling.
-- **C7 explicitly preserves disagreement** rather than forcing a single
-  verdict: this reviewer's case 30 re-read (retained, with uncertainty)
-  disagrees with one external characterization of that case, and the
-  reasoning for both the originally published and the re-reviewed labels
-  is published side by side in `CORRECTED_LABELS.json` so a future
+- **C7 explicitly preserves uncertainty** rather than forcing a single
+  verdict: this reviewer's case 30 re-read is retained, with uncertainty
+  about whether its faint background texture is the same artifact family
+  at low amplitude — not a disagreement with any specific prior claim
+  (see C14, which removes an invented attribution on this point) — and
+  the reasoning for both the originally published and the re-reviewed
+  labels is published side by side in `CORRECTED_LABELS.json` so a future
   reviewer can adjudicate independently rather than inherit a silently
   resolved call.
+- **C13–C16 were found the same way**: re-examining this repository's own
+  already-published arithmetic, attributions, and prompt-family metadata,
+  and (for C16) re-viewing the already-saved `review_grids/` contact
+  sheets and the already-published, unchanged `evidence/VISUAL_REVIEW.json`
+  for the existing `A→B` checkpoint — no new GPU computation, image
+  generation, or embedding recovery. **C16 is the most consequential**:
+  it corrects a false mechanism claim in `embedding_cross_swap/
+  FINAL_REPORT.md` (the English-springer "clean column effect") to the
+  narrower, direction-specific one-cell pattern actually supported by the
+  preserved evidence; it does not change the golf-ball interaction
+  finding or any recognition/degeneration count.

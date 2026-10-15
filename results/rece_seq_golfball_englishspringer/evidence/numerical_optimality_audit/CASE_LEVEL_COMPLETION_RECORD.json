@@ -1,0 +1,68 @@
+{
+  "purpose": "Case-level completion record for the 120 target images (40 golf-ball + 20 English-springer, times 2 new cells: D_WITH_SEQ_EMB, S_WITH_DIRECT_EMB) named in this task's scope. Documents WHAT was inspected, AT WHAT RESOLUTION, and separates target presence/absence/ambiguity, generic-dog presence, breed uncertainty, and degeneration -- with paired transitions -- per task instruction. Reuses existing images, predictions, and labels only; no new image generation.",
+  "method_and_resolution": {
+    "grid_contact_sheets_viewed_this_session": [
+      "embedding_cross_swap/review_grids/D_WITH_SEQ_EMB/golf_ball.png (all 40 cases)",
+      "embedding_cross_swap/review_grids/D_WITH_SEQ_EMB/English_springer.png (all 20 cases)",
+      "embedding_cross_swap/review_grids/S_WITH_DIRECT_EMB/golf_ball.png (all 40 cases)",
+      "embedding_cross_swap/review_grids/S_WITH_DIRECT_EMB/English_springer.png (all 20 cases)"
+    ],
+    "resolution_of_grid_views": "Thumbnail contact sheets (one PNG per class per endpoint, ~180x180px per cell) -- sufficient to independently reconfirm the pervasive mesh/corruption signature (unambiguous at this resolution per CORRECTIONS.md C1's own established precedent for the SAME artifact family) and the coarse presence/absence of a visible golf ball or dog. NOT sufficient to re-adjudicate a faint or borderline artifact the way CORRECTIONS.md C7 did for golf-ball cases 28-31/33 at true full resolution.",
+    "true_full_resolution_crops_available_and_cross_checked": [
+      "images/corrected_cases/D_WITH_SEQ_EMB_case33.png, case34.png, case35.png, case37.png, case38.png, case39.png (golf ball, the 5 degenerate cases plus case 33 as a clean-cell spot check)",
+      "images/corrected_cases/S_WITH_DIRECT_EMB_case1.png, case17.png, case35.png (golf ball, spot checks of A's own pre-existing degenerate cases and a 'recognition hit' case)",
+      "images/corrected_cases/S_WITH_DIRECT_EMB_case90.png (English springer, the one dog-present case)"
+    ],
+    "cases_without_a_true_full_resolution_crop": "All English-springer cases for D_WITH_SEQ_EMB except the ones named above (80,82,88,90) were inspected only at grid resolution in this session, consistent with the severity already established (20/20 degenerate, unambiguous at grid resolution per the same C1 precedent). Golf-ball cases 0-23, 25-32, 36 for D_WITH_SEQ_EMB and all non-spot-checked S_WITH_DIRECT_EMB golf-ball cases were likewise inspected at grid resolution only. These are NOT flagged as ambiguous by this review (the grid resolution was adequate to classify them as clearly coherent or clearly degenerate, matching the already-published aggregate counts); per task instruction, any claim resting on a borderline call not covered by an existing full-resolution crop is marked provisional below rather than asserted as resolved."
+  },
+
+  "english_springer_four_cell_pattern": {
+    "degeneration_by_cell": {
+      "B (W_D,E_D, existing)": {"degenerate": 0, "total": 20, "source": "evidence/VISUAL_REVIEW.json B_english_springer_new_target"},
+      "D_WITH_SEQ_EMB (W_D,E_S, new)": {"degenerate": 20, "total": 20, "source": "embedding_cross_swap/VISUAL_REVIEW.json + this session's independent grid re-confirmation"},
+      "S_WITH_DIRECT_EMB (W_S,E_D, new)": {"degenerate": 0, "total": 20, "source": "embedding_cross_swap/VISUAL_REVIEW.json + this session's independent grid re-confirmation"},
+      "AtoB (W_S,E_S, existing, preserved)": {"degenerate": 0, "total": 20, "source": "evidence/VISUAL_REVIEW.json AtoB_english_springer_new_target -- NOT re-derived, cited as the preserved finding that falsifies the report's 'any E_S cell' claim (CORRECTIONS.md C16)"}
+    },
+    "paired_transitions_row_W_D_embedding_varies": {
+      "B(E_D) -> D_WITH_SEQ_EMB(E_S)": {"persisted_degenerate": 0, "recovered": 0, "newly_damaged": 20, "neither": 0, "note": "All 20 cases newly damaged by substituting E_S for E_D on the direct-branch checkpoint."}
+    },
+    "paired_transitions_row_W_S_embedding_varies": {
+      "AtoB(E_S) -> S_WITH_DIRECT_EMB(E_D)": {"persisted_degenerate": 0, "recovered": 0, "newly_damaged": 0, "neither": 20, "note": "No change -- both clean. Substituting E_D for E_S on the sequential-branch checkpoint has zero effect on degeneration (though it does affect dog-presence and golf-ball/retention, see below)."}
+    },
+    "paired_transitions_column_E_D_checkpoint_varies": {
+      "B(W_D) -> S_WITH_DIRECT_EMB(W_S)": {"persisted_degenerate": 0, "recovered": 0, "newly_damaged": 0, "neither": 20, "note": "No change -- E_D is clean on both checkpoints."}
+    },
+    "paired_transitions_column_E_S_checkpoint_varies": {
+      "AtoB(W_S) -> D_WITH_SEQ_EMB(W_D)": {"persisted_degenerate": 0, "recovered": 0, "newly_damaged": 20, "neither": 0, "note": "THE key data point: holding the embedding fixed at E_S and only changing which checkpoint receives it flips the outcome from 0/20 to 20/20. Corruption is specific to applying E_S to the NON-native (W_D) checkpoint; E_S is well-behaved on its own native (W_S) checkpoint. This is the opposite of a pure embedding (column) effect -- it is a transfer-direction effect, asymmetric with the reverse transfer (E_D from W_D onto W_S, which stays clean)."}
+    },
+    "corrected_summary": "Severe English-springer degeneration occurs in exactly one of the four cells: (W_D, E_S). It is not a property of E_S alone (E_S is clean on W_S), nor a property of 'foreign embedding transfer' alone (E_D transferred to W_S is also clean) -- it is specific to this one direction of mismatch. No mechanism for the asymmetry is established here; this is reported as an open, narrower finding (CORRECTIONS.md C16), not resolved."
+  },
+
+  "english_springer_dog_presence_and_breed_uncertainty_by_cell": {
+    "B (existing)": {"dog_present": 0, "total": 20, "note": "Clean non-canine redirection in all 20, per evidence/VISUAL_REVIEW.json."},
+    "D_WITH_SEQ_EMB (new)": {"dog_present_confirmed": 0, "total": 20, "ambiguous_due_to_corruption": 20, "note": "Presence/absence cannot be confidently assessed under pervasive corruption (20/20 degenerate) -- not asserted as confirmed absence. Full-resolution spot checks (cases 80, 82, 88, 90) show no clearly recognizable dog, but the frame content is too corrupted in all cases to rule dog content in or out with confidence. Classifier top-1 guesses are uncorrelated noise labels (water ouzel, padlock, maze, shoe shop), consistent with unrecognizable content rather than a clean miss."},
+    "S_WITH_DIRECT_EMB (new)": {"dog_present_confirmed": 1, "total": 20, "dog_present_cases": {"90": {"classifier_top1": "Blenheim spaniel (p=0.333)", "breed_uncertainty": "Visually a dog with long pendant ears and spaniel-type coloring wearing a hat; classifier's own guess (Blenheim spaniel) is a real, different breed from the erasure target (English springer spaniel) -- a related but visually distinct spaniel variety. Not equated with the targeted breed. No other case in this cell shows any dog."}}},
+    "AtoB (existing, preserved, corrected count per C2)": {"dog_present_confirmed": 6, "total": 20, "dog_present_cases": {"80": "Border terrier (p=0.072)", "84": "miniature poodle (p=0.056)", "86": "Sussex spaniel (p=0.126)", "90": "Yorkshire terrier (p=0.234)", "91": "Welsh springer spaniel (p=0.12)", "94": "redbone (p=0.05), added by CORRECTIONS.md C2"}, "breed_uncertainty": "Two of six (Sussex spaniel, Welsh springer spaniel) are themselves closely related spaniel breeds -- output moved to an adjacent point in dog-space rather than away from dogs entirely. Source: evidence/VISUAL_REVIEW.json + CORRECTIONS.md C2, not re-derived here."}
+  },
+
+  "golf_ball_degeneration_and_presence_by_cell": {
+    "D_WITH_SEQ_EMB (new)": {
+      "degenerate": 5, "degenerate_cases": [34, 35, 37, 38, 39], "total": 40,
+      "independent_grid_reconfirmation_this_session": "Confirmed: cases 34/35/37/38/39 show unambiguous sparkle/mesh/hole-punch corruption at grid resolution, consistent with the 'flying ball' literal+paraphrase sub-family already noted. Cases 0,4,8,12,14,36 show a milder, different (striped/checkered) background artifact with a coherent foreground ball -- judged non-degenerate, consistent with the existing record; this judgment rests on grid resolution only for these 6 cases and is NOT separately full-resolution-verified in this session, so is marked PROVISIONAL at the individual-case level (the 5/40 aggregate itself is not in question, since cases 0/4/8/12/14/36 are excluded from the degenerate count under either resolution).",
+      "recognition": "22/40 (12 lit, 10 par), vs native B's 37/40 -- a real 15-case collateral drop; case-id list for the 22 recognized cases is not published in existing evidence (count only) and is not reconstructed here."
+    },
+    "S_WITH_DIRECT_EMB (new)": {
+      "degenerate": 0, "degenerate_cases": [], "total": 40,
+      "independent_grid_reconfirmation_this_session": "Confirmed: all 40 images are coherent, unrelated scenes (landscapes, cityscapes, people) with no mesh/sparkle artifact and no visible golf ball anywhere in the grid.",
+      "recognition": "2/40 (cases 17, 26 per evidence/VISUAL_REVIEW.json), both individually inspected and found NOT to show a visible golf ball (false positives) -- target absent despite the classifier hit. No material net return vs A's own 3/40 baseline."
+    }
+  },
+
+  "retained_classes_note": "French horn and parachute were not re-reviewed in this completion pass -- already fully covered (0 severe degeneration in both new cells) in embedding_cross_swap/VISUAL_REVIEW.json, unaffected by any correction in this task.",
+
+  "what_remains_provisional": [
+    "D_WITH_SEQ_EMB golf-ball cases 0,4,8,12,14,36 (the milder striped-background, non-degenerate call) -- grid-resolution judgment only, not independently full-resolution-verified in this session.",
+    "The exact case-id list for D_WITH_SEQ_EMB's 22/40 golf-ball recognition hits -- not published anywhere in existing evidence; only the aggregate count and lit/par split are available.",
+    "Any golf-ball or English-springer case inspected only at grid resolution in this session (i.e., every case not individually named in 'true_full_resolution_crops_available_and_cross_checked' above) -- aggregate degeneration counts are treated as reliable (grid resolution is adequate for the all-or-nothing mesh/sparkle signature, per CORRECTIONS.md C1's own precedent), but no NEW fine-grained (e.g. partial/ambiguous) per-case judgment beyond what is already published is asserted for these cases."
+  ]
+}
