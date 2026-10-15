@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `ff4866675078` — the commit that *records*
+Generated at parent commit `cbff93656ba9` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -36,7 +36,8 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/embedding_cross_swap/FINAL_REPORT.md` | 18,931 | `8ac9d8c1094f8868afde3d66779a5e0c065db487302ba99500802313ae674d10` |
 | `results/rece_seq_golfball_englishspringer/numerical_optimality_audit/FINAL_REPORT.md` | 18,057 | `9dfbd58f5c2fdb0cf0b386e513dd8c99a791126cf13e00cef9bede555b62c9ca` |
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 33,916 | `a750146097532640d415780153769e474f248bc7415bca1aacb9ede3a814c617` |
+| `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 48,134 | `f9ae767be6760536df6e7ee3f1d847a8a710ed24eae4b6b900a31de6f09d6310` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -137,6 +138,15 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/evidence/code/run_operand_provenance_check.py` | 7,485 | `bddfd5e0536079eb4697c924441ad2d28db5bc93ff3371623c5cd579a68195f4` |
 | `results/rece_seq_golfball_englishspringer/evidence/code/run_solver_only_build.py` | 11,566 | `2d77817dae275c43348d59ea408c1b46a652c867253911a73917bdf5b63f4c13` |
 | `results/rece_seq_golfball_englishspringer/evidence/code/make_review_grids_solver_only.py` | 1,682 | `09a6aaa19eb81d1d37ac101b7cd93a60dfce75697e78554614e9ae678feac70f` |
+
+## Recovery-optimality audit — does the native embedding-recovery output (E_D/E_S, close_form_emb_regzero) accurately solve its own stated closed-form objective? (CPU-only, fp64 reference solve; different computation from the numerical-optimality audit above) plus the corrected AB_STABLE_SOLVE golf-ball case table (C17)
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/evidence/recovery_optimality_audit/FROZEN_MANIFEST.json` | 8,044 | `285824dbc28c94ce5d1790fc761f535a9b243b092651966f223a402feda81cf7` |
+| `results/rece_seq_golfball_englishspringer/evidence/recovery_optimality_audit/RESULT.json` | 61,704 | `1b385c98c8cf579fd6e531e7566c974e3221915295a98430afa5e9a5ce591415` |
+| `results/rece_seq_golfball_englishspringer/evidence/recovery_optimality_audit/CASE_LEVEL_AB_STABLE_SOLVE_GOLF_CORRECTED.json` | 2,937 | `43cc1ea6a98c91f6cce288f9d1ff11f7f5a37577603c3d0bd497b028837ed55b` |
+| `results/rece_seq_golfball_englishspringer/evidence/code/run_recovery_optimality_audit.py` | 18,826 | `f727179db33991f1f20cb3e13a37833335bcb270e2ba508eb90c5b137aeedb11` |
 
 ## Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)
 
@@ -275,4 +285,4 @@ LAST, after every other file in this result set is final.
 
 ---
 
-**173 files listed**, none absent.
+**178 files listed**, none absent.

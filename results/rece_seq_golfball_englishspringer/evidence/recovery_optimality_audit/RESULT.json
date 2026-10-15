@@ -1,0 +1,1774 @@
+{
+  "cpu_lockdown": {
+    "cuda_visible_devices_env": "",
+    "torch_cuda_is_available": false,
+    "torch_num_threads": 8
+  },
+  "hash_verification": {
+    "W_D": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/refinement_ablation/edits/B_UCE.pt",
+      "expected": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+      "actual": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+      "match": true
+    },
+    "W_S": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/refinement_ablation/edits/AB_UCE.pt",
+      "expected": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+      "actual": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+      "match": true
+    },
+    "E_D": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/E_D.pt",
+      "expected": "32d1bd98471b6672310228470feb8ab18f58c557eb5b1c4c300dffef0ebd4c3b",
+      "actual": "32d1bd98471b6672310228470feb8ab18f58c557eb5b1c4c300dffef0ebd4c3b",
+      "match": true
+    },
+    "E_S": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/E_S.pt",
+      "expected": "e6ea282ad27441aacf47b2824c693166b59d669eb6ae9520978f0194af89bdb8",
+      "actual": "e6ea282ad27441aacf47b2824c693166b59d669eb6ae9520978f0194af89bdb8",
+      "match": true
+    },
+    "concept_embedding_C": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/concept_embedding.pt",
+      "expected": "2e5ab9daadf03b4bcbdfa7b678b749c6078ed4de20b13c6ad6c2eb7c14a4e5c6",
+      "actual": "2e5ab9daadf03b4bcbdfa7b678b749c6078ed4de20b13c6ad6c2eb7c14a4e5c6",
+      "match": true
+    },
+    "M0": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/embedding_cross_swap/edits/M0_unet_state_dict.pt",
+      "expected": null,
+      "actual": "ee60d14bf80c6f829ab1b9da5f6c0eb63338f8a29d7ec7f6a3895bae1b1611df",
+      "match": null,
+      "note": "no supplied hash; recorded, not verified"
+    }
+  },
+  "m0_provenance": {
+    "pinned_sd14_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b",
+    "pinned_sd14_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+    "snapshot_unet_safetensors_sha256": "145a07e0f05ec5bbe6e2e9faf608bdb311caf708895cac8c8ed713c59864e1e8",
+    "M0_unet_state_dict_sha256_current": "ee60d14bf80c6f829ab1b9da5f6c0eb63338f8a29d7ec7f6a3895bae1b1611df",
+    "M0_unet_state_dict_sha256_previously_published": false,
+    "note": "M0_unet_state_dict.pt was saved by embedding_cross_swap/run_embedding_cross_swap.py (line ~212, ~283) as the untouched .state_dict() of a freshly-loaded StableDiffusionPipeline.from_pretrained(SD14) UNet, detached/cloned/cpu'd, before any edit was applied to that pipeline object. This audit independently re-derives the same 32 projections directly from the pinned snapshot's own safetensors file (no pipeline, no inference) and compares them bit-for-bit against the saved M0_unet_state_dict.pt.",
+    "n_audited_keys": 32,
+    "n_to_v": 16,
+    "n_to_k": 16,
+    "all_32_projections_bit_identical_to_pinned_snapshot": true,
+    "per_key": {
+      "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "mid_block.attentions.0.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "mid_block.attentions.0.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      },
+      "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v.weight": {
+        "present_in_snapshot": true,
+        "same_shape": true,
+        "max_abs_diff": 0.0,
+        "bit_identical": true
+      }
+    },
+    "bias_keys_present_for_audited_layers": [],
+    "bias_assumption_confirmed_no_bias": true
+  },
+  "shape_finiteness_layer_checks": {
+    "shapes": {
+      "C": [
+        77,
+        768
+      ],
+      "E_D_native": [
+        77,
+        768
+      ],
+      "E_S_native": [
+        77,
+        768
+      ]
+    },
+    "finiteness": {
+      "C": true,
+      "E_D_native": true,
+      "E_S_native": true,
+      "M0_all_32": true,
+      "W_D_all_32": true,
+      "W_S_all_32": true
+    },
+    "layer_correspondence": {
+      "W_D_vs_M0_shapes_match": true,
+      "W_S_vs_M0_shapes_match": true,
+      "per_layer_dout": {
+        "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k.weight": [
+          320,
+          768
+        ],
+        "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v.weight": [
+          320,
+          768
+        ],
+        "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k.weight": [
+          320,
+          768
+        ],
+        "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v.weight": [
+          320,
+          768
+        ],
+        "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight": [
+          640,
+          768
+        ],
+        "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight": [
+          640,
+          768
+        ],
+        "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight": [
+          640,
+          768
+        ],
+        "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight": [
+          640,
+          768
+        ],
+        "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight": [
+          1280,
+          768
+        ],
+        "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight": [
+          1280,
+          768
+        ],
+        "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight": [
+          1280,
+          768
+        ],
+        "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight": [
+          1280,
+          768
+        ],
+        "mid_block.attentions.0.transformer_blocks.0.attn2.to_k.weight": [
+          1280,
+          768
+        ],
+        "mid_block.attentions.0.transformer_blocks.0.attn2.to_v.weight": [
+          1280,
+          768
+        ],
+        "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k.weight": [
+          1280,
+          768
+        ],
+        "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v.weight": [
+          1280,
+          768
+        ],
+        "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k.weight": [
+          1280,
+          768
+        ],
+        "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v.weight": [
+          1280,
+          768
+        ],
+        "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k.weight": [
+          1280,
+          768
+        ],
+        "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v.weight": [
+          1280,
+          768
+        ],
+        "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k.weight": [
+          640,
+          768
+        ],
+        "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v.weight": [
+          640,
+          768
+        ],
+        "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k.weight": [
+          640,
+          768
+        ],
+        "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v.weight": [
+          640,
+          768
+        ],
+        "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k.weight": [
+          640,
+          768
+        ],
+        "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v.weight": [
+          640,
+          768
+        ],
+        "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k.weight": [
+          320,
+          768
+        ],
+        "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v.weight": [
+          320,
+          768
+        ],
+        "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k.weight": [
+          320,
+          768
+        ],
+        "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v.weight": [
+          320,
+          768
+        ],
+        "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k.weight": [
+          320,
+          768
+        ],
+        "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v.weight": [
+          320,
+          768
+        ]
+      }
+    }
+  },
+  "branches": {
+    "D": {
+      "n_layers": 32,
+      "min_eig": 0.10008247422474129,
+      "max_eig": 680.0385955672214,
+      "cond_A": 6794.782011885051,
+      "reference_backward_error": 1.080893225635786e-16,
+      "reference_backward_error_within_tol": true,
+      "F_native_E": 1312447.4348344158,
+      "F_Y_star": 1312447.4339125133,
+      "quadratic_gap_lhs_F(E)_minus_F(Ystar)": 0.0009219024796038866,
+      "quadratic_gap_rhs_trace_identity": 0.0009219020436139603,
+      "quadratic_gap_discrepancy": 4.3598992634490824e-10,
+      "quadratic_gap_tolerance": 0.013124474348344158,
+      "quadratic_gap_within_tol": true,
+      "native_backward_error": 1.1363114249175954e-06,
+      "abs_forward_discrepancy_native_vs_Ystar": 0.013952440138704352,
+      "rel_forward_discrepancy_native_vs_Ystar": 4.233867714914416e-05,
+      "magnitude_native_E": 329.5411305562234,
+      "magnitude_Y_star": 329.54360122199495,
+      "magnitude_ratio_native_over_Ystar": 0.9999925027651503,
+      "cosine_native_vs_Ystar": 0.9999999991318054,
+      "angle_deg_native_vs_Ystar": 0.002387515376270393,
+      "fp32_cast_reference": {
+        "note": "Y* rounded to fp32 and back to fp64 -- an output-rounding floor, NOT held to the fp64 1e-10 backward-error tolerance.",
+        "backward_error": 2.2954997682144477e-09,
+        "objective_gap_vs_Ystar": 3.958120942115784e-09,
+        "abs_diff_vs_Ystar": 8.3350212032699e-06
+      },
+      "per_token": [
+        {
+          "token": 0,
+          "abs_diff": 0.005567737702181993,
+          "native_norm": 20.63266280071063,
+          "ystar_norm": 20.632528169697206,
+          "cosine": 0.9999999636113618,
+          "angle_deg": 0.01545683365511082
+        },
+        {
+          "token": 1,
+          "abs_diff": 0.0008683045504148221,
+          "native_norm": 35.56239265128226,
+          "ystar_norm": 35.56253411222944,
+          "cosine": 0.9999999997098334,
+          "angle_deg": 0.0013802612922187787
+        },
+        {
+          "token": 2,
+          "abs_diff": 0.000737642133026862,
+          "native_norm": 24.69095922478306,
+          "ystar_norm": 24.691032109721068,
+          "cosine": 0.9999999995581006,
+          "angle_deg": 0.0017033321320556213
+        },
+        {
+          "token": 3,
+          "abs_diff": 0.0010265195821674447,
+          "native_norm": 38.790578459065,
+          "ystar_norm": 38.79119568829445,
+          "cosine": 0.9999999997764485,
+          "angle_deg": 0.0012115084140847617
+        },
+        {
+          "token": 4,
+          "abs_diff": 0.0009546067519293924,
+          "native_norm": 36.078764508209936,
+          "ystar_norm": 36.07917396181562,
+          "cosine": 0.9999999997143635,
+          "angle_deg": 0.0013694446782888693
+        },
+        {
+          "token": 5,
+          "abs_diff": 0.0009382075415474549,
+          "native_norm": 35.72672586089945,
+          "ystar_norm": 35.72699814984518,
+          "cosine": 0.9999999996842346,
+          "angle_deg": 0.0014398588164435402
+        },
+        {
+          "token": 6,
+          "abs_diff": 0.0009602796845734884,
+          "native_norm": 36.001094905606614,
+          "ystar_norm": 36.00130145412795,
+          "cosine": 0.9999999996607192,
+          "angle_deg": 0.0014925101332754517
+        },
+        {
+          "token": 7,
+          "abs_diff": 0.0009967304701342754,
+          "native_norm": 36.312171939099876,
+          "ystar_norm": 36.312343503914505,
+          "cosine": 0.9999999996344415,
+          "angle_deg": 0.0015492305667705478
+        },
+        {
+          "token": 8,
+          "abs_diff": 0.0010338900998588725,
+          "native_norm": 36.63619467759191,
+          "ystar_norm": 36.63634247903546,
+          "cosine": 0.9999999996099427,
+          "angle_deg": 0.001600301625516349
+        },
+        {
+          "token": 9,
+          "abs_diff": 0.0010731621013184895,
+          "native_norm": 36.8976098870577,
+          "ystar_norm": 36.89774332455646,
+          "cosine": 0.9999999995835764,
+          "angle_deg": 0.0016535041062579509
+        },
+        {
+          "token": 10,
+          "abs_diff": 0.0011118324768215867,
+          "native_norm": 37.15236746402859,
+          "ystar_norm": 37.15248888502532,
+          "cosine": 0.999999999557551,
+          "angle_deg": 0.0017043909624311253
+        },
+        {
+          "token": 11,
+          "abs_diff": 0.0011493196018448996,
+          "native_norm": 37.37450726240278,
+          "ystar_norm": 37.37461918980316,
+          "cosine": 0.9999999995316606,
+          "angle_deg": 0.0017535492288571113
+        },
+        {
+          "token": 12,
+          "abs_diff": 0.0011877632054263561,
+          "native_norm": 37.63995526501641,
+          "ystar_norm": 37.64006503251387,
+          "cosine": 0.9999999995063662,
+          "angle_deg": 0.0018002800754343563
+        },
+        {
+          "token": 13,
+          "abs_diff": 0.0012194582984505979,
+          "native_norm": 37.93993966414383,
+          "ystar_norm": 37.940046812786484,
+          "cosine": 0.9999999994874417,
+          "angle_deg": 0.0018344643565401163
+        },
+        {
+          "token": 14,
+          "abs_diff": 0.0012511766566118232,
+          "native_norm": 38.20368680309178,
+          "ystar_norm": 38.20380034587179,
+          "cosine": 0.999999999468132,
+          "angle_deg": 0.0018686998841578584
+        },
+        {
+          "token": 15,
+          "abs_diff": 0.0012842353249578856,
+          "native_norm": 38.498555363413196,
+          "ystar_norm": 38.49867857142503,
+          "cosine": 0.9999999994487446,
+          "angle_deg": 0.0019024534920189977
+        },
+        {
+          "token": 16,
+          "abs_diff": 0.0013139564849232379,
+          "native_norm": 38.87801683370897,
+          "ystar_norm": 38.87816061709874,
+          "cosine": 0.9999999994357259,
+          "angle_deg": 0.001924787004629641
+        },
+        {
+          "token": 17,
+          "abs_diff": 0.0013442803922178853,
+          "native_norm": 39.56716850405628,
+          "ystar_norm": 39.567353779547794,
+          "cosine": 0.9999999994338279,
+          "angle_deg": 0.001928021470545184
+        },
+        {
+          "token": 18,
+          "abs_diff": 0.0013679363325479889,
+          "native_norm": 40.48034734267412,
+          "ystar_norm": 40.48057530219637,
+          "cosine": 0.9999999994448897,
+          "angle_deg": 0.0019090938104980792
+        },
+        {
+          "token": 19,
+          "abs_diff": 0.0013857310246352893,
+          "native_norm": 41.7435828397212,
+          "ystar_norm": 41.74387457974239,
+          "cosine": 0.9999999994734301,
+          "angle_deg": 0.0018593692520006155
+        },
+        {
+          "token": 20,
+          "abs_diff": 0.0014111653623156515,
+          "native_norm": 42.68967515671258,
+          "ystar_norm": 42.690006239315615,
+          "cosine": 0.9999999994837173,
+          "angle_deg": 0.0018411170908940477
+        },
+        {
+          "token": 21,
+          "abs_diff": 0.0014237306202936498,
+          "native_norm": 43.64658869521486,
+          "ystar_norm": 43.64697004542449,
+          "cosine": 0.9999999995061576,
+          "angle_deg": 0.001800660436734839
+        },
+        {
+          "token": 22,
+          "abs_diff": 0.0014168961781838845,
+          "native_norm": 43.614319196840675,
+          "ystar_norm": 43.6147339220322,
+          "cosine": 0.9999999995175138,
+          "angle_deg": 0.001779836305380381
+        },
+        {
+          "token": 23,
+          "abs_diff": 0.0014111189147612468,
+          "native_norm": 42.710381454323205,
+          "ystar_norm": 42.71078864106401,
+          "cosine": 0.9999999994996546,
+          "angle_deg": 0.0018124773988635384
+        },
+        {
+          "token": 24,
+          "abs_diff": 0.0013814000710081487,
+          "native_norm": 40.54429749275558,
+          "ystar_norm": 40.54466275281118,
+          "cosine": 0.999999999460156,
+          "angle_deg": 0.0018826593629466194
+        },
+        {
+          "token": 25,
+          "abs_diff": 0.0013808273939305935,
+          "native_norm": 39.7136614884932,
+          "ystar_norm": 39.71400877321461,
+          "cosine": 0.9999999994337786,
+          "angle_deg": 0.0019281054005303253
+        },
+        {
+          "token": 26,
+          "abs_diff": 0.0013834689273028954,
+          "native_norm": 39.26504751857744,
+          "ystar_norm": 39.26538076017682,
+          "cosine": 0.999999999415298,
+          "angle_deg": 0.0019593178844026712
+        },
+        {
+          "token": 27,
+          "abs_diff": 0.0013744114568919092,
+          "native_norm": 38.08131437550903,
+          "ystar_norm": 38.08162183671942,
+          "cosine": 0.9999999993813008,
+          "angle_deg": 0.0020154749675959363
+        },
+        {
+          "token": 28,
+          "abs_diff": 0.0013868956339945621,
+          "native_norm": 38.056972679986266,
+          "ystar_norm": 38.05727620150817,
+          "cosine": 0.999999999367777,
+          "angle_deg": 0.002037383542156933
+        },
+        {
+          "token": 29,
+          "abs_diff": 0.0013803288972711535,
+          "native_norm": 37.34362753986811,
+          "ystar_norm": 37.3439161735228,
+          "cosine": 0.999999999346747,
+          "angle_deg": 0.002070991608180179
+        },
+        {
+          "token": 30,
+          "abs_diff": 0.0014048431991717303,
+          "native_norm": 37.998093429116594,
+          "ystar_norm": 37.998394155640796,
+          "cosine": 0.9999999993478806,
+          "angle_deg": 0.002069193838829299
+        },
+        {
+          "token": 31,
+          "abs_diff": 0.0014437978895037052,
+          "native_norm": 39.531043760753796,
+          "ystar_norm": 39.53137021731071,
+          "cosine": 0.9999999993671349,
+          "angle_deg": 0.002038417792504459
+        },
+        {
+          "token": 32,
+          "abs_diff": 0.001455470967350311,
+          "native_norm": 39.52897909940952,
+          "ystar_norm": 39.529306588203234,
+          "cosine": 0.9999999993564553,
+          "angle_deg": 0.002055544941455341
+        },
+        {
+          "token": 33,
+          "abs_diff": 0.0014753968325036224,
+          "native_norm": 39.816226214223306,
+          "ystar_norm": 39.81656225651535,
+          "cosine": 0.9999999993490785,
+          "angle_deg": 0.002067292606993429
+        },
+        {
+          "token": 34,
+          "abs_diff": 0.0014635788174015834,
+          "native_norm": 39.00421102181372,
+          "ystar_norm": 39.00453568376759,
+          "cosine": 0.9999999993306378,
+          "angle_deg": 0.0020963714303172507
+        },
+        {
+          "token": 35,
+          "abs_diff": 0.0014662889914017067,
+          "native_norm": 38.76896607320223,
+          "ystar_norm": 38.769292239251875,
+          "cosine": 0.999999999320174,
+          "angle_deg": 0.0021126935519770336
+        },
+        {
+          "token": 36,
+          "abs_diff": 0.0014811208541167706,
+          "native_norm": 39.23201760453757,
+          "ystar_norm": 39.23235271535928,
+          "cosine": 0.9999999993238481,
+          "angle_deg": 0.0021069768823207195
+        },
+        {
+          "token": 37,
+          "abs_diff": 0.0014635514089975851,
+          "native_norm": 38.18590940452295,
+          "ystar_norm": 38.186233063283275,
+          "cosine": 0.9999999993014471,
+          "angle_deg": 0.0021415946571612184
+        },
+        {
+          "token": 38,
+          "abs_diff": 0.0014841500621832406,
+          "native_norm": 38.68863186381019,
+          "ystar_norm": 38.68896929231394,
+          "cosine": 0.9999999993022411,
+          "angle_deg": 0.002140377156538607
+        },
+        {
+          "token": 39,
+          "abs_diff": 0.001498329054326838,
+          "native_norm": 39.121490815156655,
+          "ystar_norm": 39.12183584897146,
+          "cosine": 0.999999999305477,
+          "angle_deg": 0.002135408390635685
+        },
+        {
+          "token": 40,
+          "abs_diff": 0.0015097022251722373,
+          "native_norm": 39.259814600388744,
+          "ystar_norm": 39.26016456018988,
+          "cosine": 0.9999999993003758,
+          "angle_deg": 0.002143236301640533
+        },
+        {
+          "token": 41,
+          "abs_diff": 0.0015323812794930114,
+          "native_norm": 39.69064501397009,
+          "ystar_norm": 39.69100460840954,
+          "cosine": 0.9999999992957541,
+          "angle_deg": 0.0021503036342258707
+        },
+        {
+          "token": 42,
+          "abs_diff": 0.0015197706115232551,
+          "native_norm": 38.91211367365706,
+          "ystar_norm": 38.91246570724794,
+          "cosine": 0.9999999992782249,
+          "angle_deg": 0.0021769004707592717
+        },
+        {
+          "token": 43,
+          "abs_diff": 0.0015368561359177925,
+          "native_norm": 39.3062044680836,
+          "ystar_norm": 39.30656523895288,
+          "cosine": 0.9999999992777404,
+          "angle_deg": 0.002177630985191166
+        },
+        {
+          "token": 44,
+          "abs_diff": 0.0015305661754684563,
+          "native_norm": 38.838823626499625,
+          "ystar_norm": 38.839174498153334,
+          "cosine": 0.9999999992643129,
+          "angle_deg": 0.002197779868358195
+        },
+        {
+          "token": 45,
+          "abs_diff": 0.0015341156704141877,
+          "native_norm": 38.708735287481964,
+          "ystar_norm": 38.709085075796516,
+          "cosine": 0.9999999992554764,
+          "angle_deg": 0.0022109394613345824
+        },
+        {
+          "token": 46,
+          "abs_diff": 0.001521645532471648,
+          "native_norm": 37.737675799428295,
+          "ystar_norm": 37.738012191366046,
+          "cosine": 0.9999999992268188,
+          "angle_deg": 0.0022530885941712616
+        },
+        {
+          "token": 47,
+          "abs_diff": 0.0015136566065165984,
+          "native_norm": 36.7861673564261,
+          "ystar_norm": 36.786495942335904,
+          "cosine": 0.999999999193345,
+          "angle_deg": 0.002301343973368251
+        },
+        {
+          "token": 48,
+          "abs_diff": 0.0015112943890541305,
+          "native_norm": 36.235820934646,
+          "ystar_norm": 36.23614433005167,
+          "cosine": 0.9999999991700886,
+          "angle_deg": 0.0023342828830374457
+        },
+        {
+          "token": 49,
+          "abs_diff": 0.0015230620205291538,
+          "native_norm": 36.378509969757054,
+          "ystar_norm": 36.37883615256419,
+          "cosine": 0.9999999991637792,
+          "angle_deg": 0.0023431392698841868
+        },
+        {
+          "token": 50,
+          "abs_diff": 0.0015480467774719802,
+          "native_norm": 36.90813167071035,
+          "ystar_norm": 36.90846271530125,
+          "cosine": 0.999999999160615,
+          "angle_deg": 0.00234756828569929
+        },
+        {
+          "token": 51,
+          "abs_diff": 0.00155504799347951,
+          "native_norm": 36.68454043184314,
+          "ystar_norm": 36.684867524498685,
+          "cosine": 0.9999999991413142,
+          "angle_deg": 0.0023744048355988554
+        },
+        {
+          "token": 52,
+          "abs_diff": 0.0015711533366866571,
+          "native_norm": 36.814788134264354,
+          "ystar_norm": 36.815117067858594,
+          "cosine": 0.9999999991292504,
+          "angle_deg": 0.002391025831126235
+        },
+        {
+          "token": 53,
+          "abs_diff": 0.0015606478636779827,
+          "native_norm": 35.95462800475252,
+          "ystar_norm": 35.954944942790156,
+          "cosine": 0.999999999096818,
+          "angle_deg": 0.0024351474365125387
+        },
+        {
+          "token": 54,
+          "abs_diff": 0.0015652089830110096,
+          "native_norm": 35.76624495314558,
+          "ystar_norm": 35.76655790057666,
+          "cosine": 0.9999999990807235,
+          "angle_deg": 0.002456748613833758
+        },
+        {
+          "token": 55,
+          "abs_diff": 0.001567315886911869,
+          "native_norm": 35.67849677572789,
+          "ystar_norm": 35.678802518997195,
+          "cosine": 0.999999999071853,
+          "angle_deg": 0.0024685732227163
+        },
+        {
+          "token": 56,
+          "abs_diff": 0.0015672592394458203,
+          "native_norm": 35.30330591577576,
+          "ystar_norm": 35.30360288888892,
+          "cosine": 0.999999999049971,
+          "angle_deg": 0.0024975033198521897
+        },
+        {
+          "token": 57,
+          "abs_diff": 0.0015828584435641287,
+          "native_norm": 35.40604471593507,
+          "ystar_norm": 35.4063378188859,
+          "cosine": 0.9999999990349658,
+          "angle_deg": 0.0025171492927729415
+        },
+        {
+          "token": 58,
+          "abs_diff": 0.0015735604176298943,
+          "native_norm": 34.7088055664701,
+          "ystar_norm": 34.70908280162394,
+          "cosine": 0.9999999990042291,
+          "angle_deg": 0.0025569212219442032
+        },
+        {
+          "token": 59,
+          "abs_diff": 0.0015988299335676704,
+          "native_norm": 35.082700434912475,
+          "ystar_norm": 35.082981549513036,
+          "cosine": 0.9999999989936547,
+          "angle_deg": 0.002570461777308119
+        },
+        {
+          "token": 60,
+          "abs_diff": 0.001613799032522902,
+          "native_norm": 35.21635861613411,
+          "ystar_norm": 35.216632921796524,
+          "cosine": 0.9999999989803664,
+          "angle_deg": 0.002587376917495675
+        },
+        {
+          "token": 61,
+          "abs_diff": 0.0016254167315762275,
+          "native_norm": 35.15533508276672,
+          "ystar_norm": 35.15560861289905,
+          "cosine": 0.999999998961427,
+          "angle_deg": 0.0026112962518960356
+        },
+        {
+          "token": 62,
+          "abs_diff": 0.0016537470783451387,
+          "native_norm": 35.89874210349964,
+          "ystar_norm": 35.89902049865372,
+          "cosine": 0.9999999989689943,
+          "angle_deg": 0.0026017656090786896
+        },
+        {
+          "token": 63,
+          "abs_diff": 0.0016575556435619002,
+          "native_norm": 35.78966463167372,
+          "ystar_norm": 35.78993522768901,
+          "cosine": 0.9999999989561058,
+          "angle_deg": 0.0026179772677129677
+        },
+        {
+          "token": 64,
+          "abs_diff": 0.0016784358368136427,
+          "native_norm": 35.98034025595185,
+          "ystar_norm": 35.980611803405864,
+          "cosine": 0.9999999989404378,
+          "angle_deg": 0.002637550974176908
+        },
+        {
+          "token": 65,
+          "abs_diff": 0.0016922676222446038,
+          "native_norm": 35.905831354665224,
+          "ystar_norm": 35.90609877907301,
+          "cosine": 0.999999998917092,
+          "angle_deg": 0.002666449778990091
+        },
+        {
+          "token": 66,
+          "abs_diff": 0.0016968162181426327,
+          "native_norm": 35.40319909444147,
+          "ystar_norm": 35.403461222454936,
+          "cosine": 0.9999999988788563,
+          "angle_deg": 0.0027131154667620447
+        },
+        {
+          "token": 67,
+          "abs_diff": 0.0016997577698159567,
+          "native_norm": 35.19124388215721,
+          "ystar_norm": 35.191499613256624,
+          "cosine": 0.9999999988599391,
+          "angle_deg": 0.0027359090906089395
+        },
+        {
+          "token": 68,
+          "abs_diff": 0.0017135509387400574,
+          "native_norm": 35.53810032205232,
+          "ystar_norm": 35.53835467285805,
+          "cosine": 0.9999999988631671,
+          "angle_deg": 0.0027320329792480994
+        },
+        {
+          "token": 69,
+          "abs_diff": 0.0017424857974456677,
+          "native_norm": 36.49101321319972,
+          "ystar_norm": 36.49127600980436,
+          "cosine": 0.9999999988858572,
+          "angle_deg": 0.002704631208588386
+        },
+        {
+          "token": 70,
+          "abs_diff": 0.0017553855260231893,
+          "native_norm": 36.64882925743186,
+          "ystar_norm": 36.64909178668489,
+          "cosine": 0.9999999988785825,
+          "angle_deg": 0.0027134467151541334
+        },
+        {
+          "token": 71,
+          "abs_diff": 0.0017737152527510709,
+          "native_norm": 36.95575346329479,
+          "ystar_norm": 36.95601451505158,
+          "cosine": 0.9999999988731667,
+          "angle_deg": 0.002719990989499705
+        },
+        {
+          "token": 72,
+          "abs_diff": 0.0017882857643500673,
+          "native_norm": 37.3852099352721,
+          "ystar_norm": 37.38547341430233,
+          "cosine": 0.9999999988807952,
+          "angle_deg": 0.002710768435749426
+        },
+        {
+          "token": 73,
+          "abs_diff": 0.0017972565255554632,
+          "native_norm": 37.447814399414455,
+          "ystar_norm": 37.44807555012042,
+          "cosine": 0.9999999988726305,
+          "angle_deg": 0.0027206381075312903
+        },
+        {
+          "token": 74,
+          "abs_diff": 0.0018132764284831276,
+          "native_norm": 37.93768008109238,
+          "ystar_norm": 37.93794436695695,
+          "cosine": 0.9999999988820357,
+          "angle_deg": 0.002709265667058251
+        },
+        {
+          "token": 75,
+          "abs_diff": 0.0018001530898713388,
+          "native_norm": 37.70761005738849,
+          "ystar_norm": 37.707873948282256,
+          "cosine": 0.999999998884953,
+          "angle_deg": 0.002705728571892127
+        },
+        {
+          "token": 76,
+          "abs_diff": 0.0018288286425734287,
+          "native_norm": 40.29911878649692,
+          "ystar_norm": 40.299408457700736,
+          "cosine": 0.9999999989961077,
+          "angle_deg": 0.0025673270248725948
+        }
+      ],
+      "elapsed_seconds": 0.6257765293121338
+    },
+    "S": {
+      "n_layers": 32,
+      "min_eig": 0.10007203268609771,
+      "max_eig": 1392.0610723100003,
+      "cond_A": 13910.59055107401,
+      "reference_backward_error": 4.1438617372048984e-17,
+      "reference_backward_error_within_tol": true,
+      "F_native_E": 449976.33079422,
+      "F_Y_star": 449976.3282087189,
+      "quadratic_gap_lhs_F(E)_minus_F(Ystar)": 0.002585501060821116,
+      "quadratic_gap_rhs_trace_identity": 0.0025854973690042924,
+      "quadratic_gap_discrepancy": 3.6918168236019233e-09,
+      "quadratic_gap_tolerance": 0.0044997633079422,
+      "quadratic_gap_within_tol": true,
+      "native_backward_error": 3.255121832176486e-07,
+      "abs_forward_discrepancy_native_vs_Ystar": 0.04830739274451056,
+      "rel_forward_discrepancy_native_vs_Ystar": 3.758788690365023e-05,
+      "magnitude_native_E": 1285.1685410687287,
+      "magnitude_Y_star": 1285.1851147774773,
+      "magnitude_ratio_native_over_Ystar": 0.9999871040299502,
+      "cosine_native_vs_Ystar": 0.999999999376709,
+      "angle_deg_native_vs_Ystar": 0.002022940220985553,
+      "fp32_cast_reference": {
+        "note": "Y* rounded to fp32 and back to fp64 -- an output-rounding floor, NOT held to the fp64 1e-10 backward-error tolerance.",
+        "backward_error": 1.5933714818416244e-09,
+        "objective_gap_vs_Ystar": 5.4016709327697754e-08,
+        "abs_diff_vs_Ystar": 3.247379184484084e-05
+      },
+      "per_token": [
+        {
+          "token": 0,
+          "abs_diff": 0.006566683612892322,
+          "native_norm": 17.927774678809108,
+          "ystar_norm": 17.927391842816483,
+          "cosine": 0.999999933144049,
+          "angle_deg": 0.020951140442291887
+        },
+        {
+          "token": 1,
+          "abs_diff": 0.0025980615784571455,
+          "native_norm": 49.214327607520204,
+          "ystar_norm": 49.21468780859778,
+          "cosine": 0.9999999986333626,
+          "angle_deg": 0.00299546517281332
+        },
+        {
+          "token": 2,
+          "abs_diff": 0.0041359896133407285,
+          "native_norm": 152.48381562717876,
+          "ystar_norm": 152.48567410117798,
+          "cosine": 0.9999999997064185,
+          "angle_deg": 0.0013883595987404967
+        },
+        {
+          "token": 3,
+          "abs_diff": 0.006264860651730925,
+          "native_norm": 189.94304152580742,
+          "ystar_norm": 189.94543409480352,
+          "cosine": 0.9999999995354045,
+          "angle_deg": 0.0017465262492955703
+        },
+        {
+          "token": 4,
+          "abs_diff": 0.006301523523845314,
+          "native_norm": 189.43740773714777,
+          "ystar_norm": 189.43982410920293,
+          "cosine": 0.9999999995280973,
+          "angle_deg": 0.0017602075494964405
+        },
+        {
+          "token": 5,
+          "abs_diff": 0.0062630543917207284,
+          "native_norm": 187.35976383965743,
+          "ystar_norm": 187.36216862630843,
+          "cosine": 0.999999999523662,
+          "angle_deg": 0.001768459956987668
+        },
+        {
+          "token": 6,
+          "abs_diff": 0.006193486891749789,
+          "native_norm": 184.83108371079405,
+          "ystar_norm": 184.833456788981,
+          "cosine": 0.9999999995210055,
+          "angle_deg": 0.001773384460033639
+        },
+        {
+          "token": 7,
+          "abs_diff": 0.006119578491840027,
+          "native_norm": 182.1300285493287,
+          "ystar_norm": 182.13236025670008,
+          "cosine": 0.9999999995174758,
+          "angle_deg": 0.0017799065415767521
+        },
+        {
+          "token": 8,
+          "abs_diff": 0.0060572955846488995,
+          "native_norm": 179.87983781512298,
+          "ystar_norm": 179.88213368363142,
+          "cosine": 0.9999999995144846,
+          "angle_deg": 0.0017854148295836825
+        },
+        {
+          "token": 9,
+          "abs_diff": 0.005999822021018565,
+          "native_norm": 177.6831911271479,
+          "ystar_norm": 177.6854516595631,
+          "cosine": 0.9999999995108306,
+          "angle_deg": 0.0017921207100523966
+        },
+        {
+          "token": 10,
+          "abs_diff": 0.005944979679155622,
+          "native_norm": 175.4546860878981,
+          "ystar_norm": 175.45690401027034,
+          "cosine": 0.9999999995058659,
+          "angle_deg": 0.0018011920791683375
+        },
+        {
+          "token": 11,
+          "abs_diff": 0.005899794874563244,
+          "native_norm": 173.5635598887683,
+          "ystar_norm": 173.5657485071509,
+          "cosine": 0.9999999995017788,
+          "angle_deg": 0.0018086259188764783
+        },
+        {
+          "token": 12,
+          "abs_diff": 0.005852693919770388,
+          "native_norm": 171.40377001498968,
+          "ystar_norm": 171.405920508412,
+          "cosine": 0.9999999994957495,
+          "angle_deg": 0.001819536667804198
+        },
+        {
+          "token": 13,
+          "abs_diff": 0.005822306966138989,
+          "native_norm": 169.81360899324866,
+          "ystar_norm": 169.81573335991186,
+          "cosine": 0.9999999994904759,
+          "angle_deg": 0.0018290264716083137
+        },
+        {
+          "token": 14,
+          "abs_diff": 0.005781362162827371,
+          "native_norm": 168.05486804132735,
+          "ystar_norm": 168.0569580886315,
+          "cosine": 0.9999999994856064,
+          "angle_deg": 0.0018377457408398127
+        },
+        {
+          "token": 15,
+          "abs_diff": 0.005744395316430104,
+          "native_norm": 166.04149779278973,
+          "ystar_norm": 166.04355428629978,
+          "cosine": 0.9999999994782597,
+          "angle_deg": 0.001850822751035977
+        },
+        {
+          "token": 16,
+          "abs_diff": 0.005710399725407085,
+          "native_norm": 164.44296126970863,
+          "ystar_norm": 164.44498403647034,
+          "cosine": 0.9999999994727229,
+          "angle_deg": 0.0018606174501527145
+        },
+        {
+          "token": 17,
+          "abs_diff": 0.005680276761546427,
+          "native_norm": 162.89395628352224,
+          "ystar_norm": 162.8959442184498,
+          "cosine": 0.9999999994664802,
+          "angle_deg": 0.0018715993880228385
+        },
+        {
+          "token": 18,
+          "abs_diff": 0.005667607776917229,
+          "native_norm": 161.98869026979182,
+          "ystar_norm": 161.99066086461548,
+          "cosine": 0.9999999994619319,
+          "angle_deg": 0.001879560334363101
+        },
+        {
+          "token": 19,
+          "abs_diff": 0.0056661942825955765,
+          "native_norm": 161.78891617831428,
+          "ystar_norm": 161.7908825033633,
+          "cosine": 0.9999999994605874,
+          "angle_deg": 0.001881907114078539
+        },
+        {
+          "token": 20,
+          "abs_diff": 0.00565805532742263,
+          "native_norm": 160.88806664421958,
+          "ystar_norm": 160.89002298214322,
+          "cosine": 0.9999999994555534,
+          "angle_deg": 0.0018906680048728951
+        },
+        {
+          "token": 21,
+          "abs_diff": 0.00565649692414782,
+          "native_norm": 160.88186569252775,
+          "ystar_norm": 160.8838262260998,
+          "cosine": 0.9999999994561689,
+          "angle_deg": 0.0018895989838691484
+        },
+        {
+          "token": 22,
+          "abs_diff": 0.005643242118130555,
+          "native_norm": 160.72025098566638,
+          "ystar_norm": 160.72222376089326,
+          "cosine": 0.9999999994589062,
+          "angle_deg": 0.0018848375432690986
+        },
+        {
+          "token": 23,
+          "abs_diff": 0.005612062147080246,
+          "native_norm": 159.40518640660028,
+          "ystar_norm": 159.40715938317973,
+          "cosine": 0.9999999994568625,
+          "angle_deg": 0.0018883936818451942
+        },
+        {
+          "token": 24,
+          "abs_diff": 0.005566813612254744,
+          "native_norm": 157.66323638571416,
+          "ystar_norm": 157.66521658440578,
+          "cosine": 0.9999999994555434,
+          "angle_deg": 0.0018906853541241543
+        },
+        {
+          "token": 25,
+          "abs_diff": 0.005529789058414997,
+          "native_norm": 155.79296408216538,
+          "ystar_norm": 155.79493467574423,
+          "cosine": 0.9999999994500745,
+          "angle_deg": 0.0019001574072883885
+        },
+        {
+          "token": 26,
+          "abs_diff": 0.005513970266512007,
+          "native_norm": 154.61847066112563,
+          "ystar_norm": 154.6204358100842,
+          "cosine": 0.9999999994448936,
+          "angle_deg": 0.0019090871286433482
+        },
+        {
+          "token": 27,
+          "abs_diff": 0.005486182751052328,
+          "native_norm": 153.03603426092786,
+          "ystar_norm": 153.0380000058773,
+          "cosine": 0.9999999994399303,
+          "angle_deg": 0.0019176027887260084
+        },
+        {
+          "token": 28,
+          "abs_diff": 0.005479911905988558,
+          "native_norm": 151.98742850269417,
+          "ystar_norm": 151.98939025640516,
+          "cosine": 0.9999999994333242,
+          "angle_deg": 0.0019288789344457922
+        },
+        {
+          "token": 29,
+          "abs_diff": 0.0054735966132079495,
+          "native_norm": 151.211572668266,
+          "ystar_norm": 151.21354388182553,
+          "cosine": 0.9999999994298211,
+          "angle_deg": 0.0019348317379924602
+        },
+        {
+          "token": 30,
+          "abs_diff": 0.005484095912385896,
+          "native_norm": 150.6162067663948,
+          "ystar_norm": 150.61817940423344,
+          "cosine": 0.9999999994228925,
+          "angle_deg": 0.0019465518626158927
+        },
+        {
+          "token": 31,
+          "abs_diff": 0.005521666324876833,
+          "native_norm": 150.8114295036983,
+          "ystar_norm": 150.81340796197333,
+          "cosine": 0.9999999994158014,
+          "angle_deg": 0.0019584743056938318
+        },
+        {
+          "token": 32,
+          "abs_diff": 0.005522839755704763,
+          "native_norm": 150.22042822471641,
+          "ystar_norm": 150.22240746200475,
+          "cosine": 0.9999999994109766,
+          "angle_deg": 0.001966545046936545
+        },
+        {
+          "token": 33,
+          "abs_diff": 0.005512253155212481,
+          "native_norm": 149.18995937625397,
+          "ystar_norm": 149.19192514047833,
+          "cosine": 0.9999999994042418,
+          "angle_deg": 0.0019777557329635166
+        },
+        {
+          "token": 34,
+          "abs_diff": 0.00548886991602537,
+          "native_norm": 148.38982474259853,
+          "ystar_norm": 148.39178409314485,
+          "cosine": 0.9999999994030692,
+          "angle_deg": 0.001979701162298659
+        },
+        {
+          "token": 35,
+          "abs_diff": 0.005465056978604061,
+          "native_norm": 147.22570670979056,
+          "ystar_norm": 147.2276505804793,
+          "cosine": 0.9999999993982154,
+          "angle_deg": 0.001987733573233129
+        },
+        {
+          "token": 36,
+          "abs_diff": 0.005461561363592482,
+          "native_norm": 146.62067448207353,
+          "ystar_norm": 146.62260705886052,
+          "cosine": 0.9999999993931088,
+          "angle_deg": 0.001996149442462336
+        },
+        {
+          "token": 37,
+          "abs_diff": 0.005441520357900944,
+          "native_norm": 145.88583868672416,
+          "ystar_norm": 145.8877684333516,
+          "cosine": 0.9999999993918559,
+          "angle_deg": 0.0019982088392767796
+        },
+        {
+          "token": 38,
+          "abs_diff": 0.0054400397550801345,
+          "native_norm": 145.04667770093832,
+          "ystar_norm": 145.04859332539584,
+          "cosine": 0.999999999383891,
+          "angle_deg": 0.0020112517050806158
+        },
+        {
+          "token": 39,
+          "abs_diff": 0.005454524875924772,
+          "native_norm": 144.8398815579197,
+          "ystar_norm": 144.84180193698165,
+          "cosine": 0.9999999993788043,
+          "angle_deg": 0.002019537088635745
+        },
+        {
+          "token": 40,
+          "abs_diff": 0.005466817252270245,
+          "native_norm": 144.55170396645784,
+          "ystar_norm": 144.5536278244662,
+          "cosine": 0.9999999993734323,
+          "angle_deg": 0.002028250665265317
+        },
+        {
+          "token": 41,
+          "abs_diff": 0.0054722064357358045,
+          "native_norm": 143.94093854362907,
+          "ystar_norm": 143.9428519165958,
+          "cosine": 0.9999999993657104,
+          "angle_deg": 0.0020407106581857627
+        },
+        {
+          "token": 42,
+          "abs_diff": 0.005464434457232343,
+          "native_norm": 143.62267626179923,
+          "ystar_norm": 143.6245925028223,
+          "cosine": 0.9999999993652227,
+          "angle_deg": 0.0020414950838685167
+        },
+        {
+          "token": 43,
+          "abs_diff": 0.005457775948544914,
+          "native_norm": 142.65522376393002,
+          "ystar_norm": 142.65712624157607,
+          "cosine": 0.9999999993570793,
+          "angle_deg": 0.0020545482284177203
+        },
+        {
+          "token": 44,
+          "abs_diff": 0.005449704474888868,
+          "native_norm": 142.11316891514568,
+          "ystar_norm": 142.11507220142366,
+          "cosine": 0.9999999993544209,
+          "angle_deg": 0.002058791548048467
+        },
+        {
+          "token": 45,
+          "abs_diff": 0.00543622753168613,
+          "native_norm": 141.0504202969661,
+          "ystar_norm": 141.05230630168614,
+          "cosine": 0.9999999993466974,
+          "angle_deg": 0.0020710702722534654
+        },
+        {
+          "token": 46,
+          "abs_diff": 0.0054053923491882054,
+          "native_norm": 140.18406048993083,
+          "ystar_norm": 140.1859280181608,
+          "cosine": 0.9999999993453388,
+          "angle_deg": 0.0020732226079607182
+        },
+        {
+          "token": 47,
+          "abs_diff": 0.005376291152658327,
+          "native_norm": 139.19652685400962,
+          "ystar_norm": 139.1983732484312,
+          "cosine": 0.9999999993420878,
+          "angle_deg": 0.002078363898358009
+        },
+        {
+          "token": 48,
+          "abs_diff": 0.005365855823107605,
+          "native_norm": 138.75440244751812,
+          "ystar_norm": 138.7562400555774,
+          "cosine": 0.9999999993399589,
+          "angle_deg": 0.00208172391179135
+        },
+        {
+          "token": 49,
+          "abs_diff": 0.005371400549885291,
+          "native_norm": 138.29545999258207,
+          "ystar_norm": 138.29729301291113,
+          "cosine": 0.9999999993335743,
+          "angle_deg": 0.0020917679102098446
+        },
+        {
+          "token": 50,
+          "abs_diff": 0.005377977303534362,
+          "native_norm": 137.58737323127923,
+          "ystar_norm": 137.58919184098514,
+          "cosine": 0.9999999993234402,
+          "angle_deg": 0.0021076123147755503
+        },
+        {
+          "token": 51,
+          "abs_diff": 0.005381929052282373,
+          "native_norm": 137.19745411791638,
+          "ystar_norm": 137.19927085384091,
+          "cosine": 0.9999999993182787,
+          "angle_deg": 0.002115636624742383
+        },
+        {
+          "token": 52,
+          "abs_diff": 0.005383206635051607,
+          "native_norm": 136.6402923279437,
+          "ystar_norm": 136.64209663774307,
+          "cosine": 0.9999999993111343,
+          "angle_deg": 0.002126693599532692
+        },
+        {
+          "token": 53,
+          "abs_diff": 0.00536946669945717,
+          "native_norm": 136.2556933805443,
+          "ystar_norm": 136.25749550459847,
+          "cosine": 0.9999999993110066,
+          "angle_deg": 0.002126890673059713
+        },
+        {
+          "token": 54,
+          "abs_diff": 0.005364219005579148,
+          "native_norm": 135.51170977316548,
+          "ystar_norm": 135.51350416949447,
+          "cosine": 0.9999999993041979,
+          "angle_deg": 0.002137373853790286
+        },
+        {
+          "token": 55,
+          "abs_diff": 0.0053566882547001135,
+          "native_norm": 134.82685233863918,
+          "ystar_norm": 134.8286422061563,
+          "cosine": 0.9999999992988851,
+          "angle_deg": 0.002145518394293086
+        },
+        {
+          "token": 56,
+          "abs_diff": 0.005348242523533316,
+          "native_norm": 134.0010650146317,
+          "ystar_norm": 134.00284698141976,
+          "cosine": 0.9999999992919484,
+          "angle_deg": 0.002156105909182456
+        },
+        {
+          "token": 57,
+          "abs_diff": 0.005337229139233495,
+          "native_norm": 132.8014853640852,
+          "ystar_norm": 132.80324865909293,
+          "cosine": 0.999999999280559,
+          "angle_deg": 0.0021733777046482306
+        },
+        {
+          "token": 58,
+          "abs_diff": 0.005338836199811325,
+          "native_norm": 132.58053010280082,
+          "ystar_norm": 132.5823017355359,
+          "cosine": 0.9999999992785096,
+          "angle_deg": 0.002176471154072529
+        },
+        {
+          "token": 59,
+          "abs_diff": 0.005336924657865765,
+          "native_norm": 131.37576312154414,
+          "ystar_norm": 131.3775155085686,
+          "cosine": 0.9999999992638425,
+          "angle_deg": 0.002198482391058548
+        },
+        {
+          "token": 60,
+          "abs_diff": 0.005342612919228641,
+          "native_norm": 130.75264227678633,
+          "ystar_norm": 130.75439385890695,
+          "cosine": 0.9999999992549504,
+          "angle_deg": 0.0022117203641892555
+        },
+        {
+          "token": 61,
+          "abs_diff": 0.005339907312134347,
+          "native_norm": 130.08247603531782,
+          "ystar_norm": 130.08422287282636,
+          "cosine": 0.9999999992476172,
+          "angle_deg": 0.0022225782813409577
+        },
+        {
+          "token": 62,
+          "abs_diff": 0.005339871751915421,
+          "native_norm": 128.92534390578305,
+          "ystar_norm": 128.92707335905732,
+          "cosine": 0.9999999992322447,
+          "angle_deg": 0.0022451690300801463
+        },
+        {
+          "token": 63,
+          "abs_diff": 0.005334138780621747,
+          "native_norm": 128.32861018887448,
+          "ystar_norm": 128.33033262048343,
+          "cosine": 0.9999999992262096,
+          "angle_deg": 0.0022539760089711784
+        },
+        {
+          "token": 64,
+          "abs_diff": 0.005318724584498392,
+          "native_norm": 127.00285625909845,
+          "ystar_norm": 127.00454857694459,
+          "cosine": 0.9999999992118732,
+          "angle_deg": 0.00227476047891509
+        },
+        {
+          "token": 65,
+          "abs_diff": 0.00528921989498287,
+          "native_norm": 125.60272999722821,
+          "ystar_norm": 125.60439397372325,
+          "cosine": 0.9999999992011089,
+          "angle_deg": 0.0022902421966123276
+        },
+        {
+          "token": 66,
+          "abs_diff": 0.0052719168424804445,
+          "native_norm": 124.89037678622321,
+          "ystar_norm": 124.89202360616025,
+          "cosine": 0.9999999991960066,
+          "angle_deg": 0.0022975442233636595
+        },
+        {
+          "token": 67,
+          "abs_diff": 0.0052532042522263475,
+          "native_norm": 123.97495233262899,
+          "ystar_norm": 123.97658198458507,
+          "cosine": 0.9999999991886664,
+          "angle_deg": 0.002308008210396352
+        },
+        {
+          "token": 68,
+          "abs_diff": 0.005249594265677353,
+          "native_norm": 123.1494163977963,
+          "ystar_norm": 123.1510364308244,
+          "cosine": 0.9999999991779718,
+          "angle_deg": 0.0023231700202974315
+        },
+        {
+          "token": 69,
+          "abs_diff": 0.005264272124223469,
+          "native_norm": 122.27677243514496,
+          "ystar_norm": 122.27837471025352,
+          "cosine": 0.9999999991591229,
+          "angle_deg": 0.002349653946368371
+        },
+        {
+          "token": 70,
+          "abs_diff": 0.00526420421980096,
+          "native_norm": 121.90008192845144,
+          "ystar_norm": 121.90167463115918,
+          "cosine": 0.9999999991529129,
+          "angle_deg": 0.00235831414509154
+        },
+        {
+          "token": 71,
+          "abs_diff": 0.0052800489466480385,
+          "native_norm": 121.3145426377622,
+          "ystar_norm": 121.3161302594829,
+          "cosine": 0.9999999991384908,
+          "angle_deg": 0.00237830522176709
+        },
+        {
+          "token": 72,
+          "abs_diff": 0.0052738358296134215,
+          "native_norm": 120.56622353865373,
+          "ystar_norm": 120.56780023990324,
+          "cosine": 0.9999999991288306,
+          "angle_deg": 0.002391602100543209
+        },
+        {
+          "token": 73,
+          "abs_diff": 0.005276523799912409,
+          "native_norm": 119.99237181956718,
+          "ystar_norm": 119.99394528548336,
+          "cosine": 0.9999999991191393,
+          "angle_deg": 0.0024048680454306433
+        },
+        {
+          "token": 74,
+          "abs_diff": 0.005267053201112224,
+          "native_norm": 119.11847626814607,
+          "ystar_norm": 119.12003563106487,
+          "cosine": 0.9999999991081292,
+          "angle_deg": 0.002419850873178704
+        },
+        {
+          "token": 75,
+          "abs_diff": 0.005251537215488925,
+          "native_norm": 118.43060376929097,
+          "ystar_norm": 118.43215212749378,
+          "cosine": 0.9999999991023373,
+          "angle_deg": 0.002427695567475467
+        },
+        {
+          "token": 76,
+          "abs_diff": 0.0052173788377456645,
+          "native_norm": 115.55871769131804,
+          "ystar_norm": 115.56022632415052,
+          "cosine": 0.9999999990660078,
+          "angle_deg": 0.0024763342185495757
+        }
+      ],
+      "elapsed_seconds": 0.5177853107452393
+    }
+  },
+  "reference_solve_fully_valid": true,
+  "direct_vs_sequential_contrast": {
+    "native_norm_D": 329.5411305562234,
+    "native_norm_S": 1285.1685410687287,
+    "native_norm_ratio_D_over_S": 0.25641860971961034,
+    "native_cosine_D_vs_S": -0.06750172748182559,
+    "native_angle_deg_D_vs_S": 93.87050721499097,
+    "accurate_norm_D": 329.54360122199495,
+    "accurate_norm_S": 1285.1851147774773,
+    "accurate_norm_ratio_D_over_S": 0.25641722537305733,
+    "accurate_cosine_D_vs_S": -0.06750561849406504,
+    "accurate_angle_deg_D_vs_S": 93.87073066325007,
+    "norm_ratio_shift": -1.3843465530016807e-06,
+    "angle_shift_deg": 0.00022344825910636246
+  },
+  "diagnostic_tensors_saved": {
+    "Y_STAR_D_fp64": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/recovery_optimality_audit/diagnostics/Y_STAR_D_fp64.pt",
+      "sha256": "ef1f29d69a936e536e36a223a759e85f6f343c639fc45e90da8bdd232939263c",
+      "shape": [
+        77,
+        768
+      ],
+      "dtype": "torch.float64"
+    },
+    "Y_STAR_S_fp64": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/recovery_optimality_audit/diagnostics/Y_STAR_S_fp64.pt",
+      "sha256": "514800046a7e22f27f41902e50708909c7bb03351f55efad20d85e4045a50bc7",
+      "shape": [
+        77,
+        768
+      ],
+      "dtype": "torch.float64"
+    },
+    "Y_STAR_D_fp32cast": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/recovery_optimality_audit/diagnostics/Y_STAR_D_fp32cast.pt",
+      "sha256": "1f722a13446f2f2957255f29cb3cf91b28f0f9767a8fcf9f3295db4a0f7356e7",
+      "shape": [
+        77,
+        768
+      ],
+      "dtype": "torch.float32"
+    },
+    "Y_STAR_S_fp32cast": {
+      "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/recovery_optimality_audit/diagnostics/Y_STAR_S_fp32cast.pt",
+      "sha256": "8e8ddf31587bcae85233d564df82ac4a6a5d4ce478a935f717dcc488ab7565bb",
+      "shape": [
+        77,
+        768
+      ],
+      "dtype": "torch.float32"
+    }
+  },
+  "diagnostic_tensors_authorized_use": "Diagnostic reference solutions only. NOT applied to any model, NOT used to build or modify any UNet checkpoint, NOT used to generate any image in this task.",
+  "timing": {
+    "total_script_seconds": 18.115017414093018
+  },
+  "rece_source_pin": {
+    "repo": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/repo_src/RECE",
+    "commit_required": "403a67fd86dce6c124b88798340e001e625b28c9",
+    "function": "utils/embedding_calculation/close_form_emb.py :: close_form_emb_regzero",
+    "confirmed_call_site": "erase_methods... train_object.py line 310: close_form_emb_regzero(ldm_stable, ldm_stable_copy, batch_concept, with_to_k=True, save_path=save_path, regeular_scale=regular_scale, seed=seed, save_name=...); regular_scale=0.1 confirmed via RUN_MANIFEST.md's directly-published train_object.py command (--regular_scale 1e-1) and embedding_cross_swap/FROZEN_MANIFEST.json's own recovery parameters (regeular_scale=0.1, with_to_k=true, seed=42, reference=pristine M0 both branches). with_to_k=True is hardcoded at the call site (not the function's own 1e-3/with_to_k defaults), so this audit uses r=0.1 and all 32 K/V projections, not to_v-only -- the prior solver-only report's to_v-only mention concerned a different computation (Stage-2 refinement) and does not apply here; this manifest records with_to_k=True explicitly to avoid the same ambiguity.",
+    "algebraic_derivation": "In the source: mat1 = r*I + sum_l W_l^T W_l; mat2 = sum_l W_l^T W0_l (both accumulated from zero/r*I, model=working checkpoint supplies W_l, model_copy=M0 supplies W0_l); coefficient = inverse(mat1) @ mat2; adv_embedding = concept_embedding @ coefficient.T. Transposing: adv_embedding^T = coefficient^T^T... = (inv(mat1)@mat2)^T applied... concretely adv_embedding^T = inverse(mat1) @ mat2 @ concept_embedding^T (using mat1 symmetric so inverse(mat1)^T = inverse(mat1)). Writing A=mat1, B=mat2, C=concept_embedding, D=B@C^T, Y=adv_embedding: A @ Y^T = D exactly -- matches the task's stated A, B, D, and AY*^T=D normal-equation form with no discrepancy."
+  }
+}

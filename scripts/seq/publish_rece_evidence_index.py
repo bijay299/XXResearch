@@ -29,6 +29,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/embedding_cross_swap/FINAL_REPORT.md",
         f"{R}/numerical_optimality_audit/FINAL_REPORT.md",
         f"{R}/solver_only_intervention/FINAL_REPORT.md",
+        f"{R}/recovery_optimality_audit/FINAL_REPORT.md",
         f"{R}/CORRECTIONS.md",
     ]),
     ("Recognition tables and visual-review labels — direct-vs-sequential experiment", [
@@ -103,6 +104,12 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/evidence/code/run_operand_provenance_check.py",
         f"{R}/evidence/code/run_solver_only_build.py",
         f"{R}/evidence/code/make_review_grids_solver_only.py",
+    ]),
+    ("Recovery-optimality audit — does the native embedding-recovery output (E_D/E_S, close_form_emb_regzero) accurately solve its own stated closed-form objective? (CPU-only, fp64 reference solve; different computation from the numerical-optimality audit above) plus the corrected AB_STABLE_SOLVE golf-ball case table (C17)", [
+        f"{R}/evidence/recovery_optimality_audit/FROZEN_MANIFEST.json",
+        f"{R}/evidence/recovery_optimality_audit/RESULT.json",
+        f"{R}/evidence/recovery_optimality_audit/CASE_LEVEL_AB_STABLE_SOLVE_GOLF_CORRECTED.json",
+        f"{R}/evidence/code/run_recovery_optimality_audit.py",
     ]),
     ("Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)", [
         f"{R}/images/grids/B/golf_ball.png",

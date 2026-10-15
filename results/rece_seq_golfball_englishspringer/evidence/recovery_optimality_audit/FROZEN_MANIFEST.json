@@ -1,0 +1,77 @@
+{
+  "task": "recovery_optimality_audit",
+  "question": "Does the saved, native (fp32, GPU) recovered adversarial embedding (E_D / E_S) accurately solve close_form_emb_regzero's own stated closed-form objective, or does it carry a substantial numerical error? This is a different computation from numerical_optimality_audit/ (which audited edit_model_adversarial's Stage-2 UCE refinement solve, H*V=N). Here the audited computation is the embedding-recovery solve itself (the one that produced E_D and E_S in the first place), confirmed against erase_methods/uce.py::close_form_emb_regzero at the pinned RECE commit.",
+  "not_repeated": [
+    "eligibility", "baseline searches", "parent confirmation", "Stage-1 reconstruction",
+    "both diagonal replays", "downstream erase-optimality audit (numerical_optimality_audit/)",
+    "AB_STABLE_SOLVE / solver-only intervention"
+  ],
+  "cpu_only": {
+    "CUDA_VISIBLE_DEVICES": "set to \"\" before importing torch",
+    "torch_cuda_is_available_assert": "False, asserted before any computation",
+    "torch_num_threads": 8,
+    "no_gpu_allocation": true,
+    "no_image_generation": true,
+    "no_model_editing": true,
+    "no_text_encoding": "concept embedding C is loaded from the already-saved concept_embedding.pt; no tokenizer/text_encoder is invoked anywhere in this script",
+    "no_pipeline_instantiation": "diffusers is not imported; the UNet architecture is never instantiated as an nn.Module -- all three weight sets (W_D, W_S, M0) are read directly as raw state_dict tensors, and the 32 audited K/V layers are the raw .weight tensors at matching state_dict keys"
+  },
+  "inputs": {
+    "W_D": {
+      "path": "refinement_ablation/edits/B_UCE.pt",
+      "sha256_supplied": "23b691460d7189b7e8c78ceb5ea8441a0400f61c6a79abf8a6e8afd89a161bc4",
+      "role": "Direct-branch working UNet state dict (Stage-1 UCE output from M0). Projections W_l for the W_D branch."
+    },
+    "W_S": {
+      "path": "refinement_ablation/edits/AB_UCE.pt",
+      "sha256_supplied": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550",
+      "role": "Sequential-branch working UNet state dict (Stage-1 UCE output starting from A). Projections W_l for the W_S branch."
+    },
+    "E_D": {
+      "path": "embedding_cross_swap/edits/E_D.pt",
+      "sha256_supplied": "32d1bd98471b6672310228470feb8ab18f58c557eb5b1c4c300dffef0ebd4c3b",
+      "role": "Saved native (fp32, GPU, close_form_emb_regzero) recovered embedding from the W_D branch. Shape [1,77,768]. Compared against this audit's Y*_D."
+    },
+    "E_S": {
+      "path": "embedding_cross_swap/edits/E_S.pt",
+      "sha256_supplied": "e6ea282ad27441aacf47b2824c693166b59d669eb6ae9520978f0194af89bdb8",
+      "role": "Saved native recovered embedding from the W_S branch. Shape [1,77,768]. Compared against this audit's Y*_S."
+    },
+    "concept_embedding_C": {
+      "path": "embedding_cross_swap/edits/concept_embedding.pt",
+      "sha256_supplied": "2e5ab9daadf03b4bcbdfa7b678b749c6078ed4de20b13c6ad6c2eb7c14a4e5c6",
+      "role": "Shared original concept embedding C (English Springer, 77 tokens), identical for both branches -- previously verified identical across the W_D and W_S recovery pipelines (embedding_cross_swap/EMBEDDING_PROVENANCE.json)."
+    },
+    "M0": {
+      "path": "embedding_cross_swap/edits/M0_unet_state_dict.pt",
+      "sha256_supplied": null,
+      "note": "No hash was supplied in the task instruction for M0 (only the five tensors above carry supplied hashes to verify). M0's provenance is established in this audit from run_embedding_cross_swap.py's own save code (line ~212-283: m0_state_cpu is unet.state_dict() of a fresh StableDiffusionPipeline.from_pretrained(SD14) with no edits applied, immediately detached/cloned/cpu'd and saved verbatim) plus an independent CPU-only cross-check of the 32 audited projections against the pinned SD1.4 snapshot's own safetensors file, read directly (no pipeline, no inference). Its sha256 as currently stored on disk is recorded in RESULT.json, disclosed as newly recorded here, not as a previously-published value.",
+      "pinned_sd14_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b",
+      "pinned_sd14_revision": "133a221b8aa7292a167afc5127cb63fb5005638b"
+    }
+  },
+  "rece_source": {
+    "repo": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/repo_src/RECE",
+    "commit_required": "403a67fd86dce6c124b88798340e001e625b28c9",
+    "function": "utils/embedding_calculation/close_form_emb.py :: close_form_emb_regzero",
+    "confirmed_call_site": "erase_methods... train_object.py line 310: close_form_emb_regzero(ldm_stable, ldm_stable_copy, batch_concept, with_to_k=True, save_path=save_path, regeular_scale=regular_scale, seed=seed, save_name=...); regular_scale=0.1 confirmed via RUN_MANIFEST.md's directly-published train_object.py command (--regular_scale 1e-1) and embedding_cross_swap/FROZEN_MANIFEST.json's own recovery parameters (regeular_scale=0.1, with_to_k=true, seed=42, reference=pristine M0 both branches). with_to_k=True is hardcoded at the call site (not the function's own 1e-3/with_to_k defaults), so this audit uses r=0.1 and all 32 K/V projections, not to_v-only -- the prior solver-only report's to_v-only mention concerned a different computation (Stage-2 refinement) and does not apply here; this manifest records with_to_k=True explicitly to avoid the same ambiguity.",
+    "algebraic_derivation": "In the source: mat1 = r*I + sum_l W_l^T W_l; mat2 = sum_l W_l^T W0_l (both accumulated from zero/r*I, model=working checkpoint supplies W_l, model_copy=M0 supplies W0_l); coefficient = inverse(mat1) @ mat2; adv_embedding = concept_embedding @ coefficient.T. Transposing: adv_embedding^T = coefficient^T^T... = (inv(mat1)@mat2)^T applied... concretely adv_embedding^T = inverse(mat1) @ mat2 @ concept_embedding^T (using mat1 symmetric so inverse(mat1)^T = inverse(mat1)). Writing A=mat1, B=mat2, C=concept_embedding, D=B@C^T, Y=adv_embedding: A @ Y^T = D exactly -- matches the task's stated A, B, D, and AY*^T=D normal-equation form with no discrepancy."
+  },
+  "equations": {
+    "objective": "F(Y) = r*||Y||_F^2 + sum_l ||W_l Y^T - W0_l C^T||_F^2, Y in R^{77x768}, l ranges over all 32 cross-attention to_v/to_k weight matrices",
+    "A": "r*I_768 + sum_l W_l^T W_l  (768x768, fp64)",
+    "B": "sum_l W_l^T W0_l  (768x768, fp64)",
+    "D": "B @ C^T  (768x77, fp64)",
+    "normal_equation": "A @ Y*^T = D, solved via fp64 Cholesky factorization of A, no explicit matrix inverse formed (torch.linalg.cholesky + torch.cholesky_solve)",
+    "r": 0.1,
+    "tokens": 77,
+    "n_layers": 32
+  },
+  "tolerances": {
+    "reference_normalized_backward_error_max": 1e-10,
+    "quadratic_gap_identity_discrepancy_max": "1e-8 * max(1, |F(E)|, |F(Y*)|)"
+  },
+  "fp64_discipline": "All operands (W_l, W0_l, C) are loaded as the original fp32 tensors and upcast to fp64 BEFORE any product or accumulation -- never casting an already-rounded fp32 Gram/cross matrix. A, B, D are formed and the Cholesky solve performed entirely in fp64.",
+  "authorized_diagnostic_use_only": "The two reference solutions Y*_D, Y*_S computed here are diagnostic tensors only. They are NOT applied to any model, NOT used to build or modify any UNet checkpoint, and NOT used to generate any image. They are saved locally under recovery_optimality_audit/diagnostics/ with sha256 hashes so a later, separately authorized intervention does not need to repeat this solve.",
+  "scoped_stop_rule": "If any of the five supplied hashes fails to verify, if M0's 32-projection cross-check against the pinned snapshot disagrees, if Cholesky factorization of A fails (not positive definite), or if the reference-solve validation (backward error or quadratic-gap identity) exceeds its frozen tolerance for any layer/branch, this audit reports unresolved validity for the affected branch and stops -- no jitter, truncated SVD, parameter change, solver sweep, or tolerance relaxation."
+}

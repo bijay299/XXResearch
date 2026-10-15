@@ -1,0 +1,44 @@
+{
+  "note": "Bounded correction to solver_only_intervention/FINAL_REPORT.md section 4.2's golf-ball paired transition table, from recovery_optimality_audit's full-resolution re-inspection of the disputed case and consistent re-check of the borderline cases named in the task instruction. Full detail and narrative: CORRECTIONS.md C17.",
+  "endpoint": "AB_STABLE_SOLVE",
+  "comparator": "native AtoB",
+  "class": "golf_ball",
+  "n_cases": 40,
+  "cases_reviewed_this_session_at_full_512x512_resolution": [15, 24, 28, 38],
+  "image_paths": {
+    "15": "solver_only_intervention/eval/AB_STABLE_SOLVE/imgs/15_0.png",
+    "24": "solver_only_intervention/eval/AB_STABLE_SOLVE/imgs/24_0.png",
+    "28": "solver_only_intervention/eval/AB_STABLE_SOLVE/imgs/28_0.png",
+    "38": "solver_only_intervention/eval/AB_STABLE_SOLVE/imgs/38_0.png"
+  },
+  "adjudications": {
+    "15": {"previous_label": "non-degenerate (minor edge artifact)", "this_session_label": "non-degenerate", "changed": false,
+           "basis": "right-edge chromatic/mesh fringe covers a minority of the frame; central golf-green subject clean and coherent"},
+    "24": {"previous_label": "non-degenerate (milder striping texture)", "this_session_label": "non-degenerate", "changed": false,
+           "basis": "faint regular-striping background texture, not mesh/sparkle; coherent clean foreground subject"},
+    "28": {"previous_label": "non-degenerate (milder striping texture)", "this_session_label": "non-degenerate", "changed": false,
+           "basis": "mild vertical striping in background trees, not mesh/sparkle; coherent clean large foreground subject"},
+    "38": {"previous_label": "recovered (non-degenerate)", "this_session_label": "degenerate", "changed": true,
+           "basis": "pervasive mesh/checkerboard moire corruption across flag backdrop plus chromatic-fringed sparkle texture across lower-left region -- covers the large majority of the frame, matching this results line's own established whole-frame mesh/sparkle degeneration signature, not the milder non-mesh family"}
+  },
+  "corrected_paired_table": {
+    "persisted_degenerate": {"count": 31, "note": "adds case 38 to the previously-published 30"},
+    "recovered": {"count": 4, "cases": [28, 29, 30, 31], "note": "removes case 38 from the previously-published 5"},
+    "newly_damaged": {"count": 0},
+    "neither": {"count": 5, "cases": [15, 24, 25, 26, 27]},
+    "sum_check": 40
+  },
+  "corrected_rates": {
+    "AB_STABLE_SOLVE_golf_degeneration": "31/40 (77.5%)",
+    "native_AtoB_golf_degeneration_unchanged": "35/40 (87.5%)",
+    "net_improvement_cases": 4,
+    "relative_reduction_pct": 11.4
+  },
+  "previously_published_values_superseded": {
+    "AB_STABLE_SOLVE_golf_degeneration": "30/40 (75.0%)",
+    "recovered_cases": [28, 29, 30, 31, 38],
+    "net_improvement_cases": 5,
+    "relative_reduction_pct": 14.3,
+    "source": "solver_only_intervention/FINAL_REPORT.md section 4.2"
+  }
+}

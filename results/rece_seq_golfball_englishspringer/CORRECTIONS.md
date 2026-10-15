@@ -530,6 +530,239 @@ correction) supersede its English-springer "corruption cleanly follows
 the embedding" framing with the corrected one-cell-pattern description
 above.
 
+## C17 — `solver_only_intervention/FINAL_REPORT.md`'s "5 recovered" golf-ball cases is wrong: case 38 still shows pervasive mesh corruption under the line's own criterion
+
+**What was claimed.** §4.2 reports `AB_STABLE_SOLVE`'s paired transition
+vs. native `AtoB` as "30 persisted degenerate / **5 recovered** (28, 29,
+30, 31, 38) / 0 newly damaged / 5 neither (15, 24, 25, 26, 27)," giving a
+headline golf-ball degeneration rate of 30/40 (75.0%, down from native
+`AtoB`'s 35/40).
+
+**What direct full-resolution inspection shows.** Viewing
+`solver_only_intervention/eval/AB_STABLE_SOLVE/imgs/38_0.png` at native
+512x512 resolution (this audit; not previously done at this resolution
+for this specific case/endpoint pairing) shows the same pervasive
+mesh/sparkle corruption signature this results line has used throughout
+as its whole-frame degeneration criterion (`VISUAL_REVIEW.json`'s own
+note: "the familiar mesh/sparkle corruption signature... dominates
+cases 0-23 and 32-39... plus case 38"): heavy checkerboard/moiré texture
+across the flag backdrop and chromatic-fringed sparkle texture across
+the lower-left region, covering the large majority of the frame. This is
+**not** the milder, non-mesh "faint striping" / "minor edge artifact"
+family that distinguishes this line's non-degenerate borderline cases.
+For consistency, cases 15, 24, and 28 (the other cases this report or
+its precedents flagged as borderline) were re-inspected at the same
+resolution during this audit: all three remain correctly non-degenerate
+under the existing rubric — case 15's artifact is a right-edge chromatic
+fringe covering a minority of the frame with the central golf-green
+subject clean; cases 24 and 28 show the milder regular-striping
+background texture family (not mesh/sparkle) with a coherent, clean
+foreground subject in both. Only case 38's label changes.
+
+**Corrected paired table** (native `AtoB` vs. `AB_STABLE_SOLVE`, golf-ball,
+40 cases): **31 persisted degenerate** (adds case 38) / **4 recovered**
+(28, 29, 30, 31) / 0 newly damaged / 5 neither (15, 24, 25, 26, 27) — sums
+to 40, consistent with the unchanged native-`AtoB` degenerate-case count.
+Corrected `AB_STABLE_SOLVE` golf-ball degeneration: **31/40 (77.5%)**, not
+30/40 (75.0%). Net improvement vs. native `AtoB`'s 35/40 is **4 cases**,
+not 5 (35->31, 11.4% relative reduction, not 14.3%).
+
+**What does still hold.** Every qualitative claim in §4.2/§4.4/§6 survives
+this correction unchanged in direction and is, if anything, mildly
+strengthened: golf-ball corruption remains the large majority outcome
+under a verified fp64-accurate solve (77.5%, not 75.0%); the improvement
+over native `AtoB` is real but even more modest than reported (4 of 35
+cases, not 5); none of the recovered cases shows an actual returned golf
+ball (unaffected by this correction, not re-examined here); and the
+paired-vs-`AB_UCE` finding ("28 of 30 degenerate cases are
+refinement-introduced, not inherited from Stage 1") becomes "29 of 31,"
+the same conclusion more strongly. The English-springer and retained-class
+tables (§4.1, §4.3) are untouched by this correction.
+
+**Resolution.** `solver_only_intervention/FINAL_REPORT.md` is left as
+published, per this repository's practice. This correction, plus the
+independent recovery-optimality audit below, is the basis for not
+carrying "35->30, five recoveries" forward as a settled headline in any
+later report in this line.
+
+## C18 — `solver_only_intervention/FINAL_REPORT.md`'s fp32-storage objective change is mislabeled and imprecise: "~5e-8 relative" should read ~5.04e-8 absolute / ~5.18e-10 relative
+
+**What was claimed.** §3: "casting V* to fp32 and back to fp64 changes
+the total objective by ≈5e-8 relative (97.388368776 ->
+97.388368827)."
+
+**What is actually true.** The quoted numbers' own difference,
+97.388368827 - 97.388368776 = 5.1e-8, is the **absolute** change, not
+the relative one (as printed, the sentence mislabels an absolute figure
+as "relative"). Recomputing precisely from the full-precision per-layer
+values already in `solver_only_intervention/RESULT.json` (summing
+`J_at_V_star_fp64.total` and `J_at_V_star_fp32_roundtrip.total` across
+all 32 layers, no new computation): **absolute change = 5.0418e-08**,
+**relative change = 5.1770e-10** (sum fp64 = 97.38836877622424, sum
+fp32-roundtrip = 97.38836882664246). The qualitative point the report
+draws from this number is unaffected: at ~5e-10 relative, fp32 storage
+remains roughly six orders of magnitude smaller than native's own
+backward error (0.93e-3-2.74e-3) and is not a meaningful source of the
+native/reference gap.
+
+**Resolution.** Reported precisely here; `solver_only_intervention/
+FINAL_REPORT.md`'s §3 text is left as published, per this repository's
+practice, with this entry as the correction of record.
+
+## C19 — "Accurate solving" in the solver-only report describes assembly-and-solve accuracy, not matrix-inversion accuracy alone
+
+**What was imprecise.** `solver_only_intervention/FINAL_REPORT.md` and
+`numerical_optimality_audit/FINAL_REPORT.md` describe the tested change
+as replacing "the native float32 `torch.inverse` path" with an "fp64
+Cholesky solve," which can read as isolating matrix-inversion accuracy
+specifically. The actual tested change is broader: fp64 upcasting of the
+operands **before** forming the Gram matrices (`H`/`N` or, in this
+audit, `A`/`B`/`D`), fp64 accumulation across all 32 layers, and a
+Cholesky solve with no explicit inverse formed -- i.e. **assembly-and-
+solve accuracy**, not inversion accuracy in isolation. Neither report's
+own methodology actually isolates inversion from accumulation (both
+cited reports state this explicitly: "this audit assesses the combined
+recovery computation... does not claim to separate accumulation,
+inversion and final multiplication errors"), so no finding in either
+report is affected -- this corrects only how the intervention is
+*described*, not what was measured.
+
+**Resolution.** Both reports are left as published. Future reports in
+this line (including `recovery_optimality_audit/FINAL_REPORT.md` below)
+use "assembly-and-solve accuracy" rather than "inversion accuracy" when
+describing this class of intervention.
+
+## C20 — Visual-review blinding: classification and aggregate inspection preceded visual review for every endpoint in this line, and this cannot be repaired retroactively
+
+**What was disclosed, partially.** Several reports in this line (e.g.
+`solver_only_intervention/FINAL_REPORT.md` S4, `embedding_cross_swap/
+FINAL_REPORT.md`) disclose, per-endpoint, that "per-class aggregate
+recognition counts were queried immediately after classification and
+before the visual review began," describing this as a limitation on
+independence but not always stating plainly that this means the
+**classifier ran, and its aggregate output was seen, before any human
+visual judgment was formed** -- for every endpoint published in this
+results line, not a subset.
+
+**Stated plainly here.** The frozen protocol this line's earlier work
+(`RUN_MANIFEST.md`, `ELIGIBILITY.md`) describes as the intended practice
+-- visual review before classification, to avoid anchoring labels to the
+classifier's own (separately fallible) judgment -- was **not followed**
+for any endpoint in this results line, including every endpoint audited
+or corrected in this publication. This is a departure from the frozen
+instruction, not a partial compliance, a blinding, or a "soft" blinding;
+no rereading of the existing record can make the already-completed
+visual passes have happened before classification. All visual-review
+labels in this line, including the corrections in this file, should be
+read as **prediction-informed retrospective review**, not independent
+human validation -- consistent with how individual reports already
+describe their own method sections, stated here as a line-wide fact
+rather than a per-report footnote.
+
+**Resolution.** No report is retracted on this basis; the quantitative
+labels are not disputed by this disclosure alone (C17 above is a
+separate, evidence-based relabeling of one specific case). This entry
+exists so the limitation is visible at the collection level, not only
+inside each report's own methods section.
+
+## C21 — The 120-row embedding-cross-swap case-level record: full-resolution-vs-thumbnail accounting corrected, partial completion only
+
+**What was claimed.** `solver_only_intervention/CASE_LEVEL_COMPLETION_
+RECORD_120.json` (published in the solver-only report) records, for each
+of 120 rows (40 golf-ball + 20 English-springer, x `D_WITH_SEQ_EMB` and
+`S_WITH_DIRECT_EMB`), the resolution at which it was viewed: 14 rows
+`full_512x512_crop` (10 via previously-saved `images/corrected_cases/`
+crops, plus 4 more read directly from `eval/*/imgs/` during that
+session), 106 rows `grid_thumbnail_180px`.
+
+**What this audit adds.** Bounded additional full-resolution spot checks
+this session (reading the actual `eval/*/imgs/<case>_0.png` files
+directly -- these exist at full 512x512 resolution for every case
+regardless of what resolution any prior pass used, so "viewing at full
+resolution" only required opening the right file, not generating
+anything new): `D_WITH_SEQ_EMB` case 38 (golf-ball) and case 87
+(English-springer) were viewed at full resolution and both show the same
+pervasive mesh-corruption signature already counted in that cell's
+published 5/40 golf-ball and 20/20 springer degeneration totals --
+**reconfirming**, not changing, those existing aggregate counts.
+
+**What remains thumbnail-only.** The remaining ~104 rows of the 120-row
+record were **not** re-viewed at full resolution in this bounded
+session. Per the task scope that authorized this correction pass ("no
+repeated baselines... no automatic follow-up"), a full case-by-case
+re-review of all 120 rows was not undertaken. These rows' existing
+thumbnail-grid-based labels are **not disputed** by this entry (no
+inspection here contradicts any of them), but they remain exactly what
+they were: thumbnail-resolution judgments, explicitly marked as such in
+the existing record, not upgraded to full-resolution by this correction.
+Any future claim that treats the full 120-row record as fully
+full-resolution-reviewed would be incorrect; this entry is the record of
+that limit.
+
+**Resolution.** `CASE_LEVEL_COMPLETION_RECORD_120.json` is left as
+published (its own `resolution_viewed` field per row is accurate and
+unchanged). This entry records the two additional full-resolution views
+performed during this audit and states plainly that the rest remain
+provisional in the sense that they rest on thumbnail resolution only,
+per this repository's own standing distinction between thumbnail and
+full-resolution review.
+
+## C22 — M0's provenance and the embedding-recovery operands' remaining documentation limits
+
+**M0 provenance, newly recorded.** `embedding_cross_swap/edits/
+M0_unet_state_dict.pt` was never independently hashed or provenance-
+checked in any previously published report in this line (`embedding_
+cross_swap/EMBEDDING_PROVENANCE.json` hashes `E_D`, `E_S`,
+`concept_embedding`, `guide_embedding`, and `retain_embedding`, but not
+M0 itself). `recovery_optimality_audit/` (below) establishes, for the
+first time in this line: (a) M0's current sha256
+(`ee60d14bf80c6f829ab1b9da5f6c0eb63338f8a29d7ec7f6a3895bae1b1611df`),
+disclosed as newly recorded, not previously published; (b) its save-code
+provenance, read directly from `embedding_cross_swap/
+run_embedding_cross_swap.py` (an untouched `state_dict()` of a fresh
+`StableDiffusionPipeline.from_pretrained` load of the pinned SD1.4
+snapshot, saved before any edit is applied to that pipeline object); and
+(c) an independent CPU-only, no-pipeline cross-check of all 32 audited
+K/V projections directly against the pinned snapshot's own safetensors
+file -- all 32 bit-identical. M0's provenance for this audit's purposes
+is fully established.
+
+**Remaining operand-provenance documentation limits, using only existing
+artifacts.** The embedding-recovery operands' concept embedding `C` was
+independently verified identical across the `W_D` and `W_S` recovery
+pipelines (`EMBEDDING_PROVENANCE.json`, pre-existing). The retain/guide
+text-embedding batching artifact documented in `solver_only_intervention/
+FINAL_REPORT.md` S2 (a ~4.29e-6 max-abs-diff, batch-size-dependent
+floating-point difference, not a content difference) concerns the
+*Stage-2 refinement's* retain operand, not this audit's `close_form_
+emb_regzero` computation, which has no retain term (confirmed in
+`recovery_optimality_audit/FROZEN_MANIFEST.json`'s equation derivation --
+`close_form_emb_regzero` has only a zero-regularizer term and the
+erase/B term, no `preserve`/retain accumulation at all, unlike `edit_
+model_adversarial`'s Stage-2 objective). No new text-encoding check,
+endpoint build, or replay was run to further verify any operand in this
+audit, per task scope; where an operand's provenance rests on a prior
+report's own disclosure (e.g. the text-encoder batching note above), that
+prior disclosure is cited, not re-verified.
+
+- **C17–C22 were produced during `recovery_optimality_audit/`**, a CPU-
+  only task auditing a different computation (`close_form_emb_regzero`,
+  the embedding-recovery step) from either prior audit
+  (`numerical_optimality_audit/` audited `edit_model_adversarial`'s
+  Stage-2 refinement solve). **C17 is the most consequential of this
+  batch**: it withdraws the "35->30, five recoveries" headline from
+  `solver_only_intervention/FINAL_REPORT.md`, replacing it with "35->31,
+  four recoveries" on direct full-resolution re-inspection of case 38 —
+  a correction that strengthens, not weakens, that report's own
+  "not an unqualified rescue" framing. C18 is a units/precision fix with
+  no effect on any conclusion. C19 is a description-only correction. C20
+  states a line-wide blinding limitation explicitly rather than only
+  per-report. C21 reports two additional genuine full-resolution views
+  and is explicit that the bulk of the 120-row record remains
+  thumbnail-based, not newly completed. C22 records M0's provenance for
+  the first time and notes no further operand-provenance work was done
+  beyond what already existed.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by
