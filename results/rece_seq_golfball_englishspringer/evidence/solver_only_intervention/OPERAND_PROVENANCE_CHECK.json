@@ -1,0 +1,53 @@
+{
+  "device": "cuda:0",
+  "gpu_idle_check_before_allocation": {
+    "free_bytes": 41816752128,
+    "total_bytes": 42285268992,
+    "free_frac": 0.9889200926192845
+  },
+  "guide": {
+    "native_shape": [
+      77,
+      768
+    ],
+    "native_dtype": "torch.float32",
+    "saved_shape": [
+      77,
+      768
+    ],
+    "saved_dtype": "torch.float32",
+    "native_sha256": "24a6d0eea897a96a53bfe5c349bad87dbb81ad0b424fe02ff9413895fbdbb93f",
+    "saved_sha256": "24a6d0eea897a96a53bfe5c349bad87dbb81ad0b424fe02ff9413895fbdbb93f",
+    "equal": true,
+    "max_abs_diff": 0.0
+  },
+  "retain": {
+    "native_row0_shape": [
+      77,
+      768
+    ],
+    "native_row0_dtype": "torch.float32",
+    "native_row1_shape": [
+      77,
+      768
+    ],
+    "native_row1_dtype": "torch.float32",
+    "saved_singleton_shape": [
+      77,
+      768
+    ],
+    "saved_singleton_dtype": "torch.float32",
+    "native_row0_sha256": "7126eadbe469788b642853860b1246f695edf06bbf966ef77236691948e19ec8",
+    "native_row1_sha256": "7126eadbe469788b642853860b1246f695edf06bbf966ef77236691948e19ec8",
+    "saved_singleton_sha256": "24a6d0eea897a96a53bfe5c349bad87dbb81ad0b424fe02ff9413895fbdbb93f",
+    "rows_equal_to_each_other": true,
+    "rows_max_abs_diff": 0.0,
+    "row0_equal_to_saved_singleton": false,
+    "row0_max_abs_diff_vs_saved_singleton": 4.291534423828125e-06,
+    "row1_equal_to_saved_singleton": false,
+    "row1_max_abs_diff_vs_saved_singleton": 4.291534423828125e-06
+  },
+  "elapsed_seconds": 1.3479762077331543,
+  "resolution": "Guide matches exactly. Native retain batch rows agree with each other (max_abs_diff=0.000e+00). Row does NOT match the saved singleton retain_embedding.pt exactly -- per task instruction, the solver will use the NATIVE two-row operands (row0 as context/R_ctx, row1 as value-side/R_val), preserving edit_model_adversarial's own original indexing and multiplicity, not the saved singleton, and will disclose the audit's prior singleton approximation as superseded for this build.",
+  "gate_pass": true
+}

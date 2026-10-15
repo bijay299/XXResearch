@@ -28,6 +28,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/reference_A_intervention/FINAL_REPORT.md",
         f"{R}/embedding_cross_swap/FINAL_REPORT.md",
         f"{R}/numerical_optimality_audit/FINAL_REPORT.md",
+        f"{R}/solver_only_intervention/FINAL_REPORT.md",
         f"{R}/CORRECTIONS.md",
     ]),
     ("Recognition tables and visual-review labels — direct-vs-sequential experiment", [
@@ -91,6 +92,18 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/evidence/numerical_optimality_audit/CASE_LEVEL_COMPLETION_RECORD.json",
         f"{R}/evidence/code/run_numerical_optimality_audit.py",
     ]),
+    ("Solver-only intervention — AB_STABLE_SOLVE: does accurately solving the existing refinement equations for the native sequential (AtoB) checkpoint remove the original corruption while preserving deletion and retention?", [
+        f"{R}/evidence/solver_only_intervention/FROZEN_MANIFEST.json",
+        f"{R}/evidence/solver_only_intervention/OPERAND_PROVENANCE_CHECK.json",
+        f"{R}/evidence/solver_only_intervention/RESULT.json",
+        f"{R}/evidence/solver_only_intervention/VISUAL_REVIEW.json",
+        f"{R}/evidence/solver_only_intervention/CASE_LEVEL_COMPLETION_RECORD_120.json",
+        f"{R}/evidence/solver_only_intervention/classifications.jsonl",
+        f"{R}/evidence/solver_only_intervention/classify_report.json",
+        f"{R}/evidence/code/run_operand_provenance_check.py",
+        f"{R}/evidence/code/run_solver_only_build.py",
+        f"{R}/evidence/code/make_review_grids_solver_only.py",
+    ]),
     ("Visual evidence — fixed-order review grids (golf ball + English springer only; French horn/parachute stayed clean at every endpoint and are not pictured)", [
         f"{R}/images/grids/B/golf_ball.png",
         f"{R}/images/grids/B/English_springer.png",
@@ -106,6 +119,15 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/images/grids/D_WITH_SEQ_EMB/English_springer.png",
         f"{R}/images/grids/S_WITH_DIRECT_EMB/golf_ball.png",
         f"{R}/images/grids/S_WITH_DIRECT_EMB/English_springer.png",
+        f"{R}/images/grids/AB_STABLE_SOLVE/golf_ball.png",
+        f"{R}/images/grids/AB_STABLE_SOLVE/parachute.png",
+        f"{R}/images/grids/AB_STABLE_SOLVE/French_horn.png",
+        f"{R}/images/grids/AB_STABLE_SOLVE/English_springer.png",
+    ]),
+    ("Visual evidence — AB_STABLE_SOLVE, all 60 new target images at full 512x512 resolution (40 golf ball + 20 English springer; parachute/French horn stayed clean, pictured only in the grids above)", [
+        f"{R}/images/full_resolution/AB_STABLE_SOLVE/golf_ball/case{i}.png" for i in range(40)
+    ] + [
+        f"{R}/images/full_resolution/AB_STABLE_SOLVE/english_springer/case{i}.png" for i in range(80, 100)
     ]),
     ("Visual evidence — full-resolution crops for the corrected and ambiguous cases (CORRECTIONS.md C1/C2)", [
         f"{R}/images/corrected_cases/AtoB_case22.png",

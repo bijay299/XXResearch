@@ -1,0 +1,87 @@
+{
+  "experiment": "solver_only_intervention: does accurately solving the EXISTING RECE refinement-stage equations for the sequential (A->B) checkpoint, using the same inputs the native edit already used, remove the original sequential corruption while preserving deletion and retention?",
+  "status_at_freeze_time": "FROZEN BEFORE SECTION 4 (SOLVE/BUILD) COMPUTATION -- 2026-10-14. The GPU-based text-encoding operand-provenance check (OPERAND_PROVENANCE_CHECK.json) was run first, per task structure (its result determines which R operand this manifest's solve step uses); no UNet weight, image, or embedding-recovery computation preceded this freeze.",
+  "frame": "A single numerical-implementation test, not a new method. Tests whether numerical-implementation inaccuracy (established in numerical_optimality_audit/, commit ff48666750783ce1fa8e8af96b5f0ad237b050e0) is a causal contributor to the original sequential endpoint's quality problems, holding every other factor (embedding, working checkpoint, hyperparameters) fixed.",
+  "authorization_scope": [
+    "One new endpoint: AB_STABLE_SOLVE.",
+    "CPU-only linear algebra for the solve. One GPU, idle-verified immediately before each allocation, for (a) the text-encoding operand-provenance check and (b) image generation/classification only -- no other GPU use.",
+    "At most 100 new images (the 100-case frozen panel), for AB_STABLE_SOLVE only. No comparator images regenerated.",
+    "No second endpoint, no baseline repeat, no new embedding recovery, no parameter sweep, no concept pair, no layer/spatial-correlation search, no automatic follow-up."
+  ],
+
+  "closed_not_repeated": [
+    "Eligibility, parent verification, both diagonal replays (direct and sequential M0-reference), preliminary-UCE reconstruction, baseline searches, and numerical_optimality_audit/ (commit ff48666) -- all closed, not re-run.",
+    "The proposed layer/spatial-correlation exercise from numerical_optimality_audit/FINAL_REPORT.md section 4 is explicitly NOT launched here -- causal localization to 'quality-relevant layers' remains unestablished."
+  ],
+
+  "established_baseline_from_numerical_optimality_audit_commit_ff48666": {
+    "W_S,E_S (AtoB) cell": "native objective sum J(V_native)=161687.96 (approx, matches task statement); fp64 reference J(V*)=97.39; median per-layer relative weight discrepancy ||V_native-V*||/||V*|| = 12.0%; all 128 reference solves (4 cells x 32 layers) passed frozen validation (backward error <=1e-10, quadratic-gap identity)."
+  },
+
+  "original_sequential_endpoint_state_preserved_not_reopened": {
+    "golf_ball_degeneration": "35/40 (AtoB vs native, CORRECTIONS.md C1)",
+    "english_springer_degeneration": "0/20 (AtoB, evidence/VISUAL_REVIEW.json AtoB_english_springer_new_target -- NOT globally clean: golf-prompt degeneration is severe on this same checkpoint; the two E_S cells (AtoB and D_WITH_SEQ_EMB) are each severely corrupted on DIFFERENT prompt classes, per numerical_optimality_audit and CORRECTIONS.md C16)",
+    "recognition": {"golf_ball": "0/40", "english_springer": "0/20", "parachute": "18/20", "french_horn": "19/20"},
+    "generic_dog_presence_english_springer": "6/20 (CORRECTIONS.md C2)"
+  },
+
+  "inputs": {
+    "W (working checkpoint, untouched)": {"path": "refinement_ablation/edits/AB_UCE.pt", "sha256": "3a9d86de1339f9c516399fde1a9ab3c6b4ff8851062fb371712d473e7862b550"},
+    "X (saved embedding, untouched, loaded as-is, NOT re-recovered)": {"path": "embedding_cross_swap/edits/E_S.pt", "sha256": "e6ea282ad27441aacf47b2824c693166b59d669eb6ae9520978f0194af89bdb8"},
+    "comparator (existing native sequential final, untouched)": {"path": "edits/AtoB_english_springer.pt", "sha256": "ec16c9f748035b832d57dbe6b2eaa33d0e26279fe9a852eb171837f48a7a2469"},
+    "G (guide embedding)": {"source": "recomputed natively on cuda:0 this session via tokenizer(' ')->text_encoder, exactly as run_edit.py's own Stage-2 call; VERIFIED bit-identical (sha256 match) to the previously-published embedding_cross_swap/edits/guide_embedding.pt. Either may be cited; the natively-recomputed tensor is used in the solve. See OPERAND_PROVENANCE_CHECK.json."},
+    "R (retain embedding)": {"source": "recomputed natively on cuda:0 this session via edit_model_adversarial's OWN internal convention: tokenizer(['','']) batch of 2 -> text_encoder -> row0 (context/R_ctx), row1 (value-side/R_val). VERIFIED row0==row1 bit-exactly (max_abs_diff=0.0). VERIFIED this common row does NOT bit-match the previously-published singleton embedding_cross_swap/edits/retain_embedding.pt (max_abs_diff=4.2915e-06) -- both ' ' and '' tokenize to the identical [BOS,EOS,PAD...] sequence (confirmed by direct tokenizer check), so the discrepancy is a genuine, small, batch-size-dependent floating-point artifact of the text encoder forward pass, not a text/content difference. Per task instruction (rows agree with each other, differ from the singleton): this solve uses the NATIVE two-row operand's common value (row0=row1), NOT the old singleton -- superseding the prior audit's singleton approximation for THIS build. The prior numerical_optimality_audit's use of the singleton is disclosed as an approximation, not retroactively edited there."},
+    "retain_batching_resolution": "Since native row0 and row1 are bit-identical here, R_ctx=R_val=R (a single consistent tensor), so H's preserve term (lambda*I + erase*X^TX + preserve*R^TR) and N's preserve term (lambda*W + erase*W(G^TX) + preserve*W(R^TR)) retain the SAME symmetric form as numerical_optimality_audit's manifest -- only the numeric value of R changes (native vs. old singleton), not the equation structure. The retain term is NOT doubled; it is computed once, as the native code does."
+  },
+
+  "projection_bias_check": "Directly instantiated the SD1.4 UNet (not just inspected a state-dict key whitelist) and read `.bias` on all 16 cross-attention modules' to_v/to_k (and to_q) nn.Linear layers: confirmed bias is None for all of them (any(... .bias is not None ...) == False for both to_v and to_k across all 16 ca_layers). The 32-key changed-set whitelist from embedding_cross_swap/VERIFICATION_LOG.json is corroborating evidence, not the sole basis for this conclusion.",
+
+  "pinned_source": {
+    "repo": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/repo_src/RECE",
+    "commit_reconfirmed": "403a67fd86dce6c124b88798340e001e625b28c9",
+    "working_tree_clean_reconfirmed": true,
+    "sd14_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b"
+  },
+
+  "fixed_hyperparameters": {
+    "lamb": 0.1, "erase_scale": 1, "preserve_scale": 0.1, "technique": "replace",
+    "with_to_k": true, "guide_text": " ", "retain_texts": [""], "layers_to_edit": null,
+    "n_edited_layers": 32, "token_handling": "full 77-token padded sequence, unchanged",
+    "n_refinement_updates": "one (the existing single Stage-2 pass; no additional/iterative refinement)"
+  },
+
+  "equations": {
+    "objective": "J(V) = lambda*||V-W||_F^2 + erase*||VX^T-WG^T||_F^2 + preserve*||VR^T-WR^T||_F^2",
+    "normal_matrices": "H = lambda*I_768 + erase*(X^T X) + preserve*(R^T R); N_layer = lambda*W_layer + erase*(W_layer (G^T X)) + preserve*(W_layer (R^T R))",
+    "stationarity_condition": "V*_layer . H = N_layer (V* = N_layer @ H^-1, H symmetric)",
+    "each_layer_uses_its_own_pre_edit_W": "W = AB_UCE.pt's own per-layer weight, untouched; same non-aliasing argument as numerical_optimality_audit/FROZEN_MANIFEST.json."
+  },
+
+  "numerical_method": {
+    "upcast": "All operands (W, X, G, R, V_native) cast to float64 BEFORE forming H and N.",
+    "solve": "H V*^T = N^T via fp64 Cholesky of H (expected PD: lambda=0.1>0 floor on a PSD Gram-matrix sum). No explicit inverse. H depends only on X (fixed at E_S for this single endpoint) and R -- identical across all 32 layers, so Cholesky-factored ONCE and reused for all 32 per-layer solves.",
+    "output_storage": "Only the 32 solved layer weights are cast to float32 and inserted into a clone of AB_UCE.pt's full state dict (654 other tensors copied byte-for-byte, untouched); saved as AB_STABLE_SOLVE.pt.",
+    "threads_and_devices": "CPU-only for the solve itself (CUDA_VISIBLE_DEVICES='' in-process, torch.cuda.is_available() asserted False before solving); torch.set_num_threads bounded. GPU used ONLY for the separate text-encoding provenance check (already completed, released) and later for image generation/classification (separately idle-checked immediately before that allocation).",
+    "fallback_if_cholesky_fails": "Reported as an unresolved reference-validity diagnostic; no jitter, truncated SVD, or altered regularization. If this or any consequential provenance/scope check fails, a scoped stop report is published before any image generation -- no second solver variant, no relaxed tolerance."
+  },
+
+  "validation_tolerances_frozen_before_interpretation": {
+    "reference_backward_error_tolerance": "normalized backward error for V* <= 1e-10 per layer (same metric/tolerance as numerical_optimality_audit).",
+    "quadratic_gap_identity_tolerance": "|[J(V_native)-J(V*)] - tr((V_native-V*)H(V_native-V*)^T)| <= 1e-8 * max(1,|J(V_native)|,|J(V*)|), using THIS build's actual operands (native R, not the old singleton).",
+    "reload_verification": "After saving AB_STABLE_SOLVE.pt, reload from disk and verify: exactly the expected 32 keys differ from AB_UCE.pt, the other 654 tensors are byte-identical, every tensor is finite, and the 32 changed tensors equal the intended float32 casts of V* exactly (bit-for-bit).",
+    "fp32_vs_fp64_measurement": "Numerical quality is measured on BOTH the fp64 reference (V*) and the actual saved/reloaded fp32 endpoint (V*_fp32, i.e. what inference actually uses) -- the fp32 reload is not required to meet the 1e-10 fp64 backward-error tolerance; its own backward error is reported separately, descriptively."
+  },
+
+  "image_generation_scope": {
+    "panel_manifest": {"path": "/data/bijaypandey/cuig_pilot/rece_golfball_confirmation/manifest/frozen_manifest.json", "sha256": "ca1401c0064441969fdf3ab329fb9ab8eaab980b63ade62b6f14bd9bd1ef43ad"},
+    "endpoint": "AB_STABLE_SOLVE only, <=100 images, reusing generate_confirmation.py / classify_confirmation.py unmodified (float32 inference, 512x512, 50 LMS steps, guidance 7.5, per-case torch.cuda.manual_seed(seed) global-RNG convention, ResNet50_Weights.DEFAULT/IMAGENET1K_V2 classifier) -- identical mechanics to every prior endpoint in this results line.",
+    "comparators_reused_unchanged": ["AtoB (native sequential final)", "AB_UCE (Stage-1 input)", "A (parent, context only)"]
+  },
+
+  "decision_rule_frozen_before_interpretation": [
+    "Accurate solving substantially improves quality (golf-ball and/or English-springer degeneration) while preserving measured deletion (springer recognition/suppression, generic-dog count) and retention (French horn/parachute recognition+degeneration) -> supports numerical implementation as a causal contributor to the original failure; framed as an implementation correction, not a new method.",
+    "Corruption persists despite a verified-accurate solve -> the numerical defect established in numerical_optimality_audit/ is real but insufficient, alone, to explain the image-level failure; report tradeoffs plainly.",
+    "Any partial pattern (one class improves, another does not, or quality improves at a measured deletion/retention cost) is reported as exactly that -- not rounded up to success or down to failure. No quality-success threshold is defined after seeing results; only the pre-existing historical flags (>=7/40 material golf-ball return vs A, >=10/40 loss of 75% suppression vs M0's 39/40) and the 75% English-springer suppression gate are applied, unchanged.",
+    "One development pair (golf ball / English springer) cannot establish generality to other concepts. Embedding recovery (close_form_emb_regzero) remains unchanged and untested by this intervention."
+  ]
+}
