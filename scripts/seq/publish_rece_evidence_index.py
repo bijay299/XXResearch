@@ -208,6 +208,85 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/images/corrected_cases/S_WITH_DIRECT_EMB_case35.png",
         f"{R}/images/corrected_cases/S_WITH_DIRECT_EMB_case90.png",
     ]),
+    ("Reports — history_preservation_confirmation and stage1_history_intervention", [
+        f"{R}/history_preservation_confirmation/FINAL_REPORT.md",
+        f"{R}/history_preservation_confirmation/closeout/CLOSEOUT_CORRECTIONS.md",
+        f"{R}/history_preservation_confirmation/closeout/VERIFICATION_AND_CORRECTIONS_2.md",
+        f"{R}/stage1_history_intervention/FINAL_REPORT.md",
+    ]),
+    ("Evidence — history_preservation_confirmation (manifests, provenance, verification logs, joint tables)", [
+        f"{R}/history_preservation_confirmation/evidence/FROZEN_MANIFEST.json",
+        f"{R}/history_preservation_confirmation/evidence/FRESH_PANEL_MANIFEST.json",
+        f"{R}/history_preservation_confirmation/evidence/FRESH_PANEL_MANIFEST.sha256",
+        f"{R}/history_preservation_confirmation/evidence/ELIGIBILITY.json",
+        f"{R}/history_preservation_confirmation/evidence/expected_32_keys.json",
+        f"{R}/history_preservation_confirmation/evidence/VISUAL_REVIEW_INITIAL_SHARED_INPUTS.json",
+        f"{R}/history_preservation_confirmation/evidence/CASE_LEVEL_COMPLETION_RECORD_SHARED_INPUTS.json",
+        f"{R}/history_preservation_confirmation/evidence/CLASSIFIER_PRECONDITION_GATE_SHARED_INPUTS.json",
+        f"{R}/history_preservation_confirmation/evidence/VISUAL_REVIEW_INITIAL_NEW_ENDPOINTS.json",
+        f"{R}/history_preservation_confirmation/evidence/CASE_LEVEL_COMPLETION_RECORD_NEW_ENDPOINTS.json",
+        f"{R}/history_preservation_confirmation/evidence/CLASSIFIER_PRECONDITION_GATE_NEW_ENDPOINTS.json",
+        f"{R}/history_preservation_confirmation/evidence/VISUAL_JOINT_RECOMPUTED.json",
+        f"{R}/history_preservation_confirmation/evidence/history_preservation_confirmation_JOINT_ANALYSIS.json",
+        f"{R}/history_preservation_confirmation/evidence/stage1_logs/S1_stage1.uce_only_log.json",
+        f"{R}/history_preservation_confirmation/evidence/stage1_logs/S2_stage1.uce_only_log.json",
+        f"{R}/history_preservation_confirmation/evidence/recover/RECOVER_ENCODE_S1_RESULT.json",
+        f"{R}/history_preservation_confirmation/evidence/recover/RECOVER_ENCODE_S2_RESULT.json",
+        f"{R}/history_preservation_confirmation/evidence/arm_builds/RESULT_S1_BLANK.json",
+        f"{R}/history_preservation_confirmation/evidence/arm_builds/RESULT_S1_HISTORY.json",
+        f"{R}/history_preservation_confirmation/evidence/arm_builds/RESULT_S2_BLANK.json",
+        f"{R}/history_preservation_confirmation/evidence/arm_builds/RESULT_S2_HISTORY.json",
+        f"{R}/history_preservation_confirmation/closeout/ORIGINAL_IMAGES_HASH_MAPPING.json",
+        f"{R}/history_preservation_confirmation/closeout/JOINT_ANALYSIS_CORRECTIONS.json",
+    ] + [
+        f"{R}/history_preservation_confirmation/evidence/image_reports/{ck}/{f}"
+        for ck in ["M0", "GolfBall_parent", "EnglishSpringer_parent", "S1_Stage1", "S1_BLANK", "S1_HISTORY",
+                   "S2_Stage1", "S2_BLANK", "S2_HISTORY"]
+        for f in ["image_report.json", "classifications.jsonl", "classify_report.json"]
+    ] + [
+        f"{R}/history_preservation_confirmation/evidence/code/{f}"
+        for f in ["encode_retain_texts.py", "run_build_arm.py", "build_visual_review.py",
+                   "recover_and_encode.py", "run_build_arm_seq.py", "review_lib.py",
+                   "build_fresh_panel.py", "build_shared_input_review.py", "build_new_endpoints_review.py",
+                   "make_uce_only_checkpoint.py"]
+    ]),
+    ("Visual evidence — preservation_content_control, all 120 original target images (both arms), retroactively published", [
+        f"{R}/images/history_preservation_confirmation/preservation_content_control_originals/AB_RETAIN_GOLF/case{c:02d}_{cls}.png"
+        for c, cls in [(i, "golf_ball") for i in range(40)] + [(i, "English_springer") for i in range(80, 100)]
+    ] + [
+        f"{R}/images/history_preservation_confirmation/preservation_content_control_originals/AB_RETAIN_HORN/case{c:02d}_{cls}.png"
+        for c, cls in [(i, "golf_ball") for i in range(40)] + [(i, "English_springer") for i in range(80, 100)]
+    ]),
+    ("Visual evidence — history_preservation_confirmation, all 380 individually-reviewed target-role full-resolution originals (M0/parents/Stage-1 references + 6 new endpoints) and 17 fixed-order retained-class grids", [
+        f"{R}/images/history_preservation_confirmation/target_role_full_res/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/history_preservation_confirmation/target_role_full_res").glob("*.png"))
+    ] + [
+        f"{R}/images/history_preservation_confirmation/review_grids/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/history_preservation_confirmation/review_grids").glob("*.png"))
+    ] + [
+        f"{R}/images/history_preservation_confirmation/disputed_cases/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/history_preservation_confirmation/disputed_cases").glob("*.png"))
+    ]),
+    ("Evidence — stage1_history_intervention (manifest, provenance, verification, joint outcomes)", [
+        f"{R}/stage1_history_intervention/evidence/FROZEN_MANIFEST.json",
+        f"{R}/stage1_history_intervention/evidence/S1_STAGE1_HISTORY.stage1_history_log.json",
+        f"{R}/stage1_history_intervention/evidence/CASE_LEVEL_COMPLETION_RECORD.json",
+        f"{R}/stage1_history_intervention/evidence/VISUAL_REVIEW_INITIAL.json",
+        f"{R}/stage1_history_intervention/evidence/CLASSIFIER_PRECONDITION_GATE.json",
+        f"{R}/stage1_history_intervention/evidence/image_report.json",
+        f"{R}/stage1_history_intervention/evidence/classifications.jsonl",
+        f"{R}/stage1_history_intervention/evidence/classify_report.json",
+        f"{R}/stage1_history_intervention/evidence/JOINT_OUTCOMES_COMPUTED.txt",
+        f"{R}/stage1_history_intervention/evidence/code/make_stage1_history_checkpoint.py",
+        f"{R}/stage1_history_intervention/evidence/code/build_review.py",
+    ]),
+    ("Visual evidence — stage1_history_intervention, all 80 new original images and 2 retained-class grids", [
+        f"{R}/images/stage1_history_intervention/original_images/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/stage1_history_intervention/original_images").glob("*.png"))
+    ] + [
+        f"{R}/images/stage1_history_intervention/review_grids/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/stage1_history_intervention/review_grids").glob("*.png"))
+    ]),
 ]
 
 

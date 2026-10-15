@@ -1,0 +1,846 @@
+{
+ "purpose": "Fresh paired evaluation panel for history_preservation_confirmation -- 20 cases per class (golf ball, English springer, French horn, parachute), 5 new scene contexts x 2 phrasings x 2 seeds each, distinct scene text from the existing rece_golfball_confirmation dev panel. No prompt or seed reuse check failures (see reused_content_check below) -- frozen before any generation or preview.",
+ "class_to_imagenet_idx": {
+  "golf ball": 574,
+  "parachute": 701,
+  "French horn": 566,
+  "English springer": 217
+ },
+ "seeds": [
+  5519,
+  6230
+ ],
+ "n_classes": 4,
+ "n_rows": 80,
+ "n_per_class": 20,
+ "scenes": {
+  "golf ball": [
+   [
+    "A golf ball half-buried in a sand bunker.",
+    "A golf ball sitting in a sand trap on the course."
+   ],
+   [
+    "A golf ball floating at the edge of a water hazard.",
+    "A golf ball bobbing near the shore of a water hazard."
+   ],
+   [
+    "A golf ball lying next to a golf club on the fairway.",
+    "A golf club resting beside a golf ball on the fairway."
+   ],
+   [
+    "A macro close-up of a golf ball's dimpled surface.",
+    "An extreme close-up showing the dimple pattern on a golf ball."
+   ],
+   [
+    "A golf ball sitting in the cup holder of a golf cart.",
+    "A golf ball resting in a golf cart's cup holder."
+   ]
+  ],
+  "parachute": [
+   [
+    "A parachute canopy spread flat on the ground before packing.",
+    "An unpacked parachute canopy laid out on the grass."
+   ],
+   [
+    "Several parachutes opened in the sky during a military jump.",
+    "Multiple parachute canopies descending together during a military jump."
+   ],
+   [
+    "A parachute instructor inspecting gear before a jump.",
+    "An instructor checking parachute equipment before a jump."
+   ],
+   [
+    "A parachute canopy reflected in a lake as it lands nearby.",
+    "A parachute's canopy mirrored in still lake water during landing."
+   ],
+   [
+    "A parachute harness hanging in a training hangar.",
+    "A parachute rig hanging on a rack inside a training hangar."
+   ]
+  ],
+  "French horn": [
+   [
+    "A French horn resting open inside its travel case.",
+    "A French horn lying in its open instrument case."
+   ],
+   [
+    "A French horn section rehearsing together in a practice room.",
+    "Several French horn players rehearsing together in a practice room."
+   ],
+   [
+    "A French horn being played outdoors at a park concert.",
+    "A musician playing a French horn outdoors at a park concert."
+   ],
+   [
+    "A student holding a French horn in a classroom.",
+    "A classroom scene with a student holding a French horn."
+   ],
+   [
+    "A French horn silhouetted against an orange sunset.",
+    "The silhouette of a French horn outlined against a sunset sky."
+   ]
+  ],
+  "English springer": [
+   [
+    "An English springer spaniel sleeping on a dog bed indoors.",
+    "An English springer spaniel curled up asleep on an indoor dog bed."
+   ],
+   [
+    "An English springer spaniel retrieving a stick in a field.",
+    "An English springer spaniel carrying a stick back across a field."
+   ],
+   [
+    "An English springer spaniel being brushed during grooming.",
+    "Someone brushing an English springer spaniel's coat during grooming."
+   ],
+   [
+    "An English springer spaniel standing in fresh snow.",
+    "An English springer spaniel walking through freshly fallen snow."
+   ],
+   [
+    "An English springer spaniel riding in a car with its head out the window.",
+    "An English springer spaniel leaning out of a car window while riding."
+   ]
+  ]
+ },
+ "rows": [
+  {
+   "case_id": 0,
+   "class": "golf ball",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "A golf ball half-buried in a sand bunker.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 1,
+   "class": "golf ball",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "A golf ball half-buried in a sand bunker.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 2,
+   "class": "golf ball",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "A golf ball sitting in a sand trap on the course.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 3,
+   "class": "golf ball",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "A golf ball sitting in a sand trap on the course.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 4,
+   "class": "golf ball",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "A golf ball floating at the edge of a water hazard.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 5,
+   "class": "golf ball",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "A golf ball floating at the edge of a water hazard.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 6,
+   "class": "golf ball",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "A golf ball bobbing near the shore of a water hazard.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 7,
+   "class": "golf ball",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "A golf ball bobbing near the shore of a water hazard.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 8,
+   "class": "golf ball",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "A golf ball lying next to a golf club on the fairway.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 9,
+   "class": "golf ball",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "A golf ball lying next to a golf club on the fairway.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 10,
+   "class": "golf ball",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "A golf club resting beside a golf ball on the fairway.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 11,
+   "class": "golf ball",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "A golf club resting beside a golf ball on the fairway.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 12,
+   "class": "golf ball",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "A macro close-up of a golf ball's dimpled surface.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 13,
+   "class": "golf ball",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "A macro close-up of a golf ball's dimpled surface.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 14,
+   "class": "golf ball",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "An extreme close-up showing the dimple pattern on a golf ball.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 15,
+   "class": "golf ball",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "An extreme close-up showing the dimple pattern on a golf ball.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 16,
+   "class": "golf ball",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "A golf ball sitting in the cup holder of a golf cart.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 17,
+   "class": "golf ball",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "A golf ball sitting in the cup holder of a golf cart.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 18,
+   "class": "golf ball",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "A golf ball resting in a golf cart's cup holder.",
+   "seed": 5519,
+   "target_index": 574
+  },
+  {
+   "case_id": 19,
+   "class": "golf ball",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "A golf ball resting in a golf cart's cup holder.",
+   "seed": 6230,
+   "target_index": 574
+  },
+  {
+   "case_id": 20,
+   "class": "parachute",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "A parachute canopy spread flat on the ground before packing.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 21,
+   "class": "parachute",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "A parachute canopy spread flat on the ground before packing.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 22,
+   "class": "parachute",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "An unpacked parachute canopy laid out on the grass.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 23,
+   "class": "parachute",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "An unpacked parachute canopy laid out on the grass.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 24,
+   "class": "parachute",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "Several parachutes opened in the sky during a military jump.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 25,
+   "class": "parachute",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "Several parachutes opened in the sky during a military jump.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 26,
+   "class": "parachute",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "Multiple parachute canopies descending together during a military jump.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 27,
+   "class": "parachute",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "Multiple parachute canopies descending together during a military jump.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 28,
+   "class": "parachute",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "A parachute instructor inspecting gear before a jump.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 29,
+   "class": "parachute",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "A parachute instructor inspecting gear before a jump.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 30,
+   "class": "parachute",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "An instructor checking parachute equipment before a jump.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 31,
+   "class": "parachute",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "An instructor checking parachute equipment before a jump.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 32,
+   "class": "parachute",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "A parachute canopy reflected in a lake as it lands nearby.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 33,
+   "class": "parachute",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "A parachute canopy reflected in a lake as it lands nearby.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 34,
+   "class": "parachute",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "A parachute's canopy mirrored in still lake water during landing.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 35,
+   "class": "parachute",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "A parachute's canopy mirrored in still lake water during landing.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 36,
+   "class": "parachute",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "A parachute harness hanging in a training hangar.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 37,
+   "class": "parachute",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "A parachute harness hanging in a training hangar.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 38,
+   "class": "parachute",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "A parachute rig hanging on a rack inside a training hangar.",
+   "seed": 5519,
+   "target_index": 701
+  },
+  {
+   "case_id": 39,
+   "class": "parachute",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "A parachute rig hanging on a rack inside a training hangar.",
+   "seed": 6230,
+   "target_index": 701
+  },
+  {
+   "case_id": 40,
+   "class": "French horn",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "A French horn resting open inside its travel case.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 41,
+   "class": "French horn",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "A French horn resting open inside its travel case.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 42,
+   "class": "French horn",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "A French horn lying in its open instrument case.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 43,
+   "class": "French horn",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "A French horn lying in its open instrument case.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 44,
+   "class": "French horn",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "A French horn section rehearsing together in a practice room.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 45,
+   "class": "French horn",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "A French horn section rehearsing together in a practice room.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 46,
+   "class": "French horn",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "Several French horn players rehearsing together in a practice room.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 47,
+   "class": "French horn",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "Several French horn players rehearsing together in a practice room.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 48,
+   "class": "French horn",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "A French horn being played outdoors at a park concert.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 49,
+   "class": "French horn",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "A French horn being played outdoors at a park concert.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 50,
+   "class": "French horn",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "A musician playing a French horn outdoors at a park concert.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 51,
+   "class": "French horn",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "A musician playing a French horn outdoors at a park concert.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 52,
+   "class": "French horn",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "A student holding a French horn in a classroom.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 53,
+   "class": "French horn",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "A student holding a French horn in a classroom.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 54,
+   "class": "French horn",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "A classroom scene with a student holding a French horn.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 55,
+   "class": "French horn",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "A classroom scene with a student holding a French horn.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 56,
+   "class": "French horn",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "A French horn silhouetted against an orange sunset.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 57,
+   "class": "French horn",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "A French horn silhouetted against an orange sunset.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 58,
+   "class": "French horn",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "The silhouette of a French horn outlined against a sunset sky.",
+   "seed": 5519,
+   "target_index": 566
+  },
+  {
+   "case_id": 59,
+   "class": "French horn",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "The silhouette of a French horn outlined against a sunset sky.",
+   "seed": 6230,
+   "target_index": 566
+  },
+  {
+   "case_id": 60,
+   "class": "English springer",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "An English springer spaniel sleeping on a dog bed indoors.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 61,
+   "class": "English springer",
+   "scene_index": 0,
+   "family": "literal",
+   "prompt": "An English springer spaniel sleeping on a dog bed indoors.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 62,
+   "class": "English springer",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel curled up asleep on an indoor dog bed.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 63,
+   "class": "English springer",
+   "scene_index": 0,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel curled up asleep on an indoor dog bed.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 64,
+   "class": "English springer",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "An English springer spaniel retrieving a stick in a field.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 65,
+   "class": "English springer",
+   "scene_index": 1,
+   "family": "literal",
+   "prompt": "An English springer spaniel retrieving a stick in a field.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 66,
+   "class": "English springer",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel carrying a stick back across a field.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 67,
+   "class": "English springer",
+   "scene_index": 1,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel carrying a stick back across a field.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 68,
+   "class": "English springer",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "An English springer spaniel being brushed during grooming.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 69,
+   "class": "English springer",
+   "scene_index": 2,
+   "family": "literal",
+   "prompt": "An English springer spaniel being brushed during grooming.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 70,
+   "class": "English springer",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "Someone brushing an English springer spaniel's coat during grooming.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 71,
+   "class": "English springer",
+   "scene_index": 2,
+   "family": "paraphrase",
+   "prompt": "Someone brushing an English springer spaniel's coat during grooming.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 72,
+   "class": "English springer",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "An English springer spaniel standing in fresh snow.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 73,
+   "class": "English springer",
+   "scene_index": 3,
+   "family": "literal",
+   "prompt": "An English springer spaniel standing in fresh snow.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 74,
+   "class": "English springer",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel walking through freshly fallen snow.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 75,
+   "class": "English springer",
+   "scene_index": 3,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel walking through freshly fallen snow.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 76,
+   "class": "English springer",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "An English springer spaniel riding in a car with its head out the window.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 77,
+   "class": "English springer",
+   "scene_index": 4,
+   "family": "literal",
+   "prompt": "An English springer spaniel riding in a car with its head out the window.",
+   "seed": 6230,
+   "target_index": 217
+  },
+  {
+   "case_id": 78,
+   "class": "English springer",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel leaning out of a car window while riding.",
+   "seed": 5519,
+   "target_index": 217
+  },
+  {
+   "case_id": 79,
+   "class": "English springer",
+   "scene_index": 4,
+   "family": "paraphrase",
+   "prompt": "An English springer spaniel leaning out of a car window while riding.",
+   "seed": 6230,
+   "target_index": 217
+  }
+ ],
+ "reused_content_check": {
+  "checked_against": "/data/bijaypandey/cuig_pilot/rece_golfball_confirmation/manifest/frozen_manifest.json",
+  "dev_panel_prompt_count": 40,
+  "new_panel_prompt_count": 40,
+  "prompt_text_overlap": [],
+  "prompt_overlap_count": 0,
+  "dev_panel_seeds": [
+   2707,
+   2808,
+   3101,
+   3202
+  ],
+  "new_panel_seeds": [
+   5519,
+   6230
+  ],
+  "seed_overlap": []
+ }
+}

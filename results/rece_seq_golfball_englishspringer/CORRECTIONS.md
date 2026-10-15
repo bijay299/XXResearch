@@ -819,6 +819,105 @@ classifier/visual divergence this task's review-before-classify ordering
 caught (case 30, a confirmed false positive) are in the report itself,
 not duplicated here.
 
+## C25 — `preservation_content_control` closeout: two case reinspections, math-description and resource-arithmetic corrections
+
+`history_preservation_confirmation/closeout/CLOSEOUT_CORRECTIONS.md`
+(published alongside this entry) closes `preservation_content_control`
+using only existing artifacts (no new generation, recovery, or audit).
+Reinspecting `AB_RETAIN_HORN` case 16 (golf ball) at full resolution finds
+pervasive sparkle/speckle sky corruption inconsistent with its original
+"recovered" label; corrected to degenerate, moving `AB_RETAIN_HORN` golf
+degeneration **31/40 → 32/40** and its paired transition from blank from a
+nominal net-zero to a genuine **net -1** (0 recovered, 1 newly damaged).
+Reinspecting case 94 (English springer) finds a hairy, paw-shaped limb
+entering water, scored as generic-dog-present under this line's own
+rubric; `AB_RETAIN_HORN` generic-dog presence **5/20 → 6/20**. The
+`AB_RETAIN_GOLF` headline (1/40, a 96.8% relative reduction from the
+31/40 blank baseline) is unaffected. Separately corrected: the
+mathematical claim that `cond(H)`'s near-identity between arms reflects
+`H` depending on `X` "not on R" (it depends on both; `p·R^TR`'s
+contribution is merely small relative to `e·X^TX` here, and similar
+`cond(H)` does not establish equal effective preservation strength); two
+unsupported "noise-level"/statistical-equivalence phrases are withdrawn;
+chronology evidence (file-write timestamps only, disclosed as
+non-independent) and GPU/CPU resource arithmetic (791.09s GPU, 43.80s CPU,
+precise logged figures) are corrected from existing records. All 120
+target-class originals from both arms are published for the first time
+(`history_preservation_confirmation/original_images/`), where previously
+only 4 individual crops were available.
+
+## C26 — History-preservation confirmation on two new sequences (index entry)
+
+`history_preservation_confirmation/FINAL_REPORT.md` (published alongside
+this entry) tests the same existing-method preservation control on two
+fresh sequential-editing sequences (S1: golf ball → French horn, from the
+author's own `GolfBall_ep0.pt`; S2: English springer → golf ball, from
+this line's own `edits/B_english_springer.pt`), using a freshly frozen
+80-case evaluation panel distinct from every prior panel in this line and
+a BLANK-vs-HISTORY refinement comparison built the same way as
+`preservation_content_control`. See that report for eligibility gates,
+joint outcomes, and the qualified per-sequence result — not duplicated
+here.
+
+## C27 — `history_preservation_confirmation`: verification and corrections (round 2)
+
+`history_preservation_confirmation/closeout/VERIFICATION_AND_CORRECTIONS_2.md`
+(published alongside this entry) verifies the Stage-1 premise behind the
+`stage1_history_intervention` (C28) against frozen labels and corrects
+several imprecise statements from the prior turn, none of which changes
+any published case label:
+
+- S2's Stage-1 golf-ball-sequence historical (English springer)
+  degeneration, previously reported as "approximately 20/20," is
+  **exactly 20/20** in `S2_Stage1`, `S2_BLANK`, and `S2_HISTORY` alike,
+  recomputed directly from `CASE_LEVEL_COMPLETION_RECORD_NEW_ENDPOINTS.json`.
+- The report's interpretation is narrowed: **"refinement-only historical
+  preservation did not rescue these two extensions, with most damage
+  introduced earlier"** replaces the prior, overstated reading that
+  implied history preservation fails generally or that the original
+  `preservation_content_control` benefit is pair-specific — neither is
+  established (the sequence *and* the evaluation panel both changed
+  between the two experiments, so they are not a matched comparison).
+- GPU allocation is corrected from "GPU 2 throughout" to by-phase: GPU 0
+  for the shared-input generation/classification, GPU 2 for everything
+  from the Stage-1 builds onward (after GPU 0/1 were claimed by another
+  user's job).
+- The prior chat summary's claim that all 720 images were "individually
+  reviewed" is corrected: 380 were individually inspected at native
+  512×512, 340 purely-retained-class images were grid-reviewed (no
+  escalation needed in any case) — `FINAL_REPORT.md` itself already
+  stated this correctly and required no change.
+- Chronology evidence (file-write timestamps, not proof of viewing) is
+  added for the new-endpoint review step, extending the same disclosure
+  already made for the shared-input step and for every earlier endpoint
+  in this line (C20).
+- Raw classifier hits vs. visual judgment (S2 golf case 8), generic-dog
+  vs. categorical historical-object-absence, and retained recognition
+  vs. retained image quality were already kept distinct in the published
+  record; VERIFICATION_AND_CORRECTIONS_2.md confirms no change needed.
+- `AB_RETAIN_HORN` 32/40 degeneration and 6/20 generic dogs (C25), and
+  GOLF cases 8/9/11/12 ambiguity, are reaffirmed unchanged — no new
+  evidence warranted revisiting them.
+
+## C28 — Stage-1 history intervention: preserving earlier prevents the damage (index entry)
+
+`stage1_history_intervention/FINAL_REPORT.md` (published alongside this
+entry) tests whether applying RECE's existing preservation mechanism AT
+Stage 1 -- before the golf-ball-prompt damage occurs -- rather than only
+at Stage-2 refinement (after it, where C26/`history_preservation_confirmation`
+found it did not help), can prevent that damage. Built from the
+untouched `GolfBall_ep0.pt` parent with exactly one changed argument
+(`retain_texts=['']` → `retain_texts=['golf ball']`) on the native
+Stage-1 UCE edit erasing French horn. Result: golf-ball degeneration
+**18/20 (blank Stage-1) → 0/20** -- a complete, exact paired recovery of
+every degenerate case, zero newly damaged -- with French-horn deletion
+unchanged (0/20, 100% suppression against the parent's own verified
+16/20) and retained-class recognition slightly higher than the blank
+comparator, zero degeneration either way. A narrow, qualified result:
+one sequence, one fixed preservation choice, no refinement stage added
+on top (not run, per task instruction). See the report itself for full
+tables and the explicit scope limits.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by

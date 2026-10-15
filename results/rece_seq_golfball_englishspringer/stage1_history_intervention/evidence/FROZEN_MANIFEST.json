@@ -1,0 +1,57 @@
+{
+  "task": "stage1_history_intervention",
+  "purpose": "Test whether RECE's existing preservation mechanism (retain_texts) prevents historical-prompt corruption when applied AT Stage 1, before the damage occurs -- not just at Stage-2 refinement, after it. Existing-method control, not a new method.",
+  "frozen_before_computation": true,
+
+  "pinned_sources": {
+    "sd14_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b",
+    "rece_commit": "403a67fd86dce6c124b88798340e001e625b28c9"
+  },
+
+  "parent": {
+    "path": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/checkpoint/GolfBall_ep0.pt",
+    "sha256": "62720e14f828e98f974e04de2e60f6133521b36126401438ec95b0e2b839f97b",
+    "verified_at_setup": true,
+    "note": "untouched author parent, same as S1's parent; NEVER build from S1_Stage1 or any refined checkpoint"
+  },
+
+  "new_endpoint": "S1_STAGE1_HISTORY",
+  "concept_erased": "French horn",
+  "only_scientific_change_vs_S1_Stage1": "retain_texts=[''] -> retain_texts=['golf ball']",
+  "held_fixed": {
+    "lambda": 0.5, "erase_scale": 1, "preserve_scale": 1.0, "guide": " ", "technique": "replace",
+    "all_32_cross_attn_kv_weights": true, "n_native_edits": 1,
+    "native_token_suffix_alignment": true, "native_full_token_retain_handling": true,
+    "no_erase_slicing_applied_to_retain": true, "precision": "native fp32 (no fp64 solver)"
+  },
+  "comparator": "existing S1_Stage1 (blank preservation) -- images, labels, predictions reused unmodified, not regenerated",
+
+  "reused_panel": {
+    "path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/history_preservation_confirmation/panel/FRESH_PANEL_MANIFEST.json",
+    "sha256_verified": "cfb0f264b76620f47c292752515d545cb9ff058616b0c53d5c688753d628b8e2",
+    "design": "20 cases each: golf ball, English springer, French horn, parachute -- identical manifest, not reconstructed or rewritten"
+  },
+  "reused_references": {
+    "M0": "history_preservation_confirmation/panel/eval/M0 (unchanged)",
+    "GolfBall_parent": "history_preservation_confirmation/panel/eval/GolfBall_parent (unchanged)",
+    "S1_Stage1": "history_preservation_confirmation/panel/eval/S1_Stage1 (unchanged) -- the blank-preservation comparator"
+  },
+
+  "image_budget": {"max_new_endpoints": 1, "max_new_images": 80},
+
+  "execution_order": [
+    "1. Verify parent hash, manifest hash, pinned-source checks.",
+    "2. Build S1_STAGE1_HISTORY from the untouched parent (GPU, native fp32 Stage-1 edit only).",
+    "3. Verify exactly 32 changed keys, 654 unchanged, all finite, exact reload.",
+    "4. Generate 80 images on the reused manifest; release GPU.",
+    "5. Individually review all 40 target-role images (golf ball, French horn) at native 512px; grid-review the 2 retained classes (parachute, English springer), escalating on uncertainty.",
+    "6. Freeze and hash labels before classification.",
+    "7. Classify only after the freeze.",
+    "8. Compute joint outcomes against S1_Stage1, GolfBall_parent, and M0.",
+    "9. Publish and stop."
+  ],
+
+  "tolerances": "native fp32 Stage-1 verification only (exact key-set/reload checks); the fp64 reference solver's 1e-10 backward-error tolerance does NOT apply here and is not imposed",
+  "scoped_stop_rule": "on a consequential provenance or source-drift failure, stop and preserve evidence; narrow runtime fixes that leave scientific settings unchanged are allowed",
+  "forbidden": ["Stage-2 refinement", "recovered embedding", "reference swap", "second sequence", "coefficient sweep", "new baseline", "comparator regeneration", "automatic advance to refinement even if Stage 1 improves"]
+}

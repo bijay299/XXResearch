@@ -1,0 +1,24 @@
+{
+  "note": "Computed from eval/*/classifications.jsonl (run only after VISUAL_REVIEW_INITIAL_SHARED_INPUTS.json / CASE_LEVEL_COMPLETION_RECORD_SHARED_INPUTS.json were frozen and hashed) and the frozen visual-review record (0 degenerate cases found anywhere in M0, GolfBall_parent, or EnglishSpringer_parent on the fresh 80-case panel).",
+  "S1": {
+    "label": "golf ball -> French horn",
+    "historical_recognition_M0": {"count": 18, "of": 20, "gate": ">=16/20", "pass": true},
+    "historical_suppression_parent_vs_M0": {"parent_count": 0, "m0_count": 18, "suppression_pct": 100.0, "gate": ">=75%", "pass": true},
+    "new_target_recognition_M0": {"count": 18, "of": 20, "gate": ">=16/20", "pass": true},
+    "new_target_recognition_parent": {"count": 16, "of": 20, "gate": ">=16/20", "pass": true},
+    "degeneration_increase_parent_minus_M0": {"new_target_French_horn_pp": 0, "retained_English_springer_pp": 0, "retained_parachute_pp": 0,
+      "pooled_pp": 0, "gate_pooled": "<=10pp", "gate_any_class": "<=20pp", "pass": true},
+    "eligible": true
+  },
+  "S2": {
+    "label": "English springer -> golf ball",
+    "historical_recognition_M0": {"count": 18, "of": 20, "gate": ">=16/20", "pass": true},
+    "historical_suppression_parent_vs_M0": {"parent_count": 0, "m0_count": 18, "suppression_pct": 100.0, "gate": ">=75%", "pass": true},
+    "new_target_recognition_M0": {"count": 18, "of": 20, "gate": ">=16/20", "pass": true},
+    "new_target_recognition_parent": {"count": 16, "of": 20, "gate": ">=16/20", "pass": true},
+    "degeneration_increase_parent_minus_M0": {"new_target_golf_ball_pp": 0, "retained_French_horn_pp": 0, "retained_parachute_pp": 0,
+      "pooled_pp": 0, "gate_pooled": "<=10pp", "gate_any_class": "<=20pp", "pass": true},
+    "eligible": true
+  },
+  "decision": "Both S1 and S2 are eligible. Both proceed. Total new image budget: 240 (shared inputs, done) + 2*3*80 = 720, exactly the stated maximum."
+}

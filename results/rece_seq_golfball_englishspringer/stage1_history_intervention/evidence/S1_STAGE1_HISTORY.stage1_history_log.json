@@ -1,0 +1,46 @@
+{
+  "start": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/checkpoint/GolfBall_ep0.pt",
+  "concept": "French horn",
+  "procedure": "Stage 1 (preliminary UCE) ONLY, from the untouched GolfBall parent -- the ONLY scientific change vs. the existing S1_Stage1 comparator is retain_text_",
+  "stage1_hyperparameters": {
+    "lamb": 0.5,
+    "erase_scale": 1,
+    "preserve_scale": 1.0,
+    "guide": " ",
+    "retain_texts": [
+      "golf ball"
+    ],
+    "technique": "replace"
+  },
+  "comparator_hyperparameters_for_reference": {
+    "lamb": 0.5,
+    "erase_scale": 1,
+    "preserve_scale": 1.0,
+    "guide": " ",
+    "retain_texts": [
+      ""
+    ],
+    "technique": "replace"
+  },
+  "stage2_omitted_components_unused": [
+    "pristine-M0 reference copy (ldm_stable_copy) -- never instantiated",
+    "close_form_emb_regzero adversarial embedding -- never computed",
+    "edit_model_adversarial (fp64 refinement solve) -- never called"
+  ],
+  "start_checkpoint_sha256": "62720e14f828e98f974e04de2e60f6133521b36126401438ec95b0e2b839f97b",
+  "start_checkpoint_loaded_and_verified": true,
+  "stage1_seconds": 0.7806966304779053,
+  "stage1_changed_working_model": true,
+  "n_keys_changed_vs_start": 32,
+  "changed_keys_are_only_cross_attn_kv": true,
+  "all_686_tensors_finite": true,
+  "out_checkpoint_sha256": "e9595e105c718e5207ada59ad9b8100f93dd94523f832a70fdd4589d161030e9",
+  "reload_verification": {
+    "n_total_tensors": 686,
+    "n_changed_vs_parent": 32,
+    "changed_set_size_is_32": true,
+    "other_654_tensors_byte_identical_to_parent": true,
+    "all_tensors_finite": true
+  },
+  "total_seconds": 58.34213733673096
+}

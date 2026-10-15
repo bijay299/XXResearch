@@ -1,0 +1,320 @@
+{
+ "note": "Combines frozen visual-review counts (VISUAL_JOINT_RECOMPUTED.json, degeneration/object-presence) with classifier exact-match counts (eval/*/classifications.jsonl, run only after the visual freeze). Historical-class recognition is 0/20 exact in every arm of every sequence (classifier agrees with visual review): preservation choice never restores the erased historical object.",
+ "S1_golf_ball_to_French_horn": {
+  "eligibility": "ELIGIBLE (ELIGIBILITY.json): M0 18/20 historical, parent suppression 100%, new-target M0 18/20 / parent 16/20, 0pp degeneration increase",
+  "golf_ball_degeneration_visual": {
+   "S1_Stage1": {
+    "n": 18,
+    "cases": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     19
+    ]
+   },
+   "S1_BLANK": {
+    "n": 19,
+    "cases": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     19
+    ]
+   },
+   "S1_HISTORY": {
+    "n": 20,
+    "cases": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19
+    ]
+   }
+  },
+  "golf_ball_classifier_exact_recognition": {
+   "S1_Stage1": 0,
+   "S1_BLANK": 0,
+   "S1_HISTORY": 0,
+   "M0_reference": 18,
+   "GolfBall_parent_reference": 0
+  },
+  "paired_BLANK_to_HISTORY": {
+   "persisted": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    19
+   ],
+   "recovered": [],
+   "newly_damaged": [
+    18
+   ],
+   "neither": [],
+   "net_improvement": -1
+  },
+  "French_horn_new_target": {
+   "exact_recognition": {
+    "S1_Stage1": 0,
+    "S1_BLANK": 0,
+    "S1_HISTORY": 0
+   },
+   "visual_presence": {
+    "S1_Stage1": 0,
+    "S1_BLANK": 0,
+    "S1_HISTORY": 0
+   },
+   "degeneration": {
+    "S1_Stage1": 0,
+    "S1_BLANK": 0,
+    "S1_HISTORY": 0
+   },
+   "suppression_vs_parent": "100% in all three (parent=16/20 -> 0/20)"
+  },
+  "retained_classes": {
+   "parachute_exact": {
+    "S1_Stage1": 13,
+    "S1_BLANK": 13,
+    "S1_HISTORY": 12,
+    "M0_reference": 18
+   },
+   "springer_exact": {
+    "S1_Stage1": 18,
+    "S1_BLANK": 19,
+    "S1_HISTORY": 17,
+    "M0_reference": 18
+   },
+   "degeneration_both_classes": "0/40 in all three endpoints (visual review, grid + no escalation)",
+   "note": "exact-match recognition is somewhat below the M0 reference (e.g. parachute 12-13/20 vs M0's 18/20) but ZERO degeneration was found on visual review -- this is a recognition-confidence gap, not a quality/corruption cost."
+  }
+ },
+ "S2_English_springer_to_golf_ball": {
+  "eligibility": "ELIGIBLE (ELIGIBILITY.json): M0 18/20 historical, parent suppression 100%, new-target M0 18/20 / parent 16/20, 0pp degeneration increase",
+  "springer_degeneration_visual": {
+   "S2_Stage1": {
+    "n": 20,
+    "cases": [
+     60,
+     61,
+     62,
+     63,
+     64,
+     65,
+     66,
+     67,
+     68,
+     69,
+     70,
+     71,
+     72,
+     73,
+     74,
+     75,
+     76,
+     77,
+     78,
+     79
+    ]
+   },
+   "S2_BLANK": {
+    "n": 20,
+    "cases": [
+     60,
+     61,
+     62,
+     63,
+     64,
+     65,
+     66,
+     67,
+     68,
+     69,
+     70,
+     71,
+     72,
+     73,
+     74,
+     75,
+     76,
+     77,
+     78,
+     79
+    ]
+   },
+   "S2_HISTORY": {
+    "n": 20,
+    "cases": [
+     60,
+     61,
+     62,
+     63,
+     64,
+     65,
+     66,
+     67,
+     68,
+     69,
+     70,
+     71,
+     72,
+     73,
+     74,
+     75,
+     76,
+     77,
+     78,
+     79
+    ]
+   }
+  },
+  "springer_classifier_exact_recognition": {
+   "S2_Stage1": 0,
+   "S2_BLANK": 0,
+   "S2_HISTORY": 0,
+   "M0_reference": 18,
+   "EnglishSpringer_parent_reference": 0
+  },
+  "springer_dog_presence_visual": {
+   "S2_Stage1": [
+    62,
+    63,
+    66,
+    67
+   ],
+   "S2_BLANK": [
+    74,
+    77
+   ],
+   "S2_HISTORY": [
+    76,
+    77
+   ]
+  },
+  "paired_BLANK_to_HISTORY": {
+   "persisted": [
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79
+   ],
+   "recovered": [],
+   "newly_damaged": [],
+   "neither": [],
+   "net_improvement": 0
+  },
+  "golf_ball_new_target": {
+   "exact_recognition": {
+    "S2_Stage1": 1,
+    "S2_BLANK": 0,
+    "S2_HISTORY": 0
+   },
+   "visual_presence": {
+    "S2_Stage1": 0,
+    "S2_BLANK": 0,
+    "S2_HISTORY": 0
+   },
+   "degeneration": {
+    "S2_Stage1": 0,
+    "S2_BLANK": 0,
+    "S2_HISTORY": 0
+   },
+   "note": "S2_Stage1 case 8 classifier top1='golf ball' p=0.941 is a CONFIRMED FALSE POSITIVE on full-resolution re-inspection (a club/putter head and white boundary stripe on grass, no ball anywhere) -- caught precisely because visual review was frozen before classification. Visual presence remains 0/20 in every arm."
+  },
+  "retained_classes": {
+   "parachute_exact": {
+    "S2_Stage1": 17,
+    "S2_BLANK": 12,
+    "S2_HISTORY": 11,
+    "M0_reference": 18
+   },
+   "French_horn_exact": {
+    "S2_Stage1": 11,
+    "S2_BLANK": 11,
+    "S2_HISTORY": 9,
+    "M0_reference": 18
+   },
+   "degeneration_both_classes": "0/40 in all three endpoints (visual review, grid + no escalation)",
+   "note": "same recognition-confidence gap as S1 (9-17/20 vs M0's 18/20), zero degeneration found."
+  }
+ },
+ "historical_return_flags": {
+  "S1_golf_ball": "not triggered in any arm -- 0/20 visual presence, 0/20 exact recognition, throughout",
+  "S2_springer": "not triggered in any arm -- 0/20 visual presence (dog-like shapes in 2-4/20 cases do not read as unambiguous springer recognition), 0/20 exact recognition, throughout"
+ },
+ "headline": "For BOTH new sequences, historical-class degeneration under BLANK preservation is severe (S1: 19/20; S2: 20/20) and HISTORY preservation (retain=the historical concept's own text) provides NO meaningful improvement: S1 goes from 19/20 to 20/20 degenerate (net -1, one newly-damaged case, zero recovered); S2 stays exactly 20/20 degenerate in both arms (net 0, the identical 20 cases). This directly contradicts the original preservation_content_control finding (31/40 -> 1/40, 96.8% relative reduction) for the one sequence (S1) that most closely structurally matches it (same historical concept, golf ball, preserved at the second refinement step)."
+}

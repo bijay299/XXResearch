@@ -1,0 +1,113 @@
+{
+  "task": "history_preservation_confirmation",
+  "purpose": "Confirm the preservation_content_control finding (RECE's existing preservation term, pointed at the already-erased historical concept, beats a blank/unrelated preservation choice) on two FRESH sequential-editing sequences, with a freshly frozen 80-case evaluation panel distinct from every prior panel in this results line. Existing-method control, not a new method.",
+  "frozen_before_computation": true,
+  "frozen_at_utc_approx": "2026-10-15T05:20:00Z",
+
+  "pinned_sources": {
+    "sd14_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b",
+    "rece_commit": "403a67fd86dce6c124b88798340e001e625b28c9",
+    "verified_at_setup": true
+  },
+
+  "sequences": {
+    "S1": {
+      "label": "golf ball -> French horn",
+      "parent_checkpoint": "/data/bijaypandey/cuig_pilot/rece_golfball_author_screen/checkpoint/GolfBall_ep0.pt",
+      "parent_sha256": "62720e14f828e98f974e04de2e60f6133521b36126401438ec95b0e2b839f97b",
+      "historical_concept": "golf ball",
+      "new_target_concept": "French horn",
+      "retained_classes": ["English springer", "parachute"]
+    },
+    "S2": {
+      "label": "English springer -> golf ball",
+      "parent_checkpoint": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/edits/B_english_springer.pt",
+      "parent_sha256": "c711e97127d3dcca9d6752e86d64fba8240ed20347c699179f9fe0859267b9dc",
+      "historical_concept": "English springer",
+      "new_target_concept": "golf ball",
+      "retained_classes": ["French horn", "parachute"]
+    },
+    "authorization_note": "S2 is the explicitly authorized reverse sequence; no other order is authorized. Neither parent is rebuilt; both verified by sha256 before use."
+  },
+
+  "fresh_panel": {
+    "path": "panel/FRESH_PANEL_MANIFEST.json",
+    "sha256_file": "panel/FRESH_PANEL_MANIFEST.sha256",
+    "n_cases": 80, "n_per_class": 20,
+    "design": "5 new scene contexts x 2 phrasings x 2 seeds per class, 4 classes (golf ball, English springer, French horn, parachute)",
+    "seeds": [5519, 6230],
+    "reused_content_check": "performed against /data/bijaypandey/cuig_pilot/rece_golfball_confirmation/manifest/frozen_manifest.json -- 0 prompt-text overlaps, 0 seed overlaps (recorded in the manifest's own reused_content_check field)",
+    "frozen_before_any_generation_or_preview": true
+  },
+
+  "shared_input_checkpoints": {
+    "M0": "pristine SD1.4 (no edit_ckpt)",
+    "GolfBall_parent": "author's GolfBall_ep0.pt",
+    "EnglishSpringer_parent": "this line's B_english_springer.pt",
+    "note": "Evaluated once on the fresh 80-case panel, reused across both sequences as eligibility references. Not a repeat of the original dev panel."
+  },
+
+  "stage1_uce_hyperparameters": {
+    "lambda": 0.5, "erase_scale": 1, "preserve_scale": 1.0,
+    "guide": " ", "retain_texts": [""], "technique": "replace",
+    "all_32_cross_attn_kv_weights": true, "native_token_suffix_handling": true,
+    "script": "refinement_ablation/make_uce_only_checkpoint.py (reused unmodified, new --start/--concept/--out)"
+  },
+
+  "recovery_procedure": {
+    "function": "close_form_emb_regzero (vendored, pin-checked against RECE commit 403a67fd)",
+    "reference": "pristine M0 (separate, freshly loaded copy, never the Stage-1 working pipeline)",
+    "regular_scale": 0.1, "with_to_k": true, "seed": 42,
+    "recovered_once_per_sequence": true,
+    "note": "Does NOT reuse the old English-springer E_S or recover separate embeddings for the two arms -- one recovery per sequence, both arms built from the identical recovered embedding and identical Stage-1 weights."
+  },
+
+  "refinement_arms": {
+    "BLANK": {"retain_texts": [""]},
+    "HISTORY": {"S1": ["golf ball"], "S2": ["English springer"]},
+    "held_fixed": {
+      "lambda": 0.1, "erase_scale": 1.0, "preserve_scale": 0.1,
+      "guide": " ", "n_refinement_updates": 1, "technique": "replace",
+      "full_77_tokens": true, "all_32_kv_weights": true,
+      "assembly_precision": "fp64 (Cholesky)", "storage_precision": "fp32 weights, fp32 inference"
+    },
+    "equations": {
+      "J(V)": "lambda*||V-W||_F^2 + erase*||V X^T - W G^T||_F^2 + preserve*||V R^T - W R^T||_F^2",
+      "H": "lambda*I + erase*X^T X + preserve*R^T R",
+      "N": "lambda*W + erase*W G^T X + preserve*W R^T R",
+      "solve": "H V^T = N^T via fp64 Cholesky (torch.linalg.cholesky + torch.cholesky_solve, no explicit inverse)"
+    },
+    "preservation_target_source": "Stage-1 W (untouched), never pristine M0 or another parent",
+    "tolerances": {"reference_backward_error": "<=1e-10 (normalized)", "quadratic_gap_identity": "1e-8*max(1,|J|)"},
+    "quadratic_gap_diagnostic_candidate": "the untouched Stage-1 weight W itself (no external numerically-accurate comparator exists for these new sequences; this is a self-consistency check on H/N assembly and the Cholesky solve)"
+  },
+
+  "eligibility_gates": {
+    "historical_recognition_M0": ">=16/20",
+    "historical_suppression_parent_vs_M0": ">=75% suppression relative to M0's historical-recognition count",
+    "new_target_recognition_both_M0_and_parent": ">=16/20 each",
+    "degeneration_increase_parent_minus_M0": "pooled (new target + 2 retained classes) <=10 percentage points; any single class <=20 points",
+    "failure_handling": "report and do not edit; no substitute sequence, relaxed gate, extra sample, or prompt repair; the other sequence may proceed independently"
+  },
+
+  "image_budget": {
+    "max_new_endpoints": 9,
+    "shared_inputs": 3, "max_stage1_intermediates": 2, "max_final_endpoints": 4,
+    "max_new_images": 720, "images_per_checkpoint": 80
+  },
+
+  "execution_order": [
+    "1. Freeze fresh panel manifest (done, before any generation).",
+    "2. Generate shared-input batch (M0, GolfBall_parent, EnglishSpringer_parent) on the fresh panel; release GPU.",
+    "3. Review shared-input images individually at native 512px (historical/new-target roles) + retained classes; freeze labels; classify only after freeze; compute eligibility gates.",
+    "4. For each eligible sequence: build Stage-1 (GPU, fast UCE), recover new-target embedding once + encode retain texts (GPU), release GPU.",
+    "5. CPU fp64 build of BLANK and HISTORY arms from identical Stage-1 weights/embedding.",
+    "6. Generate Stage-1/BLANK/HISTORY image batches; release GPU.",
+    "7. Review all new images individually at native 512px; freeze labels; classify only after freeze.",
+    "8. Compute joint outcomes, decide, publish."
+  ],
+
+  "classifier_precondition": "classification may run only after a frozen, hashed label file records the required completed rows; never consult predictions beforehand",
+  "scoped_stop_rule": "on a consequential provenance or numerical failure, stop that sequence, preserve evidence, do not repair; narrow runtime fixes that leave scientific settings unchanged are allowed",
+  "forbidden": ["new recovery beyond one per sequence", "replay", "additional comparator generation", "prompt/weight sweep", "additional endpoint beyond the 9 listed", "layer search", "automatic follow-up experiment"]
+}
