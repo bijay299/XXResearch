@@ -1,0 +1,91 @@
+{
+  "task": "history_both_stages_s2",
+  "purpose": "Test whether S2's Stage-1 quality gain (stage1_history_intervention_s2) survives the complete two-stage RECE pipeline -- Stage-2 refinement with historical preservation applied to the already-improved S2_STAGE1_HISTORY checkpoint -- while maintaining historical (English springer) erasure and golf-ball deletion, and without new retained-class loss. English springer is the historical ERASED concept; its continued absence is desired, not a failure. Existing-method control using the already-validated fp64 stable-solve implementation; not a new method, not a claim about unmodified upstream RECE.",
+  "frozen_before_computation": true,
+
+  "pinned_sources": {
+    "sd14_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b",
+    "rece_commit": "403a67fd86dce6c124b88798340e001e625b28c9"
+  },
+
+  "inputs": {
+    "working_unet_start": {
+      "path": "stage1_history_intervention_s2/S2_STAGE1_HISTORY.pt",
+      "sha256": "797739999bc29c2978dc10f3b7ebb7c6f983e7e1738732a5ad47b7d2c4c6bf41",
+      "note": "the Stage-1-with-historical-preservation checkpoint this refinement is applied to"
+    },
+    "englishspringer_parent_for_provenance_only": {
+      "path": "edits/B_english_springer.pt",
+      "sha256": "c711e97127d3dcca9d6752e86d64fba8240ed20347c699179f9fe0859267b9dc"
+    },
+    "s2_stage1_blank_comparator_reuse_only": {
+      "path": "history_preservation_confirmation/stage1/S2_stage1.pt",
+      "sha256": "76c8740e543b90b5b065aceb7bb7772f186b9f3a9fd38f81d4d16b1c6d3895ee"
+    },
+    "s2_history_refinement_only_comparator_reuse_only": {
+      "path": "history_preservation_confirmation/edits/S2_HISTORY.pt",
+      "sha256": "1b6b4c9ee79436b6b3bfc4e6a1cf90b17c84c4d0b639f2c5d64ac193efa26b68"
+    },
+    "guide_reused_not_reencoded": {
+      "path": "history_preservation_confirmation/recover/guide_S2.pt",
+      "sha256": "3d1919279165c3e1ba25e09224e6d13af6301b7fe2341f65e07d9516725a032c"
+    },
+    "retain_historical_reused_not_reencoded": {
+      "path": "history_preservation_confirmation/recover/retain_S2_historical.pt",
+      "sha256": "6dec8c005e362bffa89d55a2775491c62e675e58e46d1bad67a69a2dc0fe6672",
+      "text": "English springer"
+    },
+    "panel_manifest_reused": {
+      "path": "history_preservation_confirmation/panel/FRESH_PANEL_MANIFEST.json",
+      "sha256": "cfb0f264b76620f47c292752515d545cb9ff058616b0c53d5c688753d628b8e2"
+    },
+    "expected_32_keys_whitelist": {
+      "path": "history_preservation_confirmation/expected_32_keys.json",
+      "n_keys": 32
+    }
+  },
+
+  "new_endpoint": "S2_HISTORY_BOTH_STAGES",
+  "new_target_concept_recovered_once": "golf ball",
+
+  "recovery_step": {
+    "working_unet": "the exact S2_STAGE1_HISTORY checkpoint (verified above)",
+    "reference": "separate pristine M0 -- never the working model, never EnglishSpringer_parent",
+    "method": "vf.close_form_emb_regzero, regular_scale=0.1, with_to_k=True, seed=42, native fp32, full 77-token",
+    "guide_and_retain": "NOT re-encoded -- reused from existing files (hashes above), guide=' ', retain=['English springer']",
+    "note": "the old E_S2_newtarget (recovered from the corrupted S2_Stage1 checkpoint) is explicitly NOT reused -- a fresh recovery from this improved working UNet is required"
+  },
+
+  "refinement_step": {
+    "n_updates": 1,
+    "technique": "replace",
+    "scope": "all 32 cross-attention K/V weights (expected_32_keys.json)",
+    "hyperparameters": {"lambda": 0.1, "erase_scale": 1, "preserve_scale": 0.1},
+    "precision": "fp64 assembly and Cholesky solve, fp32 storage/inference",
+    "objective": "J(V) = lambda*||V-W||_F^2 + erase*||V X^T - W G^T||_F^2 + preserve*||V R^T - W R^T||_F^2",
+    "normal_equations": "H = lambda*I + erase*(X^T X) + preserve*(R^T R); N = lambda*W + erase*(W G^T X) + preserve*(W R^T R); solve H V^T = N^T",
+    "per_layer_W": "the untouched S2_STAGE1_HISTORY weight for that layer (not S2_Stage1, not M0)",
+    "X": "the newly recovered embedding[0] from the recovery step above",
+    "G": "reused guide_S2.pt",
+    "R": "reused retain_S2_historical.pt",
+    "guide_and_preserve_targets_source": "this improved pre-refinement W (S2_STAGE1_HISTORY) -- never M0, never the earlier parent"
+  },
+
+  "image_budget": {"max_new_endpoints": 1, "max_new_images": 80},
+
+  "execution_order": [
+    "1. Verify all input hashes, pinned-source checks.",
+    "2. GPU: recover 'golf ball' embedding once from the S2_STAGE1_HISTORY working UNet vs. pristine M0 reference; verify storage separation and value invariance.",
+    "3. CPU-only fp64: assemble H/N per layer, solve, verify backward error <=1e-10 and quadratic-gap identity <=1e-8*max(1,|J(W)|,|J(V*)|) using W as diagnostic candidate.",
+    "4. Save checkpoint; independently clone the intended final CPU state BEFORE saving; after reload, assert exact key/shape/dtype/value equality to that clone, changed-key set equals the 32-key whitelist exactly, all 686 tensors finite.",
+    "5. Generate 80 images on the reused manifest; release GPU.",
+    "6. Individually review all 80 images (including retained classes) at native 512x512.",
+    "7. Freeze and hash labels before classification.",
+    "8. Run the classification guard: a single executed wrapper that validates the 80-case ID set, image hashes, completion rows, and label hashes, logs the check, and only then invokes classification in the same guarded path. Refuse on failure.",
+    "9. Compute joint outcomes against S2_STAGE1_HISTORY (primary comparator), with parent/blank/existing-final as context.",
+    "10. Publish and stop."
+  ],
+
+  "scoped_stop_rule": "on a consequential provenance/hash mismatch or a failed build check, stop before generation and publish a scoped failure; no silent repair, no relaxed tolerance, no artifact substitution",
+  "forbidden": ["Stage-1 rebuild", "a second arm (e.g. refinement-blank from the same improved input)", "S1 completion of any kind", "fresh panel", "baseline replay", "coefficient/layer sweep", "comparator regeneration", "automatic follow-up experiment", "claims of universal generalization or novelty"]
+}

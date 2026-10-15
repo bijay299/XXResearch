@@ -995,6 +995,78 @@ quality repaired, recognition not — not a second confirmation of C28.
 See the report itself for full tables, scene/family breakdowns, and
 explicit scope limits.
 
+## C31 — Corrections bundled ahead of the S2 both-stages build
+
+`history_both_stages_s2/closeout/CORRECTIONS_BEFORE_BOTH_STAGES.md`
+(published alongside this entry) bundles corrections found entirely
+from existing artifacts, no new GPU computation:
+
+- **Objective reframing**: English springer is the historical,
+  deliberately erased concept in S2 — its continued 0/20 absence is the
+  *desired* outcome, not a "failure to restore correct recognition."
+  `stage1_history_intervention_s2/FINAL_REPORT.md`'s "quality-vs-
+  recognition dissociation" framing and the prior turn's proposed
+  recognition-restoration diagnostic are withdrawn; "reverse sequence"
+  as a description of S2 relative to S1 is withdrawn (S2 does not share
+  a concept pair with S1 in reverse order).
+- **Springer case 63**: re-inspected against `EnglishSpringer_parent`'s
+  own identical-prompt/seed image and found to be an **inherited**
+  rendering pattern (present before any sequential edit), not added
+  damage. `S2_STAGE1_HISTORY` springer degeneration corrected **3/20 →
+  2/20** (cases 77, 79 only); paired recovery corrected **17/3 →
+  18/2**. Cases 77 and 79 (genuinely added distortion, confirmed by
+  direct comparison) are unaffected.
+- **Retained cases 32 (parachute), 54 (French horn)**: individually
+  reinspected and found to have no object present despite coherent,
+  non-degenerate images (grid-level review had inferred presence from
+  coherence alone). `object_present` corrected `true → false` for both;
+  no degeneration count changes. The remaining 38 retained-class images
+  in `S2_STAGE1_HISTORY` were not individually re-verified for object
+  presence — disclosed as a scope limit, not assumed complete.
+- **S1 macro-case arithmetic, propagated**: holding C29's corrected
+  `S1_Stage1` baseline (14/20) and the existing final `S1_BLANK`/
+  `S1_HISTORY` labels fixed, Stage 1 accounts for **14/19** of
+  `S1_BLANK`'s final degenerate count (14 persisted, 5 newly damaged:
+  12,13,14,15,17; 1 neither: 18) and **14/20** of `S1_HISTORY`'s (14
+  persisted, 6 newly damaged: 12,13,14,15,17,18) — not "100%," and not
+  exactly C29's own "18/19 or 18/20" either. Pure set arithmetic over
+  already-fixed labels; `S1_BLANK`/`S1_HISTORY` themselves remain
+  unreopened.
+- **Verification-claim honesty**: the Stage-1 build scripts (S1 and S2)
+  never asserted reload equality against the actual saved object
+  (`final_state_cpu`), only against the untouched parent — a disclosed
+  rigor gap, not a proven defect. The S2_STAGE1_HISTORY classifier guard
+  was an after-the-fact check run post-classification, not a true
+  precondition gate. Both are fixed, not merely relabeled, in the new
+  build below.
+
+## C32 — S2 both-stages: the Stage-1 quality gain mostly survives full refinement, with one disclosed cost (index entry)
+
+`history_both_stages_s2/FINAL_REPORT.md` (published alongside this
+entry) applies the already-validated Stage-2 refinement (fp64 stable
+solve, historical preservation) to the improved `S2_STAGE1_HISTORY`
+checkpoint — one freshly recovered `'golf ball'` embedding (working
+UNet = `S2_STAGE1_HISTORY`, reference = pristine M0), one refinement
+update (λ=0.1, erase=1, preserve=0.1), reload verified against an
+independently cloned intended final state (not just the parent, fixing
+the gap disclosed in C31). **Result: golf-ball suppression reaches
+0/20 exact (the best of any S2 checkpoint tested, improving on
+`S2_STAGE1_HISTORY`'s 1/20 genuine leak and `S2_Stage1`'s own 1/20 false
+positive); English springer correctly stays erased (0/20 throughout, as
+desired); French horn recognition ties the best of any S2 checkpoint
+(14/20) and parachute improves over the refinement-only `S2_HISTORY`
+comparator (13/20 vs. 9/20); retained-class degeneration holds at 0/40.
+But springer-prompt degeneration rises from 2/20 (corrected
+`S2_STAGE1_HISTORY`) to 6/20** (18 recovered, 2 persisted, 4 newly
+damaged, 0 neither vs. that baseline) — refinement reintroduces some
+corruption, concentrated in 3 of 5 scenes and 5 of 6 cases at one seed.
+A genuine, qualified result on four dimensions, not a clean "the Stage-1
+gain simply persists" finding. The classification guard used here is a
+single executed wrapper that validates preconditions and invokes
+classification in the same guarded path, refusing on failure — see the
+report itself for full tables, scene/family breakdowns, and explicit
+scope limits.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by

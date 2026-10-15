@@ -1,0 +1,36 @@
+{
+  "purpose": "Side-by-side original vs. corrected labels for S2_STAGE1_HISTORY cases 63, 32, 54, found ahead of the S2 both-stages build. The original frozen stage1_history_intervention_s2/CASE_LEVEL_COMPLETION_RECORD.json is left byte-unchanged -- this file is the correction layer.",
+  "corrections": [
+    {
+      "endpoint": "S2_STAGE1_HISTORY", "case_id": 63, "class": "English springer",
+      "original_label": {"degenerate": true, "object_present": false, "generic_dog_visible": false,
+        "note": "glowing neon abstract scene, indistinct blobby white forms and tiny distorted human figures over colorful static/streaks -- painterly/indistinct distortion"},
+      "corrected_label": {"degenerate": false, "object_present": false, "generic_dog_visible": false,
+        "note": "glowing neon abstract scene with blobby forms -- INHERITED from EnglishSpringer_parent's own case 63 (same visual pattern already present before any sequential edit), not damage added by this checkpoint; S2_Stage1's own case 63 is a materially different, genuinely corrupted image and is unaffected"},
+      "reason": "Direct comparison against EnglishSpringer_parent's case 63 (identical prompt/seed) at native resolution shows the same neon/blobby rendering pattern, establishing this as inherited content, not added corruption."
+    },
+    {
+      "endpoint": "S2_STAGE1_HISTORY", "case_id": 32, "class": "parachute",
+      "original_label": {"degenerate": false, "object_present": true,
+        "note": "retained class, grid-reviewed (review_grids/parachute.png), clean parachute visible, no escalation"},
+      "corrected_label": {"degenerate": false, "object_present": false,
+        "note": "coherent lake/mountain landscape, no parachute visible anywhere -- inherited absence (EnglishSpringer_parent's own case 32 is also a lake/mountain scene with no parachute); S2_Stage1's case 32 shows a clear parachute"},
+      "reason": "Individual full-resolution reinspection (grid-level coherence had masked object-presence); image is coherent/non-degenerate but the parachute itself is absent."
+    },
+    {
+      "endpoint": "S2_STAGE1_HISTORY", "case_id": 54, "class": "French horn",
+      "original_label": {"degenerate": false, "object_present": true,
+        "note": "retained class, grid-reviewed (review_grids/french_horn.png), clean French horn visible, no escalation"},
+      "corrected_label": {"degenerate": false, "object_present": false,
+        "note": "classroom scene with students, no French horn visible anywhere; one child's face is covered by a blocky multi-colored glitch artifact -- a LOCAL corruption signature, not pervasive (every other child, the desks, and the room render cleanly), so whole-frame degenerate stays false while the local defect and object absence are now explicitly recorded"},
+      "reason": "Individual full-resolution reinspection; object absent and a local (not whole-frame) artifact present, neither of which the grid-level 'clean' label captured."
+    }
+  ],
+  "corrected_s2_stage1_history_springer_degeneration": "2/20 (was reported 3/20); degenerate cases: 77, 79 only",
+  "corrected_paired_transition_s2_stage1_to_s2_stage1_history": {
+    "recovered": 18, "persisted": 2, "newly_damaged": 0, "neither": 0,
+    "persisted_case_ids": [77, 79]
+  },
+  "retained_class_object_presence_scope_note": "Only cases 32 and 54 were individually reinspected for object presence; the remaining 38 parachute/French-horn S2_STAGE1_HISTORY images were grid-reviewed for coherence/degeneration only -- this is a disclosed limitation, not a claim of full individual verification for that endpoint.",
+  "not_reopened": ["S1_BLANK", "S1_HISTORY", "preservation_content_control", "any other closed finding in this results line"]
+}

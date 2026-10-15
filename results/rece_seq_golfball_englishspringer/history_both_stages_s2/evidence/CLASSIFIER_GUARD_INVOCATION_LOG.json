@@ -1,0 +1,34 @@
+{
+  "endpoint": "S2_HISTORY_BOTH_STAGES",
+  "check_started_at": 1792093108.7077675,
+  "checks": {
+    "1_frozen_hashes_unchanged": {
+      "completion_record_hash_match": true,
+      "initial_labels_hash_match": true
+    },
+    "2_case_id_set_and_completion": {
+      "n_rows": 80,
+      "case_ids_match_0_to_79": true,
+      "every_row_has_completed_judgment_fields": true
+    },
+    "3_image_files_match_recorded_hashes": {
+      "n_checked": 80,
+      "n_mismatches": 0,
+      "mismatches": []
+    },
+    "4_image_report_agrees_with_completion_record": {
+      "image_report_case_ids_match": true,
+      "image_report_hashes_match_completion_record": true
+    }
+  },
+  "guard_passed": true,
+  "precondition_check_passed_at": 1792093108.73819,
+  "classification_invocation": {
+    "started_at": 1792093108.7384715,
+    "ended_at": 1792093115.6535685,
+    "returncode": 0,
+    "stdout_tail": "[S2_HISTORY_BOTH_STAGES] classified 80/80 (errors=0) in 1.9s, complete=True\n",
+    "stderr_tail": ""
+  },
+  "classification_complete": true
+}

@@ -315,6 +315,33 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/images/stage1_history_intervention_s2/review_grids/{f.name}"
         for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/review_grids").glob("*.png"))
     ]),
+    ("Corrections bundled ahead of the S2 both-stages build (C31): objective reframing, springer case 63, retained cases 32/54, S1 arithmetic propagation, verification-claim honesty", [
+        f"{R}/history_both_stages_s2/closeout/CORRECTIONS_BEFORE_BOTH_STAGES.md",
+        f"{R}/history_both_stages_s2/closeout/CORRECTED_LABELS.json",
+    ]),
+    ("Reports — history_both_stages_s2 (C32): does the S2 Stage-1 quality gain survive full-pipeline refinement?", [
+        f"{R}/history_both_stages_s2/FINAL_REPORT.md",
+    ]),
+    ("Evidence — history_both_stages_s2 (manifest, recovery result, build log, visual review, classifier guard invocation log, joint outcomes)", [
+        f"{R}/history_both_stages_s2/evidence/FROZEN_MANIFEST.json",
+        f"{R}/history_both_stages_s2/evidence/RECOVER_S2_BOTH_STAGES_RESULT.json",
+        f"{R}/history_both_stages_s2/evidence/S2_HISTORY_BOTH_STAGES.build_log.json",
+        f"{R}/history_both_stages_s2/evidence/CASE_LEVEL_COMPLETION_RECORD.json",
+        f"{R}/history_both_stages_s2/evidence/VISUAL_REVIEW_INITIAL.json",
+        f"{R}/history_both_stages_s2/evidence/CLASSIFIER_PRECONDITION_GATE.json",
+        f"{R}/history_both_stages_s2/evidence/CLASSIFIER_GUARD_INVOCATION_LOG.json",
+        f"{R}/history_both_stages_s2/evidence/image_report.json",
+        f"{R}/history_both_stages_s2/evidence/classifications.jsonl",
+        f"{R}/history_both_stages_s2/evidence/classify_report.json",
+        f"{R}/history_both_stages_s2/evidence/code/recover_newtarget_s2_both_stages.py",
+        f"{R}/history_both_stages_s2/evidence/code/build_both_stages_s2.py",
+        f"{R}/history_both_stages_s2/evidence/code/build_review_both_stages.py",
+        f"{R}/history_both_stages_s2/evidence/code/guarded_classify.py",
+    ]),
+    ("Visual evidence — history_both_stages_s2, all 80 new original images", [
+        f"{R}/images/history_both_stages_s2/original_images/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/history_both_stages_s2/original_images").glob("*.png"))
+    ]),
 ]
 
 

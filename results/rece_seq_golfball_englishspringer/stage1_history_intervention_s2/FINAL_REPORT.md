@@ -1,5 +1,25 @@
 # Stage-1 History Intervention on S2: Does the S1 Fix Generalize to the Reverse Sequence?
 
+> **Correction note (2026-10-15, see `CORRECTIONS.md` C31 and
+> `../history_both_stages_s2/closeout/CORRECTIONS_BEFORE_BOTH_STAGES.md`).**
+> Two corrections to this report:
+> (1) **Objective framing**: English springer is the historical, deliberately
+> erased concept in this sequence — its continued 0/20 absence is the
+> *desired* outcome, not a "failure to restore correct recognition." The
+> "quality-vs-recognition dissociation" framing below, and "reverse
+> sequence" as a description of S2 relative to S1 (S2 does not share a
+> concept pair with S1 in reverse order), are both withdrawn.
+> (2) **Case 63** was re-inspected against `EnglishSpringer_parent`'s own
+> identical-prompt/seed image and found to be an **inherited** rendering
+> pattern (present before any sequential edit), not added damage;
+> corrected to non-degenerate. Springer degeneration moves ~~3/20~~ to
+> **2/20** (cases 77, 79 only); the paired recovery moves ~~17
+> recovered/3 persisted~~ to **18 recovered/2 persisted**. Separately,
+> cases 32 (parachute) and 54 (French horn) were found to have no object
+> present despite coherent, non-degenerate images — corrected from
+> `object_present: true` (grid-inferred) to `false` (individually
+> verified); this does not change any degeneration count.
+
 **Question.** `stage1_history_intervention` (S1: golf ball → French horn)
 found that applying RECE's existing preservation mechanism AT Stage 1
 (before the damage occurs) rather than only at Stage-2 refinement
@@ -11,22 +31,25 @@ report runs the identical intervention on S2: the untouched
 with the one change `retain_text_=['']` → `retain_text_=['English
 springer']`. Existing-method control; no new method introduced.
 
-**Answer: the result does not generalize the same way.** Image *quality*
-on historical-class (English springer) prompts improves dramatically —
+**Answer: a substantial quality improvement on historical-class prompts,
+while correctly maintaining springer's erasure.** Image quality on
+historical-class (English springer) prompts improves dramatically —
 degeneration drops from an established 20/20 (blank Stage-1,
-`S2_Stage1`) to **3/20** — but the *correct subject* (an actual English
-springer) essentially never returns: exact classifier recognition and
-visual breed-specific presence are **0/20 in every checkpoint from
-`EnglishSpringer_parent` onward**, identical to blank Stage-1. New-target
-(golf ball) deletion shows one genuine, confirmed return (case 10) plus
-two visually ambiguous cases, a materially different picture from the
-blank comparator's own single raw hit, which was already a confirmed
-classifier false positive. Retained classes show no degeneration
-either way. This is a **quality-vs-recognition dissociation**: Stage-1
-historical preservation substantially repairs *how corrupted* the
-historical-prompt images look without repairing *what they depict* —
-the opposite of a clean replication of S1's near-total fix, and a
-narrower, more qualified result than S1's.
+`S2_Stage1`) to **2/20** (corrected from an originally reported 3/20;
+see correction note above) — and English springer correctly stays
+absent throughout: exact classifier recognition and visual
+breed-specific presence are 0/20 in every checkpoint from
+`EnglishSpringer_parent` onward, identical to blank Stage-1. This is the
+*desired* outcome, not a shortfall — springer is the deliberately erased
+historical concept in this sequence, the same role golf ball played in
+S1. New-target (golf ball) deletion shows one genuine, confirmed return
+(case 10) plus two visually ambiguous cases, a materially different
+picture from the blank comparator's own single raw hit, which was
+already a confirmed classifier false positive. Retained classes show no
+degeneration either way. A narrower, more qualified result than S1's
+near-total fix (this one is 18/20 recovered, not a full 20/20), but a
+genuine quality improvement with erasure correctly held — not a
+dissociation or a failure.
 
 ---
 
@@ -123,13 +146,15 @@ Full tables: `CASE_LEVEL_COMPLETION_RECORD.json`,
 |---|---:|---:|---:|
 | EnglishSpringer_parent | 0/20 | 0/20 | 0/20 |
 | S2_Stage1 (blank, comparator) | 20/20 (established) | 0/20 | 2–4/20 (established) |
-| **S2_STAGE1_HISTORY** | **3/20** | **0/20** | **0/20** |
+| **S2_STAGE1_HISTORY** | **2/20** (corrected from 3/20) | **0/20** | **0/20** |
 
-Paired S2_Stage1 → S2_STAGE1_HISTORY: **17 recovered, 3 persisted, 0
-newly damaged, 0 neither** (every case was degenerate under blank
-Stage-1, per the established record; 3 remain degenerate here: cases 63,
-77, 79). A large, genuine quality improvement — unlike S1, this is not a
-complete elimination (17/20, not 20/20).
+Paired S2_Stage1 → S2_STAGE1_HISTORY: **18 recovered, 2 persisted, 0
+newly damaged, 0 neither** (corrected from 17/3; every case was
+degenerate under blank Stage-1, per the established record; 2 remain
+degenerate here: cases 77, 79 — case 63 was re-inspected and found to be
+an inherited `EnglishSpringer_parent` rendering pattern, not added
+damage, see correction note above). A large, genuine quality improvement
+— unlike S1, this is not a complete elimination (18/20, not 20/20).
 
 Degenerate cases 77 and 79 are both scene 4 ("riding in a car / leaning
 out the window", literal and paraphrase, both seed 6230) — pronounced
