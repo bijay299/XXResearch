@@ -1,5 +1,21 @@
 # Stage-1 History Intervention: Does Preserving Earlier Prevent the Damage?
 
+> **Correction note (2026-10-15, see `CORRECTIONS.md` C29 and
+> `closeout/CORRECTIONS_BEFORE_S2.md`).** Re-inspection of golf-ball
+> cases 12-15 found the `S1_Stage1` labels for those four cases did not
+> match the frozen corruption rubric (coherent-but-unexpected macro
+> textures, not sparkle/mesh/checkerboard corruption) and corrected them
+> to non-degenerate. This moves `S1_Stage1`'s own golf-ball degeneration
+> from ~~18/20~~ to **14/20**, and the paired recovery below from
+> ~~18 recovered / 2 neither~~ to **14 recovered / 6 neither**.
+> `S1_STAGE1_HISTORY` itself is unaffected (still exactly 0/20
+> degenerate) — the intervention's result is unchanged in kind (complete
+> recovery, zero newly damaged), only in magnitude. A separate sentence
+> below overclaimed that golf-ball return is "structurally impossible";
+> that claim is removed (a later edit can restore an earlier-erased
+> concept in principle — the 0/20 return result here is an empirical
+> observation, not a structural guarantee).
+
 **Question.** Can RECE's existing preservation mechanism (`retain_texts`)
 prevent historical-prompt corruption when applied **at Stage 1, before
 the damage occurs**, rather than only at Stage-2 refinement, after it?
@@ -9,9 +25,10 @@ Existing-method control; no new method introduced.
 one sequence.** `S1_STAGE1_HISTORY` (same native Stage-1 edit as the
 existing `S1_Stage1` comparator, with the one change
 `retain_texts=['']` → `retain_texts=['golf ball']`) eliminates the
-golf-ball-prompt degeneration that `S1_Stage1` showed: **18/20 → 0/20**,
-an exact, complete paired recovery of every persisted-degenerate case,
-zero newly damaged. French-horn suppression is unchanged (0/20, ≥75%
+golf-ball-prompt degeneration that `S1_Stage1` showed: **14/20 → 0/20**
+(corrected from a previously reported 18/20 — see correction note
+above), an exact, complete paired recovery of every correctly-labeled
+degenerate case, zero newly damaged. French-horn suppression is unchanged (0/20, ≥75%
 suppression against the parent's own 16/20 — denominator verified, not
 assumed) and retained-class recognition is, if anything, slightly higher
 than the blank comparator (parachute 13→16/20, springer 18→20/20), with
@@ -26,9 +43,9 @@ the work, and was not tested on S2.
 ## 1. Premise verification (see `closeout/VERIFICATION_AND_CORRECTIONS_2.md`)
 
 Recomputed directly from frozen labels, not assumed: `GolfBall_parent`
-0/20 degenerate → `S1_Stage1` **18/20** (not "approximately") →
-confirming the damage is introduced at the native Stage-1 edit itself,
-materially and almost entirely, before any refinement step runs. All
+0/20 degenerate → `S1_Stage1` **14/20** (corrected from 18/20; see
+correction note above) → confirming the damage is introduced at the
+native Stage-1 edit itself, materially, before any refinement step runs. All
 four proceed-conditions (eligibility, parent-vs-Stage1 contrast,
 widespread Stage-1 corruption, provenance availability) were verified
 and held; this intervention was authorized to proceed automatically.
@@ -80,20 +97,24 @@ Full tables: `CASE_LEVEL_COMPLETION_RECORD.json`,
 | | degenerate |
 |---|---|
 | GolfBall_parent | 0/20 |
-| S1_Stage1 (blank, comparator) | 18/20 |
+| S1_Stage1 (blank, comparator) | 14/20 (corrected from 18/20) |
 | **S1_STAGE1_HISTORY** | **0/20** |
 
-Paired S1_Stage1 → S1_STAGE1_HISTORY: **18 recovered, 0 newly damaged, 0
-persisted, 2 neither** (cases 17, 18, already non-degenerate in both) —
-a complete, exact recovery of every case that was degenerate under blank
-Stage-1 preservation.
+Paired S1_Stage1 → S1_STAGE1_HISTORY: **14 recovered, 0 newly damaged, 0
+persisted, 6 neither** (cases 12, 13, 14, 15, 17, 18, already
+non-degenerate in both — corrected from a previously reported 2; see
+correction note above) — a complete, exact recovery of every case that
+was (correctly) degenerate under blank Stage-1 preservation.
 
 **Golf-ball return**: exact classifier recognition 0/20 in every
-checkpoint from `GolfBall_parent` onward (M0's 18/20 structurally cannot
-recur here — golf ball is erased by the untouched parent itself, before
-French horn is ever touched). Visual presence likewise 0/20. The
-historical-return flag (≥2 net additional hits vs. the parent on 20
-cases) is **not triggered** — 0 vs. 0.
+checkpoint from `GolfBall_parent` onward. Visual presence likewise 0/20.
+The historical-return flag (≥2 net additional hits vs. the parent on 20
+cases) is **not triggered** — 0 vs. 0. (A prior version of this sentence
+claimed golf-ball return was "structurally impossible" because the
+untouched parent already erased it; that claim is removed — a later
+edit can in principle restore an earlier-erased concept, and the 0/20
+result here is an empirical observation on this panel, not a structural
+guarantee.)
 
 **French-horn (new target) deletion**: `GolfBall_parent`'s own panel
 count is **16/20** (verified directly, not assumed as 16/20 by default).
@@ -108,11 +129,15 @@ and degeneration is **0/40 in both endpoints** — no retained-class
 quality cost from this preservation choice, on this panel.
 
 **Scene/family breakdown**: no single scene or phrasing family drove the
-golf-ball recovery — all 5 scene contexts × both phrasings × both seeds
-(20/20 cases) flipped from degenerate to clean, including the
-previously-worst cases (macro dimple-texture scenes, golf-cart interior
-scenes) that showed the heaviest corruption under blank Stage-1
-preservation.
+golf-ball recovery. Corrected from a prior "all 20/20 cases flipped"
+overclaim: **14/20 cases flipped** from degenerate to clean (4 of 5
+scene contexts, both phrasings, both seeds represented among them,
+including the golf-cart interior scenes that showed heavy corruption
+under blank Stage-1 preservation); the remaining **6/20 were already
+non-degenerate under blank Stage-1** (cases 12, 13, 14, 15 — the macro
+dimple-texture scene, scene_index 3, correctly non-degenerate in both
+blank and historical Stage-1 once the rubric is applied consistently —
+plus cases 17, 18). Final state is 0/20 degenerate either way.
 
 ## 5. Interpretation — qualified, not generalized
 
@@ -152,3 +177,4 @@ before classification ran).
 - `CASE_LEVEL_COMPLETION_RECORD.json`, `VISUAL_REVIEW_INITIAL.json`, `CLASSIFIER_PRECONDITION_GATE.json`
 - `review_grids/{parachute,springer}.png` — fixed-order retained-class contact sheets
 - `closeout/VERIFICATION_AND_CORRECTIONS_2.md` — premise verification and corrections to the prior report
+- `closeout/CORRECTIONS_BEFORE_S2.md` — cases 12-15 relabeling, "structurally impossible" claim removal, and other corrections bundled ahead of the S2 intervention

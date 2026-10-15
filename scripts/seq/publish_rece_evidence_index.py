@@ -287,6 +287,34 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/images/stage1_history_intervention/review_grids/{f.name}"
         for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/stage1_history_intervention/review_grids").glob("*.png"))
     ]),
+    ("Corrections bundled ahead of the S2 Stage-1 history intervention (C29): S1 cases 12-15 relabeling, false claim removal, M0 parachute fix", [
+        f"{R}/stage1_history_intervention/closeout/CORRECTIONS_BEFORE_S2.md",
+        f"{R}/stage1_history_intervention/closeout/CORRECTED_LABELS.json",
+    ]),
+    ("Reports — stage1_history_intervention_s2 (C30): does the S1 Stage-1 fix generalize to the reverse sequence?", [
+        f"{R}/stage1_history_intervention_s2/FINAL_REPORT.md",
+    ]),
+    ("Evidence — stage1_history_intervention_s2 (manifest, provenance, verification, classifier invocation guard, joint outcomes)", [
+        f"{R}/stage1_history_intervention_s2/evidence/FROZEN_MANIFEST.json",
+        f"{R}/stage1_history_intervention_s2/evidence/S2_STAGE1_HISTORY.stage1_history_log.json",
+        f"{R}/stage1_history_intervention_s2/evidence/CASE_LEVEL_COMPLETION_RECORD.json",
+        f"{R}/stage1_history_intervention_s2/evidence/VISUAL_REVIEW_INITIAL.json",
+        f"{R}/stage1_history_intervention_s2/evidence/CLASSIFIER_PRECONDITION_GATE.json",
+        f"{R}/stage1_history_intervention_s2/evidence/CLASSIFIER_INVOCATION_GUARD_RESULT.json",
+        f"{R}/stage1_history_intervention_s2/evidence/image_report.json",
+        f"{R}/stage1_history_intervention_s2/evidence/classifications.jsonl",
+        f"{R}/stage1_history_intervention_s2/evidence/classify_report.json",
+        f"{R}/stage1_history_intervention_s2/evidence/code/make_stage1_history_checkpoint_s2.py",
+        f"{R}/stage1_history_intervention_s2/evidence/code/build_review_s2.py",
+        f"{R}/stage1_history_intervention_s2/evidence/code/make_review_grids_s2.py",
+    ]),
+    ("Visual evidence — stage1_history_intervention_s2, all 80 new original images and 2 retained-class grids", [
+        f"{R}/images/stage1_history_intervention_s2/original_images/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images").glob("*.png"))
+    ] + [
+        f"{R}/images/stage1_history_intervention_s2/review_grids/{f.name}"
+        for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/review_grids").glob("*.png"))
+    ]),
 ]
 
 

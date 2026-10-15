@@ -918,6 +918,83 @@ one sequence, one fixed preservation choice, no refinement stage added
 on top (not run, per task instruction). See the report itself for full
 tables and the explicit scope limits.
 
+## C29 — Corrections bundled ahead of the S2 Stage-1 history intervention
+
+`stage1_history_intervention/closeout/CORRECTIONS_BEFORE_S2.md` and
+`CORRECTED_LABELS.json` (published alongside this entry) bundle a
+bounded correction pass over `stage1_history_intervention` (S1), found
+entirely from existing artifacts, no new GPU computation:
+
+- **S1 golf-ball cases 12, 13, 14, 15**: `S1_Stage1`'s labels for these
+  four macro-texture-prompt cases were `degenerate: true` with a
+  templated "sparkle/mesh/checkerboard" note that does not match what
+  the images show (a coherent embossed medallion, radiating macro
+  spikes, a stitched fabric patch, a scaled/mosaic texture — none show
+  the corruption signature; `GolfBall_parent`'s own equivalent images
+  were already correctly labeled non-degenerate on the same basis).
+  Corrected to non-degenerate, consistent with this line's own
+  `GolfBall_parent`/`EnglishSpringer_parent` precedent for erased-concept
+  classes. `S1_Stage1` golf-ball degeneration moves **18/20 → 14/20**;
+  the paired `S1_Stage1`→`S1_STAGE1_HISTORY` recovery moves **18
+  recovered/2 neither → 14 recovered/6 neither**. `S1_STAGE1_HISTORY`
+  itself (still exactly 0/20 degenerate) and its qualitative conclusion
+  (complete recovery, zero newly damaged) are unchanged — only the
+  magnitude. `S1_BLANK`/`S1_HISTORY` (separate Stage-2-refined
+  checkpoints, different images) are explicitly **not** reopened here.
+- **False "structurally impossible" claim removed**: the per-case note
+  used for all 20 `S1_STAGE1_HISTORY` golf-ball rows implied golf ball
+  cannot return because the untouched parent already erased it — false
+  as a general claim (a later edit can in principle restore an
+  earlier-erased concept). Corrected to an observation-only note; the
+  underlying `object_present: false` judgments are unchanged.
+- **`history_preservation_confirmation/FINAL_REPORT.md` M0 parachute
+  reference corrected**: stated "vs. M0's 18/20 each" for both parachute
+  and springer; M0's actual parachute exact-hit count (recomputed from
+  `panel/eval/M0/classifications.jsonl`) is **11/20**, not 18/20 — the
+  new-endpoint parachute figures reported (12–13/20) were in fact above,
+  not below, the true M0 parachute reference.
+- **S2_Stage1 case 8** (raw classifier hit `p=0.941`, visual judgment
+  "no ball," confirmed false positive): reaffirmed unchanged, both
+  records published side by side, no new finding.
+- **Publication sequencing**, disclosed: `cfd674b` bundled the Stage-1
+  intervention's build/generation/review together with the
+  then-unresolved disk-space recovery rather than publishing strictly
+  after every check was independently reread. Freeze-file hashes
+  establish *what* was frozen, not *when* each image was viewed; this
+  limit is disclosed, not resolved by invented telemetry.
+- **Reload-verification scope clarified**: the save/reload checks used
+  throughout this line (S1 and the new S2 build below) prove exact
+  byte-identity between the saved file and the in-memory state computed
+  immediately before saving — not equivalence to an independent
+  "intended" target, since none exists for these native fp32 Stage-1
+  edits. Nothing is retracted; this makes the existing scope explicit.
+
+## C30 — Stage-1 history intervention on S2: quality improves substantially, recognition does not (index entry)
+
+`stage1_history_intervention_s2/FINAL_REPORT.md` (published alongside
+this entry) tests the same Stage-1 preservation intervention as C28, on
+the reverse sequence (S2: English springer → golf ball), explicitly left
+open by C28. Built from the untouched `B_english_springer.pt` parent
+with exactly one changed argument (`retain_texts=['']` →
+`retain_texts=['English springer']`) on the native Stage-1 UCE edit
+erasing golf ball. **Result does not replicate C28's pattern**: English
+springer (historical) degeneration drops from an established **20/20
+(blank Stage-1) to 3/20** — a large quality improvement — but exact
+classifier recognition and visual breed-specific presence stay at
+**0/20 in every checkpoint from `EnglishSpringer_parent` onward**,
+identical to blank Stage-1; even generic dog-like shapes (2–4/20 under
+blank Stage-1) drop to 0/20. Golf-ball (new-target) deletion shows one
+genuine, independently confirmed return (case 10, a clear dimpled ball
+on a fairway) plus two visually ambiguous cases (small round objects in
+a water-hazard scene, not flagged by the raw classifier) — a materially
+different picture from the blank comparator's own single raw hit, which
+was already a confirmed false positive (C27). Suppression remains well
+above the ≥75% gate either way (81.25–93.75%). Retained classes: 0/40
+degeneration in both arms. A genuine, narrower, dissociated result —
+quality repaired, recognition not — not a second confirmation of C28.
+See the report itself for full tables, scene/family breakdowns, and
+explicit scope limits.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by

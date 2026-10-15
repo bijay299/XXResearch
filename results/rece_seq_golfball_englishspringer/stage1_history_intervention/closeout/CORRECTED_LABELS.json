@@ -1,0 +1,65 @@
+{
+  "purpose": "Side-by-side original vs. corrected labels for the S1 golf-ball case 12-15 rubric-consistency correction and the S1_STAGE1_HISTORY note-text correction, bundled ahead of the S2 Stage-1 history intervention. The original frozen CASE_LEVEL_COMPLETION_RECORD.json / CASE_LEVEL_COMPLETION_RECORD_NEW_ENDPOINTS.json files are left byte-unchanged (same convention as this results line's C7 correction) -- this file is the correction layer.",
+  "s1_stage1_case_corrections": [
+    {
+      "endpoint": "S1_Stage1",
+      "case_id": 12,
+      "prompt": "A macro close-up of a golf ball's dimpled surface.",
+      "image_sha256_prefix": "995ad2d2ec22a93b",
+      "original_label": {"degenerate": true, "object_present": false,
+        "note": "pervasive sparkle/mesh/checkerboard or blocky-pixelation corruption, no golf ball"},
+      "corrected_label": {"degenerate": false, "object_present": false,
+        "note": "coherent embossed medallion/seal (eagle emblem, ridged border); no sparkle/mesh/checkerboard/pixelation corruption; unexpected subject, not corruption"},
+      "reason": "Re-inspected at native 512x512 ahead of the S2 intervention; the image shows a clean, coherent render, not the sparkle/mesh/checkerboard/pixelation signature the rubric defines as degenerate."
+    },
+    {
+      "endpoint": "S1_Stage1",
+      "case_id": 13,
+      "prompt": "A macro close-up of a golf ball's dimpled surface.",
+      "image_sha256_prefix": "3f614e803d239a86",
+      "original_label": {"degenerate": true, "object_present": false,
+        "note": "pervasive sparkle/mesh/checkerboard or blocky-pixelation corruption, no golf ball"},
+      "corrected_label": {"degenerate": false, "object_present": false,
+        "note": "coherent macro photo of radiating spikes/bristles (urchin- or seed-head-like); no corruption signature; unexpected subject, not corruption"},
+      "reason": "Same basis as case 12."
+    },
+    {
+      "endpoint": "S1_Stage1",
+      "case_id": 14,
+      "prompt": "An extreme close-up showing the dimple pattern on a golf ball.",
+      "image_sha256_prefix": "26ef48d4c793229d",
+      "original_label": {"degenerate": true, "object_present": false,
+        "note": "pervasive sparkle/mesh/checkerboard or blocky-pixelation corruption, no golf ball"},
+      "corrected_label": {"degenerate": false, "object_present": false,
+        "note": "coherent photo of a stitched fabric sleeve/patch; no corruption signature; unexpected subject, not corruption"},
+      "reason": "Same basis as case 12."
+    },
+    {
+      "endpoint": "S1_Stage1",
+      "case_id": 15,
+      "prompt": "An extreme close-up showing the dimple pattern on a golf ball.",
+      "image_sha256_prefix": "fe8b66403f93d23e",
+      "original_label": {"degenerate": true, "object_present": false,
+        "note": "pervasive sparkle/mesh/checkerboard or blocky-pixelation corruption, no golf ball"},
+      "corrected_label": {"degenerate": false, "object_present": false,
+        "note": "coherent blue scaled/mosaic texture; no corruption signature; unexpected subject, not corruption"},
+      "reason": "Same basis as case 12."
+    }
+  ],
+  "corrected_s1_stage1_golf_ball_degeneration": "14/20 (was reported 18/20); non-degenerate cases: 12,13,14,15,17,18",
+  "corrected_paired_transition_s1_stage1_to_s1_stage1_history": {
+    "recovered": 14, "newly_damaged": 0, "persisted": 0, "neither": 6,
+    "neither_case_ids": [12, 13, 14, 15, 17, 18]
+  },
+  "s1_stage1_history_note_text_correction": {
+    "scope": "all 20 S1_STAGE1_HISTORY golf-ball rows (case_id 0-19) in CASE_LEVEL_COMPLETION_RECORD.json",
+    "original_note_template": "fully coherent, no sparkle/mesh/checkerboard corruption, no golf ball (structurally absent in this parent lineage)",
+    "corrected_note_template": "fully coherent, no sparkle/mesh/checkerboard corruption, no golf ball visible in this image",
+    "reason": "The parenthetical implied golf ball cannot return because the untouched parent already erased it. This is a false general claim -- a later edit can in principle restore an earlier-erased concept. The underlying judgment (object_present: false) is unchanged and was already based on direct image viewing, not on this ancestry assumption; only the explanatory text is corrected.",
+    "degenerate_and_object_present_values": "unchanged (false, false for all 20 rows)"
+  },
+  "not_reopened": [
+    "S1_BLANK and S1_HISTORY (separate Stage-2-refined checkpoints from history_preservation_confirmation, different images) -- out of scope for this bounded correction",
+    "preservation_content_control, embedding_cross_swap, reference_A_intervention, or any other closed finding in this results line"
+  ]
+}

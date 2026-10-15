@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `f8dfc416b245` — the commit that *records*
+Generated at parent commit `cfd674b5de31` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -38,7 +38,7 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
 | `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
 | `results/rece_seq_golfball_englishspringer/preservation_content_control/FINAL_REPORT.md` | 14,917 | `370214d3721a10067ffa15ff368e031b778df25ca233914c55e5da1618dba01b` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 57,651 | `6b657e74de7e0948f1856841f95a0c92f9a7a2915fb40b170c64844eff54735d` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 62,601 | `126ceaccbcdb53278c3fccf36b21c07c0e489ba3907801f460f99046131183ce` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -330,7 +330,7 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/history_preservation_confirmation/FINAL_REPORT.md` | 13,378 | `f8c063a0b058b41c4854a992a55ea4274a24e933176d0a1d16b56be05eb55115` |
 | `results/rece_seq_golfball_englishspringer/history_preservation_confirmation/closeout/CLOSEOUT_CORRECTIONS.md` | 12,066 | `9273d99849e8d927bfdd4b50f969008bb2ff63656f069e9c180c9552f6f43e94` |
 | `results/rece_seq_golfball_englishspringer/history_preservation_confirmation/closeout/VERIFICATION_AND_CORRECTIONS_2.md` | 9,787 | `01f453ca91e1c8fa41d63bccf6a781d5811834c048ad7bc29d84f273f9a8ae21` |
-| `results/rece_seq_golfball_englishspringer/stage1_history_intervention/FINAL_REPORT.md` | 8,179 | `7122021f7878778570abaa63c3c3f94f140d9005b743143a6862fe5cd17aee61` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention/FINAL_REPORT.md` | 10,093 | `c3580514f96a4ccbb415bd1346f1da0c79728119cdc3832f14978e961bea29ed` |
 
 ## Evidence — history_preservation_confirmation (manifests, provenance, verification logs, joint tables)
 
@@ -1028,6 +1028,123 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention/review_grids/parachute.png` | 828,189 | `50df466f59b30ce77c33eb8386ad1753499c8815c0983ed8e8541bbd79384c81` |
 | `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention/review_grids/springer.png` | 1,012,446 | `011829fd26ec13341a76bceb45dde4e5630a1caab1ef31a3a5bfd10447b77959` |
 
+## Corrections bundled ahead of the S2 Stage-1 history intervention (C29): S1 cases 12-15 relabeling, false claim removal, M0 parachute fix
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention/closeout/CORRECTIONS_BEFORE_S2.md` | 9,567 | `389c34d83a27b73326eebf1107248568f7093e23e62f6dfc7002b6be85e5a903` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention/closeout/CORRECTED_LABELS.json` | 4,690 | `4b6351fb15b76d1a37c876099c1d5ec6e26611e5774c1296c3be8935bcb790c5` |
+
+## Reports — stage1_history_intervention_s2 (C30): does the S1 Stage-1 fix generalize to the reverse sequence?
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/FINAL_REPORT.md` | 14,834 | `6fef8330d612e636b89c9c1f79a5e03c5f662a0191368c13facd91195f6f99e8` |
+
+## Evidence — stage1_history_intervention_s2 (manifest, provenance, verification, classifier invocation guard, joint outcomes)
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/FROZEN_MANIFEST.json` | 4,444 | `26c73d8d2209c0adca067652b36a8d2e91b6ed8ab4182ab09553a58041ccd182` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/S2_STAGE1_HISTORY.stage1_history_log.json` | 1,911 | `3ca0add8090e2cf8f142f5284b5d12212c0acc21022f2b370c79f3a3189220fb` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/CASE_LEVEL_COMPLETION_RECORD.json` | 46,826 | `276bec761e6c0daed431f0ffca786f714cb05c74c20cae7534bfed3ff9424795` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/VISUAL_REVIEW_INITIAL.json` | 268 | `a0e92d84e245b4c767910bbba81d1bdc6571231f451ede01c25f092297974692` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/CLASSIFIER_PRECONDITION_GATE.json` | 615 | `19f823bbd5d9d53cc069665b9fa4b2736310a1b1780942ea7680dbdef175cfe7` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/CLASSIFIER_INVOCATION_GUARD_RESULT.json` | 287 | `2da904f4b7f1d5320fa936f3ca6550ef18a0a982fe702674265d27756c0a086c` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/image_report.json` | 34,016 | `8c557df19fa00e803968c7ce5060b5df0da360739357bd36c1d279cff85e3df8` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/classifications.jsonl` | 37,204 | `6f96c44f3ea93b031a8f3ebc685aba9d574fdc37f89f2c061a0b57d1fdff3c09` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/classify_report.json` | 239 | `bf9ce2bf532d0bf1509f2fee9769ac70effcdac9aef024ba276cc77b7d8d2215` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/code/make_stage1_history_checkpoint_s2.py` | 7,344 | `44f6e3df0a6e3d028922e1d902f7896f52495929950e8ef3ca74f4c25cd032f2` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/code/build_review_s2.py` | 9,641 | `4630e8d6d23124345d80754230b0dad1730d2f488c0ca31da1fe4363dd0c4270` |
+| `results/rece_seq_golfball_englishspringer/stage1_history_intervention_s2/evidence/code/make_review_grids_s2.py` | 1,794 | `7de9920ca291b49f4b3d2c9e9aa6626bacd3b72ea54aea0ccfe6ab23a3967410` |
+
+## Visual evidence — stage1_history_intervention_s2, all 80 new original images and 2 retained-class grids
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/0_0.png` | 427,788 | `d24ceadf104e34657656a7a96aee79fc2384e3325c06902f90c41516137524ca` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/10_0.png` | 466,017 | `581e2e443b72fb0b284d48c6900ad7237b275fcc097d8730f76554e80a995e45` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/11_0.png` | 515,996 | `65eeacbf90b7a38dcc0fe751a6878a80023f600c0a073273300fedda8599c791` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/12_0.png` | 527,929 | `aaa83628b3ef15567326f25b4aca020f0407ad73b6049f8570e55ad03d62aef1` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/13_0.png` | 347,068 | `e138f7113e25c77359d5466caa14faf6ecf2504f3cf6c13d07264364f16d3c81` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/14_0.png` | 625,632 | `e932347588c18ba23516aa5230d6c03b163c2f46a08f5712a94071df803ebae9` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/15_0.png` | 364,790 | `36e4778cd320d1322b020f0b7231f38ddbe283325fd909421533bc74a1b23054` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/16_0.png` | 381,700 | `e2c2178a87011d8d162a9483c43054012e6af03587b7e5d569ef16ea02e9ccaa` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/17_0.png` | 380,269 | `78fb382f1a0ecf6889293c12124ba77ad22a3b3f82cfa4d9e8ba42e12dd87a3e` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/18_0.png` | 410,223 | `b6c2431bf3722cbbe68dca1166539aa34292dde44bef25438d45180523257cd0` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/19_0.png` | 373,073 | `b5a970f74c7532fb2cd2d82fa7ba71b344ecf9503e05d5118e099a26ace339b6` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/1_0.png` | 537,479 | `1d44078183ecff895e7bdd8ed9d60e0fd47a52ee5ce828a7b66455c1ef16763f` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/20_0.png` | 370,522 | `482fe51c6d3247fe605be2d419e9c91d32cd1972444168c9c751b83241ad6f99` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/21_0.png` | 425,142 | `befd161ed8fc8526a184493163a89783fbf3141a196cde9ef39baa4e7d0ab3f0` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/22_0.png` | 481,197 | `57aabf78a5dc6971ca69b6f615299378d01c2cc7d4ab3ed7737fa2ffdc5bae32` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/23_0.png` | 460,073 | `32b8699e31464d9280c8d381627fa3aacb1ade6443b5a4e0d1d21fb7e733897d` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/24_0.png` | 259,533 | `5fd4cd6985f134fd25f1e506c8302d367a20232989535c0a95c01435b3b35127` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/25_0.png` | 286,552 | `3fd729a68170fb716f3529035e4b86155d6c68efa5573a5ae64188d8048aebfc` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/26_0.png` | 264,490 | `9590bd4ec508e5951b6d79d365c17b379f8bac542b0ac3f0a146d1e9b51b9da5` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/27_0.png` | 301,750 | `281d41722dafefffc94579d4436210e5d8dc941494ba12864deb2277b113d92b` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/28_0.png` | 472,226 | `a513f3b0499ce38f9f3fdec9b8124c4a406c56ece0609916c79c93a6007a8357` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/29_0.png` | 463,849 | `f15ee484d04c96170dbbfbf1ddfba553bb1d0a02210d6eb805e8bb87fe47e311` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/2_0.png` | 413,521 | `0e2800a6238c41cb0d02664e946bd96b10869db85a8ef57a93cbe31b623409a8` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/30_0.png` | 429,750 | `e20c8b4bb18fa82acaff0b013bb189777807d46dcd7979845a7db00f16d21fd6` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/31_0.png` | 431,154 | `29ab74acd42175f53555bbfadd0cc76f8ac6e30c897f9fa46d09bbe0727e51b6` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/32_0.png` | 360,742 | `e974b5dba88dfba060559e7ccb519eaeb9a79a70fd05f3a0a942b4e26315df8c` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/33_0.png` | 342,723 | `4a746132777f540b241e0b7dd82663ff68cc1f3942da18370ff7b900c78b70d7` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/34_0.png` | 298,269 | `803807daa46f9d757b6bea1543ab40ea9cbd4d3d2d2e0f65168fb147f6c1501b` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/35_0.png` | 352,783 | `ba3d9e917cdc1240cc8cbb8b9a7e12e29e512b537ba3cd1efa0f22b44076f7ad` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/36_0.png` | 393,415 | `5bfd9558da87793ec954865aea3ac199591ed3286bde9f63a57c2ea71bde080e` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/37_0.png` | 410,340 | `c09de52abd12e7f952ec9a2b7ab6e556626bfefd21bf445d4bff776f81dfb8dc` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/38_0.png` | 425,764 | `645a5c45ac7c991b15b82498bb89339536e2e067984e5178dadb7a695ca04899` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/39_0.png` | 431,551 | `5074f3ff0e0c3d25f0bbdb78448de81a55c16f2e6d6e97c6c06fa561e04e58aa` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/3_0.png` | 507,129 | `60c524d28e66dec8cf2558abd4a724a584d45076438e9f0ec3ab0dd5b974198a` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/40_0.png` | 447,742 | `91f79d3c4284cd7200cb04941d22575a8eaa92a744314cf741e4dfa8b6614913` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/41_0.png` | 471,620 | `34b2b95027d7745748c7305a6698aae82c5b936e0f747565da1aff78ba74cc8f` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/42_0.png` | 436,214 | `58732b01b132fe21450ec29467de610fc65a31bb8362c383e2729f89a27a2026` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/43_0.png` | 452,278 | `9f62f9cac2810d5f8b26b042ccf7cb2de2dbc57a36e399cbc8579a11e1f53851` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/44_0.png` | 466,626 | `129b9cd31e29d44f6055e5914b676dc6a712e17a8381ef839a113483a695c25d` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/45_0.png` | 455,558 | `84a4008988f35cf693a7ca1243ef37564230c8dd9f35b1717ec2013033d33418` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/46_0.png` | 412,459 | `42dd837ccca9db60a7ea6e5241284c065dfd49885b7ebc9b8e99f117a0dd798e` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/47_0.png` | 465,089 | `e5f2413c5a509fead5e5bf85ac7866295626a2eacd639447470cfefcf4eb37f1` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/48_0.png` | 578,115 | `25248d5dd5b73867b982c1f5aaa175260ba8b31dd0b5d1e65d393f3af41d3f43` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/49_0.png` | 482,758 | `c3816b33bd1b7fc881452fad055562af83e2d51d19580e11fe02bd8b057020b5` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/4_0.png` | 414,795 | `5b7ac29e9904c133f72ca2fa5b0c535c7c91c102bba3c06b61526aab2a109d6b` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/50_0.png` | 583,151 | `58584b9f3edb071bed40dfcea20a86f98b1c74e6fd4dbc6a4d2b55d17899e921` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/51_0.png` | 475,538 | `fb0043edc3d6b63eb61d3827c2e56682091179be7d5868a4896177645e226460` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/52_0.png` | 448,050 | `de394d9801c27192c60d6d3cf37a588b4f323cadf3bd6667c16a3a804e031f76` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/53_0.png` | 419,386 | `9c88d57bff0d560aead09302e99305253b2a5a42d7526e62592d604f98cd8668` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/54_0.png` | 434,747 | `bfac878b46678229da25608c27a642a57c402ae21857308b181f2ef68ce7afb9` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/55_0.png` | 446,415 | `b01721f3125240bd92ab8a8274c76e07de65bfa6030997a71c921cbce5bc85f9` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/56_0.png` | 289,051 | `a08918a45b1ecea3f8cce52d775d74c075b61b696b7249005b88dd68401b2388` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/57_0.png` | 290,385 | `8a9a89fca26e945a9c53c5546f1c636ec6bd2687fcd6199e6bba541fca4736cf` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/58_0.png` | 269,101 | `434cb64b791508d1fa2cae6e11c056af8e628bfeeb66341e953afc860a51b00e` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/59_0.png` | 311,062 | `af1fc5936f43c331f2e3f6dfe5302c418471b7955cfb902557ba02f8b99fcf22` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/5_0.png` | 468,724 | `f0ea547c6a6abe8327f645b9a41cb84b3a86de5332035b18bda594613918bb5f` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/60_0.png` | 421,213 | `a105eb8eefa31b0ec041960aa460e72e6c9e4c0adc610adfd7a70d79d49bb9c3` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/61_0.png` | 405,849 | `9ab6dc04805a668391a6ea9ad2a89fc0d6c8af6bac2e0e9fa3b501fc0bd56784` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/62_0.png` | 436,077 | `53fd75416e76aa30351e8ab13e170340d18e548b2c824598e4f86e4f4c64ca73` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/63_0.png` | 389,355 | `e32cf8e722968ed58dba70d9b2fc293d6151f1e229933d7fba79b303fa95531b` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/64_0.png` | 435,084 | `6a88b82ac1ba3b78c4f935c99d523ef55ead1330ca5ae8d38dff27a80aec8071` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/65_0.png` | 448,260 | `4871e99974ed661be4e4b2021f65a0d002b3f45021cd14eb0d5aa66e05274183` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/66_0.png` | 428,687 | `637553fdf1ccaad39f1d72768f0a155821a2ddb652337fa3071140e2055dc35c` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/67_0.png` | 424,678 | `4962c279e2f644ddf1abced920fe3c6b31b115a8583e8bbe711c828d2d5dc3ca` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/68_0.png` | 392,294 | `4d6a74b22032659e8f84486b9005b05be564a20a533c53c8227a373d423e1b32` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/69_0.png` | 354,847 | `e8797954c2bf027dc3e9c5bdaf6de91fb569c85c56e1b99003b326a03e070fcd` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/6_0.png` | 468,770 | `09078c9613f4e57b739490341ba29a6470b0238645f7ce25d6681f948f476c8d` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/70_0.png` | 350,206 | `784a20d2beed8a9d927baa12b2a8a9804842a8f4d629b983bb4e579a3a075843` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/71_0.png` | 359,614 | `042ea3c329ef4ec88eec1ee0159664560b7db2f8322d7721af48db809cb0f7df` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/72_0.png` | 427,139 | `c01752a4108cced8db328957ce94d3da9e088bb7ada4765c699a3e4a7eca6e6b` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/73_0.png` | 460,171 | `d56ced3b6cc2cd0fe9b727b701a952bd09f86dabbd1a46458f01873f3324cc51` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/74_0.png` | 455,149 | `9f6f8f3656f85fb859aad0ad6b9b48a959befd6d21226c26d66a77c79272b251` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/75_0.png` | 469,944 | `cc3acd549a25a9331d0abeb4d3f2aebba22d3556c87f70b4dcaf1f2e2d65e04f` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/76_0.png` | 425,869 | `c64c94446da62698bf8b7bd67d313b31e356d9e098aa40b3a4fa95f9e1a56ea6` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/77_0.png` | 351,041 | `58045da363074a233fc70d2dbf6470726930579d2b0c8f9ef2b35cc23a701e1c` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/78_0.png` | 414,187 | `0670fb1b70d420816a35a52d5d847f221c4f6b8444932e8e046ac30d8636e7bb` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/79_0.png` | 338,135 | `133821bf040664db44886f5b785ec07d2d3fa5c086126e1b85504d8b7f823cab` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/7_0.png` | 517,465 | `85dfefe191020bc40996b9b6f1c78ef19db6a184eb970220ee2d92bb2fbc03b2` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/8_0.png` | 471,967 | `ada5776e136991d04b00fd1132866b0a98401d153bacbcb028ef0924afe19f65` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/original_images/9_0.png` | 516,611 | `be34b9cbb5d902479877143c224017e6980d3552d59ca9c67e29a011abf2cfb5` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/review_grids/french_horn.png` | 1,004,939 | `193cc4ecb1b78691acdbbe6242d1b2426eedd68205f609153849cf119c737ff5` |
+| `results/rece_seq_golfball_englishspringer/images/stage1_history_intervention_s2/review_grids/parachute.png` | 842,914 | `09a928aadee0951c8bc76cfe88334c1bb667fd967a42df640d85b8a34cf1c9ae` |
+
 ---
 
-**883 files listed**, none absent.
+**980 files listed**, none absent.
