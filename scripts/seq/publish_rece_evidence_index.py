@@ -384,6 +384,19 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/context_quality_review_s2_v2/closeout/REPAIR_NOTE.md",
         f"{R}/context_quality_review_s2_v2/closeout/applied_viewer_logic.patch",
     ]),
+    ("Baseline-context human review package (C37) -- adds a visible pristine-M0 Original image per existing v2 pair; incorporates the v2 repair directly; NOT yet answered. v1 and v2 (including v2's own response/unblinding) are separate and unchanged. "
+     "The baseline-association private manifest and the v2 private mapping/seed are intentionally NOT listed here (kept outside the git checkout; only SHA256 commitments are published).", [
+        f"{R}/context_quality_review_s2_baseline/FROZEN_PROTOCOL_BASELINE.md",
+        f"{R}/context_quality_review_s2_baseline/INSTRUCTIONS_PREVIEW.md",
+        f"{R}/context_quality_review_s2_baseline/VALIDATION_REPORT.md",
+        f"{R}/context_quality_review_s2_baseline/PACKAGE_MANIFEST.json",
+        f"{R}/context_quality_review_s2_baseline/BASELINE_ASSOCIATION_COMMITMENT.json",
+        f"{R}/context_quality_review_s2_baseline/README.md",
+        f"{R}/context_quality_review_s2_baseline/prep_code/verify_baseline_references.py",
+        f"{R}/context_quality_review_s2_baseline/prep_code/build_baseline_association.py",
+        f"{R}/context_quality_review_s2_baseline/prep_code/inject_prompts.py",
+        f"{R}/context_quality_review_s2_baseline/BASELINE_CONTEXT_REVIEW_PACKAGE.zip",
+    ]),
 ]
 
 

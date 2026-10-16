@@ -1215,6 +1215,47 @@ incompatible import is refused, not silently mishandled. No browser tool
 was available to verify real rendering/interaction — disclosed, not
 assumed, in `VALIDATION_REPORT_V2.md`.
 
+## C37 — Baseline-context human review package published, incorporating the v2 repair (not yet answered)
+
+`context_quality_review_s2_baseline/` (published alongside this entry)
+is a third, separate preparation deliverable — not a revision of v1 or
+v2, both of which (including v2's own `-v2` repair, C36, and v1's
+selected response/unblinding, C33–C34) remain **unchanged**. It adds a
+visible pristine-**M0** image (explicitly confirmed by its own
+`image_report.json` to record no edit checkpoint — not
+`EnglishSpringer_parent`) alongside each of v2's existing 20 A/B pairs,
+reusing those 40 edited images byte-identical (pair order, A/B
+assignment, and v2's private mapping all unchanged — the v2 builder was
+not re-run; the v2 mapping's commitment,
+`bd360bc35c45d5eb68f5ff6e91aedb1db30cd70e10a9b55023bb2d330fbbc529`, was
+independently re-verified unchanged immediately before and after a
+single read-only read). Generation settings (512×512, 50 steps,
+guidance 7.5, float32, `LMSDiscreteScheduler`) were confirmed identical
+across M0 and both edited checkpoints' own `image_report.json` files —
+no material mismatch found or silently worked around. A new, separate
+private baseline-association manifest (not v2's mapping) records which
+Original belongs to which existing pair, with its own public commitment
+(`333e9230740ce9b636bb561e50cdcf9bc7ab81b9f071e0023a6e4f587df74edd`)
+published before any response. The Original's **identity is
+intentionally visible** (explained as a quality reference, not ground
+truth) — this is explicitly disclosed as **partial masking, not full
+blinding**: the 40 edited images were already public, and a visible,
+genuine baseline does not undo that prior exposure. A new question per
+edited image ("compared with the Original, how much visible structural
+deformation?" Less/About the same/More/Unable to compare, required
+reason on More/Unable) is tracked **separately** from the existing
+absolute breakdown/local-defect/style questions and the existing A-vs-B
+comparison — nothing is inferred from, or merged into, anything else.
+The already-reproduced and already-fixed v2 viewer defects
+(`saveReasonAndRefresh`, `restoreExport`) are **incorporated directly**
+into this new package, extended to cover the new relative-deformation
+fields, and independently re-verified with a freshly written regression
+harness (not published; synthetic data only) confirming the same live-
+refresh and import/resume behavior holds for the new fields. No browser
+tool was available to verify real rendering/interaction — disclosed, not
+assumed, in `VALIDATION_REPORT.md`. No response exists for this package;
+no v1 or v2 response was pooled, analyzed, or altered.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by

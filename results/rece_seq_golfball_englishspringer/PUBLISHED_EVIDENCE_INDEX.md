@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `321b83679f2b` — the commit that *records*
+Generated at parent commit `3d008875267b` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -38,7 +38,7 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
 | `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
 | `results/rece_seq_golfball_englishspringer/preservation_content_control/FINAL_REPORT.md` | 14,917 | `370214d3721a10067ffa15ff368e031b778df25ca233914c55e5da1618dba01b` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 76,716 | `124e053b0aac17f2d6356d646868d28ab8469fda6d1c02ca8ca850757d14d2bd` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 79,418 | `c3fcfc08ec9f6b231ca85831dcd55039bd9835b3e19865ecfc52a754b00a2391` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -1312,6 +1312,21 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/closeout/REPAIR_NOTE.md` | 9,703 | `36edc0c3e80734b8fbe582dad9869513e4f6ec4b52b9f840ca61a608c459bf78` |
 | `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/closeout/applied_viewer_logic.patch` | 7,759 | `1486d3aa09f03040ebdc88b366164d7ac39c5731a6be3f80fb275277e6004036` |
 
+## Baseline-context human review package (C37) -- adds a visible pristine-M0 Original image per existing v2 pair; incorporates the v2 repair directly; NOT yet answered. v1 and v2 (including v2's own response/unblinding) are separate and unchanged. The baseline-association private manifest and the v2 private mapping/seed are intentionally NOT listed here (kept outside the git checkout; only SHA256 commitments are published).
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/FROZEN_PROTOCOL_BASELINE.md` | 9,691 | `fbc219902149cb0364de3a1336cff32e787fadfc9f483bced1825644754905e2` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/INSTRUCTIONS_PREVIEW.md` | 5,758 | `2c78ad1abf611f8e839d7417cfe42e99c62ff259e5f261ec46bcd2ef7d54da71` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/VALIDATION_REPORT.md` | 6,537 | `9bc43328e82ff653a0fe314db3940c1cb6fc42b8e4c45cad79c9323d403c6c98` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/PACKAGE_MANIFEST.json` | 7,178 | `47a25f01935e2f27ff9abf5037ceea2613179a724dfc83025dea4cc941afb8ca` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/BASELINE_ASSOCIATION_COMMITMENT.json` | 671 | `c3eaaa1a95507a1aa4672aeaea9714637939a0b17951a8e662a17b7a2107ba73` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/README.md` | 4,613 | `22a71e8aa4bfae712075f345ee8d3ee310bcec2bb5706ae49163d2228718bcf0` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/prep_code/verify_baseline_references.py` | 5,437 | `7f6e1d68afe4f0fee22cbd075e957123bdb8e9ea5297ee67fa9bfb26e40583db` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/prep_code/build_baseline_association.py` | 6,755 | `cfa4e685ec87ab250155e1903593e42745e7cb85d0a91606e6f46823300bf207` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/prep_code/inject_prompts.py` | 1,751 | `974db83cdfac2368b10aa5641dc2270d822a0c7a939cd082655f722c12ac9b77` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_baseline/BASELINE_CONTEXT_REVIEW_PACKAGE.zip` | 24,448,438 | `fc087488916e82d61370817e5a25a3995fae67878ebb59537de81e66950b7b73` |
+
 ---
 
-**1107 files listed**, none absent.
+**1117 files listed**, none absent.
