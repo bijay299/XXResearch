@@ -1,10 +1,11 @@
 {
- "package_version": "context_quality_review_s2_v2-v1",
- "protocol_version": "FROZEN_PROTOCOL_V2-v1",
- "built_at_unix": 1792164318.4066308,
+ "package_version": "context_quality_review_s2_v2-v2",
+ "protocol_version": "FROZEN_PROTOCOL_V2-v2",
+ "built_at_unix": 1792166150.0208101,
+ "repairs_previous_revision": "context_quality_review_s2_v2-v1 (same commit history, see closeout/REPAIR_NOTE.md)",
  "zip_filename": "CONTEXT_REVIEW_PACKAGE_V2.zip",
- "zip_sha256": "e9c9906a8b5633aafc5e718b727e8d493d65d83b7660b6251464c512acc66953",
- "zip_bytes": 16509896,
+ "zip_sha256": "b73caf1310d4e9533b5660341e7d46a5b7a8cff2790e4b1d367bcb262b14227d",
+ "zip_bytes": 16510713,
  "n_pairs": 20,
  "n_images": 40,
  "a_position_balance": {
@@ -12,8 +13,9 @@
   "S2_HISTORY_BOTH_STAGES": 10
  },
  "source_panel_sha256": "cfb0f264b76620f47c292752515d545cb9ff058616b0c53d5c688753d628b8e2",
- "reuses_same_source_images_as": "blinded_quality_review_s2 (v1) -- same 40 original PNGs, byte-identical",
- "new_in_v2": [
+ "reuses_same_source_images_as": "blinded_quality_review_s2 (v1) -- same 40 original PNGs, byte-identical, UNCHANGED by this repair",
+ "mapping_commitment_unchanged": "bd360bc35c45d5eb68f5ff6e91aedb1db30cd70e10a9b55023bb2d330fbbc529 (same as -v1; private mapping/randomization untouched by this repair)",
+ "new_in_v2_v1": [
   "exact shared generation prompt shown per pair",
   "widespread-breakdown reason field (required on yes/unable)",
   "optional style-mismatch field",
@@ -21,8 +23,13 @@
   "new R01-R20 neutral IDs",
   "new independent randomization"
  ],
+ "new_in_v2_v2_repair": [
+  "reason input now triggers immediate re-render (completion gating, progress, paired-question visibility)",
+  "import now reconstructs internal state via a validating restoreExport() function instead of direct assignment",
+  "instruction wording clarifications (subject-mismatch claim removed, local-defect co-occurrence clarified, example-consistency statement corrected, 40-images-in-20-pairs wording)"
+ ],
  "zip_contents": {
-  "index.html": "6580cfcc95147d5bb0749098eb827c67bd5d5772bdbaffea0baa594f883431f3",
+  "index.html": "98897ba185d6f22d783410440204f8a66cfd880d56c496dbfa0945292f5d1fb0",
   "images": {
    "R01_A.png": "9f6f8f3656f85fb859aad0ad6b9b48a959befd6d21226c26d66a77c79272b251",
    "R01_B.png": "cc2f9ca1f06880e035339ce753d1dcdf61e1e6c69ca2398d751de44739fd2bf1",

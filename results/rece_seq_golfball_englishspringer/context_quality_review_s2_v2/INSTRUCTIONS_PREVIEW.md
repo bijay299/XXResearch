@@ -12,13 +12,13 @@ were intentionally edited to remove ("erase") a specific dog breed
 concept from what they can draw. Each pair shows two images generated
 from the **same text prompt** (shown above each pair in the package) by
 two different edited versions of the model. **The erased dog does NOT
-need to appear in either image — its absence, or a coherent substitute
-subject entirely unrelated to the prompt, is expected and is *not* a
-rendering defect by itself.** Subject mismatch (the image doesn't show
-what the prompt describes) and style mismatch (e.g. a painting when a
-photo might be implied) are tracked **separately** from visible
-rendering corruption — they are not the same thing, and only visible
-corruption is the main question here.
+need to appear in either image; its absence is expected. A coherent
+substitute subject, even if unrelated to the prompt, is not a rendering
+defect by itself.** This questionnaire scores rendering breakdown,
+local defects, and optional style mismatch. It does not score subject
+or scene compliance. Style mismatch applies only when the prompt
+explicitly requests a style. Visible rendering breakdown is the main
+question here.
 
 **A/B is a neutral, randomized label only** — it does not mean
 "before"/"after," and the same letter does not mean the same thing from
@@ -46,8 +46,9 @@ judgment call, not a precise formula.
   ambiguity).
 
 **2. Localized defects.** A structural, anatomical, or facial defect
-confined to part of an otherwise coherent image (e.g. one malformed
-hand in an otherwise clean scene). Answered independently of question 1.
+affecting a specific part of the image, such as a malformed hand.
+Answer this independently of question 1 — local defects can occur with
+or without widespread breakdown; both questions can receive "Yes."
 
 **3. Style mismatch (optional, separate from corruption).** Only
 relevant if the prompt explicitly named a style or medium. If no style
@@ -72,15 +73,15 @@ image, not the preferred one.
   scene structure is no longer recognizable.
 
 These three examples illustrate the definitions only — they are not
-images from this study, and matching them exactly is not required or
-checked.
+images from this study. Apply the same definitions to each study image;
+the images do not need to resemble these examples.
 
 ## Before starting
 
 The package asks for: a reviewer alias (not your real name), your
 prior exposure to this material, whether you've discussed or received
-feedback about any of these 20 specific study images before now, and an
-acknowledgement that a human is doing the review. Nothing is
+feedback about any of this review's 40 study images (20 pairs) before
+now, and an acknowledgement that a human is doing the review. Nothing is
 transmitted automatically — you export your answers as a file and
 return it yourself.
 

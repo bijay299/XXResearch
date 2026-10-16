@@ -1,0 +1,142 @@
+--- reviewer_package/index.html
++++ reviewer_package/index.html
+@@ -166,12 +166,12 @@
+       were intentionally edited to remove ("erase") a specific dog breed concept from what
+       they can draw. Each pair below shows two images generated from the <strong>same text
+       prompt</strong> (shown above each pair) by two different edited versions of the model.
+-      <strong>The erased dog does NOT need to appear in either image — its absence, or a
+-      coherent substitute subject entirely unrelated to the prompt, is expected and is
+-      <em>not</em> a rendering defect by itself.</strong> Subject mismatch (the image doesn't
+-      show what the prompt describes) and style mismatch (e.g. a painting when a photo might
+-      be implied) are tracked <strong>separately</strong> from visible rendering corruption —
+-      they are not the same thing, and only visible corruption is the main question here.</p>
++      <strong>The erased dog does NOT need to appear in either image; its absence is
++      expected. A coherent substitute subject, even if unrelated to the prompt, is not
++      a rendering defect by itself.</strong> This questionnaire scores rendering breakdown,
++      local defects, and optional style mismatch. It does not score subject or scene
++      compliance. Style mismatch applies only when the prompt explicitly requests a style.
++      Visible rendering breakdown is the main question here.</p>
+ 
+       <p><strong>A/B is a neutral, randomized label only</strong> — it does not mean
+       "before"/"after," and the same letter does not mean the same thing from one pair to the
+@@ -197,10 +197,10 @@
+         judge."</strong></li>
+       </ul>
+       <h3>2. Localized defects</h3>
+-      <p>A structural, anatomical, or facial defect confined to <strong>part</strong> of an
+-      otherwise coherent image (e.g. one malformed hand in an otherwise clean scene). This is
+-      answered <strong>independently</strong> of question 1 — an image can have a local defect
+-      without widespread breakdown, or vice versa.</p>
++      <p>A structural, anatomical, or facial defect affecting a specific
++      <strong>part</strong> of the image, such as a malformed hand. Answer this
++      <strong>independently</strong> of question 1. Local defects can occur with or without
++      widespread breakdown; both questions can receive Yes.</p>
+       <h3>3. Style mismatch (optional, separate from corruption)</h3>
+       <p>Only relevant if the prompt explicitly named a style or medium (e.g. "a photo of...").
+       If no style was specified, choose "Style not specified." This is never combined with the
+@@ -224,8 +224,8 @@
+         the frame, so the underlying scene structure is no longer recognizable.
+       </div>
+       <p class="muted">These three examples illustrate the definitions only — they are not
+-      images from this study, and answering consistently with them is not required or
+-      checked.</p>
++      images from this study. Apply the same definitions to each study image; the
++      images do not need to resemble these examples.</p>
+     </div>
+ 
+     <div class="panel">
+@@ -244,7 +244,7 @@
+         </div>
+       </div>
+       <div class="field">
+-        <label class="block">Have you discussed, or received feedback about, any of THIS review's specific 20 study images before now?</label>
++        <label class="block">Have you discussed, or received feedback about, any of THIS review's 40 study images (20 pairs) before now?</label>
+         <div class="choice-group" id="casefeedback-group">
+           ${CASE_SPECIFIC_FEEDBACK_OPTIONS.map(([v,l]) => `
+             <label class="${state.reviewer.caseSpecificFeedback===v?'selected':''}">
+@@ -319,7 +319,7 @@
+           alert("This export is from a different package version and cannot be imported here.");
+           return;
+         }
+-        state = imported;
++        state = restoreExport(imported);
+         saveState();
+         render();
+       } catch (err) {
+@@ -330,6 +330,64 @@
+   });
+ 
+   refreshBegin();
++}
++
++
++// Export files contain response rows; live UI state uses a neutral-ID map.
++function restoreExport(payload) {
++  if (payload.packageVersion !== PACKAGE_VERSION || payload.protocolVersion !== PROTOCOL_VERSION)
++    throw new Error("Wrong package or protocol version");
++  if (!Array.isArray(payload.responses) || payload.responses.length !== PAIRS.length)
++    throw new Error("Expected one response row per pair");
++  const next = freshState();
++  const expected = new Set(PAIRS.map(p => p.id));
++  const seen = new Set();
++  for (const row of payload.responses) {
++    if (!expected.has(row.neutral_id) || seen.has(row.neutral_id))
++      throw new Error("Missing, unknown, or duplicate neutral ID");
++    seen.add(row.neutral_id);
++    const target = next.responses[row.neutral_id];
++    for (const field of Object.keys(target)) {
++      if (typeof row[field] !== "string") throw new Error("Invalid answer field");
++      let allowed = null;
++      if (field.endsWith("_breakdown") || field.endsWith("_local_defects")) allowed = ["", ...YNU.map(x => x[0])];
++      else if (field.endsWith("_style_mismatch")) allowed = ["", ...STYLE_YNU.map(x => x[0])];
++      else if (field === "pair_preference") allowed = ["", ...PAIR_PREF.map(x => x[0])];
++      if (allowed && !allowed.includes(row[field])) throw new Error("Invalid answer value");
++      target[field] = row[field];
++    }
++  }
++  const reviewer = payload.reviewer;
++  if (!reviewer || typeof reviewer.alias !== "string" || typeof reviewer.ack !== "boolean" ||
++      !["", ...EXPOSURE_OPTIONS.map(x => x[0])].includes(reviewer.exposure) ||
++      !["", ...CASE_SPECIFIC_FEEDBACK_OPTIONS.map(x => x[0])].includes(reviewer.caseSpecificFeedback))
++    throw new Error("Invalid reviewer fields");
++  next.reviewer = { alias: reviewer.alias, exposure: reviewer.exposure,
++    caseSpecificFeedback: reviewer.caseSpecificFeedback, ack: reviewer.ack };
++  for (const key of ["startedAt", "exportedAt"]) {
++    if (payload[key] !== null && typeof payload[key] !== "string") throw new Error("Invalid timestamp");
++    next[key] = payload[key];
++  }
++  // Return to reviewer info; the normal Begin action resumes at a defined pair.
++  next.currentIndex = 0;
++  next.setupComplete = false;
++  return next;
++}
++
++function saveReasonAndRefresh(pairId, field, element) {
++  const id = element.id;
++  const start = element.selectionStart;
++  const end = element.selectionEnd;
++  const x = window.scrollX, y = window.scrollY;
++  state.responses[pairId][field] = element.value;
++  saveState();
++  render();
++  const replacement = document.getElementById(id);
++  if (replacement) {
++    replacement.focus({ preventScroll: true });
++    if (typeof start === "number" && typeof end === "number") replacement.setSelectionRange(start, end);
++  }
++  window.scrollTo(x, y);
+ }
+ 
+ function pairCompleteCount() {
+@@ -461,9 +519,9 @@
+   });
+ 
+   const reasonA = document.getElementById("reason-a-box");
+-  if (reasonA) reasonA.addEventListener("input", () => { state.responses[pair.id].a_widespread_reason = reasonA.value; saveState(); });
++  if (reasonA) reasonA.addEventListener("input", () => saveReasonAndRefresh(pair.id, "a_widespread_reason", reasonA));
+   const reasonB = document.getElementById("reason-b-box");
+-  if (reasonB) reasonB.addEventListener("input", () => { state.responses[pair.id].b_widespread_reason = reasonB.value; saveState(); });
++  if (reasonB) reasonB.addEventListener("input", () => saveReasonAndRefresh(pair.id, "b_widespread_reason", reasonB));
+   const commentBox = document.getElementById("comment-box");
+   if (commentBox) commentBox.addEventListener("input", () => { state.responses[pair.id].comment = commentBox.value; saveState(); });
+ 

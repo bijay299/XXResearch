@@ -1174,6 +1174,47 @@ specifically to "the addition of context" without further evidence —
 v2 is a second development evaluation on the same already-inspected
 panel, not an independent replication.
 
+## C36 — v2 viewer repair: two interaction/resume defects fixed, wording clarified, before any response collected
+
+`context_quality_review_s2_v2/closeout/REPAIR_NOTE.md` (published
+alongside this entry) is a **software/documentation repair**, not a new
+research package — no model, prompt, image, pair, A/B assignment, or
+qualitative criterion changed, and no response is known to exist for
+either revision. An external review independently verified the
+published `-v1` package (hashes, image multiset, prompt multiset, v1
+subtree untouched) and reported two reproducible defects, which were
+independently re-reproduced here before fixing: (1) the reason-entry
+textareas updated state but never re-rendered, so the paired-comparison
+question and progress/export controls could stay stale until the
+reviewer navigated away and back; (2) importing a real exported response
+crashed on Begin (`TypeError: Cannot read properties of undefined
+(reading 'id')`) because the import handler assigned the export's array
+shape directly to UI state instead of reconstructing it. Both are fixed
+— a `saveReasonAndRefresh()` handler re-renders immediately with focus/
+caret/scroll preserved; a validating `restoreExport()` function rebuilds
+state from a fresh default, rejecting version/ID/value mismatches rather
+than silently completing or crashing. **Independently re-verified here**
+with a freshly written regression harness run against both the pre- and
+post-repair files side by side (not the external review's own harness),
+confirming the exact reported crash reproduces on `-v1` and is absent on
+`-v2`, and that no human judgment is inferred or altered by either fix.
+Several instruction-wording points are also corrected (a nonexistent
+"subject mismatch" field claim removed; local defects clarified as
+independent of, and compatible with, widespread breakdown; "40 images in
+20 pairs" phrasing corrected throughout; the paired-question "unlock"
+condition in the protocol corrected to the actual mandatory-field gate).
+A prior validation claim that "a re-imported export round-trips without
+data loss" is corrected — it tested JSON serialization fidelity only,
+never the actual (broken) import handler. **Unchanged, re-verified**:
+all 40 source images, the v2 private mapping and its seed (not
+regenerated), the published mapping commitment
+`bd360bc35c45d5eb68f5ff6e91aedb1db30cd70e10a9b55023bb2d330fbbc529`, and
+v1's own subtree and verified unblinding result. Package/protocol
+version and the localStorage key are incremented (`-v1` → `-v2`) so an
+incompatible import is refused, not silently mishandled. No browser tool
+was available to verify real rendering/interaction — disclosed, not
+assumed, in `VALIDATION_REPORT_V2.md`.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by

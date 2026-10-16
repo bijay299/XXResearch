@@ -91,16 +91,33 @@ that exist only in `/data/bijaypandey/claude_tmp/scratch_check/` and are
   `caseSpecificFeedback`) — **human fields start empty.**
 - **New v2-specific logic verified**: a "yes" or "unable" widespread-
   breakdown answer without an accompanying reason is correctly treated
-  as an **incomplete** pair (`isPairComplete` and
-  `isIndividualPhaseComplete` both return false); once the reason is
-  supplied, the same pair is correctly treated as complete.
+  as an **incomplete** pair by `isPairComplete`/`isIndividualPhaseComplete`
+  as standalone functions, and once the reason is supplied in `state`
+  directly, the same predicates correctly return complete.
+  **Correction**: this check exercised the predicates in isolation, not
+  the actual `reason-a-box`/`reason-b-box` `input` event handlers — the
+  real handlers updated `state` but never called `render()`, so the
+  page did not visibly unlock the paired question until the reviewer
+  navigated away and back. The predicates being correct did not catch
+  this, because the defect was in the handler wiring, not the
+  completion logic. See `closeout/REPAIR_NOTE.md` for the handler-level
+  fix and verification.
 - The export payload contains all required fields and correctly
   reports `isComplete: false` for an incomplete synthetic draft; the
   required reason text is present in the export for a "yes" answer.
 - An explicit answer and a genuinely missing one remain distinguishable
   in the export.
-- A re-imported export round-trips without data loss; the package-
-  version check that gates import would reject a mismatched version.
+- **Correction (see the repair section below)**: this section originally
+  claimed "a re-imported export round-trips without data loss." That
+  claim tested only `JSON.parse(JSON.stringify(payload))` — plain data
+  serialization fidelity — never the app's actual `import-file` change
+  handler. The real handler (`state = imported;`) was broken and did
+  not round-trip; clicking Begin after importing a real export threw
+  `TypeError: Cannot read properties of undefined (reading 'id')`. This
+  was not caught because the original check exercised a standalone
+  reimplementation of round-tripping, not the shipped handler. See
+  `closeout/REPAIR_NOTE.md` for the defect, the fix, and the corrected,
+  handler-level verification that replaces this claim.
 
 ## 7. Zip deliverable check
 

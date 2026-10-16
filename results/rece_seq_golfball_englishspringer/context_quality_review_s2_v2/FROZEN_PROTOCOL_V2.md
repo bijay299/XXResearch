@@ -1,13 +1,24 @@
 # Context-aware human quality review, v2 — frozen protocol
 
-**Package version**: `context_quality_review_s2_v2-v1`
-**Protocol version**: `FROZEN_PROTOCOL_V2-v1`
+**Package version**: `context_quality_review_s2_v2-v2`
+**Protocol version**: `FROZEN_PROTOCOL_V2-v2`
 **Frozen**: 2026-10-16, before any v2 response is collected.
 **Replaces**: the proposal to reuse the unchanged v1 questionnaire for a
 second review round. v1 itself, its selected published response, and
 its verified unblinding result (`blinded_quality_review_s2/`) are
 **unchanged and preserved** — this is a new, separate package, not a
 revision of v1.
+
+> **Repair note (`-v2`, 2026-10-16).** This revision fixes two
+> interaction/resume software defects found in the first published v2
+> package (`-v1`) and clarifies several instruction-wording points — it
+> does **not** change the underlying qualitative criterion, model
+> endpoints, prompts, image pixels, pair membership, pair order, A/B
+> assignment, or any success threshold, and it is not a new research
+> experiment. See `closeout/REPAIR_NOTE.md` for the full list of fixes
+> and verification. No `-v1` response is known to exist; `-v1` and
+> `-v2` are **not** interchangeable — the viewer rejects an import whose
+> `packageVersion`/`protocolVersion` do not match exactly.
 
 ## Why a v2 package
 
@@ -55,10 +66,12 @@ reference image is included — intentionally, so the task cannot become
 > from what they can draw. Each pair shows two images generated from
 > the **same text prompt** (shown above the pair) by two different
 > edited versions of the model. **The erased dog does NOT need to
-> appear in either image — its absence, or a coherent substitute
-> subject entirely unrelated to the prompt, is expected and is *not* a
-> rendering defect by itself.** Subject mismatch and style mismatch are
-> tracked **separately** from visible rendering corruption.
+> appear in either image; its absence is expected. A coherent
+> substitute subject, even if unrelated to the prompt, is not a
+> rendering defect by itself.** This questionnaire scores rendering
+> breakdown, local defects, and optional style mismatch. It does not
+> score subject or scene compliance. Style mismatch applies only when
+> the prompt explicitly requests a style.
 >
 > **A/B is a neutral, randomized label only** — it does not mean
 > "before"/"after," and the same letter does not mean the same thing
@@ -84,8 +97,10 @@ Explicitly **not** automatically a breakdown:
 
 Explicitly recorded **separately**, never combined into the corruption
 judgment:
-- Localized structural/anatomical/facial defects (independent yes/no/
-  unable-to-judge, not implied by or implying the whole-frame answer).
+- Localized structural/anatomical/facial defects, affecting a specific
+  part of the image (independent yes/no/unable-to-judge; local defects
+  can occur with or without widespread breakdown, and both questions
+  can receive "yes").
 - Style mismatch — only meaningful if the prompt names a style; answered
   "style not specified" otherwise. Optional, and never merged into the
   severity score.
@@ -101,7 +116,10 @@ judgment:
 4. Image A — style mismatch (optional): yes / no / unable to judge /
    style not specified
 5–8. The same four questions for Image B
-9. *(revealed only once 1–8 are answered)* Which image has **more**
+9. *(revealed once every **mandatory** field above is answered — the
+   two breakdown questions, the two local-defects questions, and each
+   reason field whenever it applies — not the optional style fields and
+   not a reason field that isn't applicable)* Which image has **more**
    widespread rendering breakdown? A / B / no clear difference / unable
    to judge — **the selected letter is the worse image, not a
    preference**
@@ -139,8 +157,8 @@ measurement reliability, and no claim to that effect is made.
 - **Prior exposure to this material**: none / read summaries or labels /
   previously inspected these specific images / uncertain.
 - **Case-specific feedback disclosure (new in v2)**: has the reviewer
-  discussed or received feedback about any of *these exact 20 study
-  images* before this review? none / yes / uncertain. This targets
+  discussed or received feedback about any of *this review's 40 study
+  images (20 pairs)* before this review? none / yes / uncertain. This targets
   exactly the kind of exposure the v1 reviewer disclosed for image Q10
   (C34).
 - **Acknowledgement**: a checkbox confirming a human is performing the

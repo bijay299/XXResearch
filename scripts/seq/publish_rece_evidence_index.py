@@ -380,6 +380,10 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/context_quality_review_s2_v2/prep_code/inject_prompts.py",
         f"{R}/context_quality_review_s2_v2/CONTEXT_REVIEW_PACKAGE_V2.zip",
     ]),
+    ("v2 viewer repair (C36) -- two interaction/resume defects fixed, wording clarified, independently re-verified. Software/documentation fix, not a new package design; mapping/commitment/images/v1 unchanged.", [
+        f"{R}/context_quality_review_s2_v2/closeout/REPAIR_NOTE.md",
+        f"{R}/context_quality_review_s2_v2/closeout/applied_viewer_logic.patch",
+    ]),
 ]
 
 

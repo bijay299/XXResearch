@@ -3,6 +3,16 @@
 **Status: preparation deliverable, ready for the user to inspect — not
 a scientific result, and no review has been collected yet.**
 
+**Package revision `-v2`** (current). This revision repairs two
+interaction/resume software defects found in the first published
+revision (`-v1`) — a reason entry not refreshing the UI, and imported
+exports crashing on Begin — and clarifies several instruction-wording
+points. It is a software/documentation fix, not a new research
+experiment: no model, prompt, image, pair, A/B assignment, or
+qualitative criterion changed. See `closeout/REPAIR_NOTE.md` for the
+full before/after verification. No response exists for either
+revision.
+
 ## What this is
 
 A second, separate human-review package for the same 20 matched
@@ -27,7 +37,7 @@ replacement or correction of v1's data.
 2. Extract it.
 3. Open `index.html` — no server, login, or installation required.
 4. Have one reviewer (preferably someone unfamiliar with this project's
-   prior claims, and not separately coached on any of these 20 specific
+   prior claims, and not separately coached on any of this review's 40
    images beforehand) go through all 20 pairs.
 5. Export the responses (JSON) and return the file.
 
@@ -43,7 +53,7 @@ replacement or correction of v1's data.
 - A new, optional style-mismatch field, tracked separately from
   corruption.
 - A new provenance question asks directly whether the reviewer has
-  discussed or received feedback about any of these 20 specific images
+  discussed or received feedback about any of this review's 40 images (20 pairs)
   before — the exact gap disclosed in v1's C34 report.
 - New randomization: neutral IDs `R01`–`R20` (not v1's `Q01`–`Q20`), a
   fresh independent seed, verified not to touch v1's mapping.

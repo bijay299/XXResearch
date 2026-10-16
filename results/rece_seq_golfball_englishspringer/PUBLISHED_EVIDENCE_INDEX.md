@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `65ef74777b5a` — the commit that *records*
+Generated at parent commit `321b83679f2b` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -38,7 +38,7 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
 | `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
 | `results/rece_seq_golfball_englishspringer/preservation_content_control/FINAL_REPORT.md` | 14,917 | `370214d3721a10067ffa15ff368e031b778df25ca233914c55e5da1618dba01b` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 73,979 | `f0909d840d330752f74c7674880487bfc6a6ab0bfbc28c2b32eaa8d25366f1f6` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 76,716 | `124e053b0aac17f2d6356d646868d28ab8469fda6d1c02ca8ca850757d14d2bd` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -1294,17 +1294,24 @@ LAST, after every other file in this result set is final.
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/FROZEN_PROTOCOL_V2.md` | 10,312 | `d51aedd1330cfa6422a64015f05577637064d71ca3572c06bd22e54e4a732ae8` |
-| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/INSTRUCTIONS_PREVIEW.md` | 4,255 | `e585f093c61896fab153df3f768152feaa8ed4f61f064965576caaecff0e48b7` |
-| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/VALIDATION_REPORT_V2.md` | 6,530 | `8b6f060547ddcc952467b216355ed2534fb4294547122f6e71782408f4091f1b` |
-| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/PACKAGE_MANIFEST_V2.json` | 4,383 | `a07002f211564ea213bc94e86a0903ad1c02db591f6f0224237eab14a59e2d63` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/FROZEN_PROTOCOL_V2.md` | 11,422 | `a63808a169d5804a3e2bba8f1a35af9a623a3bd85a65ccb0d4875e071e91cff1` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/INSTRUCTIONS_PREVIEW.md` | 4,345 | `843b33b0040d7917c09b83e3e4daa5dc3f95b27f4bd53d74962f9ccf439cba46` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/VALIDATION_REPORT_V2.md` | 7,690 | `24aa62321eccd82f84d686f4c50d14f2c6d6d8151464f895092912c31fe6ebe5` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/PACKAGE_MANIFEST_V2.json` | 5,135 | `aa838f1a76e0cde5543eedc9d642f6ce34b9b83dc263f3416553a7f9693c13a4` |
 | `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/MAPPING_COMMITMENT_V2.json` | 691 | `7b26efb03a2c9ecb2c2ec9410d57d5e761af4f2cdb9efc783bf4e0454884978a` |
-| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/README_V2.md` | 3,905 | `02d82e541d9b9e7efb583e281bf6f95e0ca04619fa2cf8475f9a5fc3813f1608` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/README_V2.md` | 4,454 | `54b25b2406c2fd5ae90163114361006f9972e7e62a7218a7c8416828dd48c86f` |
 | `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/prep_code/verify_source_and_extract_prompts.py` | 6,116 | `a7c05aa742ac23ef8255bd38e5b1c27cf45da28ec1c9b66e4917641812a459ae` |
 | `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/prep_code/build_v2_reviewer_package.py` | 7,082 | `51a955ed8c19f2042b3e1df52ffd5d97aa3c41843293eacae380a3c70760b1b8` |
 | `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/prep_code/inject_prompts.py` | 2,027 | `0a01b3193a9f88454ee584c384810f1ad8828690d33c7f89f041252969637e15` |
-| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/CONTEXT_REVIEW_PACKAGE_V2.zip` | 16,509,896 | `e9c9906a8b5633aafc5e718b727e8d493d65d83b7660b6251464c512acc66953` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/CONTEXT_REVIEW_PACKAGE_V2.zip` | 16,510,713 | `b73caf1310d4e9533b5660341e7d46a5b7a8cff2790e4b1d367bcb262b14227d` |
+
+## v2 viewer repair (C36) -- two interaction/resume defects fixed, wording clarified, independently re-verified. Software/documentation fix, not a new package design; mapping/commitment/images/v1 unchanged.
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/closeout/REPAIR_NOTE.md` | 9,703 | `36edc0c3e80734b8fbe582dad9869513e4f6ec4b52b9f840ca61a608c459bf78` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/closeout/applied_viewer_logic.patch` | 7,759 | `1486d3aa09f03040ebdc88b366164d7ac39c5731a6be3f80fb275277e6004036` |
 
 ---
 
-**1105 files listed**, none absent.
+**1107 files listed**, none absent.
