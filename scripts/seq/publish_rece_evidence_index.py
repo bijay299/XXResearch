@@ -354,6 +354,18 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/blinded_quality_review_s2/prep_code/verify_source_images.py",
         f"{R}/blinded_quality_review_s2/BLINDED_REVIEW_PACKAGE.zip",
     ]),
+    ("Unblinded human review response (C34) — preserved selected response, receipt, mapping verification, unblinded mapping/joined table, case-level agreement with assistant labels, and the final human review report. "
+     "An earlier survey submission was explicitly withdrawn by the user and is intentionally NOT listed or published here.", [
+        f"{R}/blinded_quality_review_s2/responses/review_export_final_2026-10-16T14-06-23-096Z.json",
+        f"{R}/blinded_quality_review_s2/responses/RESPONSE_RECEIPT.json",
+        f"{R}/blinded_quality_review_s2/closeout/UNBLINDING_VERIFICATION.json",
+        f"{R}/blinded_quality_review_s2/closeout/UNBLINDED_MAPPING.json",
+        f"{R}/blinded_quality_review_s2/closeout/UNBLINDED_JOINED_TABLE.json",
+        f"{R}/blinded_quality_review_s2/closeout/CASE_LEVEL_AGREEMENT_TABLE.json",
+        f"{R}/blinded_quality_review_s2/closeout/unblind_and_analyze.py",
+        f"{R}/blinded_quality_review_s2/closeout/compare_with_assistant_labels.py",
+        f"{R}/blinded_quality_review_s2/closeout/HUMAN_REVIEW_REPORT.md",
+    ]),
 ]
 
 

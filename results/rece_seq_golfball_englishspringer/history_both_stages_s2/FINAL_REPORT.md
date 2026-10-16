@@ -19,9 +19,13 @@ not a new method, not a claim about unmodified upstream RECE.
 `S2_Stage1`'s own 1/20 false-positive) and visually near-complete (0
 confirmed, 2 ambiguous). English springer stays correctly erased (0/20
 throughout, as desired — this is not a failure). French horn recognition
-is tied for best among every S2 checkpoint tested (14/20), and parachute
-improves over the refinement-only `S2_HISTORY` comparator (13/20 vs.
-9/20). But **springer degeneration on historical-class prompts rises
+is tied for best among every S2 checkpoint tested (14/20, vs. the
+refinement-only `S2_HISTORY`'s 9/20), and parachute improves over that
+same refinement-only `S2_HISTORY` comparator (13/20 vs. 11/20 —
+corrected from an originally mis-cited 9/20, which is French horn's
+figure, not parachute's; see
+`blinded_quality_review_s2/closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md`).
+But **springer degeneration on historical-class prompts rises
 from 2/20 (corrected `S2_STAGE1_HISTORY`) to 6/20** — the full pipeline
 does not simply inherit Stage-1's quality gain unchanged; refinement
 reintroduces some corruption, concentrated in 3 of 5 scenes and 5 of 6
@@ -211,12 +215,22 @@ blocky glitch artifact on one child's face; see object-absence below).
 Paired against `S2_STAGE1_HISTORY`'s own 0/40: **0/40 → 0/40, no change,
 no new degeneration from refinement.**
 
-**Object presence, individually verified (not grid-inferred)**:
+**Object presence**: fully individually verified for `S2_HISTORY_BOTH_STAGES`
+(all 40 retained-class cases, this endpoint's own review, §4 below). For
+`S2_STAGE1_HISTORY`, **not** fully individually verified — only cases 32
+and 54 were individually reinspected and corrected (C31); the other 38
+retained-class cases rely on grid-level coherence review only, not
+per-image object-presence verification. The matching "19/20" and
+"16/2/2" totals shown below for `S2_STAGE1_HISTORY` are therefore an
+assumption of consistency with `S2_HISTORY_BOTH_STAGES`'s fully-verified
+numbers, not an independently verified count — see
+`blinded_quality_review_s2/closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md`
+item 6.
 
 | | French horn present | parachute present (confirmed/ambiguous/absent) |
 |---|---:|---|
-| S2_STAGE1_HISTORY (grid-level, 2 cases individually corrected) | 19/20 | 16 / 2 / 2 |
-| **S2_HISTORY_BOTH_STAGES** | **19/20** | **16 / 2 / 2** |
+| S2_STAGE1_HISTORY (2/20 cases individually verified; 18/20 grid-level only) | 19/20 (not fully verified) | 16 / 2 / 2 (not fully verified) |
+| **S2_HISTORY_BOTH_STAGES** (all 20/20 individually verified) | **19/20** | **16 / 2 / 2** |
 
 French horn absent only at case 54 (persists from `S2_STAGE1_HISTORY`,
 same classroom scene, same local glitch — an inherited, not newly

@@ -99,14 +99,18 @@ historical degeneration, i.e. **10/10 per seed and 4/4 per scene** in
 every one of those three checkpoints. These are **saturated binary
 counts** (every case degenerate) and carry no information that could
 distinguish a seed effect, a scene effect, or any other mechanism — they
-are consistent with literally any explanation, including none. The
-6/20 pattern newly observed in `S2_HISTORY_BOTH_STAGES` is the first
-*non-saturated* count in this comparison and is observational only (6
-cases, from one checkpoint, on one reused panel); it does not by itself
-establish a seed-driven mechanism, and no claim to that effect is made
-or should be inferred. This item does not reopen or repeat that seed
-diagnostic — it clarifies what the already-published, already-closed
-counts can and cannot show.
+are consistent with literally any explanation, including none.
+**Corrected**: the 6/20 `S2_HISTORY_BOTH_STAGES` pattern is not the
+*first* non-saturated count in this comparison — `S2_STAGE1_HISTORY`'s
+own corrected 2/20 (C31: cases 77, 79) was already non-saturated, and
+precedes it. Both non-saturated counts are observational only (2 and 6
+cases respectively, from two checkpoints, on one reused panel); neither
+by itself establishes a seed-driven or any other mechanism, and no such
+claim is made or should be inferred. This item does not reopen or
+repeat the seed diagnostic — it clarifies what the already-published,
+already-closed saturated counts (`S2_Stage1`/`S2_BLANK`/`S2_HISTORY`)
+can and cannot show, and corrects an overclaim about which count was
+first non-saturated.
 
 ## What this does not do
 

@@ -1,0 +1,116 @@
+{
+ "steps": {
+  "1_mapping_hash_verification": {
+   "required": "bbf8a9eb8b6459bdb2e4ff33ed8638c5708fe4ecb10e58c09a02ecbdcb47689a",
+   "actual": "bbf8a9eb8b6459bdb2e4ff33ed8638c5708fe4ecb10e58c09a02ecbdcb47689a",
+   "match": true
+  },
+  "2_mapping_structure": {
+   "n_pairs": 20,
+   "case_ids_are_60_to_79_unique": true,
+   "a_position_balance": {
+    "S2_STAGE1_HISTORY": 10,
+    "S2_HISTORY_BOTH_STAGES": 10
+   },
+   "balance_is_10_10": true
+  },
+  "3_panel_hash": {
+   "expected": "cfb0f264b76620f47c292752515d545cb9ff058616b0c53d5c688753d628b8e2",
+   "actual": "cfb0f264b76620f47c292752515d545cb9ff058616b0c53d5c688753d628b8e2",
+   "match": true
+  },
+  "4_mapping_hashes_vs_source_verification": {
+   "n_checked": 40,
+   "mismatches": []
+  },
+  "5_one_image_per_endpoint_per_pair": {
+   "ok": true
+  },
+  "6_response_integrity": {
+   "sha256": "7c4c509f470abbdbc79b8bef3aacc2f065bca35cc5f792cdf59fe957fc3a57b8",
+   "packageVersion_ok": true,
+   "protocolVersion_ok": true,
+   "isComplete": true,
+   "n_rows": 20
+  },
+  "7_join_and_unblind": {
+   "n_rows_joined": 20
+  }
+ },
+ "recomputed_counts": {
+  "S2_STAGE1_HISTORY_degeneration_yes": "2/20",
+  "degenerate_cases": [
+   63,
+   72
+  ],
+  "S2_HISTORY_BOTH_STAGES_degeneration_yes": "1/20",
+  "degenerate_cases_both_stages": [
+   63
+  ],
+  "S2_STAGE1_HISTORY_local_defects_yes": "19/20",
+  "local_defects_no_cases": [
+   72
+  ],
+  "S2_HISTORY_BOTH_STAGES_local_defects_yes": "20/20",
+  "local_defects_no_cases_both_stages": [],
+  "paired_degeneration_transition": {
+   "persisted": [
+    63
+   ],
+   "recovered": [
+    72
+   ],
+   "newly_damaged": [],
+   "neither": [
+    60,
+    61,
+    62,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79
+   ],
+   "n_persisted": 1,
+   "n_recovered": 1,
+   "n_newly_damaged": 0,
+   "n_neither": 18
+  },
+  "more_corrupted_counts": {
+   "S2_STAGE1_HISTORY": 2,
+   "S2_HISTORY_BOTH_STAGES": 2,
+   "none": 16,
+   "uncertain": 0
+  },
+  "more_corrupted_detail": [
+   {
+    "case_id": 68,
+    "more_corrupted": "S2_HISTORY_BOTH_STAGES"
+   },
+   {
+    "case_id": 72,
+    "more_corrupted": "S2_STAGE1_HISTORY"
+   },
+   {
+    "case_id": 78,
+    "more_corrupted": "S2_STAGE1_HISTORY"
+   },
+   {
+    "case_id": 79,
+    "more_corrupted": "S2_HISTORY_BOTH_STAGES"
+   }
+  ]
+ },
+ "joined_table_path": "/data/bijaypandey/cuig_pilot/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/UNBLINDED_JOINED_TABLE.json",
+ "all_checks_passed": true
+}

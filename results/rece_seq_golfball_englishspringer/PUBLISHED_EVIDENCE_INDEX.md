@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `d29f19b7b1ce` — the commit that *records*
+Generated at parent commit `f6fe138edbe5` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -38,7 +38,7 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
 | `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
 | `results/rece_seq_golfball_englishspringer/preservation_content_control/FINAL_REPORT.md` | 14,917 | `370214d3721a10067ffa15ff368e031b778df25ca233914c55e5da1618dba01b` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 68,829 | `4ee69ac27ff1c0fed551e88a3512dbb489aa29e2bca7938a8c9157bc9adb42a0` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 71,780 | `b433d5345745a0feab8eef226e401bdfd75ab4685db9a3b58b375f32e2098fba` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -1156,7 +1156,7 @@ LAST, after every other file in this result set is final.
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/rece_seq_golfball_englishspringer/history_both_stages_s2/FINAL_REPORT.md` | 15,885 | `9ffdb94f3547aa75bc5ab863aab16452dc04cddeb6c1ee28af70a72e1102b4b2` |
+| `results/rece_seq_golfball_englishspringer/history_both_stages_s2/FINAL_REPORT.md` | 16,840 | `0421818808b420eab87a51d2b58c804e6250ae1cb4002deeebc890a8daaf36fb` |
 
 ## Evidence — history_both_stages_s2 (manifest, recovery result, build log, visual review, classifier guard invocation log, joint outcomes)
 
@@ -1271,11 +1271,25 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/PACKAGE_MANIFEST.json` | 4,177 | `9f7a55ffe3a4cc2000242e27bbf72b97e30b81819418e0e3a055c8e8cb818fe1` |
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/MAPPING_COMMITMENT.json` | 470 | `a074f89d9b88d629888b4fce164351566ab82fedce5c56b229bcad8e3205c7df` |
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/READY_FOR_HUMAN_REVIEW.md` | 2,831 | `d2aa610cb4463a2c08bbbe38b73c61a6aa4afc08a6bfb7d3436031de8815f685` |
-| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md` | 6,525 | `3b158bafbd393fc0e9b59eee7463329c917e5917c99558952bb0a1690f5ee129` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md` | 6,795 | `7ad65c3235dd021712df5868a8fa959d71956ada20743369d8d5219f75589060` |
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/prep_code/build_reviewer_package.py` | 6,411 | `5d1d7603bcba8abb9b1d8cc9083fb3fc25327a5e1effd8e6eef1ee419ab79d82` |
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/prep_code/verify_source_images.py` | 6,497 | `6b37ed628b07c948d361d0816203bf9fa1318468af2344d49fd1b7fcfb260470` |
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/BLINDED_REVIEW_PACKAGE.zip` | 16,507,991 | `7af1cac52bbeb36d7f8e580081ec882992dd6d41fbd65559f01a5565fb06ac39` |
 
+## Unblinded human review response (C34) — preserved selected response, receipt, mapping verification, unblinded mapping/joined table, case-level agreement with assistant labels, and the final human review report. An earlier survey submission was explicitly withdrawn by the user and is intentionally NOT listed or published here.
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/responses/review_export_final_2026-10-16T14-06-23-096Z.json` | 4,705 | `7c4c509f470abbdbc79b8bef3aacc2f065bca35cc5f792cdf59fe957fc3a57b8` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/responses/RESPONSE_RECEIPT.json` | 1,664 | `2fb7e7a7187f6b70e73b12efc7262c6cf87f05e286fc04ae02c50669e0ab140c` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/UNBLINDING_VERIFICATION.json` | 2,501 | `9a3665d1de1ef524fcfd4dfc8f02511892da5bd77c574142db873174b84c8d19` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/UNBLINDED_MAPPING.json` | 14,206 | `bbf8a9eb8b6459bdb2e4ff33ed8638c5708fe4ecb10e58c09a02ecbdcb47689a` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/UNBLINDED_JOINED_TABLE.json` | 10,096 | `97c4e04c05de61614e63defdbbec2437f5bcd0d5a2963f419ff81cf6830ce9b1` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/CASE_LEVEL_AGREEMENT_TABLE.json` | 4,812 | `28bd14dd3100fbd6f2811f17468b275c51b6cf73f62862a0fa3161e02bca5c26` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/unblind_and_analyze.py` | 9,643 | `6d2eae294dd9c41502a6143a5ff4b4693c8c68a0acc342c4d91a8f7b00d5cf57` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/compare_with_assistant_labels.py` | 3,004 | `93d727d36a83d518b672fe41557db2b953160d879410335e80c0f35625135053` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/HUMAN_REVIEW_REPORT.md` | 11,271 | `f0ed592acb9e4e944878d0ff47afd0ef3b05d98868108de1fbd03189170bb976` |
+
 ---
 
-**1086 files listed**, none absent.
+**1095 files listed**, none absent.

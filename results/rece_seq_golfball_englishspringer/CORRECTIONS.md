@@ -1054,8 +1054,10 @@ the gap disclosed in C31). **Result: golf-ball suppression reaches
 `S2_STAGE1_HISTORY`'s 1/20 genuine leak and `S2_Stage1`'s own 1/20 false
 positive); English springer correctly stays erased (0/20 throughout, as
 desired); French horn recognition ties the best of any S2 checkpoint
-(14/20) and parachute improves over the refinement-only `S2_HISTORY`
-comparator (13/20 vs. 9/20); retained-class degeneration holds at 0/40.
+(14/20, vs. `S2_HISTORY`'s 9/20) and parachute improves over that same
+refinement-only `S2_HISTORY` comparator (13/20 vs. 11/20 — corrected
+from a mis-cited 9/20, French horn's figure, not parachute's);
+retained-class degeneration holds at 0/40.
 But springer-prompt degeneration rises from 2/20 (corrected
 `S2_STAGE1_HISTORY`) to 6/20** (18 recovered, 2 persisted, 4 newly
 damaged, 0 neither vs. that baseline) — refinement reintroduces some
@@ -1093,6 +1095,50 @@ cannot distinguish any mechanism, unlike the new, non-saturated 6/20
 pattern. **No disputed quality count is changed by this entry.** Status
 is `READY_FOR_HUMAN_REVIEW`, not a scientific finding — see
 `READY_FOR_HUMAN_REVIEW.md` for exact reviewer instructions.
+
+## C34 — First human response, unblinded: does not reproduce the claimed springer-degeneration regression
+
+`blinded_quality_review_s2/closeout/HUMAN_REVIEW_REPORT.md` (published
+alongside this entry) unblinds and analyzes one selected human response
+to the C33 package (reviewer alias "Bijay," submitted after a rubric
+clarification; an earlier submission was explicitly withdrawn by the
+user and is not published or analyzed here). Mapping verified against
+the published commitment before opening (`bbf8a9eb8b6459bdb2e4ff33ed8638c5708fe4ecb10e58c09a02ecbdcb47689a`,
+exact match); response file verified against its claimed hash/size
+before analysis. **Disclosed, not concealed**: the reviewer had prior
+exposure to the assistant's aggregate claim and received case-specific
+guidance on one study image (Q10) from another assistant before this
+submission was frozen — the endpoint mapping itself was not revealed
+first. This is reported as blinded to case/endpoint identity with
+disclosed prior exposure, not as a fully naive validation.
+
+**Unblinded result: whole-frame degeneration goes `S2_STAGE1_HISTORY`
+2/20 → `S2_HISTORY_BOTH_STAGES` 1/20** (1 recovered — case 72, 1
+persisted — case 63, 0 newly damaged, 18 neither) — the opposite
+direction from C32's claimed regression (2/20→6/20, 4 newly damaged).
+**Case-level agreement with the assistant's own current labels is low**:
+16/20 for `S2_STAGE1_HISTORY`, 15/20 for `S2_HISTORY_BOTH_STAGES`, with
+the two flagged case sets overlapping in exactly one case
+(`S2_HISTORY_BOTH_STAGES` case 63) across both endpoints — close or
+matching totals should not be read as agreement on which cases. Local
+defects are flagged on 39/40 images by this reviewer, far more liberally
+than the assistant's own sparse free-text local-defect notes; no
+structured comparison is computed for that dimension since the
+assistant's schema has no directly comparable field. Three further
+textual errata (a mis-cited `S2_HISTORY` parachute comparator, an
+overclaim about which degeneration count was "first non-saturated," and
+an overstated retained-object-presence verification claim) are corrected
+directly in `history_both_stages_s2/FINAL_REPORT.md` and
+`blinded_quality_review_s2/closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md`,
+verified against raw classification records before being applied. **No
+disputed quality count from C32 is altered** — this entry adds an
+independent, lower-weight, non-reproducing data point against it. One
+human reviewer; per the frozen protocol, this does not establish broad
+improvement, equivalence, or a new method, and does not end the
+question — see the report itself for the full joined table, severity
+comparison, and recommendation to recruit further independent reviewers
+on the existing, unmodified package before treating either direction as
+settled.
 
 ## What must not be concluded from any of this
 
