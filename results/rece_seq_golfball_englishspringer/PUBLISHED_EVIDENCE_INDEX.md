@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `f6fe138edbe5` — the commit that *records*
+Generated at parent commit `65ef74777b5a` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -38,7 +38,7 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
 | `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
 | `results/rece_seq_golfball_englishspringer/preservation_content_control/FINAL_REPORT.md` | 14,917 | `370214d3721a10067ffa15ff368e031b778df25ca233914c55e5da1618dba01b` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 71,780 | `b433d5345745a0feab8eef226e401bdfd75ab4685db9a3b58b375f32e2098fba` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 73,979 | `f0909d840d330752f74c7674880487bfc6a6ab0bfbc28c2b32eaa8d25366f1f6` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -1290,6 +1290,21 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/compare_with_assistant_labels.py` | 3,004 | `93d727d36a83d518b672fe41557db2b953160d879410335e80c0f35625135053` |
 | `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/HUMAN_REVIEW_REPORT.md` | 11,271 | `f0ed592acb9e4e944878d0ff47afd0ef3b05d98868108de1fbd03189170bb976` |
 
+## Second (v2), context-aware human review package (C35) — protocol, instructions preview, manifest, mapping commitment, validation report, prep code, and the reviewer zip. Reuses v1's same 40 images; adds the generation prompt and erasure context. NOT yet answered -- v1's own response and unblinding (C33-C34) are separate and unchanged. The v2 private mapping and its random seed are intentionally NOT listed here (kept outside the git checkout; only a SHA256 commitment is published).
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/FROZEN_PROTOCOL_V2.md` | 10,312 | `d51aedd1330cfa6422a64015f05577637064d71ca3572c06bd22e54e4a732ae8` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/INSTRUCTIONS_PREVIEW.md` | 4,255 | `e585f093c61896fab153df3f768152feaa8ed4f61f064965576caaecff0e48b7` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/VALIDATION_REPORT_V2.md` | 6,530 | `8b6f060547ddcc952467b216355ed2534fb4294547122f6e71782408f4091f1b` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/PACKAGE_MANIFEST_V2.json` | 4,383 | `a07002f211564ea213bc94e86a0903ad1c02db591f6f0224237eab14a59e2d63` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/MAPPING_COMMITMENT_V2.json` | 691 | `7b26efb03a2c9ecb2c2ec9410d57d5e761af4f2cdb9efc783bf4e0454884978a` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/README_V2.md` | 3,905 | `02d82e541d9b9e7efb583e281bf6f95e0ca04619fa2cf8475f9a5fc3813f1608` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/prep_code/verify_source_and_extract_prompts.py` | 6,116 | `a7c05aa742ac23ef8255bd38e5b1c27cf45da28ec1c9b66e4917641812a459ae` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/prep_code/build_v2_reviewer_package.py` | 7,082 | `51a955ed8c19f2042b3e1df52ffd5d97aa3c41843293eacae380a3c70760b1b8` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/prep_code/inject_prompts.py` | 2,027 | `0a01b3193a9f88454ee584c384810f1ad8828690d33c7f89f041252969637e15` |
+| `results/rece_seq_golfball_englishspringer/context_quality_review_s2_v2/CONTEXT_REVIEW_PACKAGE_V2.zip` | 16,509,896 | `e9c9906a8b5633aafc5e718b727e8d493d65d83b7660b6251464c512acc66953` |
+
 ---
 
-**1095 files listed**, none absent.
+**1105 files listed**, none absent.

@@ -366,6 +366,20 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/blinded_quality_review_s2/closeout/compare_with_assistant_labels.py",
         f"{R}/blinded_quality_review_s2/closeout/HUMAN_REVIEW_REPORT.md",
     ]),
+    ("Second (v2), context-aware human review package (C35) — protocol, instructions preview, manifest, mapping commitment, validation report, prep code, and the reviewer zip. "
+     "Reuses v1's same 40 images; adds the generation prompt and erasure context. NOT yet answered -- v1's own response and unblinding (C33-C34) are separate and unchanged. "
+     "The v2 private mapping and its random seed are intentionally NOT listed here (kept outside the git checkout; only a SHA256 commitment is published).", [
+        f"{R}/context_quality_review_s2_v2/FROZEN_PROTOCOL_V2.md",
+        f"{R}/context_quality_review_s2_v2/INSTRUCTIONS_PREVIEW.md",
+        f"{R}/context_quality_review_s2_v2/VALIDATION_REPORT_V2.md",
+        f"{R}/context_quality_review_s2_v2/PACKAGE_MANIFEST_V2.json",
+        f"{R}/context_quality_review_s2_v2/MAPPING_COMMITMENT_V2.json",
+        f"{R}/context_quality_review_s2_v2/README_V2.md",
+        f"{R}/context_quality_review_s2_v2/prep_code/verify_source_and_extract_prompts.py",
+        f"{R}/context_quality_review_s2_v2/prep_code/build_v2_reviewer_package.py",
+        f"{R}/context_quality_review_s2_v2/prep_code/inject_prompts.py",
+        f"{R}/context_quality_review_s2_v2/CONTEXT_REVIEW_PACKAGE_V2.zip",
+    ]),
 ]
 
 

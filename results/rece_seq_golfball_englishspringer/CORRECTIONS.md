@@ -1140,6 +1140,40 @@ comparison, and recommendation to recruit further independent reviewers
 on the existing, unmodified package before treating either direction as
 settled.
 
+## C35 — Second (v2), context-aware human review package prepared — not yet answered
+
+`context_quality_review_s2_v2/` (published alongside this entry) is a
+**separate, additive** preparation deliverable, not a revision of v1
+(`blinded_quality_review_s2/`, C33–C34) and not yet a scientific result.
+It reuses the identical 20 matched case-60–79 pairs and 40 original
+images as v1 (re-verified against the evidence index and the frozen
+panel manifest `cfb0f264b76620f47c292752515d545cb9ff058616b0c53d5c688753d628b8e2`
+before building), adding the generation-prompt context v1 did not show
+(the exact shared prompt per pair, taken verbatim from the frozen
+manifest) and explicit erasure-objective framing: the erased dog's
+absence is expected, not a defect. The rubric term is renamed "widespread
+rendering breakdown" (from v1's "whole-frame degeneration"), now
+requiring a brief written reason whenever the answer is "yes" or
+"unable to judge"; a new optional style-mismatch field is tracked
+separately from corruption; a new provenance question asks directly
+whether the reviewer discussed or received feedback about any of these
+20 specific images beforehand — the exact gap C34 disclosed for v1's
+Q10. New, independent randomization (neutral IDs `R01`–`R20`, a fresh
+seed, a separate private mapping and public commitment
+`MAPPING_COMMITMENT_V2.json`); the build script asserts v1's private
+mapping is byte-unchanged before and after the v2 build, confirmed.
+**No study image, prior count, assistant label, or endpoint-specific
+explanation is used in the three generic illustrative examples shown to
+the reviewer; Q10_B is explicitly not used as a calibration example.**
+No browser tool was available to verify rendering/layout — disclosed,
+not assumed, in `VALIDATION_REPORT_V2.md`. **No response has been
+collected for v2; v1's own selected response and its verified
+unblinding result (C34) are unchanged and not reanalyzed here.** Any
+future difference between v1 and v2 results must not be attributed
+specifically to "the addition of context" without further evidence —
+v2 is a second development evaluation on the same already-inspected
+panel, not an independent replication.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by
