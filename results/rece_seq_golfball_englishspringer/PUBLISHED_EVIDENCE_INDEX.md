@@ -8,7 +8,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `20d5c230c2e1` — the commit that *records*
+Generated at parent commit `d29f19b7b1ce` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded, unchanged:** the ~3.44 GB author-released
@@ -38,7 +38,7 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/solver_only_intervention/FINAL_REPORT.md` | 15,030 | `02080a601b7553b535afb378ab93bbe14ef1c04385a50e5289570d4bf54bb9ec` |
 | `results/rece_seq_golfball_englishspringer/recovery_optimality_audit/FINAL_REPORT.md` | 16,194 | `a2494b800a067e9a6b89c48f919131bb5c0df1033318f609374b6fe3f06c725a` |
 | `results/rece_seq_golfball_englishspringer/preservation_content_control/FINAL_REPORT.md` | 14,917 | `370214d3721a10067ffa15ff368e031b778df25ca233914c55e5da1618dba01b` |
-| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 67,037 | `f25caa714e33635ba553b8f761155ce3c8a2c0959cc0e6f6165ae0ea31724172` |
+| `results/rece_seq_golfball_englishspringer/CORRECTIONS.md` | 68,829 | `4ee69ac27ff1c0fed551e88a3512dbb489aa29e2bca7938a8c9157bc9adb42a0` |
 
 ## Recognition tables and visual-review labels — direct-vs-sequential experiment
 
@@ -1262,6 +1262,20 @@ LAST, after every other file in this result set is final.
 | `results/rece_seq_golfball_englishspringer/images/history_both_stages_s2/original_images/8_0.png` | 427,433 | `1c81525e490cc87af96da3d80d2f6a0bd5a07f5f1d97361fbac9d671af6fe6bf` |
 | `results/rece_seq_golfball_englishspringer/images/history_both_stages_s2/original_images/9_0.png` | 430,110 | `0cd2762cc3f804d07087ad477ca59726985c486506e274cac45770a5ee865d35` |
 
+## Blinded human review package (C33) — protocol, manifest, mapping commitment, bounded corrections, prep code, and the reviewer zip itself. The private neutral-ID mapping and its random seed are intentionally NOT listed here (kept outside the git checkout; only a SHA256 commitment is published).
+
+| path | bytes | sha256 |
+|---|---|---|
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/FROZEN_PROTOCOL.md` | 8,788 | `8f37086ccc7d9876a3c732315ecc78eac533e2811cfa8901c7f4fb86cdf0b5ed` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/VALIDATION_REPORT.md` | 6,382 | `08cc19c5aa69e24667039cdc37b9eded358593915e78fe18a0521bd6f69f355a` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/PACKAGE_MANIFEST.json` | 4,177 | `9f7a55ffe3a4cc2000242e27bbf72b97e30b81819418e0e3a055c8e8cb818fe1` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/MAPPING_COMMITMENT.json` | 470 | `a074f89d9b88d629888b4fce164351566ab82fedce5c56b229bcad8e3205c7df` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/READY_FOR_HUMAN_REVIEW.md` | 2,831 | `d2aa610cb4463a2c08bbbe38b73c61a6aa4afc08a6bfb7d3436031de8815f685` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md` | 6,525 | `3b158bafbd393fc0e9b59eee7463329c917e5917c99558952bb0a1690f5ee129` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/prep_code/build_reviewer_package.py` | 6,411 | `5d1d7603bcba8abb9b1d8cc9083fb3fc25327a5e1effd8e6eef1ee419ab79d82` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/prep_code/verify_source_images.py` | 6,497 | `6b37ed628b07c948d361d0816203bf9fa1318468af2344d49fd1b7fcfb260470` |
+| `results/rece_seq_golfball_englishspringer/blinded_quality_review_s2/BLINDED_REVIEW_PACKAGE.zip` | 16,507,991 | `7af1cac52bbeb36d7f8e580081ec882992dd6d41fbd65559f01a5565fb06ac39` |
+
 ---
 
-**1077 files listed**, none absent.
+**1086 files listed**, none absent.

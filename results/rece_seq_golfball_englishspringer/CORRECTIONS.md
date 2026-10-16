@@ -1067,6 +1067,33 @@ classification in the same guarded path, refusing on failure — see the
 report itself for full tables, scene/family breakdowns, and explicit
 scope limits.
 
+## C33 — Blinded human review package published for the S2 springer quality question (index entry; no scientific finding yet)
+
+`blinded_quality_review_s2/` (published alongside this entry) prepares,
+but does not yet answer, a direct human check of C32's claimed springer
+degeneration regression (`S2_STAGE1_HISTORY` 2/20 → `S2_HISTORY_BOTH_STAGES`
+6/20). All 20 matched case-60–79 pairs (not only the 6 disputed cases)
+are included, randomized once (pair position and A/B assignment,
+balanced 10/10), with a private neutral-ID↔endpoint mapping kept outside
+the git checkout and a public SHA256 commitment to it
+(`MAPPING_COMMITMENT.json`) published before any response is collected.
+The frozen protocol applies the same whole-frame-degeneration rubric
+used throughout this results line, collects individual-image judgments
+before any paired comparison, and does not ask the reviewer to confirm
+either assistant's interpretation. Bounded factual corrections
+(`closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md`), verified against raw
+classification records, accompany the package: a mixed visual-numerator/
+classifier-denominator suppression estimate (87.5%) is withdrawn; the
+French-horn 14/20 totals are shown to involve a 4-case identity shift
+(gains 46/58, loses 44/50) between the two endpoints despite the equal
+total, while parachute's 13/20 case identities are unchanged; the
+existing seed/scene check (`S2_Stage1`/`S2_BLANK`/`S2_HISTORY`, each
+20/20 historical degeneration) is noted as a saturated binary count that
+cannot distinguish any mechanism, unlike the new, non-saturated 6/20
+pattern. **No disputed quality count is changed by this entry.** Status
+is `READY_FOR_HUMAN_REVIEW`, not a scientific finding — see
+`READY_FOR_HUMAN_REVIEW.md` for exact reviewer instructions.
+
 ## What must not be concluded from any of this
 
 - **These are not new findings** — all three corrections were found by

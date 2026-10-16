@@ -342,6 +342,18 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/images/history_both_stages_s2/original_images/{f.name}"
         for f in sorted(pathlib.Path("results/rece_seq_golfball_englishspringer/images/history_both_stages_s2/original_images").glob("*.png"))
     ]),
+    ("Blinded human review package (C33) — protocol, manifest, mapping commitment, bounded corrections, prep code, and the reviewer zip itself. "
+     "The private neutral-ID mapping and its random seed are intentionally NOT listed here (kept outside the git checkout; only a SHA256 commitment is published).", [
+        f"{R}/blinded_quality_review_s2/FROZEN_PROTOCOL.md",
+        f"{R}/blinded_quality_review_s2/VALIDATION_REPORT.md",
+        f"{R}/blinded_quality_review_s2/PACKAGE_MANIFEST.json",
+        f"{R}/blinded_quality_review_s2/MAPPING_COMMITMENT.json",
+        f"{R}/blinded_quality_review_s2/READY_FOR_HUMAN_REVIEW.md",
+        f"{R}/blinded_quality_review_s2/closeout/CORRECTIONS_BEFORE_HUMAN_REVIEW.md",
+        f"{R}/blinded_quality_review_s2/prep_code/build_reviewer_package.py",
+        f"{R}/blinded_quality_review_s2/prep_code/verify_source_images.py",
+        f"{R}/blinded_quality_review_s2/BLINDED_REVIEW_PACKAGE.zip",
+    ]),
 ]
 
 
