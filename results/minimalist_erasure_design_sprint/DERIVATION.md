@@ -1,8 +1,15 @@
 # Derivation — the reference objective and mask-parameter gradient
 
 **NO EXPERIMENTS.** Everything below is static reading of the paper and of the author
-source at the pinned commit, plus pencil derivation and two tiny exact rational/scalar
+source at the pinned commit, plus pencil derivation and tiny exact rational/scalar
 arithmetic checks. No model was loaded and no research code was imported or executed.
+
+> **Amended 2026-10-17 — see [`CORRECTIONS.md`](CORRECTIONS.md).** The **local
+> multiplicative-gate derivative of §4 is retained**. The **impossibility corollary drawn
+> from it is withdrawn** (X1), together with the measure-theoretic reading of the clamp
+> (X22), the "not an unbiased estimate" assertion (X23), the multi-sample requirement
+> (X21), the `image[0]` batch-index diagnosis (X24), the `L0` "divergence" (X20), and the
+> "different empirical objective" reading of per-example term selection (X19).
 
 Pinned source: `YaNgZhAnG-V5/minimalist_concept_erasure` @
 **`d178324ec4a48d0536a595b25fdad587b441add8`** (all code added in one commit,
@@ -59,8 +66,14 @@ scalability."*
 
 ### 1.2 What the implementation actually optimizes
 
-Four substantive divergences from §1.1. All are **source-supported**, and the first is
-**essential** — it changes the objective, not the estimator.
+A **source-defined empirical reference objective can be stated** from the code below. Its
+**alignment with the publication is unverified** — that is the accurate claim, and the
+earlier assertion that "there is no reference objective to be cheaper than" is withdrawn
+(X25).
+
+Of the four items originally listed as divergences, **(a) is a genuine and essential
+difference** and **(c) is a genuine but narrower one**; **(b) and (d) are corrected below
+and are *not* divergences** (X19, X20).
 
 **(a) The erasure target is not `ℱθ′(x_T, ∅)`.** Targets are **precomputed once per
 dataset row and cached to disk** as safetensors
@@ -75,7 +88,8 @@ hand-written `CON_DECON_DICT` substitution table (`unlearn_template.py:282+`, e.
 `"Hulk": "a strong man"` at `:292`). **Neither branch is `ℱθ′(x_T, ∅)`**, and the paper never
 mentions FlowEdit as a target construction or FLUX.1-dev at all.
 
-**(b) The two loss terms are not summed; one replaces the other.** `scripts/train.py:284-297`:
+**(b) Per-example term selection — *not* a different empirical objective (corrected, X19).**
+`scripts/train.py:284-297`:
 
 ```python
 loss, loss_reconstruct = pruning_loss(...)        # loss = β · ‖z_K − z*_retain‖²
@@ -84,27 +98,50 @@ if value:                                         # value == 1 → forget row
     loss = intermediate_loss                      # ← REPLACES, discarding the β term
 ```
 
-So per sample the objective is **either** the forget term **or** `β ×` the retain term,
-chosen by the row's `value` flag. The dataset is built to alternate them exactly 50/50
-(`promptdataset.py:177-179`: `df.iloc[::2] = deconceptdf`, `df.iloc[1::2] = df`). This is a
-**stochastic (here: deterministically alternating) single-term surrogate** of Eq. 16's sum,
-not Eq. 16. The retain term also takes `image` while the forget term takes `image[0]` —
-batch element 0 only.
+Per sample the loss is **either** the forget term **or** `β ×` the retain term, chosen by the
+row's `value` flag, and the dataset alternates them exactly 50/50
+(`promptdataset.py:177-179`: `df.iloc[::2] = deconceptdf`, `df.iloc[1::2] = df`).
 
-**(c) `x_T` is not sampled.** `scripts/train.py:268` re-seeds the generator to the *same*
-`cfg.trainer.seed` **inside the per-sample loop**, and `promptdataset.py:182` does the same
-when building targets. The initial latent is therefore **one fixed `x_T`** for every
-iteration, every prompt and every epoch. The `E_{x_T}` in Eq. 16 is **not estimated**; the
-implemented objective is conditional on a single noise draw.
+**Corrected reading (X19).** At fixed parameters, a **balanced uniform** forget/retain row
+mixture **estimates `½(L_forget + β·L_retain)`** — a positive multiple of Eq. 16's sum.
+Choosing one term per example is therefore **not automatically a different empirical
+objective**, and the earlier "single-term surrogate, not Eq. 16" reading is withdrawn. What
+*does* remain true, and is weaker: **alternating updates need not reproduce the finite-step
+trajectory** of computing both terms together, since each update sees one term. The genuine
+objective differences are **(a) target construction** and **(c) fixed-seed coverage**, kept
+separate from this.
 
-**(d) There is no sparsity/`L0` term in the trained loss.** `calculate_reg_loss` and
+**Also withdrawn (X24):** the claim that the forget term "takes batch element 0 only".
+`image` at `:294` is the `FluxPipelineOutput` returned at `:282`, and in the declared
+compatible Diffusers (`pyproject.toml:19`, `diffusers>=0.31.0`) `BaseOutput.__getitem__` is
+`return self.to_tuple()[k]` for non-`str` keys — so `image[0]` returns the **first declared
+output field** (`.images`), i.e. the **whole latent tensor**. There is no batch-index
+asymmetry.
+
+**(c) Fixed-seed coverage of `x_T` (genuine, but narrower than published).**
+`scripts/train.py:268` re-seeds the generator to the *same* `cfg.trainer.seed` **inside the
+per-sample loop**, and `promptdataset.py:182` does the same when building targets. The
+initial latent is therefore **one fixed `x_T`** for every iteration, every prompt and every
+epoch.
+
+**Corrected framing (X21).** The accurate statement is that the **fixed seed limits coverage
+of `x_T` across iterations**. The earlier stronger framing — that `E_{x_T}` is therefore
+"not estimated" and that unbiasedness needs an averaging the implementation "does not
+realize" — is withdrawn: **a coherent single reparameterized sample can be unbiased** under
+the required regularity conditions, and **multiple samples within an iteration are not
+required**. **Initial-latent randomness and mask randomness are separate axes**, and the
+fixed seed constrains only the former.
+
+**(d) No sparsity/`L0` term in the trained loss — a source fact, *not* a paper/code
+divergence (corrected, X20).** The cited paper objective (Eq. 16) **also contains no such
+term**, so its absence in the code is not a divergence. What remains is the narrower source
+fact: `calculate_reg_loss` and
 `l0_complexity_loss` exist (`src/diffsolver/utils/utils.py:226-257`) and `configs/flux.yaml:45-53`
 configures `reg`, `reg_alpha`, `reg_beta`, `lambda_reg`, `use_ffn_reg`, but **nothing in
 `scripts/train.py` calls them** (verified by grep over all `*.py`; the only other reference
 is `scripts/hyperparameter_tuning.py`, which merely sets the config value and shells out via
 `os.system`, `:91`). Sparsity in the published FLUX path is produced **only** by the
-post-hoc binarization threshold, not by the objective. The paper likewise shows no `L0`
-term in Eq. 16.
+post-hoc binarization threshold, not by the objective.
 
 ### 1.3 The mask: parameterization, relaxation, and where it acts
 
@@ -245,11 +282,14 @@ Three implementation facts that matter for cost (§[`COST_MODEL.md`](COST_MODEL.
 
 ---
 
-## 4. The structural lemma: the mask gradient is a free byproduct
+## 4. The local gate derivative (retained) — and the withdrawn corollary
 
-This is the core result of the sprint.
+> **Amended.** The **local identity below is retained**: the mask derivative is the incoming
+> activation times the gate-output adjoint, with the appropriate reductions. The
+> **impossibility corollary drawn from it is withdrawn** (X1). It was presented as the core
+> result of the sprint; it is not a result.
 
-**Lemma.** At every hooked module the gate acts as `h ↦ m ⊙ h` with `epsilon = 0`
+**Local identity.** At every hooked module the gate acts as `h ↦ m ⊙ h` with `epsilon = 0`
 (§1.3). Hence for neuron `j` of a hooked module at step `k`,
 
 ```
@@ -258,26 +298,44 @@ This is the core result of the sprint.
 
 and then `∂L/∂λ_j = (∂m_j/∂λ_j) · ∂L/∂m_j` with `∂m_j/∂λ_j` a scalar from the relaxation.
 
-**`ḡ` is exactly the activation gradient the reverse sweep must already compute** at that
-module in order to keep propagating toward `z_k`. Therefore:
+`ḡ` is the activation gradient at that module. **Conditional on the state adjoint at that
+site already being computed**, the mask term is an elementwise multiply-accumulate,
+`O(#neurons × #tokens)` — small relative to the module's own matmuls.
 
-> The entire per-step mask gradient — across **all** hooked modules, attention, FFN and
-> norm alike — costs `O(#neurons × #tokens)` multiply-accumulates on top of a reverse
-> sweep that must happen anyway. Relative to the module's own matmuls, that is a rounding
-> error.
+### 4.1 What this supports, and what it does not (X1)
 
-**Corollary (why the sprint's hypothesis fails).** The two quantities the native loop
-computes with *two separate sweeps* — `(∂f_k/∂λ)ᵀḡ_{k+1}` and `(∂f_k/∂z)ᵀḡ_{k+1}` —
-are obtainable from **one** sweep, because the first is the elementwise byproduct (†) of the
-activation gradients the second produces en route. It follows that:
+**Supported — regime (1).** *If all state adjoints are always computed*, then skipping the
+cheap local mask terms offers little saving. Concretely: the two quantities the native loop
+obtains with *two separate sweeps* — `(∂f_k/∂λ)ᵀḡ_{k+1}` and `(∂f_k/∂z)ᵀḡ_{k+1}` — can be
+obtained from **one** sweep over the same recomputed graph, because the first is the
+elementwise byproduct (†) of activation gradients the second produces en route. **This is a
+statement about one implementation detail, not about estimators.**
 
-- the exact gradient (★) costs **one forward + one reverse sweep per step**, and
-- **no estimator that targets the mask-gradient terms can save anything**, since those
-  terms are free riders. Subsampling them, importance-weighting them, or estimating them
-  stochastically removes work that costs nothing and buys variance.
+**Withdrawn — the impossibility corollary.** The published record inferred that therefore
+*"no estimator that targets the mask-gradient terms can save anything"*, that the exact
+gradient's cost is a **floor**, and that truncation is *"the only remaining lever"*. **All
+three are withdrawn.** The identity is **conditional on the state adjoint being computed at
+that site**; it says nothing about estimators that **do not compute every state adjoint**.
 
-The only remaining lever is **not sweeping a step at all** — truncation — which is
-published prior art (DRaFT-K, AlignProp; see [`ALGORITHM.md`](ALGORITHM.md) §4).
+**Regime (2) — the case the record ignored.** If reverse traversal **stops after the
+earliest selected contribution**, cost depends on a **random stopping depth**, and a nonzero
+probability of a full sweep does **not** force full expected cost. Under the record's own
+simplified expression,
+`E[C] = K·F + (1+c_b)·F·Σ_i q_i(K−i) + selection overhead`, with `K = 5`, `c_b = 1`, one
+draw and all probabilities positive, `q = (1/20,1/20,1/20,1/20,4/5)` gives expected reverse
+depth `3/2` and **expected main cost `8F` against `A2 = 10F`** — a saving is possible within
+this model if overhead is below `2F`. See [`CORRECTIONS.md`](CORRECTIONS.md) §A.
+
+**That counterexample refutes the universal proof only.** It is not evidence of a FLUX
+speedup, of acceptable variance or convergence, or of novelty, and it is **not adopted as a
+proposal**. Separately, **one forward plus one full reverse traversal per step is an
+ordinary reverse-mode cost model, not a universal lower-bound theorem** over estimators or
+implementations (X5).
+
+Prior art bearing on the truncation lever is stated accurately in
+[`ALGORITHM.md`](ALGORITHM.md) §4: **DRaFT** §4 covers **deterministic** suffix truncation
+with checkpointing; **ARTBP** covers **unbiased reweighted variable-length** truncation.
+Those raise a **novelty objection**, not an impossibility (X27).
 
 ---
 
@@ -302,16 +360,23 @@ sampling density is **reparameterized** so `ξ` carries no `λ`-dependence — s
 `ξ` is `U(0,1)` independent of `λ`; (ii) `L(λ, ·)` is a.e. differentiable in `λ` and
 **locally Lipschitz with an integrable dominating bound** near `λ` (dominated convergence).
 
-(ii) holds but is **weak at the published settings**: the gate is clamped, so `L(·, ξ)` is
-only piecewise differentiable in `λ`, with `∂m/∂λ = 0` on the clamped set. Since
-`P(clamped at 1) = 0.9659` at `λ = 3` (§1.3), the single-sample estimator is an exact zero
-for ~96.6% of gates at initialization, and unbiasedness for `∇J` holds only in an
-average-over-`ξ` sense that the implementation does not realize — it uses **one** `ξ` per
-iteration and **one fixed `x_T`** ever (§1.2c). The clamp set has measure zero in `λ` for
-fixed `ξ`, so a.e. differentiability is not violated; the practical issue is variance and
-signal sparsity, not formal bias.
+**Corrected treatment of the clamp (X22).** The gate is clamped, so `L(·, ξ)` is only
+piecewise differentiable in `λ`, with `∂m/∂λ = 0` on the clamped region. That region
+**can have positive measure** — it is **not** a measure-zero set, and the earlier claim that
+"the clamp set has measure zero in `λ` for fixed `ξ`" is withdrawn. What *is* measure-zero is
+the **transition boundary** between clamped and unclamped regions; the two must be
+distinguished. With `P(clamped at 1) = 0.9659` at `λ = 3` (§1.3), the per-gate derivative is
+an exact zero for ~96.6% of draws at initialization — a real feature of the relaxation at
+these settings, affecting signal density.
 
-### 5.3 What the code actually computes — neither of the above
+**Corrected treatment of sampling (X21).** A **coherent single reparameterized sample can be
+unbiased** for `∇_λ J` under (i) and (ii); **multiple samples within an iteration are not
+required**, and the earlier suggestion that unbiasedness needs an averaging "the
+implementation does not realize" is withdrawn. **Initial-latent randomness and mask
+randomness are separate axes**: the fixed seed (§1.2c) constrains coverage of `x_T`, which
+is a coverage limitation, not a failure of per-sample unbiasedness in `ξ`.
+
+### 5.3 What the code actually computes — fresh replay, and what that does and does not imply
 
 `u` is redrawn on **every** hook call and there is **no RNG stashing** (§1.3). So:
 
@@ -327,24 +392,28 @@ The implemented quantity is therefore
 Σ_k ( ∂f_k/∂λ |_{z_k^A, ξ_k^B} )ᵀ ( Π_{j>k} ∂f_j/∂z |_{z_j^A, ξ_j^B} )ᵀ ∂ℓ/∂z_K|_{z_K^A}
 ```
 
-which is **not** the conditional pathwise gradient at `ξ^A` (wrong linearization noise) and
-**not** an unbiased estimate of `∇_λ J` (the factors carry independent `ξ^B`, so their
-expectation factorizes, whereas the true pathwise product shares one `ξ_k` per step). It is
-a **mismatched-realization estimator** whose bias we have **not** characterized and do not
-claim to bound.
+**Corrected characterization (X23).** Fresh replay **does not enforce conditional pathwise
+consistency**: the linearization noise differs from the noise that produced the stored
+trajectory. It therefore **removes the general unbiasedness guarantee** that a coherent
+single reparameterized sample would carry (§5.2). But **nonzero bias of this actual FLUX
+system was not analytically established**, and none is claimed here. The earlier flat
+assertion that the implemented quantity is "**not** an unbiased estimate of `∇_λ J`" is
+withdrawn as unproven; so is the framing that the native reference computes a gradient
+"that is not the exact gradient of its own forward trajectory" **as if the resulting bias
+were derived**. No measured or derived native bias is claimed anywhere in this record.
 
-> **So the native reference already pays the full price of an exact method for a gradient
-> that is not the exact gradient of its own forward trajectory.** `torch.utils.checkpoint`
-> exists precisely to avoid this: `preserve_rng_state` **defaults to `True`** and the
-> recompute runs under `torch.random.fork_rng` with the stashed forward state restored
-> (verified by static read of the locally installed
-> `torch/utils/checkpoint.py:291-297, 477, 1507-1513`). The published trainer hand-rolls its
-> own checkpointing and omits this.
+> **On RNG-preserving replay (X13).** `torch.utils.checkpoint`'s `preserve_rng_state`
+> **defaults to `True`** and the recompute runs under `torch.random.fork_rng` with the
+> stashed forward state restored (static read of the locally installed
+> `torch/utils/checkpoint.py:291-297, 477, 1507-1513`); the published trainer hand-rolls its
+> own checkpointing and omits this. **RNG-preserving replay changes the reference contract
+> — it is not proof of an unchanged native gradient**, and it does not establish what the
+> native gradient "should" have been.
 >
-> This is a **fidelity** finding, not a saving. It matters here because it **confounds**
-> any future efficiency comparison: a "cheaper" estimator could appear better or worse
-> purely through differing mask-noise consistency. See
-> [`FALSIFICATION_PLAN.md`](FALSIFICATION_PLAN.md) §3.
+> This remains a **reference-definition** issue, not a saving, and it is a **confound** for
+> any future efficiency comparison: two arms differing in mask-noise consistency are
+> estimating with respect to **different stochastic references**. Every cost expression in
+> [`COST_MODEL.md`](COST_MODEL.md) therefore names the reference it concerns.
 
 ### 5.4 The deployed artifact: the discrete mask
 
@@ -363,10 +432,17 @@ variance, or loss values says anything about them. See
 ## 6. Assumptions used, and what is derived vs. assumed
 
 **Derived from source** (traceable to file:line above): the computation (§2); the reverse
-accumulation (★) and its two-sweep structure (§3); the gate form and hence the lemma (†)
-and its corollary (§4); the four objective divergences (§1.2); `K = 5`; the bounded-noise
-relaxation and `P(clamp) = 0.9659` at `λ = 3`; the RNG mismatch (§5.3); targets cached and
-never recomputed; no VAE decode in the training graph; no `L0` term.
+accumulation (★) and its two-sweep structure (§3); the gate form and hence the **local
+identity** (†) (§4 — **not** its withdrawn corollary); the **target-construction** and
+**fixed-seed coverage** differences (§1.2a, §1.2c); `K = 5`; the bounded-noise relaxation
+and `P(clamp) = 0.9659` at `λ = 3`; the **fresh-replay** RNG behavior (§5.3); targets cached
+and never recomputed; no VAE decode in the training graph; no `L0` term in either the code's
+trained loss or the paper's Eq. 16.
+
+**Withdrawn from the "derived" list:** the impossibility corollary (X1); the exact-gradient
+"floor" as a theorem (X5); the "four objective divergences" count — (b) and (d) are not
+divergences (X19, X20); the `image[0]` batch-index reading (X24); and any derived native
+bias (X23).
 
 **Assumed** (and carried as uncertainty, never asserted):
 
@@ -375,29 +451,37 @@ never recomputed; no VAE decode in the training graph; no `L0` term.
    updates — see [`COST_MODEL.md`](COST_MODEL.md) §2). Unresolved.
 2. `with_flowedit=True` (the code default) is the published target construction. The paper
    says `ℱθ′(x_T, ∅)`. **Unresolved, and essential.**
-3. A reverse sweep over one step's graph costs `c_b · F` with `c_b ∈ [1,2]`. **Unmeasured.**
+3. A reverse sweep over one step's graph costs `c_b · F` with `c_b ∈ [1,2]`. **Unmeasured**,
+   and a **single** `c_b` is a simplification: state-only, mask-only and joint VJP costs may
+   differ, and [`COST_MODEL.md`](COST_MODEL.md) §1 now carries `c_state`, `c_mask`, `c_joint`
+   separately.
 4. Hook ordering stays aligned with `hook_counter`
    (`linear_layer_hooks.py:106-107`, modulo arithmetic over a fixed traversal order). A
    static-reading assumption we did not validate at runtime.
-5. The lemma assumes `epsilon = 0`. At `epsilon > 0` the gate gains the additive branch
-   `randn·epsilon·(1−m)` and (†) acquires a second term — still an elementwise byproduct,
-   so the corollary survives, but we only checked this for the published `epsilon: 0.0`.
+5. The local identity (†) assumes `epsilon = 0`. At `epsilon > 0` the gate gains the additive
+   branch `randn·epsilon·(1−m)` and (†) acquires a second term; we only checked the published
+   `epsilon: 0.0`.
 
 **Not established:** which of paper and code is authoritative; any runtime behavior, timing
-or memory figure; whether the snapshot is the publication implementation; the bias of the
-mismatched-realization estimator (§5.3).
+or memory figure; whether the snapshot is the publication implementation — **later
+source-release dates alone do not prove a different algorithm was used** (X26); and the bias
+of the fresh-replay estimator, which was **not** analytically established (X23).
 
 ---
 
 ## 7. Arithmetic checks
 
-Two tiny deterministic checks were run (exact rationals / scalar `math`), with no tensors,
-no model, no learned system, no simulation and no sweep:
+Tiny deterministic checks only (exact rationals / scalar `math`), with no tensors, no model,
+no learned system, no simulation and no sweep:
 
 - **Gate saturation** (§1.3): `P(m = 1)` at `λ ∈ {3, 1, 0}` = `0.9659 / 0.0417 / 0.0000`;
   noise range `[−1.0986, +1.0986]` at `eps = 0.5`.
 - **Reverse accumulation (★)** reproduces the analytically substituted gradient exactly on a
-  2-step rational chain, and the attempted design is unbiased but zero-saving on it. Full
-  worked example, including the variance, in [`ALGORITHM.md`](ALGORITHM.md) §3.
+  2-step rational chain. Full worked example in [`ALGORITHM.md`](ALGORITHM.md) §3, with the
+  corrected variance reading.
+- **Amendment counterexamples** (§4.1, [`CORRECTIONS.md`](CORRECTIONS.md) §G): expected
+  reverse depth `3/2` and expected main cost `8F` vs `A2 = 10F`; and zero importance-sampling
+  variance at `v = (10,15)`, `q = (2/5,3/5)`.
 
-Synthetic arithmetic is **not** FLUX evidence and certifies only the algebra.
+Synthetic arithmetic is **not** FLUX evidence and certifies only the algebra. **Scalar
+counterexamples are not model evidence** and are not reinterpreted as such.

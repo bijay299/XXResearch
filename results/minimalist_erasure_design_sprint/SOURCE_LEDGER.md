@@ -3,6 +3,12 @@
 **NO EXPERIMENTS.** Sources were **retrieved and read as text only**. No research code was
 imported or executed; no model, weight, checkpoint or dataset was downloaded or loaded.
 
+> **Amended 2026-10-17 — see [`CORRECTIONS.md`](CORRECTIONS.md).** The author-source
+> inspection is **reused unchanged at the same pin**; **no new source version was fetched**.
+> Corrected here: **inspection depths** for DRaFT (now §4 targeted) and ARTBP (now a primary
+> row), **removal of decisive claims resting on uninspected sources** (X28), and a rewritten
+> deductions list (§3.2) with the withdrawn items marked.
+
 ---
 
 ## 1. Primary sources
@@ -11,16 +17,19 @@ imported or executed; no model, weight, checkpoint or dataset was downloaded or 
 |---|---|---|---|---|
 | **P1** | **Minimalist Concept Erasure**, `arxiv.org/html/2507.13386v1` | **v1**, retrieved **2026-10-17** (also read for the closed gap map at `edaec97`, same version) | **targeted sections**: §3.2 / Eq. 16 (objective), §3.6 (mask, relaxation, binarization), **§3.7 verbatim in full** (gradient rule, step-wise checkpointing, prompt filtering, multi-GPU limitation), §4.1 (backbone), App. H.1 / Table 6 (hyperparameters) | explicit source claims |
 | **C1** | **Author source**, `github.com/YaNgZhAnG-V5/minimalist_concept_erasure` | **`d178324ec4a48d0536a595b25fdad587b441add8`** (HEAD at clone, 2025-12-02). Code added in a **single commit `1bb7ca2`, 2025-11-24**; repo created `67231ff`, 2025-06-20 (README only) | **relevant code, read line by line** (files in §2) | explicit source inspection |
-| **A1** | **DRaFT / DRaFT-K / DRaFT-LV** — Clark, Vicol, Swersky, Fleet, *Directly Fine-Tuning Diffusion Models on Differentiable Rewards*, `arXiv:2309.17400` | located 2026-10-17 | **abstract + method summary via search result text; full paper NOT read** | explicit (secondary-rendered quotes) — see §4 |
-| **A2** | **AlignProp** — Prabhudesai, Goyal, Pathak, Fragkiadaki, *Aligning Text-to-Image Diffusion Models with Reward Backpropagation*, `arXiv:2310.03739` | abstract page, retrieved 2026-10-17 | **abstract only** | explicit (abstract) |
+| **A1** | **DRaFT / DRaFT-K / DRaFT-LV** — Clark, Vicol, Swersky, Fleet, *Directly Fine-Tuning Diffusion Models on Differentiable Rewards*, `arXiv:2309.17400` | HTML, **§4 retrieved 2026-10-17 in the correction pass** (originally located via search-result text only) | **§4 targeted** — truncation form, stop-gradient, checkpointing, DRaFT-LV | explicit source claim |
+| **A1b** | **ARTBP** — Tallec & Ollivier, *Unbiasing Truncated Backpropagation Through Time*, `arXiv:1705.08209` | HTML, retrieved **2026-10-17 in the correction pass**; **promoted to a primary row** | **abstract + core mechanism** (variable truncation lengths, compensation factors, `1/p` reweighting) | explicit source claim |
+| **A2** | **AlignProp** — Prabhudesai, Goyal, Pathak, Fragkiadaki, *Aligning Text-to-Image Diffusion Models with Reward Backpropagation*, `arXiv:2310.03739` | abstract page, retrieved 2026-10-17 | **abstract only** | explicit (abstract). **Carries no decisive claim** (X28) |
+| **D1** | **Diffusers `BaseOutput`** — `github.com/huggingface/diffusers/blob/v0.31.0/src/diffusers/utils/outputs.py` | **v0.31.0**, retrieved **2026-10-17 in the correction pass**; the declared compatible version (`pyproject.toml:19`, `diffusers>=0.31.0`) | **targeted**: `__getitem__`, `to_tuple` | explicit source claim — grounds the withdrawal of the `image[0]` batch-index reading (X24) |
 | **T1** | **`torch.utils.checkpoint`** — locally installed `torch/utils/checkpoint.py` | `/data/bijaypandey/envs/eabu-cu124/lib/python3.10/site-packages/torch/utils/checkpoint.py`; **static read, module never imported** | lines **291-297** (fork_rng + state restore), **477** and **565** (`preserve = kwargs.pop("preserve_rng_state", True)`), **429** and **1439** (docstring), **1424** (signature default), **1488-1513** (non-reentrant path) | explicit source inspection |
 
 ### Cited by identifier only — **not inspected in this sprint**
 
 `Louizos, Welling, Kingma 2018` (hard concrete, `arXiv:1712.01312`); `Maddison et al. 2017`
 (`arXiv:1611.00712`); `Jang et al. 2017` (`arXiv:1611.01144`); `Chen et al. 2016` sublinear
-checkpointing (`arXiv:1604.06174`); `Williams & Peng 1990`; `Tallec & Ollivier 2017`
-(`arXiv:1705.08209`); REBAR / RELAX / ARMS. Named in
+checkpointing (`arXiv:1604.06174`); `Williams & Peng 1990`; REBAR / RELAX / ARMS.
+(**`Tallec & Ollivier 2017`, `arXiv:1705.08209`, was promoted to primary row A1b in this
+amendment** and is no longer identifier-only.) Named in
 [`ALGORITHM.md`](ALGORITHM.md) §4 to **locate** the design, **not** to support any claim
 about their contents beyond what is standard and attributed. **No novelty search is
 claimed.** `"Zhang et al. (2024d)"` — the work P1 §3.7 credits its checkpointing scheme to —
@@ -71,11 +80,21 @@ config assignment — searched across all `*.py` in the repository.
 - P1 §4.1: FLUX.1-schnell primary. P1 Table 6: batch 4, `lr = 0.5`, `β = 0.01`, Adam,
   400 steps, wd `1e-2`, 1× H100.
 - C1: every row of §2.
-- A1 (as rendered in retrieved summary text): DRaFT-K *"differentiates through only the last
-  K steps of sampling"*; *"while gradient checkpointing makes it possible to backpropagate
-  through the full sampling chain, optimization speed and overall performance can be
-  substantially improved by truncating backprop through only the last K sampling steps"*;
-  `K=1` best reward-vs-compute; DRaFT-LV reduces variance.
+- A1 (**§4, read in the correction pass**): DRaFT-K *"truncates backpropagation to only the
+  last K steps of sampling"*, implemented with `x_t = stop_grad(x_t)` and **no importance
+  weighting or bias correction**; checkpointing stores step input latents and recomputes
+  activations; DRaFT-LV *"noise the generated image n times, and use the summed reward
+  gradient over these examples"*. **Supports deterministic suffix truncation and
+  checkpointing — not randomized or reweighted truncation** (X27).
+- A1b (abstract + mechanism): ARTBP = *Anticipated Reweighted Truncated Backpropagation*,
+  which *"keeps the computational benefits of truncated BPTT, while providing unbiasedness"*
+  by *"using variable truncation lengths together with carefully chosen compensation factors
+  in the backpropagation equation"*; *"if a flow has a probability p to occur, multiplication
+  of the flow by 1/p restores balance on average"*. **Supports unbiased reweighted randomized
+  truncation.**
+- D1 (v0.31.0): `BaseOutput.__getitem__` is `return self.to_tuple()[k]` for non-`str` keys,
+  and `to_tuple` returns the declared non-`None` fields in order — so integer indexing
+  returns the **first output field**, not a batch element.
 - A2 (abstract): *"end-to-end backpropagation of the reward gradient through the denoising
   process"*; *"finetunes low-rank adapter weight modules and uses gradient checkpointing, to
   render its memory usage viable"*.
@@ -84,38 +103,66 @@ config assignment — searched across all `*.py` in the repository.
 
 ### 3.2 Our deductions (**not** source claims — ours, and falsifiable)
 
-1. **The lemma:** the mask gradient is an elementwise byproduct of the state-chain reverse
-   sweep, so it cannot be made cheaper. *Deduced* from the gate form at four lines plus
-   `epsilon: 0.0`. **This is the load-bearing claim of the sprint.**
-2. **The exact-gradient floor** `K·F·(1+c_b)`, attained by `A2`; and that `A1` is
-   bit-identical to the reference at `(2+c_b)/(2+2c_b)` of the cost.
-3. **The Amdahl ceiling:** a free gradient is worth ≤`1.33×` over `A2` at `c_b = 1`.
-4. **Four paper/code objective divergences** (target construction; replacement vs. sum;
-   single fixed `x_T`; no `L0` term in the trained loss).
-5. **The RNG mismatch** ⇒ the implemented gradient is neither the conditional pathwise
-   gradient nor an unbiased estimate of `∇E`. **We did not characterize or bound its bias.**
-6. **`P(m = 1) = 0.9659` at `λ = 3`** and the bounded noise range `[−1.0986, +1.0986]` at
-   `eps = 0.5`; hence the published relaxation is a **bounded-noise variant**, not the
-   hard-concrete distribution P1 cites.
+**Retained:**
+
+1. **The local gate derivative:** with `h ↦ m ⊙ h` at `epsilon = 0`, the mask derivative is
+   the incoming activation times the gate-output adjoint, with the appropriate reductions.
+   *Deduced* from the gate form at four lines plus `epsilon: 0.0`. **Conditional on the state
+   adjoint at that site already being computed.**
+2. **The reverse accumulation (★)** as the computation the native loop performs, and its
+   **two-sweep** structure; and that `A1` can return both derivatives **from the same
+   recomputed graph in exact arithmetic**.
+3. **`A2` is a different stochastic reference** (coherent graph) from the native fresh-replay
+   computation.
+4. **Two genuine objective differences:** target construction (P1 Eq. 16 `ℱθ′(x_T, ∅)` vs.
+   C1's FlowEdit-on-FLUX.1-dev default) and **fixed-seed coverage** of `x_T`.
+5. **Fresh replay removes the general unbiasedness guarantee** a coherent single
+   reparameterized sample would carry. **No nonzero bias of the actual system was
+   established, and none is claimed.**
+6. **`P(m = 1) = 0.9659` at `λ = 3`** and bounded noise `[−1.0986, +1.0986]` at `eps = 0.5`;
+   hence the published relaxation is a **bounded-noise variant**, not the hard-concrete
+   distribution P1 cites. The **clamped region has positive measure**; the transition
+   boundary is the measure-zero set.
 7. **Training resolution 1024×1024** (≈4608 tokens) from the absent `img_size`.
-8. **Cost composition** (gradient 54% / instrumentation 27% / preparation 19% at `c_b = 1`)
-   and the **break-even budget `ν < 1.23–1.56`**.
-9. **SSMG's unbiasedness, variance, and exact dominance.**
+8. **SSMG's unbiasedness** (counting draws with multiplicity) and its **variance formula**
+   under the stated assumptions.
+9. **Per-iteration prompt encoding** `F_txt` occurs inside each training forward preparation
+   (`models/flux.py:250`) — a cost term the original model omitted.
+
+**Withdrawn (see [`CORRECTIONS.md`](CORRECTIONS.md)):**
+
+- ~~The mask gradient "cannot be made cheaper"; no estimator can save anything~~ (X1) — a
+  non-sequitur from the conditional local identity.
+- ~~The exact-gradient **floor** `K·F·(1+c_b)` as a lower bound attained by `A2`~~ (X5) — an
+  ordinary reverse-mode cost model, not a theorem.
+- ~~`A1` is **bit-identical**; `25–33%` less work; identical optimization trajectory~~ (X11).
+- ~~The Amdahl ceiling of `1.33×` over `A2`~~ (X9) — the gradient-only ratio is **`2`**.
+- ~~Four paper/code objective divergences~~ (X19, X20) — term selection and the absent `L0`
+  term are **not** divergences; **two** genuine differences remain.
+- ~~The implemented gradient "is not an unbiased estimate of `∇E`"~~ (X23).
+- ~~Cost composition `54%/27%/19%` and break-even `ν < 1.23–1.56`~~ (X14, X10) — the
+  corrected break-even is `ν < c_base/c_new` = `5/3`, `15/7`.
+- ~~SSMG's **exact dominance** and "cannot break even for any parameters"~~ (X3).
+- ~~`image[0]` indexes batch element 0~~ (X24) — it returns the first declared output field.
+- ~~Preparation is the pipeline's **global peak memory**~~ (X15).
 
 ### 3.3 Unverified / unresolved — asserted by nobody here
 
 | item | why unresolved |
 |---|---|
 | **Which erasure target is authoritative** | P1 Eq. 16 says `ℱθ′(x_T, ∅)`; C1's default says FlowEdit-on-FLUX.1-dev. **Essential, and we did not adjudicate it** |
-| **Whether C1 @ `d178324` is the publication implementation** | all code in one commit **4 months after** P1 v1. A snapshot is not automatically the publication implementation |
+| **Whether C1 @ `d178324` is the publication implementation** | **Unverified.** All code landed in one commit, dated after P1 v1 — a **dating fact only**. **Later source-release dates alone do not prove a different algorithm was used for the publication** (X26) |
+| **The source-defined reference objective** | **Can be stated** from C1; its **alignment with the publication is unverified** (X25). The earlier claim that "there is no reference objective" is withdrawn |
 | `β`, batch size, `N_upd` | P1 Table 6 vs `configs/flux.yaml` disagree on all three |
 | Training step count in P1 | §4.1/Table 6 give **training steps (400)**, never the **sampler step count**; `K = 5` is from C1 only |
 | `F`, `c_b`, `D`, `F_dev`, `ν`, `A2` memory feasibility | **unmeasured**; no profiling authorized or performed |
 | `|D| ≈ 64` | depends on CLIP scores we did **not** compute |
 | Binarization threshold / sparsity ratio | unspecified in P1; hardcoded `0` with a `TODO` in C1's training-time logging |
 | `hook_counter` ordering | a static-reading assumption, **not runtime-validated** |
-| A1's full method details | **abstract/summary level only**; the full DRaFT paper was not read |
+| A1 beyond §4 / A1b beyond its mechanism | **not read.** DRaFT's §4 and ARTBP's mechanism are inspected; the rest of both papers is not. **No decisive claim rests on uninspected content** (X28) |
+| **Novelty of SSMG vs. ARTBP / DRaFT §4** | **UNRESOLVED.** The prior art raises a **novelty objection**; we established no additional useful technical claim, and assert **no novelty finding in either direction**. No broad literature survey was performed |
 | `"Zhang et al. (2024d)"` | not resolved to a specific paper |
+| `ν`, selection overhead, `F_txt`, `c_state`/`c_mask`/`c_joint`, graph-retention memory | **unmeasured or unquantified**; no profiling authorized or performed |
 
 **Static inspection is not runtime validation.** Nothing here is a reproduction, a method
 audit, or evidence that any claim of P1 is right or wrong.
@@ -128,10 +175,14 @@ audit, or evidence that any claim of P1 is right or wrong.
   rendering (Eq. 16, the §3.7 formula) passed through that tool's transcription; §3.7 was
   retrieved verbatim and is quoted as such, but **we did not verify the equations against
   the PDF typesetting**. Treat equation glyphs as transcribed, not photographed.
-- **A1's quotes are from retrieved search-result text, not the paper body.** They are
-  attributed at that depth in [`ALGORITHM.md`](ALGORITHM.md) §4 and are used only to
-  establish that truncated backprop through a sampler with checkpointing is **published** —
-  a point that does not turn on exact wording.
+- **A1 and A1b were re-read in the correction pass** to replace quotes that had originally
+  come from search-result text. DRaFT is now quoted from **§4** of the arXiv HTML and ARTBP
+  from its abstract and mechanism, both via a fetch-and-summarize tool. **Decisive claims
+  that had rested on summary-level reading are removed** (X28); what the two sources now
+  support is stated exactly in [`ALGORITHM.md`](ALGORITHM.md) §4 — **deterministic** suffix
+  truncation (DRaFT) and **unbiased reweighted variable-length** truncation (ARTBP) — and
+  these ground a **novelty objection**, not an impossibility.
+- **D1 was read at the pinned v0.31.0 path** for `__getitem__`/`to_tuple` only.
 - **C1 was cloned and read.** `git clone` of a public source repository is source retrieval.
   **Nothing was installed, imported, built or run**; no dependency, weight or model file was
   fetched; `pyproject.toml` was not acted on. The clone lives in the session scratchpad on

@@ -27,6 +27,9 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/FALSIFICATION_PLAN.md",
         f"{R}/SOURCE_LEDGER.md",
     ]),
+    ("Amendment — documentation-only correction pass (2026-10-17)", [
+        f"{R}/CORRECTIONS.md",
+    ]),
     ("Index generator", [
         "scripts/seq/publish_minimalist_erasure_design_sprint_evidence_index.py",
     ]),
@@ -54,9 +57,15 @@ def main() -> int:
         "No paper PDF/HTML and no third-party source is vendored. The author source is",
         "cited by pinned commit and line in `SOURCE_LEDGER.md`",
         "(`YaNgZhAnG-V5/minimalist_concept_erasure@d178324ec4a48d0536a595b25fdad587b441add8`),",
-        "read as text and never imported or executed. Decision: **STOP — the mask gradient",
-        "is a free byproduct of the state-chain reverse sweep; remaining headroom is exact",
-        "and ordinary, and the reference objective is unresolved**.", "",
+        "read as text and never imported or executed; this amendment **reused** that",
+        "inspection and fetched **no new source version**.", "",
+        "Decision: **STOP — DESIGN SPRINT CLOSED WITH CORRECTIONS.** No distinct, justified",
+        "improvement has been established; the proposed estimator's novelty,",
+        "variance/convergence and actual total-cost benefit remain unresolved, and fidelity",
+        "of the source-defined reference to the publication is not established. **This is",
+        "not an impossibility theorem.** The originally published dominance and",
+        "no-break-even proofs are **withdrawn** — see `CORRECTIONS.md`, which indexes every",
+        "replaced claim (X1–X30) and links the original publication at `53d3fb1`.", "",
         "Regenerate: `python scripts/seq/publish_minimalist_erasure_design_sprint_evidence_index.py`",
         "— run it LAST.", "",
     ]

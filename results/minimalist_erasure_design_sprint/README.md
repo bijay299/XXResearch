@@ -2,8 +2,15 @@
 
 Bounded design sprint on the **training efficiency of Minimalist Concept Erasure**
 (`arxiv.org/html/2507.13386v1`; author source `YaNgZhAnG-V5/minimalist_concept_erasure`).
-Derivation, one attempted algorithmic design, a complete cost model and a prospective
-falsification decision. **Nothing here was executed.**
+Derivation, one attempted algorithmic design, a cost model and a prospective falsification
+decision. **Nothing here was executed.**
+
+> **Amended 2026-10-17 — read [`CORRECTIONS.md`](CORRECTIONS.md) alongside this record.**
+> The original publication ([`53d3fb1`](https://github.com/bijay299/XXResearch/tree/53d3fb1c287b735176a8a1a192ec94ca48d1d3b3/results/minimalist_erasure_design_sprint),
+> preserved in Git history) asserted **impossibility and strict-dominance results it did
+> not establish**. Those proofs are **withdrawn** (X1–X5), along with dependent variance,
+> cost, objective-interpretation and prior-art claims (X6–X30). **The STOP is retained on
+> narrower grounds.** No new experimental or source evidence was produced or required.
 
 ## The question
 
@@ -13,65 +20,95 @@ falsification decision. **Nothing here was executed.**
 
 This was a **working hypothesis**, not a verified gap and not a novelty claim.
 
-## Decision: **STOP — the mask gradient is a free byproduct of the state-chain reverse sweep, so the available headroom is exact-and-ordinary (fused VJP, standard RNG-preserving checkpointing, DRaFT-K truncation), and no estimator contribution survives; compounded by an unresolved paper/code objective mismatch that prevents establishing the reference objective.**
+## Decision: **STOP — DESIGN SPRINT CLOSED WITH CORRECTIONS**
 
-Three of the four stated technical stopping conditions fire independently. No algorithm is
-proposed, and **no experiment is justified or authorized.**
+> **No distinct, justified improvement has been established. The proposed estimator's
+> novelty, variance/convergence and actual total-cost benefit remain unresolved; fidelity
+> of the source-defined reference to the publication is not established. No experiment is
+> authorized.**
 
-### The one-sentence technical reason
+**This is not an impossibility theorem and not a proof that estimators cannot save work.**
+The question is **closed as not established**, not closed as impossible.
 
-In the published trainer the mask enters as a **per-neuron multiplicative gate on hooked
-linear-layer outputs** (`src/diffsolver/hooks/linear_layer_hooks.py:70-75`), so
+### What the STOP now rests on
+
+1. **Novelty unresolved.** The one formulation developed — importance-weighted
+   step-subsampled mask gradients (SSMG) — is ordinary importance weighting over truncation
+   depth. **ARTBP** (`arXiv:1705.08209`) already obtains **unbiased** gradients from
+   **variable-length** truncation via compensation factors, and **DRaFT** §4 already
+   establishes **deterministic** suffix truncation with checkpointing. Those raise a
+   **novelty objection**; we did **not** resolve it, and we claim **no** novelty finding.
+2. **Variance and convergence unresolved.** The importance-sampling variance formula holds
+   under its assumptions, but the **update count required to reach comparable effectiveness
+   (`ν`) is unknown**. We do **not** claim added variance implies more updates.
+3. **Actual total-cost benefit unresolved.** Corrected break-even is
+   **`ν < c_base/c_new`** — `5/3` at `c_b = 1`, `15/7` at `c_b = 2`
+   ([`COST_MODEL.md`](COST_MODEL.md) §6). These corrected thresholds **still do not
+   establish useful actual-model savings**, and several cost terms remain unmodelled or
+   unmeasured.
+4. **Reference fidelity not established.** A **source-defined empirical reference objective
+   can be stated**, but its **alignment with the publication is unverified**: paper Eq. 16's
+   forget target is `ℱθ′(x_T, ∅)`, while the code default constructs targets with
+   **FlowEdit on FLUX.1-dev** at `T_steps=28` (`promptdataset.py:250-276`). `β`, batch size
+   and update count also disagree. We **identified** this; we did **not** adjudicate it.
+
+## What is retained, and what is withdrawn
+
+**Retained — the local derivative.** With the gate acting as `h ↦ m ⊙ h` at `epsilon = 0`
+(`ff_hooks.py:87`, `norm_hook.py:92`, `attention_processor.py:64`, `configs/flux.yaml:17`),
+the mask derivative is **the incoming activation times the gate-output adjoint, with the
+appropriate reductions**:
 
 ```
-∂L/∂m_j^(k)  =  Σ_{b,t}  h_{b,t,j} · ḡ_{b,t,j}        ḡ = ∂L/∂(m ⊙ h)
+∂L/∂m_j^(k)  =  Σ_{b,t}  h_{b,t,j} · ḡ_{b,t,j}
 ```
 
-where `ḡ` is **exactly the activation gradient the reverse sweep must already compute** in
-order to continue propagating toward `z_k`. The mask gradient at every hooked layer and
-every step therefore costs one elementwise multiply-accumulate on top of a sweep that has
-to happen anyway. **There is no mask-gradient work to make cheaper.** Any saving must come
-from not sweeping a step at all — which is truncated backpropagation through the sampler,
-published as **DRaFT-K** (`arXiv:2309.17400`) and **AlignProp** (`arXiv:2310.03739`).
+**Withdrawn — what we wrongly inferred from it.** This identity bounds the *marginal* cost
+of a mask term **given that the state adjoint at that site is already computed**. It does
+**not** show that every estimator must traverse the full reverse chain. Two regimes must be
+kept apart:
 
-## What *is* true about the headroom — and why it is not a contribution
+1. **If all state adjoints are always computed**, skipping cheap local mask terms offers
+   little saving. *This* is what the identity supports.
+2. **If reverse traversal stops after the earliest selected contribution**, cost depends on
+   a **random stopping depth**. A nonzero probability of a full sweep does **not** force
+   full expected cost.
 
-The native trainer is roughly **2× off the exact-gradient floor**, and every bit of that is
-recoverable **exactly**, with **no bias and no change to the objective**, by ordinary means:
+Under the record's own simplified expression,
+`E[C] = K·F + (1+c_b)·F·Σ_i q_i(K−i) + selection overhead`, with `K = 5`, `c_b = 1`, one
+draw and **all probabilities positive**, `q = (1/20,1/20,1/20,1/20,4/5)` gives expected
+reverse depth `3/2` and **expected main cost `8F` against the record's `A2 = 10F`** — so a
+saving is possible within this model if overhead is below `2F`.
 
-| | per-iteration cost | exact? | why it is ordinary |
+**That counterexample refutes the universal proof and nothing more.** It is **not** evidence
+of a FLUX speedup, **not** evidence of acceptable variance or convergence, **not** evidence
+of novelty, and it is **not adopted as a new algorithm proposal**.
+
+## The cost picture, corrected
+
+| | per-iteration cost | stochastic reference | status |
 |---|---|---|---|
-| **Native reference** | `K·F·(2 + 2c_b)` | yes | two separate `autograd.grad` sweeps over the same graph (`scripts/train.py:320-333`) |
-| **A1** fuse the two sweeps | `K·F·(2 + c_b)` | **yes, identical gradient** | one `autograd.grad` call with both input lists — correct autograd usage |
-| **A2** retain graph, drop recompute | `K·F·(1 + c_b)` | **yes** | the classic memory/time trade; costs `K×` activation memory |
-| *floor* for the exact relaxed gradient | `K·F·(1 + c_b)` | — | **A2 attains it** |
+| **native** | `K·F·(2 + 2c_b)` | fresh mask draws on each recompute | two separate `autograd.grad` sweeps (`train.py:320`, `:333`) |
+| **A1** fuse the sweeps | `K·F·(2 + c_b)` | **same as native** | returns both derivatives from the same recomputed graph **in exact arithmetic**; **no** bit-identity, fixed-runtime or identical-trajectory claim |
+| **A2** retain graph | `K·F·(1 + c_b)` | **coherent graph — a *different* reference** | **not** an exact substitute for the native estimator; ordinary reverse-mode cost, **not a lower-bound theorem** |
 
-With `c_b = 1`: `20F → 15F → 10F` per iteration (`K = 5`). See
-[`COST_MODEL.md`](COST_MODEL.md). `F` = one FLUX transformer forward; `c_b` = reverse-sweep
-cost in units of `F`; **both are unmeasured** and carried symbolically.
+Corrected conditional ceilings for a hypothetical **free** gradient, each **with its actual
+included costs** (`c_b = 1`): vs native gradient-only **`4×`**; vs `A2` gradient-only
+**`2×`** (*not* the `1.33×` previously published, which was the including-instrumentation
+figure); vs native including instrumentation **`2×`**; vs `A2` including instrumentation
+**`4/3×`**.
 
-A separate finding, and the **largest single reducible cost** in the published trainer:
+**Withdrawn:** the `54%/27%/19%` composition, the whole-run predicted ratios, and
+"preparation is the pipeline's global peak memory". Two resident models establish a
+**preparation memory burden**, not proof it exceeds the unknown training activation peak.
+Newly accounted or explicitly excluded: **per-iteration prompt encoding**
+(`inference_preparation_phase` calls `encode_prompt`, `models/flux.py:250`), decodes,
+optimizer work, I/O, batching, initialization, **separate `c_state`/`c_mask`/`c_joint`
+costs**, and graph-retention memory feasibility.
 
-- **Instrumentation ≈ 10·F per training iteration** — `plot_interval: 4` regenerates 8
-  images (3 validation prompts + 1 train prompt) × (continuous **and** binarized mask),
-  each `K = 5` forwards **plus a VAE decode**, every 4 iterations
-  (`scripts/train.py:344-414`). That is **33–50% of the gradient cost, in pure logging.**
-- **One-time dataset preparation ≈ 24% of total training**, dominated by a **FlowEdit pass
-  at `T_steps=28` on a second 12B model, FLUX.1-dev** (`promptdataset.py:78-84, 250-276`).
-
-None of this is an estimator. Reporting it as a speedup would be reporting that we removed
-logging and used autograd correctly.
-
-## The proposed additional claim — withdrawn
-
-The formulation actually developed was **SSMG — Step-Subsampled Mask Gradient with
-importance weighting** (sample a subset of steps at which to accumulate the mask term,
-reweight by `1/q_k`). It is **unbiased** for the relaxed pathwise gradient and **exactly
-dominated**: the state-chain VJP must traverse every step down to `min(S)` regardless, and
-the mask terms it skips were free. It buys **variance for no saving**. The full attempted
-formulation, its unbiasedness proof, the dominance argument, the exactly-verified worked
-counterexample, and the condition under which it *would* have been viable (and which this
-source graph does not satisfy) are in [`ALGORITHM.md`](ALGORITHM.md).
+Real, source-supported, and still **not** contributions: fusing the two sweeps; raising
+`plot_interval`; RNG-preserving replay (which **changes the reference contract** — it is
+**not** proof of an unchanged native gradient).
 
 ## Evidence limits — read before citing anything here
 
@@ -79,57 +116,43 @@ source graph does not satisfy) are in [`ALGORITHM.md`](ALGORITHM.md).
   features, no training/edit/replay, no generation, no classifiers or detectors, no image
   viewing or reannotation, no GPU allocation or polling, **no profiling**, no dependency or
   weight downloads, no environment rebuilding, no imported research code executed, no
-  runnable implementation, no adapters, no datasets or evaluation packages, no author or
-  reviewer contact.
-- **Static source reading only.** The author repository was cloned and read **as text**; it
-  was never imported or run. Pinned commit, paths and line numbers in
-  [`SOURCE_LEDGER.md`](SOURCE_LEDGER.md).
-- **Every cost figure is symbolic or an arithmetic consequence of source-supported
-  parameters.** `F`, `c_b`, VAE-decode cost and all hardware constants are **unmeasured and
-  labelled as such**. There are **no measured seconds, no speedups and no GPU-hours** in
-  this record, and none may be quoted as if measured.
-- **A STOP is specific to this formulation.** It is **not** a claim that Minimalist erasure
-  is optimally implemented, that its training cost is irreducible, that no estimator could
-  ever help, or that erasure-efficiency research is closed. A2 and the instrumentation
-  finding are real reducible costs — they are simply **not contributions**.
-- **The paper/code mismatch is unresolved, not adjudicated.** We did not determine which
-  artifact is authoritative. We did not patch the trainer, substitute a baseline, or claim
-  a faithful reproduction.
-- The repository snapshot is **not** established as the publication implementation: all code
-  arrived in a single commit on **2025-11-24**, ~4 months after paper v1 (**2025-07**).
+  runnable implementation or trainer patch, no adapters, no datasets, manifests or
+  evaluation packages, no author or reviewer contact.
+- **Static source reading only**, reused from the original inspection at the same pin
+  `d178324`. The repository was read **as text** and never imported or run.
+- **No measurements.** `F`, `c_b` (and the distinct `c_state`/`c_mask`/`c_joint`), `D`,
+  `F_txt`, `ν` and all hardware constants are **unmeasured** and labelled. There are **no
+  seconds, no speedups and no GPU-hours** here. Simplified arithmetic is not a measurement.
+- **Scalar/rational counterexamples certify algebra only** — they are **not** FLUX evidence
+  and say nothing about deletion, retained utility, rendering quality or robustness.
+- **A STOP is specific to this formulation.** It is **not** a claim that Minimalist's
+  training cost is irreducible, that estimators cannot save work, that the paper is wrong,
+  or that erasure-efficiency research is closed. **Later source-release dates alone do not
+  prove a different algorithm was used for the publication.**
 
 ## Relationship to closed work — nothing reopened
 
-This is a **new optimization question**, not a gap map, a candidate ranking, or a revision
-of C1–C3. Untouched and not reranked or revived:
-
-- the closed gap map at `edaec97` (**NONE — scoping pass closed with corrections**);
-- the changing-replacement closure at `5786864` (**NO_GO — CLOSED_CORRECTED**);
-- the FLUX chain-saw→parachute diagnostic at `0e88d26`, with its original numerical results
-  and **unused image budget unspent**;
-- the SD1.x and human-review closures and pauses;
-- previously unselected theory and evaluation formulations.
-
-No closed image, prompt, label or outcome was read, re-scored or mined for this sprint.
+This is a **correction pass** on a design sprint — not a new sprint, algorithm search,
+candidate ranking, successor project or revision of C1–C3. Untouched, unmodified and not
+reranked: the closed gap map at `edaec97`; the changing-replacement closure at `5786864`;
+the FLUX diagnostic at `0e88d26` with its original results and **unused budget**; the SD1.x
+and human-review closures and pauses; previously unselected theory/evaluation formulations.
+No closed image, prompt, label or outcome was read, re-scored or mined.
 
 ## Files
 
 | file | contents |
 |---|---|
-| [`DERIVATION.md`](DERIVATION.md) | source/objective map, the discrete computation, the reference mask gradient, the four distinct gradient notions, and the assumptions each needs |
-| [`ALGORITHM.md`](ALGORITHM.md) | the one attempted formulation (SSMG) in full, the dominance lemma, the exact worked counterexample, closest prior art, and the scoped stop |
-| [`COST_MODEL.md`](COST_MODEL.md) | symbolic accounting for reference / A1 / A2 / truncation, break-even conditions, the Amdahl ceiling, update-count uncertainty, and every unmeasured constant |
-| [`FALSIFICATION_PLAN.md`](FALSIFICATION_PLAN.md) | **why no experiment is justified**, and the outstanding requirements that would have to be met first. **Not execution-ready and not a plan to execute.** |
-| [`SOURCE_LEDGER.md`](SOURCE_LEDGER.md) | paper version, pinned source commit and lines, inspection depth, source claims vs. our deductions, and unverified claims |
+| [`CORRECTIONS.md`](CORRECTIONS.md) | **read alongside this record.** X1–X30: every replaced claim, the supplied counterexamples, and the corrected scope, with a pointer to the original publication |
+| [`DERIVATION.md`](DERIVATION.md) | source/objective map, the discrete computation, the reference mask gradient, the retained local identity, and the gradient notions kept separate |
+| [`ALGORITHM.md`](ALGORITHM.md) | the one attempted formulation (SSMG), preserved as a record with its corrected status, the unresolved novelty objection, and the scoped stop |
+| [`COST_MODEL.md`](COST_MODEL.md) | corrected symbolic accounting, per-reference cost expressions, corrected ceilings and break-even, and the newly accounted or excluded terms |
+| [`FALSIFICATION_PLAN.md`](FALSIFICATION_PLAN.md) | **why no experiment is justified** and what remains outstanding. **Not execution-ready; authorizes nothing** |
+| [`SOURCE_LEDGER.md`](SOURCE_LEDGER.md) | paper version, pinned source commit and lines, corrected inspection depths, source claims vs. our deductions, and unverified claims |
 | [`PUBLISHED_EVIDENCE_INDEX.md`](PUBLISHED_EVIDENCE_INDEX.md) | path, byte count and sha256 of every published file |
 
 ## Status
 
-**STOP — the mask gradient is a free byproduct of the state-chain reverse sweep; all
-available headroom is exact and ordinary (fused VJP / RNG-preserving checkpointing /
-published DRaFT-K truncation), and the reference objective cannot be established because
-the paper's erasure target (`ℱθ′(x_T, ∅)`, Eq. 16) and the code's default target
-(FlowEdit on FLUX.1-dev, `T_steps=28`) are different objectives.**
-
-Not DESIGN_READY_FOR_REVIEW. No follow-up job, monitor or scheduled task was created, and
-**no future computation is authorized by this sprint.**
+**STOP — DESIGN SPRINT CLOSED WITH CORRECTIONS.** Not `DESIGN_READY_FOR_REVIEW`. No
+follow-up job, monitor or scheduled task was created, and **no future computation is
+authorized.**

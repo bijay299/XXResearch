@@ -1,63 +1,86 @@
 # Falsification plan — **not produced: no experiment is justified**
 
 **NO EXPERIMENTS.** This file records *why* no prospective comparison is warranted and what
-would have to be true first. It is **not a plan to execute**, it is **not execution-ready**,
-and it authorizes nothing.
+remains outstanding. It is **not a plan to execute**, it is **not execution-ready**, and it
+**authorizes nothing**.
+
+> **Amended 2026-10-17 — see [`CORRECTIONS.md`](CORRECTIONS.md).** The original publication
+> required a future design to **defeat the local derivative identity**, **change the gate**,
+> or **reduce forward work** "to be mathematically possible", and treated empirical `ν` as
+> **mandatory knowledge** before a plan could be written. **All of these requirements are
+> withdrawn as invalid** (X29). The instruction to *"falsify the stop by falsifying the
+> lemma"* is also withdrawn (X30): the STOP no longer rests on that lemma.
 
 ---
 
 ## 1. The gate for building a plan was not met
 
-The sprint's own condition was: *"Only if a specific defensible design remains, describe one
+The sprint's condition was: *"Only if a specific defensible design remains, describe one
 minimal future comparison."*
 
-**No design remains.** [`ALGORITHM.md`](ALGORITHM.md) records the one formulation developed
-(SSMG) and its exact dominance; three of four technical stopping conditions fire
-independently. Accordingly **no comparison is specified here** — no arms, no tolerances, no
-seed counts, no resource ceiling, no case selection.
+**No sufficiently distinct, justified improvement was established.** The one formulation
+developed (SSMG, [`ALGORITHM.md`](ALGORITHM.md)) has **unresolved novelty**, **unresolved
+variance/convergence**, and **unresolved actual total-cost benefit**; and the
+source-defined reference objective's **fidelity to the publication is unverified**.
+Accordingly **no comparison is specified here** — no arms, no tolerances, no seed counts, no
+resource ceiling, no case selection.
 
-Writing a plan anyway would mean manufacturing an executable artifact to satisfy a file
-list. It would also be actively misleading: **there is nothing to falsify**, because there
-is no improvement claim. The honest deliverable is this statement.
+**This is a "not established" stop, not an impossibility stop.** The record no longer claims
+a design *cannot* succeed; it claims **this one was not shown to**.
 
 ### 1.1 Not created, by design
 
 No dataset, no case manifest, no evaluation package, no launcher, no config, no
-implementation patch, no adapter. No closed image, prompt, label or outcome was read,
-re-scored or mined — in particular nothing from the FLUX diagnostic at `0e88d26`, whose
-results and **unused image budget remain untouched and unspent**.
+implementation or trainer patch, no adapter. No closed image, prompt, label or outcome was
+read, re-scored or mined — in particular nothing from the FLUX diagnostic at `0e88d26`,
+whose results and **unused image budget remain untouched and unspent**.
 
 ---
 
-## 2. What would have to change to reopen the question
+## 2. What would have to be resolved to reopen the question
 
-All four are necessary. Any one unmet leaves the question closed.
+These are **the actual open questions**, not necessary conditions on a design's form.
 
-**(a) Resolve the paper/code objective mismatch.** Establish which erasure target is
-authoritative: paper Eq. 16's `ℱθ′(x_T, ∅)`, or the code's default FlowEdit-on-FLUX.1-dev
-target at `T_steps=28`, or the `CON_DECON_DICT` neutral-prompt branch
-(`DERIVATION.md` §1.2a). **Until this is settled there is no reference objective to be
-cheaper than.** This is a documentation/authorship question, not an experimental one — and
-it is not ours to settle unilaterally. We did not patch the trainer, substitute a baseline,
-or claim a reproduction.
+**(a) Novelty against ARTBP and DRaFT.** Establish an **additional useful technical claim**
+for a reweighted/randomized truncation scheme on this graph beyond **ARTBP**
+(`arXiv:1705.08209`, unbiased reweighted variable-length truncation) and **DRaFT** §4
+(deterministic suffix truncation with checkpointing). We did **not** resolve this, and we
+assert **no** novelty finding in either direction.
 
-**(b) Defeat the dominance lemma.** Exhibit a mask parameterization for which the per-step
-mask-Jacobian VJP is **not** an elementwise byproduct of the state VJP — e.g. dense weight
-masking `W ⊙ M`, or a low-rank/hypernetwork map `λ ↦ m`
-([`ALGORITHM.md`](ALGORITHM.md) §1.4). Native Minimalist is explicitly the opposite case
-(§3.6: *"neuron masking instead of weight masking"*), so **(b) requires changing the method,
-at which point it is no longer a cheaper gradient for native Minimalist** — it is a
-different method, needing its own deletion/utility/quality/robustness case.
+**(b) Variance and convergence.** `ν` — the update-count factor to reach comparable
+deletion, retained utility, rendering quality and robustness — is **unknown**.
+**Corrected (X29): `ν` is measurable by a future prospective test and is *not* a
+precondition for writing one.** It is listed here as an open quantity, not a gate.
 
-**(c) Beat the Amdahl ceiling.** The irreducible `K·F` forward caps a *free* gradient at
-`1.33×` over ordinary correct autograd usage at `c_b = 1`
-([`COST_MODEL.md`](COST_MODEL.md) §4.3). A design must clear that ceiling, which means
-reducing the **forward**, not the gradient — a different question from this sprint's.
+**(c) Net cost after the unmodelled terms.** Corrected break-even is `ν < c_base/c_new`
+(`5/3` at `c_b = 1`, `15/7` at `c_b = 2`, [`COST_MODEL.md`](COST_MODEL.md) §6) — a
+**nonvanishing but unresolved** condition. Resolving it requires accounting for
+per-iteration prompt encoding `F_txt`, selection overhead, distinct
+`c_state`/`c_mask`/`c_joint`, optimizer/I/O work, and the memory feasibility of graph
+retention.
 
-**(d) Supply evidence on `ν`.** Any biased estimator needs the update-count inflation to
-stay under `ν < 1.23–1.56` ([`COST_MODEL.md`](COST_MODEL.md) §6). `ν` is **unknown**, and
-DRaFT reports truncation depth trading against result quality. A margin that thin cannot be
-assumed.
+**(d) Reference fidelity.** Settle which erasure target is authoritative: paper Eq. 16's
+`ℱθ′(x_T, ∅)`, the code default's **FlowEdit on FLUX.1-dev** at `T_steps=28`, or the
+`CON_DECON_DICT` neutral-prompt branch; plus the `β`, batch-size and update-count
+disagreements. **A source-defined reference objective can be stated** — the accurate
+statement is that **its alignment with the publication is unverified** (X25). This is a
+documentation/authorship question, not an experimental one, and not ours to settle
+unilaterally. We did not patch the trainer, substitute a baseline, or claim a reproduction.
+
+### 2.1 Explicitly withdrawn requirements (X29)
+
+The following were published as things a future design **must** do. **None is a necessary
+condition**, and all are withdrawn:
+
+- ~~Exhibit a mask parameterization for which the mask-Jacobian VJP is *not* an elementwise
+  byproduct of the state VJP~~ — the local identity is **conditional on the state adjoint
+  being computed**; early-stopping estimators are not bound by it.
+- ~~Change the gate (e.g. to dense weight masking) — otherwise it "is no longer a cheaper
+  gradient for native Minimalist"~~.
+- ~~"Beat the Amdahl ceiling", i.e. reduce the **forward** rather than the gradient~~ — this
+  rested on the withdrawn `1.33×` figure (X9) and on reading an objective-specific forward
+  requirement as a bound on estimators.
+- ~~Supply `ν` before a plan can be written~~ — see (b).
 
 ---
 
@@ -65,28 +88,30 @@ assumed.
 
 Recorded because they are easy to get wrong, not because a comparison is contemplated.
 
-1. **Mask-RNG consistency.** The native trainer redraws gate noise on every recompute with
-   no RNG stashing, so it does **not** compute the pathwise gradient of its own trajectory
-   (`DERIVATION.md` §5.3). An arm that stashes RNG (torch's `preserve_rng_state` default)
-   computes a **different estimator**. Comparing a "cheaper" method against the native
-   reference without pinning this measures the confound, not the method.
+1. **Which stochastic reference each arm estimates.** The native trainer redraws gate noise
+   on every recompute with no RNG stashing (`DERIVATION.md` §5.3), so it does **not** enforce
+   conditional pathwise consistency. **RNG-preserving replay changes the reference contract
+   and is not proof of an unchanged native gradient** (X13). `A2` likewise retains a
+   **coherent** graph and is **not** an exact substitute for the native estimator (X12).
+   Arms differing here are estimating with respect to **different references**.
+   **No native bias is claimed as derived or measured** (X23).
 2. **Gate saturation at initialization.** `P(m = 1) = 0.9659` at `λ = 3`, where
-   `∂m/∂λ = 0` exactly (`DERIVATION.md` §1.3). Gradient-signal density changes by ~20× as
-   `λ` moves from 3 to 1, so any fixed-iteration-budget comparison is comparing different
+   `∂m/∂λ = 0`. The **clamped region has positive measure** and must be distinguished from
+   the measure-zero **transition boundary** (X22). Gradient-signal density changes by ~20×
+   between `λ = 3` and `λ = 1`, so fixed-iteration-budget comparisons may span different
    optimization regimes.
-3. **Instrumentation.** At `plot_interval: 4` logging is 27% of total work
-   ([`COST_MODEL.md`](COST_MODEL.md) §5). Any arm that changes it reports a logging
-   difference as a method difference.
-4. **`A1`/`A2` as the mandatory baseline.** A biased method must be compared against
-   **exact ordinary autograd usage**, never against the unfixed two-sweep reference.
-   Measured against the reference, a 2× "speedup" is just the fused VJP.
+3. **Instrumentation.** `plot_interval: 4` drives 8 image generations (with decodes and
+   their own prompt encoding) every 4 iterations. Any arm changing it reports a logging
+   difference as a method difference. **The previously published "27% of total work" figure
+   is withdrawn** (X14).
+4. **Baseline choice.** A method must be compared against **correct ordinary autograd usage**
+   (`A1`), not only against the native two-sweep loop — otherwise an apparent speedup is
+   just sweep fusion. `A1` carries **no verified runtime or trajectory claim** (X11).
 5. **The binarization threshold is hardcoded to 0** with an acknowledged `TODO`
    (`scripts/train.py:398-399`) and unspecified in the paper. Deletion and utility are
-   properties of the **binarized** mask, so an unspecified threshold is a free parameter
-   sitting directly on every outcome metric.
-6. **`A2`'s feasibility is an unmeasured memory question** (`≈5×` activation memory,
-   [`COST_MODEL.md`](COST_MODEL.md) §4.2). If it does not fit, the floor is unreachable and
-   the honest baseline is `A1`.
+   properties of the **binarized** mask, so this is a free parameter on every outcome metric.
+6. **`A2`'s feasibility is an unmeasured memory question** (≈5× activation memory,
+   [`COST_MODEL.md`](COST_MODEL.md) §4.2).
 
 ---
 
@@ -94,40 +119,42 @@ Recorded because they are easy to get wrong, not because a comparison is contemp
 
 | quantity | status |
 |---|---|
-| `F`, `c_b`, `D`, `F_dev` | **unmeasured**; no profiling authorized or performed |
-| `ν` (update-count inflation to comparable effectiveness) | **unknown**; no evidence |
-| authoritative erasure target | **unresolved** (§2a) |
+| `F`, `F_txt`, `c_state`, `c_mask`, `c_joint`, `D`, `F_dev` | **unmeasured**; no profiling authorized or performed |
+| `ν` | **unknown**; measurable by a future prospective test, **not** a precondition for one |
+| selection/estimation overhead for any sampling scheme | **unquantified** |
+| novelty vs. ARTBP / DRaFT §4 | **unresolved**; no finding claimed |
+| authoritative erasure target | **unresolved** (§2d) |
 | authoritative `N_upd` | **unresolved**: 80 (config) vs 400 (paper Table 6) |
 | authoritative `β` | **unresolved**: 0.1 (config) vs 0.01 (paper) |
 | authoritative batch size | **unresolved**: 1 (config) vs 4 (paper) |
 | `|D|` after CLIP filtering | **≈64, data-dependent, not computed** |
 | binarization threshold / sparsity ratio | **unspecified** in the paper; hardcoded `0` in training-time logging |
-| whether the repo snapshot is the publication implementation | **not established** (all code in one commit, 2025-11-24, vs. paper v1 2025-07) |
-| peak-memory feasibility of `A2` | **unmeasured** |
+| whether the repo snapshot is the publication implementation | **unverified**. **Later release dates alone do not prove a different algorithm was used** (X26) |
+| peak-memory feasibility of graph retention | **unmeasured** |
 
 ---
 
 ## 5. If a future reviewer disagrees with the stop
 
-The decisive claim is narrow and checkable **without any experiment**: the lemma that
-`∂L/∂m_j = Σ_{b,t} h_{b,t,j} · ḡ_{b,t,j}` makes every mask gradient an elementwise byproduct
-of the state-chain reverse sweep (`DERIVATION.md` §4), which rests on the gate being exactly
-`h ↦ m ⊙ h` at `epsilon = 0` — verifiable by reading four lines
-(`hooks/ff_hooks.py:87`, `hooks/norm_hook.py:92`, `hooks/attention_processor.py:64`,
-`configs/flux.yaml:17`).
+**Corrected (X30).** The STOP does **not** rest on the local derivative identity, so
+falsifying that identity would not overturn it. The STOP rests on the **absence of an
+established, sufficiently distinct and justified improvement** together with **unresolved
+fidelity and performance** (§2a–d).
 
-**Falsify the stop by falsifying the lemma, by static reading.** No GPU is needed, and none
-is authorized. If the lemma fails — a mask site we missed, or `epsilon > 0` in the published
-run — the estimator question reopens on its merits, and this sprint's conclusion should be
-revisited rather than defended.
+To overturn it, resolve §2(a) — an additional useful technical claim beyond ARTBP and
+DRaFT — and then §2(c). Both are **analytical and documentary** questions in the first
+instance; neither requires a GPU, and none is authorized here. §2(b) is the one genuinely
+empirical item, and it would belong to a **separately reviewed and separately authorized**
+future test, not to this record.
 
-**Reuse note.** Should the question ever reopen under §2, existing unchanged assets and
-infrastructure may be *proposed* for reuse. **Closed outcomes are not fresh confirmation**
-and must not be used as evidence for any new method.
+**Reuse note.** Should the question reopen, existing unchanged assets and infrastructure may
+be *proposed* for reuse. **Closed outcomes are not fresh confirmation** and must not serve as
+evidence for any new method.
 
 ---
 
 ## Status
 
-**No experiment is justified. No plan is execution-ready. No follow-up job, monitor or
-scheduled task was created, and no future computation is authorized by this sprint.**
+**STOP — DESIGN SPRINT CLOSED WITH CORRECTIONS. No experiment is justified. No plan is
+execution-ready. No comparison plan was manufactured or executed. No follow-up job, monitor
+or scheduled task was created, and no future computation is authorized.**
