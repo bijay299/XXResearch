@@ -1,6 +1,8 @@
 # Source ledger — modern erasure gap map
 
-Scoping date **2026-10-17**. Two evidence fields are tracked separately for every row:
+Scoping date **2026-10-17**; **amended 2026-10-17** (`CORRECTIONS.md`) to add two
+flow-targeted weight-space methods, qualify DVE's baseline attribution, and correct scope
+wording. Two evidence fields are tracked separately for every row:
 
 - **Inspection depth** — `abstract` / `methods` / `evaluation` / `relevant code`.
 - **Claim support** — `explicit source claim/result` (the source states it) /
@@ -15,7 +17,9 @@ image was viewed. **No exhaustive novelty search is claimed.**
 | # | Source | Version / date | Inspection depth | Used for | Claim support |
 |---|---|---|---|---|---|
 | S1 | **Mosaic / CoME-Bench**, `arxiv.org/abs/2605.25574v1` + `/html/2605.25574v1` | v1, fetched 2026-10-17 | **methods + evaluation** (HTML) | Inference-time vector-field blending with per-concept LoRA masks, "without additional optimization"; "We adopt FLUX.1-dev as our baseline T2I model" (§5.1); baselines **MACE** (weight-fused into DiT linear weights, App. A, Eq. 9) and **EraseAnything** (§5.1, Tbl 2); metrics ESR (VLM), C-CLIP, **Selective Alignment** (App. B), SSIM/MS-SSIM, FID, GFLOPs ratio (Tbl 4); limitations §6 — LoRA dependency, extra inference cost, object/character-level only | explicit source claim/result |
-| S2 | **DVE**, `arxiv.org/abs/2602.01089v1` + `/html/2602.01089v1` | v1, fetched 2026-10-17 | **methods + evaluation** (HTML) | Training-free inference-time velocity projection: `Δv = v_anc − v_era` (Eq. 6), `s = ⟨v_user, Δv/‖Δv‖⟩` (Eq. 8), correction only when `s < τ` (Eq. 9); requires erase/anchor/user prompts, **no weight modification, LoRA or classifier** (Alg. 1); "We use Flux.1-dev as our base model" (§5.1); baselines ESD, UCE, CA, MACE, EAP, Meta-Unlearning, EraseAnything (§5.1); I2P 4,703 prompts, 12 ImageNet objects, 3 styles; ASR over 4 attack suites (Tbl 2); latency 5.45 → 16.37 → 5.49 s (Tbl 6); multi-concept via independent `Δv⁽ⁱ⁾` (§4.4, Tbl 7/11); **sequential not addressed**; App. A.1 Case 3 "the velocity space of flow models is not a perfectly idealized semantic space" | explicit source claim/result |
+| S2 | **DVE**, `arxiv.org/abs/2602.01089v1` + `/html/2602.01089v1` | v1, fetched 2026-10-17 | **methods + evaluation** (HTML) | Training-free inference-time velocity projection: `Δv = v_anc − v_era` (Eq. 6), `s = ⟨v_user, Δv/‖Δv‖⟩` (Eq. 8), correction only when `s < τ` (Eq. 9); requires erase/anchor/user prompts, **no weight modification, LoRA or classifier** (Alg. 1); "We use Flux.1-dev as our base model" (§5.1); baselines ESD, UCE, CA, MACE, EAP, Meta-Unlearning, EraseAnything (§5.1); I2P 4,703 prompts, 12 ImageNet objects, 3 styles; ASR (Tbl 2); latency 5.45 → 16.37 → 5.49 s (Tbl 6); multi-concept via independent `Δv⁽ⁱ⁾` (§4.4, Tbl 7/11); **sequential not addressed**; **Table 5 ablates both `τ` and `γ`** (caption: *"Impact of erasure strength γ and threshold τ"*, reporting exposed-body count, CLIP, FID, incl. a projection-disabled condition). **Attribution caveats (amendment):** Table 1's caption states *"The results with \* are sourced from EraseAnything"* — some baseline numbers are **imported, not rerun**; and Table 2's robustness set is only CA (Model-base), ESD, EraseAnything and DVE, **smaller** than the §5.1 list (which also names UCE, MACE, EAP, Meta-Unlearning). Do **not** read this as every named baseline being independently rerun across all metrics, attacks and costs; App. A.1 Case 3 "the velocity space of flow models is not a perfectly idealized semantic space" | explicit source claim/result |
+| S2b | **Minimalist Concept Erasure**, `arxiv.org/html/2507.13386v1` | v1, fetched 2026-10-17 | **methods + evaluation** (§3.6, §4.1, App. E/H.1) | **Weight-space parameter masking**, not inference-time: `θ = M ⊙ θ′, M ∈ {0,1}^{\|θ\|}` (§3.6), hard-discrete sampling then binarisation, producing a modified checkpoint. Primary backbone **FLUX.1-schnell** — *"we focus on demonstrating a comprehensive study of our method on the latest state-of-the-art (SOTA) time-step distilled rectified flow image generative model, FLUX.1-Schnell"* (§4.1); SD-XL secondary in appendix. Multiple concepts (IP characters, art styles). ACC via LLaVA; CLIP/FID/SSIM; step-wise gradient checkpointing (§3.7). Stated limitation: that checkpointing *"lacks support for multi-GPU training, limiting the method's scalability"* | explicit source claim/result |
+| S2c | **EraseAnything**, `arxiv.org/html/2412.20413v1` | v1, fetched 2026-10-17 | **methods + evaluation** | **Flow-specific LoRA optimization** producing adapted weights, not an inference-time intervention; tunes `add_q_proj`/`add_k_proj` in dual-stream blocks (App. A). Backbone **FLUX.1-dev** (§5.1). Single-concept primary; multi-concept via normalized LoRA blending (App. F.2, Eq. 12); sequential not discussed as a distinct capability. NudeNet on I2P (4,703); FID/CLIP on MS-COCO 10k; synonym + black-box robustness (App. B); 3.57 MB LoRA per concept, single A100. Limitations (§6): degradation when erasing 10+ concepts via the normalized sum; no guaranteed erasure strength / no interactive intensity control | explicit source claim/result |
 | S3 | **EMMA**, `arxiv.org/abs/2512.17320v2` | v2, fetched 2026-10-17 | **abstract only** | Concept-erasure benchmark; 13 metrics; 5 methods analysed; robustness to indirect descriptions and visually similar non-targets; gender/ethnicity bias. **Backbone coverage not stated in the abstract** — whether flow models are included is **unverified** | explicit (abstract) / coverage unverified |
 | S4 | **M-ErasureBench**, `arxiv.org/abs/2512.22877v1` | v1, located 2026-10-17 via arXiv API listing | **listing/abstract only** | Multimodal erasure-evaluation benchmark across text prompts, learned embeddings and inverted latents; introduces an IRECE defense | explicit (listing) / details unverified |
 | S5 | **CEASE**, `arxiv.org/html/2610.01989v1` | v1, fetched 2026-10-17 (reused from the prior assessment's corrected record) | **methods + evaluation** | Sequential closed-form updates against running weights (§3.1); AIC `Δᵢc∗=0` "up to numerical precision" on the anchor response (§3.3); HOC orthogonal projection (Eq. 12–13); one generic anchor per task `person`/`art`/`object` (§4.1); ~13 s/request (App. A.6) | explicit source claim/result |
@@ -26,8 +30,9 @@ image was viewed. **No exhaustive novelty search is claimed.**
 
 ## Secondary mentions — named only inside S1/S2, **not independently inspected**
 
-**MACE**, **EraseAnything**, **ESD**, **CA**, **EAP**, **Meta-Unlearning**. Recorded as
-baselines reported by DVE §5.1 and Mosaic §5.1. Their own claims, scopes and limitations
+**MACE**, **ESD**, **CA**, **EAP**, **Meta-Unlearning**. Recorded as baselines reported by
+DVE §5.1 and Mosaic §5.1. (**EraseAnything** was promoted to a primary row, S2c, in this
+amendment.) Their own claims, scopes and limitations
 were **not** read; nothing in this map treats them as audited.
 
 ## In-repo records reused as **context only** (never as fresh confirmation data)
@@ -48,7 +53,15 @@ were **not** read; nothing in this map treats them as audited.
   at code level. **No imported research code was executed.**
 - Mosaic and DVE were previously known here at abstract level only; this pass raised them
   to methods/evaluation depth via fetched HTML, which is **not** independent reproduction.
-- Backbone naming: Mosaic and DVE both state **FLUX.1-dev**; our own closed records concern
-  **FLUX.1-schnell**. These are different checkpoints and are not treated as interchangeable.
+- Backbone naming: Mosaic, DVE and EraseAnything state **FLUX.1-dev**; Minimalist Concept
+  Erasure and our own closed records concern **FLUX.1-schnell**. Different checkpoints, not
+  treated as interchangeable.
+- **Corrected scope (amendment):** the observation that a method is inference-time applies
+  to **DVE and Mosaic as inspected**, and must not be generalised to the modern flow-erasure
+  landscape — S2b and S2c are flow-targeted **weight-space** methods. The earlier
+  characterisation of that landscape as inference-time, with weight editing "mainly ported
+  U-Net-era methods", is withdrawn.
+- These source claims are **not** independent reproductions, comprehensive method audits, or
+  proof that any candidate's objective is solved.
 - No author or reviewer was contacted; no dataset, benchmark or evaluation package was
   created or downloaded.

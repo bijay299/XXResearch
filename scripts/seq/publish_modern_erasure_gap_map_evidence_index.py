@@ -24,6 +24,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/GAP_MAP.md",
         f"{R}/CANDIDATES.md",
         f"{R}/SOURCE_LEDGER.md",
+        f"{R}/CORRECTIONS.md",
     ]),
 ]
 
@@ -49,7 +50,8 @@ def main() -> int:
         "No external paper PDFs/HTML are vendored: sources are cited by arXiv ID, version,",
         "inspection depth and claim-support status in `SOURCE_LEDGER.md`. The pinned DP",
         "source (`czhang024/CVPR_DouleProjection@3fc3d8afe03a400dfa71aaaa34b647fef6550e0f`)",
-        "is cited by commit and line, not copied. Decision: **NONE selected**.", "",
+        "is cited by commit and line, not copied. Decision: **NONE — scoping pass",
+        "closed with corrections**.", "",
         "Regenerate: `python scripts/seq/publish_modern_erasure_gap_map_evidence_index.py`",
         "— run it LAST.", "",
     ]

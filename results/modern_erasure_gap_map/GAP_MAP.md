@@ -1,89 +1,107 @@
 # Modern text-to-image concept-erasure — capability & assumptions gap map
 
-## Decision: **NONE selected**
+## Decision: **NONE — SCOPING PASS CLOSED WITH CORRECTIONS**
 
-Three distinct candidates were formulated and gated (`CANDIDATES.md`). **None clears the
-plausible-novelty gate**, and a strength elsewhere cannot compensate. The decision rests on
-two different grounds, kept separate on purpose:
+**No sufficiently specified and justified additional contribution was established in this
+bounded scoping pass.** That is the whole of the claim. It does **not** mean the three
+assessed directions are solved, impossible, or exhausted, and **no field-wide impossibility
+or solvedness conclusion follows.**
 
-- **Established coverage** — C2's measurement already exists (CoME-Bench evaluates a
-  weight-editing baseline, MACE fused into DiT linear weights, with a Selective-Alignment
-  metric); C1's weight-edit-vs-inference-time comparison on FLUX.1-dev already exists
-  (DVE §5.1 benchmarks ESD, UCE, CA, MACE, EAP, Meta-Unlearning, EraseAnything).
-- **Triviality / insufficient class** — what remains of C1 is either "build a better weight
-  edit" (method design) or an elementary expressiveness observation (a fixed linear map on
-  the conditioning path is not an input- and timestep-dependent velocity correction); C3
-  reduces to a threshold/attack study on a method whose own robustness is already measured
-  across four attack suites.
+> **Amended 2026-10-17** — see [`CORRECTIONS.md`](CORRECTIONS.md). The decision (**NONE**)
+> is retained; several supporting claims published at `5b2d184` were wrong or overreaching
+> and are corrected: a backwards description of DVE's Eq. 9 repair direction, an unsupported
+> expressiveness separation, an over-general "the frontier is inference-time" characterisation,
+> prior-art reasoning that treated existing comparisons as disproof, and blanket
+> field-closure wording. **No new experimental evidence was produced or required.**
 
-**NONE does not mean no gap exists in this field.** It means no candidate I could justify
-from the inspected evidence survived the bar that a model port, standard projection, generic
-bound, extra detector/attack, or bookkeeping is insufficient. Inspection was bounded (see
-`SOURCE_LEDGER.md`): no code was audited, several sources were read at abstract level only,
-and **no exhaustive novelty search is claimed**.
+Why no candidate was selected, stated correctly:
 
-No successor assessment, experiment or follow-up job is scheduled, and nothing here
-authorises implementation.
+- **C1 and C2**: repeating an existing comparison would not by itself establish novelty —
+  DVE §5.1 contains relevant FLUX baseline comparisons and CoME-Bench evaluates fused MACE
+  with non-target preservation metrics. But those comparisons **do not prove the task
+  solved and do not rule out a stronger algorithmic or theoretical contribution**. The
+  stronger hypothesis in each card was simply **not specified sharply enough to select**:
+  "build a better weight-space editor" is too vague to act on, not inadmissible.
+- **C3**: a sharper mechanistic claim about persistent non-activation might be worth
+  stating, but none was developed here to a selectable level. DVE's own Table 5 already
+  ablates threshold `τ` and strength `γ`, which covers an ordinary parameter sweep; it does
+  not settle the sharper claim either way.
+
+An **unresolved** essential gate prevents selection just as a failed one does. All three
+cards are retained as assessed (`CANDIDATES.md`); no replacement, fourth candidate,
+charter, dossier or successor assessment is created.
 
 ---
 
 ## 1. Capability and assumptions matrix
 
-Deployment contract is tracked separately from mechanism, because an inference-time
-intervention and a weight edit ship different artifacts: a weight edit yields a standalone
-checkpoint that carries the erasure wherever the weights go; an inference-time method
-protects only a serving stack whose sampling loop the provider controls. Neither is
-"better" in general — they answer different deployment questions.
+Deployment contract is tracked separately from mechanism, because a weight-space
+modification ships an artifact that carries the erasure wherever the weights go, whereas an
+inference-time intervention protects only a serving stack whose sampling loop the provider
+controls. Neither is "better" in general.
 
 | Method | Deployment contract | Mechanism / access needed | Scope (backbone, concepts, operation) | Evidence reported | Guarantee status | Inspection depth |
 |---|---|---|---|---|---|---|
-| **DP** (2604.10032; pinned `3fc3d8a`) | Standalone edited checkpoint | Closed-form edit of **2 global matrices** on the text-conditioning path: `context_embedder` (T5 seq) + `time_text_embed.text_embedder.linear_1` (CLIP pooled); guides **pooled** across erase tokens | FLUX.1-schnell in our records; objects; single or batch erase list (`;`-separated = batch **interface**) | Our closed run (context only): parachute 100→0; retention mixed | Hard null-space projection on preserve vectors; no semantic-absence guarantee | **relevant code** (lines cited) |
-| **UCE** (as implemented in the pinned DP repo) | Standalone edited checkpoint | Regularized closed-form least squares; last-content-token encoding; fp32 edit | FLUX adaptation in the pinned repo; objects | Our closed run (context only): cumulative retention failed on 2 classes | Soft trade-off, no exact preservation | **relevant code** |
-| **CEASE** (2610.01989v1) | Standalone edited checkpoint | Closed-form sequential update; AIC hard-constrains the anchor response, HOC projects off historical updates | SD 1.4/1.5/2.1 per prior record; one **generic** anchor per task (`person`/`art`/`object`); continual | ~13 s/request (App. A.6) | `Δᵢc∗=0` "up to numerical precision" on the anchor; not semantic absence over earlier prompts | **methods/eval** (no code; none released as of the 2026-10-11 record) |
-| **LACU v2** (2512.02657v2) | Fine-tuned checkpoint | Distillation from frozen teacher + ℓ2 reg; per-prompt mapping from 10 LLM+CLIP candidates, **recomputed every continual step** (§4.4, Alg. 1) | SD1.5 default; continual; `N_f=100` forget prompts/concept (§5.1) | ~60 min/update, 3×H100 | Soft losses; §5.3 addresses target-invalidation for the **newly requested** concept | **methods/eval** |
-| **AGE** (2501.18950v3) | Fine-tuned checkpoint | Minimax-selected concrete target (Eq. 3), Gumbel-Softmax relaxation (Eq. 4) | **Fixed erasure set assumed upfront**; not a continual method | 1000 steps, batch 1; `k=100` nearest concepts | Soft `L₁+λL₂` | **methods/eval** |
-| **DVE** (2602.01089v1) | **Inference-time** — erasure does **not** travel with weights | Velocity-field projection inside the ODE loop: `Δv = v_anc − v_era` (Eq. 6), correct only when `s < τ` (Eq. 9). Needs erase/anchor/user prompts; **no weights, LoRA or classifier** | **FLUX.1-dev**; NSFW (I2P 4,703), 12 ImageNet objects, 3 styles; multi-concept via independent `Δv⁽ⁱ⁾` (§4.4; 12 groups of 3). **Sequential not addressed** | Deletion (NudeNet / ResNet50 / style clf); FID MSCOCO30k; CLIP; **ASR over 4 attack suites** (Tbl 2); latency 5.45→16.37 s, 5.49 s with preprocessing (Tbl 6) | Empirical only; appendix notes velocity space "is not a perfectly idealized semantic space" | **methods/eval** |
-| **Mosaic + CoME-Bench** (2605.25574v1) | **Inference-time** | Vector-field blending with **pre-trained per-concept LoRA** masks; no optimization | **FLUX.1-dev**; compositional multi-concept within one scene; object/character-level | ESR (VLM), C-CLIP, **Selective Alignment**, SSIM/MS-SSIM, FID, GFLOPs ratio (Tbl 4); baselines **MACE (weight-fused into DiT)** and EraseAnything (§5.1, Tbl 2) | Empirical only | **methods/eval** |
-| **Continual-unlearning regularizers** (2511.07970v2) | Fine-tuning | Add-on regularizers + gradient projection orthogonal to a subspace | Sequential requests; reports **rapid utility collapse** from cumulative drift | — | — | **abstract only** |
-| **EMMA** (2512.17320v2) | Benchmark | 13 metrics; indirect descriptions, visually similar non-targets, gender/ethnicity bias; 5 methods | Architecture coverage **not stated in the abstract** | — | — | **abstract only** |
-| **M-ErasureBench** (2512.22877v1) | Benchmark | Multimodal: text prompts, learned embeddings, inverted latents; introduces an IRECE defense | — | — | — | **listing/abstract only** |
+| **DP** (2604.10032; pinned `3fc3d8a`) | Modified checkpoint | Closed-form edit of **2 conditioning-path matrices**: `context_embedder` (T5 seq) + `time_text_embed.text_embedder.linear_1` (CLIP pooled); guides **pooled** across erase tokens | FLUX.1-**schnell** in our records; objects; `;`-separated list = batch **interface** | Our closed run (context only) | Hard null-space projection on preserve vectors; no semantic-absence guarantee | **relevant code** |
+| **UCE** (as implemented in the pinned DP repo) | Modified checkpoint | Regularized closed-form least squares; last-content-token encoding | FLUX adaptation in the pinned repo; objects | Our closed run (context only) | Soft trade-off | **relevant code** |
+| **Minimalist Concept Erasure** (2507.13386v1) | **Modified checkpoint** | **Parameter masking / neuron-level ablation**: `θ = M ⊙ θ′, M ∈ {0,1}^{\|θ\|}` (§3.6); hard-discrete sampling then binarisation | **FLUX.1-schnell** primary (§4.1: *"we focus on … FLUX.1-Schnell"*); SD-XL in appendix; IP characters + art styles, multiple concepts | ACC via LLaVA; CLIP, FID, SSIM; step-wise gradient checkpointing (§3.7) | Empirical | **methods/eval** |
+| **EraseAnything** (2412.20413v1) | **Adapted checkpoint (LoRA)** | **Flow-specific LoRA optimization**; tunes `add_q_proj`/`add_k_proj` in dual-stream blocks (App. A) | **FLUX.1-dev**; single-concept primary, multi-concept via normalized LoRA blending (App. F.2, Eq. 12) | NudeNet on I2P (4,703); FID/CLIP on MS-COCO 10k; synonym + black-box robustness (App. B); 3.57 MB LoRA/concept, single A100 | Empirical | **methods/eval** |
+| **CEASE** (2610.01989v1) | Modified checkpoint | Closed-form sequential update; AIC hard-constrains the anchor response; HOC projects off historical updates | SD 1.4/1.5/2.1 per prior record; generic anchor per task; continual | ~13 s/request (App. A.6) | `Δᵢc∗=0` "up to numerical precision" on the anchor | **methods/eval** (no code released as of the 2026-10-11 record) |
+| **LACU v2** (2512.02657v2) | Fine-tuned checkpoint | Distillation from frozen teacher + ℓ2; mapping recomputed each continual step (§4.4, Alg. 1) | SD1.5 default; continual; `N_f=100` forget prompts/concept | ~60 min/update, 3×H100 | Soft losses | **methods/eval** |
+| **AGE** (2501.18950v3) | Fine-tuned checkpoint | Minimax target selection (Eq. 3), Gumbel-Softmax (Eq. 4) | **Fixed erasure set upfront**; not continual | 1000 steps, batch 1 | Soft `L₁+λL₂` | **methods/eval** |
+| **DVE** (2602.01089v1) | **Inference-time** | Velocity projection in the ODE loop; `Δv = v_anc − v_era` (Eq. 6), `s = ⟨v_user, Δv/‖Δv‖⟩` (Eq. 8); correction **only when `s < τ`** (Eq. 9). Needs prompts only — no weights, LoRA or classifier | **FLUX.1-dev**; NSFW/objects/styles; multi-concept via independent `Δv⁽ⁱ⁾` (§4.4); sequential not addressed | Deletion detectors; FID/CLIP; **ASR (Tbl 2)**; latency 5.45→16.37→5.49 s (Tbl 6); **τ/γ ablation (Tbl 5)** | Empirical; App. A.1 notes velocity space "is not a perfectly idealized semantic space" | **methods/eval** |
+| **Mosaic + CoME-Bench** (2605.25574v1) | **Inference-time** | Vector-field blending with **per-concept pre-trained LoRA** masks; no optimization | **FLUX.1-dev**; compositional multi-concept in one scene; object/character-level | ESR (VLM), C-CLIP, **Selective Alignment** (App. B), SSIM/MS-SSIM, FID, GFLOPs (Tbl 4); baselines **MACE fused into DiT** (App. A) + EraseAnything (§5.1, Tbl 2) | Empirical | **methods/eval** |
+| **Continual-unlearning regularizers** (2511.07970v2) | Fine-tuning | Add-on regularizers + gradient projection | Sequential requests; reports rapid utility collapse | — | — | **abstract only** |
+| **EMMA** (2512.17320v2) | Benchmark | 13 metrics; 5 methods; indirect descriptions, similar non-targets, bias | Backbone coverage not stated in abstract | — | — | **abstract only** |
+| **M-ErasureBench** (2512.22877v1) | Benchmark | Text prompts, learned embeddings, inverted latents; IRECE defense | — | — | — | **listing only** |
 
-Secondary mentions not independently inspected: **MACE**, **EraseAnything**, **ESD**, **CA**,
-**EAP**, **Meta-Unlearning** — known to me only as baselines named inside DVE §5.1 and
-Mosaic §5.1. They are recorded as such and not treated as audited.
+Secondary mentions **not independently inspected**: MACE, ESD, CA, EAP, Meta-Unlearning —
+known only as baselines named inside DVE §5.1 and Mosaic §5.1.
 
-### What the matrix shows
+### What the matrix shows (corrected)
 
-The recent flow-model frontier (DVE, Mosaic — both **FLUX.1-dev**) is **inference-time**.
-Both require control of the sampling loop; Mosaic additionally requires a per-concept LoRA
-and extra vector-field evaluations, DVE roughly 3× latency before its preprocessing
-optimisation. The weight-editing line that yields a distributable checkpoint is represented
-on flow backbones mainly by ported U-Net-era methods (UCE, MACE fused into DiT) plus the
-pinned DP/UCE FLUX adaptation. Benchmarks exist on both sides (CoME-Bench verified;
-EMMA and M-ErasureBench abstract-level only).
+**The modern flow-model erasure landscape is not characterised by inference-time methods.**
+Of the flow-targeted work inspected here, **two are weight-space** —
+Minimalist Concept Erasure (parameter masking, **FLUX.1-schnell**) and EraseAnything
+(flow-specific LoRA, FLUX.1-dev) — and **two are inference-time** (DVE, Mosaic). The
+earlier published statement that the frontier is inference-time, with weight editing
+represented "mainly by ported U-Net-era methods", was an artifact of which papers that pass
+happened to inspect and is **withdrawn**. Weight-space erasure on flow backbones is an
+active, current line, not a vacancy.
 
-## 2. Gate results
+The genuine distinction that survives is narrower and still useful: **DVE and Mosaic, as
+inspected, do not modify weights**, so their erasure does not travel with a released
+checkpoint — DVE states it needs "no weight modification, LoRA or external classifiers", and
+Mosaic depends on per-concept LoRA masks plus extra vector-field evaluations. That is a
+property of **those two inspected methods**, not of the field.
+
+## 2. Gate results (corrected)
 
 | Candidate | Relevance | Plausible novelty | Measurability | Feasibility | Outcome |
 |---|---|---|---|---|---|
-| **C1** — erasure that survives weight release on flow backbones | **PASS** — open-weight release is a real contract (FLUX weights are distributed) | **FAIL** — DVE §5.1 already benchmarks weight-edit baselines on FLUX.1-dev; the residue is either method design ("a better weight edit") or an elementary expressiveness point | PASS — deletion/utility/cost are separately definable | UNRESOLVED — a fair comparison needs backbone-scale generation | **Rejected** |
-| **C2** — compositional selective removal by weight-only edits | PASS | **FAIL** — established coverage: CoME-Bench evaluates MACE weight-fusion with a Selective-Alignment metric on exactly this task | PASS | UNRESOLVED | **Rejected** |
-| **C3** — blind spot of thresholded velocity projection (`s ≥ τ` ⇒ no correction) | PASS | **FAIL** — DVE already reports ASR across four attack suites; τ and γ are its own knobs, so this reduces to a sweep or a new attack (insufficient class) | PASS | PASS (analysis-first) | **Rejected** |
+| **C1** — erasure carried by released weights on flow backbones | **PASS** | **UNRESOLVED — insufficiently specified.** Repeating DVE's existing FLUX baseline comparison would not establish novelty; but that comparison does not prove the task solved or exclude a stronger algorithmic/theoretical result. C1 as written reduces to "build a better weight-space editor", which is **too vague to select, not inadmissible** | PASS | UNRESOLVED | **Not selected** |
+| **C2** — compositional selective removal under weight-space edits | PASS | **UNRESOLVED — insufficiently specified.** CoME-Bench evaluates fused MACE with non-target preservation metrics, so re-running that comparison adds nothing; it does **not** show weight-space methods cannot achieve compositional selectivity. **C2 specializes C1** (same weight-release objective, compositional setting) rather than being an independent mechanism | PASS | UNRESOLVED | **Not selected** |
+| **C3** — persistent non-activation of thresholded velocity correction | PASS | **UNRESOLVED — insufficiently specified.** DVE Table 5 already ablates `τ` and `γ`, covering an ordinary sweep; a sharper mechanistic claim about *persistent* non-activation across a trajectory was **not developed here** to a selectable level, and existing ASR results neither establish nor exclude it | PASS | PASS (analysis-first) | **Not selected** |
 
-No candidate passes every gate, so **NONE is selected**. Per the rules, a strong Relevance
-or Feasibility score does not offset a failed novelty gate, and I have not required
-experimental proof at this scoping stage — C1–C3 fail on *attribution to existing work* and
-*insufficient claim class*, not on being untested.
+**Three cards do not mean three independent technical mechanisms**: C2 is a specialization
+of C1. An unresolved essential gate prevents selection exactly as a failure would, so the
+outcome is NONE either way — but the *reason* is under-specification, not refutation.
 
-## 3. What would change this
+## 3. What this pass could not settle
 
-Honest statement of what my inspection could not settle, recorded as **limits, not gaps**:
+Recorded as limits, **not** as gaps and **not** as coverage:
 
-- EMMA and M-ErasureBench were read at abstract/listing level. If either already covers
-  flow backbones with the weight-edit vs inference-time distinction, that further
-  *strengthens* NONE; if neither does, that absence still would not by itself establish a
-  gap.
-- No code was audited for DVE, Mosaic, CEASE, LACU or AGE; MACE and EraseAnything were not
-  inspected at all. A deeper audit could reveal either prior coverage I missed or a sharper
-  distinction — in the latter case a **new, separately declared** scoping pass would be
-  required. Nothing here schedules one.
+- EMMA, M-ErasureBench and 2511.07970v2 were read at abstract/listing level only.
+- No code was audited beyond the pinned DP repository; MACE, ESD, CA, EAP and
+  Meta-Unlearning were not inspected at all.
+- **DVE's reported comparisons are not uniformly first-party**: Table 1 states *"The results
+  with * are sourced from EraseAnything"*, and its robustness table (Tbl 2) covers only
+  CA (Model-base), ESD, EraseAnything and DVE — a **smaller set** than the full §5.1
+  baseline list (which also names UCE, MACE, EAP, Meta-Unlearning). Nothing here should be
+  read as every named baseline having been independently rerun across all metrics, attacks
+  and costs.
+- Backbone versions differ and are not interchangeable: Mosaic, DVE and EraseAnything use
+  **FLUX.1-dev**; Minimalist Concept Erasure and our own closed records use
+  **FLUX.1-schnell**.
+- Source reading here is **not** independent reproduction, a comprehensive method audit, or
+  proof that C1/C2 is solved. **No exhaustive novelty search is claimed.**
