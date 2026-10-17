@@ -16,7 +16,8 @@ being run and against what.
 | Model | `black-forest-labs/FLUX.1-schnell` rev `741f7c3ce8b383c54771c7003378a50191e9efe9` (already downloaded, hash-verified in `../RUN_MANIFEST.md`) |
 | Environment | `/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/venv_flux_dp_uce` (Python 3.10.12, torch 2.4.0+cu121, diffusers 0.30.2, transformers 4.44.2) — reused, nothing installed |
 | Work directory | `/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/` (all compute, scratch, logs, images on `/data`) |
-| Hardware | 1x NVIDIA A100-SXM4-40GB, `CUDA_VISIBLE_DEVICES=2`, verified 0% util / 14MiB before allocation; GPUs 0/1/3 untouched |
+| Hardware (**initial allocation**, as frozen pre-generation) | 1x NVIDIA A100-SXM4-40GB, `CUDA_VISIBLE_DEVICES=2`, verified 0% util / 14MiB before allocation; GPUs 0/1/3 untouched **at that moment** |
+| Hardware (**post-execution correction C5** — what was actually used over the whole run) | GPU 2 ran every edit and all four generations. **GPU 3 was additionally used later in the run, concurrently with GPU 2**, for residual logging and the `DP_SEQ` classification pass; it was verified idle immediately before that first use. GPUs 0/1 were never used. The row above records the *initial* allocation only and must not be read as exclusive use of a single physical GPU throughout. |
 | `/data` free at start | 652 GB |
 
 ## Frozen inputs verified by hash before use
@@ -62,15 +63,30 @@ Reused existing outputs (not regenerated): M0 (1,000 images), DP A-parent `DP_B`
    guide and preservation response is computed from the edited parent, (c) verifies the
    actually-loaded tensors are bitwise equal to the parent, exactly two expected keys,
    finite, native dtype (no silent casting — a dtype mismatch is a hard failure), and
-   save/reload integrity of the produced child, and (d) for DP only, clones the final
-   fp32 matrices at the moment of the native bf16 cast (shape+dtype filtered, observational
-   only) for the protocol's pre-cast residual log.
+   a save/reload check on the produced child (see the correction immediately below), and
+   (d) for DP only, clones the final fp32 matrices at the moment of the native bf16 cast
+   (shape+dtype filtered, observational only) for the protocol's pre-cast residual log.
    **The pinned source files are not modified.** Native arithmetic, update order, token
    handling, precision and guide semantics are untouched.
+
+   > **Post-execution correction C8 — what `save_reload_bitwise_identical` actually
+   > records.** The executed code (`run_edit_with_parent.py`, the `child2 = load_file(...)`
+   > block) deserializes the **saved file a second time** and compares that against the
+   > first deserialization of the same file. It is a **repeated-deserialization
+   > determinism check**, *not* a documented comparison against the in-memory tensor as it
+   > existed before saving. It therefore does not, on its own, rule out a
+   > serialization-time discrepancy between the in-memory edit result and the stored file.
+   > No further integrity experiment was run; the recorded field and its value are
+   > unchanged, only its description is corrected.
+
 2. `*_B_direct` and `*_BATCH` endpoints are run through the **native CLI unchanged**
    (no adapter, no patching) — the no-parent path remains the native reproduction.
 3. Residual logging is computed **post hoc** from saved checkpoints plus cached text
-   encodings; it does not alter any edit.
+   encodings; it does not alter any edit. **Post-execution correction C3:** that logger
+   hardcodes **bf16** text encoders for both methods, while native UCE encodes in fp32 —
+   so UCE's logged residuals are probes on bf16 encodings, not measurements of its native
+   fp32 preservation vectors. The executed logger source and its outputs are preserved
+   unchanged as historical artifacts; see `FINAL_REPORT.md` §3 and `CORRECTIONS.md`.
 
 No tuning knob exists in any of the above, and nothing is adjusted in response to
 residuals or to any intermediate result.

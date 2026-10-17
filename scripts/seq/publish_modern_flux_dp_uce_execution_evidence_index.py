@@ -25,10 +25,11 @@ def listing(sub: str, pattern: str = "*") -> list[str]:
 
 
 GROUPS: list[tuple[str, list[str]]] = [
-    ("Reports and manifest", [
+    ("Reports, manifest and corrections", [
         f"{R}/README.md",
         f"{R}/FINAL_REPORT.md",
         f"{R}/EXECUTION_MANIFEST.md",
+        f"{R}/CORRECTIONS.md",
     ]),
     ("Gate evaluation, paired transitions and the C/U case-judgment record", [
         f"{R}/evidence/ANALYSIS.json",

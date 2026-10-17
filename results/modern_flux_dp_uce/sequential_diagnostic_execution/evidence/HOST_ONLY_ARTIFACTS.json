@@ -1,5 +1,5 @@
 {
-  "note": "Deliberately NOT published (repo policy): edited checkpoints and the full raw generation output. Identified here by host path, byte count and sha256 so any row can be verified on the host.",
+  "note": "Deliberately NOT published (repo policy). NOTE (post-execution correction C6): the two inventory sections below carry DIFFERENT levels of identification. 'checkpoints' and 'instrumentation_captures' are hash-identified (host path + bytes + sha256). 'raw_generation' is inventoried ONLY by directory path, image count and total bytes -- individual images are NOT individually hashed, and no full-image hashing campaign was run. The 140 PUBLISHED panel images are individually hashed separately in evidence/panel_hashes.csv.",
   "checkpoints": [
     {
       "host_path": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/DP_B_direct/models/flux_double_proxy_Parachute.safetensors",
@@ -26,22 +26,40 @@
     {
       "host_dir": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/DP_B_direct/images",
       "n_images": 1000,
-      "total_bytes": 342724958
+      "total_bytes": 342724958,
+      "hash_status": "not hash-indexed per image (directory-level accounting only)"
     },
     {
       "host_dir": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/DP_SEQ/images",
       "n_images": 1000,
-      "total_bytes": 320406390
+      "total_bytes": 320406390,
+      "hash_status": "not hash-indexed per image (directory-level accounting only)"
     },
     {
       "host_dir": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/UCE_B_direct/images",
       "n_images": 1000,
-      "total_bytes": 336870829
+      "total_bytes": 336870829,
+      "hash_status": "not hash-indexed per image (directory-level accounting only)"
     },
     {
       "host_dir": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/UCE_SEQ/images",
       "n_images": 1000,
-      "total_bytes": 315519061
+      "total_bytes": 315519061,
+      "hash_status": "not hash-indexed per image (directory-level accounting only)"
+    }
+  ],
+  "identification_levels": {
+    "checkpoints": "host_path + bytes + sha256 (file-level hash, no tensor deserialization)",
+    "instrumentation_captures": "host_path + bytes + sha256 (file-level hash, no tensor deserialization)",
+    "raw_generation": "host_dir + n_images + total_bytes ONLY -- not hash-indexed per image"
+  },
+  "instrumentation_captures": [
+    {
+      "host_path": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/logs/DP_SEQ.precast_fp32.pt",
+      "bytes": 59770400,
+      "sha256": "5a3995fbd0d1fed27c69e1d7a0b26d91a5159f16f8441014bcd49e40c06da9a8",
+      "what": "DP_SEQ pre-cast fp32 weight capture taken by the adapter at the native bf16 cast site; the source of DP's pre-cast residual rows. Preserved on host, NOT committed. Hashed at file level only -- tensors were not loaded to produce this entry.",
+      "added_by": "post-execution correction C7 (inventory completeness); artifact itself unchanged"
     }
   ]
 }

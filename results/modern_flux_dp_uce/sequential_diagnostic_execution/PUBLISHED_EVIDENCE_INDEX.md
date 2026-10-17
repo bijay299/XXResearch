@@ -10,7 +10,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `c2c0388da4b8` — the commit that *records*
+Generated at parent commit `ffc133f1e94c` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Deliberately excluded** (repo policy, hashed instead in
@@ -24,13 +24,14 @@ and this host's venv/model caches.
 Regenerate: `python scripts/seq/publish_modern_flux_dp_uce_execution_evidence_index.py`
 — run it LAST.
 
-## Reports and manifest
+## Reports, manifest and corrections
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/modern_flux_dp_uce/sequential_diagnostic_execution/README.md` | 3,290 | `b2c3859ebe5c19f44abbc4979d541921d27f0003e30bad93e490f3ba49be3d9e` |
-| `results/modern_flux_dp_uce/sequential_diagnostic_execution/FINAL_REPORT.md` | 12,195 | `4144a0a21e7adf8dca1f110b82a714c3bb0849f48038bcbd868e002d7366aa45` |
-| `results/modern_flux_dp_uce/sequential_diagnostic_execution/EXECUTION_MANIFEST.md` | 8,558 | `5440a1304efde6eaf8c3d56d0d5a40440a3c748bef367adae87169e4a8f93550` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_execution/README.md` | 4,599 | `bb13dc83bee5aa7edc5b002f5de91f2fa8b84d5858de5ea16a954d3a69ae9e13` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_execution/FINAL_REPORT.md` | 17,209 | `e4570e9b5f0afaed15d62178752f02ef1ded048ed5ac099f0092d57224d6f321` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_execution/EXECUTION_MANIFEST.md` | 10,289 | `e2c1320cba65a47923c136e80dfa15cf672244e356bd3a51125611523f9655f0` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_execution/CORRECTIONS.md` | 8,892 | `1759c1556a9a32fd2b724938057c949c3338d37ea09861d7f1af5b7ab74160b6` |
 
 ## Gate evaluation, paired transitions and the C/U case-judgment record
 
@@ -41,7 +42,7 @@ Regenerate: `python scripts/seq/publish_modern_flux_dp_uce_execution_evidence_in
 | `results/modern_flux_dp_uce/sequential_diagnostic_execution/evidence/DP_SEQ_chain_saw_transitions.csv` | 10,237 | `3557c978e6a5bff1153e7e125a98f41fe8547db044e628fc9ee8d8c48a9fd50f` |
 | `results/modern_flux_dp_uce/sequential_diagnostic_execution/evidence/UCE_SEQ_chain_saw_transitions.csv` | 9,204 | `c9a37b544ca525acf16ae7aa2d8b8e40438d9837b6ae7d954cd5e4e572df08e2` |
 | `results/modern_flux_dp_uce/sequential_diagnostic_execution/evidence/panel_hashes.csv` | 16,105 | `6951c96dda4cedbe4c9b4030c79fb9e23171594414d95118e41c2488d9618e97` |
-| `results/modern_flux_dp_uce/sequential_diagnostic_execution/evidence/HOST_ONLY_ARTIFACTS.json` | 2,011 | `7e297377a68cf83247a622a3e9730f2789a082f2e0b044357838845f891e89c6` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_execution/evidence/HOST_ONLY_ARTIFACTS.json` | 3,638 | `9e75bee3a23a5261abd66c6800387b045d9314eb02800918c3ceb912c402045a` |
 
 ## Per-image classifier predictions — all 4,000 newly generated images
 
@@ -253,4 +254,4 @@ Regenerate: `python scripts/seq/publish_modern_flux_dp_uce_execution_evidence_in
 
 ---
 
-**187 files listed**, none absent.
+**188 files listed**, none absent.
