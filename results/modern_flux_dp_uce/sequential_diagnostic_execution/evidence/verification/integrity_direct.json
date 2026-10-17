@@ -1,0 +1,66 @@
+{
+  "DP_B_direct": {
+    "path": "runs/DP_B_direct/models/flux_double_proxy_Parachute.safetensors",
+    "sha256": "ba91e2443451836d9bae02e305ef67138dcc7297262a2670f17ac21ee8a68b35",
+    "keys": [
+      "context_embedder.weight",
+      "time_text_embed.text_embedder.linear_1.weight"
+    ],
+    "exactly_two_expected_keys": true,
+    "save_reload_bitwise_identical": true,
+    "tensors": {
+      "context_embedder.weight": {
+        "shape": [
+          3072,
+          4096
+        ],
+        "dtype": "torch.bfloat16",
+        "finite": true,
+        "fro_norm_fp32": 165.34326171875
+      },
+      "time_text_embed.text_embedder.linear_1.weight": {
+        "shape": [
+          3072,
+          768
+        ],
+        "dtype": "torch.bfloat16",
+        "finite": true,
+        "fro_norm_fp32": 23.564266204833984
+      }
+    },
+    "all_finite": true,
+    "technical_integrity_pass": true
+  },
+  "UCE_B_direct": {
+    "path": "runs/UCE_B_direct/models/flux_UCE_proxy_Parachute.safetensors",
+    "sha256": "badb20e3f0fbe9efb577882120b9ef0c89ad0c2bb5a80f746bdce598bcff2766",
+    "keys": [
+      "context_embedder.weight",
+      "time_text_embed.text_embedder.linear_1.weight"
+    ],
+    "exactly_two_expected_keys": true,
+    "save_reload_bitwise_identical": true,
+    "tensors": {
+      "context_embedder.weight": {
+        "shape": [
+          3072,
+          4096
+        ],
+        "dtype": "torch.float32",
+        "finite": true,
+        "fro_norm_fp32": 165.2400360107422
+      },
+      "time_text_embed.text_embedder.linear_1.weight": {
+        "shape": [
+          3072,
+          768
+        ],
+        "dtype": "torch.float32",
+        "finite": true,
+        "fro_norm_fp32": 23.56836700439453
+      }
+    },
+    "all_finite": true,
+    "technical_integrity_pass": true
+  }
+}

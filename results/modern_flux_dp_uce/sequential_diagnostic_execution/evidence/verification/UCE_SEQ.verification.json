@@ -1,0 +1,136 @@
+{
+  "utc": "2026-10-17T16:19:50.202729+00:00",
+  "method": "UCE",
+  "exp_name": "flux_UCE_proxy_ChainSaw_then_Parachute",
+  "argv": [
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/adapter/run_edit_with_parent.py",
+    "--method",
+    "UCE",
+    "--parent_checkpoint",
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors",
+    "--parent_sha256",
+    "bd21369aed67f69f199d037fce27041da300aab17ba2179f23a9f08f9155ee20",
+    "--edit_concepts",
+    "parachute",
+    "--guide_concepts",
+    "cloth",
+    "--preserve_concepts",
+    "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn",
+    "--save_dir",
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/UCE_SEQ/models",
+    "--exp_name",
+    "flux_UCE_proxy_ChainSaw_then_Parachute",
+    "--verification_log",
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/logs/UCE_SEQ.verification.json"
+  ],
+  "native_source_dir": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/source_repo/Flux",
+  "parent_verification": {
+    "parent_path": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors",
+    "parent_sha256_expected": "bd21369aed67f69f199d037fce27041da300aab17ba2179f23a9f08f9155ee20",
+    "parent_sha256_actual": "bd21369aed67f69f199d037fce27041da300aab17ba2179f23a9f08f9155ee20",
+    "parent_sha256_match": true,
+    "parent_keys": [
+      "context_embedder.weight",
+      "time_text_embed.text_embedder.linear_1.weight"
+    ],
+    "parent_tensor_meta": {
+      "context_embedder.weight": {
+        "shape": [
+          3072,
+          4096
+        ],
+        "dtype": "torch.float32",
+        "finite": true,
+        "fro_norm_fp32": 165.25363159179688
+      },
+      "time_text_embed.text_embedder.linear_1.weight": {
+        "shape": [
+          3072,
+          768
+        ],
+        "dtype": "torch.float32",
+        "finite": true,
+        "fro_norm_fp32": 23.555145263671875
+      }
+    },
+    "pristine_fro_norm_before_merge": {
+      "context_embedder.weight": 165.26602172851562,
+      "time_text_embed.text_embedder.linear_1.weight": 23.553926467895508
+    },
+    "loaded_fro_norm_after_merge": {
+      "context_embedder.weight": 165.25363159179688,
+      "time_text_embed.text_embedder.linear_1.weight": 23.555145263671875
+    },
+    "loaded_equals_parent_bitwise": {
+      "context_embedder.weight": true,
+      "time_text_embed.text_embedder.linear_1.weight": true
+    }
+  },
+  "edit_concepts": [
+    "parachute"
+  ],
+  "guide_concepts": [
+    "cloth"
+  ],
+  "preserve_concepts_in_order": [
+    "cassette player",
+    "chain saw",
+    "church",
+    "english springer",
+    "gas pump",
+    "tench",
+    "garbage truck",
+    "golf ball",
+    "french horn"
+  ],
+  "edit_time_max_sequence_length": 256,
+  "edit_torch_dtype": "torch.float32",
+  "native_entrypoint": "UCE_original.UCE",
+  "uce_hyperparams": {
+    "erase_scale": 10,
+    "preserve_scale": 1,
+    "lamb": 0.1
+  },
+  "child_checkpoint": {
+    "path": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/UCE_SEQ/models/flux_UCE_proxy_ChainSaw_then_Parachute.safetensors",
+    "sha256": "04d0dbbd2c4092fdb20e1c04d86300d26e6eaa3eff39ab984df5e5b27a84dc91",
+    "keys": [
+      "context_embedder.weight",
+      "time_text_embed.text_embedder.linear_1.weight"
+    ],
+    "exactly_two_expected_keys": true,
+    "tensors": {
+      "context_embedder.weight": {
+        "shape": [
+          3072,
+          4096
+        ],
+        "dtype": "torch.float32",
+        "finite": true,
+        "fro_norm_fp32": 165.25071716308594
+      },
+      "time_text_embed.text_embedder.linear_1.weight": {
+        "shape": [
+          3072,
+          768
+        ],
+        "dtype": "torch.float32",
+        "finite": true,
+        "fro_norm_fp32": 23.570592880249023
+      }
+    },
+    "save_reload_bitwise_identical": true,
+    "all_finite": true
+  },
+  "child_minus_parent": {
+    "time_text_embed.text_embedder.linear_1.weight": {
+      "delta_fro_norm": 0.8239039778709412,
+      "changed": true
+    },
+    "context_embedder.weight": {
+      "delta_fro_norm": 4.763692378997803,
+      "changed": true
+    }
+  },
+  "technical_integrity_pass": true
+}

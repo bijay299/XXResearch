@@ -1,0 +1,370 @@
+{
+  "endpoint": "UCE_SEQ",
+  "method": "UCE",
+  "child": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/UCE_SEQ/models/flux_UCE_proxy_ChainSaw_then_Parachute.safetensors",
+  "parent_source": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors",
+  "preserve_concepts_in_order": [
+    "cassette player",
+    "chain saw",
+    "church",
+    "english springer",
+    "gas pump",
+    "tench",
+    "garbage truck",
+    "golf ball",
+    "french horn"
+  ],
+  "evaluation_representation": "both child and parent cast to bfloat16 (exactly what generate_erased_flux.py loads), then promoted to fp32 for the residual arithmetic; dW is never cast alone",
+  "rows": [
+    {
+      "stage": "post_cast",
+      "vector": "cassette player::clip_pooled",
+      "residual_l2": 0.8889033198356628,
+      "input_l2": 28.113798141479492,
+      "relative_residual": 0.03161804446920896,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "chain saw::clip_pooled",
+      "residual_l2": 0.9299450516700745,
+      "input_l2": 29.14289093017578,
+      "relative_residual": 0.03190984222869839,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "church::clip_pooled",
+      "residual_l2": 0.9991711974143982,
+      "input_l2": 28.87649154663086,
+      "relative_residual": 0.03460154415923065,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "english springer::clip_pooled",
+      "residual_l2": 0.8836170434951782,
+      "input_l2": 28.151094436645508,
+      "relative_residual": 0.031388372678858814,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "gas pump::clip_pooled",
+      "residual_l2": 0.8996968269348145,
+      "input_l2": 28.551645278930664,
+      "relative_residual": 0.03151120778313727,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "tench::clip_pooled",
+      "residual_l2": 0.9024022221565247,
+      "input_l2": 28.90037727355957,
+      "relative_residual": 0.031224582766333504,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "garbage truck::clip_pooled",
+      "residual_l2": 0.9223162531852722,
+      "input_l2": 29.05467414855957,
+      "relative_residual": 0.031744160972839455,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "golf ball::clip_pooled",
+      "residual_l2": 0.931488037109375,
+      "input_l2": 29.395118713378906,
+      "relative_residual": 0.031688527819600784,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "post_cast",
+      "vector": "french horn::clip_pooled",
+      "residual_l2": 0.9189068078994751,
+      "input_l2": 28.779748916625977,
+      "relative_residual": 0.03192893762073877,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8257741928100586
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "cassette player::clip_pooled",
+      "residual_l2": 0.88282310962677,
+      "input_l2": 28.113798141479492,
+      "relative_residual": 0.031401773078972225,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "chain saw::clip_pooled",
+      "residual_l2": 0.9230722188949585,
+      "input_l2": 29.14289093017578,
+      "relative_residual": 0.03167401000492955,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "church::clip_pooled",
+      "residual_l2": 0.9940710663795471,
+      "input_l2": 28.87649154663086,
+      "relative_residual": 0.03442492536789946,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "english springer::clip_pooled",
+      "residual_l2": 0.8804153203964233,
+      "input_l2": 28.151094436645508,
+      "relative_residual": 0.031274639157557876,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "gas pump::clip_pooled",
+      "residual_l2": 0.8947482705116272,
+      "input_l2": 28.551645278930664,
+      "relative_residual": 0.03133788829927415,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "tench::clip_pooled",
+      "residual_l2": 0.8982794284820557,
+      "input_l2": 28.90037727355957,
+      "relative_residual": 0.03108192740805066,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "garbage truck::clip_pooled",
+      "residual_l2": 0.9172594547271729,
+      "input_l2": 29.05467414855957,
+      "relative_residual": 0.031570116740498616,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "golf ball::clip_pooled",
+      "residual_l2": 0.9250680208206177,
+      "input_l2": 29.395118713378906,
+      "relative_residual": 0.03147012365694519,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "french horn::clip_pooled",
+      "residual_l2": 0.9140433073043823,
+      "input_l2": 28.779748916625977,
+      "relative_residual": 0.03175994724458288,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8239039778709412
+    },
+    {
+      "stage": "post_cast",
+      "vector": "cassette player::t5_last",
+      "residual_l2": 2.883488416671753,
+      "input_l2": 7.026694297790527,
+      "relative_residual": 0.41036201298503006,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "chain saw::t5_last",
+      "residual_l2": 2.8873047828674316,
+      "input_l2": 7.46148157119751,
+      "relative_residual": 0.386961323339976,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "church::t5_last",
+      "residual_l2": 2.8673691749572754,
+      "input_l2": 7.1454010009765625,
+      "relative_residual": 0.40128876945680053,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "english springer::t5_last",
+      "residual_l2": 2.849856376647949,
+      "input_l2": 7.656445503234863,
+      "relative_residual": 0.3722166343956709,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "gas pump::t5_last",
+      "residual_l2": 2.8769538402557373,
+      "input_l2": 7.9549384117126465,
+      "relative_residual": 0.3616563311187657,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "tench::t5_last",
+      "residual_l2": 2.8755242824554443,
+      "input_l2": 7.484540939331055,
+      "relative_residual": 0.38419514379895287,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "garbage truck::t5_last",
+      "residual_l2": 2.8855130672454834,
+      "input_l2": 6.880444526672363,
+      "relative_residual": 0.4193788724056502,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "golf ball::t5_last",
+      "residual_l2": 2.8810484409332275,
+      "input_l2": 8.38748550415039,
+      "relative_residual": 0.3434937013611045,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "post_cast",
+      "vector": "french horn::t5_last",
+      "residual_l2": 2.877019166946411,
+      "input_l2": 7.334132671356201,
+      "relative_residual": 0.3922780369358117,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.775290489196777
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "cassette player::t5_last",
+      "residual_l2": 2.88157057762146,
+      "input_l2": 7.026694297790527,
+      "relative_residual": 0.41008907681205664,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "chain saw::t5_last",
+      "residual_l2": 2.8839192390441895,
+      "input_l2": 7.46148157119751,
+      "relative_residual": 0.3865075872031328,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "church::t5_last",
+      "residual_l2": 2.8650403022766113,
+      "input_l2": 7.1454010009765625,
+      "relative_residual": 0.4009628433568733,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "english springer::t5_last",
+      "residual_l2": 2.8464343547821045,
+      "input_l2": 7.656445503234863,
+      "relative_residual": 0.371769687850515,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "gas pump::t5_last",
+      "residual_l2": 2.8736701011657715,
+      "input_l2": 7.9549384117126465,
+      "relative_residual": 0.36124353859668523,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "tench::t5_last",
+      "residual_l2": 2.8730952739715576,
+      "input_l2": 7.484540939331055,
+      "relative_residual": 0.38387060706335663,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "garbage truck::t5_last",
+      "residual_l2": 2.8817691802978516,
+      "input_l2": 6.880444526672363,
+      "relative_residual": 0.4188347379484769,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "golf ball::t5_last",
+      "residual_l2": 2.878591299057007,
+      "input_l2": 8.38748550415039,
+      "relative_residual": 0.34320074802306244,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "french horn::t5_last",
+      "residual_l2": 2.8741698265075684,
+      "input_l2": 7.334132671356201,
+      "relative_residual": 0.3918895328595259,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 4.763692378997803
+    }
+  ],
+  "notes": [
+    "time_text_embed.text_embedder.linear_1.weight: pre-cast residual taken directly from the saved fp32 child minus fp32 parent (UCE edits in fp32 end-to-end; no cast occurs at edit time)",
+    "context_embedder.weight: pre-cast residual taken directly from the saved fp32 child minus fp32 parent (UCE edits in fp32 end-to-end; no cast occurs at edit time)"
+  ],
+  "summary": {
+    "post_cast|time_text_embed.text_embedder.linear_1.weight": {
+      "n": 9,
+      "max_residual_l2": 0.9991711974143982,
+      "max_relative": 0.03460154415923065
+    },
+    "pre_cast|time_text_embed.text_embedder.linear_1.weight": {
+      "n": 9,
+      "max_residual_l2": 0.9940710663795471,
+      "max_relative": 0.03442492536789946
+    },
+    "post_cast|context_embedder.weight": {
+      "n": 9,
+      "max_residual_l2": 2.8873047828674316,
+      "max_relative": 0.4193788724056502
+    },
+    "pre_cast|context_embedder.weight": {
+      "n": 9,
+      "max_residual_l2": 2.8839192390441895,
+      "max_relative": 0.4188347379484769
+    }
+  }
+}

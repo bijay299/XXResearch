@@ -1,0 +1,568 @@
+{
+  "endpoint": "DP_SEQ",
+  "method": "DP",
+  "child": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/DP_SEQ/models/flux_double_proxy_ChainSaw_then_Parachute.safetensors",
+  "parent_source": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors",
+  "preserve_concepts_in_order": [
+    "cassette player",
+    "chain saw",
+    "church",
+    "english springer",
+    "gas pump",
+    "tench",
+    "garbage truck",
+    "golf ball",
+    "french horn"
+  ],
+  "evaluation_representation": "both child and parent cast to bfloat16 (exactly what generate_erased_flux.py loads), then promoted to fp32 for the residual arithmetic; dW is never cast alone",
+  "rows": [
+    {
+      "stage": "post_cast",
+      "vector": "cassette player::clip_pooled",
+      "residual_l2": 0.04414583742618561,
+      "input_l2": 28.113798141479492,
+      "relative_residual": 0.0015702551894278638,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "chain saw::clip_pooled",
+      "residual_l2": 0.03862548992037773,
+      "input_l2": 29.14289093017578,
+      "relative_residual": 0.0013253829214446007,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "church::clip_pooled",
+      "residual_l2": 0.04804211109876633,
+      "input_l2": 28.87649154663086,
+      "relative_residual": 0.0016637101159324046,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "english springer::clip_pooled",
+      "residual_l2": 0.038439471274614334,
+      "input_l2": 28.151094436645508,
+      "relative_residual": 0.0013654698704919975,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "gas pump::clip_pooled",
+      "residual_l2": 0.04101520776748657,
+      "input_l2": 28.551645278930664,
+      "relative_residual": 0.0014365269450077275,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "tench::clip_pooled",
+      "residual_l2": 0.039574649184942245,
+      "input_l2": 28.90037727355957,
+      "relative_residual": 0.001369347147628705,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "garbage truck::clip_pooled",
+      "residual_l2": 0.04148086532950401,
+      "input_l2": 29.05467414855957,
+      "relative_residual": 0.001427683033628532,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "golf ball::clip_pooled",
+      "residual_l2": 0.03969983011484146,
+      "input_l2": 29.395118713378906,
+      "relative_residual": 0.0013505585911028305,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "post_cast",
+      "vector": "french horn::clip_pooled",
+      "residual_l2": 0.04001445323228836,
+      "input_l2": 28.779748916625977,
+      "relative_residual": 0.001390368392309779,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8094130754470825
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "cassette player::clip_pooled",
+      "residual_l2": 7.719119707871869e-07,
+      "input_l2": 28.113798141479492,
+      "relative_residual": 2.745669464163567e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "chain saw::clip_pooled",
+      "residual_l2": 8.505328423780156e-07,
+      "input_l2": 29.14289093017578,
+      "relative_residual": 2.9184916637674334e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "church::clip_pooled",
+      "residual_l2": 8.380646363548294e-07,
+      "input_l2": 28.87649154663086,
+      "relative_residual": 2.9022384350311072e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "english springer::clip_pooled",
+      "residual_l2": 6.848603106845985e-07,
+      "input_l2": 28.151094436645508,
+      "relative_residual": 2.4328017236626012e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "gas pump::clip_pooled",
+      "residual_l2": 7.414063247779268e-07,
+      "input_l2": 28.551645278930664,
+      "relative_residual": 2.5967201453186954e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "tench::clip_pooled",
+      "residual_l2": 7.30147576177842e-07,
+      "input_l2": 28.90037727355957,
+      "relative_residual": 2.52642922016745e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "garbage truck::clip_pooled",
+      "residual_l2": 7.909983992249181e-07,
+      "input_l2": 29.05467414855957,
+      "relative_residual": 2.7224480136327154e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "golf ball::clip_pooled",
+      "residual_l2": 8.052498401411867e-07,
+      "input_l2": 29.395118713378906,
+      "relative_residual": 2.7393998574827494e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "french horn::clip_pooled",
+      "residual_l2": 7.898262879280082e-07,
+      "input_l2": 28.779748916625977,
+      "relative_residual": 2.74438213556383e-08,
+      "module": "time_text_embed.text_embedder.linear_1.weight",
+      "delta_fro_norm": 0.8086374402046204
+    },
+    {
+      "stage": "post_cast",
+      "vector": "cassette player::t5_tok0",
+      "residual_l2": 0.0324217714369297,
+      "input_l2": 7.696187496185303,
+      "relative_residual": 0.0042127055055506245,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "cassette player::t5_tok1",
+      "residual_l2": 0.02960735559463501,
+      "input_l2": 7.026694297790527,
+      "relative_residual": 0.004213553961490077,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "chain saw::t5_tok0",
+      "residual_l2": 0.030643383041024208,
+      "input_l2": 7.223989963531494,
+      "relative_residual": 0.00424189169637827,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "chain saw::t5_tok1",
+      "residual_l2": 0.031560055911540985,
+      "input_l2": 7.46148157119751,
+      "relative_residual": 0.004229730464438558,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "church::t5_tok0",
+      "residual_l2": 0.03036150522530079,
+      "input_l2": 7.1454010009765625,
+      "relative_residual": 0.004249097457392703,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "english springer::t5_tok0",
+      "residual_l2": 0.030311675742268562,
+      "input_l2": 7.135527610778809,
+      "relative_residual": 0.004247993616685086,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "english springer::t5_tok1",
+      "residual_l2": 0.032246872782707214,
+      "input_l2": 7.680903434753418,
+      "relative_residual": 0.004198317692265382,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "english springer::t5_tok2",
+      "residual_l2": 0.03227232024073601,
+      "input_l2": 7.656445503234863,
+      "relative_residual": 0.004215052562850593,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "gas pump::t5_tok0",
+      "residual_l2": 0.030148634687066078,
+      "input_l2": 7.2998223304748535,
+      "relative_residual": 0.004130050475503136,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "gas pump::t5_tok1",
+      "residual_l2": 0.0337388850748539,
+      "input_l2": 7.9549384117126465,
+      "relative_residual": 0.00424125031881801,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "tench::t5_tok0",
+      "residual_l2": 0.02380358800292015,
+      "input_l2": 5.933619499206543,
+      "relative_residual": 0.004011647192089621,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "tench::t5_tok1",
+      "residual_l2": 0.03218874707818031,
+      "input_l2": 7.648401737213135,
+      "relative_residual": 0.004208558622328461,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "tench::t5_tok2",
+      "residual_l2": 0.03194652870297432,
+      "input_l2": 7.484540939331055,
+      "relative_residual": 0.0042683350872057095,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "garbage truck::t5_tok0",
+      "residual_l2": 0.029529260471463203,
+      "input_l2": 6.997241497039795,
+      "relative_residual": 0.00422012881561336,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "garbage truck::t5_tok1",
+      "residual_l2": 0.029421482235193253,
+      "input_l2": 6.880444526672363,
+      "relative_residual": 0.004276101946776768,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "golf ball::t5_tok0",
+      "residual_l2": 0.031371086835861206,
+      "input_l2": 7.533083915710449,
+      "relative_residual": 0.004164441440833542,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "golf ball::t5_tok1",
+      "residual_l2": 0.034780554473400116,
+      "input_l2": 8.38748550415039,
+      "relative_residual": 0.004146720069583382,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "french horn::t5_tok0",
+      "residual_l2": 0.027412286028265953,
+      "input_l2": 6.250128269195557,
+      "relative_residual": 0.004385875752881811,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "french horn::t5_tok1",
+      "residual_l2": 0.022585982456803322,
+      "input_l2": 5.462760925292969,
+      "relative_residual": 0.004134536137620197,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "post_cast",
+      "vector": "french horn::t5_tok2",
+      "residual_l2": 0.030922573059797287,
+      "input_l2": 7.334132671356201,
+      "relative_residual": 0.004216254933670186,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.897296905517578
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "cassette player::t5_tok0",
+      "residual_l2": 2.6489392439543735e-06,
+      "input_l2": 7.696187496185303,
+      "relative_residual": 3.441885018091553e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "cassette player::t5_tok1",
+      "residual_l2": 2.6056782189698424e-06,
+      "input_l2": 7.026694297790527,
+      "relative_residual": 3.7082561280475394e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "chain saw::t5_tok0",
+      "residual_l2": 2.825724550348241e-06,
+      "input_l2": 7.223989963531494,
+      "relative_residual": 3.911584269376348e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "chain saw::t5_tok1",
+      "residual_l2": 2.244438974230434e-06,
+      "input_l2": 7.46148157119751,
+      "relative_residual": 3.008033931081892e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "church::t5_tok0",
+      "residual_l2": 2.120153794749058e-06,
+      "input_l2": 7.1454010009765625,
+      "relative_residual": 2.967158588383348e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "english springer::t5_tok0",
+      "residual_l2": 2.5824490421655355e-06,
+      "input_l2": 7.135527610778809,
+      "relative_residual": 3.619142385861602e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "english springer::t5_tok1",
+      "residual_l2": 2.802284598146798e-06,
+      "input_l2": 7.680903434753418,
+      "relative_residual": 3.6483788944246253e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "english springer::t5_tok2",
+      "residual_l2": 2.683783804968698e-06,
+      "input_l2": 7.656445503234863,
+      "relative_residual": 3.5052607686357773e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "gas pump::t5_tok0",
+      "residual_l2": 2.999946900672512e-06,
+      "input_l2": 7.2998223304748535,
+      "relative_residual": 4.1096163233295644e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "gas pump::t5_tok1",
+      "residual_l2": 2.79566552308097e-06,
+      "input_l2": 7.9549384117126465,
+      "relative_residual": 3.514377331903292e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "tench::t5_tok0",
+      "residual_l2": 2.490873839633423e-06,
+      "input_l2": 5.933619499206543,
+      "relative_residual": 4.197899511363188e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "tench::t5_tok1",
+      "residual_l2": 3.1676784146839054e-06,
+      "input_l2": 7.648401737213135,
+      "relative_residual": 4.1416213785837553e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "tench::t5_tok2",
+      "residual_l2": 2.5263052521040663e-06,
+      "input_l2": 7.484540939331055,
+      "relative_residual": 3.3753643310685926e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "garbage truck::t5_tok0",
+      "residual_l2": 2.4752496301516658e-06,
+      "input_l2": 6.997241497039795,
+      "relative_residual": 3.5374649155654096e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "garbage truck::t5_tok1",
+      "residual_l2": 2.4617413600935834e-06,
+      "input_l2": 6.880444526672363,
+      "relative_residual": 3.5778812699536034e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "golf ball::t5_tok0",
+      "residual_l2": 2.9268855996633647e-06,
+      "input_l2": 7.533083915710449,
+      "relative_residual": 3.88537501030523e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "golf ball::t5_tok1",
+      "residual_l2": 2.875314294215059e-06,
+      "input_l2": 8.38748550415039,
+      "relative_residual": 3.428100463234498e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "french horn::t5_tok0",
+      "residual_l2": 2.474472466929001e-06,
+      "input_l2": 6.250128269195557,
+      "relative_residual": 3.959074694714203e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "french horn::t5_tok1",
+      "residual_l2": 2.24582731789269e-06,
+      "input_l2": 5.462760925292969,
+      "relative_residual": 4.11115798147847e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    },
+    {
+      "stage": "pre_cast",
+      "vector": "french horn::t5_tok2",
+      "residual_l2": 2.711898332563578e-06,
+      "input_l2": 7.334132671356201,
+      "relative_residual": 3.697640135629158e-07,
+      "module": "context_embedder.weight",
+      "delta_fro_norm": 9.892953872680664
+    }
+  ],
+  "notes": [
+    "time_text_embed.text_embedder.linear_1.weight: pre-cast residual from adapter-captured fp32 matrix (observational clone at the native cast site)",
+    "context_embedder.weight: pre-cast residual from adapter-captured fp32 matrix (observational clone at the native cast site)"
+  ],
+  "summary": {
+    "post_cast|time_text_embed.text_embedder.linear_1.weight": {
+      "n": 9,
+      "max_residual_l2": 0.04804211109876633,
+      "max_relative": 0.0016637101159324046
+    },
+    "pre_cast|time_text_embed.text_embedder.linear_1.weight": {
+      "n": 9,
+      "max_residual_l2": 8.505328423780156e-07,
+      "max_relative": 2.9184916637674334e-08
+    },
+    "post_cast|context_embedder.weight": {
+      "n": 20,
+      "max_residual_l2": 0.034780554473400116,
+      "max_relative": 0.004385875752881811
+    },
+    "pre_cast|context_embedder.weight": {
+      "n": 20,
+      "max_residual_l2": 3.1676784146839054e-06,
+      "max_relative": 4.197899511363188e-07
+    }
+  }
+}

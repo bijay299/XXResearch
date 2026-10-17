@@ -1,0 +1,140 @@
+{
+  "utc": "2026-10-17T16:19:21.752898+00:00",
+  "method": "DP",
+  "exp_name": "flux_double_proxy_ChainSaw_then_Parachute",
+  "argv": [
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/adapter/run_edit_with_parent.py",
+    "--method",
+    "DP",
+    "--parent_checkpoint",
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors",
+    "--parent_sha256",
+    "d9e3d91c1cb2b544ca8a70353146ce68bdf2d330b795223d01caea62911cfd0a",
+    "--edit_concepts",
+    "parachute",
+    "--guide_concepts",
+    "cloth",
+    "--preserve_concepts",
+    "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn",
+    "--save_dir",
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/DP_SEQ/models",
+    "--exp_name",
+    "flux_double_proxy_ChainSaw_then_Parachute",
+    "--verification_log",
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/logs/DP_SEQ.verification.json",
+    "--precast_dump",
+    "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/logs/DP_SEQ.precast_fp32.pt"
+  ],
+  "native_source_dir": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/source_repo/Flux",
+  "parent_verification": {
+    "parent_path": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors",
+    "parent_sha256_expected": "d9e3d91c1cb2b544ca8a70353146ce68bdf2d330b795223d01caea62911cfd0a",
+    "parent_sha256_actual": "d9e3d91c1cb2b544ca8a70353146ce68bdf2d330b795223d01caea62911cfd0a",
+    "parent_sha256_match": true,
+    "parent_keys": [
+      "context_embedder.weight",
+      "time_text_embed.text_embedder.linear_1.weight"
+    ],
+    "parent_tensor_meta": {
+      "context_embedder.weight": {
+        "shape": [
+          3072,
+          4096
+        ],
+        "dtype": "torch.bfloat16",
+        "finite": true,
+        "fro_norm_fp32": 165.3203582763672
+      },
+      "time_text_embed.text_embedder.linear_1.weight": {
+        "shape": [
+          3072,
+          768
+        ],
+        "dtype": "torch.bfloat16",
+        "finite": true,
+        "fro_norm_fp32": 23.555524826049805
+      }
+    },
+    "pristine_fro_norm_before_merge": {
+      "context_embedder.weight": 165.26602172851562,
+      "time_text_embed.text_embedder.linear_1.weight": 23.553926467895508
+    },
+    "loaded_fro_norm_after_merge": {
+      "context_embedder.weight": 165.3203582763672,
+      "time_text_embed.text_embedder.linear_1.weight": 23.555524826049805
+    },
+    "loaded_equals_parent_bitwise": {
+      "context_embedder.weight": true,
+      "time_text_embed.text_embedder.linear_1.weight": true
+    }
+  },
+  "edit_concepts": [
+    "parachute"
+  ],
+  "guide_concepts": [
+    "cloth"
+  ],
+  "preserve_concepts_in_order": [
+    "cassette player",
+    "chain saw",
+    "church",
+    "english springer",
+    "gas pump",
+    "tench",
+    "garbage truck",
+    "golf ball",
+    "french horn"
+  ],
+  "edit_time_max_sequence_length": 256,
+  "edit_torch_dtype": "torch.bfloat16",
+  "native_entrypoint": "Double_proxy.UCE_double_proxy",
+  "replace_indices": "all (native default: None -> every token)",
+  "precast_capture_count": 2,
+  "precast_dump": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/logs/DP_SEQ.precast_fp32.pt",
+  "precast_shapes": [
+    "(3072, 4096)",
+    "(3072, 768)"
+  ],
+  "child_checkpoint": {
+    "path": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/exec_rev02/runs/DP_SEQ/models/flux_double_proxy_ChainSaw_then_Parachute.safetensors",
+    "sha256": "58559a4eb0072936c6d69665126d1ef09f64bb9222003e7e0ed6a19841edbc5b",
+    "keys": [
+      "context_embedder.weight",
+      "time_text_embed.text_embedder.linear_1.weight"
+    ],
+    "exactly_two_expected_keys": true,
+    "tensors": {
+      "context_embedder.weight": {
+        "shape": [
+          3072,
+          4096
+        ],
+        "dtype": "torch.bfloat16",
+        "finite": true,
+        "fro_norm_fp32": 165.37884521484375
+      },
+      "time_text_embed.text_embedder.linear_1.weight": {
+        "shape": [
+          3072,
+          768
+        ],
+        "dtype": "torch.bfloat16",
+        "finite": true,
+        "fro_norm_fp32": 23.566749572753906
+      }
+    },
+    "save_reload_bitwise_identical": true,
+    "all_finite": true
+  },
+  "child_minus_parent": {
+    "context_embedder.weight": {
+      "delta_fro_norm": 9.897296905517578,
+      "changed": true
+    },
+    "time_text_embed.text_embedder.linear_1.weight": {
+      "delta_fro_norm": 0.8094130754470825,
+      "changed": true
+    }
+  },
+  "technical_integrity_pass": true
+}

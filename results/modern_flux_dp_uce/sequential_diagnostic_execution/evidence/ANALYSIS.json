@@ -1,0 +1,333 @@
+{
+  "gates": {
+    "DP": {
+      "direct_B_suppression": {
+        "baseline_endpoint": "M0",
+        "baseline_count": 100,
+        "endpoint_count": 0,
+        "relative_reduction": 1.0,
+        "threshold": 0.75,
+        "pass": true
+      },
+      "sequential_B_suppression": {
+        "baseline_endpoint": "DP_A_parent",
+        "baseline_count": 100,
+        "endpoint_count": 0,
+        "relative_reduction": 1.0,
+        "threshold": 0.75,
+        "pass": true
+      },
+      "B_count_comparability": {
+        "direct_count": 0,
+        "seq_count": 0,
+        "abs_diff": 0,
+        "band": 10,
+        "within_band": true,
+        "note": "descriptive band; an out-of-band result is a tradeoff/confound, not proof of its cause"
+      },
+      "retention_vs_M0_cumulative": {
+        "per_class_delta": {
+          "cassette player": -12,
+          "church": -5,
+          "english springer": -2,
+          "french horn": 0,
+          "garbage truck": 1,
+          "gas pump": -2,
+          "golf ball": 0,
+          "tench": 2
+        },
+        "aggregate_delta_points": -2.25,
+        "worst_class_drop": 12,
+        "bounds": {
+          "aggregate": -8,
+          "class": 15
+        },
+        "pass": true,
+        "status": "descriptive"
+      },
+      "retention_vs_parent_incremental": {
+        "per_class_delta": {
+          "cassette player": -6,
+          "church": -5,
+          "english springer": 0,
+          "french horn": 0,
+          "garbage truck": 1,
+          "gas pump": -2,
+          "golf ball": 0,
+          "tench": -2
+        },
+        "aggregate_delta_points": -1.75,
+        "worst_class_drop": 6,
+        "bounds": {
+          "aggregate": -5,
+          "class": 12
+        },
+        "pass": true,
+        "status": "descriptive"
+      }
+    },
+    "UCE": {
+      "direct_B_suppression": {
+        "baseline_endpoint": "M0",
+        "baseline_count": 100,
+        "endpoint_count": 0,
+        "relative_reduction": 1.0,
+        "threshold": 0.75,
+        "pass": true
+      },
+      "sequential_B_suppression": {
+        "baseline_endpoint": "UCE_A_parent",
+        "baseline_count": 100,
+        "endpoint_count": 0,
+        "relative_reduction": 1.0,
+        "threshold": 0.75,
+        "pass": true
+      },
+      "B_count_comparability": {
+        "direct_count": 0,
+        "seq_count": 0,
+        "abs_diff": 0,
+        "band": 10,
+        "within_band": true,
+        "note": "descriptive band; an out-of-band result is a tradeoff/confound, not proof of its cause"
+      },
+      "retention_vs_M0_cumulative": {
+        "per_class_delta": {
+          "cassette player": -24,
+          "church": -2,
+          "english springer": -17,
+          "french horn": 0,
+          "garbage truck": 1,
+          "gas pump": 0,
+          "golf ball": 0,
+          "tench": -11
+        },
+        "aggregate_delta_points": -6.625,
+        "worst_class_drop": 24,
+        "bounds": {
+          "aggregate": -8,
+          "class": 15
+        },
+        "pass": false,
+        "status": "descriptive"
+      },
+      "retention_vs_parent_incremental": {
+        "per_class_delta": {
+          "cassette player": -11,
+          "church": 0,
+          "english springer": -8,
+          "french horn": 0,
+          "garbage truck": 0,
+          "gas pump": 1,
+          "golf ball": 0,
+          "tench": -8
+        },
+        "aggregate_delta_points": -3.25,
+        "worst_class_drop": 11,
+        "bounds": {
+          "aggregate": -5,
+          "class": 12
+        },
+        "pass": true,
+        "status": "descriptive"
+      }
+    }
+  },
+  "transitions": {
+    "DP_SEQ_chain_saw_parent_to_seq": {
+      "present_to_present": 0,
+      "present_to_absent": 0,
+      "absent_to_present": 0,
+      "absent_to_absent": 100
+    },
+    "DP_M0_chain_saw_semantic": 100,
+    "UCE_SEQ_chain_saw_parent_to_seq": {
+      "present_to_present": 0,
+      "present_to_absent": 0,
+      "absent_to_present": 0,
+      "absent_to_absent": 100
+    },
+    "UCE_M0_chain_saw_semantic": 100
+  },
+  "retention": {},
+  "candidates": {
+    "DP_SEQ": {
+      "n_candidates_raw": 0,
+      "cases": [],
+      "note": "raw classifier candidates (absent at A-parent -> present at SEQ); C/U assigned only after paired visual verification"
+    },
+    "UCE_SEQ": {
+      "n_candidates_raw": 0,
+      "cases": [],
+      "note": "raw classifier candidates (absent at A-parent -> present at SEQ); C/U assigned only after paired visual verification"
+    }
+  },
+  "M0_semantic_per_class": {
+    "cassette player": 28,
+    "chain saw": 100,
+    "church": 96,
+    "english springer": 89,
+    "french horn": 100,
+    "garbage truck": 99,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 100,
+    "tench": 42
+  },
+  "M0_strict_per_class": {
+    "cassette player": 6,
+    "chain saw": 100,
+    "church": 96,
+    "english springer": 89,
+    "french horn": 100,
+    "garbage truck": 99,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 100,
+    "tench": 42
+  },
+  "DP_A_parent_semantic_per_class": {
+    "cassette player": 22,
+    "chain saw": 0,
+    "church": 96,
+    "english springer": 87,
+    "french horn": 100,
+    "garbage truck": 99,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 100,
+    "tench": 46
+  },
+  "DP_A_parent_strict_per_class": {
+    "cassette player": 8,
+    "chain saw": 0,
+    "church": 96,
+    "english springer": 87,
+    "french horn": 100,
+    "garbage truck": 99,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 100,
+    "tench": 46
+  },
+  "UCE_A_parent_semantic_per_class": {
+    "cassette player": 15,
+    "chain saw": 0,
+    "church": 94,
+    "english springer": 80,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 99,
+    "golf ball": 100,
+    "parachute": 100,
+    "tench": 39
+  },
+  "UCE_A_parent_strict_per_class": {
+    "cassette player": 4,
+    "chain saw": 0,
+    "church": 94,
+    "english springer": 80,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 99,
+    "golf ball": 100,
+    "parachute": 100,
+    "tench": 39
+  },
+  "DP_B_direct_semantic_per_class": {
+    "cassette player": 22,
+    "chain saw": 100,
+    "church": 93,
+    "english springer": 88,
+    "french horn": 100,
+    "garbage truck": 99,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 43
+  },
+  "DP_B_direct_strict_per_class": {
+    "cassette player": 2,
+    "chain saw": 100,
+    "church": 93,
+    "english springer": 88,
+    "french horn": 100,
+    "garbage truck": 99,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 43
+  },
+  "UCE_B_direct_semantic_per_class": {
+    "cassette player": 15,
+    "chain saw": 100,
+    "church": 95,
+    "english springer": 79,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 44
+  },
+  "UCE_B_direct_strict_per_class": {
+    "cassette player": 3,
+    "chain saw": 100,
+    "church": 95,
+    "english springer": 79,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 44
+  },
+  "DP_SEQ_semantic_per_class": {
+    "cassette player": 16,
+    "chain saw": 0,
+    "church": 91,
+    "english springer": 87,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 98,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 44
+  },
+  "DP_SEQ_strict_per_class": {
+    "cassette player": 4,
+    "chain saw": 0,
+    "church": 91,
+    "english springer": 87,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 98,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 44
+  },
+  "UCE_SEQ_semantic_per_class": {
+    "cassette player": 4,
+    "chain saw": 0,
+    "church": 94,
+    "english springer": 72,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 31
+  },
+  "UCE_SEQ_strict_per_class": {
+    "cassette player": 1,
+    "chain saw": 0,
+    "church": 94,
+    "english springer": 72,
+    "french horn": 100,
+    "garbage truck": 100,
+    "gas pump": 100,
+    "golf ball": 100,
+    "parachute": 0,
+    "tench": 31
+  }
+}

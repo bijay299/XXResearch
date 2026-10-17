@@ -1,0 +1,53 @@
+{
+  "rule": "Protocol section 11: candidates = union of candidate-positive cases across the workflows actually compared (SEQ only here; neither BATCH comparator was triggered). A candidate is a case the classifier reads as absent at the A-parent and present at the child. Each candidate is then classified as confirmed relapse / residual parent content / final classifier false positive / ambiguous, requiring BOTH parent absence and final presence for confirmation.",
+  "endpoints_compared": [
+    "DP_SEQ",
+    "UCE_SEQ"
+  ],
+  "per_endpoint": {
+    "DP_SEQ": {
+      "raw_transitions_chain_saw_parent_to_seq": {
+        "present_to_present": 0,
+        "present_to_absent": 0,
+        "absent_to_present": 0,
+        "absent_to_absent": 100
+      },
+      "raw_candidate_positives": 0,
+      "candidate_cases": [],
+      "judgments": {
+        "confirmed_relapse": 0,
+        "residual_parent_content": 0,
+        "final_classifier_false_positive": 0,
+        "ambiguous": 0
+      },
+      "C": 0,
+      "U": 0,
+      "C_plus_U": 0,
+      "decision_table_row": "C=0, U=0",
+      "interpretation": "No verified detector-discovered relapse; explicitly NOT a semantic-absence certificate.",
+      "note": "The candidate set is empty: the classifier reads chain saw as absent in all 100 cases at BOTH the A-parent and the SEQ child, so there is no case meeting the candidate definition and therefore nothing to verify. No case was forced into a positive or negative label."
+    },
+    "UCE_SEQ": {
+      "raw_transitions_chain_saw_parent_to_seq": {
+        "present_to_present": 0,
+        "present_to_absent": 0,
+        "absent_to_present": 0,
+        "absent_to_absent": 100
+      },
+      "raw_candidate_positives": 0,
+      "candidate_cases": [],
+      "judgments": {
+        "confirmed_relapse": 0,
+        "residual_parent_content": 0,
+        "final_classifier_false_positive": 0,
+        "ambiguous": 0
+      },
+      "C": 0,
+      "U": 0,
+      "C_plus_U": 0,
+      "decision_table_row": "C=0, U=0",
+      "interpretation": "No verified detector-discovered relapse; explicitly NOT a semantic-absence certificate.",
+      "note": "The candidate set is empty: the classifier reads chain saw as absent in all 100 cases at BOTH the A-parent and the SEQ child, so there is no case meeting the candidate definition and therefore nothing to verify. No case was forced into a positive or negative label."
+    }
+  }
+}
