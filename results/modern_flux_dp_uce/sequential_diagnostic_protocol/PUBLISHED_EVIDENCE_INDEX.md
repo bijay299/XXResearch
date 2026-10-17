@@ -11,7 +11,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `7e166534e2fd` — the commit that *records*
+Generated at parent commit `281a4076babd` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 The second group below lists files **already published** at commit
@@ -22,14 +22,15 @@ from this same table; they are not re-published or modified.
 Regenerate: `python scripts/seq/publish_modern_flux_dp_uce_protocol_evidence_index.py`
 — run it LAST, after every other file in this result set is final.
 
-## This protocol's own files (revision 01)
+## This protocol's own files (revision 02)
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/PROTOCOL.md` | 48,106 | `12c94b390613c35a7ab1bbf8fa6f813017f3d9cc8f6ee54be37389f73d9adc1d` |
-| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/ELIGIBILITY_AND_ENDPOINTS.json` | 11,029 | `4e14b6340e29eea0761e5fd2eecae36a04ce7f941d61ca1c29f99191f24c4a1a` |
-| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/SOURCE_AND_ASSUMPTION_LEDGER.md` | 13,572 | `cdee8c2034d3be4272c92ead2d19a3d3d86a9c073123fae10124dda26a5f4e09` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/PROTOCOL.md` | 55,545 | `73648214c5a89358c85fa605b87955698ab0b225a9d872ecef54c1dad7379d13` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/ELIGIBILITY_AND_ENDPOINTS.json` | 14,549 | `da81e24b6e49227a74f4dfb2a9aa1aac52acfd14f3ae5c6c5d13a28d74b678ef` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/SOURCE_AND_ASSUMPTION_LEDGER.md` | 14,867 | `86fb5f5854c2cbb7e3cd4170274b83ee9c36e5813e3d86749f036edef824c3dc` |
 | `results/modern_flux_dp_uce/sequential_diagnostic_protocol/REVISION_01.md` | 15,768 | `b65ef18780a65a262ae677b418bb3ca142a41f9638b3b88cb013ab64eb40daf5` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/REVISION_02.md` | 9,892 | `90b36c883b8720912ff7f87094de1c54716dc0861bd22d13eaba888b60d34b04` |
 
 ## Existing evidence this protocol depends on (referenced, not copied -- already published at commit 01f8832, listed here again only for a single-table traceability check)
 
@@ -46,4 +47,4 @@ Regenerate: `python scripts/seq/publish_modern_flux_dp_uce_protocol_evidence_ind
 
 ---
 
-**12 files listed**, none absent.
+**13 files listed**, none absent.

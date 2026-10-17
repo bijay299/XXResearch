@@ -1,6 +1,6 @@
 # Sequential-erasure diagnostic protocol — chain saw -> parachute (FLUX.1-schnell)
 
-**Status: PROTOCOL ONLY, REVISED (revision 01).** Nothing in this document
+**Status: PROTOCOL ONLY, REVISED (revision 02).** Nothing in this document
 has been executed. No model was loaded, no checkpoint tensor was loaded, no
 encoder was run, no feature was computed, no checkpoint was edited, no image
 was generated, classified or annotated, and no GPU was allocated to produce
@@ -9,10 +9,13 @@ this document. Existing checkpoint files were hashed at the file level only
 below is read from, or CPU arithmetic performed on, already-published
 tables. Execution requires a separate future instruction.
 
-This revision corrects the coordinator's NEEDS_CHANGES review of the first
-published version (commit `7e16653`). See `REVISION_01.md` for the full
-issue-by-issue correction mapping. The prior commit is preserved unchanged
-in git history; this is a new commit, not an amend.
+Revision 01 corrected the coordinator's NEEDS_CHANGES review of the first
+published version (commit `7e16653`) — see `REVISION_01.md`. **Revision 02
+makes targeted decision-rule and numerical corrections to revision 01**
+(commit `281a407`) without redesigning the accepted substantive design —
+see `REVISION_02.md` for the issue-by-issue mapping. Both prior commits are
+preserved unchanged in git history; each revision is a new commit, never an
+amend or force-push.
 
 This remains a **separately declared diagnostic**, not a continuation of the
 closed cassette-player/chain-saw reproduction and not a reopening of the
@@ -22,7 +25,7 @@ experiment's semantic-equivalence mapping.
 
 ## 0. Recovered state
 
-- Repo `bijay299/XXResearch`, branch `research/audit-and-matched-effectiveness-protocol`, prior HEAD `7e166534e2fdced7fa0cf034d159d46aae38a925` (this revision's parent) — nothing was reset, amended, or force-pushed.
+- Repo `bijay299/XXResearch`, branch `research/audit-and-matched-effectiveness-protocol`; revision 01's parent was `7e166534e2fdced7fa0cf034d159d46aae38a925`, and revision 02's parent is `281a4076babdd3fd1d2fd9b0206d17606ad6c511` — nothing was reset, amended, or force-pushed at any point.
 - Source: `czhang024/CVPR_DouleProjection` @ `3fc3d8afe03a400dfa71aaaa34b647fef6550e0f` (already cloned, unmodified, at `/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/source_repo` — reused, not re-cloned).
 - Model: `black-forest-labs/FLUX.1-schnell`, revision `741f7c3ce8b383c54771c7003378a50191e9efe9` (already downloaded and hash-verified; see `../RUN_MANIFEST.md` — reused, not re-downloaded).
 
@@ -74,13 +77,18 @@ this order:
    steady; a different, already-anticipated tradeoff (`## 9`), not the
    claimed deficit, and not itself proof that any mismatch *caused*
    historical relapse (`## 9`).
-5. **Confirmed relapse exceeding the comparator(s) and surviving every other
-   check** — this is the only outcome that motivates a subsequent method
-   question (`## 14`).
+5. **Confirmed relapse materially exceeding a qualified comparator
+   (`D_min >= 10`, `## 10`) and surviving every other check** — this flags
+   a bounded candidate for a later, separately authorized method
+   assessment, subject to `## 14`'s precedence rules (in particular, a
+   stronger applicable existing baseline succeeding takes precedence over
+   any inference that a new method is needed).
 
 **Result that would reject the claim:** zero confirmed relapse witnesses
-(`## 11`) on the chain-saw panel after SEQ — this alone can end the
-diagnostic without running any comparator (`## 14`, outcome 1).
+**and zero ambiguous candidates** (`C=0, U=0` in `## 10`'s authoritative
+decision table) on the chain-saw panel after SEQ — this alone can end the
+diagnostic without running any comparator (`## 14`, outcome 1). `C=0` with
+`U>0` is **inconclusive, not a rejection** (`## 10`).
 
 ## 2. Endpoint name mapping and checkpoint provenance
 
@@ -119,12 +127,12 @@ scope; no B-then-A reverse order is proposed.
 | cassette player | 28 | — | — | `box` | `box` | excluded — below the 80/100 floor at M0 itself |
 | tench | 42 | — | — | *(none released)* | *(none released)* | excluded — below the 80/100 floor at M0 itself |
 | english springer | 89 | 87 | 80 | `cat` | *(none released)* | excluded — UCE A-parent recognition sits exactly on the 80/100 floor (zero margin) |
-| golf ball | 100 | 100 | 100 | `sphere` | *(none released)* | eligible on recognition grounds; not selected (see preference note below) |
+| golf ball | 100 | 100 | 100 | `sphere` | *(none released)* | **provisionally recognition-qualified**, not selected (see preference note below) |
 | church | 96 | 96 | 94 | `factory` | *(none released)* | **provisionally recognition-qualified**, not selected (lower margin than the perfect-100 candidates) |
 | gas pump | 100 | 100 | 99 | `booth` | *(none released)* | **provisionally recognition-qualified**, not selected |
 | garbage truck | 99 | 99 | 100 | `bus` | *(none released)* | **provisionally recognition-qualified**, not selected |
 | **parachute** | **100** | **100** | **100** | **`cloth`** | *(none released)* | **provisionally recognition-qualified — SELECTED** |
-| french horn | 100 | 100 | 100 | `drum` | *(none released)* | eligible on recognition grounds; not selected (see preference note below) |
+| french horn | 100 | 100 | 100 | `drum` | *(none released)* | **provisionally recognition-qualified**, not selected (see preference note below) |
 
 "Provisionally recognition-qualified" means exactly what it says: M0 and
 both A-parents recognize the candidate well above the 80/100 floor. It does
@@ -203,16 +211,22 @@ this ideal identity in three concrete, source-confirmed ways:**
 
 1. **SVD rank cutoff** (`Double_proxy.py:216`): `rank_V =
    int((S_svd > 1e-6).sum().item())` — singular values at or below `1e-6`
-   are treated as zero. A preserve vector whose contribution to `C_pres` is
-   numerically small relative to this cutoff does not enlarge the
-   *effective* null space the way it would in exact arithmetic.
+   are treated as zero. Discarding a *genuinely nonzero* singular value
+   this way **lowers the retained rank and therefore enlarges the effective
+   null space** relative to exact arithmetic: directions that the exact
+   constraint would have held fixed become free, so the update can move
+   along weakly-represented preservation directions. It does not shrink the
+   null space. (The first published version of this revision stated the
+   direction backwards; corrected here — see `REVISION_02.md`.)
 2. **Projected-direction skip threshold** (`Double_proxy.py:225-228`):
    `x = U_2.T @ v_i`; if `x_norm_sq < 1e-10`, that token's update is
    **skipped entirely** (with a printed warning), not applied. **A large
    null space does not by itself establish that parachute's own erase-token
    vectors have a usable nonzero projection into it** — whether they do is
    unknown without running the edit, and is explicitly left UNESTABLISHED
-   here (see `SOURCE_AND_ASSUMPTION_LEDGER.md`).
+   here (see `SOURCE_AND_ASSUMPTION_LEDGER.md`). A skipped update affects
+   whether the *erasure* is applied for that token; **it is not itself a
+   preservation violation** and must not be logged or reported as one.
 3. **Finite-precision fp32 arithmetic throughout, with a final bf16 cast**
    (`Double_proxy.py:215-238`): the SVD, the null-space projection and the
    update are all computed in fp32, then `W_0_f32.to(torch_dtype)` casts the
@@ -223,15 +237,22 @@ this ideal identity in three concrete, source-confirmed ways:**
    performed to produce it — this is CPU bookkeeping on hypothetical
    numbers, verified by hand here):
 
-   > Toy parent weight row `[1, 1]`, update `Δw = [3/1024, -3/1024]`,
-   > preserved input `c = [1, 1]`. Before casting: `Δw · c = 3/1024 -
-   > 3/1024 = 0` — preservation is exact. After bf16 rounding (bf16 spacing
-   > near 1.0 is `1/128`; near `0.997` it is `1/256`): `1 + 3/1024 =
-   > 1.0029...` rounds to `1.0`; `1 - 3/1024 = 0.9971...` rounds to
-   > `255/256`. The rounded weight row is `[1, 255/256]`, giving a response
-   > of `1·1 + (255/256)·1 = 511/256`, a change of `511/256 - 2 = -1/256`
-   > from the exact value — a small but nonzero, directly-attributable-to-
-   > casting deviation from "exact" preservation.
+   > Toy parent weight row `[1, 1]` (exactly representable in bf16, so the
+   > parent is identical as-stored and as-evaluated), update
+   > `Δw = [3/1024, -3/1024]`, preserved input `c = [1, 1]`. Before casting:
+   > `Δw · c = 3/1024 - 3/1024 = 0` — preservation is exact. After bf16
+   > rounding of the resulting **child weights** (bf16 spacing near 1.0 is
+   > `1/128`; near `0.997` it is `1/256`): `1 + 3/1024 = 1.0029...` rounds
+   > to `1.0`; `1 - 3/1024 = 0.9971...` rounds to `255/256`. The rounded
+   > child row is `[1, 255/256]`; the **child-minus-parent difference as
+   > actually stored** is `[0, -1/256]`, giving a response change of
+   > `-1/256` — a small but nonzero, directly-attributable-to-casting
+   > deviation from "exact" preservation.
+   >
+   > Note the residual that matters is this **rounded child minus the
+   > parent, both as represented at evaluation and promoted to fp32 for the
+   > arithmetic** — rounding `Δw` on its own and applying that is a
+   > different (and not equivalent) quantity.
 
 **Protection also only concerns the specific vectors selected as inputs to
 the constraint — not the whole generator.** This applies to **both**
@@ -280,12 +301,23 @@ hard/soft distinction, not as isolating that distinction as the cause.
 
 ### Preservation-residual logging — specified for a future run, collected now: nothing
 
-If execution is authorized, the implementation should log, per edited
-module and per preserve-concept token: (a) `‖ΔW_B @ c_i‖` computed in fp32
-**before** the bf16 cast (should be exactly 0 for every preserved vector
-under DP's constraint, modulo the skip-threshold cases in point 2 above),
-and (b) the same quantity recomputed **after** the bf16 cast, using the
-rounded weights. If contextual residuals (point under "Protection also only
+If execution is authorized, the implementation should **record measured
+residuals with their numerical context — not assert an expected value**.
+Per edited module and per preserve-concept token: (a) the pre-cast residual
+`‖ΔW_B @ c_i‖`, computed in fp32 from the as-computed update; and (b) the
+post-cast residual `‖(W_child - W_parent) @ c_i‖`, where `W_child` and
+`W_parent` are both taken **as represented at evaluation** (i.e. after the
+native cast, exactly the tensors the generation pipeline would load) and
+promoted to fp32 only for this residual arithmetic — casting `ΔW_B` alone
+and applying that is a different quantity and must not be substituted.
+Each logged residual should be accompanied by its numerical context (the
+vector norms involved, the retained rank `rank_V`, and whether that token
+hit the `1e-10` skip threshold). **No exact-zero runtime assertion should
+be imposed on (a)**: finite-precision fp32 SVD and projection need not
+return a bitwise zero residual, and a nonzero small value there is a
+measurement to report, not a failure to flag. Skipped-update tokens
+(point 2 above) are recorded as skipped erasures, not as preservation
+violations. If contextual residuals (point under "Protection also only
 concerns...") are examined, the exact inputs must be the frozen evaluation
 prompts (`"Image of chain saw"`, `"Image of parachute"`) with their T5 and
 CLIP encodings computed once and cached, not re-derived per case. These
@@ -293,7 +325,7 @@ logs add no new image endpoints and do not change the 6,000-image ceiling
 (`## 7`). **No log, measurement, or computation of this kind was collected
 for this protocol** — this section specifies the plan only.
 
-## 5. Native multi-target calls: ordered-pooled (DP) vs. simultaneous-paired (UCE) — not "simultaneous joint solve" for either, and not equivalent to each other
+## 5. Native multi-target calls: ordered-with-pooled-guides (DP) vs. simultaneous paired-target solve (UCE) — two different mechanisms, not interchangeable comparators
 
 Both scripts natively accept multiple `;`-separated `edit_concepts` in one
 call — already-released capability, no new method. **The two methods'
@@ -346,9 +378,10 @@ summing weighted outer products over every listed concept and solved
 here means: reordering corresponding erase/guide pairs together leaves the
 sum unchanged in exact arithmetic — it is not a claim of bitwise
 floating-point invariance.** Floating-point summation is not strictly
-associative, so a different evaluation order can produce a bit-different
-(though not meaningfully different) result; this is noted for precision,
-not treated as a live concern for this diagnostic's conclusions.
+associative, so a different evaluation order can produce a numerically
+different result; **the magnitude of that difference, and whether it is
+large enough to matter downstream, is unestablished here** — no bound was
+derived and none is claimed in either direction.
 
 UCE's batch call's `preserve_concepts` likewise excludes both chain saw and
 parachute (both are erase targets, not preserved) — the same preservation-
@@ -463,7 +496,7 @@ proposed by default.
 | Technical integrity | Exactly 2 weight keys matched, finite values, correct native dtype (DP bf16, UCE fp32) before the bf16 evaluation cast, verified save/reload, parent-loading adapter confirmed to run *before* module copy, **loaded-parent file hash matches `## 2`** | — | prospective |
 | Direct B suppression | `DP_B_direct`/`UCE_B_direct` reduce parachute's own semantic recognition by >=75% relative to M0's 100/100 | M0 | **UNTESTED** |
 | Sequential B suppression | `DP_SEQ`/`UCE_SEQ` reduce parachute's semantic recognition by >=75% relative to the A-parent's own parachute recognition (100/100 for both methods) | DP/UCE A-parent | **UNTESTED**, depends on direct B suppression passing first |
-| Deletion-strength comparability | Direct and sequential B-suppression counts reported side by side; treated as "comparable" only if both independently clear the 75% gate **and** their absolute counts differ by <=10/100 cases. **Practical rationale**: 10 cases is a round, deliberately conservative band chosen to be comfortably larger than the single-class noise already observed in the completed reproduction's own retention tables (typically 1-6 cases, maximum 13) while remaining a small fraction of the 100-case panel — a descriptive band, not a power-derived or statistical bound. **An out-of-band result is reported as a tradeoff/confound for interpreting the historical-outcome finding — it is not itself evidence that a deletion-strength mismatch *caused* any observed historical relapse.** | `DP_B_direct`/`UCE_B_direct` vs. `DP_SEQ`/`UCE_SEQ` | **UNTESTED** |
+| Deletion-strength comparability | Direct and sequential B-suppression counts reported side by side; treated as "comparable" only if both independently clear the 75% gate **and** their absolute counts differ by <=10/100 cases. **Practical rationale**: 10/100 is a round, prospectively chosen working tolerance for calling two deletion strengths close enough that a historical-outcome comparison between them is not obviously confounded by unequal deletion. It is **not** derived from any noise estimate — no repeatability or classifier-noise measurement exists for this panel, and the per-class differences recorded in the completed reproduction (e.g. UCE's -13 on one retained class) were **observed effects of an edit, not noise**, so they do not bound this band and 10 is not claimed to exceed them. Descriptive, not a power-derived or statistical bound. **An out-of-band result is reported as a tradeoff/confound for interpreting the historical-outcome finding — it is not itself evidence that a deletion-strength mismatch *caused* any observed historical relapse.** | `DP_B_direct`/`UCE_B_direct` vs. `DP_SEQ`/`UCE_SEQ` | **UNTESTED** |
 | Retention (SEQ vs. M0, cumulative) | Aggregate mean semantic recognition across the 8 untouched classes (all 10 minus chain saw minus parachute) drops <=8 points, and no single class drops more than 15/100 cases, relative to M0 | M0 | **UNTESTED**; bound chosen as a judgment call extrapolating from the completed reproduction's worst single-edit retention cost (UCE: aggregate -3.0, max single-class -13) to allow headroom for two stacked edits — **descriptive, not a proof of acceptable quality; failing this bound alone does not establish "all quality gates clean" and passing it alone does not either** |
 | Retention (SEQ vs. its own A-parent, incremental) | Same 8-class aggregate drops <=5 points, no single class drops more than 12/100 cases, specifically attributable to the B-edit on top of A's own already-measured retention cost | DP/UCE A-parent (`DP_B`/`UCE_B`'s own existing retention table) | **UNTESTED**; same descriptive status as above |
 | Batch comparator qualification | A `DP_BATCH`/`UCE_BATCH` result is only used to inform the comparative conclusion (`## 1`, explanation 3) if it itself passes: both erased targets' own >=75% suppression, B-deletion comparability against the direct-B baseline (same <=10/100 band), and both retention bounds above. **A comparator that fails any of these is reported as a failed comparator, honestly, and is not silently used to draw a conclusion.** | — | **UNTESTED** |
@@ -492,16 +525,20 @@ quantities are defined and must be reported separately, never conflated:
 3. **Matched-case SEQ-vs-BATCH transitions, if a comparator runs**: reported
    as **both** of the following, named separately because they are
    different quantities and must not be substituted for one another —
-   - **SEQ-only discordant cases**: cases where SEQ shows a confirmed
-     relapse witness but the matched BATCH case does not (and the reverse,
-     reported separately).
-   - **Net count difference**: `(confirmed SEQ witnesses) -
+   - **SEQ-only / BATCH-only discordant cases**: cases where one workflow
+     shows a confirmed relapse witness and the matched case in the other
+     does not, counted and reported in **both** directions separately.
+   - **Net witness difference**: `(confirmed SEQ witnesses) -
      (confirmed BATCH witnesses)`, which can be zero even when the
-     discordant-case count is large if the two workflows relapse on
-     different cases. "SEQ shows relapse beyond BATCH" in this protocol
-     means **a nonzero SEQ-only-discordant count**, not merely a positive
-     net difference — this is specified now to remove ambiguity before any
-     execution.
+     discordant counts are large, if the two workflows relapse on different
+     cases.
+
+   **Discordance alone does not establish that one workflow relapses less
+   in total**: swapping *which* cases fail, at the same total count, is not
+   a reduction in failure frequency. Material comparative improvement is
+   defined only by the `D_min`/`D_max` rule below; discordance counts are
+   preserved as complementary information and cannot independently support
+   a "materially less relapse" claim.
 
 **Existence vs. meaningful aggregate deficit**: one confirmed witness (from
 quantity 2) is sufficient to support an **existence** finding — "relapse
@@ -514,6 +551,78 @@ outcome branches. This is a round, interpretable number chosen for this
 study, explicitly **not** derived from any significance or power
 calculation (`## 13` prohibits that kind of inference) — a judgment call,
 stated as one.
+
+### Authoritative ambiguity-aware decision table
+
+Define, **per endpoint**:
+
+- **C** = confirmed detector-discovered relapse witnesses (`## 11`).
+- **U** = ambiguous potential relapse cases under the same frozen
+  candidate-selection and verification rules (`## 11`).
+
+The range **`[C, C+U]`** describes the possible confirmed-relapse count on
+**that discovered candidate set only**. It is **not** a confidence
+interval, **not** a population bound, and **not** a count of total semantic
+failures on the panel.
+
+**This table is authoritative and takes precedence over any conflicting
+prose elsewhere in this protocol:**
+
+| Condition | Required interpretation |
+|---|---|
+| `C = 0, U = 0` | No verified detector-discovered relapse; **not** a semantic-absence certificate |
+| `C = 0, U > 0` | Inconclusive candidate evidence — **do not call it clean and do not treat relapse as rejected** |
+| `C >= 1` | Confirmed existence, with ambiguous cases reported separately |
+| `C >= 10` | Practical confirmed-witness threshold met |
+| `C + U < 10` | Practical threshold not reached by the current discovered candidate set |
+| `C < 10 <= C + U` | Practical-threshold determination **unresolved** |
+
+Existence and practical-threshold findings are applied **separately**: e.g.
+`C = 0, U = 2` is inconclusive about existence even though the whole
+current candidate set, if every ambiguous case were confirmed, could not
+reach ten. A *minority* of ambiguous cases can still leave a threshold
+determination unresolved — there is no "ambiguity dominates" or "no clear
+majority" criterion in this protocol, and any such wording in an earlier
+revision is withdrawn.
+
+Ambiguity is **never** reclassified as negative (or positive) to force a
+decision, and candidate-selection rules are not changed to reduce `U`. Raw
+classifier transitions (quantity 1) remain reported separately throughout.
+
+### Material comparative improvement (`D_min` / `D_max`)
+
+For a **qualified same-method comparator** (`## 9`'s batch-comparator
+qualification gate), with `s` = SEQ and `b` = BATCH:
+
+```
+D_min = C_s - (C_b + U_b)
+D_max = (C_s + U_s) - C_b
+```
+
+`[D_min, D_max]` is a **conservative range for the SEQ-minus-BATCH
+confirmed-relapse count difference on the verified candidate set** — again
+not a statistical interval. Resolved against the already-chosen ten-case
+practical scale:
+
+| Condition | Required interpretation |
+|---|---|
+| `D_min >= 10` | BATCH shows **materially fewer** verified-candidate relapse cases than SEQ |
+| `D_max < 10` | The ten-case comparative criterion is **not met** |
+| `D_min < 10 <= D_max` | Comparative threshold **unresolved** |
+
+**Applying the existing ten-case practical scale to this previously
+undefined comparative condition is a prospective operational choice — not a
+power calculation, and not derived from any observed outcome.**
+
+### Reasoned interpretation examples (hypothetical counts; no simulation, no image inspection)
+
+| Hypothetical counts | Required interpretation |
+|---|---|
+| SEQ `C=0, U=20` | Inconclusive, **not** clean; ambiguity alone does **not** trigger a batch comparator |
+| SEQ `C=9, U=2` | Existence confirmed; practical threshold **unresolved** (`C < 10 <= C+U`) |
+| SEQ and BATCH each `C=10, U=0`, on disjoint cases | Discordance exists in both directions; net difference zero; **no material comparative improvement** (`D_min = 0`, `D_max = 0`) |
+| SEQ `C=12, U=0`; BATCH `C=1, U=2` | `D_min = 12-3 = 9`, `D_max = 12-1 = 11` -> `[9, 11]`: comparative threshold **unresolved** |
+| SEQ `C=10, U=0`; BATCH `C=0, U=0` | `D_min = D_max = 10`: comparative criterion **met**, subject to comparator qualification (`## 9`) and the stronger-baseline precedence rule (`## 14`) |
 
 ## 11. Historical outcome and paired witness verification
 
@@ -548,10 +657,14 @@ case together, and classify into exactly one of:
   bare chain or a stick alone is not a chain saw — the same caution already
   established by the completed reproduction's own `UCE_B` spot-check).
 - **Ambiguous**: neither of the above can be confidently determined from
-  the image. Ambiguous cases are reported separately, counted in neither
-  "confirmed relapse" nor "clean," and do **not** by themselves block or
-  pass any gate in `## 9` or `## 10` — see `## 14` for how they affect
-  outcome determination.
+  the image. Ambiguous cases are counted as **U** (`## 10`), reported
+  separately from **C**, and are never reclassified as confirmed or as
+  clean in order to force a decision. Their effect on every finding is
+  governed by `## 10`'s authoritative decision table (`[C, C+U]`), which
+  takes precedence over any conflicting prose: in particular `C=0, U>0` is
+  inconclusive rather than clean, and a *minority* of ambiguous cases can
+  still leave a practical-threshold or comparative determination
+  unresolved.
 
 A case counts as confirmed relapse only with evidence of **both** parent
 absence and final presence — a final chain-saw-looking image alone is
@@ -606,60 +719,72 @@ null result, and no small-sample FID or CLIP-loss proxy is introduced.
 
 ## 14. Outcome branches (every branch stops this bounded diagnostic)
 
-1. **Zero confirmed relapse witnesses** on the chain-saw panel after SEQ
-   (quantity 2, `## 10`, for both methods) -> report a clean result; **this
-   can end the diagnostic without running either batch comparator** — no
-   follow-up method question.
-2. **A gate other than historical outcome fails first** (e.g., direct B
-   suppression fails for one method, or technical integrity fails) ->
-   report which gate and why, stop; that method's remaining endpoints for
-   this pair do not run, no fallback pair substituted.
-3. **Confirmed relapse exists but does not meet the meaningful-aggregate-
-   deficit threshold** (>=1 but <10 confirmed witnesses, `## 10`) -> report
-   as a bounded existence finding, explicitly not generalized to "a
-   meaningful deficit"; **trigger the objective per-method batch-comparator
-   condition below regardless**, since even a small confirmed count is
-   enough to warrant the comparability check.
+### Outcome precedence (applied in this order; a higher item settles the report before a lower one is considered)
+
+1. **Technical/eligibility failures** (`## 9`'s technical-integrity gate,
+   direct/sequential B-suppression gates).
+2. **Ambiguity-aware primary findings** — `## 10`'s authoritative decision
+   table applied to SEQ's own `C`/`U`.
+3. **Comparator conclusions**, only after that comparator passes `## 9`'s
+   batch-comparator-qualification gate, resolved by the `D_min`/`D_max`
+   rule (`## 10`).
+4. **A stronger applicable existing baseline succeeding** — this takes
+   precedence over any inference that a new preservation method is needed.
+
+### Branches
+
+1. **`C = 0, U = 0` for SEQ on the chain-saw panel (both methods)** -> no
+   verified detector-discovered relapse; **this can end the diagnostic
+   without running either batch comparator**, with no follow-up method
+   question. Explicitly not a semantic-absence certificate (`## 10`).
+2. **`C = 0, U > 0`** -> **inconclusive**, not clean. Report `C`, `U` and
+   `[C, C+U]`; do not record relapse as rejected and do not record the
+   endpoint as passing a "clean" conclusion. **Ambiguity alone does not
+   trigger a batch comparator** (branch 4).
+3. **A gate other than historical outcome fails first** (direct B
+   suppression, technical integrity) -> report which gate and why, stop;
+   that method's remaining endpoints for this pair do not run, no fallback
+   pair substituted (precedence item 1).
 4. **Objective per-method batch-comparator trigger**: for a given method,
-   run `DP_BATCH` or `UCE_BATCH` if and only if that method's SEQ shows
-   >=1 confirmed relapse witness (`## 10`, quantity 2) **and** SEQ's own
-   direct/sequential B-suppression and retention gates (`## 9`) are not
-   already failed. This condition is checked and reported per method
-   independently — DP and UCE may trigger differently.
-5. **Shared SEQ/BATCH relapse**: if a triggered batch comparator (itself
-   qualified per `## 9`'s batch-comparator-qualification gate) also shows
-   confirmed relapse on the same cases -> this does **not** erase the SEQ
-   relapse observation; it changes the comparative conclusion to "the
-   deficit is present in both the sequential and the native batch
-   workflow, not specific to either" (ties to explanation 3, `## 1`).
-6. **SEQ-only discordant relapse** (`## 10`, quantity 3) that meets the
-   meaningful-aggregate-deficit threshold, with every other gate clean, and
-   (if a batch comparator ran) the comparator itself qualified and showing
-   materially less relapse on the matched cases -> **this is the only
-   outcome that motivates a subsequent method question** (e.g., whether a
-   stronger historical-preservation mechanism than the native one is
-   needed), stated as a question for a future, separately authorized task.
-7. **Weaker baseline fails, stronger applicable baseline succeeds**: e.g.,
-   UCE shows a meaningful-aggregate-deficit relapse while DP's SEQ passes
-   cleanly (zero or below-threshold confirmed relapse, all other gates
-   clean) -> report this as a method-specific result for this pair. **This
-   does not, by itself, establish a need for a new preservation method** —
-   it is a different conclusion from a genuine eligibility or technical
-   failure, and is reported as such, not escalated.
-8. **Technical validity fails** (wrong key count, non-finite values, the
+   run `DP_BATCH` or `UCE_BATCH` **if and only if** that method's SEQ shows
+   `C >= 1` **and** that method's required gates (`## 9`: technical
+   integrity, direct/sequential B suppression, retention) are not already
+   failed. Checked and reported per method independently — DP and UCE may
+   trigger differently. Ambiguous-only evidence (`C = 0, U > 0`) never
+   triggers another endpoint.
+5. **`C >= 1` but the practical threshold is not met or is unresolved**
+   (`C < 10`, per `## 10`'s table) -> report a bounded **existence**
+   finding, stating explicitly whether the practical threshold is *not
+   reached* (`C + U < 10`) or *unresolved* (`C < 10 <= C + U`). Not
+   generalized to a meaningful aggregate deficit.
+6. **Shared SEQ/BATCH relapse**: a triggered, qualified comparator also
+   shows confirmed relapse -> this does **not** erase the primary SEQ
+   observation, which stands on its own; it changes only the **comparative**
+   conclusion, toward "present in both the sequential and the native batch
+   workflow" (ties to explanation 3, `## 1`). Resolve the magnitude
+   question with `D_min`/`D_max`, never with discordance counts alone.
+7. **Comparative criterion met** (`D_min >= 10`, qualified comparator, SEQ
+   at `C >= 10`, every other gate clean) -> report that SEQ shows a
+   materially larger verified-candidate relapse count than the qualified
+   batch comparator. Subject to precedence item 4, **this flags a bounded
+   candidate for a later, separately authorized method assessment** — it is
+   not a novelty claim, not an established method deficiency, and not an
+   automatic follow-up experiment.
+8. **Weaker baseline fails, stronger applicable baseline succeeds**: e.g.
+   UCE reaches the practical threshold while DP's SEQ does not (`C = 0,
+   U = 0`, or `C` below threshold with all other gates clean) -> report as
+   a method-specific result for this pair. By precedence item 4, this
+   **does not establish a need for a new preservation method**, and is a
+   different conclusion from an eligibility or technical failure.
+9. **Technical validity fails** (wrong key count, non-finite values, the
    parent-loading adapter verified not to have run before module copy, or
    the loaded-parent file hash not matching `## 2`) -> report the defect,
    stop; no scientific claim is drawn from that endpoint's numbers.
-9. **Ambiguous witnesses dominate** a candidate set (no clear majority
-   confirmed either way) -> report the ambiguity rate explicitly, withhold
-   both "confirmed relapse" and "clean" conclusions for those specific
-   cases, and do not let ambiguous cases push a count across the
-   meaningful-aggregate-deficit threshold in either direction without
-   separately flagging that the threshold determination itself rests on
-   ambiguous evidence.
 
-No outcome triggers an automatic sweep, a reverse order, an additional pair,
-or an unauthorized follow-up run.
+In every branch, `C`, `U`, `[C, C+U]`, the raw classifier transitions
+(quantity 1), and both discordance directions are reported separately — no
+quantity substitutes for another. No outcome triggers an automatic sweep, a
+reverse order, an additional pair, or an unauthorized follow-up run.
 
 ## Appendix — proposed commands (reference only, not executed)
 

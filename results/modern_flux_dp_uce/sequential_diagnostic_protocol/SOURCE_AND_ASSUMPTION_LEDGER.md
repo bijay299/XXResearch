@@ -1,4 +1,4 @@
-# Source and assumption ledger — chain saw -> parachute diagnostic protocol (revision 01)
+# Source and assumption ledger — chain saw -> parachute diagnostic protocol (revision 02)
 
 Every claim below is tagged **ESTABLISHED** (directly inspected source, or
 arithmetic on an already-published table or on hypothetical numbers,
@@ -40,14 +40,19 @@ NEEDS_CHANGES review; see `REVISION_01.md` for the full mapping.
    identity in three concrete, source-confirmed ways**, none stated in the
    prior ledger:
    - SVD rank cutoff `1e-6` (`Double_proxy.py:216`) — singular values at or
-     below this are treated as zero, shrinking the *effective* null space
-     relative to the ideal, infinite-precision one.
+     below this are treated as zero. **Corrected in revision 02**:
+     discarding a genuinely nonzero singular value lowers the retained rank
+     and therefore **enlarges** the effective null space relative to exact
+     arithmetic, admitting updates along weakly-represented preservation
+     directions. Revision 01 stated this direction backwards ("shrinking").
    - Per-token skip threshold `1e-10` on `x_norm_sq`
      (`Double_proxy.py:225-228`) — if a given erase token's projection onto
      the null space is too small, that token's update is **skipped**
      entirely (printed warning, not an error). A large nominal null-space
      dimension does not establish that a *specific* erase vector (e.g.
-     parachute's) has a usable nonzero projection into it.
+     parachute's) has a usable nonzero projection into it. A skipped update
+     concerns whether the *erasure* was applied for that token; it is not
+     itself a preservation violation (clarified in revision 02).
    - A single bf16 cast at the end of each module's edit loop
      (`Double_proxy.py:238`, within the fp32-arithmetic block spanning
      `Double_proxy.py:215-238`) can turn an exactly-preserved response
@@ -59,7 +64,13 @@ NEEDS_CHANGES review; see `REVISION_01.md` for the full mapping.
      `1+3/1024 -> 1.0` and `1-3/1024 -> 255/256`; the rounded response is
      `511/256`, a `-1/256` deviation from the exact value. Reproduced here
      as an illustrative toy example only, explicitly not a measured FLUX
-     effect.
+     effect. **Revision 02 clarification**: the residual that matters is
+     the rounded **child weights minus the parent weights**, both as
+     represented at evaluation and promoted to fp32 for the residual
+     arithmetic — rounding `ΔW` alone is a different, non-equivalent
+     quantity. No exact-zero expectation is imposed on native fp32
+     pre-cast residuals; a future run records measured residuals with
+     their numerical context instead.
 5. UCE's preserve term is a *soft*, weighted least-squares trade-off, not
    an exact constraint (`UCE_original.py:85-113`): `W_new = mat1 @
    inverse(mat2)` with `mat1`/`mat2` summing weighted outer products over
@@ -87,13 +98,14 @@ NEEDS_CHANGES review; see `REVISION_01.md` for the full mapping.
    (line 97) — unlike DP, `"chain saw;parachute"` paired with
    `"stick;cloth"` does pair `stick` with chain saw and `cloth` with
    parachute. `mat1`/`mat2` are built from sums over every listed concept
-   and solved once. **Correction (this revision): this order-invariance
+   and solved once. **Correction (revision 01): this order-invariance
    claim is about exact arithmetic only** — floating-point summation is not
    strictly associative, so a different evaluation order of the same
-   concept set can produce a bit-different (not meaningfully different)
-   numeric result. The prior ledger's unqualified "order of the list does
-   not change the result" claim overstated this as bitwise invariance,
-   which it is not.
+   concept set can produce a numerically different result. **Revision 02
+   correction**: the magnitude of that difference, and whether it is large
+   enough to matter downstream, is **unestablished** — the earlier "not
+   meaningfully different" parenthetical asserted a bound that was never
+   derived, and is withdrawn.
 9. **Correction (this revision): a batch call's `preserve_concepts`
    necessarily excludes both erase targets** — in a joint
    `edit_concepts="chain saw;parachute"` call, neither concept is preserved
@@ -180,10 +192,15 @@ NEEDS_CHANGES review; see `REVISION_01.md` for the full mapping.
     plausible contributors to any observed ranking. A ranking, if observed,
     is reported as consistent with the hard/soft distinction, not as
     isolating it as the sole cause. **"Noise band" is withdrawn as a
-    concept in this revision** — see `PROTOCOL.md ## 10` for the explicit
-    replacement definitions (raw transitions, confirmed witnesses, matched
-    SEQ-vs-batch counts) and the prospectively fixed
-    meaningful-aggregate-deficit threshold (>=10/100 confirmed witnesses).
+    concept** — see `PROTOCOL.md ## 10` for the explicit replacement
+    definitions (raw transitions, confirmed witnesses `C`, ambiguous
+    candidates `U`, matched SEQ-vs-batch counts), the prospectively fixed
+    meaningful-aggregate-deficit threshold (>=10/100 confirmed witnesses),
+    and — added in revision 02 — the **authoritative ambiguity-aware
+    decision table** (`[C, C+U]`, which is not a confidence interval,
+    population bound, or total-semantic-failure count) plus the
+    `D_min`/`D_max` rule for material comparative improvement. Those tables
+    take precedence over any conflicting prose, here or in `PROTOCOL.md`.
 
 ## CEASE and BLOCK — acknowledged prior art, not re-investigated here
 

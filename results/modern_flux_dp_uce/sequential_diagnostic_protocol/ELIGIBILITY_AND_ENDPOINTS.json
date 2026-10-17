@@ -1,6 +1,7 @@
 {
-  "status": "PROTOCOL ONLY - NOT EXECUTED - REVISION 01",
-  "revises_commit": "7e166534e2fdced7fa0cf034d159d46aae38a925",
+  "status": "PROTOCOL ONLY - NOT EXECUTED - REVISION 02",
+  "revises_commit": "281a4076babdd3fd1d2fd9b0206d17606ad6c511",
+  "revision_01_commit": "7e166534e2fdced7fa0cf034d159d46aae38a925",
   "recovered_from_commit": "01f88326e3e66a2baa60fa9b5cedbdaedb9c7437",
   "recovered_from_branch": "research/audit-and-matched-effectiveness-protocol",
   "existing_evidence_files_used": {
@@ -59,12 +60,12 @@
     {"class": "cassette player", "M0": 28, "DP_A_parent_sees_B": null, "UCE_A_parent_sees_B": null, "released_DP_guide": "box", "released_UCE_guide": "box", "status": "excluded_below_floor"},
     {"class": "tench", "M0": 42, "DP_A_parent_sees_B": null, "UCE_A_parent_sees_B": null, "released_DP_guide": null, "released_UCE_guide": null, "status": "excluded_below_floor"},
     {"class": "english springer", "M0": 89, "DP_A_parent_sees_B": 87, "UCE_A_parent_sees_B": 80, "released_DP_guide": "cat", "released_UCE_guide": null, "status": "excluded_zero_margin_at_floor"},
-    {"class": "golf ball", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "sphere", "released_UCE_guide": null, "status": "eligible_not_selected_preference_see_note"},
+    {"class": "golf ball", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "sphere", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected_preference_see_note"},
     {"class": "church", "M0": 96, "DP_A_parent_sees_B": 96, "UCE_A_parent_sees_B": 94, "released_DP_guide": "factory", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected"},
     {"class": "gas pump", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 99, "released_DP_guide": "booth", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected"},
     {"class": "garbage truck", "M0": 99, "DP_A_parent_sees_B": 99, "UCE_A_parent_sees_B": 100, "released_DP_guide": "bus", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected"},
     {"class": "parachute", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "cloth", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_SELECTED"},
-    {"class": "french horn", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "drum", "released_UCE_guide": null, "status": "eligible_not_selected_preference_see_note"}
+    {"class": "french horn", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "drum", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected_preference_see_note"}
   ],
   "candidate_table_note": "\"provisionally_recognition_qualified\" means M0 and both A-parents recognize the candidate above the 80/100 floor only -- it does not mean every gate is cleared; B's own direct single-edit suppression is untested for every candidate. golf ball and french horn were excluded by a documented SELECTION PREFERENCE (independence from the closed SD1.x line's own erasure/historical targets), not by a recognition failure and not by a statistical-independence proof -- see PROTOCOL.md section 3.",
   "selected_pair": {
@@ -120,8 +121,40 @@
     "no_parameter_sweep": true
   },
   "meaningful_aggregate_deficit_threshold": {
-    "definition": ">=10 confirmed relapse witnesses out of 100 chain-saw cases",
+    "definition": ">=10 confirmed relapse witnesses (C) out of 100 chain-saw cases",
     "basis": "round, interpretable, prospectively fixed number -- NOT derived from a significance or power calculation",
     "existence_threshold": "1 confirmed witness is sufficient for an existence finding only, not a meaningful-aggregate-deficit finding"
-  }
+  },
+  "authoritative_decision_table": {
+    "note": "Added in revision 02. Authoritative over any conflicting prose in PROTOCOL.md or the ledger. C = confirmed detector-discovered relapse witnesses; U = ambiguous potential relapse cases under the same frozen candidate/verification rules; defined PER ENDPOINT. [C, C+U] describes possible counts on that discovered candidate set only -- it is NOT a confidence interval, NOT a population bound, and NOT a count of total semantic failures.",
+    "rules": [
+      {"condition": "C=0 and U=0", "interpretation": "no verified detector-discovered relapse; NOT a semantic-absence certificate"},
+      {"condition": "C=0 and U>0", "interpretation": "inconclusive candidate evidence; do NOT call it clean and do NOT treat relapse as rejected"},
+      {"condition": "C>=1", "interpretation": "confirmed existence, with ambiguous cases reported separately"},
+      {"condition": "C>=10", "interpretation": "practical confirmed-witness threshold met"},
+      {"condition": "C+U<10", "interpretation": "practical threshold not reached by the current discovered candidate set"},
+      {"condition": "C<10<=C+U", "interpretation": "practical-threshold determination unresolved"}
+    ],
+    "separation_rule": "existence and practical-threshold findings are applied separately (e.g. C=0,U=2 is inconclusive about existence even though the whole current candidate set could not reach ten)",
+    "withdrawn": "the revision-01 'ambiguity dominates / no clear majority' criterion is removed; a minority of ambiguous cases can still leave a threshold unresolved",
+    "no_forcing": "ambiguity is never reclassified as negative or positive to force a decision, and candidate-selection rules are not changed to reduce U; raw classifier transitions remain reported separately"
+  },
+  "material_comparative_improvement": {
+    "note": "Added in revision 02, for a QUALIFIED same-method comparator only (s = SEQ, b = BATCH). Conservative range for the SEQ-minus-BATCH confirmed-relapse count difference on the verified candidate set -- not a statistical interval.",
+    "D_min": "C_s - (C_b + U_b)",
+    "D_max": "(C_s + U_s) - C_b",
+    "rules": [
+      {"condition": "D_min>=10", "interpretation": "BATCH shows materially fewer verified-candidate relapse cases than SEQ"},
+      {"condition": "D_max<10", "interpretation": "the ten-case comparative criterion is not met"},
+      {"condition": "D_min<10<=D_max", "interpretation": "comparative threshold unresolved"}
+    ],
+    "scale_basis": "applying the already-chosen ten-case practical scale to this previously undefined comparative condition is a prospective operational choice -- not a power calculation and not outcome-derived",
+    "discordance_rule": "SEQ-only and BATCH-only discordance counts are preserved as complementary information in both directions; swapping which cases fail at the same total does not establish lower total relapse, and discordance alone cannot establish material comparative improvement"
+  },
+  "outcome_precedence": [
+    "1. technical/eligibility failures",
+    "2. ambiguity-aware primary findings (authoritative decision table applied to SEQ's own C/U)",
+    "3. comparator conclusions, only after comparator qualification, resolved by D_min/D_max",
+    "4. a stronger applicable existing baseline succeeding -- takes precedence over any inference that a new method is needed"
+  ]
 }
