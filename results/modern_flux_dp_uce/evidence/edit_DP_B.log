@@ -1,0 +1,46 @@
+/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/venv_flux_dp_uce/lib/python3.10/site-packages/xformers/ops/fmha/flash.py:211: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.
+  @torch.library.impl_abstract("xformers_flash::flash_fwd")
+/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/venv_flux_dp_uce/lib/python3.10/site-packages/xformers/ops/fmha/flash.py:344: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.
+  @torch.library.impl_abstract("xformers_flash::flash_bwd")
+/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/venv_flux_dp_uce/lib/python3.10/site-packages/transformers/utils/hub.py:127: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Keyword arguments {'safety_checker': None} are not expected by FluxPipeline and will be ignored.
+
+Erasing  : ['chain saw']
+Guiding  : ['stick']
+Preserving: ['cassette player', 'church', 'gas pump', 'tench', 'garbage truck', 'english springer', 'golf ball', 'parachute', 'french horn']
+
+Loading pipeline components...:   0%|          | 0/2 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 1/2 [00:00<00:00,  1.55it/s]Loading pipeline components...: 100%|██████████| 2/2 [00:00<00:00,  3.09it/s]
+Keyword arguments {'safety_checker': None} are not expected by FluxPipeline and will be ignored.
+Loading pipeline components...:   0%|          | 0/5 [00:00<?, ?it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  9.38it/s][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  9.34it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  9.33it/s]
+Loading pipeline components...:  20%|██        | 1/5 [00:00<00:01,  3.71it/s]Loading pipeline components...:  40%|████      | 2/5 [00:00<00:00,  5.21it/s]You set `add_prefix_space`. The tokenizer needs to be converted from the slow tokenizers
+Loading pipeline components...: 100%|██████████| 5/5 [00:00<00:00,  7.93it/s]Loading pipeline components...: 100%|██████████| 5/5 [00:00<00:00,  7.07it/s]
+
+Collecting text embeddings ...
+  'chain saw': 2 T5 token(s), CLIP pooled [768]
+  'stick': 1 T5 token(s), CLIP pooled [768]
+  'cassette player': 2 T5 token(s), CLIP pooled [768]
+  'church': 1 T5 token(s), CLIP pooled [768]
+  'gas pump': 2 T5 token(s), CLIP pooled [768]
+  'tench': 3 T5 token(s), CLIP pooled [768]
+  'garbage truck': 2 T5 token(s), CLIP pooled [768]
+  'english springer': 3 T5 token(s), CLIP pooled [768]
+  'golf ball': 2 T5 token(s), CLIP pooled [768]
+  'parachute': 3 T5 token(s), CLIP pooled [768]
+  'french horn': 3 T5 token(s), CLIP pooled [768]
+
+Module [0] time_text_embed.text_embedder.linear_1 | shape [3072, 768] | using CLIP
+  Updated 'chain saw' token 0 | ||ΔW||=0.8409  ||x||²=5.3579e+02
+
+Module [1] context_embedder | shape [3072, 4096] | using T5
+  Updated 'chain saw' token 0 | ||ΔW||=5.0519  ||x||²=2.3715e+01
+  Updated 'chain saw' token 1 | ||ΔW||=5.5984  ||x||²=3.5251e+01
+
+
+Erased concepts using Double Proxy (FLUX)
+Model edited in 1.01 seconds
+Weights saved to /data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors
+

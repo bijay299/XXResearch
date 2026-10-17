@@ -1,0 +1,79 @@
+=== Gate 1: M0 semantic recognition >= 80/100 per target ===
+  A (cassette player): M0 semantic = 28/100 -> FAIL
+  B (chain saw): M0 semantic = 100/100 -> PASS
+
+=== Gate 2: each method's single edit reduces its own target's semantic recognition by >=75% relative to M0 ===
+  DP-A (cassette player): M0=28 -> DP_A=0  relative reduction=100.0% -> PASS
+  DP-B (chain saw): M0=100 -> DP_B=0  relative reduction=100.0% -> PASS
+  UCE-A (cassette player): M0=28 -> UCE_A=1  relative reduction=96.4% -> PASS
+  UCE-B (chain saw): M0=100 -> UCE_B=0  relative reduction=100.0% -> PASS
+
+=== Combined per-single verdict (gate1 for that target AND gate2 for that method+target) ===
+  DP-A: gate1=False gate2=True -> overall FAIL
+  DP-B: gate1=True gate2=True -> overall PASS
+  UCE-A: gate1=False gate2=True -> overall FAIL
+  UCE-B: gate1=True gate2=True -> overall PASS
+
+=== Method qualification (both singles must pass) ===
+  DP: A=False B=True -> DOES NOT QUALIFY
+  UCE: A=False B=True -> DOES NOT QUALIFY
+
+Qualified methods for sequential extension: NONE
+
+=== Strict-label numbers for the same cases (reported separately, not used for gating) ===
+  M0 cassette player: strict=6/100
+  M0 chain saw: strict=100/100
+  DP_A cassette player: strict=0/100
+  DP_B chain saw: strict=0/100
+  UCE_A cassette player: strict=1/100
+  UCE_B chain saw: strict=0/100
+
+=== Retention: 9 preserved classes, semantic + strict, M0 vs each single edit ===
+
+DP_A (target erased: cassette player); retained classes: ['chain saw', 'church', 'english springer', 'french horn', 'garbage truck', 'gas pump', 'golf ball', 'parachute', 'tench']
+    chain saw            M0=100/100  DP_A=100/100  delta=+0
+    church               M0= 96/100  DP_A= 94/100  delta=-2
+    english springer     M0= 89/100  DP_A= 88/100  delta=-1
+    french horn          M0=100/100  DP_A=100/100  delta=+0
+    garbage truck        M0= 99/100  DP_A= 98/100  delta=-1
+    gas pump             M0=100/100  DP_A= 99/100  delta=-1
+    golf ball            M0=100/100  DP_A=100/100  delta=+0
+    parachute            M0=100/100  DP_A=100/100  delta=+0
+    tench                M0= 42/100  DP_A= 44/100  delta=+2
+    AGGREGATE mean M0=91.8  mean DP_A=91.4
+
+DP_B (target erased: chain saw); retained classes: ['cassette player', 'church', 'english springer', 'french horn', 'garbage truck', 'gas pump', 'golf ball', 'parachute', 'tench']
+    cassette player      M0= 28/100  DP_B= 22/100  delta=-6
+    church               M0= 96/100  DP_B= 96/100  delta=+0
+    english springer     M0= 89/100  DP_B= 87/100  delta=-2
+    french horn          M0=100/100  DP_B=100/100  delta=+0
+    garbage truck        M0= 99/100  DP_B= 99/100  delta=+0
+    gas pump             M0=100/100  DP_B=100/100  delta=+0
+    golf ball            M0=100/100  DP_B=100/100  delta=+0
+    parachute            M0=100/100  DP_B=100/100  delta=+0
+    tench                M0= 42/100  DP_B= 46/100  delta=+4
+    AGGREGATE mean M0=83.8  mean DP_B=83.3
+
+UCE_A (target erased: cassette player); retained classes: ['chain saw', 'church', 'english springer', 'french horn', 'garbage truck', 'gas pump', 'golf ball', 'parachute', 'tench']
+    chain saw            M0=100/100  UCE_A=100/100  delta=+0
+    church               M0= 96/100  UCE_A= 92/100  delta=-4
+    english springer     M0= 89/100  UCE_A= 78/100  delta=-11
+    french horn          M0=100/100  UCE_A=100/100  delta=+0
+    garbage truck        M0= 99/100  UCE_A= 99/100  delta=+0
+    gas pump             M0=100/100  UCE_A=100/100  delta=+0
+    golf ball            M0=100/100  UCE_A=100/100  delta=+0
+    parachute            M0=100/100  UCE_A=100/100  delta=+0
+    tench                M0= 42/100  UCE_A= 36/100  delta=-6
+    AGGREGATE mean M0=91.8  mean UCE_A=89.4
+
+UCE_B (target erased: chain saw); retained classes: ['cassette player', 'church', 'english springer', 'french horn', 'garbage truck', 'gas pump', 'golf ball', 'parachute', 'tench']
+    cassette player      M0= 28/100  UCE_B= 15/100  delta=-13
+    church               M0= 96/100  UCE_B= 94/100  delta=-2
+    english springer     M0= 89/100  UCE_B= 80/100  delta=-9
+    french horn          M0=100/100  UCE_B=100/100  delta=+0
+    garbage truck        M0= 99/100  UCE_B=100/100  delta=+1
+    gas pump             M0=100/100  UCE_B= 99/100  delta=-1
+    golf ball            M0=100/100  UCE_B=100/100  delta=+0
+    parachute            M0=100/100  UCE_B=100/100  delta=+0
+    tench                M0= 42/100  UCE_B= 39/100  delta=-3
+    AGGREGATE mean M0=83.8  mean UCE_B=80.8
