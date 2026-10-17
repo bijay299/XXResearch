@@ -1,0 +1,113 @@
+{
+  "status": "PROTOCOL ONLY - NOT EXECUTED",
+  "recovered_from_commit": "01f88326e3e66a2baa60fa9b5cedbdaedb9c7437",
+  "recovered_from_branch": "research/audit-and-matched-effectiveness-protocol",
+  "existing_evidence_files_used": {
+    "recognition_summary": {
+      "path": "results/modern_flux_dp_uce/evidence/recognition_summary.json",
+      "sha256": "0dd43f81ed98fe53eecb26b72b0e423a643831df687fc9466ded3e2cedaa96d4"
+    },
+    "per_image_M0": {
+      "path": "results/modern_flux_dp_uce/evidence/M0_per_image.csv",
+      "sha256": "4217595b8ffacd7518387ad39dddb97abd4954ba7d02f4c3accaacd6a9b4dcfb"
+    },
+    "per_image_DP_B_old_name": {
+      "path": "results/modern_flux_dp_uce/evidence/DP_B_per_image.csv",
+      "sha256": "27aaa739e899fd674d760eeddd1949512a7d71ce3faedcdd5f1924537e57c388",
+      "note": "old-experiment name; this is the DP A-parent (chain-saw-erased) per-image table in this protocol's notation"
+    },
+    "per_image_UCE_B_old_name": {
+      "path": "results/modern_flux_dp_uce/evidence/UCE_B_per_image.csv",
+      "sha256": "1030d6c8e83b8f72f768112facfbfd58d5a46364ba013f9aacc8f12715555ad5",
+      "note": "old-experiment name; this is the UCE A-parent (chain-saw-erased) per-image table in this protocol's notation"
+    },
+    "full_case_manifest": {
+      "path": "results/modern_flux_dp_uce/evidence/full_case_manifest.csv",
+      "sha256": "559607683c4b97dc5b3dbdf351735f798e7902f73d88d56c333a89217f1f3c26"
+    },
+    "gates_and_retention": {
+      "path": "results/modern_flux_dp_uce/evidence/gates_and_retention.txt",
+      "sha256": "3356735da7c5a2173cd6e8d127b9ae8293a80db86f4ea3905332e0042193a2c5"
+    },
+    "run_manifest": {
+      "path": "results/modern_flux_dp_uce/RUN_MANIFEST.md",
+      "sha256": "38fce22cb58eac0f1993bca6b44e673638e02adcc8776a489b189eb6199219dc"
+    }
+  },
+  "endpoint_name_mapping": {
+    "A_symbol": "chain saw",
+    "DP_A_parent": {
+      "old_experiment_name": "DP_B",
+      "checkpoint_file_host_only": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors",
+      "per_image_csv": "evidence/DP_B_per_image.csv",
+      "chain_saw_semantic_recognition": {"M0": 100, "parent": 0, "parent_strict": 0}
+    },
+    "UCE_A_parent": {
+      "old_experiment_name": "UCE_B",
+      "checkpoint_file_host_only": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors",
+      "per_image_csv": "evidence/UCE_B_per_image.csv",
+      "chain_saw_semantic_recognition": {"M0": 100, "parent": 0, "parent_strict": 0}
+    },
+    "unrelated_old_endpoints_not_reused": ["DP_A (cassette player)", "UCE_A (cassette player)"]
+  },
+  "candidate_B_table": [
+    {"class": "cassette player", "M0": 28, "DP_A_parent_sees_B": null, "UCE_A_parent_sees_B": null, "released_DP_guide": "box", "released_UCE_guide": "box", "status": "excluded_below_floor"},
+    {"class": "tench", "M0": 42, "DP_A_parent_sees_B": null, "UCE_A_parent_sees_B": null, "released_DP_guide": null, "released_UCE_guide": null, "status": "excluded_below_floor"},
+    {"class": "church", "M0": 96, "DP_A_parent_sees_B": 96, "UCE_A_parent_sees_B": 94, "released_DP_guide": "factory", "released_UCE_guide": null, "status": "eligible_not_selected"},
+    {"class": "gas pump", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 99, "released_DP_guide": "booth", "released_UCE_guide": null, "status": "eligible_not_selected"},
+    {"class": "garbage truck", "M0": 99, "DP_A_parent_sees_B": 99, "UCE_A_parent_sees_B": 100, "released_DP_guide": "bus", "released_UCE_guide": null, "status": "eligible_not_selected"},
+    {"class": "english springer", "M0": 89, "DP_A_parent_sees_B": 87, "UCE_A_parent_sees_B": 80, "released_DP_guide": "cat", "released_UCE_guide": null, "status": "excluded_zero_margin_and_SD1x_overlap"},
+    {"class": "golf ball", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "sphere", "released_UCE_guide": null, "status": "excluded_SD1x_overlap"},
+    {"class": "parachute", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "cloth", "released_UCE_guide": null, "status": "SELECTED"},
+    {"class": "french horn", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "drum", "released_UCE_guide": null, "status": "excluded_SD1x_overlap"}
+  ],
+  "selected_pair": {
+    "A": "chain saw",
+    "B": "parachute",
+    "guide_B": "cloth",
+    "guide_B_source": "released Flux/scripts/Double_Parachute_flux.sh single-edit example; reused verbatim for both DP and UCE",
+    "order": "A_then_B",
+    "UCE_guide_is_extension_beyond_released_example": true
+  },
+  "selection_rule_order": [
+    "1. implementation/guide support (released single-edit example providing a genuine guide value)",
+    "2. robust M0 and parent recognition (restrict to 100/100 on all three existing readings)",
+    "3. independence from the closed SD1.x line (exclude any class that was an actual erasure/historical target in rece_seq_golfball_englishspringer/)"
+  ],
+  "excluded_for_SD1x_overlap": ["golf ball", "french horn", "english springer"],
+  "excluded_for_floor_or_margin": ["cassette player", "tench", "english springer"],
+  "unresolved_gates": {
+    "direct_B_suppression": "UNTESTED - no parachute single edit exists yet for either method",
+    "sequential_B_suppression": "UNTESTED - depends on direct_B_suppression passing first",
+    "technical_integrity_of_new_endpoints": "UNTESTED - no new edit has been run",
+    "historical_outcome": "UNTESTED - depends on DP_SEQ/UCE_SEQ existing"
+  },
+  "already_satisfied_from_existing_data": {
+    "A_M0_recognition": {"chain_saw": 100},
+    "A_suppression_by_both_methods": {"DP": "100/100 -> 0/100 (100% reduction)", "UCE": "100/100 -> 0/100 (100% reduction)"},
+    "B_M0_recognition": {"parachute": 100},
+    "B_recognized_by_both_A_parents_before_any_B_edit": {"DP_A_parent": 100, "UCE_A_parent": 100}
+  },
+  "proposed_endpoints": {
+    "primary_required": [
+      {"name": "DP_B_direct", "depends_on": "pristine M0 (existing)", "method": "DP", "new_args": "edit_concepts=parachute guide_concepts=cloth", "images": 1000},
+      {"name": "UCE_B_direct", "depends_on": "pristine M0 (existing)", "method": "UCE", "new_args": "edit_concepts=parachute guide_concepts=cloth erase_scale=10 preserve_scale=1 lamb=0.1", "images": 1000},
+      {"name": "DP_SEQ", "depends_on": "DP_A_parent checkpoint (existing) + parent-loading adapter", "method": "DP", "new_args": "edit_concepts=parachute guide_concepts=cloth preserve_concepts includes chain saw", "images": 1000},
+      {"name": "UCE_SEQ", "depends_on": "UCE_A_parent checkpoint (existing) + parent-loading adapter", "method": "UCE", "new_args": "same preserve-list change", "images": 1000}
+    ],
+    "conditional_control": [
+      {"name": "DP_JOINT", "depends_on": "pristine M0 (existing)", "method": "DP", "new_args": "edit_concepts=\"chain saw;parachute\" guide_concepts=\"stick;cloth\" in one call", "images": 1000, "condition": "only if DP_SEQ shows a chain-saw deficit not explained by technical/evaluator/retention causes"},
+      {"name": "UCE_JOINT", "depends_on": "pristine M0 (existing)", "method": "UCE", "new_args": "same, UCE_original.py", "images": 1000, "condition": "only if UCE_SEQ shows a chain-saw deficit not explained by technical/evaluator/retention causes"}
+    ]
+  },
+  "budget": {
+    "existing_images_reused": 3000,
+    "primary_new_images_max": 4000,
+    "conditional_new_images_max": 2000,
+    "hard_ceiling_new_images": 6000,
+    "hard_ceiling_new_endpoints": 6,
+    "no_reverse_order": true,
+    "no_extra_pairs": true,
+    "no_parameter_sweep": true
+  }
+}
