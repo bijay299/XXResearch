@@ -23,6 +23,7 @@ GROUPS: list[tuple[str, list[str]]] = [
         f"{R}/README.md",
         f"{R}/ASSESSMENT.md",
         f"{R}/SOURCE_LEDGER.md",
+        f"{R}/CORRECTIONS.md",
     ]),
 ]
 

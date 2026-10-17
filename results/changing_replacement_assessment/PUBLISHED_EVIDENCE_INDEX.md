@@ -11,7 +11,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `0e88d26a2940` — the commit that *records*
+Generated at parent commit `998aab8e240c` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 No external paper PDFs/HTML are vendored: sources are cited by arXiv ID, version
@@ -26,10 +26,11 @@ Regenerate: `python scripts/seq/publish_changing_replacement_assessment_evidence
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/changing_replacement_assessment/README.md` | 3,178 | `e843c53279b356b0f4216bf245432dfe37298b46d416b5bd178c843882da8a2e` |
-| `results/changing_replacement_assessment/ASSESSMENT.md` | 11,676 | `98441b2d9124a42bf1a992162887ebea84d3c8b62820709601bc1cfee5e99a8f` |
-| `results/changing_replacement_assessment/SOURCE_LEDGER.md` | 6,281 | `5f62d58864cbb42ed69ce5adeec8372923ab80153ff585a090904a03319b07bd` |
+| `results/changing_replacement_assessment/README.md` | 4,362 | `0a53aabc2a57e3a6986e69362271ad584d5b626a11ea0ea0f949e82bccebfde8` |
+| `results/changing_replacement_assessment/ASSESSMENT.md` | 18,409 | `0734957e29102a2777efd2f01534c3721aa129bd29f07df2795beda8f3f038b5` |
+| `results/changing_replacement_assessment/SOURCE_LEDGER.md` | 8,402 | `716c62df0d7cedb2f63f7a14085a2545f9dd3cb00a204aa7667c2db561d2ffe8` |
+| `results/changing_replacement_assessment/CORRECTIONS.md` | 7,351 | `37b9059598fe572d41bb5c2ef89f2264e849e2e0a2b304e36d93f151583b5895` |
 
 ---
 
-**3 files listed**, none absent.
+**4 files listed**, none absent.
