@@ -1,5 +1,6 @@
 {
-  "status": "PROTOCOL ONLY - NOT EXECUTED",
+  "status": "PROTOCOL ONLY - NOT EXECUTED - REVISION 01",
+  "revises_commit": "7e166534e2fdced7fa0cf034d159d46aae38a925",
   "recovered_from_commit": "01f88326e3e66a2baa60fa9b5cedbdaedb9c7437",
   "recovered_from_branch": "research/audit-and-matched-effectiveness-protocol",
   "existing_evidence_files_used": {
@@ -36,33 +37,39 @@
   },
   "endpoint_name_mapping": {
     "A_symbol": "chain saw",
+    "A_guide": "stick",
     "DP_A_parent": {
       "old_experiment_name": "DP_B",
       "checkpoint_file_host_only": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors",
+      "checkpoint_sha256_file_level": "d9e3d91c1cb2b544ca8a70353146ce68bdf2d330b795223d01caea62911cfd0a",
       "per_image_csv": "evidence/DP_B_per_image.csv",
       "chain_saw_semantic_recognition": {"M0": 100, "parent": 0, "parent_strict": 0}
     },
     "UCE_A_parent": {
       "old_experiment_name": "UCE_B",
       "checkpoint_file_host_only": "/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors",
+      "checkpoint_sha256_file_level": "bd21369aed67f69f199d037fce27041da300aab17ba2179f23a9f08f9155ee20",
       "per_image_csv": "evidence/UCE_B_per_image.csv",
       "chain_saw_semantic_recognition": {"M0": 100, "parent": 0, "parent_strict": 0}
     },
+    "checkpoint_hash_note": "File-level sha256 only (no tensor/safetensors deserialization performed). This is the identity check a future execution must match before trusting the loaded parent; matching the two weight-key names alone does not establish correct parent identity.",
     "unrelated_old_endpoints_not_reused": ["DP_A (cassette player)", "UCE_A (cassette player)"]
   },
   "candidate_B_table": [
     {"class": "cassette player", "M0": 28, "DP_A_parent_sees_B": null, "UCE_A_parent_sees_B": null, "released_DP_guide": "box", "released_UCE_guide": "box", "status": "excluded_below_floor"},
     {"class": "tench", "M0": 42, "DP_A_parent_sees_B": null, "UCE_A_parent_sees_B": null, "released_DP_guide": null, "released_UCE_guide": null, "status": "excluded_below_floor"},
-    {"class": "church", "M0": 96, "DP_A_parent_sees_B": 96, "UCE_A_parent_sees_B": 94, "released_DP_guide": "factory", "released_UCE_guide": null, "status": "eligible_not_selected"},
-    {"class": "gas pump", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 99, "released_DP_guide": "booth", "released_UCE_guide": null, "status": "eligible_not_selected"},
-    {"class": "garbage truck", "M0": 99, "DP_A_parent_sees_B": 99, "UCE_A_parent_sees_B": 100, "released_DP_guide": "bus", "released_UCE_guide": null, "status": "eligible_not_selected"},
-    {"class": "english springer", "M0": 89, "DP_A_parent_sees_B": 87, "UCE_A_parent_sees_B": 80, "released_DP_guide": "cat", "released_UCE_guide": null, "status": "excluded_zero_margin_and_SD1x_overlap"},
-    {"class": "golf ball", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "sphere", "released_UCE_guide": null, "status": "excluded_SD1x_overlap"},
-    {"class": "parachute", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "cloth", "released_UCE_guide": null, "status": "SELECTED"},
-    {"class": "french horn", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "drum", "released_UCE_guide": null, "status": "excluded_SD1x_overlap"}
+    {"class": "english springer", "M0": 89, "DP_A_parent_sees_B": 87, "UCE_A_parent_sees_B": 80, "released_DP_guide": "cat", "released_UCE_guide": null, "status": "excluded_zero_margin_at_floor"},
+    {"class": "golf ball", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "sphere", "released_UCE_guide": null, "status": "eligible_not_selected_preference_see_note"},
+    {"class": "church", "M0": 96, "DP_A_parent_sees_B": 96, "UCE_A_parent_sees_B": 94, "released_DP_guide": "factory", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected"},
+    {"class": "gas pump", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 99, "released_DP_guide": "booth", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected"},
+    {"class": "garbage truck", "M0": 99, "DP_A_parent_sees_B": 99, "UCE_A_parent_sees_B": 100, "released_DP_guide": "bus", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_not_selected"},
+    {"class": "parachute", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "cloth", "released_UCE_guide": null, "status": "provisionally_recognition_qualified_SELECTED"},
+    {"class": "french horn", "M0": 100, "DP_A_parent_sees_B": 100, "UCE_A_parent_sees_B": 100, "released_DP_guide": "drum", "released_UCE_guide": null, "status": "eligible_not_selected_preference_see_note"}
   ],
+  "candidate_table_note": "\"provisionally_recognition_qualified\" means M0 and both A-parents recognize the candidate above the 80/100 floor only -- it does not mean every gate is cleared; B's own direct single-edit suppression is untested for every candidate. golf ball and french horn were excluded by a documented SELECTION PREFERENCE (independence from the closed SD1.x line's own erasure/historical targets), not by a recognition failure and not by a statistical-independence proof -- see PROTOCOL.md section 3.",
   "selected_pair": {
     "A": "chain saw",
+    "A_guide": "stick",
     "B": "parachute",
     "guide_B": "cloth",
     "guide_B_source": "released Flux/scripts/Double_Parachute_flux.sh single-edit example; reused verbatim for both DP and UCE",
@@ -72,15 +79,17 @@
   "selection_rule_order": [
     "1. implementation/guide support (released single-edit example providing a genuine guide value)",
     "2. robust M0 and parent recognition (restrict to 100/100 on all three existing readings)",
-    "3. independence from the closed SD1.x line (exclude any class that was an actual erasure/historical target in rece_seq_golfball_englishspringer/)"
+    "3. a documented preference (not a proof) for independence from the closed SD1.x line's own erasure/historical targets"
   ],
-  "excluded_for_SD1x_overlap": ["golf ball", "french horn", "english springer"],
+  "excluded_by_preference_not_proof": ["golf ball", "french horn"],
   "excluded_for_floor_or_margin": ["cassette player", "tench", "english springer"],
   "unresolved_gates": {
     "direct_B_suppression": "UNTESTED - no parachute single edit exists yet for either method",
     "sequential_B_suppression": "UNTESTED - depends on direct_B_suppression passing first",
-    "technical_integrity_of_new_endpoints": "UNTESTED - no new edit has been run",
-    "historical_outcome": "UNTESTED - depends on DP_SEQ/UCE_SEQ existing"
+    "technical_integrity_of_new_endpoints": "UNTESTED - no new edit has been run; includes loaded-parent file-hash match, not just weight-key match",
+    "historical_outcome": "UNTESTED - depends on DP_SEQ/UCE_SEQ existing",
+    "retention_bounds": "UNTESTED - descriptive bounds only, see PROTOCOL.md section 9",
+    "batch_comparator_qualification": "UNTESTED - a batch comparator result is only used if it itself passes both-target suppression, B-deletion comparability, and retention bounds"
   },
   "already_satisfied_from_existing_data": {
     "A_M0_recognition": {"chain_saw": 100},
@@ -90,14 +99,14 @@
   },
   "proposed_endpoints": {
     "primary_required": [
-      {"name": "DP_B_direct", "depends_on": "pristine M0 (existing)", "method": "DP", "new_args": "edit_concepts=parachute guide_concepts=cloth", "images": 1000},
-      {"name": "UCE_B_direct", "depends_on": "pristine M0 (existing)", "method": "UCE", "new_args": "edit_concepts=parachute guide_concepts=cloth erase_scale=10 preserve_scale=1 lamb=0.1", "images": 1000},
-      {"name": "DP_SEQ", "depends_on": "DP_A_parent checkpoint (existing) + parent-loading adapter", "method": "DP", "new_args": "edit_concepts=parachute guide_concepts=cloth preserve_concepts includes chain saw", "images": 1000},
-      {"name": "UCE_SEQ", "depends_on": "UCE_A_parent checkpoint (existing) + parent-loading adapter", "method": "UCE", "new_args": "same preserve-list change", "images": 1000}
+      {"name": "DP_B_direct", "depends_on": "pristine M0 (existing)", "method": "DP", "preserve_concepts_exact_order": "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn", "new_args": "edit_concepts=parachute guide_concepts=cloth", "images": 1000},
+      {"name": "UCE_B_direct", "depends_on": "pristine M0 (existing)", "method": "UCE", "preserve_concepts_exact_order": "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn", "new_args": "edit_concepts=parachute guide_concepts=cloth erase_scale=10 preserve_scale=1 lamb=0.1", "images": 1000},
+      {"name": "DP_SEQ", "depends_on": "DP_A_parent checkpoint (existing, hash-pinned) + parent-loading adapter", "method": "DP", "preserve_concepts_exact_order": "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn", "new_args": "edit_concepts=parachute guide_concepts=cloth; preserve list identical to DP_B_direct (chain saw already present in released order)", "images": 1000},
+      {"name": "UCE_SEQ", "depends_on": "UCE_A_parent checkpoint (existing, hash-pinned) + parent-loading adapter", "method": "UCE", "preserve_concepts_exact_order": "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn", "new_args": "same preserve list, identical to UCE_B_direct", "images": 1000}
     ],
-    "conditional_control": [
-      {"name": "DP_JOINT", "depends_on": "pristine M0 (existing)", "method": "DP", "new_args": "edit_concepts=\"chain saw;parachute\" guide_concepts=\"stick;cloth\" in one call", "images": 1000, "condition": "only if DP_SEQ shows a chain-saw deficit not explained by technical/evaluator/retention causes"},
-      {"name": "UCE_JOINT", "depends_on": "pristine M0 (existing)", "method": "UCE", "new_args": "same, UCE_original.py", "images": 1000, "condition": "only if UCE_SEQ shows a chain-saw deficit not explained by technical/evaluator/retention causes"}
+    "conditional_batch_comparators": [
+      {"name": "DP_BATCH", "old_name": "DP_JOINT", "depends_on": "pristine M0 (existing)", "method": "DP", "preserve_concepts_exact_order": "cassette player;church;english springer;gas pump;tench;garbage truck;golf ball;french horn", "new_args": "edit_concepts=\"chain saw;parachute\" guide_concepts=\"stick;cloth\" in one call -- guides POOLED (not per-target) per DP's native loop", "images": 1000, "trigger": "run only if DP_SEQ shows >=1 confirmed relapse witness AND DP_SEQ's direct/sequential B-suppression and retention gates are not already failed (objective, per-method, checked independently of UCE)"},
+      {"name": "UCE_BATCH", "old_name": "UCE_JOINT", "depends_on": "pristine M0 (existing)", "method": "UCE", "preserve_concepts_exact_order": "cassette player;church;english springer;gas pump;tench;garbage truck;golf ball;french horn", "new_args": "edit_concepts=\"chain saw;parachute\" guide_concepts=\"stick;cloth\", UCE_original.py -- guides PAIRED per-target via zip (true simultaneous paired-target solve)", "images": 1000, "trigger": "run only if UCE_SEQ shows >=1 confirmed relapse witness AND UCE_SEQ's direct/sequential B-suppression and retention gates are not already failed (objective, per-method, checked independently of DP)"}
     ]
   },
   "budget": {
@@ -109,5 +118,10 @@
     "no_reverse_order": true,
     "no_extra_pairs": true,
     "no_parameter_sweep": true
+  },
+  "meaningful_aggregate_deficit_threshold": {
+    "definition": ">=10 confirmed relapse witnesses out of 100 chain-saw cases",
+    "basis": "round, interpretable, prospectively fixed number -- NOT derived from a significance or power calculation",
+    "existence_threshold": "1 confirmed witness is sufficient for an existence finding only, not a meaningful-aggregate-deficit finding"
   }
 }

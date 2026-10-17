@@ -20,10 +20,11 @@ OUT = "results/modern_flux_dp_uce/sequential_diagnostic_protocol/PUBLISHED_EVIDE
 R = "results/modern_flux_dp_uce/sequential_diagnostic_protocol"
 
 GROUPS: list[tuple[str, list[str]]] = [
-    ("This protocol's own files", [
+    ("This protocol's own files (revision 01)", [
         f"{R}/PROTOCOL.md",
         f"{R}/ELIGIBILITY_AND_ENDPOINTS.json",
         f"{R}/SOURCE_AND_ASSUMPTION_LEDGER.md",
+        f"{R}/REVISION_01.md",
     ]),
     ("Existing evidence this protocol depends on (referenced, not copied -- "
      "already published at commit 01f8832, listed here again only for a "

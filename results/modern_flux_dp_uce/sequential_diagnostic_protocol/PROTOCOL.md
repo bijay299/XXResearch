@@ -1,14 +1,20 @@
 # Sequential-erasure diagnostic protocol — chain saw -> parachute (FLUX.1-schnell)
 
-**Status: PROTOCOL ONLY. Nothing in this document has been executed.** No
-model was loaded, no encoder was run, no feature was computed, no checkpoint
-was edited, no image was generated or classified, and no GPU was allocated
-to produce this document. Every number below is read from, or arithmetic
-performed on, the already-published tables at commit
-[`01f8832`](https://github.com/bijay299/XXResearch/blob/01f88326e3e66a2baa60fa9b5cedbdaedb9c7437/results/modern_flux_dp_uce/FINAL_REPORT.md).
-Execution requires a separate, future instruction.
+**Status: PROTOCOL ONLY, REVISED (revision 01).** Nothing in this document
+has been executed. No model was loaded, no checkpoint tensor was loaded, no
+encoder was run, no feature was computed, no checkpoint was edited, no image
+was generated, classified or annotated, and no GPU was allocated to produce
+this document. Existing checkpoint files were hashed at the file level only
+(no tensor loading) to pin their identity — see `## 2`. Every other number
+below is read from, or CPU arithmetic performed on, already-published
+tables. Execution requires a separate future instruction.
 
-This is a **separately declared diagnostic**, not a continuation of the
+This revision corrects the coordinator's NEEDS_CHANGES review of the first
+published version (commit `7e16653`). See `REVISION_01.md` for the full
+issue-by-issue correction mapping. The prior commit is preserved unchanged
+in git history; this is a new commit, not an amend.
+
+This remains a **separately declared diagnostic**, not a continuation of the
 closed cassette-player/chain-saw reproduction and not a reopening of the
 closed SD1.x/RECE line. It does not change the frozen 80/100 M0 floor or
 75% relative-suppression gate used there, and it does not broaden that
@@ -16,484 +22,691 @@ experiment's semantic-equivalence mapping.
 
 ## 0. Recovered state
 
-- Repo `bijay299/XXResearch`, branch `research/audit-and-matched-effectiveness-protocol`, HEAD `01f88326e3e66a2baa60fa9b5cedbdaedb9c7437` at the time this protocol was written — matches the coordinator-verified commit exactly; nothing was reset or overwritten.
+- Repo `bijay299/XXResearch`, branch `research/audit-and-matched-effectiveness-protocol`, prior HEAD `7e166534e2fdced7fa0cf034d159d46aae38a925` (this revision's parent) — nothing was reset, amended, or force-pushed.
 - Source: `czhang024/CVPR_DouleProjection` @ `3fc3d8afe03a400dfa71aaaa34b647fef6550e0f` (already cloned, unmodified, at `/data/bijaypandey/cuig_pilot/modern_flux_dp_uce/source_repo` — reused, not re-cloned).
 - Model: `black-forest-labs/FLUX.1-schnell`, revision `741f7c3ce8b383c54771c7003378a50191e9efe9` (already downloaded and hash-verified; see `../RUN_MANIFEST.md` — reused, not re-downloaded).
-- Existing per-image predictions, the frozen 1,000-case manifest, and the completed reproduction's gate computation were read, not regenerated. See `SOURCE_AND_ASSUMPTION_LEDGER.md` and `ELIGIBILITY_AND_ENDPOINTS.json` for exact paths and hashes.
 
-## 1. Question and rejection criterion
+## 1. Primary question and rejection criterion
 
-**Primary claim under test:** loading an A-erased (chain saw) FLUX.1-schnell
-checkpoint as the parent for a second, independent closed-form edit (erasing
-B = parachute), with chain saw correctly included in that second edit's
-native preservation list and chain saw's own preserved-parent response used
-as the reference (not the pristine M0 response), still measurably degrades
-chain-saw suppression relative to the untouched A-parent — i.e., native
-per-edit preservation of A's *parent* response is not sufficient to prevent
-some chain-saw reappearance when a second, unrelated concept is erased
-afterward.
+**Primary claim under test** (corrected wording, replacing the prior
+"save/reload/serialization" framing):
 
-**Competing explanations for an observed chain-saw reappearance**, in order
-checked:
-1. **Technical defect** — the parent-loading adapter failed to actually load
-   A's edited weights before the B-edit's reference/guide/preserve
-   computation, or chain saw was omitted from the preserve list, or a
-   weight-key mismatch occurred. (Ruled out by the technical-integrity gate
-   below, not by the historical-outcome numbers.)
-2. **Evaluator/classifier artifact** — ResNet50 flags a case "chain saw
-   absent" for a reason unrelated to the model's actual depiction (compare
-   `FINAL_REPORT.md`'s own UCE spot-check: a metal chain draped over a stick
-   was correctly *not* classified as chain saw, which was the right call, not
-   an artifact — the risk runs the other way too: a chain-containing image
-   could also register a classifier false positive without being a real
-   chain saw). Checked by the apparent-positive verification rule in
-   `## 6 Retention and rendering` below, not assumed away.
-3. **General multi-edit interference, not sequential-specific** — any two
-   edits to the same two global weight matrices interfere, regardless of
-   whether the second edit is applied to a freshly loaded already-edited
-   checkpoint (our SEQ design) or to both concepts at once from pristine M0
-   in a single call (the JOINT control, `## 2`). If JOINT shows the same
-   degradation as SEQ, the deficit is not specific to the save/reload
-   sequential boundary this protocol is named for.
-4. **Deletion-strength mismatch, not reappearance** — B's sequential
-   suppression is simply weaker than its direct suppression, with no actual
-   A-reappearance (A's own numbers hold steady); this is a different,
-   already-anticipated tradeoff (see `## 4 Prospective gates`), not the
-   claimed deficit.
-5. **Bounded deficit specific to the sequential save/reload boundary** — SEQ
-   shows A-reappearance beyond what JOINT shows, with technical integrity
-   intact and no classifier artifact. This is the only outcome that
-   motivates a follow-up method question (`## 8 Outcome branches`).
+> Does adding the B edit cause verified historical A relapse relative to its
+> saved A-parent, despite native parent-response preservation, while the
+> specified deletion and retention requirements hold?
 
-**Result that would reject the claim:** SEQ's chain-saw semantic recognition,
-on the paired A-parent -> after-B cases, returns to within the completed
-reproduction's own M0-vs-parent noise band (i.e., chain-saw reappearance in
-SEQ is no larger, case-for-case, than in the JOINT control) — explanation 3
-or better.
+This question is about the **sequential (two-call, parent-loaded) workflow
+as a whole**, not about isolating "serialization" or "reload" specifically
+as the cause. The native batch-edit comparators defined in `## 6` differ
+from the sequential workflow in several ways at once (guide semantics,
+preservation-set membership, and — for DP — an extra precision-rounding
+step), not in save/reload alone. **They can compare available workflows.
+They cannot, by themselves, establish that serialization or reload caused
+any observed difference.** Exact parent loading and reload remain separate
+**technical-integrity** gates (`## 9`), verified directly from the loaded
+checkpoint's weights and the adapter's execution order — not inferred from
+a workflow comparison. No dedicated serialization-isolation experiment is
+proposed.
 
-## 2. Endpoint name mapping (old experiment -> this protocol)
+**Competing explanations for an observed chain-saw relapse**, checked in
+this order:
 
-| Old name (completed reproduction) | Checkpoint file (host-only) | New notation | Chain-saw semantic recognition |
-|---|---|---|---|
-| `DP_B` | `runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors` | **DP A-parent** | M0 100/100 -> parent 0/100 |
-| `UCE_B` | `runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors` | **UCE A-parent** | M0 100/100 -> parent 0/100 |
-| `DP_A` | `runs/DP_A/models/flux_double_proxy_CassettePlayer.safetensors` | *(unrelated to this protocol — cassette player, closed, not reused)* | — |
-| `UCE_A` | `runs/UCE_A/models/flux_UCE_proxy_CassettePlayer.safetensors` | *(unrelated to this protocol)* | — |
+1. **Technical defect** — the parent-loading adapter failed to load A's
+   edited weights before the B-edit's reference/guide/preserve computation,
+   the loaded parent's identity does not match the recorded checkpoint hash
+   (`## 2`), chain saw was omitted from the preserve list, or a weight-key
+   mismatch occurred. Ruled out by the technical-integrity gate, not by the
+   historical-outcome numbers.
+2. **Evaluator/classifier artifact** — a positive "chain saw present"
+   reading, or negative "absent" reading, that does not match the image's
+   actual content. Checked by the paired witness-verification rule (`## 11`)
+   on every candidate case, not assumed away.
+3. **General multi-target interference, not workflow-specific** — the
+   native batch-edit comparators (`## 6`) also show chain-saw degradation on
+   the same or different cases. If so, the deficit is not specific to the
+   two-call sequential workflow — it is shared with the one-call batch
+   workflow (which differs from SEQ in guide pooling/pairing, preservation
+   membership and precision boundary, not merely in "no reload"). This
+   changes the **comparative** conclusion; it does not erase a confirmed SEQ
+   relapse observation (`## 10`).
+4. **Deletion-strength mismatch, not relapse** — B's sequential suppression
+   is weaker than its direct suppression with A's own numbers holding
+   steady; a different, already-anticipated tradeoff (`## 9`), not the
+   claimed deficit, and not itself proof that any mismatch *caused*
+   historical relapse (`## 9`).
+5. **Confirmed relapse exceeding the comparator(s) and surviving every other
+   check** — this is the only outcome that motivates a subsequent method
+   question (`## 14`).
+
+**Result that would reject the claim:** zero confirmed relapse witnesses
+(`## 11`) on the chain-saw panel after SEQ — this alone can end the
+diagnostic without running any comparator (`## 14`, outcome 1).
+
+## 2. Endpoint name mapping and checkpoint provenance
+
+| Old name (completed reproduction) | Checkpoint file (host-only) | sha256 (file-level, hashed for this revision) | New notation | Chain-saw semantic recognition |
+|---|---|---|---|---|
+| `DP_B` | `runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors` | `d9e3d91c1cb2b544ca8a70353146ce68bdf2d330b795223d01caea62911cfd0a` | **DP A-parent** | M0 100/100 -> parent 0/100 |
+| `UCE_B` | `runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors` | `bd21369aed67f69f199d037fce27041da300aab17ba2179f23a9f08f9155ee20` | **UCE A-parent** | M0 100/100 -> parent 0/100 |
+| `DP_A` | `runs/DP_A/models/flux_double_proxy_CassettePlayer.safetensors` | *(unrelated to this protocol — cassette player, closed, not reused)* | — | — |
+| `UCE_A` | `runs/UCE_A/models/flux_UCE_proxy_CassettePlayer.safetensors` | *(unrelated to this protocol)* | — | — |
+
+These two sha256 values were computed directly from the files on `/data` for
+this revision (file-level hashing only, no tensor/safetensors deserialization)
+and are the values a future execution phase must match before trusting that
+the loaded parent is the recorded one. **Matching the two expected weight
+*keys* at load time is a separate, necessary-but-not-sufficient check — it
+does not by itself establish that the correct *parent checkpoint* (as
+opposed to some other file with the same two key names) was loaded; the
+file-hash check above is what establishes parent identity.**
 
 "A" in this protocol = chain saw (historical target), reusing the two
-checkpoints above verbatim. "B" = parachute (selected below, `## 3`), not
-yet edited by either method — no existing checkpoint to reuse for B.
+checkpoints above verbatim. "B" = parachute (`## 3`), not yet edited by
+either method — no existing checkpoint to reuse for B.
 
 ## 3. Selected pair and order
 
-**A = chain saw** (fixed by assignment). **B = parachute**, guide = `"cloth"`
-(reused verbatim from the released `Flux/scripts/Double_Parachute_flux.sh`
-single-edit example). **Order: A-then-B** (erase B from A's already-saved
-parent) — the only order in scope; no B-then-A reverse order is proposed.
+**A = chain saw, guide `stick`** (fixed by assignment). **B = parachute,
+guide `cloth`** (reused verbatim from the released
+`Flux/scripts/Double_Parachute_flux.sh` single-edit example). **Order:
+A-then-B** (erase B from A's already-saved parent) — the only order in
+scope; no B-then-A reverse order is proposed.
 
-### Candidate table (verified against `evidence/recognition_summary.json`, commit `01f8832`)
+### Candidate table (independently recomputed from `evidence/recognition_summary.json`, commit `01f8832`)
 
 | B candidate | M0 semantic | DP A-parent sees B | UCE A-parent sees B | Released guide (DP) | Released guide (UCE) | Status |
 |---|---:|---:|---:|---|---|---|
-| cassette player | 28 | — | — | `box` | `box` | **excluded** — below the 80/100 floor at M0 itself |
-| tench | 42 | — | — | *(none released)* | *(none released)* | **excluded** — below the 80/100 floor at M0 itself |
-| english springer | 89 | 87 | 80 | `cat` | *(none released)* | **excluded** — UCE A-parent recognition sits exactly on the 80/100 floor (zero margin), and english springer was an actual erasure target in the closed SD1.x RECE line (S2) |
-| golf ball | 100 | 100 | 100 | `sphere` | *(none released)* | **excluded** — perfect recognition, but golf ball was an actual erasure/historical target throughout the closed SD1.x RECE line; excluded to keep this selection's basis entirely independent of that prior work, per instruction |
-| church | 96 | 96 | 94 | `factory` | *(none released)* | eligible, not selected (lower margin than the perfect-100 candidates) |
-| gas pump | 100 | 100 | 99 | `booth` | *(none released)* | eligible, not selected |
-| garbage truck | 99 | 99 | 100 | `bus` | *(none released)* | eligible, not selected |
-| **parachute** | **100** | **100** | **100** | **`cloth`** | *(none released)* | **selected** |
-| french horn | 100 | 100 | 100 | `drum` | *(none released)* | eligible, not selected (french horn was an actual erasure target in the closed SD1.x line's S1 sequence — same exclusion logic as golf ball) |
+| cassette player | 28 | — | — | `box` | `box` | excluded — below the 80/100 floor at M0 itself |
+| tench | 42 | — | — | *(none released)* | *(none released)* | excluded — below the 80/100 floor at M0 itself |
+| english springer | 89 | 87 | 80 | `cat` | *(none released)* | excluded — UCE A-parent recognition sits exactly on the 80/100 floor (zero margin) |
+| golf ball | 100 | 100 | 100 | `sphere` | *(none released)* | eligible on recognition grounds; not selected (see preference note below) |
+| church | 96 | 96 | 94 | `factory` | *(none released)* | **provisionally recognition-qualified**, not selected (lower margin than the perfect-100 candidates) |
+| gas pump | 100 | 100 | 99 | `booth` | *(none released)* | **provisionally recognition-qualified**, not selected |
+| garbage truck | 99 | 99 | 100 | `bus` | *(none released)* | **provisionally recognition-qualified**, not selected |
+| **parachute** | **100** | **100** | **100** | **`cloth`** | *(none released)* | **provisionally recognition-qualified — SELECTED** |
+| french horn | 100 | 100 | 100 | `drum` | *(none released)* | eligible on recognition grounds; not selected (see preference note below) |
 
-All seven non-floor-failing counts above were independently recomputed from
-`evidence/recognition_summary.json` as part of writing this protocol (CPU
-arithmetic on an existing table, no new generation or classification) and
-match the counts supplied in the assignment exactly.
+"Provisionally recognition-qualified" means exactly what it says: M0 and
+both A-parents recognize the candidate well above the 80/100 floor. It does
+**not** mean the candidate has cleared every gate — B's own direct
+single-edit suppression is untested for every candidate, parachute
+included (`## 9`).
 
 ### Selection rule (stated before reading outcome data, applied in this order)
 
 1. **Implementation/guide support**: require a released single-edit example
-   providing a genuine guide-concept value (not invented). All seven
+   providing a genuine guide-concept value. All seven non-floor-failing
    candidates satisfy this via their `Double_<Class>_flux.sh` script — **no
    candidate has a released UCE example** (`Flux/scripts/` contains only two
-   UCE scripts: cassette player and chain saw). This is disclosed, not
-   hidden: applying `UCE_original.py` to parachute with guide `"cloth"` is
-   an **extension beyond the released UCE examples** — the guide *string*
-   itself is not new (reused verbatim from DP's released script), but its
-   use with `UCE_original.py` is. `UCE_original.py` accepts `--guide_concepts`
-   as a generic argument identical in form to `Double_proxy.py`'s, so this
-   is a direct, non-inventive reuse of an existing value in a new (but
-   structurally identical) call, not a newly authored guide word.
+   UCE scripts: cassette player and chain saw). Applying `UCE_original.py`
+   to parachute with guide `"cloth"` is an **extension beyond the released
+   UCE examples** — the guide *string* is reused verbatim from DP's
+   released script, not invented, but its use with `UCE_original.py` is new.
 2. **Robust M0 and parent recognition**: restrict to candidates at 100/100
-   on all three existing readings (M0, DP A-parent, UCE A-parent) —
-   maximum available margin above the 80/100 floor before any new edit is
-   attempted. This leaves golf ball, parachute, french horn.
-3. **Independence from the closed SD1.x line**: exclude any candidate that
-   was itself an actual erasure or historical target anywhere in the closed
-   `rece_seq_golfball_englishspringer/` line (golf ball: historical target
-   throughout; french horn: S1's erased new-target;
-   `results/README.md`, `history_preservation_confirmation/FINAL_REPORT.md`).
-   This is an explicit precaution against the appearance of selecting B
-   because of a prior SD1.x finding, not a claim that golf ball or french
-   horn are invalid choices on their own merits. **Parachute** was never an
-   erasure target in that line — it appears only in SD1.x retention panels
-   ("French horn/parachute stayed clean") — and is the sole survivor of
-   steps 1-3.
+   on all three existing readings (M0, DP A-parent, UCE A-parent). This
+   leaves golf ball, parachute, french horn.
+3. **A documented preference, not a proof, for independence from the closed
+   SD1.x line**: among the three perfect-recognition candidates, parachute
+   was never an erasure or historical target in
+   `results/rece_seq_golfball_englishspringer/` (golf ball was the
+   historical target throughout that line; french horn was S1's erased
+   new-target), while parachute appears only in that line's retention
+   panels. **This exclusion of golf ball and french horn is a selection
+   preference adopted out of caution, chosen to keep this pair's basis
+   visibly separate from a different, closed experiment — it is not a
+   claim of statistical independence between concepts, and the original
+   assignment did not require it.** No newly generated outcome informed
+   this choice, and no new search of the old SD1.x line was performed to
+   make it (only a grep of its existing published `README.md`/
+   `FINAL_REPORT.md` text) — this is a preference stated plainly, not
+   evidence manufactured to justify it after the fact.
 
-No step used expected success/failure of the *new* chain-saw/parachute pair,
-and no newly generated output was consulted.
+Parachute is the candidate selected. No step used expected success/failure
+of the *new* chain-saw/parachute pair.
 
 ### Provisional eligibility (explicit, not glossed over)
 
 M0 and parent recognition for both targets are established from existing
 data (table above). **B's own direct single-edit suppression is untested**
-— no parachute single edit exists yet for either method. This is a real,
-open gate for the execution phase (`## 4`, "Direct B suppression"), not
-assumed to pass. If it fails for a method, that method's SEQ/JOINT endpoints
-for this pair do not run, and no automatic fallback pair is substituted.
+for both methods. This is a real, open gate for the execution phase
+(`## 9`, "Direct B suppression"), not assumed to pass. If it fails for a
+method, that method's SEQ/BATCH endpoints for this pair do not run, and no
+automatic fallback pair is substituted.
 
-## 4. One mechanism-based prediction
-
-**Central question** (as given): does erasing B from an existing A-erased
-parent cause A to reappear despite preserving A's parent response, while B
-deletion and untouched-class retention remain acceptable?
-
-### What the source code actually proves (not assumed)
+## 4. What the source code actually establishes (and what it does not)
 
 Both `Double_proxy.py` and `UCE_original.py` start every edit by loading
 `pipe.transformer` fresh from `model_id` and copying its two targeted
-modules (`Double_proxy.py:34-54`, `UCE_original.py:15-30`) — `original_modules`
-*is* whatever checkpoint was loaded at call time. The planned sequential
-implementation's only required change is to load the saved A-parent
-`.safetensors` into that freshly-constructed pipeline's `transformer`
-**before** this module-copy step (the same two-key merge already used by
-`generate_erased_flux.py:67-81` in the completed reproduction), so every
-downstream reference, guide and preserve computation is built from A's own
-edited response, not M0's pristine one. "Include A in the second edit's
-native preservation list" means adding the literal string `"chain saw"` to
-`preserve_concepts` for the B-edit.
+modules (`Double_proxy.py:34-54`, `UCE_original.py:15-30`) —
+`original_modules` *is* whatever checkpoint was loaded at call time. The
+planned sequential implementation's required change is to load the saved
+A-parent `.safetensors` (identity pinned by the file hash in `## 2`) into
+that freshly-constructed pipeline's `transformer` **before** this
+module-copy step, so every downstream reference, guide and preserve
+computation is built from A's own edited response, not M0's pristine one.
+"Include A in the second edit's native preservation list" means adding the
+literal string `"chain saw"` to `preserve_concepts` for the B-edit — already
+present by default, since the released `Double_Parachute_flux.sh` example's
+own preserve list already names chain saw as one of parachute's 9 untouched
+classes (`## 7`).
 
-**DP's preservation is an exact algebraic guarantee, not an approximation**,
-*for the isolated preserve-concept string*: `Double_proxy.py:191-233`
-constrains `ΔW_B` to the left null-space of the stacked preserve-concept
-embedding vectors (SVD of `C_pres^T`, `ΔW = Z @ U_2.T` where `U_2` spans
-that null space) — by construction, `ΔW_B @ c_i = 0` exactly for every
-preserve-concept token vector `c_i`, including chain saw's, once chain saw
-is added to the list. Since `W_0` is already the loaded A-parent weight and
-nothing else in the model changes, `(W_0 + ΔW_B) @ c_{chain saw} = W_0 @
-c_{chain saw}` **exactly** — the two edited layers' output for the literal
-string `"chain saw"`'s own token embeddings is unchanged, to float32
-precision, not merely approximately preserved. This is checked against
-existing shape records, not re-run: `time_text_embed.text_embedder.linear_1`
-has `n=768` and `context_embedder` has `n=4096` (both logged in
-`evidence/edit_DP_A.log`, carried over unchanged for this protocol's edits).
-Nine preserve concepts (the other 8 untouched classes + chain saw) contribute
-at most 9 CLIP vectors (rank <=9 of 768) and at most ~27 T5 token vectors
-(rank <=27 of 4096, each class contributing 1-3 tokens per the same log) —
-both far short of making the null space collapse to zero dimensions, so the
-constraint remains well-posed by the existing shape arithmetic alone.
+### DP's preservation: an exact identity, with three named qualifications
 
-**UCE's preservation is a soft, weighted least-squares trade-off, not an
-exact guarantee** — a real, pre-existing structural asymmetry with DP, not
-an artifact introduced by this protocol. `UCE_original.py:85-113` solves
-`W_new = mat1 @ inverse(mat2)` where `mat1`/`mat2` sum weighted outer
-products over **all** erase and preserve concepts plus an `λ·w_old`
-regularization term anchoring toward the loaded parent. The preserve term's
-target (`uce_guide_outputs[preserve_concept]`) is explicitly `w_old`'s own
-output for that preserve concept — so UCE's solve *is* trying to match A's
-parent response for chain saw — but only as one weighted term in a single
-joint least-squares optimum shared with the new erase objective
-(`erase_scale=10`) and the regularizer (`lamb=0.1`); nothing in the closed
-form guarantees `W_new @ c_{chain saw} == w_old @ c_{chain saw}` even
-approximately. (UCE also uses only the *last* content token per concept,
-`UCE_original.py:55-65`, vs. DP's per-token loop under `replace_indices=all`
-— native, pre-existing, not changed here.)
+`Double_proxy.py:191-233` constrains `ΔW_B` to the left null-space of the
+stacked preserve-concept embedding vectors (SVD of `C_pres^T`,
+`ΔW = Z @ U_2.T`). **In ideal (infinite-precision) arithmetic**, this gives
+`ΔW_B @ c_i = 0` exactly for every preserve-concept vector `c_i`, so with a
+loaded parent `W_0` and chain saw in `preserve_concepts`,
+`(W_0 + ΔW_B) @ c_{chain saw} = W_0 @ c_{chain saw}` for the isolated string
+`"chain saw"`'s own token embeddings. **The native computation departs from
+this ideal identity in three concrete, source-confirmed ways:**
 
-### What is *not* proved (an honest gap, not glossed over)
+1. **SVD rank cutoff** (`Double_proxy.py:216`): `rank_V =
+   int((S_svd > 1e-6).sum().item())` — singular values at or below `1e-6`
+   are treated as zero. A preserve vector whose contribution to `C_pres` is
+   numerically small relative to this cutoff does not enlarge the
+   *effective* null space the way it would in exact arithmetic.
+2. **Projected-direction skip threshold** (`Double_proxy.py:225-228`):
+   `x = U_2.T @ v_i`; if `x_norm_sq < 1e-10`, that token's update is
+   **skipped entirely** (with a printed warning), not applied. **A large
+   null space does not by itself establish that parachute's own erase-token
+   vectors have a usable nonzero projection into it** — whether they do is
+   unknown without running the edit, and is explicitly left UNESTABLISHED
+   here (see `SOURCE_AND_ASSUMPTION_LEDGER.md`).
+3. **Finite-precision fp32 arithmetic throughout, with a final bf16 cast**
+   (`Double_proxy.py:215-238`): the SVD, the null-space projection and the
+   update are all computed in fp32, then `W_0_f32.to(torch_dtype)` casts the
+   result to bf16 at the end of each module's loop (`Double_proxy.py:238`).
+   **This cast is not a rounding-error footnote — it can change an exactly
+   preserved response into a measurably different one.** Illustrative
+   arithmetic example (not a measured FLUX effect; no re-execution was
+   performed to produce it — this is CPU bookkeeping on hypothetical
+   numbers, verified by hand here):
 
-The exact guarantee above holds for the **isolated** string `"chain saw"`
-as encoded by `pipe.encode_prompt(prompt="chain saw", ...)` — precisely how
-`preserve_concepts` embeddings are built in both scripts. The actual
-evaluation prompt is `"Image of chain saw"` (`SD/data/small_imagenet_prompts.csv`).
-FLUX's T5 encoder is contextual (full self-attention over the whole prompt),
-so the token embeddings for "chain"/"saw" inside `"Image of chain saw"` are
-**not** identical to their embeddings when "chain saw" is encoded alone —
-meaning the null-space guarantee does not automatically transfer to the
-real generation-time prompt. Whether it transfers closely enough in practice
-is an empirical question this protocol does not answer by inspection alone;
-it is exactly what SEQ generation (once authorized) would measure. No toy
-closed-form argument was constructed here to bound this gap quantitatively
-— marked **UNESTABLISHED**, not claimed either way.
+   > Toy parent weight row `[1, 1]`, update `Δw = [3/1024, -3/1024]`,
+   > preserved input `c = [1, 1]`. Before casting: `Δw · c = 3/1024 -
+   > 3/1024 = 0` — preservation is exact. After bf16 rounding (bf16 spacing
+   > near 1.0 is `1/128`; near `0.997` it is `1/256`): `1 + 3/1024 =
+   > 1.0029...` rounds to `1.0`; `1 - 3/1024 = 0.9971...` rounds to
+   > `255/256`. The rounded weight row is `[1, 255/256]`, giving a response
+   > of `1·1 + (255/256)·1 = 511/256`, a change of `511/256 - 2 = -1/256`
+   > from the exact value — a small but nonzero, directly-attributable-to-
+   > casting deviation from "exact" preservation.
 
-### Three-way distinction (as required)
+**Protection also only concerns the specific vectors selected as inputs to
+the constraint — not the whole generator.** This applies to **both**
+conditioning streams the two edited matrices consume, not only the T5
+stream: `context_embedder` operates on T5 sequence embeddings (full
+self-attention, contextual) and `time_text_embed.text_embedder.linear_1`
+operates on the CLIP **pooled** embedding — itself computed over the whole
+input sequence, so it too is contextual despite being a single vector per
+prompt. Both streams' preserve-constraint inputs are built from encoding
+the **isolated** string `"chain saw"` (`pipe.encode_prompt(prompt="chain saw", ...)`
+in both scripts), not from the actual evaluation prompt `"Image of chain
+saw"`. Because both T5 and CLIP are contextual encoders, the token/pooled
+vectors for "chain saw" differ, in general, between the isolated string and
+the full prompt — meaning the ideal (and even the finite-precision) identity
+above is proved only for the isolated-string input, not for the actual
+generation-time conditioning of either stream. Whether it transfers closely
+enough to matter in practice is UNESTABLISHED here (no toy bound was
+derived for this gap, and none is claimed).
 
-1. **Proved fixed-feature identity**: DP's constrained update leaves the two
-   edited matrices' output for the isolated preserve-string "chain saw"
-   algebraically unchanged, given correct parent-loading and chain saw's
-   inclusion in `preserve_concepts` (exact, from source, `## 4` above).
-2. **Possible failure demonstrated by toy mathematics**: **not attempted in
-   this protocol.** No closed-form bound was derived showing the
-   contextual-embedding gap (isolated vs. in-sentence "chain saw" token
-   vectors) is large enough to matter, or that UCE's soft preservation term
-   is quantitatively likely to drift past some threshold. This is a real gap
-   in the mechanistic argument, stated plainly rather than papered over.
-3. **Untested prediction about generated images**: SEQ (both methods) will
-   show some chain-saw reappearance beyond the completed reproduction's own
-   M0-vs-parent noise floor, with DP's reappearance (if any) smaller than
-   UCE's, because DP's preserve constraint is exact at the embedding-input
-   level while UCE's is only a soft least-squares trade-off — this is the
-   prediction `## 1`'s rejection criterion is built to test, not a settled
-   claim.
+### UCE's preservation: a soft least-squares trade-off, structurally different from DP
 
-### Strongest applicable existing control: native ordered/joint multi-concept call
+`UCE_original.py:85-113` solves `W_new = mat1 @ inverse(mat2)`, where
+`mat1`/`mat2` sum weighted outer products over all erase and preserve
+concepts plus an `λ·w_old` regularizer anchored to the loaded parent. The
+preserve term's target is explicitly `w_old`'s own output for that preserve
+concept, so UCE's solve *is* trying to match the parent's chain-saw
+response — but only as one weighted term in a single shared least-squares
+optimum with the new erase objective (`erase_scale=10`) and the regularizer
+(`lamb=0.1`); nothing in the closed form guarantees exact, or even tightly
+bounded, preservation. UCE also encodes only the **last** content token per
+concept (`UCE_original.py:55-65`), unlike DP's per-token loop under
+`replace_indices=all` — both native, pre-existing, unchanged here.
+
+### DP-vs-UCE relapse ranking: explicitly PREDICTION, and explicitly confounded
+
+**Prediction** (unproven): SEQ will show some chain-saw relapse for both
+methods, with DP's relapse (if any) smaller than UCE's, motivated by DP's
+exact-in-ideal-arithmetic constraint vs. UCE's soft trade-off. **This
+ranking cannot be cleanly attributed to "hard vs. soft preservation" alone**
+— DP and UCE also differ in native token selection (all tokens vs. last
+token only) and in edit/encoder precision pathway (bf16-native-with-fp32-
+internal-math for DP vs. fp32-throughout for UCE), both of which are
+independently plausible contributors to any observed ranking. If a ranking
+is observed, it will be reported as an observation consistent with the
+hard/soft distinction, not as isolating that distinction as the cause.
+
+### Preservation-residual logging — specified for a future run, collected now: nothing
+
+If execution is authorized, the implementation should log, per edited
+module and per preserve-concept token: (a) `‖ΔW_B @ c_i‖` computed in fp32
+**before** the bf16 cast (should be exactly 0 for every preserved vector
+under DP's constraint, modulo the skip-threshold cases in point 2 above),
+and (b) the same quantity recomputed **after** the bf16 cast, using the
+rounded weights. If contextual residuals (point under "Protection also only
+concerns...") are examined, the exact inputs must be the frozen evaluation
+prompts (`"Image of chain saw"`, `"Image of parachute"`) with their T5 and
+CLIP encodings computed once and cached, not re-derived per case. These
+logs add no new image endpoints and do not change the 6,000-image ceiling
+(`## 7`). **No log, measurement, or computation of this kind was collected
+for this protocol** — this section specifies the plan only.
+
+## 5. Native multi-target calls: ordered-pooled (DP) vs. simultaneous-paired (UCE) — not "simultaneous joint solve" for either, and not equivalent to each other
 
 Both scripts natively accept multiple `;`-separated `edit_concepts` in one
-call — already-released capability, no new method. **Critically, these are
-not mechanistically equivalent between methods**, and must not be
-conflated:
+call — already-released capability, no new method. **The two methods'
+batch behavior is not mechanistically equivalent, and the first published
+version of this protocol mischaracterized DP's.**
 
-- **DP's multi-concept loop is genuinely sequential, even within one call**
-  (`Double_proxy.py:153-235`): each concept's update modifies `W_0_f32` in
-  place before the next concept's own `b = W_0_f32 @ (...)` baseline is
-  computed — so a DP joint call erasing `"chain saw;parachute"` together is
-  an **ordered** two-step update from pristine M0, not a simultaneous solve.
-  Calling it "simultaneous" would be exactly the error this assignment
-  warns against.
-- **UCE's multi-concept loop *is* a true simultaneous closed-form solve**
-  (`UCE_original.py:96-113`): `mat1`/`mat2` are built by summing weighted
-  outer products over every entry in `edit_concepts`/`preserve_concepts`
-  (commutative sums) and solved once — order of the `;`-separated list does
-  not change the result. A UCE joint call is a genuine simultaneous
-  multi-target solve, not merely an ordered pair.
+### DP: ordered erase loop with *pooled*, not per-target, guides
 
-This control directly addresses competing explanation 3 (`## 1`): if DP's
-and UCE's **joint** calls (both targets erased together, from pristine M0,
-single checkpoint, single generation batch) show chain-saw suppression
-degraded to the same degree as SEQ, the deficit is not specific to the
-sequential save/reload boundary — it is general multi-target interference,
-and UCE_JOINT in particular (a true simultaneous solve) would show whether
-even simultaneity removes it. This is source-supported and requires no new
-method; it is included **conditionally** (`## 5`), not by default, to keep
-the design minimal.
+`Double_proxy.py:153-189`: the outer loop iterates `edit_concepts` in order,
+updating `W_0_f32` in place before the next concept's baseline is computed
+from the updated matrix (genuinely sequential, even within one call). But
+the inner guide-resolution step (`Double_proxy.py:174-189`) rebuilds
+`guide_vecs` from the **entire** `guide_concepts` list **for every erase
+token of every erase concept** — passing `--edit_concepts "chain
+saw;parachute" --guide_concepts "stick;cloth"` does **not** assign `stick`
+to chain saw and `cloth` to parachute; it pools `{stick, cloth}` into a
+joint projection subspace (`V_g`) used as the proxy target for **both**
+erase concepts' tokens (`Double_proxy.py:182-189`, the `len(guide_vecs) > 1`
+branch). This is a real behavioral difference from the sequential design
+(where each edit call has exactly one single-item `guide_concepts` list),
+not merely a different call boundary.
 
-### CEASE and BLOCK (acknowledged, not re-investigated)
+The batch call's `preserve_concepts` also necessarily excludes **both**
+erase targets — chain saw is no longer preserved (it is itself being
+erased in this call) and parachute is no longer preserved either. This
+is a different preservation configuration from SEQ's second edit (which
+does preserve chain saw) and from the completed reproduction's original
+single edits (each of which preserved the other target) — not a smaller
+version of the same preservation question, a different one.
 
-**CEASE** ("Continual concept erasure in diffusion models by suppressing
-cross-edit interference," `yongliang-wu/CEASE`) targets precisely this
-mechanism by name, but as last inspected (`docs/research/feasibility_sources_2026-10-11.json`,
-fetched 2026-10-11) its repository contains no method code — only a static
-project page ("Code coming soon"). It is cited here as directly relevant
-prior art for the predicted mechanism, not as an available control; its
-absence of an implementation is unchanged and not re-checked in this
-protocol-only task.
+**Precision**: a one-call DP batch edit computes both concepts' updates in
+fp32 and casts to bf16 **once**, at the very end. The two-call SEQ sequence
+casts to bf16 after edit 1 (A), reloads that bf16 checkpoint, casts back up
+to fp32 for edit 2 (B)'s internal math, then casts to bf16 again at the end
+— **one extra bf16 rounding step that the batch call does not have.** This
+is specific to DP: DP's native edit dtype is bf16 (`RUN_MANIFEST.md`).
+UCE's native edit dtype is fp32 throughout (`RUN_MANIFEST.md`), and fp32
+safetensors save/reload is lossless, so UCE's two-call SEQ does **not**
+have an analogous intermediate-rounding step — this asymmetry is
+DP-specific, not shared by UCE.
 
-**BLOCK** (`proceedings.mlr.press/v306/kumar26c.html`,
-`sprintml/block-concept-removal` @ `db4ab11a5c0cefbc71dfaedba0df3e86dd0319d5`,
-cited in `FINAL_REPORT.md`) already studies sequential removal on modern
-models. A bounded deficit found here, if any, would **not** establish that
-BLOCK fails, and would not make sequential erasure a new research topic —
-it would be a narrow, method-specific (DP/UCE) finding on one concept pair.
-No additional model or baseline search is proposed in response to either
-citation.
+### UCE: a true simultaneous paired-target solve, with one precision caveat
 
-## 5. Endpoints and budget
+`UCE_original.py:96-113`: the erase loop uses `zip(edit_concepts,
+guide_concepts)`, so `"chain saw;parachute"` paired with
+`"stick;cloth"` correctly assigns `stick` to chain saw and `cloth` to
+parachute (positional pairing, not pooling). `mat1`/`mat2` are built by
+summing weighted outer products over every listed concept and solved
+**once** — in exact arithmetic this is order-invariant. **Order invariance
+here means: reordering corresponding erase/guide pairs together leaves the
+sum unchanged in exact arithmetic — it is not a claim of bitwise
+floating-point invariance.** Floating-point summation is not strictly
+associative, so a different evaluation order can produce a bit-different
+(though not meaningfully different) result; this is noted for precision,
+not treated as a live concern for this diagnostic's conclusions.
+
+UCE's batch call's `preserve_concepts` likewise excludes both chain saw and
+parachute (both are erase targets, not preserved) — the same preservation-
+configuration difference from SEQ noted for DP above.
+
+### Naming
+
+**The endpoints formerly named `DP_JOINT`/`UCE_JOINT` are renamed
+`DP_BATCH`/`UCE_BATCH`** ("native batch-edit comparator") throughout this
+revision, to avoid implying either a simultaneous solve for DP (it is not)
+or an exact equivalence to UCE's simultaneous solve (UCE's own batch call
+differs from its sequential calls in reference weights, preservation-set
+membership, and regularization structure, even though it is a single joint
+linear solve). No new per-target guide semantics were implemented to "fix"
+DP's pooling, and no replacement exact-joint algorithm was constructed —
+DP's and UCE's native batch behavior is used exactly as released.
+
+## 6. Changed objectives and precision boundaries (summary table)
+
+| | SEQ (this protocol's central endpoint) | BATCH (comparator) |
+|---|---|---|
+| **DP guide assignment** | Each call has one single-item `guide_concepts` (`stick` for A, `cloth` for B) — no pooling | Pooled: both erase concepts' tokens projected onto the joint span of `{stick, cloth}` |
+| **UCE guide assignment** | Each call has one single-item `guide_concepts` | Paired positionally via `zip` — `stick`<->chain saw, `cloth`<->parachute (correct per-target assignment) |
+| **Preservation membership (edit 1, erasing A)** | Preserves parachute (parachute is in chain saw's original 9-class preserve list) | N/A — A and B erased together, neither preserved |
+| **Preservation membership (edit 2 / the B step)** | Preserves chain saw (added per `## 4`) | N/A — see above |
+| **DP precision** | fp32 math, bf16 cast after edit 1, reload+recast to fp32, fp32 math, bf16 cast after edit 2 (one extra rounding step) | fp32 math throughout both concepts, bf16 cast once at the end |
+| **UCE precision** | fp32 math and fp32 save/reload throughout (lossless) | fp32 math throughout, solved once |
+| **What a difference between SEQ and BATCH can be attributed to** | — | Any combination of the above, not isolable to "sequential vs. batch" alone without further, unauthorized experimentation |
+
+## 7. Endpoints and budget
 
 ### Existing (reused, not regenerated)
 
 | Endpoint | Images | Role here |
 |---|---:|---|
 | M0 | 1,000 (existing) | B's M0 baseline; A's M0 baseline |
-| DP A-parent (`DP_B`) | 1,000 (existing) | A-parent for DP SEQ; B's "parent recognition" baseline |
-| UCE A-parent (`UCE_B`) | 1,000 (existing) | A-parent for UCE SEQ; B's "parent recognition" baseline |
+| DP A-parent (`DP_B`, hash in `## 2`) | 1,000 (existing) | A-parent for DP SEQ; B's "parent recognition" baseline |
+| UCE A-parent (`UCE_B`, hash in `## 2`) | 1,000 (existing) | A-parent for UCE SEQ; B's "parent recognition" baseline |
 
 No new M0 or chain-saw-parent generation is proposed.
 
 ### Proposed (not executed) — primary, required for the central question
 
-| Endpoint | Depends on | Changed arguments vs. the released single-edit example | Purpose | Images |
-|---|---|---|---|---:|
-| `DP_B_direct` | pristine M0 (existing) | `--edit_concepts "parachute" --guide_concepts "cloth"` (preserve list = all 9 other classes, native single-edit settings, `Flux/scripts/Double_Parachute_flux.sh`'s own list, unchanged) | Direct-B suppression gate; direct-vs-sequential comparator | 1,000 |
-| `UCE_B_direct` | pristine M0 (existing) | Same `edit_concepts`/`guide_concepts`; `UCE_original.py` native settings (`erase_scale=10, preserve_scale=1, lamb=0.1`); **extension beyond released examples** (no author UCE-parachute script) | Same, UCE | 1,000 |
-| `DP_SEQ` | `DP_B` checkpoint (existing) loaded as parent | `--edit_concepts "parachute" --guide_concepts "cloth" --preserve_concepts "cassette player;chain saw;church;gas pump;tench;garbage truck;english springer;golf ball;french horn"` (chain saw added; parent-loading adapter inserted before module copy) | Central-question endpoint, DP | 1,000 |
-| `UCE_SEQ` | `UCE_B` checkpoint (existing) loaded as parent | Same preserve-list change; `UCE_original.py` native settings; parent-loading adapter | Central-question endpoint, UCE | 1,000 |
+Preserve lists below use the **exact released order** from
+`Flux/scripts/Double_Parachute_flux.sh` wherever applicable (`## 3`); no
+reordering was introduced.
+
+| Endpoint | Depends on | `--preserve_concepts` (exact order) | Other changed arguments | Purpose | Images |
+|---|---|---|---|---|---:|
+| `DP_B_direct` | pristine M0 (existing) | `"cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn"` (released order, unchanged — chain saw already included as an untouched class) | `--edit_concepts "parachute" --guide_concepts "cloth"` | Direct-B suppression gate; direct-vs-sequential comparator | 1,000 |
+| `UCE_B_direct` | pristine M0 (existing) | Same list and order, reused for UCE (no independent released UCE order exists; reuse is the documented deviation) | Same `edit_concepts`/`guide_concepts`; `UCE_original.py` native settings (`erase_scale=10, preserve_scale=1, lamb=0.1`); extension beyond released examples | Same, UCE | 1,000 |
+| `DP_SEQ` | `DP_B` checkpoint (existing, hash-pinned `## 2`) loaded as parent | **Identical list and order to `DP_B_direct`** — chain saw was already present in the released order, satisfying "include A in B's preserve list" without reordering | `--edit_concepts "parachute" --guide_concepts "cloth"`; parent-loading adapter inserted before module copy | Central-question endpoint, DP | 1,000 |
+| `UCE_SEQ` | `UCE_B` checkpoint (existing, hash-pinned `## 2`) loaded as parent | Identical list/order to `UCE_B_direct` | Same; parent-loading adapter | Central-question endpoint, UCE | 1,000 |
 
 **4 primary endpoints, 4,000 images.**
 
-### Proposed (not executed) — conditional control, only if `DP_SEQ`/`UCE_SEQ` show a chain-saw deficit against explanation 1-2 being ruled out
+### Proposed (not executed) — conditional native batch-edit comparators
 
-| Endpoint | Depends on | Changed arguments | Purpose | Images |
-|---|---|---|---|---:|
-| `DP_JOINT` | pristine M0 (existing) | `--edit_concepts "chain saw;parachute" --guide_concepts "stick;cloth"` in one call, single checkpoint | Rules out general (non-sequential-specific) ordered-multi-edit interference for DP | 1,000 |
-| `UCE_JOINT` | pristine M0 (existing) | Same, `UCE_original.py` | Rules out the same for UCE's true simultaneous solve | 1,000 |
+Triggered **only** per the objective, per-method rule in `## 14` — not run
+by default.
+
+| Endpoint | Depends on | `--preserve_concepts` (released 9-class list minus both erase targets, order otherwise unchanged) | Other changed arguments | Purpose | Images |
+|---|---|---|---|---|---:|
+| `DP_BATCH` | pristine M0 (existing) | `"cassette player;church;english springer;gas pump;tench;garbage truck;golf ball;french horn"` | `--edit_concepts "chain saw;parachute" --guide_concepts "stick;cloth"` in one call — guides pooled per `## 5`, not per-target | Compares the sequential *workflow* against DP's native batch workflow | 1,000 |
+| `UCE_BATCH` | pristine M0 (existing) | Same list | `--edit_concepts "chain saw;parachute" --guide_concepts "stick;cloth"`, `UCE_original.py` — guides paired per-target correctly per `## 5` | Compares the sequential workflow against UCE's native simultaneous-solve workflow | 1,000 |
 
 **+2 conditional endpoints, +2,000 images.**
 
 ### Hard ceiling
 
-**6 new endpoints, 6,000 new images maximum.** No reverse order (B-then-A),
-no additional pairs, no hyperparameter sweep, no exploratory ablation is
-proposed by default. The only cost beyond the 4 primary endpoints is the
-2 JOINT controls, included conditionally and only because `## 4` identifies
-them as the strongest applicable existing, source-supported control for
-ruling out the leading alternative explanation — not as an open-ended
-extension.
+**6 new endpoints, 6,000 new images maximum.** No reverse order, no
+additional pairs, no hyperparameter sweep, no exploratory ablation is
+proposed by default.
 
-## 6. Cases and settings (reused verbatim, not regenerated)
+## 8. Cases and settings (reused verbatim, not regenerated)
 
 - Case manifest: `evidence/full_case_manifest.csv`, sha256
-  `559607683c4b97dc5b3dbdf351735f798e7902f73d88d56c333a89217f1f3c26`
-  (1,000 cases: 100 CSV rows x 10 variations; same file for every new
-  endpoint).
+  `559607683c4b97dc5b3dbdf351735f798e7902f73d88d56c333a89217f1f3c26`.
+- **Exactly one literal prompt string per target**: `"Image of chain saw"`
+  and `"Image of parachute"` — confirmed directly from
+  `SD/data/small_imagenet_prompts.csv`, where all 10 rows for a given class
+  share identical prompt text and differ only in `evaluation_seed`. The 100
+  images per target come from **100 distinct generation seeds** (10 base
+  `evaluation_seed` values x 10 variation offsets), **not 10 distinct
+  prompt contexts and not 100 independent prompt contexts of any kind**
+  (corrects the prior revision's imprecise "10 CSV-row contexts" framing).
+- **Edit-time vs. generation-time sequence length, frozen separately
+  though currently equal**: `max_sequence_length` for collecting edit-time
+  text embeddings in `Double_proxy.py`/`UCE_original.py` resolves to `256`
+  for any `model_id` containing `"schnell"` (source-confirmed); the same
+  value, `256`, is also the native default passed at generation time in
+  `generate_erased_flux.py`. Both are recorded here as `256` explicitly
+  rather than assumed identical because they are set by separate code
+  paths.
 - Native generation settings carried over unchanged: 512x512, 4 inference
-  steps, `guidance_scale=0.0`, `max_sequence_length=256`, bf16 inference,
-  batch size 1, `global_seed=42`, `base_seed_offset=0`, per-image seed =
+  steps, `guidance_scale=0.0`, bf16 inference, batch size 1,
+  `global_seed=42`, `base_seed_offset=0`, per-image seed =
   `evaluation_seed + variation_index`.
 - Evaluator: the pinned `Flux/compare_accuracy.py`'s own
   `ErasureAccuracyEvaluator` (ResNet50, `ResNet50_Weights.DEFAULT` =
-  `IMAGENET1K_V2`), imported unmodified, as in the completed reproduction's
-  `evidence/code/eval_all.py`. Strict exact-label and semantic
+  `IMAGENET1K_V2`), imported unmodified. Strict exact-label and semantic
   (tape-player/radio-equivalent) scores kept separate, as before.
+- Native method precision and token behavior are preserved unchanged for
+  both methods (DP: bf16 model/fp32 internal math/`replace_indices=all`;
+  UCE: fp32 throughout/last-token-only) — no new per-target guide semantics
+  and no replacement algorithm were implemented anywhere in this protocol.
 
-## 7. Prospective gates
+## 9. Prospective gates
 
-| Gate | Definition | Default reference |
-|---|---|---|
-| Technical integrity | Exactly 2 weight keys matched (`context_embedder.weight`, `time_text_embed.text_embedder.linear_1.weight`), finite values, correct native dtype (DP bf16, UCE fp32) before the bf16 evaluation cast, verified save/reload, parent-loading adapter confirmed to run *before* module copy | Same as the completed reproduction's check |
-| Direct B suppression | `DP_B_direct`/`UCE_B_direct` reduce parachute's own semantic recognition by >=75% relative to M0's 100/100 | Original 75% relative-suppression rule, unchanged |
-| Sequential B suppression | `DP_SEQ`/`UCE_SEQ` reduce parachute's semantic recognition by >=75% relative to the A-parent's own parachute recognition (100/100 for both methods, from the existing table) | Same rule, applied to the parent baseline instead of M0 |
-| Deletion-strength comparability | Direct and sequential B-suppression counts reported side by side; treated as "comparable" only if both independently clear the 75% gate **and** their absolute counts differ by <=10/100 cases — a descriptive band, not a statistical test (see `## 9`) | New criterion for this study, justified here; does not alter the closed experiment's own gates |
-| Retention | Each of the 8 untouched classes (all 10 minus chain saw minus parachute), per-class and aggregate, M0 vs. A-parent vs. SEQ vs. (conditionally) JOINT | Same structure as the completed reproduction |
+| Gate | Definition | Reference endpoint | Status |
+|---|---|---|---|
+| Technical integrity | Exactly 2 weight keys matched, finite values, correct native dtype (DP bf16, UCE fp32) before the bf16 evaluation cast, verified save/reload, parent-loading adapter confirmed to run *before* module copy, **loaded-parent file hash matches `## 2`** | — | prospective |
+| Direct B suppression | `DP_B_direct`/`UCE_B_direct` reduce parachute's own semantic recognition by >=75% relative to M0's 100/100 | M0 | **UNTESTED** |
+| Sequential B suppression | `DP_SEQ`/`UCE_SEQ` reduce parachute's semantic recognition by >=75% relative to the A-parent's own parachute recognition (100/100 for both methods) | DP/UCE A-parent | **UNTESTED**, depends on direct B suppression passing first |
+| Deletion-strength comparability | Direct and sequential B-suppression counts reported side by side; treated as "comparable" only if both independently clear the 75% gate **and** their absolute counts differ by <=10/100 cases. **Practical rationale**: 10 cases is a round, deliberately conservative band chosen to be comfortably larger than the single-class noise already observed in the completed reproduction's own retention tables (typically 1-6 cases, maximum 13) while remaining a small fraction of the 100-case panel — a descriptive band, not a power-derived or statistical bound. **An out-of-band result is reported as a tradeoff/confound for interpreting the historical-outcome finding — it is not itself evidence that a deletion-strength mismatch *caused* any observed historical relapse.** | `DP_B_direct`/`UCE_B_direct` vs. `DP_SEQ`/`UCE_SEQ` | **UNTESTED** |
+| Retention (SEQ vs. M0, cumulative) | Aggregate mean semantic recognition across the 8 untouched classes (all 10 minus chain saw minus parachute) drops <=8 points, and no single class drops more than 15/100 cases, relative to M0 | M0 | **UNTESTED**; bound chosen as a judgment call extrapolating from the completed reproduction's worst single-edit retention cost (UCE: aggregate -3.0, max single-class -13) to allow headroom for two stacked edits — **descriptive, not a proof of acceptable quality; failing this bound alone does not establish "all quality gates clean" and passing it alone does not either** |
+| Retention (SEQ vs. its own A-parent, incremental) | Same 8-class aggregate drops <=5 points, no single class drops more than 12/100 cases, specifically attributable to the B-edit on top of A's own already-measured retention cost | DP/UCE A-parent (`DP_B`/`UCE_B`'s own existing retention table) | **UNTESTED**; same descriptive status as above |
+| Batch comparator qualification | A `DP_BATCH`/`UCE_BATCH` result is only used to inform the comparative conclusion (`## 1`, explanation 3) if it itself passes: both erased targets' own >=75% suppression, B-deletion comparability against the direct-B baseline (same <=10/100 band), and both retention bounds above. **A comparator that fails any of these is reported as a failed comparator, honestly, and is not silently used to draw a conclusion.** | — | **UNTESTED** |
 
 Passing the suppression gates does **not** by itself establish matched
-deletion strength — that is the separate, explicit comparability criterion
-above.
+deletion strength, and passing the retention bounds does **not** by itself
+establish "all quality gates clean" — both are explicitly descriptive
+criteria, stated as such.
 
-## 8. Historical outcome (to be tabulated once SEQ exists)
+## 10. Explicit rules replacing noise-band language
 
-For each of the 100 chain-saw cases, paired across M0 -> A-parent -> after-B
-(SEQ), four categories, reported separately per method:
+The prior revision referred to an "M0-vs-parent noise band." **No
+repeatability or classifier-noise measurement was ever made; M0 100/100 ->
+parent 0/100 is the measured erasure effect of the completed reproduction,
+not noise, and that language is withdrawn.** In its place, three distinct
+quantities are defined and must be reported separately, never conflated:
+
+1. **Raw classifier parent -> SEQ transitions**: for every chain-saw case,
+   the 2x2 table of (present/absent at A-parent) x (present/absent at SEQ)
+   — unfiltered, directly from classifier output, no visual verification
+   applied yet.
+2. **Confirmed detector-discovered relapse witnesses**: the subset of
+   quantity 1's "absent at parent -> present at SEQ" cases that survive the
+   paired visual-verification rule in `## 11`. This is the operative count
+   for the rejection criterion (`## 1`) and for every gate above.
+3. **Matched-case SEQ-vs-BATCH transitions, if a comparator runs**: reported
+   as **both** of the following, named separately because they are
+   different quantities and must not be substituted for one another —
+   - **SEQ-only discordant cases**: cases where SEQ shows a confirmed
+     relapse witness but the matched BATCH case does not (and the reverse,
+     reported separately).
+   - **Net count difference**: `(confirmed SEQ witnesses) -
+     (confirmed BATCH witnesses)`, which can be zero even when the
+     discordant-case count is large if the two workflows relapse on
+     different cases. "SEQ shows relapse beyond BATCH" in this protocol
+     means **a nonzero SEQ-only-discordant count**, not merely a positive
+     net difference — this is specified now to remove ambiguity before any
+     execution.
+
+**Existence vs. meaningful aggregate deficit**: one confirmed witness (from
+quantity 2) is sufficient to support an **existence** finding — "relapse
+occurs under this mechanism, at least once, on this panel" — and no more.
+It is not automatically equated with a meaningful aggregate deficit. A
+separate, prospective (not outcome-derived) threshold is fixed now for the
+latter: **a confirmed-witness count of >=10 (out of 100 chain-saw cases) is
+treated as a meaningful aggregate deficit** for the purposes of `## 14`'s
+outcome branches. This is a round, interpretable number chosen for this
+study, explicitly **not** derived from any significance or power
+calculation (`## 13` prohibits that kind of inference) — a judgment call,
+stated as one.
+
+## 11. Historical outcome and paired witness verification
+
+For every chain-saw case, tabulate quantity 1 from `## 10` (raw parent ->
+SEQ transitions), separately reporting:
 
 - Recognized at M0, absent after A's own edit, **present again after B**
-  (candidate relapse).
-- Recognized at M0, absent after A's own edit, **absent after B** (clean).
+  (candidate relapse — subject to verification below).
+- Recognized at M0, absent after A's own edit, absent after B (clean).
 - Recognized at M0, **still present after A's own edit** (residual A-edit
   failure — carried forward, not counted as relapse if it stays present
   after B too).
-- Not recognized at M0 at all (excluded from the relapse question; chain
-  saw's own M0 baseline is 100/100 so this category is expected to be
-  empty, but will be reported if not).
+- Not recognized at M0 at all (expected empty, chain saw's M0 baseline is
+  100/100; reported if not empty).
 
-Residual first-edit failures are explicitly not relapse. The minimum
-practically meaningful contrast is frozen now, before any execution: **any
-non-zero count in the first category, beyond what JOINT shows on the same
-cases, is the candidate finding** — no threshold tuning after seeing the
-numbers.
+### Paired witness verification (frozen rule, to be applied during a future execution; no image has been inspected to write this rule)
 
-## 9. Retention and rendering
+For **every** candidate-positive case — the **union** of candidate positives
+across every workflow actually compared (SEQ, and BATCH if run, so
+verification is not asymmetric in favor of or against either workflow) —
+inspect the **M0, A-parent, SEQ, and (if applicable) BATCH** images for that
+case together, and classify into exactly one of:
+
+- **Confirmed relapse**: the A-parent image does not depict a chain saw
+  (visually, independent of the classifier label) **and** the SEQ (or
+  BATCH) image does.
+- **Residual parent content**: the A-parent image already depicts a chain
+  saw that the classifier missed — the apparent SEQ/BATCH positive is not a
+  new relapse, since the content was already present and undetected.
+- **Final classifier false positive**: the SEQ/BATCH image does not
+  actually depict a chain saw despite a positive classifier label (e.g., a
+  bare chain or a stick alone is not a chain saw — the same caution already
+  established by the completed reproduction's own `UCE_B` spot-check).
+- **Ambiguous**: neither of the above can be confidently determined from
+  the image. Ambiguous cases are reported separately, counted in neither
+  "confirmed relapse" nor "clean," and do **not** by themselves block or
+  pass any gate in `## 9` or `## 10` — see `## 14` for how they affect
+  outcome determination.
+
+A case counts as confirmed relapse only with evidence of **both** parent
+absence and final presence — a final chain-saw-looking image alone is
+insufficient if the parent already had one the classifier missed.
+
+**These are assistant visual checks on a fixed, union-based candidate set —
+not independent human validation, not a comprehensive true relapse-rate
+estimate, and not an absence certificate for the rest of the panel.** Raw
+classifier results (quantity 1) are preserved and reported separately from
+verified results (quantity 2) at every stage. **No image has been inspected
+and no witness has been labeled to produce this protocol — this section
+documents the rule only.**
+
+## 12. Retention and rendering
 
 - Untouched-class aggregate excludes chain saw and parachute (8 classes:
-  cassette player, church, gas pump, tench, garbage truck, english springer,
-  golf ball, french horn), per-class and aggregate, at M0 / A-parent / SEQ /
-  (conditionally) JOINT.
-- **Apparent-positive verification rule**: any case where the classifier
-  labels "chain saw" present after B must be visually inspected against the
-  actual image before being counted as a real reappearance — "a chain is
-  not a chain saw" (per the completed reproduction's own UCE_B spot-check,
-  which showed a chain draped on a stick that the classifier correctly did
-  *not* call chain saw). Inspecting the positive witnesses this surfaces
-  does **not** establish a full-panel false-negative rate or prove semantic
-  absence elsewhere in the panel — it only checks the specific apparent
-  positives.
-- Descriptive rendering panel, frozen now (not chosen after viewing
-  outputs): variation 0 of the first two CSV rows for chain saw (cases 10,
-  11) and parachute (cases 80, 81) — 4 cases x each new endpoint. Any
-  apparent-positive case outside this fixed panel gets its own full-
-  resolution crop, identified by case id, rather than being folded into an
-  aggregate "degeneration rate."
-- No reuse of the paused human-review questionnaire. No new human review is
-  proposed or required by this protocol.
+  cassette player, church, gas pump, tench, garbage truck, english
+  springer, golf ball, french horn), per-class and aggregate, at M0 /
+  A-parent / SEQ / BATCH (if run) — bounds and reference endpoints per
+  `## 9`.
+- Descriptive rendering panel, frozen now, reusing the **exact same 20
+  cases** as the completed reproduction's own fixed panel (variation 0 of
+  the first two CSV rows per class: cases 0, 1, 10, 11, 20, 21, ..., 90,
+  91), shown across M0, the relevant A-parent, the direct-B edit, SEQ, and
+  the batch comparator if available — five columns per case where
+  applicable. No image has been selected or viewed to write this rule.
+- **Operational rule for quality-confounded or ambiguous results**: a
+  rendered image that depicts the stated guide concept (box/stick/cloth,
+  as applicable) in place of its original target is expected substitution,
+  not damage. A rendered image whose defect (malformation, wrong object,
+  low fidelity) is already present in the **matched M0 case** for that same
+  case id is an ordinary, pre-existing M0 defect, not newly introduced
+  editing damage. Only a defect that is both new (absent at the matched M0
+  case) and not explainable as guide substitution is counted as rendering
+  damage.
+- **This fixed 20-case panel cannot establish a full-panel quality rate or
+  substitute for independent human validation** — the same limitation
+  already stated for the completed reproduction's own panel, repeated here
+  because it applies again. No reuse of the paused human-review
+  questionnaire. No new human review is proposed or required by this
+  protocol.
 
-## 10. Analysis limits
+## 13. Analysis limits
 
-The 100 parachute (or chain-saw) cases are 10 prompt-template/seed
-combinations across 10 CSV rows, not 100 independent prompt contexts — the
-same caveat already stated in `FINAL_REPORT.md`. No IID significance test is
-proposed; the comparability band in `## 7` is a fixed descriptive rule, not
-an inferential one. No statistical equivalence is inferred from a null
-result, and no small-sample FID or CLIP-loss proxy is introduced.
+Each target (chain saw, parachute) has **exactly one literal prompt
+string**, evaluated at 100 distinct generation seeds (`## 8`) — not 100,
+nor even 10, independent prompt contexts. No IID significance test is
+proposed; the comparability and retention bands in `## 9`, and the
+meaningful-aggregate-deficit threshold in `## 10`, are fixed descriptive
+rules, not inferential ones. No statistical equivalence is inferred from a
+null result, and no small-sample FID or CLIP-loss proxy is introduced.
 
-## 11. Outcome branches (every branch stops this diagnostic)
+## 14. Outcome branches (every branch stops this bounded diagnostic)
 
-1. **Existing preservation works adequately**: SEQ's chain-saw recognition
-   stays within the completed reproduction's own M0-vs-parent noise band for
-   both methods -> report a clean result; no follow-up method question.
-2. **Only a weak/absent control fails**: a gate other than historical
-   outcome fails first (e.g., direct B suppression fails for one method) ->
-   report which gate, stop; that method's endpoints for this pair do not
-   run further, no fallback pair substituted.
-3. **Apparent relapse is explained by deletion, retention, rendering, or
-   evaluator tradeoffs**: a positive witness fails the verification rule in
-   `## 9`, or the comparability band in `## 7` is violated in a way that
-   explains the numbers -> report the explanation, stop.
-4. **Technical validity fails**: wrong key count, non-finite values, or the
-   parent-loading adapter verified not to have run before module copy ->
-   report the defect, stop; no scientific claim is drawn from that
-   endpoint's numbers.
-5. **A bounded deficit remains against the strongest applicable control**
-   (JOINT, if run): SEQ shows chain-saw reappearance beyond what JOINT shows
-   on the same cases, with every other gate clean -> **this is the only
+1. **Zero confirmed relapse witnesses** on the chain-saw panel after SEQ
+   (quantity 2, `## 10`, for both methods) -> report a clean result; **this
+   can end the diagnostic without running either batch comparator** — no
+   follow-up method question.
+2. **A gate other than historical outcome fails first** (e.g., direct B
+   suppression fails for one method, or technical integrity fails) ->
+   report which gate and why, stop; that method's remaining endpoints for
+   this pair do not run, no fallback pair substituted.
+3. **Confirmed relapse exists but does not meet the meaningful-aggregate-
+   deficit threshold** (>=1 but <10 confirmed witnesses, `## 10`) -> report
+   as a bounded existence finding, explicitly not generalized to "a
+   meaningful deficit"; **trigger the objective per-method batch-comparator
+   condition below regardless**, since even a small confirmed count is
+   enough to warrant the comparability check.
+4. **Objective per-method batch-comparator trigger**: for a given method,
+   run `DP_BATCH` or `UCE_BATCH` if and only if that method's SEQ shows
+   >=1 confirmed relapse witness (`## 10`, quantity 2) **and** SEQ's own
+   direct/sequential B-suppression and retention gates (`## 9`) are not
+   already failed. This condition is checked and reported per method
+   independently — DP and UCE may trigger differently.
+5. **Shared SEQ/BATCH relapse**: if a triggered batch comparator (itself
+   qualified per `## 9`'s batch-comparator-qualification gate) also shows
+   confirmed relapse on the same cases -> this does **not** erase the SEQ
+   relapse observation; it changes the comparative conclusion to "the
+   deficit is present in both the sequential and the native batch
+   workflow, not specific to either" (ties to explanation 3, `## 1`).
+6. **SEQ-only discordant relapse** (`## 10`, quantity 3) that meets the
+   meaningful-aggregate-deficit threshold, with every other gate clean, and
+   (if a batch comparator ran) the comparator itself qualified and showing
+   materially less relapse on the matched cases -> **this is the only
    outcome that motivates a subsequent method question** (e.g., whether a
    stronger historical-preservation mechanism than the native one is
-   needed) — stated as a question for a future, separately authorized task,
-   not an automatic next experiment.
+   needed), stated as a question for a future, separately authorized task.
+7. **Weaker baseline fails, stronger applicable baseline succeeds**: e.g.,
+   UCE shows a meaningful-aggregate-deficit relapse while DP's SEQ passes
+   cleanly (zero or below-threshold confirmed relapse, all other gates
+   clean) -> report this as a method-specific result for this pair. **This
+   does not, by itself, establish a need for a new preservation method** —
+   it is a different conclusion from a genuine eligibility or technical
+   failure, and is reported as such, not escalated.
+8. **Technical validity fails** (wrong key count, non-finite values, the
+   parent-loading adapter verified not to have run before module copy, or
+   the loaded-parent file hash not matching `## 2`) -> report the defect,
+   stop; no scientific claim is drawn from that endpoint's numbers.
+9. **Ambiguous witnesses dominate** a candidate set (no clear majority
+   confirmed either way) -> report the ambiguity rate explicitly, withhold
+   both "confirmed relapse" and "clean" conclusions for those specific
+   cases, and do not let ambiguous cases push a count across the
+   meaningful-aggregate-deficit threshold in either direction without
+   separately flagging that the threshold determination itself rests on
+   ambiguous evidence.
 
-No outcome triggers an automatic sweep, a reverse order, or an additional
-pair.
+No outcome triggers an automatic sweep, a reverse order, an additional pair,
+or an unauthorized follow-up run.
 
 ## Appendix — proposed commands (reference only, not executed)
 
+Preserve-concept lists below are the exact released order (`## 7`); no
+execution adapter was written or run to produce this appendix.
+
 ```
-# DP_B_direct (new) — from pristine M0
+# DP_B_direct (new) — from pristine M0, released preserve order unchanged
 python Double_proxy.py \
   --edit_concepts "parachute" --guide_concepts "cloth" \
-  --preserve_concepts "cassette player;chain saw;church;gas pump;tench;garbage truck;english springer;golf ball;french horn" \
+  --preserve_concepts "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn" \
   --concept_type object --replace_indices all --expand_prompts false \
   --save_dir <DP_B_direct>/models --exp_name flux_double_proxy_Parachute
 
-# UCE_B_direct (new) — from pristine M0
+# UCE_B_direct (new) — from pristine M0, same preserve order reused (no independent released UCE order exists)
 python UCE_original.py \
   --edit_concepts "parachute" --guide_concepts "cloth" \
-  --preserve_concepts "cassette player;chain saw;church;gas pump;tench;garbage truck;english springer;golf ball;french horn" \
+  --preserve_concepts "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn" \
   --concept_type object --erase_scale 10 --preserve_scale 1 --lamb 0.1 --expand_prompts false \
   --save_dir <UCE_B_direct>/models --exp_name flux_UCE_proxy_Parachute
 
 # DP_SEQ (new) — parent-loading adapter loads runs/DP_B/models/flux_double_proxy_ChainSaw.safetensors
-# into the freshly constructed pipeline's transformer BEFORE Double_proxy.py's module-copy step,
-# then runs with chain saw added to the preserve list:
+# (file hash d9e3d91c... pinned in ## 2) into the freshly constructed pipeline's transformer BEFORE
+# Double_proxy.py's module-copy step; preserve list identical to DP_B_direct (chain saw already present):
 python Double_proxy.py \
   --edit_concepts "parachute" --guide_concepts "cloth" \
-  --preserve_concepts "cassette player;chain saw;church;gas pump;tench;garbage truck;english springer;golf ball;french horn" \
+  --preserve_concepts "cassette player;chain saw;church;english springer;gas pump;tench;garbage truck;golf ball;french horn" \
   --concept_type object --replace_indices all --expand_prompts false \
   --save_dir <DP_SEQ>/models --exp_name flux_double_proxy_ChainSaw_then_Parachute
   # [+ parent-checkpoint load, not a native CLI flag -- the required adapter]
 
-# UCE_SEQ (new) — same adapter pattern, UCE_original.py, parent = runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors
+# UCE_SEQ (new) — same adapter pattern, parent = runs/UCE_B/models/flux_UCE_proxy_ChainSaw.safetensors
+# (file hash bd21369a... pinned in ## 2)
 
-# DP_JOINT (conditional) — single call, pristine M0, both targets together (ordered, not simultaneous for DP)
+# DP_BATCH (conditional, per ## 14's trigger) — single call, pristine M0, both targets together.
+# Guides are POOLED (## 5), not per-target; preserve list excludes both erase targets:
 python Double_proxy.py \
   --edit_concepts "chain saw;parachute" --guide_concepts "stick;cloth" \
-  --preserve_concepts "cassette player;church;gas pump;tench;garbage truck;english springer;golf ball;french horn" \
+  --preserve_concepts "cassette player;church;english springer;gas pump;tench;garbage truck;golf ball;french horn" \
   --concept_type object --replace_indices all --expand_prompts false \
-  --save_dir <DP_JOINT>/models --exp_name flux_double_proxy_ChainSaw_Parachute_joint
+  --save_dir <DP_BATCH>/models --exp_name flux_double_proxy_ChainSaw_Parachute_batch
 
-# UCE_JOINT (conditional) — single call, pristine M0, true simultaneous solve for UCE
+# UCE_BATCH (conditional, per ## 14's trigger) — single call, pristine M0, true simultaneous
+# paired-target solve for UCE (guides correctly paired per-target via zip, ## 5):
 python UCE_original.py \
   --edit_concepts "chain saw;parachute" --guide_concepts "stick;cloth" \
-  --preserve_concepts "cassette player;church;gas pump;tench;garbage truck;english springer;golf ball;french horn" \
+  --preserve_concepts "cassette player;church;english springer;gas pump;tench;garbage truck;golf ball;french horn" \
   --concept_type object --erase_scale 10 --preserve_scale 1 --lamb 0.1 --expand_prompts false \
-  --save_dir <UCE_JOINT>/models --exp_name flux_UCE_proxy_ChainSaw_Parachute_joint
+  --save_dir <UCE_BATCH>/models --exp_name flux_UCE_proxy_ChainSaw_Parachute_batch
 ```
-
-No execution adapter was written or run to produce this appendix; the
-commands document the intended arguments only, mirroring the released
-single-edit scripts' own argument style.

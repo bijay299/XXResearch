@@ -11,7 +11,7 @@ eligibility gate.
 | [`FINAL_REPORT.md`](FINAL_REPORT.md) | observed recognition counts, the gate arithmetic that blocked the sequential extension, retention, and the 4-case qualitative rendering-panel observation |
 | [`RUN_MANIFEST.md`](RUN_MANIFEST.md) | source/model commit hashes, environment, hardware, native settings — frozen before any edit or generation |
 | [`PUBLISHED_EVIDENCE_INDEX.md`](PUBLISHED_EVIDENCE_INDEX.md) | exact path, byte count and sha256 of every file published here |
-| [`sequential_diagnostic_protocol/PROTOCOL.md`](sequential_diagnostic_protocol/PROTOCOL.md) | **protocol only — not executed.** A prospective chain-saw -> parachute sequential-erasure diagnostic built from this reproduction's existing tables; no model/encoder/GPU work ran to produce it. Execution requires a separate future instruction |
+| [`sequential_diagnostic_protocol/PROTOCOL.md`](sequential_diagnostic_protocol/PROTOCOL.md) | **protocol only — not executed, revision 01.** A prospective chain-saw -> parachute sequential-erasure diagnostic built from this reproduction's existing tables; no model/encoder/GPU work ran to produce it or its correction. See [`sequential_diagnostic_protocol/REVISION_01.md`](sequential_diagnostic_protocol/REVISION_01.md) for the coordinator-requested correction mapping. Execution requires a separate future instruction |
 
 ## What is here
 

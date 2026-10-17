@@ -11,7 +11,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `01f88326e3e6` — the commit that *records*
+Generated at parent commit `7e166534e2fd` — the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 The second group below lists files **already published** at commit
@@ -22,13 +22,14 @@ from this same table; they are not re-published or modified.
 Regenerate: `python scripts/seq/publish_modern_flux_dp_uce_protocol_evidence_index.py`
 — run it LAST, after every other file in this result set is final.
 
-## This protocol's own files
+## This protocol's own files (revision 01)
 
 | path | bytes | sha256 |
 |---|---|---|
-| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/PROTOCOL.md` | 32,328 | `249701f09fab83608f7960754e749720484646986af606fea15fa2e7f5d9e4ad` |
-| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/ELIGIBILITY_AND_ENDPOINTS.json` | 7,702 | `1294d50231d88ee633cf5be5064356a1ebad80e541b820494f7bf804c63a9425` |
-| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/SOURCE_AND_ASSUMPTION_LEDGER.md` | 8,930 | `d853ee75f848a62cd12867b85564b9ce6f05123a7ccdcaf74ad86fabddcf7011` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/PROTOCOL.md` | 48,106 | `12c94b390613c35a7ab1bbf8fa6f813017f3d9cc8f6ee54be37389f73d9adc1d` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/ELIGIBILITY_AND_ENDPOINTS.json` | 11,029 | `4e14b6340e29eea0761e5fd2eecae36a04ce7f941d61ca1c29f99191f24c4a1a` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/SOURCE_AND_ASSUMPTION_LEDGER.md` | 13,572 | `cdee8c2034d3be4272c92ead2d19a3d3d86a9c073123fae10124dda26a5f4e09` |
+| `results/modern_flux_dp_uce/sequential_diagnostic_protocol/REVISION_01.md` | 15,768 | `b65ef18780a65a262ae677b418bb3ca142a41f9638b3b88cb013ab64eb40daf5` |
 
 ## Existing evidence this protocol depends on (referenced, not copied -- already published at commit 01f8832, listed here again only for a single-table traceability check)
 
@@ -45,4 +46,4 @@ Regenerate: `python scripts/seq/publish_modern_flux_dp_uce_protocol_evidence_ind
 
 ---
 
-**11 files listed**, none absent.
+**12 files listed**, none absent.
