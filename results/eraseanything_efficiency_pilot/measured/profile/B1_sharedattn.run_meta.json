@@ -1,0 +1,96 @@
+{
+ "arm": "A",
+ "concept": "Frida Kahlo",
+ "seed": 0,
+ "attn": "shared",
+ "algo": "none",
+ "algo_param": 0.0,
+ "early_stop_infonce": false,
+ "devices": [
+  0,
+  1
+ ],
+ "steps": 300,
+ "started_utc": "2026-10-17T23:34:26Z",
+ "lora_tensors": 76,
+ "lora_param_count": 1867776,
+ "frozen_tensors": 1160,
+ "train_wall_s": 72.465,
+ "seconds_by_phase": {
+  "prep_model_load": 15.081969434046187,
+  "prep_dataset": 0.1884754829807207,
+  "prep_llm_irrelevant": 0.0003836390096694231,
+  "text_encode": 1.0377283700508997,
+  "step_upper": 15.719457427039742,
+  "backward": 1.3596254030708224,
+  "optimizer": 0.0704596828436479,
+  "step_lower": 52.14220603997819,
+  "io_save_adapter": 0.030083630001172423
+ },
+ "calls_by_phase": {
+  "prep_model_load": 1,
+  "prep_dataset": 1,
+  "prep_llm_irrelevant": 1,
+  "text_encode": 21,
+  "step_upper": 3,
+  "backward": 6,
+  "optimizer": 6,
+  "step_lower": 3,
+  "io_save_adapter": 1
+ },
+ "transformer_forwards": 435,
+ "peak_mem_gb": 35.887,
+ "n_devices_occupied": 2,
+ "gpu_device_seconds": 144.93,
+ "loss_trace": [
+  {
+   "step": 0,
+   "kind": "upper",
+   "esd": 0.019775390625,
+   "attn": 61.75,
+   "loss": 0.08154296875,
+   "grad_norm": 0.1005859375
+  },
+  {
+   "step": 1,
+   "kind": "lower",
+   "lora": 0.4843895435333252,
+   "infoNCE": -4.25,
+   "loss": -0.3773422837257385,
+   "grad_norm": 0.28125
+  },
+  {
+   "step": 2,
+   "kind": "upper",
+   "esd": 0.01446533203125,
+   "attn": 146.0,
+   "loss": 0.1611328125,
+   "grad_norm": 0.201171875
+  },
+  {
+   "step": 3,
+   "kind": "lower",
+   "lora": 0.4765988886356354,
+   "infoNCE": -7.90625,
+   "loss": -0.7414026260375977,
+   "grad_norm": 0.4453125
+  },
+  {
+   "step": 4,
+   "kind": "upper",
+   "esd": 0.0189208984375,
+   "attn": 72.0,
+   "loss": 0.0908203125,
+   "grad_norm": 0.15234375
+  },
+  {
+   "step": 5,
+   "kind": "lower",
+   "lora": 0.49893099069595337,
+   "infoNCE": -3.21875,
+   "loss": -0.2723725140094757,
+   "grad_norm": 0.6328125
+  }
+ ],
+ "finished_utc": "2026-10-17T23:35:54Z"
+}

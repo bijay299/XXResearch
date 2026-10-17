@@ -1,0 +1,25 @@
+{
+ "question": "Does any available reproducible scorer reach the frozen >=80% M0 target-presence adequacy gate on the artistic-style panel?",
+ "answer": "No. Three bounded attempts, all below the gate. Effectiveness measurement is BLOCKED.",
+ "attempts_in_order": [
+  {"id": "frozen", "rule": "CLIP ViT-L/14 argmax over 10 artists + 'a plain photograph with no particular artistic style'; template 'an artwork in the style of {label}'",
+   "canonical_target_present_pct": {"Frida Kahlo": 32.5, "Katsushika Hokusai": 32.5, "Vincent van Gogh": 15.0},
+   "status": "FROZEN RULE, failed", "when": "frozen before any image was generated"},
+  {"id": "probe_1024", "rule": "frozen rule, images regenerated at FLUX native 1024x1024 instead of the author's 512x512",
+   "canonical_target_present_pct": {"Katsushika Hokusai": 45.0, "Vincent van Gogh": 10.0},
+   "status": "failed; resolution is not the cause", "n_per_concept": 20},
+  {"id": "recal_R1", "rule": "null label REMOVED, argmax over the 10 artist labels only, same template",
+   "canonical_target_present_pct": {"Frida Kahlo": 35.0, "Katsushika Hokusai": 55.0, "Vincent van Gogh": 35.0},
+   "status": "failed"},
+  {"id": "recal_R2", "rule": "10 artist labels, template 'a painting by {label}'",
+   "canonical_target_present_pct": {"Frida Kahlo": 47.5, "Katsushika Hokusai": 45.0, "Vincent van Gogh": 22.5},
+   "status": "failed"}
+ ],
+ "agent_visual_check": {
+  "what": "AGENT judgement (not human review) on the fixed-order M0 contact sheet evidence/contact_sheets/M0_Vincent_van_Gogh_canonical.jpg, all 40 canonical cases in frozen case order",
+  "finding": "The panel is unmistakable Van Gogh pastiche -- Starry-Night swirled skies, sunflowers in a yellow vase, wheat fields, the cafe terrace at night, worn boots, cypresses, irises, impasto brushwork and the yellow/blue palette. The agent judges the great majority of the 40 to carry the target style.",
+  "implication": "The GENERATOR is not the failing component. The SCORER is. CLIP ViT-L/14 zero-shot artist-identity discrimination is not a sufficiently sensitive instrument for this task, which is why the style-erasure literature (e.g. UnlearnCanvas) uses a TRAINED style classifier instead.",
+  "correction": "An earlier working note in this pilot attributed the low rates to FLUX not rendering the style at 512px. That attribution is WRONG and is withdrawn; the 1024px probe and this visual check both contradict it."
+ },
+ "stopping_rule_applied": "Two scorer recalibrations plus one resolution probe were tried and all are reported. No further variants were searched: continuing until an instrument passes would be selecting the measurement by its outcome, which the brief forbids."
+}

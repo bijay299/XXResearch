@@ -1,0 +1,87 @@
+{
+ "engineering": [
+  {
+   "tag": "A_native_frida",
+   "label": "A native (author attn, full InfoNCE)",
+   "wall": 82.651,
+   "fwd": 435,
+   "peak": 38.378,
+   "upper": 5.958467747628068,
+   "lower": 19.90756132930983,
+   "prep_load": 15.042058296967298,
+   "prep_llm": 4.489081613020971,
+   "text": 0.04914892270850638,
+   "bwd": 0.24511417302225405,
+   "pct_vs_native": 0.0,
+   "full300_wall_s": 3899.4,
+   "full300_gpu_device_h": 2.166
+  },
+  {
+   "tag": "B1_sharedattn",
+   "label": "+shared attn (explicit only in consumed block)",
+   "wall": 72.465,
+   "fwd": 435,
+   "peak": 35.887,
+   "upper": 5.2398191423465805,
+   "lower": 17.380735346659396,
+   "prep_load": 15.081969434046187,
+   "prep_llm": 0.0003836390096694231,
+   "text": 0.04941563666909046,
+   "bwd": 0.22660423384513706,
+   "pct_vs_native": 12.3,
+   "full300_wall_s": 3408.2,
+   "full300_gpu_device_h": 1.893
+  },
+  {
+   "tag": "B2_shared_plus_earlystop",
+   "label": "+shared attn +early-stop InfoNCE (arm B)",
+   "wall": 53.719,
+   "fwd": 311,
+   "peak": 35.921,
+   "upper": 5.251713161317942,
+   "lower": 11.106207669363357,
+   "prep_load": 15.061797986039892,
+   "prep_llm": 0.0004972380120307207,
+   "text": 0.047725926901746006,
+   "bwd": 0.2267387433287998,
+   "pct_vs_native": 35.0,
+   "full300_wall_s": 2468.8,
+   "full300_gpu_device_h": 1.372
+  }
+ ],
+ "m0_adequacy": {
+  "Frida Kahlo": {
+   "canonical": "13/40=32.5%",
+   "perturbed": "8/40=20.0%",
+   "retention": "22/40=55.0%",
+   "related_artist": "2/20",
+   "generic": "20/20",
+   "qualified": false,
+   "m0_quality_gray_std_min": 25.38,
+   "m0_sat_frac_max": 0.03267,
+   "m0_lap_var_min": 59.5
+  },
+  "Katsushika Hokusai": {
+   "canonical": "13/40=32.5%",
+   "perturbed": "10/40=25.0%",
+   "retention": "24/40=60.0%",
+   "related_artist": "4/20",
+   "generic": "20/20",
+   "qualified": false,
+   "m0_quality_gray_std_min": 30.18,
+   "m0_sat_frac_max": 0.05083,
+   "m0_lap_var_min": 141.2
+  },
+  "Vincent van Gogh": {
+   "canonical": "6/40=15.0%",
+   "perturbed": "8/40=20.0%",
+   "retention": "26/40=65.0%",
+   "related_artist": "6/20",
+   "generic": "20/20",
+   "qualified": false,
+   "m0_quality_gray_std_min": 28.77,
+   "m0_sat_frac_max": 0.02796,
+   "m0_lap_var_min": 199.3
+  }
+ }
+}

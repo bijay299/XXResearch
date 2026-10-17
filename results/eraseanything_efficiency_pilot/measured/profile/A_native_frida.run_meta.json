@@ -1,0 +1,96 @@
+{
+ "arm": "A",
+ "concept": "Frida Kahlo",
+ "seed": 0,
+ "attn": "author",
+ "algo": "none",
+ "algo_param": 0.0,
+ "early_stop_infonce": false,
+ "devices": [
+  0,
+  1
+ ],
+ "steps": 300,
+ "started_utc": "2026-10-17T23:32:11Z",
+ "lora_tensors": 76,
+ "lora_param_count": 1867776,
+ "frozen_tensors": 1160,
+ "train_wall_s": 82.651,
+ "seconds_by_phase": {
+  "prep_model_load": 15.042058296967298,
+  "prep_dataset": 0.16638240101747215,
+  "prep_llm_irrelevant": 4.489081613020971,
+  "text_encode": 1.032127376878634,
+  "step_upper": 17.875403242884204,
+  "backward": 1.4706850381335244,
+  "optimizer": 0.061502407770603895,
+  "step_lower": 59.722683987929486,
+  "io_save_adapter": 0.03454699402209371
+ },
+ "calls_by_phase": {
+  "prep_model_load": 1,
+  "prep_dataset": 1,
+  "prep_llm_irrelevant": 1,
+  "text_encode": 21,
+  "step_upper": 3,
+  "backward": 6,
+  "optimizer": 6,
+  "step_lower": 3,
+  "io_save_adapter": 1
+ },
+ "transformer_forwards": 435,
+ "peak_mem_gb": 38.378,
+ "n_devices_occupied": 2,
+ "gpu_device_seconds": 165.302,
+ "loss_trace": [
+  {
+   "step": 0,
+   "kind": "upper",
+   "esd": 0.0196533203125,
+   "attn": 62.0,
+   "loss": 0.08154296875,
+   "grad_norm": 0.1015625
+  },
+  {
+   "step": 1,
+   "kind": "lower",
+   "lora": 0.48393478989601135,
+   "infoNCE": -4.1875,
+   "loss": -0.36957526206970215,
+   "grad_norm": 0.28125
+  },
+  {
+   "step": 2,
+   "kind": "upper",
+   "esd": 0.0157470703125,
+   "attn": 146.0,
+   "loss": 0.162109375,
+   "grad_norm": 0.3359375
+  },
+  {
+   "step": 3,
+   "kind": "lower",
+   "lora": 0.47679415345191956,
+   "infoNCE": -7.875,
+   "loss": -0.7413830757141113,
+   "grad_norm": 0.45703125
+  },
+  {
+   "step": 4,
+   "kind": "upper",
+   "esd": 0.0179443359375,
+   "attn": 75.0,
+   "loss": 0.09326171875,
+   "grad_norm": 0.1591796875
+  },
+  {
+   "step": 5,
+   "kind": "lower",
+   "lora": 0.49906623363494873,
+   "infoNCE": -3.125,
+   "loss": -0.2625933885574341,
+   "grad_norm": 0.625
+  }
+ ],
+ "finished_utc": "2026-10-17T23:33:54Z"
+}

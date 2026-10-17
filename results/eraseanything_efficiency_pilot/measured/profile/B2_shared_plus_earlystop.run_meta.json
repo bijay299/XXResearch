@@ -1,0 +1,102 @@
+{
+ "arm": "B",
+ "concept": "Frida Kahlo",
+ "seed": 0,
+ "attn": "shared",
+ "algo": "none",
+ "algo_param": 0.0,
+ "early_stop_infonce": true,
+ "devices": [
+  0,
+  1
+ ],
+ "steps": 300,
+ "started_utc": "2026-10-17T23:38:15Z",
+ "lora_tensors": 76,
+ "lora_param_count": 1867776,
+ "frozen_tensors": 1160,
+ "train_wall_s": 53.719,
+ "seconds_by_phase": {
+  "prep_model_load": 15.061797986039892,
+  "prep_dataset": 0.1645586530212313,
+  "prep_llm_irrelevant": 0.0004972380120307207,
+  "text_encode": 1.0022444649366662,
+  "step_upper": 15.755139483953826,
+  "backward": 1.3604324599727988,
+  "optimizer": 0.08162658696528524,
+  "lower_vae_encode": 0.06361858395393938,
+  "lower_fwd_grad": 0.4879364350344986,
+  "lower_infonce_traj": 32.19051449012477,
+  "step_lower": 33.31862300809007,
+  "io_save_adapter": 0.0339981239521876
+ },
+ "calls_by_phase": {
+  "prep_model_load": 1,
+  "prep_dataset": 1,
+  "prep_llm_irrelevant": 1,
+  "text_encode": 21,
+  "step_upper": 3,
+  "backward": 6,
+  "optimizer": 6,
+  "lower_vae_encode": 3,
+  "lower_fwd_grad": 3,
+  "lower_infonce_traj": 3,
+  "step_lower": 3,
+  "io_save_adapter": 1
+ },
+ "transformer_forwards": 311,
+ "peak_mem_gb": 35.921,
+ "n_devices_occupied": 2,
+ "gpu_device_seconds": 107.438,
+ "loss_trace": [
+  {
+   "step": 0,
+   "kind": "upper",
+   "esd": 0.019775390625,
+   "attn": 61.75,
+   "loss": 0.08154296875,
+   "grad_norm": 0.1005859375
+  },
+  {
+   "step": 1,
+   "kind": "lower",
+   "lora": 0.48443692922592163,
+   "infoNCE": -4.5625,
+   "loss": -0.4085875451564789,
+   "grad_norm": 0.33203125
+  },
+  {
+   "step": 2,
+   "kind": "upper",
+   "esd": 0.0147705078125,
+   "attn": 149.0,
+   "loss": 0.1640625,
+   "grad_norm": 0.2197265625
+  },
+  {
+   "step": 3,
+   "kind": "lower",
+   "lora": 0.4776594340801239,
+   "infoNCE": -7.90625,
+   "loss": -0.7412965297698975,
+   "grad_norm": 0.40234375
+  },
+  {
+   "step": 4,
+   "kind": "upper",
+   "esd": 0.0216064453125,
+   "attn": 77.0,
+   "loss": 0.0986328125,
+   "grad_norm": 0.1943359375
+  },
+  {
+   "step": 5,
+   "kind": "lower",
+   "lora": 0.4993108808994293,
+   "infoNCE": -4.65625,
+   "loss": -0.4149126708507538,
+   "grad_norm": 0.54296875
+  }
+ ],
+ "finished_utc": "2026-10-17T23:39:25Z"
+}
