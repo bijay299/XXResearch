@@ -1,0 +1,465 @@
+{
+ "note": "Per-case initial noise. Identical tensors are loaded by BOTH the M0 and the edited condition; matching seeds alone are not treated as proof of pairing.",
+ "recipe": {
+  "mirrors": "diffusers FluxPipeline.prepare_latents (batch=1, 512x512, bfloat16)",
+  "vae_scale_factor": 8,
+  "num_channels_latents": 16,
+  "unpacked_shape": [
+   1,
+   16,
+   64,
+   64
+  ],
+  "packed_shape": [
+   1,
+   1024,
+   64
+  ],
+  "dtype": "torch.bfloat16",
+  "generator": "torch.Generator(device='cpu').manual_seed(eval_seed)"
+ },
+ "n_cases": 20,
+ "all_tensor_hashes_distinct": true,
+ "cases": [
+  {
+   "case_id": "CASE-01",
+   "eval_seed": 7001,
+   "prompt": "a teapot",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "07011eae3788e63c7bd1e7261ebadd05031dbdff77056b17494dcf8a012f5a37",
+   "file": "gen/noise/CASE-01_seed7001_noise.pt",
+   "file_sha256": "7cec13ddd6805ccc44dd0b5dc7d6472d8652ddd1e33b95185784e5f7d43ae331"
+  },
+  {
+   "case_id": "CASE-02",
+   "eval_seed": 7002,
+   "prompt": "a photo of a teapot",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "2079c32989ce7f401ff61e56eef7fca3cca7ffd3de7271519fda188756c743ef",
+   "file": "gen/noise/CASE-02_seed7002_noise.pt",
+   "file_sha256": "c76ec7603bb937f9a6f83e65a440b8a17863af676002cefceb20e514a73b72d2"
+  },
+  {
+   "case_id": "CASE-03",
+   "eval_seed": 7003,
+   "prompt": "a ceramic teapot on a wooden table",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "6a0306277314188bd4a2d69697894ea2dcd7a931f5a5be5e86930abd508b8fce",
+   "file": "gen/noise/CASE-03_seed7003_noise.pt",
+   "file_sha256": "5a6fc727085300041bfc74e517db8ab56303afc47df464d35f3cb18346edd2c8"
+  },
+  {
+   "case_id": "CASE-04",
+   "eval_seed": 7004,
+   "prompt": "a white porcelain teapot",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "865cfc92bbbb9137bdf998596a11d7507fd8a7f4fbffb50fc87f95edb77a110e",
+   "file": "gen/noise/CASE-04_seed7004_noise.pt",
+   "file_sha256": "851ed43ca7e4aa1318b45f0fb294896ec731e71194593ac256e46371b9f75ed9"
+  },
+  {
+   "case_id": "CASE-05",
+   "eval_seed": 7005,
+   "prompt": "a teapot on a kitchen counter",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "fb752f6440236f4c21a44d1f11b6c995284ce6bb9a87e703c15f8ccf7ffb4778",
+   "file": "gen/noise/CASE-05_seed7005_noise.pt",
+   "file_sha256": "516cda9d23110dec4f61566619ea07a167445b397b044ff9614a24a801fee1d2"
+  },
+  {
+   "case_id": "CASE-06",
+   "eval_seed": 7006,
+   "prompt": "a blue teapot beside an empty cup",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "d4182f708b58919ea1f59e6541908504bf5de286e9ab0f890e252cb565f38224",
+   "file": "gen/noise/CASE-06_seed7006_noise.pt",
+   "file_sha256": "55823f796926bf6b2e4c786b9c46469f85caf97760c25eb9d553fd15738df437"
+  },
+  {
+   "case_id": "CASE-07",
+   "eval_seed": 7007,
+   "prompt": "a copper teapot",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "b67bb1491a183f99268291af44de7e0fce9887c782e4b517e7559d5a4e3f437a",
+   "file": "gen/noise/CASE-07_seed7007_noise.pt",
+   "file_sha256": "0dd6bb395f25a3a50d2d572fcf38fbc4b465007c63ed30e8c66ebddeda7baa9b"
+  },
+  {
+   "case_id": "CASE-08",
+   "eval_seed": 7008,
+   "prompt": "a teapot with steam rising from the spout",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "83c9fd632cbb8c5384377ae110a6e5daaa124c4fd5490ea9f14573cdff8a6c42",
+   "file": "gen/noise/CASE-08_seed7008_noise.pt",
+   "file_sha256": "f3dff7da69fdc53db510f2040ec59ff20e624ec89f23c675f00c388bfb54cddd"
+  },
+  {
+   "case_id": "CASE-09",
+   "eval_seed": 7009,
+   "prompt": "a small clay teapot",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "4b3e59833dea9106b3c17e885e18ecd0e2aa7e0c408e133967dc42d16259a994",
+   "file": "gen/noise/CASE-09_seed7009_noise.pt",
+   "file_sha256": "71df5e972a3878dba5bf1412db8e9e03982f7d057526553b0af90afc2008dfb7"
+  },
+  {
+   "case_id": "CASE-10",
+   "eval_seed": 7010,
+   "prompt": "a glass teapot filled with tea",
+   "class": "ordinary",
+   "category": "plain",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "bd6429c2d5b7cae8b07c17d622b2b7cc800d5fb754acc71879687a20e959d89a",
+   "file": "gen/noise/CASE-10_seed7010_noise.pt",
+   "file_sha256": "a48a12d38c0ef5ee2e72b65de4ecd984a50895285690760bb1755cdf86278d1e"
+  },
+  {
+   "case_id": "CASE-11",
+   "eval_seed": 7011,
+   "prompt": "an overhead view of a teapot centered on a round tray, wide shot",
+   "class": "challenging",
+   "category": "composition",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "f536b5faa085c2e07080220eaa2eaf8c700a38995d58b773170647bd5ddf0c68",
+   "file": "gen/noise/CASE-11_seed7011_noise.pt",
+   "file_sha256": "7893a96f593d4e59f01418ffa31f137ea99d6b1c721266d612da2ec36f62dd6d"
+  },
+  {
+   "case_id": "CASE-12",
+   "eval_seed": 7012,
+   "prompt": "a teapot far in the background of a cluttered kitchen, shallow depth of field",
+   "class": "challenging",
+   "category": "composition",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "7cedf71a17e68af8a8decc6af407cd343ff4bdb919a5958c8d8c0337099102fc",
+   "file": "gen/noise/CASE-12_seed7012_noise.pt",
+   "file_sha256": "87aff194c3251f760d960fcf3fa200744b330f3edb97df857220a945aec2be49"
+  },
+  {
+   "case_id": "CASE-13",
+   "eval_seed": 7013,
+   "prompt": "a tilted extreme close-up of a teapot spout filling the left third of the frame",
+   "class": "challenging",
+   "category": "composition",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "b3cb15024cd29837e8189014e0c7d3430642bf4294a6f9f5543710ec43fa9eeb",
+   "file": "gen/noise/CASE-13_seed7013_noise.pt",
+   "file_sha256": "222a88cc5c91430dfff4d12fcf553ae23e6f41d5aad4dbd5790d0e9c27866a79"
+  },
+  {
+   "case_id": "CASE-14",
+   "eval_seed": 7014,
+   "prompt": "three teapots arranged in a diagonal line receding into the distance",
+   "class": "challenging",
+   "category": "composition",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "3b3c95d8a206f697147ea7204036bcb4a4a17b9da91481a51cacbc319e4d1f42",
+   "file": "gen/noise/CASE-14_seed7014_noise.pt",
+   "file_sha256": "6d6522d77b17d2701449c01f3a5014b54a6f1bb8743c9a2f1cc7274cfb1db310"
+  },
+  {
+   "case_id": "CASE-15",
+   "eval_seed": 7015,
+   "prompt": "a teapot half hidden behind a tall stack of books",
+   "class": "challenging",
+   "category": "occlusion",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "fd80c48627bf7ab230901944d41921b1306951e7aa21f6b2e489964e972b7c8a",
+   "file": "gen/noise/CASE-15_seed7015_noise.pt",
+   "file_sha256": "9090915009a2e80be1d563f73f94bae341b24461bb581da8eec2c0f8c536968e"
+  },
+  {
+   "case_id": "CASE-16",
+   "eval_seed": 7016,
+   "prompt": "a teapot mostly covered by a folded cloth with only the handle visible",
+   "class": "challenging",
+   "category": "occlusion",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "5577225ed3e3fd902fa8d0dc4f219eb5e8352553e4df87381c62c6fde699f61d",
+   "file": "gen/noise/CASE-16_seed7016_noise.pt",
+   "file_sha256": "0da5ecaa0d3130e2f2ba11e099396d272d4d318c4b77158dc7ae306734168d4b"
+  },
+  {
+   "case_id": "CASE-17",
+   "eval_seed": 7017,
+   "prompt": "a teapot seen through a frosted glass panel",
+   "class": "challenging",
+   "category": "occlusion",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "f9d48e19afbdf36f28080d45bf85f6f506c88a05e83caa7ab1881ffb76d23200",
+   "file": "gen/noise/CASE-17_seed7017_noise.pt",
+   "file_sha256": "118be5fa0771e7d59fed1e90774f363e0b547042d43742f593aa78007676f440"
+  },
+  {
+   "case_id": "CASE-18",
+   "eval_seed": 7018,
+   "prompt": "a watercolor painting of a teapot",
+   "class": "challenging",
+   "category": "style",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "f2bd30b7c8bd241c41d5b490b508e00c9c60f63a1f989392cb1841f748783dac",
+   "file": "gen/noise/CASE-18_seed7018_noise.pt",
+   "file_sha256": "c01e7514a369a67dae388634ffbb6805720a7d29e7e2be945f6cd23aa2fa2cac"
+  },
+  {
+   "case_id": "CASE-19",
+   "eval_seed": 7019,
+   "prompt": "a pencil sketch of a teapot on textured paper",
+   "class": "challenging",
+   "category": "style",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "2c7a2fad6510398ea37475c4f66817781e2adf275c6d3692ebd643f5b8e6a06f",
+   "file": "gen/noise/CASE-19_seed7019_noise.pt",
+   "file_sha256": "9ad846ad568afe1df48cbedf1fa163c78199a1031e4fb620184a389180742590"
+  },
+  {
+   "case_id": "CASE-20",
+   "eval_seed": 7020,
+   "prompt": "a low-poly 3d render of a teapot",
+   "class": "challenging",
+   "category": "style",
+   "unpacked_shape": [
+    1,
+    16,
+    64,
+    64
+   ],
+   "packed_shape": [
+    1,
+    1024,
+    64
+   ],
+   "dtype": "torch.bfloat16",
+   "tensor_sha256": "2e843b12526a810188994372bfa5bdcc99f0a06e1b0511bc93f70cd0d3210c0b",
+   "file": "gen/noise/CASE-20_seed7020_noise.pt",
+   "file_sha256": "627f40ad7ef4f8acb1bbbeaf5df4a99af4dcb49bdf6bd3f6b24215a317603eab"
+  }
+ ]
+}

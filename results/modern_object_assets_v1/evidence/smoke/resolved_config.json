@@ -1,0 +1,72 @@
+{
+ "mode": "smoke",
+ "pipe_config": {
+  "_allow_init": true,
+  "model_type": "flux",
+  "model_name_or_path": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--black-forest-labs--FLUX.1-dev/snapshots/3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+  "model_dtype": "bfloat16",
+  "scheduler": "default",
+  "image_size": 512,
+  "num_inference_steps": 28,
+  "inference_guidance_scale": 3.5
+ },
+ "operator_config": {
+  "adaptation_config": {
+   "subset_name": "qk_dual",
+   "adapter_mode": "lora",
+   "lora_config": {
+    "r": 16,
+    "lora_alpha": 16,
+    "lora_dropout": 0.1,
+    "bias": "none"
+   }
+  },
+  "id": null,
+  "method": "gem",
+  "run_save_path": null,
+  "train_seed": 101,
+  "val_seed": 202,
+  "use_wandb": false,
+  "initial_validation": true,
+  "steps_between_validation": 10,
+  "save_pipeline_after_operator": true,
+  "steps_to_save_checkpoints": [],
+  "max_gradient_norm": null,
+  "targets": [
+   "teapot"
+  ],
+  "prompt_augmentation": null,
+  "validation_templates": [
+   "{}",
+   "an image of {}",
+   "an artwork of {}"
+  ],
+  "validation_concepts": [
+   "a gem",
+   "a cat",
+   "a tree"
+  ],
+  "anchors": [
+   ""
+  ],
+  "max_step_budget": 2,
+  "n_iterations": 30,
+  "eta": 1.0,
+  "negative_guidance_scale": 1.0,
+  "use_inference_timesteps": true,
+  "partial_denoising_mode": "student",
+  "partial_denoising_guidance_scale": 3.0,
+  "partial_denoising_end_at_timestep": 10,
+  "partial_denoising_ignore_until_timestep": 0,
+  "partial_denoising_inference_timesteps": null,
+  "learning_rate": 0.001,
+  "gamma": 100.0,
+  "gradient_accumulation_steps": 1,
+  "max_parallel_timesteps": 1
+ },
+ "gem_commit": "c328fc6bec687efe60223498d1b6bed2e5fbcffd",
+ "base_revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+ "base_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--black-forest-labs--FLUX.1-dev/snapshots/3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+ "torch": "2.9.1+cu128",
+ "cuda_visible_devices": "1"
+}

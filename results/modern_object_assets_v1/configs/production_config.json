@@ -1,0 +1,173 @@
+{
+  "project": "modern_object_assets_v1",
+  "frozen_utc": "2026-10-18T06:55:00+00:00",
+  "purpose": "Infrastructure milestone: train one existing baseline (GEM) on one non-sensitive object (teapot) on FLUX.1-dev, then publish the actual trained checkpoint artifacts and 20 matched original/edited image pairs.",
+  "not_a_claim": [
+    "This is a source-derived GEM configuration for an ordinary object.",
+    "It is NOT an author-validated object benchmark and NOT a reproduction of paper performance.",
+    "No erasure-efficacy, retention, SOTA, novelty, evaluator-bias, human-consensus or paper-readiness claim is made."
+  ],
+
+  "source": {
+    "repo": "https://github.com/multimodal-ai-lab/GEM",
+    "commit": "c328fc6bec687efe60223498d1b6bed2e5fbcffd",
+    "license": "MIT",
+    "local_clone": "GEM_src"
+  },
+  "backbone": {
+    "repo": "black-forest-labs/FLUX.1-dev",
+    "revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+    "license": "FLUX.1 [dev] Non-Commercial License v1.1.1",
+    "gated": true,
+    "local_snapshot": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--black-forest-labs--FLUX.1-dev/snapshots/3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+    "reuse_mode": "read-only (pre-existing verified pristine cache)"
+  },
+
+  "method": "gem",
+  "model_type": "flux",
+  "target": "teapot",
+  "anchor": {
+    "value": "",
+    "source": "the pinned source's default EMPTY_CONCEPT (gem/operators/utils.py:3 -> EMPTY_CONCEPT = \"\")",
+    "note": "GEMConfig.anchors defaults to [EMPTY_CONCEPT]; the exact value is the empty string."
+  },
+
+  "adaptation": {
+    "adapter_mode": "lora",
+    "subset_name": "qk_dual",
+    "lora_config": { "r": 16, "lora_alpha": 16, "lora_dropout": 0.1, "bias": "none" },
+    "provenance": "GEMConfig.get_default_adaptation_config() -> AdaptationConfig(adapter_mode='lora', subset_name='qk_dual'); LoRA hyperparameters are AdaptationConfig.__post_init__ source defaults.",
+    "target_modules_count": 76,
+    "target_modules_rule": "startswith=['transformer'], exclude=['single_transformer_blocks'], endswith=['add_q_proj','add_k_proj','to_q','to_k']",
+    "trainable_parameters": 7471104,
+    "base_transformer_parameters": 11901408320,
+    "trainable_fraction_pct": 0.0628
+  },
+
+  "training": {
+    "max_step_budget": 250,
+    "max_step_budget_semantics": "The source's own counter: step_budget is decremented by the number of PROCESSED TIMESTEPS per inner batch (num_parallel_steps), not by optimizer updates. 250 counts processed timesteps.",
+    "optimizer": "torch.optim.AdamW (hardcoded in gem/operators/erasure/erasure_gem.py)",
+    "learning_rate": 0.001,
+    "gamma": 100.0,
+    "eta": 1.0,
+    "negative_guidance_scale": 1.0,
+    "gradient_accumulation_steps": 1,
+    "max_gradient_norm": null,
+    "loss": "target_loss = relu(||pred-anchor||_2 - eta*||pred-target||_2).sum(); loss = gamma*target_loss/n_latents",
+    "trajectory": {
+      "use_inference_timesteps": true,
+      "partial_denoising_mode": "student",
+      "partial_denoising_guidance_scale": 3.0,
+      "partial_denoising_end_at_timestep": 10,
+      "partial_denoising_ignore_until_timestep": 0,
+      "partial_denoising_inference_timesteps": null,
+      "resolved_internal_inference_steps": 28
+    },
+    "predicted_counters": {
+      "max_timestep": 10,
+      "expected_n_iterations": 26,
+      "latents_per_trajectory": 11,
+      "predicted_optimizer_updates": 23,
+      "predicted_processed_timesteps": 250,
+      "note": "Predictions only. Actual counters are recorded from the run; the native terminal endpoint is used and the schedule is not extended if it exits earlier."
+    },
+    "precision": "bfloat16",
+    "max_parallel_timesteps": 1,
+    "image_size": 512,
+    "train_seed": 20261018,
+    "val_seed": 202,
+    "save_pipeline_after_operator": true,
+    "use_wandb": false,
+    "initial_validation_effective": false,
+    "prompt_augmentation": null
+  },
+
+  "inference": {
+    "num_inference_steps": 28,
+    "inference_guidance_scale": 3.5,
+    "image_size": 512,
+    "scheduler": "FlowMatchEulerDiscreteScheduler (pinned base snapshot scheduler config)",
+    "sigmas": "np.linspace(1.0, 1/num_timesteps, num_timesteps) with dynamic mu shift via gem FluxPipelineWrapper.set_timesteps/calculate_shift",
+    "image_seq_len": 1024,
+    "tokenization": "CLIPTokenizer (77) + T5TokenizerFast (max_sequence_length=512 diffusers default); prompt and prompt_2 both set to the case prompt, per gem FluxPipelineWrapper.encode_prompt",
+    "initial_noise_handling": "Per case: g = torch.Generator(device='cpu').manual_seed(eval_seed); packed initial latents produced by FluxPipeline.prepare_latents(batch=1, ...) with that generator, captured, sha256-hashed, saved, and then passed explicitly as `latents=` to BOTH the M0 and edited runs so the two conditions provably share identical initial noise.",
+    "batch_size": 1
+  },
+
+  "deviations_from_source_defaults": [
+    {
+      "field": "pipe_config.model_dtype",
+      "source_default": "float16",
+      "used": "bfloat16",
+      "reason": "Mandated by the assignment. Disclosed; no precision search was performed."
+    },
+    {
+      "field": "GEMConfig.max_parallel_timesteps",
+      "source_default": 6,
+      "used": 1,
+      "reason": "Mandated by the assignment. Disclosed; no batch search was performed. Reduces per-iteration activation memory; the step budget still counts the same processed timesteps."
+    },
+    {
+      "field": "GEMConfig.targets / anchors",
+      "source_default": "[] / ['']",
+      "used": "['teapot'] / [''] (EMPTY_CONCEPT)",
+      "reason": "Assignment target; anchor is the pinned source default."
+    },
+    {
+      "field": "OperatorConfig.train_seed",
+      "source_default": 0,
+      "used": 20261018,
+      "reason": "One production training seed fixed in advance and distinct from the smoke seed (101) and the 20 evaluation seeds (7001-7020)."
+    }
+  ],
+  "unchanged_from_source": [
+    "max_step_budget (250 is already the source default)",
+    "image_size (512 is already the source default)",
+    "num_inference_steps (28), inference_guidance_scale (3.5) -- flux MODEL_CONFIGS defaults",
+    "LoRA rank/alpha/dropout/bias, qk_dual subset, AdamW, learning rate, gamma, eta, loss, all trajectory settings"
+  ],
+
+  "seeds": {
+    "smoke_train_seed": 101,
+    "production_train_seed": 20261018,
+    "val_seed": 202,
+    "evaluation_seeds": [7001, 7002, 7003, 7004, 7005, 7006, 7007, 7008, 7009, 7010,
+                         7011, 7012, 7013, 7014, 7015, 7016, 7017, 7018, 7019, 7020],
+    "distinctness": "production training seed is distinct from the smoke seed and from every evaluation seed"
+  },
+
+  "retry_policy": {
+    "max_technical_retries": 1,
+    "scope": "Permitted only for a technical cause (crash, OOM, corrupt state, host/device failure) within an UNCHANGED scientific configuration and the same ceilings.",
+    "forbidden": "Never retry because erasure or appearance is disappointing. The predetermined native terminal endpoint is used; interrupted endpoints are labelled partial.",
+    "resume_rule": "Resume only with trustworthy state; a fresh restart is not an exact continuation and is labelled as such."
+  },
+
+  "ceilings": {
+    "deadline_days": 7,
+    "gpu_device_hours_total": 24.0,
+    "gpu_device_hours_bringup_max": 4.0,
+    "gpu_device_hours_reserve_min": 4.0,
+    "decoded_images_total": 64,
+    "decoded_images_primary": 40,
+    "decoded_images_technical": 24,
+    "additional_storage_gib": 200.0,
+    "data_free_headroom_gib": 50.0,
+    "max_gpus": 4,
+    "gpu_memory_gib_each": 40
+  },
+
+  "publication": {
+    "repo": "bijay299/XXResearch",
+    "branch": "research/audit-and-matched-effectiveness-protocol",
+    "results_dir": "results/modern_object_assets_v1/",
+    "release_tag": "modern-object-assets-v1",
+    "asset_part_max_bytes": 1073741824,
+    "github_asset_limit_bytes": 2147483648,
+    "weights_in_git": false,
+    "git_lfs": false,
+    "checkpoint_representation": "native: GEM's save_pipeline writes the merged post-LoRA `transformer/` component (the author's own representation). A pre-merge native LoRA adapter is published alongside it as a convenience; the two are NOT claimed to be bit-identical.",
+    "base_weights_republished": false
+  }
+}

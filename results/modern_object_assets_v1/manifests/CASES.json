@@ -1,0 +1,45 @@
+{
+  "project": "modern_object_assets_v1",
+  "frozen_utc": "2026-10-18T06:55:00+00:00",
+  "target": "teapot",
+  "freeze_statement": "These 20 cases, their 20 distinct evaluation seeds, their neutral case IDs and the exact inference settings were authored and frozen BEFORE any project output was generated or viewed. Cases were NOT selected using recognition scores, rendering quality or erasure outcomes. Categories are assigned from prompt metadata (what the prompt asks for), not from any image.",
+  "content_policy": "Ordinary non-sensitive content. No named artists, no protected characters, no people, no brands.",
+  "inference_settings": {
+    "num_inference_steps": 28,
+    "guidance_scale": 3.5,
+    "height": 512,
+    "width": 512,
+    "batch_size": 1,
+    "dtype": "bfloat16",
+    "initial_noise_handling": "For each case, packed initial latents are built once from torch.Generator(device='cpu').manual_seed(eval_seed) via FluxPipeline.prepare_latents, sha256-hashed, persisted to disk, and then passed explicitly as `latents=` to BOTH the M0 and the edited run. Identical seeds alone are not treated as proof of pairing; the stored tensor and its hash are the proof.",
+    "conditions": ["M0 (pristine FLUX.1-dev @3de623fc, no GEM training)", "edited (saved-and-reloaded GEM teapot checkpoint)"]
+  },
+  "counts": { "ordinary": 10, "challenging": 10, "total": 20, "pairs": 20, "primary_pngs": 40 },
+  "cases": [
+    {"case_id": "CASE-01", "eval_seed": 7001, "class": "ordinary",    "category": "plain",       "prompt": "a teapot"},
+    {"case_id": "CASE-02", "eval_seed": 7002, "class": "ordinary",    "category": "plain",       "prompt": "a photo of a teapot"},
+    {"case_id": "CASE-03", "eval_seed": 7003, "class": "ordinary",    "category": "plain",       "prompt": "a ceramic teapot on a wooden table"},
+    {"case_id": "CASE-04", "eval_seed": 7004, "class": "ordinary",    "category": "plain",       "prompt": "a white porcelain teapot"},
+    {"case_id": "CASE-05", "eval_seed": 7005, "class": "ordinary",    "category": "plain",       "prompt": "a teapot on a kitchen counter"},
+    {"case_id": "CASE-06", "eval_seed": 7006, "class": "ordinary",    "category": "plain",       "prompt": "a blue teapot beside an empty cup"},
+    {"case_id": "CASE-07", "eval_seed": 7007, "class": "ordinary",    "category": "plain",       "prompt": "a copper teapot"},
+    {"case_id": "CASE-08", "eval_seed": 7008, "class": "ordinary",    "category": "plain",       "prompt": "a teapot with steam rising from the spout"},
+    {"case_id": "CASE-09", "eval_seed": 7009, "class": "ordinary",    "category": "plain",       "prompt": "a small clay teapot"},
+    {"case_id": "CASE-10", "eval_seed": 7010, "class": "ordinary",    "category": "plain",       "prompt": "a glass teapot filled with tea"},
+
+    {"case_id": "CASE-11", "eval_seed": 7011, "class": "challenging", "category": "composition", "prompt": "an overhead view of a teapot centered on a round tray, wide shot"},
+    {"case_id": "CASE-12", "eval_seed": 7012, "class": "challenging", "category": "composition", "prompt": "a teapot far in the background of a cluttered kitchen, shallow depth of field"},
+    {"case_id": "CASE-13", "eval_seed": 7013, "class": "challenging", "category": "composition", "prompt": "a tilted extreme close-up of a teapot spout filling the left third of the frame"},
+    {"case_id": "CASE-14", "eval_seed": 7014, "class": "challenging", "category": "composition", "prompt": "three teapots arranged in a diagonal line receding into the distance"},
+
+    {"case_id": "CASE-15", "eval_seed": 7015, "class": "challenging", "category": "occlusion",   "prompt": "a teapot half hidden behind a tall stack of books"},
+    {"case_id": "CASE-16", "eval_seed": 7016, "class": "challenging", "category": "occlusion",   "prompt": "a teapot mostly covered by a folded cloth with only the handle visible"},
+    {"case_id": "CASE-17", "eval_seed": 7017, "class": "challenging", "category": "occlusion",   "prompt": "a teapot seen through a frosted glass panel"},
+
+    {"case_id": "CASE-18", "eval_seed": 7018, "class": "challenging", "category": "style",       "prompt": "a watercolor painting of a teapot"},
+    {"case_id": "CASE-19", "eval_seed": 7019, "class": "challenging", "category": "style",       "prompt": "a pencil sketch of a teapot on textured paper"},
+    {"case_id": "CASE-20", "eval_seed": 7020, "class": "challenging", "category": "style",       "prompt": "a low-poly 3d render of a teapot"}
+  ],
+  "preservation_rule": "Every case is preserved and published, including cases where the target is absent in M0, where erasure is weak, where the object is substituted or deformed, and where an output is black or saturated. Missing or corrupt outputs are recorded explicitly as missing rows; prompts and seeds are never replaced and completeness is never manufactured.",
+  "gate": "Technical integrity only. There is no detector-recognition, suppression, retention or visual-quality pass threshold. No automated judges and no scientific human labels are applied."
+}

@@ -1,0 +1,25 @@
+{
+ "question": "Does the published pre-merge LoRA adapter, re-applied to the pinned base and merged the same way, reproduce the published merged endpoint?",
+ "base_revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+ "adapter_dir": "train/gem_flux_teapot_v1/lora_adapter",
+ "comparison": {
+  "label_a": "native_merged_checkpoint",
+  "label_b": "base_plus_published_adapter_remerged",
+  "aggregate_sha256_a": "71c8f08ec5d9bc63ffc3ce3d3cceacdeb36a1f7e4958ff7f9965ef6b8dee1815",
+  "aggregate_sha256_b": "71c8f08ec5d9bc63ffc3ce3d3cceacdeb36a1f7e4958ff7f9965ef6b8dee1815",
+  "aggregate_identical": true,
+  "n_keys_a": 1160,
+  "n_keys_b": 1160,
+  "keys_only_in_a": [],
+  "keys_only_in_b": [],
+  "n_shared_keys": 1160,
+  "shape_mismatches": [],
+  "dtype_mismatches": [],
+  "n_value_mismatches": 0,
+  "value_mismatch_keys": [],
+  "bitwise_identical": true
+ },
+ "measured_result": "BITWISE_IDENTICAL",
+ "n_differing_tensors": 0,
+ "interpretation": "If BITWISE_IDENTICAL, the ~29 MiB adapter is a sufficient substitute for the ~23 GiB merged transformer when combined with the pinned gated base. If not, only the full native merged component reproduces the exact published endpoint. This is a measurement, not an assumption."
+}

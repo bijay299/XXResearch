@@ -1,0 +1,22 @@
+diff --git a/gem/wrappers/base_pipeline_wrapper.py b/gem/wrappers/base_pipeline_wrapper.py
+index 4108378..9f98c19 100644
+--- a/gem/wrappers/base_pipeline_wrapper.py
++++ b/gem/wrappers/base_pipeline_wrapper.py
+@@ -183,6 +183,17 @@ class BasePipelineWrapper(torch.nn.Module):
+ 
+         latents = latents_per_step[-1]
+ 
++        # [PATCH P1 -- modern_object_assets_v1] The caller that passes
++        # return_all_latents=True (GEM's training loop) discards the decoded
++        # preview image (`_, all_latents = ...`). Decoding it anyway costs a
++        # full VAE decode per training iteration and produces an automatic
++        # decoded training preview, which this run's image ceiling forbids.
++        # Skipping it is numerically inert: vae.decode/postprocess draw no
++        # random numbers and never touch `latents_per_step`, the optimizer,
++        # the loss, or the sampling trajectory.
++        if return_all_latents:
++            return None, latents_per_step
++
+         with torch.no_grad():
+             # Unpack first for Flux
+             if isinstance(self.pipe, (FluxPipeline, QwenImagePipeline)):
