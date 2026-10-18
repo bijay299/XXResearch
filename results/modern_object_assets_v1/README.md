@@ -8,6 +8,16 @@ and reload verification all passed
 **Release:** [`modern-object-assets-v1`](https://github.com/bijay299/XXResearch/releases/tag/modern-object-assets-v1)
 — **31** assets, **23,863,712,600** bytes.
 
+> ### ⚠️ Amended 2026-10-18 — read [`AMENDMENT_01_ACCOUNTING_AND_PROVENANCE.md`](AMENDMENT_01_ACCOUNTING_AND_PROVENANCE.md)
+>
+> It is **authoritative** over this document on four points, all corrected
+> inline below: the **retry count is 1, not 0**; the **"frozen before any GPU
+> work" assurance is withdrawn** and that chronology marked uncertain; the
+> `ledger/ledger.py` link was **broken** (the helper is an evidence-archive
+> member, not a Git file); and **no runtime watchdog was ever implemented**.
+> `ASSETS_DELIVERED` is retained as a technical status. No artifact, hash,
+> release asset or accounting figure changed.
+
 An **infrastructure milestone**, not a method contribution and not a paper
 result: one existing baseline (GEM) was trained once on one ordinary,
 non-sensitive object (`teapot`) on FLUX.1-dev, and the **actual trained
@@ -153,9 +163,23 @@ artifact.
 
 ## 6. The 20 matched pairs
 
-20 cases were authored and **frozen before any output was generated or viewed**
-(`manifests/CASES.json`, written 06:46:38 UTC; first GPU allocation 06:50:37
-UTC). Ten ordinary prompts and ten challenging prompts covering **composition**
+20 cases were authored and fixed **before production training (07:04:55 UTC)
+and before any image was generated (07:26:25 UTC)** — no image had been decoded
+at any earlier point, so no project output existed to select on.
+
+> **Chronology qualified (Amendment 01).** The earlier categorical claim that
+> the cases were frozen *before any GPU work* is **withdrawn**. The records
+> disagree: `manifests/CASES.json` embeds `frozen_utc: 06:55:00 UTC`, which
+> *postdates* the first GPU allocation (06:50:37 UTC, a bring-up smoke run that
+> decoded 0 images), while the `06:46:38 UTC` figure previously quoted is
+> **host-reported filesystem mtime**, not an independently timestamped
+> prospective record. This chronology is **uncertain** and cannot be settled
+> from the retained evidence. The absence of any identified outcome-dependent
+> selection is **not** proof of an immutable pre-execution freeze. Checkpoint
+> reload and pairing integrity are unaffected — they rest on hashes and tensor
+> comparisons, not timestamps.
+
+Ten ordinary prompts and ten challenging prompts covering **composition**
 (4), **occlusion** (3) and **style** (3), categorised from prompt metadata — not
 from any image. Ordinary, non-sensitive content; no named artists, no protected
 characters, no people, no brands.
@@ -259,7 +283,39 @@ directions in the logs.
 ## 8. Resource ledger — actuals
 
 Append-only, `flock`-serialised JSONL: [ledger/ledger.jsonl](ledger/ledger.jsonl).
-Every attempt is counted, including one that failed at import.
+Every attempt is counted, including the one that failed at import.
+
+The helper that writes it, `ledger.py`, is **not** a file in ordinary Git. It is
+published as the member `evidence/ledger/ledger.py` inside the evidence release
+archive
+[`gem-flux-teapot-v1-evidence.tar.gz`](https://github.com/bijay299/XXResearch/releases/download/modern-object-assets-v1/gem-flux-teapot-v1-evidence.tar.gz)
+(12,445,898 B, sha256 `49fdea2338028515e2ecf694d86ac0225684899a90759da3264886400bea7488`):
+
+```bash
+tar -xzf gem-flux-teapot-v1-evidence.tar.gz evidence/ledger/ledger.py
+```
+
+An archive member is not a standalone repository file: it has no blob URL and is
+not browsable or diffable on GitHub.
+
+> **Enforcement limitation (Amendment 01).** `scripts/launch.sh` performs a
+> **pre-launch check against an operator-supplied estimate** and **end-of-job
+> accounting** of the measured device-seconds. **There is no runtime watchdog** —
+> nothing sampled resource use mid-run, and nothing would have terminated a job
+> that overran its estimate or approached a ceiling. The required runtime
+> hard-stop enforcement was never implemented. Recorded use stayed comfortably
+> below every cap, but that is an **outcome, not enforcement**; the pre-launch
+> estimates and final accounting are not a watchdog.
+
+**The one technical retry:** `smoke_train_01` failed at import
+(`ModuleNotFoundError: No module named 'gem'`, 2.15 s, no GPU work performed) and
+`smoke_train_02` reran the same command after `PYTHONPATH` wiring was added. A
+technical retry under an unchanged scientific configuration — **not** an
+outcome-driven rerun; the single production training run was never rerun. The
+ledger's historical `retry: false` fields are preserved: that field recorded only
+whether `--retry` had been passed, which it never was, and summing it to `0` was
+an error of interpretation. The failed attempt's 2.15 device-seconds were already
+charged and are not double-counted.
 
 | | used | ceiling |
 |---|---|---|
@@ -273,7 +329,7 @@ Every attempt is counted, including one that failed at import.
 | Project storage | 52.5 GiB | ≤ 200 GiB |
 | `/data` free | ~520 GiB | ≥ 50 GiB |
 | GPUs used | **1** (device 1; the native implementation uses one device) | ≤ 4 |
-| **Technical retries** | **0** | ≤ 1 |
+| **Technical retries** | **1** (corrected — Amendment 01) | ≤ 1 |
 | Failures recorded | 1 (import-path error, 2.2 s, no GPU work) | — |
 
 No paid APIs, cloud GPUs or subscriptions were used; W&B and telemetry were

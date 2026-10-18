@@ -1,3 +1,43 @@
+> # ⚠️ SUPERSEDED IN PART — read [`AMENDMENT_01_ACCOUNTING_AND_PROVENANCE.md`](AMENDMENT_01_ACCOUNTING_AND_PROVENANCE.md) first
+>
+> **Dated 2026-10-18.** The amendment is **authoritative** over this document on
+> the following points. The historical body below is **preserved unchanged** as
+> originally published at `c8502fa`, including the wording now corrected.
+>
+> 1. **Retries.** This document's accounting underpinned a reported *0 of 1*
+>    technical retries. The correct count is **1 of 1**: `smoke_train_01` failed
+>    at import and `smoke_train_02` reran the same command after `PYTHONPATH`
+>    wiring. A technical retry, not an outcome-driven rerun. All resource
+>    figures are unchanged — the failed attempt's 2.15 device-seconds were
+>    already charged and are not double-counted.
+>
+> 2. **"Frozen before any GPU work" (first line below) is WITHDRAWN as a
+>    categorical assurance.** The records disagree: both frozen files embed
+>    `frozen_utc: 2026-10-18T06:55:00+00:00`, which *postdates* the first GPU
+>    allocation (06:50:37 UTC), while the `06:46:13`/`06:46:38 UTC` times quoted
+>    below are **host-reported filesystem mtimes**, not an independently
+>    timestamped prospective record. This chronology is **uncertain**. What the
+>    records *do* support: the freeze preceded **production training**
+>    (07:04:55 UTC) and **all image generation** (07:26:25 UTC), and no image had
+>    been decoded before then. Checkpoint reload and pairing integrity are
+>    unaffected.
+>
+> 3. **The `ledger/ledger.py` link below is broken.** The helper is not in
+>    ordinary Git. It is published as the member `evidence/ledger/ledger.py`
+>    inside
+>    [`gem-flux-teapot-v1-evidence.tar.gz`](https://github.com/bijay299/XXResearch/releases/download/modern-object-assets-v1/gem-flux-teapot-v1-evidence.tar.gz)
+>    (12,445,898 B, sha256 `49fdea2338028515e2ecf694d86ac0225684899a90759da3264886400bea7488`).
+>
+> 4. **"Enforced before every launch" overstates what exists.** The launcher has
+>    pre-launch checks against an *operator-supplied estimate* plus end-of-job
+>    accounting. **No runtime watchdog was implemented**; no automatic runtime
+>    hard-stop is established. Recorded use stayed below every cap, but that is
+>    an outcome, not enforcement.
+>
+> Status **`ASSETS_DELIVERED`** is retained as a technical status.
+
+---
+
 # RUN_MANIFEST — modern_object_assets_v1
 
 **Frozen before any GPU work.** The machine-readable freeze is
