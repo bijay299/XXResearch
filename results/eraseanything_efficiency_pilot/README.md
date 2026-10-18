@@ -1,4 +1,14 @@
-# EraseAnything efficiency pilot — EXECUTED, INCOMPLETE
+# EraseAnything efficiency pilot — EXECUTED, INCOMPLETE, CLOSED
+
+> ## ⚠ READ [`AMENDMENT_02_CLOSEOUT.md`](AMENDMENT_02_CLOSEOUT.md) FIRST
+>
+> **Final status: `INCOMPLETE — PILOT CLOSED WITH CORRECTIONS`.** A review found that this
+> pilot's "exact / bit-identical / safe to adopt" claims are **not supported**: arm B
+> **resamples a different, shorter sampler schedule** rather than stopping the native one,
+> so it is a **changed variant, not an exact control**. The closeout amendment **supersedes
+> every conflicting claim below**, and supersedes all earlier recommendations — to adopt the
+> optimisation, to replace or retrain the scorer, to re-score images, or to continue.
+> **No successor work is authorised.**
 
 Bounded pilot on the training efficiency of **EraseAnything** (ICML 2025,
 `arXiv:2412.20413v1`) on **FLUX.1-dev**: reproduce an executable native reference, measure
@@ -10,11 +20,11 @@ its bottleneck, and test at most one improvement against an ordinary control.
 > taken. Budgets, start timestamp, deadline, concepts, cases, seeds and screening rules are
 > unchanged.
 
-## Status: `INCOMPLETE`
+## Status: `INCOMPLETE — PILOT CLOSED WITH CORRECTIONS`
 
-**Effectiveness measurement is BLOCKED by scorer adequacy. A measured engineering result is
-delivered. No algorithmic advantage is established, and no advantage over current methods is
-verified.**
+**No qualified edited-model deletion, retention, robustness or quality comparison exists.
+No algorithmic advantage is established. The timing observation below is a one-profile
+observation of a CHANGED variant, not an exact or adoptable optimisation.**
 
 ### The three findings
 
@@ -23,9 +33,13 @@ verified.**
 lower (InfoNCE) step is **19.91 s** against **5.96 s** for the upper step — **77%** of step
 time. Within it, **112 of 113** forwards are four full 28-step no-grad trajectories from
 which **one** attention map is consumed and **27 of 28 discarded**. Peak memory **38.4 GB**
-on a 40 GB card. Extrapolated native cost per adapter: **2.166 GPU-device-hours**.
+on a 40 GB card — which shows the tested two-device placement ran, **not** that
+single-device or offload alternatives are impossible. The previously quoted 2.166 / 1.372
+GPU-device-hour "per adapter" figures are **withdrawn from full-cost claims**: they omit the
+measured backward, optimizer and remaining loop overhead, and no replacement estimate is
+offered.
 
-**2 — Ordinary engineering already clears the pilot's 25% bar: 35.0% measured.**
+**2 — A changed variant measured ≈35% less wall time in one profile (NOT an exact control).**
 
 | configuration | wall (6 steps) | forwards | peak GB | vs native |
 |---|---|---|---|---|
@@ -33,31 +47,39 @@ on a 40 GB card. Extrapolated native cost per adapter: **2.166 GPU-device-hours*
 | + explicit softmax only in the consumed block | 72.47 s | 435 | 35.9 | −12.3% |
 | **B** + early-stop InfoNCE at the consumed index | **53.72 s** | **311** | 35.9 | **−35.0%** |
 
-Both changes are **exact on the consumed quantity** (bit-identical attention maps, verified
-in float64). Per the brief, when ordinary engineering explains the gain this is an
-**engineering result, not a contribution** — and a proposed algorithm would have had to beat
-35% to add anything.
+**Corrected (`AMENDMENT_02_CLOSEOUT.md` §2–§3).** Neither change is exact. Early-stop passes
+`j+1` as a schedule *length*, and `set_train_timesteps` draws a **new random schedule** of
+that length — so the time coordinates, latent states and consumed maps all change. Selective
+explicit attention is not bf16-equivalent either: the raw profiles differ at **step 0**
+(ESD 0.0196533203125 vs 0.019775390625; grad-norm 0.1015625 vs 0.1005859375). The figures
+above are **one-profile observations of a changed variant** and establish neither equivalent
+engineering, nor full-adapter savings, nor a safe optimisation. The claims that a proposed
+algorithm "had to beat 35%" and that ordinary engineering "explains" any arm-C gain are
+withdrawn: **no arm C result and no arm B effectiveness result exist.**
 
-**3 — The frozen panel fails its M0 adequacy gate, and the fault is ours.**
-Canonical target presence 32.5% / 32.5% / 15.0% against a required ≥80%. An agent visual
-check of the fixed-order contact sheets shows the images are unmistakable artist pastiche:
-**the generator is fine, our CLIP zero-shot scorer is not sensitive enough.** An earlier
-working note blaming 512 px rendering is **withdrawn**. Three bounded diagnostics
-(1024 px, null-label removal, alternative template) are all reported and none reaches 80%.
-Consequently the ≥75%-suppression and ±5 pp rules **cannot be evaluated**, and the concepts
-are disclosed as unqualified rather than replaced.
+**3 — The frozen panel fails its M0 adequacy requirement, so no effectiveness result exists.**
+Canonical 13/40, 13/40, 6/40; perturbed 8/40, 10/40, 8/40; retention 22/40, 24/40, 26/40 —
+all target panels below the frozen ≥80%. Consequently the ≥75%-suppression and ±5 pp rules
+**cannot be evaluated**, and the concepts are disclosed as unqualified rather than replaced.
+**Corrected:** the categorical claim that "the generator is fine; the scorer is the failing
+component" is **withdrawn**. A scorer mismatch is plausible but **not independently
+established** — contact-sheet impressions are not labelled ground truth, and several cited
+visual cues were already named in the subject prompts. The recommendation to train a
+classifier until these same M0 images pass 80% is withdrawn as outcome-selected.
 
 ### What this is not
 
 No deletion, preservation, robustness or quality comparison exists for any arm. No arm C was
-trained; no comparator arm was run; no held-out outcome was ever inspected. **BLOCK reports
-~1 s per target on FLUX.1-dev after a one-time 5428 s transcoder training, against our
-measured 2.166 GPU-device-hours per adapter** — a gap our 35% saving does not engage.
+trained; no comparator arm was run; no held-out outcome was ever inspected. BLOCK's
+author-reported quantities (upfront 5428 s, per-target 1.020 s, per-image 0.43 s) are kept
+**separate and author-reported**; the earlier "three orders of magnitude" ratio against our
+**incomplete extrapolated** GPU-hour figure is **withdrawn** as not like-for-like.
 
 ## Files
 
 | file | contents |
 |---|---|
+| [`AMENDMENT_02_CLOSEOUT.md`](AMENDMENT_02_CLOSEOUT.md) | **read first.** Corrections, withdrawn claims, corrected accounting, final status |
 | [`FINAL_REPORT.md`](FINAL_REPORT.md) | measured results, the blocker, contemporary methods, limitations, one recommendation |
 | [`AMENDMENT_01.md`](AMENDMENT_01.md) | the EA++/BLOCK/ARC check, the technical distinction, the stop decision, budgets |
 | [`RUN_MANIFEST.md`](RUN_MANIFEST.md) | pins, native-method reading, concepts/cases/seeds, scoring, 4 documented patches, append-only deviation log |
@@ -71,9 +93,9 @@ measured 2.166 GPU-device-hours per adapter** — a gap our 35% saving does not 
 
 | | consumed | cap |
 |---|---|---|
-| GPU-hours (all phases, failures charged) | **1.97** | 96 |
+| GPU-hours (all phases, failures charged) | **2.016** | 96 |
 | newly decoded images | **441** | 3000 |
-| auxiliary LLM requests | **3** | 20 |
+| auxiliary provider requests | **UNKNOWN** (≥3; see closeout §5) | 20 |
 
 Start **2026-10-17T22:19:05Z**, deadline **2026-10-31T22:19:05Z**. Charged failures include
 0.695 GPU-h to a CPU-thrashing aborted run and 2 failed LLM calls. No utilisation discount.

@@ -11,7 +11,7 @@ without trusting this table:
 
     git show <commit>:<path> | sha256sum
 
-Generated at parent commit `855240cbe12d` - the commit that *records*
+Generated at parent commit `cb9cf23dc7cb` - the commit that *records*
 these bytes is the next one, so quote that SHA when citing a row.
 
 **Image originals are NOT in git** (441 newly decoded PNGs, too large for sensible
@@ -30,14 +30,16 @@ Regenerate: `python scripts/seq/publish_eraseanything_efficiency_pilot_evidence_
 |---|---|---|
 | `results/eraseanything_efficiency_pilot/.gitignore` | 427 | `bcf6bb62ec9c56c5129943794ebc644cee8e021d987444925acc08bbfaeb53c7` |
 | `results/eraseanything_efficiency_pilot/AMENDMENT_01.md` | 13,337 | `5db3bd8c648f102dab70996ff4fd298d4e1991ee74648c3d2966c700ae5a3b25` |
-| `results/eraseanything_efficiency_pilot/FINAL_REPORT.md` | 10,172 | `d4dabb88d73b0afcf03ab93514033c584e84032d0256e050c6c235017e6e4790` |
-| `results/eraseanything_efficiency_pilot/README.md` | 5,376 | `69eb4ddd37fbde582cdd45eb1563f9a0bb3f529ecdfee91819fc89062d7c328f` |
+| `results/eraseanything_efficiency_pilot/AMENDMENT_02_CLOSEOUT.md` | 13,341 | `174815864cd670449aba78714d5770264cc826c549ae0bba273598d2d691fbc8` |
+| `results/eraseanything_efficiency_pilot/FINAL_REPORT.md` | 11,903 | `fb5c92440ceeb4bf02981d4017835ee91f56f65c403831856722a6c06842dd5b` |
+| `results/eraseanything_efficiency_pilot/README.md` | 7,352 | `1fe2f1029f39ceb353bd228600ad36f75a09e07f52c9a374b2a8d6527a744363` |
 | `results/eraseanything_efficiency_pilot/RUN_MANIFEST.md` | 8,477 | `30fd6028477da43ddd00d26123ff34d36e0246370ffed4b0c7913eec4ddbcf92` |
 
 ## Runnable code and configuration
 
 | path | bytes | sha256 |
 |---|---|---|
+| `results/eraseanything_efficiency_pilot/code/README.md` | 3,606 | `efa7d66d298dbc525aa064dd6c00c9e83a0dde850ad4589e834848ad6f6101da` |
 | `results/eraseanything_efficiency_pilot/code/apply_ea_patch.py` | 10,725 | `7b8fb53fe438e45badb7b4669803cc3ee4b2b310585bf1a27e3856a029b73398` |
 | `results/eraseanything_efficiency_pilot/code/config_frida.yaml` | 1,300 | `0e37ac238c2b7a191d731ade4d69f1653ffa5657b72e7085dfb41d16e601b133` |
 | `results/eraseanything_efficiency_pilot/code/download_flux_dev.py` | 885 | `d1d594210cc2b9b3cf611d94ff0a0079980ce81527bae9a5d33910c14644f09d` |
@@ -98,7 +100,7 @@ Regenerate: `python scripts/seq/publish_eraseanything_efficiency_pilot_evidence_
 
 ---
 
-**42 files listed**, none absent.
+**44 files listed**, none absent.
 
 `PUBLISHED_EVIDENCE_INDEX.md` itself is not listed: it is generated from the
 rows above and cannot contain its own hash.
