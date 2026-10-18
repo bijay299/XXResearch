@@ -8,10 +8,12 @@
 > neutral IDs, verified against the accepted source hashes, mechanically
 > validated, and **tested in a real browser**.
 >
-> It does **not** establish that any participant exists, that any independent
-> label has been collected, that the evaluation is scientifically valid, or that
-> erasure succeeded. **No reviewer has been recruited or contacted, and no
-> response exists.** Nothing here reports any outcome.
+> It does **not** establish that any independent label has been collected, that
+> the evaluation is scientifically valid, or that erasure succeeded.
+>
+> Distribution of the corrected Task A is handled by the user independently of
+> this repository. **This package collects no responses and reports no
+> outcomes**, and nothing here describes any participant, label or result.
 
 Task B is **prepared and fully populated but held privately** and is **not
 released**.
@@ -19,7 +21,7 @@ released**.
 | | |
 |---|---|
 | Protocol | [`TEAPOT-HR-PROTO-1.0.0`](protocol/PROTOCOL.md) |
-| Export schema | [`THR-EXPORT-SCHEMA-1.0.0`](protocol/SCHEMA.md) |
+| Export schema | [`THR-EXPORT-SCHEMA-1.1.0`](protocol/SCHEMA.md) (app 1.1.0, patch01) |
 | Task-A package | `THR-V1-A` — **public**, 40 individual images |
 | Task-B package | `THR-V1-B` — **private**, 20 matched pairs, not released |
 | Reviewer instructions | [`protocol/INSTRUCTIONS_TASK_A.md`](protocol/INSTRUCTIONS_TASK_A.md) |
@@ -69,8 +71,15 @@ reason:
    structural breakdown / unable to judge
 
 Ordering: three fixed variants (`V1`/`V2`/`V3`) or a reproducible alias-derived
-shuffle — all computed from the public IDs and alias only, **independent of the
-arm mapping**. Paired items are kept ≥4 positions apart in every fixed variant.
+shuffle.
+
+* **`V1`/`V2`/`V3` are pair-aware.** They were built **using private pair
+  membership** to keep paired items ≥4 positions apart, so they are **not**
+  computed from the public IDs and alias alone and **not** independent of
+  pairing. They do **not** explicitly use which member is M0 and which is
+  edited; the spacing rule reveals negative pairing constraints, not the key.
+* **Only the alias-derived shuffle is pairing-independent** (alias + public IDs
+  only), and it carries **no minimum-spacing guarantee**.
 
 The bundle runs **entirely offline**: no account, no network, no upload, no
 tracking. Progress is saved in the reviewer's own browser and leaves it only
@@ -95,10 +104,11 @@ standing policy, so no PNG is committed to ordinary Git). The instructions pages
 are real; **the item-view previews use a clearly synthetic placeholder, never a
 research image** — see [masking](MASKING_AND_LIMITATIONS.md) §6.
 
-## Planned participation — none yet
+## Planned participation
 
-Three independent reviewers are **planned**. **No participant is assumed and no
-recruitment is authorized at this time.**
+The protocol plans for three independent reviewers. **Recruitment and
+distribution are handled by the user, independently of this repository**, and no
+participant information, response or outcome is held or reported here.
 
 Primary Task-A reference judgments require **at least two distinct, complete,
 independent returns**; future Task-B primary reporting likewise requires two
@@ -150,6 +160,12 @@ run, and no automated judge was introduced.**
   **recomputes completion rather than trusting any supplied count**.
 * **Mechanical QA:** 18/18 synthetic cases pass —
   [`qa/validator_qa_report.json`](qa/validator_qa_report.json).
+* **Validator maintenance (r2):** the companion Python validator crashed on
+  several malformed JSON *types*. Explicit type guards were added and a 45-check
+  CPU-only regression suite now covers them —
+  [`maint/validator_r2_report.json`](maint/validator_r2_report.json). Acceptance
+  of correctly generated schema-1.1.0 exports is unchanged, verified by
+  before/after comparison. **The questionnaire was not touched.**
 * **Real-browser QA (patch01):** **150/150 focused checks pass** across **three engine
   configurations** — Chromium (the Chrome engine), Firefox, and Firefox with a
   strict file-origin policy — loading the bundle from `file://` with every
@@ -161,15 +177,29 @@ run, and no automated judge was introduced.**
   14 rejection cases each asserted to leave **memory and `localStorage`
   unchanged**; uncertainty counting as complete; isolation, navigation, zoom and
   mobile. [`qa/qa_patch01_report.json`](qa/qa_patch01_report.json).
-* **Historical reports retained:** the original 18-fixture validator report and
-  the original 30-check browser report are kept as evidence of what was run
-  before the repair.
+* **Historical reports.** The original 18-fixture validator report
+  (`qa/validator_qa_report.json`) is unchanged at its original path. The
+  original 30-check browser report **was overwritten in place** at
+  `qa/browser_qa_report.json` when the suite was re-run, and
+  `verify/published_verification.json` **was removed** from the current tree.
+  Those earlier versions remain in Git at
+  [`d7921df`](https://github.com/bijay299/XXResearch/tree/d7921df8f23609d4ce709fed4a5d78df6c103631/results/teapot_human_review_v1),
+  and exact byte-identical copies are restored under
+  [`archive/d7921df/`](archive/d7921df/) with their source commit, source path
+  and hash recorded. They were **not** preserved unchanged at their original
+  paths, and no such claim is made.
 
 All fixtures are **explicitly synthetic**, generated from a fixed rotation. **No
 fixture is a human judgement and none may be used as reviewer evidence.** No
 answer key or completed test response is present in any reviewer bundle. The
 public QA reports contain **mechanical results only** — no image-specific
 judgement.
+
+## Amendment 02 — coordinator-side cleanup (current)
+
+[`AMENDMENT_02_COORDINATOR_CLEANUP.md`](AMENDMENT_02_COORDINATOR_CLEANUP.md) —
+documentation and companion-validator corrections only, made **while reviews are
+in progress**. No questionnaire byte, release, tag or asset was changed.
 
 ## Amendment 01 — Task-A software repair (patch01)
 

@@ -71,13 +71,22 @@ point during preparation.
 
 ### What a commitment does and does not prove
 
-It proves the committed material **existed at freeze time and has not changed
-since** — so a later-revealed mapping can be checked against it.
+The commitments cover the **populated Task-A mapping, the populated Task-B
+mapping, the three order variants and the item-ID list**. They do **not** cover
+the whole Task-B package — its images, viewer files and layout are not
+committed.
 
-It does **not** make the images or their provenance private: both are already
-public in the `modern-object-assets-v1` release. It does not establish that the
-mapping is *correct*, only that it is *unchanged*. And it cannot be verified by
-anyone else until the salt is revealed.
+What they support is a **future opening anchored to public publication**: the
+commitments were published in this repository at a commit anyone can inspect, so
+a later-revealed mapping can be checked against what was publicly recorded at
+that point. They do **not** independently prove a self-declared private freeze
+timestamp — the `frozen_iso` field inside the artifacts is self-declared and is
+not independently verifiable.
+
+They also do **not** make the images or their provenance private: both are
+already public in the `modern-object-assets-v1` release. They do not establish
+that the mapping is *correct*, only that it is *unchanged*, and they cannot be
+checked by anyone else until the salt is revealed.
 
 ## Task-B release gate
 

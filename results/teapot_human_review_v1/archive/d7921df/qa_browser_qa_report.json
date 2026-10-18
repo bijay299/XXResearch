@@ -1,0 +1,170 @@
+{
+ "suite": "real-browser QA (Playwright + Firefox, headless)",
+ "browser": "Firefox (Playwright standalone build, not the system snap)",
+ "url_scheme": "file:// (offline; every non-file request aborted)",
+ "scope": "Mechanical UI behaviour only. Contains no human judgement about any image and no image-specific result. Clicked choices come from a fixed rotation and are discarded.",
+ "contains_reviewer_evidence": false,
+ "n_checks": 30,
+ "n_pass": 30,
+ "n_fail": 0,
+ "all_pass": true,
+ "network_requests_attempted": [],
+ "screenshots": [
+  "A1_instructions.png",
+  "A2_item_view.png",
+  "A3_mobile_instructions.png",
+  "A4_mobile_item.png"
+ ],
+ "checks": [
+  {
+   "check": "offline opening from file:// renders the gate",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "instructions show the frozen target definition",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "gate blocks start without required declarations",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "item ID is neutral (A-nnn only)",
+   "pass": true,
+   "detail": "A-001"
+  },
+  {
+   "check": "image renders at native 512 at 100%",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "only one image element is shown (no paired counterpart)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "zoom in enlarges the image",
+   "pass": true,
+   "detail": "768"
+  },
+  {
+   "check": "zoom reset returns to native 512",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "navigation advances to a different item",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "previous returns to the first item",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "answers persist across navigation",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "Final export disabled while answers are missing",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "resume offered for a known alias",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "resumed session restores a saved answer",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "different alias starts clean (alias isolation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "storage keys namespaced by package+stage+alias",
+   "pass": true,
+   "detail": "['THR::THR-V1-A::A::qa-beta', 'THR::THR-V1-A::A::qa-alpha']"
+  },
+  {
+   "check": "order variant V2 differs from V1",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "Final enabled once all items are answered",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "exported final has the expected shape",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "export carries explicit exposure declarations",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "export contains no condition/pairing/seed fields",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "validator accepts the browser-produced final",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "check": "draft export is marked draft and may be partial",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "draft import restores items",
+   "pass": true,
+   "detail": "Restored 40 item(s) from the file."
+  },
+  {
+   "check": "malformed import rejected without crashing",
+   "pass": true,
+   "detail": "Rejected: the file is not valid JSON."
+  },
+  {
+   "check": "wrong-package/stage import rejected",
+   "pass": true,
+   "detail": "Rejected: that file is for a different package or stage."
+  },
+  {
+   "check": "viewer still usable after bad imports",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "no horizontal page overflow at 390px",
+   "pass": true,
+   "detail": "[390, 390]"
+  },
+  {
+   "check": "question controls reachable on mobile",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "viewer made no network requests (all non-file:// blocked)",
+   "pass": true,
+   "detail": "[]"
+  }
+ ]
+}

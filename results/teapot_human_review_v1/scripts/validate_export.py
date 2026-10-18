@@ -23,6 +23,9 @@ PROTOCOL_ID = "TEAPOT-HR-PROTO-1.0.0"
 SCHEMA_ID = "THR-EXPORT-SCHEMA-1.1.0"
 LEGACY_SCHEMAS = {"THR-EXPORT-SCHEMA-1.0.0"}
 APP_VERSION = "1.1.0"
+# Maintenance revision of this validator only. The questionnaire bundle, its
+# app version and the export schema are NOT changed by this.
+VALIDATOR_REVISION = "validator-r2 (AMENDMENT_02 type-guard maintenance)"
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -53,6 +56,24 @@ A_EXPOSURE_KEYS = ["prior_access_to_source_pairings",
 B_EXPOSURE_KEYS = ["task_a_final_exported_before_task_b",
                    "prior_access_to_condition_labels",
                    "image_specific_coaching_before_task_a"]
+
+
+def _is_str(v):
+    return isinstance(v, str)
+
+
+def _hashable_str(v):
+    """Return v when it is a string, else None.
+
+    Every membership test, set insertion, sort key and .strip()/.get() call
+    below is guarded through helpers like this one. Malformed input must yield a
+    structured invalid result, never a traceback and never partial processing.
+    """
+    return v if isinstance(v, str) else None
+
+
+def _typename(v):
+    return type(v).__name__
 
 
 def _find_items():
@@ -120,15 +141,23 @@ def validate(path, expect_stage=None):
     if d.get("protocol_id") != PROTOCOL_ID:
         res["errors"].append(f"untrusted protocol_id {d.get('protocol_id')!r}")
     sid = d.get("schema_id")
-    if sid in LEGACY_SCHEMAS:
+    if not _is_str(sid):
+        res["errors"].append(
+            f"schema_id must be a string, got {_typename(sid)}")
+    elif sid in LEGACY_SCHEMAS:
         res["errors"].append(
             f"unsupported legacy export version {sid!r}; this validator reads "
             f"{SCHEMA_ID} only and does not migrate older files")
     elif sid != SCHEMA_ID:
         res["errors"].append(f"untrusted schema_id {sid!r}")
     kind = d.get("export_kind")
-    if kind not in KIND_ENUM:
+    if not _is_str(kind):
+        res["errors"].append(
+            f"export_kind must be a string, got {_typename(kind)}")
+        kind = None
+    elif kind not in KIND_ENUM:
         res["errors"].append(f"export_kind must be draft|final, got {kind!r}")
+        kind = None
     if not isinstance(d.get("reviewer_alias"), str) or not d["reviewer_alias"].strip():
         res["errors"].append("reviewer_alias missing or empty")
     ov = d.get("order_variant")
@@ -160,7 +189,9 @@ def validate(path, expect_stage=None):
                 exp["other_exposure_note"], str):
             res["errors"].append("exposure.other_exposure_note must be a string")
         res["exposure"] = {k: exp.get(k) for k in keys}
-        res["exposure_other_note_present"] = bool((exp.get("other_exposure_note") or "").strip())
+        _note = exp.get("other_exposure_note")
+        res["exposure_other_note_present"] = bool(
+            _note.strip()) if _is_str(_note) else False
 
     # ---- responses ----
     exp_ids = expected_ids(stage)
@@ -177,7 +208,12 @@ def validate(path, expect_stage=None):
         if not isinstance(r, dict):
             res["errors"].append(f"responses[{i}] is not an object")
             continue
-        rid = r.get(idkey)
+        rid = _hashable_str(r.get(idkey))
+        if rid is None:
+            res["errors"].append(
+                f"responses[{i}].{idkey} must be a string, got "
+                f"{_typename(r.get(idkey))}")
+            continue
         if rid in seen:
             dup.append(rid)
         seen.add(rid)
@@ -186,26 +222,40 @@ def validate(path, expect_stage=None):
             continue
         if stage == "A":
             t, g = r.get("target"), r.get("rendering")
-            if t is not None and t not in TARGET_ENUM:
+            if t is not None and not _is_str(t):
+                bad_enum.append(f"{rid}.target has type {_typename(t)}")
+                t = None
+            elif t is not None and t not in TARGET_ENUM:
                 bad_enum.append(f"{rid}.target={t!r}")
-            if g is not None and g not in RENDER_ENUM:
+                t = None
+            if g is not None and not _is_str(g):
+                bad_enum.append(f"{rid}.rendering has type {_typename(g)}")
+                g = None
+            elif g is not None and g not in RENDER_ENUM:
                 bad_enum.append(f"{rid}.rendering={g!r}")
+                g = None
             # 'uncertain' / 'unable_to_judge' ARE completed answers
             if t in TARGET_ENUM and g in RENDER_ENUM:
                 complete_ids.add(rid)
         else:
             c = r.get("comparison")
-            if c is not None and c not in CMP_ENUM:
+            if c is not None and not _is_str(c):
+                bad_enum.append(f"{rid}.comparison has type {_typename(c)}")
+                c = None
+            elif c is not None and c not in CMP_ENUM:
                 bad_enum.append(f"{rid}.comparison={c!r}")
+                c = None
             if c in CMP_ENUM:
                 complete_ids.add(rid)
         if r.get("reason") is not None and not isinstance(r.get("reason"), str):
             res["errors"].append(f"{rid}.reason must be a string if present")
 
     if dup:
-        res["errors"].append(f"duplicate IDs: {sorted(set(dup))}")
+        res["errors"].append(f"duplicate IDs: {sorted({x for x in dup if _is_str(x)})}")
     if unknown:
-        res["errors"].append(f"unexpected/extra IDs: {sorted(set(x for x in unknown))}")
+        res["errors"].append(
+            "unexpected/extra IDs: "
+            f"{sorted({x for x in unknown if _is_str(x)})}")
     if bad_enum:
         res["errors"].append(f"invalid enum values: {sorted(bad_enum)}")
 
@@ -214,7 +264,8 @@ def validate(path, expect_stage=None):
     res["expected_items"] = len(exp_ids)
     res["recomputed_complete_answers"] = len(complete_ids)
     res["recomputed_missing_ids"] = sorted(set(exp_ids) - complete_ids)
-    supplied = (d.get("completion") or {}).get("answered_items")
+    _comp = d.get("completion")
+    supplied = _comp.get("answered_items") if isinstance(_comp, dict) else None
     res["supplied_answered_items"] = supplied
     res["supplied_count_trusted"] = False
     if supplied is not None and supplied != len(complete_ids):
@@ -249,7 +300,8 @@ def cohort(paths):
                                ("file", "stage", "export_kind", "reviewer_alias",
                                 "file_sha256", "valid", "recomputed_complete_answers")})
         by_hash.setdefault(r.get("file_sha256"), []).append(r["file"])
-        a = (r.get("reviewer_alias") or "").strip().lower()
+        _a = r.get("reviewer_alias")
+        a = _a.strip().lower() if _is_str(_a) else f"<non-string:{_typename(_a)}>"
         by_alias.setdefault(a, []).append(r["file"])
     for h, fs in by_hash.items():
         if len(fs) > 1:
@@ -286,6 +338,7 @@ def main():
         rep = cohort(a.files)
     else:
         rep = {"schema_id": SCHEMA_ID, "protocol_id": PROTOCOL_ID,
+               "validator_revision": VALIDATOR_REVISION,
                "results": [validate(f, a.expect_stage) for f in a.files]}
         rep["n_valid"] = sum(1 for r in rep["results"] if r["valid"])
         rep["n_invalid"] = len(rep["results"]) - rep["n_valid"]

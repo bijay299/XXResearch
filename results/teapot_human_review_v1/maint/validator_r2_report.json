@@ -1,0 +1,261 @@
+{
+ "suite": "companion Python validator regression (r2)",
+ "scope": "FILE STRUCTURE handling only. CPU-only. Not browser validation and not scientific validation. The questionnaire is unchanged, so the existing 150/150 browser evidence remains the host-performed browser record.",
+ "fixtures_are_synthetic": true,
+ "fixture_warning": "SYNTHETIC TEST FIXTURE -- machine-generated, not a human judgement, not a reviewer response, not an image assessment.",
+ "contains_human_judgements": false,
+ "contains_reviewer_responses": false,
+ "real_participant_files_used": 0,
+ "browser_used": false,
+ "gpu_seconds": 0.0,
+ "model_work": 0,
+ "validator_revision": "validator-r2",
+ "acceptance_parity_vs_pre_repair": {
+  "valid_draft_partial.json": {
+   "old_valid": true,
+   "new_valid": true,
+   "identical_acceptance": true
+  },
+  "valid_final_complete.json": {
+   "old_valid": true,
+   "new_valid": true,
+   "identical_acceptance": true
+  },
+  "valid_final_all_uncertain.json": {
+   "old_valid": true,
+   "new_valid": true,
+   "identical_acceptance": true
+  }
+ },
+ "n_checks": 45,
+ "n_pass": 45,
+ "n_fail": 0,
+ "all_pass": true,
+ "checks": [
+  {
+   "check": "valid fixture still accepted: valid_draft_partial.json",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "check": "valid fixture still accepted: valid_final_complete.json",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "check": "valid fixture still accepted: valid_final_all_uncertain.json",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "check": "uncertain/unable_to_judge counts as a COMPLETE final",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "supplied completion count is not trusted",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "acceptance semantics unchanged before/after: valid_draft_partial.json",
+   "pass": true,
+   "detail": "{'old_valid': True, 'new_valid': True, 'identical_acceptance': True}"
+  },
+  {
+   "check": "acceptance semantics unchanged before/after: valid_final_complete.json",
+   "pass": true,
+   "detail": "{'old_valid': True, 'new_valid': True, 'identical_acceptance': True}"
+  },
+  {
+   "check": "acceptance semantics unchanged before/after: valid_final_all_uncertain.json",
+   "pass": true,
+   "detail": "{'old_valid': True, 'new_valid': True, 'identical_acceptance': True}"
+  },
+  {
+   "check": "structured invalid, no traceback: schema_id=[]",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: completion='bad'",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: exposure.other_exposure_note=7",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: response.item_id=[]",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: response.target=[]",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: export_kind=[]",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: response.rendering={}",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: reviewer_alias=[]",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: mixed unknown-ID types",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: B: pair_id=[]",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: B: comparison={}",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: item_count_expected='forty'",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: exposure not an object",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: responses not a list",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "structured invalid, no traceback: reason=[]",
+   "pass": true,
+   "detail": "no errors recorded"
+  },
+  {
+   "check": "handled without crashing: malformed JSON",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "handled without crashing: top-level list",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "handled without crashing: top-level string",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "handled without crashing: empty file",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "partial final rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "empty final rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "duplicate ID rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "unknown ID rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "invalid enum rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "missing declaration rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "non-boolean declaration rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "wrong package rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "wrong protocol rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "wrong stage rejected",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "legacy schema rejected, not migrated",
+   "pass": true,
+   "detail": "unexpectedly valid"
+  },
+  {
+   "check": "legacy rejection says 'unsupported legacy', never relabelled",
+   "pass": true,
+   "detail": "unsupported legacy export version 'THR-EXPORT-SCHEMA-1.0.0'; this validator reads THR-EXPORT-SCHEMA-1.1.0 only and does "
+  },
+  {
+   "check": "mixed batch: every file receives a result, no traceback",
+   "pass": true,
+   "detail": "5"
+  },
+  {
+   "check": "mixed batch: failures reported, valid files still accepted",
+   "pass": true,
+   "detail": "valid=2 invalid=3"
+  },
+  {
+   "check": "cohort: all files processed, no traceback on bad alias/JSON",
+   "pass": true,
+   "detail": "entry count mismatch"
+  },
+  {
+   "check": "cohort flags identical content / repeated alias",
+   "pass": true,
+   "detail": "[{'kind': 'identical_file_content', 'files': ['valid_final_complete.json', 'coh_dup.json'], 'meaning': 'the same file submitted more than once; counts as ONE return, not several'}, {'kind': 'repeated_alias', 'alias': 'synthetic-r2', 'files': ['valid_final_complete.json', 'coh_dup.json'], 'meaning': "
+  },
+  {
+   "check": "cohort states it cannot prove distinct humans",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "validator never modifies an input file",
+   "pass": true,
+   "detail": "[]"
+  }
+ ]
+}

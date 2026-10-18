@@ -1,3 +1,35 @@
+> # ⚠️ PARTIALLY SUPERSEDED — read [`AMENDMENT_02_COORDINATOR_CLEANUP.md`](AMENDMENT_02_COORDINATOR_CLEANUP.md)
+>
+> **Dated 2026-10-18.** Amendment 02 is authoritative over this document on the
+> three points below. The historical body is **preserved unchanged** as
+> originally published, including the wording now corrected.
+>
+> 1. **"its tag and its assets are preserved unchanged" (header) and
+>    "Original release … tag and assets — preserved" (§5) overstate what
+>    happened.** The original ZIP's **bytes** were restored exactly
+>    (13,917,868 B, sha256 `45e3eb7a…`) and the **tag target** never moved, but
+>    the asset was deleted and re-uploaded, so its **asset ID and
+>    created/updated timestamps changed**. Literal claims that all asset
+>    identities were unchanged are withdrawn; the incident disclosure stands.
+> 2. **"Original 18-fixture and 30-check QA reports — retained as historical
+>    evidence" (§5) is not accurate at the original paths.** The 18-fixture
+>    report is unchanged, but `qa/browser_qa_report.json` was **overwritten in
+>    place** and `verify/published_verification.json` was **removed** from the
+>    current tree. The earlier versions remain in Git at `d7921df`, and exact
+>    copies are now restored under `archive/d7921df/`.
+> 3. **The preview-disclosure wording should not be read as broader than it
+>    is.** Removing the two previews does not establish that nobody accessed
+>    them while they were live. Equally, a real image shown beside its neutral
+>    ID establishes only that **one ID-to-image** link was visible — it does
+>    **not** by itself reveal whether that image was the M0 or the edited member
+>    of its pair, and it is **not** a blanket unblinding. No guarantee of
+>    privacy is claimed, and no reviewer restart is implied.
+>
+> Status `READY_FOR_INDEPENDENT_REVIEW` is retained for the existing corrected
+> Task A only.
+
+---
+
 # AMENDMENT 01 — Task-A software repair (patch01)
 
 **Dated 2026-10-18. Authoritative over earlier wording on the points below.**

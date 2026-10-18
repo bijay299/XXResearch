@@ -10,7 +10,7 @@ Complete file and hash index. Generated last.
 * **Branch:** `research/audit-and-matched-effectiveness-protocol`
 * **Release tag:** [`teapot-human-review-v1-taskA-patch01`](https://github.com/bijay299/XXResearch/releases/tag/teapot-human-review-v1-taskA-patch01) → target `ce3b95f1cf72bf6260f4210bcbc0649ebeb0ab3a`
 * **Release assets:** 5, 15,250,796 bytes
-* **Status:** `READY_FOR_INDEPENDENT_REVIEW` — **Task A only**. No participant, no label, no outcome.
+* **Status:** `READY_FOR_INDEPENDENT_REVIEW` — **Task A only**. This repository holds no participant information, label or outcome.
 
 ## Verification summary
 
@@ -96,4 +96,4 @@ Reviewer bundle sha256: `837770ae23e6b1fb56b7269a87e2a2bc23f40f6e2090e5e172ea57a
 
 This index establishes **preparation and integrity only**: that the package was built from verified source material, that it is complete and masked as described, that it functions offline, and that the published artifact is the one produced.
 
-It establishes **nothing** about erasure efficacy, retention, quality, evaluator bias, novelty or paper readiness, and it does **not** establish that any participant exists, that any independent label was collected, or that the evaluation is scientifically valid. **No reviewer has been recruited or contacted and no response exists.** Task B is prepared but **not released**.
+It establishes **nothing** about erasure efficacy, retention, quality, evaluator bias, novelty or paper readiness, and it does **not** establish that any participant exists, that any independent label was collected, or that the evaluation is scientifically valid. Distribution of the corrected Task A is handled by the user independently of this repository; **this package collects no responses and reports no outcomes**. Task B is prepared but **not released**.
