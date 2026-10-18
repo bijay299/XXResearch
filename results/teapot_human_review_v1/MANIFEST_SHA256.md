@@ -31,11 +31,12 @@ release asset.
 | `qa/validator_qa_report.json` | 5,116 | `3e7aa6aad98c2cd8b81ee92916d14a445bf032eb7bb5b139fd9c69a405c0a366` |
 | `verify/masking_audit.json` | 1,087 | `63ddd5a945d3c13906c6937962c77f92d04bed7a69d77cda4bf4575a124bc8e9` |
 | `verify/private_backup.json` | 995 | `744dfbcf9c98802a54d8a373c69d4cf4945e0e8eaf4823e93aa77db8a74baed9` |
+| `verify/published_verification.json` | 1,492 | `ff53a35b48e16496c83f5009ae5827a8ea8b8150347d3f32251f052e6864db0e` |
 | `verify/source_verification_summary.json` | 1,028 | `f360789743c5235070629448131afba28b662fda0a8b78b04f5ec8c90154f54a` |
 | `verify/taskA_completeness_summary.json` | 748 | `e3b7c43497e9165ddaf0197eeb7375ffe744bdef0a7e14156e9c74992c6ebda1` |
 | `verify/taskB_completeness_summary.json` | 601 | `c2c7a869d7ee0b1e951b4d993f66af021f33a2d71f80f8053de787d6e5fb7050` |
 | `ledger/clock.json` | 334 | `b013de414a235adf80a557a5c75e49a0a4a0830f5e43225a29a651387ecc5567` |
-| `ledger/prep_ledger.jsonl` | 2,904 | `4a4d5e8e1786e5ef947180ac2f685b903b00752b45e6383c2f21fe6151a5ce5a` |
+| `ledger/prep_ledger.jsonl` | 3,351 | `184b94c743e9f0daa71a1bc16caf775a99cf58482f522ce372d24feeb5d90842` |
 | `scripts/browser_qa.py` | 12,827 | `2f913d2967b6a711f229fee13ab3d03e0b3b6eccd229eb358d9e9627c85221ad` |
 | `scripts/build_publish.py` | 7,393 | `6edf2dfe1c6c009004c497a322c8282a5c1d101e9dbcea036261bf3e7920abb5` |
 | `scripts/build_taskA.py` | 3,982 | `4d8605c6dc2b402478ba303f0bc3e676af854bc095d175c4aea62afdd8561260` |
@@ -48,7 +49,7 @@ release asset.
 | `scripts/validate_export.py` | 9,825 | `e83bf27ded448a15777512a3f3b4ef3e93ad515fb62f14403a44dc170060aeac` |
 | `scripts/verify_source.py` | 5,606 | `3ee104e99b598c147c7969f17f9d07c758b6f31524fa3d4fcd6d4b5401c1f507` |
 
-**30 repository files, 148,686 bytes** (this manifest excluded).
+**31 repository files, 150,625 bytes** (this manifest and the evidence index excluded).
 
 > Public integrity hashes are not secret and may facilitate reverse
 > identification. See `MASKING_AND_LIMITATIONS.md` §3 for why per-image
