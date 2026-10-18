@@ -53,6 +53,9 @@ def main():
 
     w(f"# EVIDENCE_INDEX — modern_object_assets_v1\n")
     w("Complete file and hash index. Generated last, after remote verification.\n")
+    w("> File hashes and links below are pinned to the commit named here, which\n"
+      "> contains every indexed file. This index file itself is added in the\n"
+      "> immediately following commit, so it cannot list its own hash.\n")
     w(f"* **Commit:** [`{a.commit}`](https://github.com/{REPO}/commit/{a.commit})")
     w(f"* **Branch:** `research/audit-and-matched-effectiveness-protocol`")
     w(f"* **Release tag:** [`{rel['tag_name']}`]({rel['html_url']}) → target `{rel['target_commitish']}`")
