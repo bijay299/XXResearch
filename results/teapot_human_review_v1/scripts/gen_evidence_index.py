@@ -63,8 +63,8 @@ def main():
       f"`{rel.get('target_commitish')}`")
     w(f"* **Release assets:** {len(rel['assets'])}, "
       f"{sum(x['size'] for x in rel['assets']):,} bytes")
-    w("* **Status:** `READY_FOR_INDEPENDENT_REVIEW` — **Task A only**. No "
-      "participant, no label, no outcome.\n")
+    w("* **Status:** `READY_FOR_INDEPENDENT_REVIEW` — **Task A only**. This "
+      "repository holds no participant information, label or outcome.\n")
 
     w("## Verification summary\n")
     w("| check | result |")
@@ -94,6 +94,14 @@ def main():
     lr = pa.get("live_releases") or {}
     w(f"| Disallowed preview assets live on either release | **{sum(len(v.get('disallowed_preview_assets') or []) for v in lr.values() if isinstance(v, dict))}** |")
     w(f"| — downloaded ZIP sha256 matches | **{pv.get('sha256_match')}** |")
+    vr = load("maint/validator_r2_report.json")
+    if vr:
+        w(f"| Validator maintenance regression (r2, CPU-only) | **{vr.get('n_pass')} / {vr.get('n_checks')}** pass |")
+    ric = load("maint/release_identity_check.json")
+    if ric:
+        w(f"| Both questionnaire releases unchanged by maintenance | "
+          f"**{ric.get('all_releases_unchanged_by_this_maintenance')}** "
+          f"(download counters excluded) |")
     w("")
 
     w("## Release assets\n")
@@ -127,10 +135,13 @@ def main():
       "artifact is the one produced.\n")
     w("It establishes **nothing** about erasure efficacy, retention, quality, "
       "evaluator bias, novelty or paper readiness, and it does **not** "
-      "establish that any participant exists, that any independent label was "
-      "collected, or that the evaluation is scientifically valid. **No reviewer "
-      "has been recruited or contacted and no response exists.** Task B is "
-      "prepared but **not released**.\n")
+      "establish that any independent label was collected or that the "
+      "evaluation is scientifically valid.\n")
+    w("Distribution of the corrected Task A is handled by the user "
+      "independently of this repository. **This package collects no responses "
+      "and reports no outcomes**, and no participant information, label or "
+      "result is held or described here. Task B is prepared but **not "
+      "released**.\n")
 
     out = os.path.join(rdir, "EVIDENCE_INDEX.md")
     open(out, "w").write("\n".join(L))
