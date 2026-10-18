@@ -1,3 +1,21 @@
+> ## ⚠ SUPERSEDED IN PART — see [`AMENDMENT_01_ACCESS_AND_READINESS.md`](AMENDMENT_01_ACCESS_AND_READINESS.md)
+>
+> **Status retained: `DATA_ACCESS_BLOCKED` — PRACTICE/UI PREVIEW ONLY.**
+>
+> The body below is preserved. Its scope is corrected: the reported **47/47** checks are
+> **synthetic-fixture UI checks**, supported by the published suite and log. They do **not**
+> establish statistical correctness, independent reviewer admission, real-arm blinding or study
+> readiness, and they say nothing about the five implementation limitations recorded in the
+> amendment §4.
+>
+> Privacy wording is likewise narrowed: no actual Task-B reference associations, arm keys or
+> automated scores were found in the published package, and generic shared viewer code
+> containing an unused reference-file field is not itself a mapping leak. But Task B is an
+> **empty private scaffold**; `COMMITMENTS.json` commits arm-key, case-provenance and prediction
+> material as **empty JSON objects**; private seed/salt storage and backups are **host-reported**
+> and were not independently verified by the coordinator; and **meaningful masking of actual
+> study arms has not yet been exercised**, because there are no study arms.
+
 # Preparation-validation record
 
 All validation used **synthetic fixtures only**. No human response was simulated as data:

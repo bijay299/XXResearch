@@ -1,3 +1,21 @@
+> ## ⚠ SUPERSEDED IN PART — see [`AMENDMENT_01_ACCESS_AND_READINESS.md`](AMENDMENT_01_ACCESS_AND_READINESS.md)
+>
+> **Status retained: `DATA_ACCESS_BLOCKED` — PRACTICE/UI PREVIEW ONLY.** No analysis has been
+> run on any human response, because none exists.
+>
+> The body below is preserved as the frozen plan. A static reading of the published
+> `analysis/` code records five **prospective implementation limitations**, detailed in the
+> amendment §4: reviewer admission counts *files* rather than distinct complete eligible
+> reviewers (and the validator accepts a zero-row or partial Final); the advertised bounds
+> exclude `no_reference` cases although the code asserts otherwise, and coverage carries no
+> bounds; the bootstrap resamples **images** rather than matched case bundles, so pairing and
+> shared contexts are not preserved as claimed; the planned suppression-estimate contrasts and
+> bounds are **not implemented**; and §5's partial-return language conflicts with §1's
+> requirement for complete independent returns.
+>
+> **The code was not repaired.** These require separate authorisation before any future
+> collection or analysis. No scientific result is invalidated, because no study result exists.
+
 # measurement_study_v1 — frozen analysis specification
 
 **Protocol:** `msv1-protocol-v1` · **Schema:** v1.0.0 · frozen before any human label.

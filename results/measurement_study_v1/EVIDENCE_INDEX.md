@@ -1,15 +1,17 @@
 # Evidence index — measurement_study_v1
 
 Generated **after** every other file was finalised; **this index excludes itself**.
-Generated (UTC): 2026-10-18T05:15:29Z
+Generated (UTC): 2026-10-18T05:56:44Z
 
-**26 published files, 18.26 MiB.** SHA256 of every published file below.
+**27 published files, 18.28 MiB.** SHA256 of every published file below.
 
 ## Status
 
-`DATA_ACCESS_BLOCKED` — the review instrument is complete and browser-validated; the study panel contains **0 study images**. See `ACCESS_CHECK.md`.
+**`DATA_ACCESS_BLOCKED` — PRACTICE/UI PREVIEW ONLY. Zero study items; not ready for independent study review. Do not collect research responses from this package.**
 
-## Reviewer package
+Corrections are authoritative in `AMENDMENT_01_ACCESS_AND_READINESS.md`. The supported access conclusion is only that *no eligible matched non-sensitive object assets were identified during the bounded access check*. The reported 47/47 checks are synthetic-fixture UI checks and do not establish statistical correctness, independent reviewer admission, real-arm blinding or study readiness.
+
+## Package (practice/UI preview — preserved byte-for-byte, not rebuilt)
 
 | | |
 |---|---|
@@ -19,7 +21,7 @@ Generated (UTC): 2026-10-18T05:15:29Z
 | entries | 15 (1 viewer, 1 readme, 12 practice images, 1 directory) |
 | study images inside | **0** |
 
-Verified: the ZIP extracts to a clean directory, the viewer opens from `file://`, and no `http(s)` request is attempted (see `VALIDATION.md`).
+The archive is unchanged from the reviewed commit. Its internal generic completion instructions are superseded by the amendment: do **not** distribute it as a study questionnaire or collect Final JSON from it.
 
 ## Held privately (never published, never in git)
 
@@ -29,13 +31,14 @@ The commitment salt, the randomisation seed, the Task-B package and its referenc
 
 | file | bytes | sha256 |
 |---|---:|---|
-| `ACCESS_CHECK.md` | 5976 | `b20cf84dbb0d85475d7e0782ea0c59862af1e0b4cfb15b01daa07cae2bc06e38` |
-| `ANALYSIS_PLAN.md` | 5330 | `a2c249306853c362f6b7987ecab814ef4151ab22de55bced0559f738000c41d8` |
+| `ACCESS_CHECK.md` | 7607 | `c5900c5922dc81f7ab62ab73e847ecdc895b7ccfffb384232403e6951073b0b4` |
+| `AMENDMENT_01_ACCESS_AND_READINESS.md` | 12767 | `278a4fcccf547fdb2319bde7edd859b77adbec1aa28ed9293ae559d5a7c67ee1` |
+| `ANALYSIS_PLAN.md` | 6556 | `480921ba0773547ebb2270a9f0d157bcd15d4e38c2884592bfd86b33b82aec2d` |
 | `COMMITMENTS.json` | 1238 | `244fe7937e63d2afde45c073144feb77bf1c513a54c1aa0a4a0e20194a27d846` |
 | `MASKING_AUDIT.json` | 6562 | `b8faf486c84704c7fc93ad856d4b088437739651446eabb5eff9c2a4f8c75212` |
-| `PROTOCOL.md` | 6719 | `9576b917ad109468f18ec4a588973c1ccc9858c9289313159da1336cb32475f2` |
-| `README.md` | 6120 | `0a04fd21733d41dbcdacd08d67a530217dd9b8bc9094fa9955e07baf02fa06cf` |
-| `VALIDATION.md` | 7045 | `8f049cccd74863df317bae3cfb0d1b6bf214b6ce0742c71c8455bb5fd204830e` |
+| `PROTOCOL.md` | 7589 | `13572f16474a3eb8050417bfd748ddf61eb571df19825cefe6dfb8befdf171c2` |
+| `README.md` | 8366 | `720a7d0c128b3744b1d5c62c7118c3bc850b822972afccf376e7e83026e894de` |
+| `VALIDATION.md` | 8264 | `dc6d2628292c0adcb053d9ab4a71674d44b4723195f9b1fd0f46cc00f0b01b3c` |
 | `analysis/analyze.py` | 9445 | `e0be75b2ff6007e515b20a80da51f772a198e7fe41e57bb22a4859e700bc0a77` |
 | `analysis/validate_responses.py` | 6188 | `07a2207d61fd08a282f28cc22317742060a93851009873c6c01f5c889bab5f2d` |
 | `code/build_viewer.py` | 26407 | `a83aca8e274b89acfb7b96ac9681509c5a268b58e5c91e06e5d0682016cca3c4` |

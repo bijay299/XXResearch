@@ -1,3 +1,25 @@
+> ## ⚠ SUPERSEDED IN PART — see [`AMENDMENT_01_ACCESS_AND_READINESS.md`](AMENDMENT_01_ACCESS_AND_READINESS.md)
+>
+> **Status retained: `DATA_ACCESS_BLOCKED` — PRACTICE/UI PREVIEW ONLY.** The body below is
+> preserved as the historical record of the bounded check. Two things in it are corrected:
+>
+> 1. **The conclusion was overstated.** The supported conclusion is only: *no eligible matched
+>    non-sensitive object assets were identified during the bounded access check.* **Withdrawn:**
+>    that no modern erased checkpoints exist, that all relevant modern papers are code-only, and
+>    that no eligible data source exists. Zero releases and zero metadata-filtered hits cannot
+>    establish nonexistence.
+> 2. **The GEM row is wrong.** GEM **does** publish FLUX erasure checkpoints —
+>    [`MAI-Lab/GEM-Flux-Nudity`](https://huggingface.co/MAI-Lab/GEM-Flux-Nudity) and
+>    [`MAI-Lab/GEM-Flux-Bloody-Gore`](https://huggingface.co/MAI-Lab/GEM-Flux-Bloody-Gore), linked
+>    from the [GEM README](https://github.com/multimodal-ai-lab/GEM/blob/c328fc6bec687efe60223498d1b6bed2e5fbcffd/README.md).
+>    The model cards describe them as **reproductions, not the original paper checkpoints**. They
+>    remain **ineligible** for this frozen non-sensitive object study because their targets are
+>    sensitive content. The search missed them because HuggingFace `search=` matches the model
+>    **name**, and neither name contains "erase" or "unlearn", though both are correctly tagged
+>    `concept-erasure` and `base_model:black-forest-labs/FLUX.1-dev`.
+>
+> Neither correction resolves the missing matched object assets.
+
 # Asset / provenance check — measurement_study_v1
 
 Window: 2026-10-18T04:42:35Z → 08:42:35Z (first four working hours).

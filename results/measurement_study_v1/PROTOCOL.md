@@ -1,3 +1,16 @@
+> ## ⚠ SUPERSEDED IN PART — see [`AMENDMENT_01_ACCESS_AND_READINESS.md`](AMENDMENT_01_ACCESS_AND_READINESS.md)
+>
+> **Status retained: `DATA_ACCESS_BLOCKED` — PRACTICE/UI PREVIEW ONLY. Zero study items; not
+> ready for independent study review. Do not collect research responses from this package.**
+>
+> The body below is preserved as the frozen protocol. It describes a **plan**, not something
+> performed. In particular, the 180-image design (and the 120-image fallback) are **planned
+> designs**; the **actual study panel is empty**. The package must not be distributed as a
+> study questionnaire, and no Final JSON may be collected from it. No participants, human
+> labels, evaluator-error findings or research contribution exist. Any future actual study
+> requires separately authorised prospective case freezing, new commitments and a new package
+> version.
+
 # measurement_study_v1 — frozen public protocol
 
 **Protocol id:** `msv1-protocol-v1` · **Schema:** `msv1-response-schema` v1.0.0

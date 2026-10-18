@@ -1,112 +1,153 @@
 # measurement_study_v1 — blinded image-review package
 
-**Status: `DATA_ACCESS_BLOCKED`.**
-The review instrument is complete and browser-validated. **The study panel is empty**: no
-eligible data source exists, so there are **0 study images** in this package. The exact
-missing item is stated below and evidenced in [`ACCESS_CHECK.md`](ACCESS_CHECK.md).
+> # ⚠ `DATA_ACCESS_BLOCKED` — PRACTICE/UI PREVIEW ONLY
+>
+> **Zero study items; not ready for independent study review.**
+> **Do not collect research responses from this package.**
+>
+> Corrections to the originally published text are in
+> **[`AMENDMENT_01_ACCESS_AND_READINESS.md`](AMENDMENT_01_ACCESS_AND_READINESS.md)**, which is
+> authoritative wherever this directory disagrees with itself.
 
-## What this study asks
+The published ZIP contains **0 study images** and **12 non-study practice images**; its
+study-item array is empty. It exists to show how the review interface works, not to gather
+data. No participants, no human labels, no evaluator-error findings and no research
+contribution exist.
+
+## What this study asks (planned; not performed)
 
 > Do automated target-presence evaluators make different errors on **original** versus
 > **concept-erased** modern-model images — enough to change estimated removal effects or
 > comparisons?
 
-The object of study is the **evaluator**, not any erasure method. This package is not
-evidence that a judge is wrong or that a method is better, and no outcome is reported here.
+The object of study is the **evaluator**, not any erasure method. No outcome is reported here,
+and none exists.
 
-## Why the panel is empty
+## Why the panel is empty — corrected conclusion
 
-**Missing item:** a publicly released **concept-erased checkpoint, or a matched
-original/erased image set, for a modern backbone (FLUX.1-dev or SD3.5), targeting concrete
-non-sensitive objects**, produced by a genuine erasure method rather than inference-time
-guidance avoidance.
+> **No eligible matched non-sensitive object assets were identified during the bounded access
+> check.**
 
-Every modern-backbone erasure paper located releases **code only**. Every released *erased
-weight* located is **SD1.x**, which this study excludes. The one training-free FLUX method
-located works by safety-guidance steering — negative-concept avoidance — on a sensitive
-target. The best-provenanced artifact found (9 methods × 15 concrete object concepts, with
-per-artifact SHA256 and reload proofs) is built on **SD v1.5** and was therefore **not**
-substituted. The scientific task was not quietly changed to fit the data that happened to
-exist. Full candidate-by-candidate record: [`ACCESS_CHECK.md`](ACCESS_CHECK.md).
+**Missing item:** matched original/erased outputs — or released original *and* erased
+checkpoints — for a **modern backbone (FLUX.1-dev or SD3.5)**, targeting **concrete
+non-sensitive objects**, from a genuine erasure method rather than inference-time guidance
+avoidance.
 
-## Download the reviewer package
+**Withdrawn** from the original publication: the claims that no modern erased checkpoints
+exist, that all relevant modern papers are code-only, and that no eligible data source exists.
+Zero GitHub releases and zero metadata-filtered search hits are absence of evidence; they
+cannot establish nonexistence.
+
+**Corrected example.** GEM **does** publish FLUX erasure checkpoints —
+[`MAI-Lab/GEM-Flux-Nudity`](https://huggingface.co/MAI-Lab/GEM-Flux-Nudity) and
+[`MAI-Lab/GEM-Flux-Bloody-Gore`](https://huggingface.co/MAI-Lab/GEM-Flux-Bloody-Gore), linked
+from the [GEM README](https://github.com/multimodal-ai-lab/GEM/blob/c328fc6bec687efe60223498d1b6bed2e5fbcffd/README.md).
+As the model cards state, they are **reproductions, not the original paper checkpoints**. They
+are **ineligible here** because their targets are sensitive content, not concrete non-sensitive
+objects. The original access check recorded GEM as "code only", which was wrong; the bounded
+search missed these because HuggingFace's `search=` matches the model **name**, and neither
+name contains "erase" or "unlearn" even though both repositories are correctly tagged
+`concept-erasure` and `base_model:black-forest-labs/FLUX.1-dev`.
+
+This correction does **not** resolve the missing matched object assets, so the status stands.
+Candidate-by-candidate record: [`ACCESS_CHECK.md`](ACCESS_CHECK.md) (see its supersession
+notice).
+
+## The package — practice/UI preview
 
 **[`package/measurement_study_v1_taskA_v1.0.0.zip`](package/measurement_study_v1_taskA_v1.0.0.zip)** — 17.8 MB
 
-Unzip it and open `index.html` in any browser. No account, no install, no network, no
-server, nothing uploaded. File list and hashes: [`package/PACKAGE_MANIFEST.json`](package/PACKAGE_MANIFEST.json).
+| | |
+|---|---|
+| bytes | `18,641,021` |
+| SHA256 | `604e3227d28bcc3c1548a59da33fd5a01f27fed9f95e35409035a547c3fb2246` |
+| study images | **0** |
+| practice images | 12 |
 
-> GitHub's rendering of `index.html` is **not** an interactive viewer. The ZIP must be
-> downloaded and extracted for the viewer to work.
+Unzip and open `index.html` in any browser to **preview the interface**. It runs offline with
+no account, no install, no server and no upload.
 
-Screenshots: [`preview/`](preview/).
+> **Do not distribute this as a study questionnaire and do not collect Final JSON from it.**
+> The generic completion instructions **inside** the archive — its `README.txt` and the
+> viewer's own "send the downloaded JSON to your coordinator" wording — are **superseded by
+> this amendment**. They remain present only because the archive is preserved byte-for-byte
+> and is deliberately **not** rebuilt or repackaged.
+>
+> The viewer itself correctly **disables Final submission at zero items**, so it does not
+> invite an empty study return. An empty **draft** export is a UI artefact, not a human study
+> response.
 
-## What a reviewer sees (Task A)
+GitHub's rendering of `index.html` is not an interactive viewer; the ZIP must be downloaded
+and extracted. Screenshots: [`preview/`](preview/).
 
-One full-resolution image at a time, with the target name and a short frozen object
-definition. For each image, three questions:
+## What the interface shows (Task A, as designed)
 
-1. target **present / absent / uncertain**;
-2. **coherent scene / severe rendering failure / unable to judge**;
-3. an optional short explanation.
+One full-resolution image at a time with the target name and a short frozen object definition,
+then: target **present / absent / uncertain**; **coherent scene / severe rendering failure /
+unable to judge**; and an optional short explanation. Model, method, prompt, filename, seed and
+all machine scores are withheld by design; ids are neutral and order is derived from the
+reviewer's alias and an assigned variant.
 
-Reviewers are **not** shown the model, the method, the generation prompt, the source
-filename, the seed, any machine score, any other reviewer's answers, or any desired outcome.
-Item ids are neutral and opaque, and presentation order is derived from the reviewer's own
-alias and an assigned order variant (A/B/C), independently of any private mapping.
+The 12 practice examples are instructional aids only — not study items, not scored, not an
+accuracy gate — on a practice object (*bicycle*) deliberately outside any study target set.
 
-The package also carries **12 non-study practice examples**. They are instructional aids
-only — not study items, not scored, not a reviewer-accuracy gate — and they use a practice
-object (*bicycle*) that is deliberately not a study target.
+## Planned designs versus the actual panel
 
-## Task B is prepared but **not** published
+The **planned** design was 180 images (3 targets × 20 cases × 3 conditions), with a 120-image
+fallback if only one erased condition were obtainable and ranking claims dropped. Those are
+**plans**. The **actual** study panel is **empty**. Do not read the planned numbers as a
+description of what exists.
 
-A second, matched-reference stage exists: it shows the original-model reference beside each
-erased-condition candidate and asks whether the candidate shows less / about the same / more
-structural deformation, or cannot be fairly compared. It is **built and held privately** and
-will be released only after first-stage collection closes, all submitted responses are
-locked, and separate explicit authorisation is given. Only its salted commitment and its
-procedure are published here. Stage-A labels are locked once a reference has been seen; any
-later revision is recorded separately and never overwrites an original.
+## Readiness
+
+The reported **47/47** browser checks are **synthetic-fixture UI checks**. They do not
+establish statistical correctness, independent reviewer admission, real-arm blinding or study
+readiness. Five prospective implementation limitations in the analysis code and plan — reviewer
+admission, uncertainty bounds, bootstrap clustering, unimplemented suppression contrasts, and an
+internal inconsistency about partial returns — are documented in
+[`AMENDMENT_01_ACCESS_AND_READINESS.md`](AMENDMENT_01_ACCESS_AND_READINESS.md) §4. **The code
+was not repaired**; these require separate authorisation before any future collection or
+analysis.
+
+## Blinding and privacy, stated precisely
+
+No actual Task-B reference associations, arm keys or automated scores were found in the
+published package. Generic shared viewer code containing an unused reference-file field is not
+itself a mapping leak. [`COMMITMENTS.json`](COMMITMENTS.json) explicitly commits the arm-key,
+case-provenance and prediction material as **empty JSON objects**, because no study cases
+exist. Task B is an **empty private scaffold**, not a populated matched-reference package.
+
+Private seed/salt storage and backups are **host-reported**; the coordinator did not
+independently verify their contents or permissions. **Meaningful masking of actual study arms
+has not yet been exercised**, because there are no study arms.
+
+Any future actual study requires separately authorised prospective case freezing, new
+commitments and a new package version. This frozen empty panel must not be silently populated.
 
 ## Contents
 
 | | |
 |---|---|
-| [`PROTOCOL.md`](PROTOCOL.md) | frozen public protocol |
-| [`ANALYSIS_PLAN.md`](ANALYSIS_PLAN.md) | frozen analysis specification |
-| [`schema/response_schema_v1.json`](schema/response_schema_v1.json) | versioned response schema |
-| [`analysis/`](analysis/) | response validator and analysis code (synthetic fixtures only) |
-| [`ACCESS_CHECK.md`](ACCESS_CHECK.md) | source/access scope and the blocker |
-| [`VALIDATION.md`](VALIDATION.md) | preparation-validation record, including real browser results |
-| [`COMMITMENTS.json`](COMMITMENTS.json) | salted blinding commitments |
-| [`MASKING_AUDIT.json`](MASKING_AUDIT.json) | masking audit of the public build and the ZIP |
-| [`ledgers/`](ledgers/) | resource, job and failure ledgers |
-| [`validation/`](validation/) | validation suite and results |
+| [`AMENDMENT_01_ACCESS_AND_READINESS.md`](AMENDMENT_01_ACCESS_AND_READINESS.md) | **authoritative corrections** |
+| [`PROTOCOL.md`](PROTOCOL.md) | frozen protocol (historical; see its notice) |
+| [`ANALYSIS_PLAN.md`](ANALYSIS_PLAN.md) | frozen analysis plan (historical; see its notice) |
+| [`VALIDATION.md`](VALIDATION.md) | validation record (historical; see its notice) |
+| [`ACCESS_CHECK.md`](ACCESS_CHECK.md) | access scope (historical; see its notice) |
+| [`schema/`](schema/), [`analysis/`](analysis/), [`code/`](code/) | schema and code, **unchanged** |
+| [`COMMITMENTS.json`](COMMITMENTS.json), [`MASKING_AUDIT.json`](MASKING_AUDIT.json) | **unchanged** |
+| [`ledgers/`](ledgers/), [`validation/`](validation/) | raw ledgers and validation log, **unchanged** |
 
-## Blinding, honestly stated
+## Accounting (recorded totals)
 
-Held outside this repository, the ZIP, the viewer and git history: the arm/method key, the
-randomisation seed, case-level source provenance, source-to-review hash associations, all
-automated predictions and raw answers, and all Task-B reference associations. A salted
-SHA256 commitment to each is in [`COMMITMENTS.json`](COMMITMENTS.json); the salt is retained
-privately with a verified backup.
-
-**Masking limitation:** public source images can in principle be reverse-identified by
-someone who goes looking for them. Blinding here means reviewers are not *told* the arm. It
-is not a guarantee that an arm cannot be inferred, and no stronger claim is made. Case-level
-provenance is withheld until review lock where licensing permits.
+**0.042485 GPU-hours** (≈ 0.0425), **12** generated practice images, **0** study images,
+**0** recorded failed GPU jobs. The rounded 152.9-second duration is consistent with the
+rounded GPU-hour figure; there is no discrepancy. These are this study's own recorded totals,
+not independent proof of complete host history. The original 12 GPU-hour / 240-image /
+72-hour figures are historical ceilings, not renewed permission to spend unused allowance.
 
 ## Licensing and attribution
 
 The 12 practice images were generated for this study with **FLUX.1-dev**
 (`black-forest-labs/FLUX.1-dev`, revision `3de623fc3c33e44ffbe2bad470d0f45bccf2eb21`) and are
-distributed under that model's licence terms for generated outputs. No third-party image is
-redistributed in this package, because the study panel is empty. When a source is adopted,
-its licence and attribution will be published with it, and only permitted copies or stable
-source identifiers will be distributed.
-
-## Status if and when a source becomes available
-
-Nothing here authorises a new experiment. This package records a blocked study with a ready
-instrument. Filling the panel requires an eligible source and a separate decision.
+distributed under that model's terms for generated outputs. No third-party image is
+redistributed, because the study panel is empty.
