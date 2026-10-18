@@ -6,7 +6,7 @@ and reload verification all passed
 [EVIDENCE_INDEX.md](EVIDENCE_INDEX.md)).
 
 **Release:** [`modern-object-assets-v1`](https://github.com/bijay299/XXResearch/releases/tag/modern-object-assets-v1)
-— 31 assets, 23,861,453,027 bytes.
+— **31** assets, **23,863,712,600** bytes.
 
 An **infrastructure milestone**, not a method contribution and not a paper
 result: one existing baseline (GEM) was trained once on one ordinary,
@@ -351,8 +351,10 @@ meets:
 
 ## 10. Release assets
 
-Tag **`modern-object-assets-v1`** — 26 assets, 23,861,428,095 bytes total, every
-asset under GitHub's 2 GiB per-asset limit.
+Tag **`modern-object-assets-v1`** — **31** assets, **23,863,712,600** bytes
+total, every asset under GitHub's 2 GiB per-asset limit. (`ASSET_MANIFEST.json`
+describes the other 30; its own 9,332 bytes are the difference between the
+release total and the manifest's 23,863,703,268.)
 
 | asset | parts | bytes | sha256 (reconstructed) |
 |---|---|---|---|
