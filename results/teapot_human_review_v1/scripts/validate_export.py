@@ -25,7 +25,7 @@ LEGACY_SCHEMAS = {"THR-EXPORT-SCHEMA-1.0.0"}
 APP_VERSION = "1.1.0"
 # Maintenance revision of this validator only. The questionnaire bundle, its
 # app version and the export schema are NOT changed by this.
-VALIDATOR_REVISION = "validator-r2 (AMENDMENT_02 type-guard maintenance)"
+VALIDATOR_REVISION = ("validator-r3 (AMENDMENT_03: stage-B disclosure declaration + stage-aware order variants; stage-A behaviour unchanged)")
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -161,8 +161,11 @@ def validate(path, expect_stage=None):
     if not isinstance(d.get("reviewer_alias"), str) or not d["reviewer_alias"].strip():
         res["errors"].append("reviewer_alias missing or empty")
     ov = d.get("order_variant")
-    if not isinstance(ov, str) or ov not in {"V1", "V2", "V3", "ALIAS"}:
-        res["errors"].append(f"order_variant must be V1|V2|V3|ALIAS, got {ov!r}")
+    _allowed_orders = ({"V1", "V2", "V3", "ALIAS"} if stage == "A"
+                       else {"ALIAS", "FIXED"})
+    if not isinstance(ov, str) or ov not in _allowed_orders:
+        res["errors"].append(
+            f"order_variant must be one of {sorted(_allowed_orders)}, got {ov!r}")
     if "item_count_expected" in d and not isinstance(d["item_count_expected"], int):
         res["errors"].append("item_count_expected must be an integer if present")
     comp = d.get("completion")
@@ -188,6 +191,14 @@ def validate(path, expect_stage=None):
         if "other_exposure_note" in exp and not isinstance(
                 exp["other_exposure_note"], str):
             res["errors"].append("exposure.other_exposure_note must be a string")
+        # Stage B deliberately discloses reference identity; the export must say
+        # so explicitly. This is a stage-B-only requirement and does not affect
+        # valid stage-A exports.
+        if stage == "B" and exp.get(
+                "reference_identity_disclosed_in_this_stage") is not True:
+            res["errors"].append(
+                "exposure.reference_identity_disclosed_in_this_stage must be "
+                "true for stage B")
         res["exposure"] = {k: exp.get(k) for k in keys}
         _note = exp.get("other_exposure_note")
         res["exposure_other_note_present"] = bool(

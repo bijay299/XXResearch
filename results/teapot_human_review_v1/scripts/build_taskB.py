@@ -52,22 +52,48 @@ def main():
             rows.append({"pair_id": pid, "role": role, "bytes": os.path.getsize(dst),
                          "sha256": got, "byte_identical_to_source": ok})
 
-    # viewer bundle: items.json carries ONLY neutral pair IDs
+    # Viewer bundle: items.json carries ONLY neutral pair IDs.
+    #
+    # The frozen private mapping records schema_id THR-EXPORT-SCHEMA-1.0.0,
+    # which was current when the IDs were frozen and is covered by the published
+    # commitment. It must NOT be edited. The B SOFTWARE therefore declares the
+    # export contract it actually implements, rather than inheriting that legacy
+    # value into the support files. The mapping and its commitment are untouched.
+    B_SCHEMA_ID = "THR-EXPORT-SCHEMA-1.1.0"
+    B_APP_VERSION = "1.1.0"
+    B_APP_BUILD = "taskB-b1"
     items = {
         "package_id": priv["package_b"],
         "protocol_id": priv["protocol_id"],
-        "schema_id": priv["schema_id"],
+        "schema_id": B_SCHEMA_ID,
+        "app_version": B_APP_VERSION,
+        "app_build": B_APP_BUILD,
+        "schema_id_in_frozen_mapping": priv["schema_id"],
+        "schema_note": ("The frozen private mapping records "
+                        f"{priv['schema_id']}, which was current at ID-freeze "
+                        "time and is covered by the published commitment. The "
+                        "mapping is not edited. This bundle implements "
+                        f"{B_SCHEMA_ID}; legacy exports are rejected, not "
+                        "migrated."),
         "stage": "B",
         "n_items": len(bmap),
         "item_ids": sorted(bmap),
         "images_dir": "images",
-        "note": ("Pair IDs are neutral. This bundle deliberately discloses which "
-                 "side is the reference, so this stage is only partially masked. "
-                 "It carries no case IDs, seeds, prompts, machine scores or "
-                 "Task-A associations."),
+        "order_note": ("Presentation order is reconstructed from this list plus "
+                       "the reviewer alias. Task A's 40-item permutations and "
+                       "its pair-spacing rule do not apply to Task B and are "
+                       "not used here."),
+        "note": ("Pair IDs are neutral, but this bundle deliberately discloses "
+                 "which side is the reference, so this stage is only partially "
+                 "masked. It carries no case IDs, seeds, prompts, machine "
+                 "scores, Task-A associations, Task-A responses or reviewer "
+                 "roster."),
     }
     json.dump(items, open(os.path.join(B, "items.json"), "w"), indent=1)
     with open(os.path.join(B, "items.js"), "w") as fh:
+        fh.write("/* Loaded by index.html via <script src=\"items.js\">.\n"
+                 "   Not fetched: file:// XHR/fetch is blocked by browser CORS\n"
+                 "   policy, a script tag is not. Mirrors items.json. */\n")
         fh.write("window.THR_ITEMS = ")
         json.dump(items, fh, indent=1)
         fh.write(";\n")

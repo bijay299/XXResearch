@@ -1,6 +1,6 @@
 # teapot_human_review_v1 — two-stage human review package
 
-**Status: `READY_FOR_INDEPENDENT_REVIEW` — Task A only.**
+**Status: Task A `CLOSED` (2 reviewers) · Task B `READY_FOR_TASK_B_REVIEW`.**
 
 > ### What this status does and does not mean
 >
@@ -15,8 +15,17 @@
 > this repository. **This package collects no responses and reports no
 > outcomes**, and nothing here describes any participant, label or result.
 
-Task B is **prepared and fully populated but held privately** and is **not
-released**.
+**Task B is now released** at tag
+[`teapot-human-review-v1-taskB`](https://github.com/bijay299/XXResearch/releases/tag/teapot-human-review-v1-taskB),
+under the user's explicit authorization and after Task A closed with its
+original responses preserved. See
+[`AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md`](AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md).
+
+> **Task B is partially unmasked by design.** It reveals matched pairs and
+> reference identity, does **not** conceal pairing or condition roles, and —
+> because the 40 images are already public — can enable matching back to the
+> public Task-A images. Publishing on GitHub does **not** restrict access to any
+> particular people; eligibility is **procedural**.
 
 | | |
 |---|---|
@@ -195,7 +204,17 @@ answer key or completed test response is present in any reviewer bundle. The
 public QA reports contain **mechanical results only** — no image-specific
 judgement.
 
-## Amendment 02 — coordinator-side cleanup (current)
+## Amendment 03 — Task-A closure and Task-B release (current)
+
+[`AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md`](AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md)
+— Task A closed with **2** independent reviewers (planned 3; the frozen minimum
+is ≥2, and the change was recorded after receipt and before any outcome
+analysis), and the authorized second-stage questionnaire released. Task-B
+integrity `TASKB_INTEGRITY_VERIFIED` (20/20 pairs, 40/40 images, 20/20 roles)
+and **174/174** browser checks across three engine configurations. No outcome is
+reported and no response was read on this host.
+
+## Amendment 02 — coordinator-side cleanup
 
 [`AMENDMENT_02_COORDINATOR_CLEANUP.md`](AMENDMENT_02_COORDINATOR_CLEANUP.md) —
 documentation and companion-validator corrections only, made **while reviews are
