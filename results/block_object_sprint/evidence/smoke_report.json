@@ -1,0 +1,66 @@
+{
+ "load_seconds": 11.6,
+ "peak_mem_after_load_GB": 31.42,
+ "context_embedder": {
+  "type": "Linear",
+  "in": 4096,
+  "out": 3072,
+  "dtype": "torch.bfloat16"
+ },
+ "text_embedder": {
+  "type": "PixArtAlphaTextProjection",
+  "repr": "PixArtAlphaTextProjection(\n  (linear_1): Linear(in_features=768, out_features=3072, bias=True)\n  (act_1): SiLU()\n  (linear_2): Linear(in_features=3072, out_features=3072, bias=True)\n)",
+  "in": 768,
+  "hidden": 3072,
+  "out": 3072,
+  "named_children": [
+   [
+    "linear_1",
+    "Linear"
+   ],
+   [
+    "act_1",
+    "SiLU"
+   ],
+   [
+    "linear_2",
+    "Linear"
+   ]
+  ]
+ },
+ "pooled_refactor_bit_identical": true,
+ "pooled_refactor_max_abs_diff": 0.0,
+ "pooled_shape": [
+  8,
+  768
+ ],
+ "t5_context_shape": [
+  8,
+  512,
+  4096
+ ],
+ "valid_t5_tokens_per_prompt_sample": [
+  16,
+  15,
+  15,
+  15,
+  15,
+  15,
+  15,
+  15
+ ],
+ "gen_seconds_per_image": 13.59,
+ "peak_mem_gen_GB": 33.84,
+ "smoke_images_decoded": 3,
+ "gen_args": {
+  "height": 1024,
+  "width": 1024,
+  "num_inference_steps": 28,
+  "guidance_scale": 3.5,
+  "max_sequence_length": 512,
+  "torch_dtype": "bfloat16",
+  "generator": "torch.Generator(device='cpu').manual_seed(case.init_seed)",
+  "note": "FLUX.1-dev diffusers defaults, pinned explicitly rather than relied on. CPU generators are used so initial latents are identical across arms and independent of which GPU runs the job.",
+  "output_format": "PNG (lossless; filenames stay parseable by eval/llava.py)"
+ }
+}

@@ -1,0 +1,61 @@
+{
+  "procedure": "All 40 native-BLOCK (N/Bears) target images audited by the agent in two fixed-order contact sheets of 20. Arm identity was constant (all N), so blinding was not applicable; the earlier 20-tile audit WAS arm-blinded. These are AGENT JUDGMENTS, not independent human review.",
+  "sheets": {
+    "1": {
+      "n": 20
+    },
+    "2": {
+      "n": 20
+    }
+  },
+  "disagreements": [
+    {
+      "sheet": 1,
+      "slot": "S03",
+      "theme": "Byzantine",
+      "filename": "Byzantine_Bears_seed188121.png",
+      "scorer": "yes",
+      "agent": "no"
+    },
+    {
+      "sheet": 1,
+      "slot": "S07",
+      "theme": "Byzantine",
+      "filename": "Byzantine_Bears_seed588121.png",
+      "scorer": "yes",
+      "agent": "no"
+    },
+    {
+      "sheet": 1,
+      "slot": "S14",
+      "theme": "Cartoon",
+      "filename": "Cartoon_Bears_seed688001.png",
+      "scorer": "yes",
+      "agent": "no"
+    },
+    {
+      "sheet": 2,
+      "slot": "S08",
+      "theme": "Van_Gogh",
+      "filename": "Van_Gogh_Bears_seed188141.png",
+      "scorer": "yes",
+      "agent": "no"
+    },
+    {
+      "sheet": 2,
+      "slot": "S13",
+      "theme": "Watercolor",
+      "filename": "Watercolor_Bears_seed688181.png",
+      "scorer": "yes",
+      "agent": "no"
+    }
+  ],
+  "totals": {
+    "n_images": 40,
+    "scorer_target_present": 5,
+    "agent_target_present": 0,
+    "n_disagreements": 5,
+    "all_disagreements_same_direction": "scorer=yes, agent=no (scorer over-reports residual target)"
+  },
+  "interpretation": "Systematic, one-directional generated-domain scoring failure on the EDITED arm: the frozen presence judge answers 'yes, a bear is visible' on 5/40 native-BLOCK images in which the agent sees no bear. The failure mode is confusion of stylised cartoon quadrupeds (dogs, foxes, cats) and crowded Byzantine/Van Gogh scenes with bears. The 120-photograph COCO controls (20/20 sensitivity and 20/20 specificity per object, including related-animal negatives) did NOT detect this, because real photographs lack that stylisation. This is exactly the limitation the protocol warned of: small real-image controls do not establish synthetic-domain validity. Direction matters: the error is CONSERVATIVE with respect to erasure, over-reporting residual target and therefore UNDER-reporting suppression."
+}

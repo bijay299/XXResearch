@@ -1,0 +1,42 @@
+{
+ "cold_preparation_gpu_hours": {
+  "activation_collection_context_s": 964,
+  "activation_collection_pooled_s": 250,
+  "transcoder_training_context_s": 1324,
+  "transcoder_training_pooled_s": 567,
+  "total_s": 3105,
+  "total_gpu_hours": 0.863,
+  "note": "one-time and SHARED by all targets; a pretrained transcoder is not free"
+ },
+ "per_target_edit_s": {
+  "install_transcoder_modules": 5.67,
+  "feature_identification": 0.55,
+  "erasure_update": 0.037,
+  "note": "excludes pipeline load, which every arm pays"
+ },
+ "inference_s_per_image": {
+  "M0": 13.932,
+  "T0": 14.392,
+  "N": 14.32,
+  "T0_overhead_vs_M0_pct": 3.31,
+  "N_overhead_vs_M0_pct": 2.79
+ },
+ "peak_memory_GB": {
+  "M0/Bears": 33.81,
+  "M0/Cats": 33.81,
+  "M0/Horses": 33.81,
+  "M0/SHARED": 33.81,
+  "N/Bears": 35.69,
+  "N/Cats": 35.69,
+  "N/Horses": 35.69,
+  "T0/Bears": 35.69,
+  "T0/Cats": 35.69,
+  "T0/Horses": 35.69,
+  "T0/SHARED": 35.69
+ },
+ "amortisation": {
+  "targets_served_by_one_preparation": 3,
+  "cold_prep_per_target_if_3_targets_gpu_h": 0.288,
+  "assumption": "the SAME two transcoders serve every target; only W_dec rows differ per target"
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "arm": "M0",
+ "object": "Bears",
+ "strata": [
+  "target"
+ ],
+ "variant": null,
+ "variant_arg": null,
+ "erase_target": null,
+ "transcoder_dir": null,
+ "gpu_name": "NVIDIA A100-SXM4-40GB",
+ "visible_devices": "0",
+ "generation_arguments": {
+  "height": 1024,
+  "width": 1024,
+  "num_inference_steps": 28,
+  "guidance_scale": 3.5,
+  "max_sequence_length": 512,
+  "torch_dtype": "bfloat16",
+  "generator": "torch.Generator(device='cpu').manual_seed(case.init_seed)",
+  "note": "FLUX.1-dev diffusers defaults, pinned explicitly rather than relied on. CPU generators are used so initial latents are identical across arms and independent of which GPU runs the job.",
+  "output_format": "PNG (lossless; filenames stay parseable by eval/llava.py)"
+ },
+ "n_cases": 40,
+ "t_load_s": 9.69,
+ "paired_noise_check": {
+  "case": "target|Bears|Cartoon|188001",
+  "init_seed": 188001,
+  "same_seed_bit_identical": true,
+  "noise_sha256_first4096": "43ea71c1eb57a7b50eeb35dbcaedc8c8",
+  "note": "CPU generator rebuilt per image from case.init_seed, so the initial latent for a case is identical across arms and independent of device/order"
+ },
+ "t_generation_s": 558.9,
+ "t_generation_per_image_s": 13.973,
+ "peak_mem_GB": 33.81,
+ "images_written": 40
+}

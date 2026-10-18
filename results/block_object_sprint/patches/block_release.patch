@@ -1,0 +1,455 @@
+diff --git a/scripts/eval/llava.py b/scripts/eval/llava.py
+index f7e9181..351e62b 100644
+--- a/scripts/eval/llava.py
++++ b/scripts/eval/llava.py
+@@ -3,6 +3,7 @@ import re
+ import sys
+ import argparse
+ import csv
++import json   # [PATCH A21]
+ import torch
+ import pandas as pd
+ from tqdm import tqdm
+@@ -46,8 +47,15 @@ def parse_style_class(fn):
+     for cls in class_available:
+         if prefix.endswith(f"_{cls}"):
+             style_raw = prefix[:-(len(cls)+1)]
+-            style = style_raw.replace("_", " ")
+-            return style, cls
++            # [PATCH A22] The release returned style_raw.replace("_", " ") here, but the
++            # caller indexes the result into `theme_available`, whose entries are
++            # UNDERSCORED ("Pop_Art", "Van_Gogh"). So the released evaluator raised
++            # ValueError: 'Pop Art' is not in list on filenames produced by the release's
++            # OWN generation script (diffusion.py writes f"{theme}_{cls}_seed{n}.jpg" with
++            # theme taken from theme_available). It also broke the "Seed_Images" filter
++            # below. Returning the canonical underscored form fixes both; predictions come
++            # from theme_available and are already underscored.
++            return style_raw, cls
+     raise ValueError(f"Cannot parse style/class from {fn}")
+ 
+ def is_valid_image(fp: str) -> bool:
+@@ -258,6 +266,11 @@ if __name__ == "__main__":
+ 
+     targ_idx = label_list_task.index(args.theme)
+ 
++    # [PATCH A21] The release writes only the three aggregate numbers. The protocol
++    # requires raw evaluator answers and per-case labels, so we additionally stream one
++    # row per image (prediction + verbatim raw string). Aggregates are untouched.
++    per_image = []
++
+     # evaluate per image
+     for fp in tqdm(imgs, desc=f"LLaVA eval {args.task}={args.theme}"):
+         # ground truth from file name
+@@ -279,6 +292,16 @@ if __name__ == "__main__":
+         sp = theme_available.index(pred_style) if pred_style in theme_available else -1
+         cp = class_available.index(pred_class) if pred_class in class_available else -1
+ 
++        per_image.append({                                        # [PATCH A21]
++            "file": os.path.basename(fp),
++            "true_style": true_style, "true_class": true_class,
++            "pred_style": pred_style, "pred_class": pred_class,
++            "raw_style": _raw_s, "raw_class": _raw_c,
++            "is_target": bool((ts == targ_idx) if args.task == "style" else (tc == targ_idx)),
++            "style_correct": bool(sp == ts), "class_correct": bool(cp == tc),
++            "pred_is_target": bool((sp == targ_idx) if args.task == "style" else (cp == targ_idx)),
++        })
++
+         if args.task == "style":
+             m_target = (ts == targ_idx)
+             if m_target:
+@@ -308,6 +331,13 @@ if __name__ == "__main__":
+     os.makedirs(target_dir, exist_ok=True)
+     out_csv = os.path.join(target_dir, "retain_and_unlearn.csv")
+ 
++    # [PATCH A21] per-image dump with raw answers
++    pd.DataFrame(per_image).to_csv(os.path.join(target_dir, "per_image.csv"), index=False)
++    with open(os.path.join(target_dir, "per_image.jsonl"), "w") as _f:
++        for r in per_image:
++            _f.write(json.dumps(r) + "\n")
++    print(f"Wrote {len(per_image)} per-image rows to {target_dir}")
++
+     df = pd.DataFrame([{
+         "target": args.theme,
+         "unlearn_acc":    unlearn_acc,
+diff --git a/scripts/transcoder/get_activation_diffusion.py b/scripts/transcoder/get_activation_diffusion.py
+index 2f079fd..cff008e 100644
+--- a/scripts/transcoder/get_activation_diffusion.py
++++ b/scripts/transcoder/get_activation_diffusion.py
+@@ -39,8 +39,11 @@ def read_prompts(path: str | Path) -> List[str]:
+ @torch.no_grad()
+ def get_prompt_embeds(pipe, model, prompts, device, dtype):
+     if model == "flux":
++        # [PATCH A18] diffusers 0.30.2 makes `prompt_2` a REQUIRED positional; the release
++        # omitted it (TypeError). None reproduces the release's intent exactly because
++        # encode_prompt does `prompt_2 = prompt_2 or prompt`.
+         prompt_embeds, _, _ = pipe.encode_prompt(
+-            prompts, device=device, num_images_per_prompt=1, max_sequence_length=512
++            prompts, None, device=device, num_images_per_prompt=1, max_sequence_length=512
+         )
+         toks2 = pipe.tokenizer_2(
+             prompts, padding="max_length", max_length=512, truncation=True, return_tensors="pt"
+@@ -121,6 +124,12 @@ def collect_activations_transformer(
+         B, T, _ = prompt_embeds.shape
+         assert attn.shape == (B, T) and attn.dtype == torch.bool
+ 
++        # [PATCH A1] the release binds `context_embedder` (above) but never calls it, so
++        # `ctx_out` below was an undefined name. The transcoder's training target is the
++        # ORIGINAL module's output on the same input, per paper 4.2.
++        with torch.no_grad():
++            ctx_out = context_embedder(prompt_embeds)
++
+         valid_in_list, valid_out_list = [], []
+         for b in range(B):
+             m = attn[b]
+@@ -158,7 +167,7 @@ def main():
+     # parsing
+     parse = argparse.ArgumentParser(description="Collect CA activations (inputs, context_embedder, text_embedder) for SD3, FLUX")
+     parse.add_argument("--model", type=str, choices=MODEL_PATHS.keys(), required=True, help="sd3, flux")
+-    parser.add_argument("--output_path", type=str, required=True, help="")
++    parse.add_argument("--output_path", type=str, required=True, help="")  # [PATCH A2] was `parser`
+     parse.add_argument("--batch-size", type=int, default=4)
+     parse.add_argument("--out", type=str, default="activations.pt")
+     parse.add_argument("--log-dir", type=str, default="log/get_activations_diffusion/", help="Directory for log files")
+@@ -237,7 +246,7 @@ def main():
+ 
+     t_save0 = time.perf_counter()
+     for label, tensor in acts.items():
+-        out_dir = os.path.join(output_path, label)
++        out_dir = os.path.join(args.output_path, label)  # [PATCH A3] was unbound global
+         os.makedirs(out_dir, exist_ok=True)
+         torch.save(tensor, os.path.join(out_dir, args.out))
+         logging.info(f"Saved {label} → {out_dir}/{args.out}")
+diff --git a/scripts/transcoder/get_activation_diffusion_mlp.py b/scripts/transcoder/get_activation_diffusion_mlp.py
+index 2e96ff8..5a5f7b0 100644
+--- a/scripts/transcoder/get_activation_diffusion_mlp.py
++++ b/scripts/transcoder/get_activation_diffusion_mlp.py
+@@ -39,9 +39,24 @@ def read_prompts(path: str | Path) -> List[str]:
+ @torch.no_grad()
+ def get_prompt_embeds(pipe, model, prompts, device, dtype):
+     if model == "flux":
+-        _, pooled_in, _ = pipe.encode_prompt(
+-            prompts, device=device, num_images_per_prompt=1, max_sequence_length=512
+-        )
++        # [PATCH A19] Efficiency-only fast path, OFF by default.
++        # In diffusers 0.30.2 FluxPipeline.encode_prompt computes the pooled vector as
++        #     pooled_prompt_embeds = self._get_clip_prompt_embeds(prompt=prompt, ...)
++        # i.e. it depends ONLY on the CLIP text encoder, while the T5-XXL branch feeds
++        # `prompt_embeds`, which this script discards. Running encode_prompt over the
++        # 330,000-pair pooled corpus would therefore execute T5-XXL 330,000 times for
++        # nothing (~4.6 measured GPU-hours). Verified BIT-IDENTICAL to the released path
++        # (torch.equal, max abs diff 0.000e+00) in artifacts/smoke/smoke_report.json
++        # before being enabled. The arithmetic is unchanged.
++        if os.environ.get("POOLED_CLIP_ONLY") == "1":
++            pooled_in = pipe._get_clip_prompt_embeds(
++                prompt=prompts, device=device, num_images_per_prompt=1
++            )
++        else:
++            # [PATCH A18] see get_activation_diffusion.py; `prompt_2` is required positionally.
++            _, pooled_in, _ = pipe.encode_prompt(
++                prompts, None, device=device, num_images_per_prompt=1, max_sequence_length=512
++            )
+ 
+     elif model == "sd3":
+         _, _, pooled_in, _ = pipe.encode_prompt(
+@@ -118,7 +133,7 @@ def main():
+     # parsing
+     parse = argparse.ArgumentParser(description="Collect CA activations (inputs, context_embedder, text_embedder) for SD3, FLUX")
+     parse.add_argument("--model", type=str, choices=MODEL_PATHS.keys(), required=True, help="sd3, flux")
+-    parser.add_argument("--output_path", type=str, required=True, help="")
++    parse.add_argument("--output_path", type=str, required=True, help="")  # [PATCH A2] was `parser`
+     parse.add_argument("--batch-size", type=int, default=4)
+     parse.add_argument("--out", type=str, default="activations.pt")
+     parse.add_argument("--log-dir", type=str, default="log/get_activations_diffusion/", help="Directory for log files")
+@@ -158,7 +173,9 @@ def main():
+ 
+     all_prompts = []
+     
+-    with open("prompts/coco_train2014_30k_prompts.txt", "r",) as prompt_file:
++    # [PATCH A4] this file is referenced by the release but NOT shipped in it; it is
++    # reconstructed by code/build_coco_assets.py (seeded MS-COCO train2014 sample).
++    with open(os.environ.get("COCO_PROMPTS", "prompts/coco_train2014_30k_prompts.txt"), "r",) as prompt_file:
+         for prompt in prompt_file:
+             prompt = prompt.strip()
+             prompt = prompt if not prompt.endswith(".") else prompt[:-1]
+@@ -190,7 +207,7 @@ def main():
+ 
+     t_save0 = time.perf_counter()
+     for label, tensor in acts.items():
+-        out_dir = os.path.join(output_path, label)
++        out_dir = os.path.join(args.output_path, label)  # [PATCH A3] was unbound global
+         os.makedirs(out_dir, exist_ok=True)
+         torch.save(tensor, os.path.join(out_dir, args.out))
+         logging.info(f"Saved {label} → {out_dir}/{args.out}")
+diff --git a/scripts/transcoder/model_inference.py b/scripts/transcoder/model_inference.py
+index 9f15eb7..c95f58e 100644
+--- a/scripts/transcoder/model_inference.py
++++ b/scripts/transcoder/model_inference.py
+@@ -61,6 +61,12 @@ class Transcoder(nn.Module):
+         :return: output data (same rank with last dim = n_outputs)
+         """
+         orig_dtype = x.dtype
++        # [PATCH A15] The transcoder is built/loaded in fp32 while the FLUX pipeline runs in
++        # bf16, so the release raised a dtype RuntimeError in nn.Linear. The file already
++        # intends an input-dtype-preserving contract (it captures orig_dtype and casts the
++        # output), so we complete it: compute in the PARAMETER dtype, return in the input
++        # dtype. No change to the arithmetic.
++        x = x.to(self.encoder.weight.dtype)
+ 
+         if x.dim() == 3:
+             B, T, D = x.shape
+@@ -94,6 +100,9 @@ class Transcoder(nn.Module):
+ 
+     @classmethod
+     def from_state_dict(cls, state_dict: dict[str, torch.Tensor], strict: bool = True) -> "Transcoder":
++        # [PATCH A16] the release pops from the caller's dict, so loading the same state
++        # dict twice failed; work on a shallow copy instead.
++        state_dict = dict(state_dict)
+         # model shape and expansion factor
+         n_latents, n_inputs = state_dict["encoder.weight"].shape
+         n_outputs = state_dict["dec_bias"].shape[0]
+diff --git a/scripts/transcoder/train.py b/scripts/transcoder/train.py
+index 276f441..76283ac 100644
+--- a/scripts/transcoder/train.py
++++ b/scripts/transcoder/train.py
+@@ -12,8 +12,10 @@ from dataclasses import asdict
+ 
+ class ActivationPairDataset(Dataset):
+     def __init__(self, root_dir, layer, fname="activations_8b_style.pt"):
+-        x_path = os.path.join(root_dir, f"layer{layer}_in", fname)
+-        y_path = os.path.join(root_dir, f"layer{layer}_out", fname)
++        # [PATCH A9] the activation collectors write `<layer>_in` / `<layer>_out`
++        # (e.g. context_embedder_in), not `layer<layer>_in`.
++        x_path = os.path.join(root_dir, f"{layer}_in", fname)
++        y_path = os.path.join(root_dir, f"{layer}_out", fname)
+         self.x = torch.load(x_path, weights_only=False)
+         self.y = torch.load(y_path, weights_only=False)
+         self.length = min(self.x.size(0), self.y.size(0))
+@@ -34,6 +36,11 @@ def main():
+     parser.add_argument( "--epoch", type=int, required=True, help="Number of epoch")
+     parser.add_argument( "--fname", type=str, required=True, help="fname")
+     parser.add_argument( "--dead_threshold", type=int, required=True, help="dead_threshold")
++    # [PATCH B6] paper E.1 pins batch size per module (16384 projection / 1024 MLP) but the
++    # release exposes no flag and its default (4096) matches neither.
++    parser.add_argument( "--batch_size", type=int, required=True, help="paper E.1 batch size")
++    parser.add_argument( "--save_name", type=str, required=True, help="checkpoint basename, e.g. context_embedder")
++    parser.add_argument( "--run_name", type=str, required=True, help="explicit run dir name")
+     parser.add_argument("--log-dir",        type=str,   default="log/train_transcoder/",                                                              help="Directory for log files")
+     args = parser.parse_args()
+ 
+@@ -49,6 +56,8 @@ def main():
+     cfg.fname = args.fname
+     cfg.dead_feature_threshold = args.dead_threshold
+     cfg.layers = args.layers
++    cfg.batch_size = args.batch_size      # [PATCH B6]
++    cfg.log_to_wandb = False              # [PATCH A10] no external services this sprint
+ 
+     cfg.wandb_project = 'transcoder'
+ 
+@@ -64,12 +73,17 @@ def main():
+         for layer in args.layers
+     }
+ 
+-    # Initialize and launch the trainer
+-    trainer = TranscoderTrainer(cfg, dataset_dict)
++    # [PATCH A8] TranscoderTrainer treats its argument as a Dataset (len(), [0],
++    # random_split), but the release handed it this dict -> len()==#layers and dataset[0]
++    # raised KeyError. We train one layer per invocation and pass that Dataset.
++    if len(args.layers) != 1:
++        raise SystemExit("train one layer per invocation (see PATCH A8)")
++    trainer = TranscoderTrainer(cfg, dataset_dict[args.layers[0]])
+     trainer.fit()
+ 
+-    # Save model checkpoints
+-    trainer.save()
++    # [PATCH A12/A13] save() with no args wrote `None.pt` into a freshly incremented run
++    # dir; diffusion.py loads `context_embedder.pt` / `text_embedder.pt`.
++    trainer.save(typ=args.save_name, name=args.run_name)
+ 
+ if __name__ == "__main__":
+     main()
+diff --git a/scripts/transcoder/trainer.py b/scripts/transcoder/trainer.py
+index 96c6a0c..289aa2f 100644
+--- a/scripts/transcoder/trainer.py
++++ b/scripts/transcoder/trainer.py
+@@ -16,7 +16,14 @@ from scripts.transcoder.config import TrainingConfig
+ 
+ from scripts.transcoder.model_training import Transcoder
+ 
+-import wandb
++# [PATCH A20] The release imports wandb unconditionally, so training could not run at
++# all without it even with log_to_wandb=False. Every wandb call site is behind the
++# cfg.log_to_wandb guard (see PATCH A10), so a guarded import is sufficient and avoids
++# adding an external-telemetry dependency to this sprint's environment.
++try:
++    import wandb
++except ModuleNotFoundError:
++    wandb = None
+ 
+ class TranscoderTrainer:
+     """Transcoder trainer
+@@ -28,6 +35,7 @@ class TranscoderTrainer:
+         """
+         self.cfg = cfg
+         self.dataset = dataset
++        self.val_fvu_history = []   # [PATCH A10] local training record when W&B is off
+ 
+         self.num_examples = len(dataset)
+ 
+@@ -211,8 +219,19 @@ class TranscoderTrainer:
+                     info_eval[f"dead_latents"] = num_dead / transcoder.n_latents
+ 
+                     info_eval[f"val_fvu"] = val_fvu
+-                
+-                wandb.log(info_eval, step=steps)
++
++                    # [PATCH A10] this log call sat OUTSIDE the log_to_wandb guard
++                    # in the release, so it crashed whenever W&B was disabled.
++                    wandb.log(info_eval, step=steps)
++
++                # [PATCH A10] mirror per-epoch validation to the normal logger so a
++                # local (W&B-free) run still leaves a training record.
++                self.logger.info(
++                    "epoch end: step=%d val_fvu=%.6f dead_frac=%.6f",
++                    steps, float(val_fvu),
++                    float((transcoder.activation_frequency.cpu().numpy() < 1).mean()),
++                )
++                self.val_fvu_history.append(float(val_fvu))
+ 
+         pbar.close()
+ 
+diff --git a/scripts/unlearn_canvas/diffusion.py b/scripts/unlearn_canvas/diffusion.py
+index 41dd0c3..240ffc6 100644
+--- a/scripts/unlearn_canvas/diffusion.py
++++ b/scripts/unlearn_canvas/diffusion.py
+@@ -35,7 +35,15 @@ def load_pipeline(model: str):
+     if model == "sd3":
+         pipe = StableDiffusion3Pipeline.from_pretrained(path, device_map="balanced")
+     elif model == "flux":
+-        pipe = FluxPipeline.from_pretrained(path, device_map="balanced")
++        # [PATCH A14] the release passed no torch_dtype here, so FLUX loaded in fp32
++        # (~70GB, cannot fit) and silently disagreed with diffusion_baseline.py, which
++        # uses bfloat16. Pin bfloat16 for ALL arms so arms are dtype-matched.
++        pipe = FluxPipeline.from_pretrained(
++            path, torch_dtype=torch.bfloat16,
++            device_map=os.environ.get("FLUX_DEVICE_MAP") or None,
++        )
++        if os.environ.get("FLUX_DEVICE_MAP") in (None, ""):
++            pipe = pipe.to(os.environ.get("FLUX_DEVICE", "cuda"))
+     else:
+         raise ValueError(model)
+ 
+@@ -79,7 +87,8 @@ def get_prompt_embeds(pipe, model: str, prompts):
+         return keep
+ 
+     if model == "flux":
+-        prompt_embeds, pooled_embeds, _ = pipe.encode_prompt(prompts)
++        # [PATCH A18] `prompt_2` is a required positional in diffusers 0.30.2.
++        prompt_embeds, pooled_embeds, _ = pipe.encode_prompt(prompts, None)
+ 
+         toks_t5 = pipe.tokenizer_2(
+             prompts,
+@@ -256,6 +265,54 @@ def _main_device(pipe):
+     return next(pipe.transformer.parameters()).device
+ 
+ 
++# [PATCH REFACTOR] The release performed the W_dec erasure inline inside main(). It is moved
++# here UNCHANGED (every expression copied character-for-character) so that an external
++# evaluation harness can invoke the authors' own update rather than a reimplementation.
++# `stats` is write-only bookkeeping and does not touch the arithmetic.
++def apply_block_erasure(transcoder_context, transcoder_text, latent_info, device, stats=None):
++    transcoders = {"context": transcoder_context, "text": transcoder_text}
++
++    for key, value in latent_info.items():
++        transcoder = transcoders[key]
++
++        idx_target, value_target, idx_empty, value_empty = value
++
++        latents_targets = torch.tensor(idx_target, dtype=torch.int64, device=device)
++        latents_empty = torch.tensor(idx_empty, dtype=torch.int64, device=device)
++
++        value_target = torch.tensor(value_target, dtype=torch.float32, device=device)
++        value_empty = torch.tensor(value_empty, dtype=torch.float32, device=device)
++
++        latents_empty_exp = latents_empty.expand_as(latents_targets)
++        src_rows = transcoder.W_dec.data[latents_empty_exp]
++        denom = torch.clamp(value_target, min=1e-6)
++        scale    = (value_empty / denom).unsqueeze(-1)
++
++        if stats is not None:
++            flat = latents_targets.reshape(-1)
++            uniq = torch.unique(flat)
++            before = transcoder.W_dec.data[uniq].clone()
++            stats[key] = {
++                "n_target_rows_written": int(flat.numel()),
++                "n_unique_rows_written": int(uniq.numel()),
++                "n_duplicate_writes": int(flat.numel() - uniq.numel()),
++                "n_latents": int(transcoder.W_dec.shape[0]),
++                "frac_rows_touched": float(uniq.numel()) / float(transcoder.W_dec.shape[0]),
++                "target_token_count": int(latents_targets.shape[0]) if latents_targets.dim() > 1 else 1,
++                "k": int(latents_targets.shape[-1]),
++                "_uniq": uniq, "_before": before,
++            }
++
++        transcoder.W_dec.data[latents_targets] = src_rows * scale
++
++        if stats is not None:
++            uniq = stats[key].pop("_uniq"); before = stats[key].pop("_before")
++            after = transcoder.W_dec.data[uniq]
++            stats[key]["max_abs_change_on_written_rows"] = float((after - before).abs().max())
++            stats[key]["all_written_finite"] = bool(torch.isfinite(after).all())
++    return stats
++
++
+ def main():
+     parser = argparse.ArgumentParser(
+         description=""
+@@ -303,25 +360,7 @@ def main():
+ 
+     device = _main_device(pipe)
+ 
+-    transcoders = {"context": transcoder_context, "text": transcoder_text}
+-
+-    for key, value in latent_info.items():
+-        transcoder = transcoders[key]
+-
+-        idx_target, value_target, idx_empty, value_empty = value
+-
+-        latents_targets = torch.tensor(idx_target, dtype=torch.int64, device=device)
+-        latents_empty = torch.tensor(idx_empty, dtype=torch.int64, device=device)
+-
+-        value_target = torch.tensor(value_target, dtype=torch.float32, device=device)
+-        value_empty = torch.tensor(value_empty, dtype=torch.float32, device=device)
+-
+-        latents_empty_exp = latents_empty.expand_as(latents_targets)  
+-        src_rows = transcoder.W_dec.data[latents_empty_exp]
+-        denom = torch.clamp(value_target, min=1e-6)
+-        scale    = (value_empty / denom).unsqueeze(-1)  
+-
+-        transcoder.W_dec.data[latents_targets] = src_rows * scale
++    apply_block_erasure(transcoder_context, transcoder_text, latent_info, device)
+ 
+     # Generate and save images
+     out_dir = args.output
+diff --git a/scripts/unlearn_canvas/diffusion_baseline.py b/scripts/unlearn_canvas/diffusion_baseline.py
+index 024dd9b..58348f8 100644
+--- a/scripts/unlearn_canvas/diffusion_baseline.py
++++ b/scripts/unlearn_canvas/diffusion_baseline.py
+@@ -14,7 +14,8 @@ from huggingface_hub import login
+ from diffusers import FluxPipeline, StableDiffusion3Pipeline, StableDiffusionPipeline
+ from scripts.utils import setup_logger, get_module_by_name
+ from scripts.transcoder.model_inference import Transcoder
+-from scripts.transcoder.model_inference_ca import TranscoderCA
++# [PATCH A6] `scripts.transcoder.model_inference_ca` does not exist in the release and
++# TranscoderCA is unused in this file.
+ from constants.const import theme_available, class_available
+ 
+ MODEL_PATHS = {
+@@ -43,6 +44,8 @@ def load_pipeline(model: str, device: torch.device):
+     except Exception:
+         pass
+ 
++    return pipe.to(device)  # [PATCH A7] the release returned None and never moved to device
++
+ def main():
+     parser = argparse.ArgumentParser(description="")
+     parser.add_argument("--model", choices=MODEL_PATHS.keys(), required=True)

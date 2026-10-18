@@ -1,0 +1,1865 @@
+{
+ "source": "COCO instances_val2014.json (human instance annotations)",
+ "independence": "labels come from COCO annotators, not from prompts, filenames, or the judge",
+ "frozen_rules": {
+  "panel_seed": 20261018,
+  "n_pos": 20,
+  "n_neg": 20,
+  "n_neg_related": 10,
+  "min_area_frac": 0.02,
+  "positive": ">=1 non-crowd target instance with largest area >= 2% of image",
+  "negative": "zero target instances of any kind (incl. iscrowd)",
+  "negative_related_animal": "contains another animal >=2% area, never the target"
+ },
+ "targets": {
+  "Bears": "bear",
+  "Cats": "cat",
+  "Horses": "horse"
+ },
+ "related_animal_set": [
+  "bear",
+  "cat",
+  "dog",
+  "horse",
+  "sheep",
+  "cow",
+  "elephant",
+  "zebra",
+  "giraffe",
+  "bird"
+ ],
+ "panels": {
+  "Bears": {
+   "target_coco_category": "bear",
+   "rows": [
+    {
+     "coco_image_id": 201241,
+     "file_name": "COCO_val2014_000000201241.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000201241.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2642/5819294476_f8cf2f47b9_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 318721,
+     "file_name": "COCO_val2014_000000318721.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000318721.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7145/6606491533_731573b1bc_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 67015,
+     "file_name": "COCO_val2014_000000067015.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000067015.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4040/4632251950_9fd320f18e_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear",
+      "chair",
+      "person",
+      "teddy bear"
+     ]
+    },
+    {
+     "coco_image_id": 439007,
+     "file_name": "COCO_val2014_000000439007.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000439007.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7024/6753153947_40f396f944_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 489209,
+     "file_name": "COCO_val2014_000000489209.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000489209.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2832/9579968449_4e3be250a3_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 521231,
+     "file_name": "COCO_val2014_000000521231.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000521231.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7215/7184941145_7d6930bdf2_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 102057,
+     "file_name": "COCO_val2014_000000102057.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000102057.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7100/6950640732_726cdbbabd_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 211204,
+     "file_name": "COCO_val2014_000000211204.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000211204.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8189/8085150647_abcd44f272_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 61262,
+     "file_name": "COCO_val2014_000000061262.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000061262.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7168/6678525353_bf019c6276_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 255067,
+     "file_name": "COCO_val2014_000000255067.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000255067.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7166/6606496553_34db9b1d10_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 239888,
+     "file_name": "COCO_val2014_000000239888.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000239888.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4035/4652248508_742081218b_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 547645,
+     "file_name": "COCO_val2014_000000547645.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000547645.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7404/9087145419_956ce8560d_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 192676,
+     "file_name": "COCO_val2014_000000192676.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000192676.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7246/7569273794_a0d3c452f4_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 519611,
+     "file_name": "COCO_val2014_000000519611.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000519611.jpg",
+     "flickr_url": "http://farm6.staticflickr.com/5525/9168005994_6f372df6d6_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 490720,
+     "file_name": "COCO_val2014_000000490720.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000490720.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8298/8004571231_071390d574_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 46245,
+     "file_name": "COCO_val2014_000000046245.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000046245.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2836/9771327721_657a9f9c00_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 219524,
+     "file_name": "COCO_val2014_000000219524.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000219524.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7162/6436971419_b0c1de5b20_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear",
+      "truck"
+     ]
+    },
+    {
+     "coco_image_id": 113313,
+     "file_name": "COCO_val2014_000000113313.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000113313.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3694/9442724936_1e13fdb379_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 98197,
+     "file_name": "COCO_val2014_000000098197.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000098197.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3728/8895714619_f48b715daa_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 75948,
+     "file_name": "COCO_val2014_000000075948.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000075948.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3733/9470380683_fcb1a665c8_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bear"
+     ]
+    },
+    {
+     "coco_image_id": 449327,
+     "file_name": "COCO_val2014_000000449327.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000449327.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4081/4774747845_0bd26c6c4a_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "dog",
+      "skateboard"
+     ]
+    },
+    {
+     "coco_image_id": 163831,
+     "file_name": "COCO_val2014_000000163831.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000163831.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4091/5072911098_88004a9f89_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bed",
+      "book",
+      "cat",
+      "cell phone",
+      "handbag"
+     ]
+    },
+    {
+     "coco_image_id": 463669,
+     "file_name": "COCO_val2014_000000463669.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000463669.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/73/177308417_158a1328f5_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bed",
+      "cat"
+     ]
+    },
+    {
+     "coco_image_id": 570171,
+     "file_name": "COCO_val2014_000000570171.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000570171.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/180/409414059_facfad2931_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "zebra"
+     ]
+    },
+    {
+     "coco_image_id": 156195,
+     "file_name": "COCO_val2014_000000156195.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000156195.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3018/4560571583_a02ba13796_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "sheep"
+     ]
+    },
+    {
+     "coco_image_id": 415183,
+     "file_name": "COCO_val2014_000000415183.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000415183.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/36/94372980_a1306cc966_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "cat",
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 378163,
+     "file_name": "COCO_val2014_000000378163.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000378163.jpg",
+     "flickr_url": "http://farm7.staticflickr.com/6219/6268180506_08056e7302_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "dog",
+      "motorcycle",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 45176,
+     "file_name": "COCO_val2014_000000045176.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000045176.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2395/2447498165_5830c70b3a_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "dog"
+     ]
+    },
+    {
+     "coco_image_id": 555478,
+     "file_name": "COCO_val2014_000000555478.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000555478.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7335/9107818112_b383e744a3_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "elephant"
+     ]
+    },
+    {
+     "coco_image_id": 68005,
+     "file_name": "COCO_val2014_000000068005.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000068005.jpg",
+     "flickr_url": "http://farm2.staticflickr.com/1137/1022753488_5114cbeb8c_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bowl",
+      "dog"
+     ]
+    },
+    {
+     "coco_image_id": 407403,
+     "file_name": "COCO_val2014_000000407403.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000407403.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/38/85373199_25693860c8_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "vase"
+     ]
+    },
+    {
+     "coco_image_id": 541909,
+     "file_name": "COCO_val2014_000000541909.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000541909.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3225/2771621504_eee2b9d9cd_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "person",
+      "tennis racket"
+     ]
+    },
+    {
+     "coco_image_id": 410487,
+     "file_name": "COCO_val2014_000000410487.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000410487.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2180/2227215068_15821347b1_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "oven"
+     ]
+    },
+    {
+     "coco_image_id": 290948,
+     "file_name": "COCO_val2014_000000290948.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000290948.jpg",
+     "flickr_url": "http://farm2.staticflickr.com/1368/984759336_933bd2a2f0_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "person",
+      "snowboard"
+     ]
+    },
+    {
+     "coco_image_id": 328,
+     "file_name": "COCO_val2014_000000000328.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000000328.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2813/9198207893_5f31aaa152_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "backpack",
+      "bench",
+      "book",
+      "car",
+      "cell phone",
+      "person",
+      "tie"
+     ]
+    },
+    {
+     "coco_image_id": 491064,
+     "file_name": "COCO_val2014_000000491064.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000491064.jpg",
+     "flickr_url": "http://farm6.staticflickr.com/5165/5201755199_11ed1d8ae8_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "person",
+      "tie"
+     ]
+    },
+    {
+     "coco_image_id": 45248,
+     "file_name": "COCO_val2014_000000045248.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000045248.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/225/515581439_5c0d3dd713_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "cell phone",
+      "handbag",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 333020,
+     "file_name": "COCO_val2014_000000333020.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000333020.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/24/51048198_3596d2e126_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "hair drier",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 60730,
+     "file_name": "COCO_val2014_000000060730.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000060730.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8509/8462686082_3e0c0d8abd_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "bench",
+      "dining table",
+      "potted plant"
+     ]
+    },
+    {
+     "coco_image_id": 411630,
+     "file_name": "COCO_val2014_000000411630.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000411630.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8302/7904577154_b795d8fd57_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "airplane"
+     ]
+    }
+   ]
+  },
+  "Cats": {
+   "target_coco_category": "cat",
+   "rows": [
+    {
+     "coco_image_id": 153217,
+     "file_name": "COCO_val2014_000000153217.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000153217.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/32/36546844_5d6e8e5c37_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "motorcycle"
+     ]
+    },
+    {
+     "coco_image_id": 78107,
+     "file_name": "COCO_val2014_000000078107.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000078107.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2347/1905268355_180fc45598_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "tv"
+     ]
+    },
+    {
+     "coco_image_id": 560297,
+     "file_name": "COCO_val2014_000000560297.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000560297.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/28/92229914_a5688e9e5e_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "apple",
+      "bottle",
+      "cat",
+      "person",
+      "refrigerator"
+     ]
+    },
+    {
+     "coco_image_id": 520694,
+     "file_name": "COCO_val2014_000000520694.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000520694.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4115/4858617956_1e74f02498_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bed",
+      "cat",
+      "suitcase"
+     ]
+    },
+    {
+     "coco_image_id": 38769,
+     "file_name": "COCO_val2014_000000038769.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000038769.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3258/3147405328_8e09ea46cc_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "car",
+      "cat",
+      "traffic light"
+     ]
+    },
+    {
+     "coco_image_id": 506586,
+     "file_name": "COCO_val2014_000000506586.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000506586.jpg",
+     "flickr_url": "http://farm7.staticflickr.com/6028/5930246315_d0952e3cee_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "backpack",
+      "cat"
+     ]
+    },
+    {
+     "coco_image_id": 30356,
+     "file_name": "COCO_val2014_000000030356.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000030356.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3088/2618820116_10394eda1a_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "sink",
+      "toilet"
+     ]
+    },
+    {
+     "coco_image_id": 295016,
+     "file_name": "COCO_val2014_000000295016.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000295016.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3181/2372884516_469da44f2b_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "cup"
+     ]
+    },
+    {
+     "coco_image_id": 489743,
+     "file_name": "COCO_val2014_000000489743.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000489743.jpg",
+     "flickr_url": "http://farm6.staticflickr.com/5172/5529409501_91e3930182_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bed",
+      "cat",
+      "teddy bear"
+     ]
+    },
+    {
+     "coco_image_id": 96517,
+     "file_name": "COCO_val2014_000000096517.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000096517.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/74/173613117_1a0f64a277_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "suitcase"
+     ]
+    },
+    {
+     "coco_image_id": 258789,
+     "file_name": "COCO_val2014_000000258789.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000258789.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4114/4940708476_8197995b1f_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bird",
+      "cat"
+     ]
+    },
+    {
+     "coco_image_id": 83476,
+     "file_name": "COCO_val2014_000000083476.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000083476.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2038/2308761843_381c06b359_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bed",
+      "cat",
+      "remote"
+     ]
+    },
+    {
+     "coco_image_id": 504167,
+     "file_name": "COCO_val2014_000000504167.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000504167.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/34/73376498_764bf2ec6f_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat"
+     ]
+    },
+    {
+     "coco_image_id": 47121,
+     "file_name": "COCO_val2014_000000047121.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000047121.jpg",
+     "flickr_url": "http://farm2.staticflickr.com/1432/1439410299_012ca34a4e_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bottle",
+      "bowl",
+      "cat",
+      "sink"
+     ]
+    },
+    {
+     "coco_image_id": 67164,
+     "file_name": "COCO_val2014_000000067164.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000067164.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/157/402208027_c387f9d755_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "car",
+      "cat"
+     ]
+    },
+    {
+     "coco_image_id": 411685,
+     "file_name": "COCO_val2014_000000411685.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000411685.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/23/26905583_c021c50f6f_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "toilet"
+     ]
+    },
+    {
+     "coco_image_id": 466007,
+     "file_name": "COCO_val2014_000000466007.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000466007.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3155/2285175536_4f0a6b780d_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "bed",
+      "book",
+      "cat",
+      "handbag"
+     ]
+    },
+    {
+     "coco_image_id": 205378,
+     "file_name": "COCO_val2014_000000205378.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000205378.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/34/122334984_9876910101_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "laptop"
+     ]
+    },
+    {
+     "coco_image_id": 422655,
+     "file_name": "COCO_val2014_000000422655.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000422655.jpg",
+     "flickr_url": "http://farm6.staticflickr.com/5308/5730543439_e3d677f5b8_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "umbrella"
+     ]
+    },
+    {
+     "coco_image_id": 438985,
+     "file_name": "COCO_val2014_000000438985.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000438985.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/69/163953275_9630302259_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cat",
+      "suitcase"
+     ]
+    },
+    {
+     "coco_image_id": 467978,
+     "file_name": "COCO_val2014_000000467978.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000467978.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7182/7079730957_65f332fc7f_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "dog",
+      "sheep"
+     ]
+    },
+    {
+     "coco_image_id": 389404,
+     "file_name": "COCO_val2014_000000389404.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000389404.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/75/154050631_4acddf0e67_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bird",
+      "carrot"
+     ]
+    },
+    {
+     "coco_image_id": 473731,
+     "file_name": "COCO_val2014_000000473731.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000473731.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8386/8626586312_d94972232c_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 174838,
+     "file_name": "COCO_val2014_000000174838.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000174838.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/32/271174514_92e1095d5c_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "car",
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 25191,
+     "file_name": "COCO_val2014_000000025191.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000025191.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3594/3315343823_27a8a07db8_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "elephant"
+     ]
+    },
+    {
+     "coco_image_id": 453321,
+     "file_name": "COCO_val2014_000000453321.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000453321.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3497/3263360646_29d10b7bc4_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "zebra"
+     ]
+    },
+    {
+     "coco_image_id": 518836,
+     "file_name": "COCO_val2014_000000518836.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000518836.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8476/8124445515_12fd44c5f9_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 176796,
+     "file_name": "COCO_val2014_000000176796.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000176796.jpg",
+     "flickr_url": "http://farm7.staticflickr.com/6150/5937868059_cbd76d47f0_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "zebra"
+     ]
+    },
+    {
+     "coco_image_id": 18864,
+     "file_name": "COCO_val2014_000000018864.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000018864.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2518/4063043167_2e1dbcc2c9_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "giraffe"
+     ]
+    },
+    {
+     "coco_image_id": 114420,
+     "file_name": "COCO_val2014_000000114420.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000114420.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7351/9534356426_0a5a2d5902_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bird"
+     ]
+    },
+    {
+     "coco_image_id": 313176,
+     "file_name": "COCO_val2014_000000313176.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000313176.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3090/2748824269_c5be8b2b97_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "broccoli",
+      "cake"
+     ]
+    },
+    {
+     "coco_image_id": 70739,
+     "file_name": "COCO_val2014_000000070739.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000070739.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/79/256538714_92f15efcd7_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "person",
+      "wine glass"
+     ]
+    },
+    {
+     "coco_image_id": 183991,
+     "file_name": "COCO_val2014_000000183991.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000183991.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/45/180604644_7a8d1ec976_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "frisbee",
+      "person",
+      "umbrella"
+     ]
+    },
+    {
+     "coco_image_id": 242189,
+     "file_name": "COCO_val2014_000000242189.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000242189.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3292/2502281864_a9c98d9189_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "handbag",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 536200,
+     "file_name": "COCO_val2014_000000536200.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000536200.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8182/8034636938_a2170825d1_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "cell phone",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 121839,
+     "file_name": "COCO_val2014_000000121839.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000121839.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7254/6892942538_74a8f06b1f_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "backpack",
+      "person",
+      "skis",
+      "snowboard"
+     ]
+    },
+    {
+     "coco_image_id": 22158,
+     "file_name": "COCO_val2014_000000022158.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000022158.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7045/6865627890_427843d062_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "microwave",
+      "oven",
+      "refrigerator",
+      "sink"
+     ]
+    },
+    {
+     "coco_image_id": 535185,
+     "file_name": "COCO_val2014_000000535185.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000535185.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/204/458615293_ac2801fdcf_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "laptop",
+      "tv"
+     ]
+    },
+    {
+     "coco_image_id": 4576,
+     "file_name": "COCO_val2014_000000004576.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000004576.jpg",
+     "flickr_url": "http://farm7.staticflickr.com/6196/6087137948_683fb66746_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "backpack",
+      "bicycle",
+      "bus",
+      "clock",
+      "handbag",
+      "person",
+      "umbrella"
+     ]
+    },
+    {
+     "coco_image_id": 223751,
+     "file_name": "COCO_val2014_000000223751.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000223751.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4135/4881687862_c35141ac2e_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "person",
+      "surfboard"
+     ]
+    }
+   ]
+  },
+  "Horses": {
+   "target_coco_category": "horse",
+   "rows": [
+    {
+     "coco_image_id": 300322,
+     "file_name": "COCO_val2014_000000300322.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000300322.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2477/3596858016_9a83736097_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "dog",
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 524064,
+     "file_name": "COCO_val2014_000000524064.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000524064.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8090/8566930110_a35b98cf1d_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 352007,
+     "file_name": "COCO_val2014_000000352007.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000352007.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8386/8479911578_c26bc41dfd_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 156756,
+     "file_name": "COCO_val2014_000000156756.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000156756.jpg",
+     "flickr_url": "http://farm7.staticflickr.com/6218/6283402298_260aba3c29_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "cow",
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 579872,
+     "file_name": "COCO_val2014_000000579872.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000579872.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3627/3439304220_019736eeee_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 82740,
+     "file_name": "COCO_val2014_000000082740.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000082740.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3695/9634580615_5aeb7f94a3_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person",
+      "potted plant",
+      "zebra"
+     ]
+    },
+    {
+     "coco_image_id": 576955,
+     "file_name": "COCO_val2014_000000576955.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000576955.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3704/8949853096_d3ffcd111f_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 449274,
+     "file_name": "COCO_val2014_000000449274.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000449274.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/236/518340943_56125316cb_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 56092,
+     "file_name": "COCO_val2014_000000056092.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000056092.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2809/9590764245_36524a5f94_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 473731,
+     "file_name": "COCO_val2014_000000473731.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000473731.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8386/8626586312_d94972232c_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 182227,
+     "file_name": "COCO_val2014_000000182227.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000182227.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3073/2802602207_0f4cce5e8f_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 109403,
+     "file_name": "COCO_val2014_000000109403.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000109403.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7364/9654847981_3fb3996a15_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 140286,
+     "file_name": "COCO_val2014_000000140286.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000140286.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2700/4062490884_20b9d0de26_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 384496,
+     "file_name": "COCO_val2014_000000384496.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000384496.jpg",
+     "flickr_url": "http://farm7.staticflickr.com/6156/6195072019_af35d9b85a_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 465879,
+     "file_name": "COCO_val2014_000000465879.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000465879.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7307/9195546126_0f8f228670_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 57550,
+     "file_name": "COCO_val2014_000000057550.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000057550.jpg",
+     "flickr_url": "http://farm6.staticflickr.com/5004/5352483148_19b04d75f0_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 400569,
+     "file_name": "COCO_val2014_000000400569.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000400569.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7425/8917903107_c9e6d7b3a2_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "car",
+      "dog",
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 514173,
+     "file_name": "COCO_val2014_000000514173.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000514173.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8247/8490950964_331656924d_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 290957,
+     "file_name": "COCO_val2014_000000290957.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000290957.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3589/5844418942_b4f80a965d_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "horse"
+     ]
+    },
+    {
+     "coco_image_id": 434509,
+     "file_name": "COCO_val2014_000000434509.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000434509.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/82/233535169_398d3b6644_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": true,
+     "panel": "positive",
+     "coco_annotated_categories": [
+      "backpack",
+      "horse",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 563723,
+     "file_name": "COCO_val2014_000000563723.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000563723.jpg",
+     "flickr_url": "http://farm2.staticflickr.com/1363/543967835_6386ba7986_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "backpack",
+      "cat",
+      "chair",
+      "person",
+      "sandwich"
+     ]
+    },
+    {
+     "coco_image_id": 175494,
+     "file_name": "COCO_val2014_000000175494.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000175494.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2462/3889476537_9e1a7c6af4_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bed",
+      "dog"
+     ]
+    },
+    {
+     "coco_image_id": 329687,
+     "file_name": "COCO_val2014_000000329687.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000329687.jpg",
+     "flickr_url": "http://farm6.staticflickr.com/5215/5534098880_76b8e9fa1c_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bench",
+      "dog",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 418625,
+     "file_name": "COCO_val2014_000000418625.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000418625.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3581/3807691297_5162de8d0d_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "person",
+      "zebra"
+     ]
+    },
+    {
+     "coco_image_id": 321385,
+     "file_name": "COCO_val2014_000000321385.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000321385.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3420/3768786892_c43ea60662_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "cake",
+      "chair",
+      "dining table",
+      "dog"
+     ]
+    },
+    {
+     "coco_image_id": 139130,
+     "file_name": "COCO_val2014_000000139130.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000139130.jpg",
+     "flickr_url": "http://farm7.staticflickr.com/6025/5981963667_68130362d5_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "zebra"
+     ]
+    },
+    {
+     "coco_image_id": 492658,
+     "file_name": "COCO_val2014_000000492658.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000492658.jpg",
+     "flickr_url": "http://farm8.staticflickr.com/7073/6975786066_156a33b649_z.jpg",
+     "license_id": 2,
+     "license_name": "Attribution-NonCommercial License",
+     "license_url": "http://creativecommons.org/licenses/by-nc/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "sheep"
+     ]
+    },
+    {
+     "coco_image_id": 372249,
+     "file_name": "COCO_val2014_000000372249.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000372249.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3068/2293095525_5a84b88708_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bird"
+     ]
+    },
+    {
+     "coco_image_id": 362275,
+     "file_name": "COCO_val2014_000000362275.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000362275.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4072/4525494953_aa663a793e_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "zebra"
+     ]
+    },
+    {
+     "coco_image_id": 149669,
+     "file_name": "COCO_val2014_000000149669.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000149669.jpg",
+     "flickr_url": "http://farm3.staticflickr.com/2331/2211388705_7bebdc3e56_z.jpg",
+     "license_id": 6,
+     "license_name": "Attribution-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_related_animal",
+     "coco_annotated_categories": [
+      "bus",
+      "elephant",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 483965,
+     "file_name": "COCO_val2014_000000483965.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000483965.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4044/4543117153_2155ffecaf_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "hot dog",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 330348,
+     "file_name": "COCO_val2014_000000330348.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000330348.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4069/4527959615_1b538d06ec_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "person",
+      "tie"
+     ]
+    },
+    {
+     "coco_image_id": 154241,
+     "file_name": "COCO_val2014_000000154241.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000154241.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/2/1484590_08cdd4da4a_z.jpg",
+     "license_id": 5,
+     "license_name": "Attribution-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "book",
+      "cell phone"
+     ]
+    },
+    {
+     "coco_image_id": 389295,
+     "file_name": "COCO_val2014_000000389295.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000389295.jpg",
+     "flickr_url": "http://farm5.staticflickr.com/4049/4590880088_dd5c31a9a9_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "baseball bat",
+      "baseball glove",
+      "bench",
+      "car",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 227048,
+     "file_name": "COCO_val2014_000000227048.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000227048.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8174/8032409619_f0be403c33_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "person",
+      "sports ball",
+      "tennis racket"
+     ]
+    },
+    {
+     "coco_image_id": 281163,
+     "file_name": "COCO_val2014_000000281163.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000281163.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3087/3100293420_991e55c1b2_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "bottle",
+      "hot dog"
+     ]
+    },
+    {
+     "coco_image_id": 501062,
+     "file_name": "COCO_val2014_000000501062.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000501062.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3296/2867910928_5528cff556_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "broccoli",
+      "carrot"
+     ]
+    },
+    {
+     "coco_image_id": 479562,
+     "file_name": "COCO_val2014_000000479562.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000479562.jpg",
+     "flickr_url": "http://farm1.staticflickr.com/45/118668282_df8953024f_z.jpg",
+     "license_id": 3,
+     "license_name": "Attribution-NonCommercial-NoDerivs License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "cell phone",
+      "person"
+     ]
+    },
+    {
+     "coco_image_id": 191693,
+     "file_name": "COCO_val2014_000000191693.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000191693.jpg",
+     "flickr_url": "http://farm9.staticflickr.com/8192/8094170738_e4ae6376a2_z.jpg",
+     "license_id": 4,
+     "license_name": "Attribution License",
+     "license_url": "http://creativecommons.org/licenses/by/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "chair",
+      "person",
+      "tie"
+     ]
+    },
+    {
+     "coco_image_id": 45550,
+     "file_name": "COCO_val2014_000000045550.jpg",
+     "coco_url": "http://images.cocodataset.org/val2014/COCO_val2014_000000045550.jpg",
+     "flickr_url": "http://farm4.staticflickr.com/3011/2951101998_d454d50177_z.jpg",
+     "license_id": 1,
+     "license_name": "Attribution-NonCommercial-ShareAlike License",
+     "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+     "ground_truth_target_present": false,
+     "panel": "negative_other",
+     "coco_annotated_categories": [
+      "bowl",
+      "clock",
+      "person",
+      "sandwich"
+     ]
+    }
+   ]
+  }
+ }
+}

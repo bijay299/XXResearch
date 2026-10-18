@@ -1,0 +1,116 @@
+{
+ "arm": "N",
+ "object": "Bears",
+ "strata": [
+  "target",
+  "related",
+  "unrelated"
+ ],
+ "variant": null,
+ "variant_arg": null,
+ "erase_target": "Bears",
+ "transcoder_dir": "/data/bijaypandey/cuig_pilot/block_object_sprint/artifacts/transcoders/native_T0",
+ "gpu_name": "NVIDIA A100-SXM4-40GB",
+ "visible_devices": "0",
+ "generation_arguments": {
+  "height": 1024,
+  "width": 1024,
+  "num_inference_steps": 28,
+  "guidance_scale": 3.5,
+  "max_sequence_length": 512,
+  "torch_dtype": "bfloat16",
+  "generator": "torch.Generator(device='cpu').manual_seed(case.init_seed)",
+  "note": "FLUX.1-dev diffusers defaults, pinned explicitly rather than relied on. CPU generators are used so initial latents are identical across arms and independent of which GPU runs the job.",
+  "output_format": "PNG (lossless; filenames stay parseable by eval/llava.py)"
+ },
+ "n_cases": 80,
+ "t_load_s": 10.22,
+ "transcoder_files": {
+  "context_embedder.pt": {
+   "sha256": "c16c37ae09b2ff213cfe865455ffbf47e90e701ad6c4eb1e994a13b323667d16"
+  },
+  "text_embedder.pt": {
+   "sha256": "fd3430fddad4d2dc4f0ce53ed0c80ba482c187a2325c10c195cb5e7c1af39f0a"
+  }
+ },
+ "transcoder_shapes": {
+  "context": {
+   "n_inputs": 4096,
+   "n_outputs": 3072,
+   "n_latents": 65536,
+   "k": 32,
+   "param_dtype": "torch.float32"
+  },
+  "pooled": {
+   "n_inputs": 768,
+   "n_outputs": 3072,
+   "n_latents": 12288,
+   "k": 32,
+   "param_dtype": "torch.float32"
+  }
+ },
+ "replaced_modules": {
+  "transformer.context_embedder": "Linear(4096,3072) -> Transcoder",
+  "transformer.time_text_embed.text_embedder": "PixArtAlphaTextProjection(768,3072) -> Transcoder"
+ },
+ "t_install_transcoders_s": 6.16,
+ "t_feature_identification_s": 0.59,
+ "t_erasure_s": 0.04,
+ "erasure_stats": {
+  "context": {
+   "n_target_rows_written": 64,
+   "n_unique_rows_written": 57,
+   "n_duplicate_writes": 7,
+   "n_latents": 65536,
+   "frac_rows_touched": 0.0008697509765625,
+   "target_token_count": 2,
+   "k": 32,
+   "max_abs_change_on_written_rows": 0.16979821026325226,
+   "all_written_finite": true
+  },
+  "text": {
+   "n_target_rows_written": 32,
+   "n_unique_rows_written": 32,
+   "n_duplicate_writes": 0,
+   "n_latents": 12288,
+   "frac_rows_touched": 0.0026041666666666665,
+   "target_token_count": 1,
+   "k": 32,
+   "max_abs_change_on_written_rows": 0.14978453516960144,
+   "all_written_finite": true
+  }
+ },
+ "edit_verification": {
+  "context": {
+   "rows_changed": 57,
+   "rows_total": 65536,
+   "all_finite_after": true,
+   "max_abs_delta": 0.16979821026325226
+  },
+  "pooled": {
+   "rows_changed": 32,
+   "rows_total": 12288,
+   "all_finite_after": true,
+   "max_abs_delta": 0.14978453516960144
+  },
+  "unrelated_tensors_bit_identical": {
+   "context_enc": true,
+   "context_encb": true,
+   "context_decb": true,
+   "pooled_enc": true,
+   "pooled_encb": true,
+   "pooled_decb": true
+  }
+ },
+ "paired_noise_check": {
+  "case": "target|Bears|Cartoon|188001",
+  "init_seed": 188001,
+  "same_seed_bit_identical": true,
+  "noise_sha256_first4096": "43ea71c1eb57a7b50eeb35dbcaedc8c8",
+  "note": "CPU generator rebuilt per image from case.init_seed, so the initial latent for a case is identical across arms and independent of device/order"
+ },
+ "t_generation_s": 1149.56,
+ "t_generation_per_image_s": 14.369,
+ "peak_mem_GB": 35.69,
+ "images_written": 80
+}

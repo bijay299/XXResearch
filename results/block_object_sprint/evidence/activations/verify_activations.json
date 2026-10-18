@@ -1,0 +1,60 @@
+{
+ "context_embedder": {
+  "x_shape": [
+   321920,
+   4096
+  ],
+  "y_shape": [
+   321920,
+   3072
+  ],
+  "x_dtype": "torch.bfloat16",
+  "y_dtype": "torch.bfloat16",
+  "n_pairs": 321920,
+  "x_finite": true,
+  "y_finite": true,
+  "x_std": 0.10455531626939774,
+  "y_std": 0.4884718954563141,
+  "recompute_check": {
+   "n_sampled": 4096,
+   "max_abs_diff": 0.0,
+   "mean_abs_diff": 0.0,
+   "rel_mean_abs_diff": 0.0,
+   "bit_identical": true
+  }
+ },
+ "text_embedder": {
+  "x_shape": [
+   330000,
+   768
+  ],
+  "y_shape": [
+   330000,
+   3072
+  ],
+  "x_dtype": "torch.bfloat16",
+  "y_dtype": "torch.bfloat16",
+  "n_pairs": 330000,
+  "x_finite": true,
+  "y_finite": true,
+  "x_std": 0.9929672479629517,
+  "y_std": 1.481359839439392,
+  "recompute_check": {
+   "n_sampled": 4096,
+   "max_abs_diff": 0.0,
+   "mean_abs_diff": 0.0,
+   "rel_mean_abs_diff": 0.0,
+   "bit_identical": true
+  }
+ },
+ "expectations": {
+  "context_prompts": 17600,
+  "context_rule": "80 prompts x 20 objects x (10 styles + no-style)",
+  "pooled_pairs_expected": 330000,
+  "pooled_rule": "30000 COCO prompts x (10 styles + no-style)",
+  "pooled_pairs_actual": 330000,
+  "pooled_matches_E1": true,
+  "context_pairs_actual_token_level": 321920,
+  "context_note": "context pairs are per VALID T5 TOKEN (the release masks padding), so the count is ~15x the 17,600 prompts, not equal to it"
+ }
+}
