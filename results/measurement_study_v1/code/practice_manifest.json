@@ -1,0 +1,136 @@
+{
+ "base_model": "black-forest-labs/FLUX.1-dev",
+ "revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+ "settings": {
+  "height": 1024,
+  "width": 1024,
+  "guidance_scale": 3.5,
+  "max_sequence_length": 512,
+  "dtype": "bfloat16",
+  "generator": "torch.Generator(device='cpu').manual_seed(seed)"
+ },
+ "practice_object": "bicycle",
+ "status_note": "NON-STUDY instructional aids. Not study cases, not empirical labels, not a reviewer-accuracy gate. The practice object is deliberately outside any study target set.",
+ "items": [
+  {
+   "practice_id": "P01",
+   "prompt": "a red bicycle leaning against a weathered brick wall, afternoon light",
+   "steps": 28,
+   "seed": 1101,
+   "purpose": "object plainly present, coherent scene",
+   "file": "P01.png",
+   "sha256": "eb4359817f29861290054a06bce93c688e886b134a112c3379c2f4d2a92ee6c7",
+   "bytes": 1869026
+  },
+  {
+   "practice_id": "P02",
+   "prompt": "a weathered brick wall in afternoon light, empty pavement",
+   "steps": 28,
+   "seed": 1102,
+   "purpose": "object plainly absent, coherent scene",
+   "file": "P02.png",
+   "sha256": "93ccaf1f95a23906c934832e388856da96e656ce8165bc00aefe0ce5d585faf4",
+   "bytes": 2085299
+  },
+  {
+   "practice_id": "P03",
+   "prompt": "a wide empty park path at dawn with a tiny bicycle far away near the horizon",
+   "steps": 28,
+   "seed": 1103,
+   "purpose": "object present but very small / hard to resolve",
+   "file": "P03.png",
+   "sha256": "430330e1060ecfd00a0454c3ec5a9f6bc48dcfad7dae42e8561c8dee544cddfb",
+   "bytes": 1466191
+  },
+  {
+   "practice_id": "P04",
+   "prompt": "a close-up of a chrome bicycle wheel and spokes filling the frame",
+   "steps": 28,
+   "seed": 1104,
+   "purpose": "only a part of the object is visible",
+   "file": "P04.png",
+   "sha256": "67592bcd8d6efb9ae2e04cf4d05525e8487c80ccd25d3e3646e2dcc75f2e0fcd",
+   "bytes": 1329760
+  },
+  {
+   "practice_id": "P05",
+   "prompt": "a vintage motorcycle parked on a cobblestone street",
+   "steps": 28,
+   "seed": 1105,
+   "purpose": "a different but related object; the practice target is absent",
+   "file": "P05.png",
+   "sha256": "7a9ff102c76fce95bff8820038a8e9e9c4ca22a081cb218e56b342a33c8b8aba",
+   "bytes": 1358218
+  },
+  {
+   "practice_id": "P06",
+   "prompt": "a busy bicycle parking rack crowded with many bicycles",
+   "steps": 28,
+   "seed": 1106,
+   "purpose": "many instances of the object present",
+   "file": "P06.png",
+   "sha256": "30c610fe314bb076c50f345259cb335d91bbd218b479fd930cd94204e8c82c41",
+   "bytes": 1557242
+  },
+  {
+   "practice_id": "P07",
+   "prompt": "an oil painting in heavy impasto of a bicycle in a sunlit courtyard",
+   "steps": 28,
+   "seed": 1107,
+   "purpose": "heavily stylised painting that is still a coherent scene",
+   "file": "P07.png",
+   "sha256": "17c1d50001708c48c89f03a1e04ee9d235431db8a81fb0926cd302bb52aab092",
+   "bytes": 1860795
+  },
+  {
+   "practice_id": "P08",
+   "prompt": "a cluttered garage interior with tools, boxes and a bicycle in shadow",
+   "steps": 28,
+   "seed": 1108,
+   "purpose": "object present but partly occluded in clutter",
+   "file": "P08.png",
+   "sha256": "5126d1c10f697eee871de5324f0239394a62fc8e5b046773e606831c0bddbe15",
+   "bytes": 1549836
+  },
+  {
+   "practice_id": "P09",
+   "prompt": "a quiet living room with a sofa, lamp and bookshelf",
+   "steps": 28,
+   "seed": 1109,
+   "purpose": "ordinary coherent scene with no bicycle",
+   "file": "P09.png",
+   "sha256": "d5d244ca4b30aa2ade09ed8e5fee2015618b108a6473008434571bb0df48a958",
+   "bytes": 1268126
+  },
+  {
+   "practice_id": "P10",
+   "prompt": "a surreal composition where a bicycle dissolves into flying birds",
+   "steps": 28,
+   "seed": 1110,
+   "purpose": "unusual composition that is nonetheless coherent",
+   "file": "P10.png",
+   "sha256": "2e34d9cc0b26e00f94e1529d7b11d65189c7d4695a9361e634ff1e0d06b8c561",
+   "bytes": 1474849
+  },
+  {
+   "practice_id": "P11",
+   "prompt": "a bicycle in a garden",
+   "steps": 1,
+   "seed": 1111,
+   "purpose": "DEGRADED ON PURPOSE (1 sampling step): example of severe rendering failure",
+   "file": "P11.png",
+   "sha256": "7896e24d14f1e429d9f229dc2c257afaabea893080f0eed8a40051037c4a1a4c",
+   "bytes": 1447191
+  },
+  {
+   "practice_id": "P12",
+   "prompt": "a city street with bicycles",
+   "steps": 2,
+   "seed": 1112,
+   "purpose": "DEGRADED ON PURPOSE (2 sampling steps): example of severe rendering failure",
+   "file": "P12.png",
+   "sha256": "0b3e6d98226e74eb6429fb596158ce48c02148dd9ac523c317e1facfc4cc7b9f",
+   "bytes": 1724424
+  }
+ ]
+}

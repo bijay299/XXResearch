@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "msv1-response-schema",
+  "title": "measurement_study_v1 reviewer response file",
+  "description": "Exported by the offline review viewer. One file per reviewer per stage. Stage A asks target presence and scene quality; stage B asks a structural-deformation comparison against a shown original reference.",
+  "type": "object",
+  "required": [
+    "schema_id", "schema_version", "package_id", "protocol_id", "stage",
+    "export_kind", "reviewer_alias", "order_variant", "prior_exposure",
+    "exported_utc", "n_items", "n_answered", "n_missing", "responses"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_id": { "const": "msv1-response-schema" },
+    "schema_version": { "const": "1.0.0" },
+    "package_id": { "type": "string", "minLength": 1 },
+    "protocol_id": { "type": "string", "minLength": 1 },
+    "stage": { "enum": ["A", "B"] },
+    "export_kind": {
+      "enum": ["draft", "final"],
+      "description": "Only 'final' files are admitted to the primary analysis. A 'draft' may be used to resume a session."
+    },
+    "reviewer_alias": {
+      "type": "string", "pattern": "^[A-Za-z0-9_-]{2,32}$",
+      "description": "Coordinator-assigned alias. Must not contain a name, email or other identifying detail."
+    },
+    "order_variant": { "enum": ["A", "B", "C"] },
+    "prior_exposure": {
+      "enum": ["none", "some", "involved"],
+      "description": "Self-declared. Recorded honestly; it is not a disqualification and is reported, not used to silently drop a reviewer."
+    },
+    "session_started_utc": { "type": ["string", "null"], "format": "date-time" },
+    "exported_utc": { "type": "string", "format": "date-time" },
+    "n_items": { "type": "integer", "minimum": 0 },
+    "n_answered": { "type": "integer", "minimum": 0 },
+    "n_missing": { "type": "integer", "minimum": 0 },
+    "responses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["neutral_id", "target", "position", "answered"],
+        "additionalProperties": false,
+        "properties": {
+          "neutral_id": {
+            "type": "string", "pattern": "^[A-Za-z0-9_-]{1,32}$",
+            "description": "Opaque item id. Carries no arm, method, prompt, seed or source information."
+          },
+          "target": { "type": "string", "minLength": 1 },
+          "position": {
+            "type": "integer", "minimum": 1,
+            "description": "1-based position in this reviewer's presentation order."
+          },
+          "target_presence": {
+            "type": ["string", "null"],
+            "enum": ["present", "absent", "uncertain", null],
+            "description": "Stage A only. null means not answered. 'uncertain' is a real answer and is never coerced to present/absent."
+          },
+          "scene_quality": {
+            "type": ["string", "null"],
+            "enum": ["coherent", "severe_rendering_failure", "unable_to_judge", null],
+            "description": "Stage A only. null means not answered."
+          },
+          "deformation_vs_reference": {
+            "type": ["string", "null"],
+            "enum": ["less", "about_same", "more", "cannot_compare", null],
+            "description": "Stage B only. null means not answered."
+          },
+          "explanation": { "type": ["string", "null"], "maxLength": 2000 },
+          "answered": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "x_notes": {
+    "missingness": "A response row is always emitted for every item in the package, with nulls where the reviewer did not answer. Missing answers are never inferred, defaulted or back-filled.",
+    "identifiability": "The file intentionally contains no name, email, IP, timing trace, user agent or machine score.",
+    "stage_separation": "A viewer refuses to import a file whose stage, package_id or schema_version does not match its own."
+  }
+}
