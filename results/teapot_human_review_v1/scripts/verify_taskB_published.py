@@ -55,20 +55,25 @@ def main():
     need={"index.html","app.js","items.js","style.css","items.json","INSTRUCTIONS.md","README.txt"}
     rep["support_complete"]=set(rep["inventory"]["support_files"])>=need
     # private-association audit on downloaded bytes
+    # roster comes from the PRIVATE record; never a literal in published code
+    _rp=os.path.join(ROOT,"private","taskA_closure_private.json")
+    roster=[r["alias"] for r in json.load(open(_rp))["roster"]] if os.path.isfile(_rp) else []
     badf=[]
     for n in names:
         if n.endswith(".png"): continue
         txt=open(os.path.join(ex,n),"r",errors="ignore").read()
+        for a in roster:
+            if re.search(r"\b"+re.escape(a)+r"\b",txt): badf.append({"member":n,"kind":"reviewer alias"})
         for label,rx in [("case id",re.compile(r"\bCASE-\d{2}\b")),
                          ("seed",re.compile(r"\bseed ?7\d{3}\b",re.I)),
                          ("source cond",re.compile(r"_(m0|edited)_seed")),
                          ("A item id",re.compile(r"\bA-\d{3}\b")),
                          ("crosswalk",re.compile(r'"(reference_filename|candidate_filename|case_id|source_filename)"')),
                          ("answer key",re.compile(r'"(answer_key|ground_truth|gold)"')),
-                         ("alias",re.compile(r"\b(los|Shree)\b")),
                          ("test export",re.compile(r'"_fixture"|SYNTHETIC QA FIXTURE'))]:
             if rx.search(txt): badf.append({"member":n,"kind":label})
-    rep["private_audit"]={"findings":badf,"clean":not badf}
+    rep["private_audit"]={"findings":badf,"clean":not badf,
+                          "alias_scan_performed":bool(roster)}
     # browser QA on the downloaded bytes
     qout=os.path.join(ROOT,"qa","qa_taskB_downloaded_report.json")
     subprocess.run([sys.executable,os.path.join(ROOT,"scripts","qa_taskB.py"),

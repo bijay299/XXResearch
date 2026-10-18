@@ -181,6 +181,25 @@ mapping field was edited to change a software version. No new generation, model
 loading, training, GPU allocation, judging, image-content labelling or outcome
 analysis occurred.
 
+## 7b. One mistake of mine during this release, and its fix
+
+While building the Task-B audit tooling I **hard-coded the two reviewer aliases
+as literals** in two scripts that are published in this repository
+(`scripts/audit_taskB.py` and `scripts/verify_taskB_published.py`). They were
+there so the audit could scan public artifacts *for* those aliases — but putting
+them in published code **disclosed the roster that is supposed to stay
+private**.
+
+They were never in the reviewer bundle or on any release asset (the bundle audit
+confirms zero alias findings), but they were committed to Git and pushed. Both
+scripts now **load the roster from the private coordination record** instead, and
+report whether the alias scan actually ran rather than silently passing when the
+private record is unavailable. No alias literal remains in any published file.
+
+The aliases were briefly present in the public Git history for those commits.
+Rewriting published history would be worse than disclosing this, so the commits
+stand and this note records what happened.
+
 ## 8. Accounting — appended, historical clocks not reset
 
 | | used | cap |

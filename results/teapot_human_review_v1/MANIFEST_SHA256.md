@@ -14,13 +14,14 @@ sha256 of every published file and release asset.
 > instructions page containing no research image, and an item/pair view
 > rendered against a clearly synthetic placeholder.
 
+
 ## Repository files
 
 | file | bytes | sha256 |
 |---|---|---|
 | `AMENDMENT_01_TASKA_PATCH01.md` | 12,531 | `40fd70e1d42b4409d36254724b469cebf5fccc946eea91d18b89133cef65856d` |
 | `AMENDMENT_02_COORDINATOR_CLEANUP.md` | 11,075 | `7c7342b629337c5da49a9bfed0b79ac228337246c368d22f107efd488f3a1794` |
-| `AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md` | 9,436 | `57afb70a96ff09cd7721fea30c6f7a0389f7b53ebc35c5c4589816d7aefcba1e` |
+| `AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md` | 10,493 | `5f31a1eb357cdc5f5b1a4b8eb7426fef89dbdeae17009116d5a49d25a8a7abae` |
 | `MASKING_AND_LIMITATIONS.md` | 9,691 | `e4b995e9be861c9a2c7f47eeb920b5565a359729d3a52e7407d8471d86e29c9c` |
 | `PREPARATION_ACCOUNTING.md` | 7,904 | `81df2f5124dcb12c7fb593a97274ed9b94a6c1dde3bc5e55d94de5cb9c0ca47d` |
 | `PRIVATE_RECOVERY.md` | 4,496 | `02f3be3f809d3eecb45d2ae638e3ed30559a008593b47b7d20f0bcb015e3284d` |
@@ -54,10 +55,10 @@ sha256 of every published file and release asset.
 | `relB/release_snapshot_after_taskB.json` | 4,817 | `266554f8e070a1c5e7b924657ca35f18afd6dc58ab7c1be6d3c1cf47375ca18f` |
 | `relB/taskA_unchanged_check.json` | 1,255 | `001d03a829fb940f416f8877f405800ad3bf317955850ebb9f6290c84d636631` |
 | `relB/taskB_integrity.json` | 403 | `cf62351ddbd881cbaf24d4d93abde415f20bdfd880a936da73feada050b715b8` |
-| `relB/taskB_public_audit.json` | 1,390 | `251793d5415302306b798912d3907b66113bee4ed3cca1d467831da08155b7ff` |
-| `relB/taskB_published_verification.json` | 1,598 | `521a76924cad5330320fe317fe774564811ba10eccf9540b4222b9778535f498` |
+| `relB/taskB_public_audit.json` | 1,421 | `69f977646c8645a90863e352ff5c747e0b0ba5b0e66bdd11973456747242cda2` |
+| `relB/taskB_published_verification.json` | 1,630 | `80fd747c69820edbeb989460d6c0ba48d845933abdacf0360bf7946e881dc3e2` |
 | `relB/taskB_release_clock.json` | 400 | `0e208dcbea0e228d7306b2ba3c490ba6ba959fdaa0a0db998b0eb20b410711df` |
-| `scripts/audit_taskB.py` | 6,909 | `3ea46972fcfc8b703f9378934b71a1b2bb41c6a9cb1a72c64e7e03c0eb529e98` |
+| `scripts/audit_taskB.py` | 7,466 | `f4b06defb7391a52f5d8c498691cfe6d92eca04886013e7a2ebf4395cd63041a` |
 | `scripts/browser_qa.py` | 14,084 | `5df4edc4efe6f3f95d3da840ec4017239635ef47b1eabfb1151855daf90ba742` |
 | `scripts/build_publish.py` | 8,599 | `4c4f5af4bbe722a9f15d72c31f2ae491e43d20f03ab9fee55c7c73cb6d216cfa` |
 | `scripts/build_publish_taskB.py` | 5,192 | `39530ec600967193cb869d5454df3097c4776da465f5835ff0ba5699acc44472` |
@@ -76,7 +77,7 @@ sha256 of every published file and release asset.
 | `scripts/validate_export.py` | 14,951 | `78ab8ea4b2a9b5a001abf5a9b35c154e12b2610d9d47bb4895c7885350ed55ae` |
 | `scripts/verify_published.py` | 7,436 | `2ac7133183992fa65e96fecad9a306fbe0ae95d45f82477b5b17f7bf6c205921` |
 | `scripts/verify_source.py` | 5,606 | `3ee104e99b598c147c7969f17f9d07c758b6f31524fa3d4fcd6d4b5401c1f507` |
-| `scripts/verify_taskB_published.py` | 6,505 | `6a359017bb1adcca698e1e654b5c186d695645470b703c4cb4cb985617704318` |
+| `scripts/verify_taskB_published.py` | 6,871 | `00f695406ad90c1abdd8ab4af1a9f3fa6c901a15508a304f28d6b3eecdd115a0` |
 | `verify/masking_audit.json` | 2,003 | `63ad2ec141a2010788b9e88e3987f61eb3368a0bb94538f7eab77fcfde282137` |
 | `verify/private_backup.json` | 995 | `744dfbcf9c98802a54d8a373c69d4cf4945e0e8eaf4823e93aa77db8a74baed9` |
 | `verify/published_verification_patch01.json` | 1,784 | `85aaea1e8369b68f6c9b7c6c933a56357ba4a44def92136308bc17d2c37778b8` |
@@ -84,7 +85,7 @@ sha256 of every published file and release asset.
 | `verify/taskA_completeness_summary.json` | 748 | `e3b7c43497e9165ddaf0197eeb7375ffe744bdef0a7e14156e9c74992c6ebda1` |
 | `verify/taskB_completeness_summary.json` | 601 | `c2c7a869d7ee0b1e951b4d993f66af021f33a2d71f80f8053de787d6e5fb7050` |
 
-**65 repository files, 489,176 bytes** (manifest and evidence index excluded).
+**65 repository files, 491,219 bytes** (manifest and evidence index excluded).
 
 > Public integrity hashes are not secret and may facilitate reverse
 > identification. See `MASKING_AND_LIMITATIONS.md` §3. Task B additionally

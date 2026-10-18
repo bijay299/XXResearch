@@ -23,8 +23,20 @@ SRCMAN = "/data/bijaypandey/cuig_pilot/modern_object_assets_v1/manifests"
 ZPATH = os.path.join(ROOT, "publishB", "teapot-human-review-v1-taskB.zip")
 PREVIEWS = os.path.join(ROOT, "publishB", "preview_assets")
 
-# The locked-A roster is private. Aliases must never appear in public artifacts.
-ROSTER = ["los", "Shree"]
+def _private_roster():
+    """Load the locked-A roster from the PRIVATE coordination record.
+
+    The roster must never appear as a literal in published code. If the private
+    record is absent (e.g. someone re-running this from the public repo), the
+    alias scan is skipped and reported as such rather than silently passing.
+    """
+    p = os.path.join(ROOT, "private", "taskA_closure_private.json")
+    if not os.path.isfile(p):
+        return None
+    try:
+        return [r["alias"] for r in json.load(open(p))["roster"]]
+    except Exception:
+        return None
 
 PATTERNS = [
     ("source filename", re.compile(r"CASE-\d{2}_(m0|edited)_seed\d+\.png")),
@@ -59,6 +71,7 @@ def main():
     prompts = [c["prompt"] for c in
                json.load(open(os.path.join(SRCMAN, "CASES.json")))["cases"]]
     salt_hex = open(os.path.join(ROOT, "private", "salt.bin"), "rb").read().hex()
+    roster = _private_roster()
 
     rep = {"zip": ZPATH, "findings": [], "previews": {}, "docs": {}}
     hits = []
@@ -92,7 +105,7 @@ def main():
                     hits.append({"member": n, "kind": "verbatim case prompt"})
             if salt_hex in txt:
                 hits.append({"member": n, "kind": "SALT"})
-            for a in ROSTER:
+            for a in (roster or []):
                 if re.search(r"\b" + re.escape(a) + r"\b", txt):
                     hits.append({"member": n, "kind": "reviewer alias"})
             if re.search(r'"_fixture"|SYNTHETIC QA FIXTURE', txt):
@@ -124,6 +137,7 @@ def main():
     rep["previews"] = {"staged": sorted(pv), "identities": pv,
                        "disallowed": sorted(set(pv) - allowed)}
 
+    rep["alias_scan_performed"] = roster is not None
     rep["findings"] = hits
     rep["clean"] = (not hits
                     and rep["zip_inventory"]["pair_ids_contiguous"]
