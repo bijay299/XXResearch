@@ -94,7 +94,7 @@ def main():
 
     targets = []
     pubdir = os.path.join(ROOT, "publish", "results_tree")
-    zpath = os.path.join(ROOT, "publish", "teapot-human-review-v1-taskA.zip")
+    zpath = os.path.join(ROOT, "publish", "teapot-human-review-v1-taskA-patch01.zip")
 
     if os.path.isdir(pubdir):
         for dp, _, fns in os.walk(pubdir):
@@ -152,6 +152,12 @@ def main():
                     if len(pr) >= 15 and pr.lower() in txt.lower():
                         zhits.append({"member": n, "kind": "verbatim case prompt",
                                       "match": pr[:60]})
+                # no synthetic test export may ship inside the reviewer bundle
+                if re.search(r'"_fixture"|SYNTHETIC QA FIXTURE', txt):
+                    zhits.append({"member": n, "kind": "synthetic test export"})
+                # nor any completed response set
+                if '"responses"' in txt and '"export_kind"' in txt:
+                    zhits.append({"member": n, "kind": "completed export in bundle"})
                 if re.search(r'B-\d{2}_(reference|candidate)', txt):
                     zhits.append({"member": n, "kind": "Task-B association"})
             zip_report["content_leaks"] = zhits

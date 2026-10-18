@@ -79,20 +79,28 @@ You'll be asked for:
   real name.** Use the same alias if you come back later.
 * **A presentation order** — the default derives an order from your alias. Any
   option is fine.
-* **Three required declarations** about whether you had previously seen the
-  source pairings or condition labels for these images, and whether anyone gave
-  you image-specific guidance.
+* **Three required declarations** about whether, **before starting this Task A
+  review** (including earlier the same day), you had seen the source pairings or
+  condition labels for these images, or anyone gave you image-specific guidance.
 
-Please answer the declarations honestly. **Answering "yes" does not disqualify
-you** — it is recorded so your responses can be described accurately. General
-familiarity with image-generation research is completely fine and is not a
-problem; there's an optional box to mention it.
+Please answer the declarations honestly.
+
+> **You may still participate if you answer yes.** Certain prior exposure can
+> make your return ineligible for the primary independent-review analysis; it
+> will be retained with its exposure status.
+
+General research context alone is completely fine and is **not** excluding;
+there's an optional box to mention it.
 
 ## Saving, resuming and sending your answers
 
 * Progress saves in your browser automatically, and there's a **Save** button.
 * To stop and come back: just reopen `index.html` and enter the **same alias** —
   you'll be offered **Resume**.
+* **Moving to another computer or browser?** Export a draft first, then on the
+  new machine open `index.html` and use **"Continue from an exported file"** on
+  the first screen. That restores *that file's own* alias, declarations, order
+  and answers — you do not need to fill in the form first.
 * Under **Finish & export**:
   * **Export draft** at any time to back up partial work (you can re-import a
     draft later).
@@ -112,4 +120,5 @@ being looked for.
 ---
 
 *Package `THR-V1-A` · protocol `TEAPOT-HR-PROTO-1.0.0` · schema
-`THR-EXPORT-SCHEMA-1.0.0` · 40 images · offline, no network.*
+`THR-EXPORT-SCHEMA-1.1.0` · app 1.1.0 (patch01) · 40 images · offline, no
+network.*

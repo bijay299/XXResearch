@@ -13,9 +13,9 @@ import zipfile
 
 ROOT = "/data/bijaypandey/cuig_pilot/teapot_human_review_v1"
 OUT = os.path.join(ROOT, "publish", "results_tree")
-ZIPNAME = "teapot-human-review-v1-taskA.zip"
+ZIPNAME = "teapot-human-review-v1-taskA-patch01.zip"
 ZPATH = os.path.join(ROOT, "publish", ZIPNAME)
-ZROOT = "teapot-human-review-v1-taskA"
+ZROOT = "teapot-human-review-v1-taskA-patch01"
 
 
 def sha256_file(p, chunk=1 << 22):
@@ -69,7 +69,7 @@ def main():
                    "Your answers stay in your browser until you export a file.\n\n"
                    "See INSTRUCTIONS.md for what to do.\n\n"
                    "package THR-V1-A | protocol TEAPOT-HR-PROTO-1.0.0 | "
-                   "schema THR-EXPORT-SCHEMA-1.0.0 | 40 images\n").encode(),
+                   "schema THR-EXPORT-SCHEMA-1.1.0 | app 1.1.0 patch01 | 40 images\n").encode(),
             f"{ZROOT}/README.txt")
 
     zsha, zbytes = sha256_file(ZPATH), os.path.getsize(ZPATH)
@@ -83,7 +83,8 @@ def main():
     # hand-written top-level documents live in docs/ so that rebuilding the
     # generated tree cannot destroy them
     for f in ("README.md", "MASKING_AND_LIMITATIONS.md",
-              "PREPARATION_ACCOUNTING.md", "PRIVATE_RECOVERY.md"):
+              "PREPARATION_ACCOUNTING.md", "PRIVATE_RECOVERY.md",
+              "AMENDMENT_01_TASKA_PATCH01.md"):
         cp(os.path.join(ROOT, "docs", f), f)
     for f in ("PROTOCOL.md", "SCHEMA.md", "INSTRUCTIONS_TASK_A.md",
               "taskA_items.json", "COMMITMENTS.json"):
@@ -91,12 +92,14 @@ def main():
     for f in ("validate_export.py", "verify_source.py", "build_taskA.py",
               "build_taskB.py", "private_backup.py",
               "masking_audit.py", "browser_qa.py", "make_fixtures_and_qa.py",
-              "build_publish.py", "freeze_ids.py"):
+              "build_publish.py", "freeze_ids.py", "qa_patch01.py",
+              "verify_published.py"):
         p = os.path.join(ROOT, "scripts", f)
         if os.path.isfile(p):
             cp(p, f"scripts/{f}")
     cp(os.path.join(ROOT, "ledger", "prep_ledger.py"), "scripts/prep_ledger.py")
-    for f in ("validator_qa_report.json", "browser_qa_report.json"):
+    for f in ("validator_qa_report.json", "browser_qa_report.json",
+              "qa_patch01_report.json"):
         cp(os.path.join(ROOT, "qa", f), f"qa/{f}")
     cp(os.path.join(ROOT, "verify", "taskB_completeness_summary.json"),
        "verify/taskB_completeness_summary.json")
@@ -140,6 +143,9 @@ def main():
     # the Task-A ZIP is a release asset, not a Git file; record its identity
     json.dump({
         "release_asset": ZIPNAME,
+        "supersedes": "teapot-human-review-v1-taskA.zip (original, preserved)",
+        "app_version": "1.1.0",
+        "schema_id": "THR-EXPORT-SCHEMA-1.1.0",
         "bytes": zbytes, "sha256": zsha,
         "zip_root": ZROOT,
         "n_members": 40 + len(files) + 2,

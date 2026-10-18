@@ -1,10 +1,17 @@
-# EXPORT SCHEMA — `THR-EXPORT-SCHEMA-1.0.0`
+# EXPORT SCHEMA — `THR-EXPORT-SCHEMA-1.1.0`
 
 Reviewer exports are plain JSON files produced entirely in the browser. Nothing
 is uploaded; the reviewer saves a file and sends it however they choose.
 
 The reference implementation of the checks below is
-[`scripts/validate_export.py`](../scripts/validate_export.py).
+[`scripts/validate_export.py`](../scripts/validate_export.py). It contains **no
+absolute host path**: it discovers the trusted item list relative to itself or
+the working directory, or takes `--items PATH`. From this results directory:
+
+```bash
+python3 scripts/validate_export.py EXPORT.json --expect-stage A \
+        --items protocol/taskA_items.json
+```
 
 ## Common envelope
 
@@ -12,7 +19,8 @@ The reference implementation of the checks below is
 |---|---|---|
 | `package_id` | string | `THR-V1-A` (stage A) or `THR-V1-B` (stage B) |
 | `protocol_id` | string | `TEAPOT-HR-PROTO-1.0.0` |
-| `schema_id` | string | `THR-EXPORT-SCHEMA-1.0.0` |
+| `schema_id` | string | `THR-EXPORT-SCHEMA-1.1.0` (`1.0.0` is legacy: **rejected, not migrated**) |
+| `app_version` | string | bundle app version, e.g. `1.1.0` |
 | `stage` | `"A"` \| `"B"` | |
 | `export_kind` | `"draft"` \| `"final"` | |
 | `reviewer_alias` | string | non-empty; a self-chosen label, **not** an identity |
@@ -87,14 +95,50 @@ applies no automated scoring, and **cannot establish that two files came from
 two distinct independent humans**. Independence is a procedural claim about
 people, not a property the schema can check.
 
+## Import policy (viewer) — restore, never merge
+
+An accepted import **restores a validated snapshot of its own session**. It is
+never merged into whatever session happens to be open.
+
+1. **Validate the whole file first.** Trusted package / protocol / schema /
+   stage, supported `export_kind`, a usable alias, a valid `order_variant`, all
+   declarations present and explicitly boolean, correct types for optional
+   reasons and notes and for any supplied completion block, expected item IDs
+   with no duplicates or unknowns, and valid enums. Finals additionally require
+   all 40 items fully answered. **Nothing is touched until every check passes.**
+2. **Reconstruct the order from trusted data** — the bundle's own item list plus
+   the alias. An imported file's ordering is never trusted.
+3. **Recompute completion** from valid choices; a supplied count is only
+   type-checked, never believed.
+4. **Restore under the file's own alias**, keeping its declarations, order and
+   raw answers. If a stored session for that alias already holds answers, the
+   reviewer is asked to confirm the replacement. Any other alias's session is
+   left untouched.
+5. **A rejected import changes nothing** — not the in-memory session, not
+   `localStorage`. The reason is shown.
+
+### Supported workflow for a new computer or browser
+
+Export a draft (or final) on the first machine → open `index.html` on the second
+→ use **"Continue from an exported file"** on the first screen → the session is
+restored with its **original** alias, declarations, presentation order and
+answers. No form needs to be filled in first, and no provenance is rewritten.
+
+**Unsupported legacy exports (`THR-EXPORT-SCHEMA-1.0.0`) are rejected with a
+clear message and are not silently migrated.** No real reviewer return exists to
+migrate — none has ever been collected.
+
 ## Mechanical QA
 
-18 synthetic fixtures exercise the rules above (valid final, all-`uncertain`
+18 synthetic fixtures exercise the original rules (valid final, all-`uncertain`
 final, partial draft, Task-B final, missing item, empty final, duplicate ID,
 extra ID, bad enum, missing answer, missing exposure key, non-boolean exposure,
 wrong package, wrong stage, wrong schema, partial B final, malformed JSON, and a
-duplicate-file cohort audit). All 18 pass; see
-[`qa/validator_qa_report.json`](../qa/validator_qa_report.json).
+duplicate-file cohort audit). All 18 pass; see [`qa/validator_qa_report.json`](../qa/validator_qa_report.json)
+(retained as historical evidence for schema `1.0.0`).
+
+The corrected bundle is covered by **150 focused browser checks across three
+engine configurations** — [`qa/qa_patch01_report.json`](../qa/qa_patch01_report.json).
 
 **Every fixture is explicitly synthetic and machine-generated.** Fixture choices
 come from a fixed rotation and encode no assessment of any image. No fixture is

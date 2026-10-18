@@ -76,12 +76,17 @@ The bundle runs **entirely offline**: no account, no network, no upload, no
 tracking. Progress is saved in the reviewer's own browser and leaves it only
 when they export a file.
 
-**Download:** `teapot-human-review-v1-taskA.zip` from the release
+**Download (corrected — use this one):**
+`teapot-human-review-v1-taskA-patch01.zip` from the release
+[`teapot-human-review-v1-taskA-patch01`](https://github.com/bijay299/XXResearch/releases/tag/teapot-human-review-v1-taskA-patch01)
+— 13,923,703 bytes, sha256
+`837770ae23e6b1fb56b7269a87e2a2bc23f40f6e2090e5e172ea57a8719ab7e7`,
+47 members, 40 PNGs. The archive build is deterministic.
+
+The original release
 [`teapot-human-review-v1-taskA`](https://github.com/bijay299/XXResearch/releases/tag/teapot-human-review-v1-taskA)
-— 13,919,126 bytes, sha256
-`e239f2d4d52ce75bd914a4c6073cb98da6c702b825f64f0394afbe9130a7f456`,
-47 members, 40 PNGs. The archive build is deterministic: rebuilding from the
-same inputs reproduces the same hash.
+(13,917,868 bytes, sha256 `45e3eb7a…`) is **preserved for the record**. It does
+**not** open in Chrome or Edge — do not send it to reviewers.
 
 UI preview: published as the release assets `preview_A1_instructions.png`,
 `preview_A2_item_view_synthetic.png`, `preview_A3_mobile_instructions.png` and
@@ -145,15 +150,20 @@ run, and no automated judge was introduced.**
   **recomputes completion rather than trusting any supplied count**.
 * **Mechanical QA:** 18/18 synthetic cases pass —
   [`qa/validator_qa_report.json`](qa/validator_qa_report.json).
-* **Real-browser QA:** **88/88 checks pass** across **three engine
+* **Real-browser QA (patch01):** **150/150 focused checks pass** across **three engine
   configurations** — Chromium (the Chrome engine), Firefox, and Firefox with a
   strict file-origin policy — loading the bundle from `file://` with every
-  non-`file://` request aborted — offline opening, navigation, zoom, save/resume,
-  alias/package/stage storage isolation, draft export + import round-trip,
-  complete Final round-trip accepted by the validator, Final correctly
-  unavailable while answers are missing, malformed and wrong-stage imports
-  rejected without crashing, and no horizontal overflow at 390 px.
-  [`qa/browser_qa_report.json`](qa/browser_qa_report.json).
+  non-`file://` request aborted. They assert **actual restored state** — alias,
+  declarations, order and raw answers — not just a success message: incomplete
+  draft export → fresh-browser import → reload/resume; complete 40-item Final
+  export → **fresh-session re-import** → reload/resume → companion-validator
+  acceptance; conflicting-provenance imports following the documented policy;
+  14 rejection cases each asserted to leave **memory and `localStorage`
+  unchanged**; uncertainty counting as complete; isolation, navigation, zoom and
+  mobile. [`qa/qa_patch01_report.json`](qa/qa_patch01_report.json).
+* **Historical reports retained:** the original 18-fixture validator report and
+  the original 30-check browser report are kept as evidence of what was run
+  before the repair.
 
 All fixtures are **explicitly synthetic**, generated from a fixed rotation. **No
 fixture is a human judgement and none may be used as reviewer evidence.** No
@@ -161,28 +171,42 @@ answer key or completed test response is present in any reviewer bundle. The
 public QA reports contain **mechanical results only** — no image-specific
 judgement.
 
-## Correction — bundle v2 (2026-10-18)
+## Amendment 01 — Task-A software repair (patch01)
 
-The **first published bundle did not open in Chrome or Edge.** It loaded its
-item list with `XMLHttpRequest` over `file://`, which every Chromium browser
-blocks by CORS policy ("Cross origin requests are only supported for protocol
-schemes: … http, https"), and which Firefox's file-origin policy can block too.
-Reviewers saw *"Could not load items.json"* instead of the task.
+Read **[`AMENDMENT_01_TASKA_PATCH01.md`](AMENDMENT_01_TASKA_PATCH01.md)**; it is
+authoritative on these points.
 
-**Fixed:** the item list now ships as `items.js` and is loaded with a plain
-`<script src="items.js">`, which is not subject to that restriction and works
-from `file://` in every browser. No `XMLHttpRequest` or `fetch` remains in
-either viewer. `items.json` is retained for reference and tooling.
+Five defects were found after the first publication and repaired:
 
-**Why QA missed it:** the browser suite ran **only Firefox**, which permits the
-request, so it reported every check green against a bundle that was broken for
-most reviewers. The suite now runs **Chromium, Firefox and strict-file-origin
-Firefox** on every check, and the fresh-download verification runs in Chromium —
-the engine that failed.
+1. **The bundle would not open in Chrome or Edge** (found by the user) — it
+   fetched its item list with `XMLHttpRequest` over `file://`, which Chromium
+   browsers block. Now loaded with a plain `<script src="items.js">`.
+2. **Import validation was far too weak** — it checked almost nothing and then
+   *merged* a file into whatever session was open, keeping that session's alias
+   and declarations. Imports are now fully validated first and **restore their
+   own session**; they are never merged into another alias.
+3. **`answered()` counted truthiness, not valid choices**, so a malformed file
+   could enable a Final export.
+4. **The Python validator had a hard-coded host path** and could not run from
+   the documented location.
+5. **A mis-stated QA claim** — a Final export plus Python validation was
+   described as a Final *re-import* test. It was not; that claim is withdrawn
+   and a genuine re-import test now exists.
 
-The replaced asset keeps the same tag and filename; its sha256 changed from
-`45e3eb7a…` to `e239f2d4…`. No image, ID, mapping, ordering or commitment
-changed — only the loader.
+Also corrected: the **ordering-provenance claims** (the fixed variants are
+pair-aware, not public-data-only), the **exposure wording** ("Before starting
+this Task A review", covering same-day exposure), and the **scope of the
+published commitments**.
+
+**Versioning:** export schema `THR-EXPORT-SCHEMA-1.0.0` → **`1.1.0`**, app
+**1.1.0 (patch01)**. Legacy `1.0.0` exports are **rejected, not migrated** — no
+reviewer return has ever been collected. Package and protocol IDs are unchanged;
+scientific definitions and reporting conventions are unchanged.
+
+**Nothing about the study material changed:** the 40 image bytes, neutral IDs,
+pairings, private mapping, `V1`/`V2`/`V3` permutations, alias-order algorithm and
+the published commitments are all **unchanged and verified identical** to the
+reviewed publication. `freeze_ids.py` was not re-run.
 
 ## Masking, privacy and limitations
 

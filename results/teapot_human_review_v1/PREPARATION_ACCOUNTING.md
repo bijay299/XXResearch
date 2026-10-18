@@ -10,7 +10,8 @@ helper: [`scripts/prep_ledger.py`](scripts/prep_ledger.py)
 |---|---|
 | Started | `2026-10-18T13:05:57−04:00` |
 | Deadline | `2026-10-20T13:05:57−04:00` (48 elapsed hours) |
-| Elapsed at publication | under 1 h |
+| Elapsed at first publication | under 1 h |
+| Elapsed after the patch01 repair | see ledger (same clock, not reset) |
 
 The clock was recorded **once**, at the first preparation action, and never
 reset.
@@ -107,6 +108,48 @@ completeness rather than as failures:
 CPU and browser work only. No allowance from any completed project was spent:
 this package has its own clock, its own ledger and its own limits, and the
 `modern_object_assets_v1` accounting is untouched.
+
+## Repair accounting (patch01) — appended, not rewritten
+
+The original clock was **not reset** and the original ledger entries were **not
+rewritten**. Repair work is appended.
+
+| | |
+|---|---|
+| GPU allocation / model loading / training / generation | **still 0** |
+| New model-generated images | **still 0** |
+| Images imported | **still 40** (the same files; none re-imported) |
+| Synthetic placeholder images | 1 (UI preview only) |
+| Browser engines exercised | 3 (Chromium, Firefox, strict-file-origin Firefox) |
+| Focused browser checks | **150 / 150 pass** |
+
+### Successful ledger steps vs unsuccessful setup attempts
+
+Distinguished deliberately, because the earlier report blurred them:
+
+**Unsuccessful setup / harness attempts (no research effect):**
+
+1. System Firefox is a snap and could not write a profile while `/` was full.
+2. The same standalone build needed `HOME` redirected to `/data`.
+3. First browser-QA run stopped on a collapsed `<details>` in the harness.
+4. First masking audit produced false positives on field names in code.
+5. **patch01:** the first run of the new suite reported 6 failures in the
+   provenance-conflict section. Investigation showed the **product was correct**
+   and the **test helper** was reading an arbitrary `localStorage` key instead of
+   the active session. The helper was fixed; no product change resulted.
+
+**Genuine defects found and repaired:** the five listed in Amendment 01 — the
+Chromium loader failure (found by the user), weak import validation, truthiness
+completion, the validator's hard-coded path, and a mis-stated QA claim.
+
+### Storage
+
+| | used | limit |
+|---|---|---|
+| Project directory | ~0.5 GiB | — |
+| Playwright browsers (Firefox + Chromium) | ~0.43 GiB | — |
+| **Total additional storage under `/data`** | **well under 1 GiB** | ≤ 10 GiB |
+| CPU/BLAS worker threads | capped at **8** | ≤ 8 |
 
 ## What was *not* done
 

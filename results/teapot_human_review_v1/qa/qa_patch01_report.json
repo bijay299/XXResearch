@@ -1,0 +1,927 @@
+{
+ "suite": "focused synthetic browser QA (patch01)",
+ "tested_artifact": "/data/bijaypandey/cuig_pilot/teapot_human_review_v1/taskA",
+ "artifact_label": "local build (pre-publication)",
+ "app_version": "1.1.0",
+ "schema_id": "THR-EXPORT-SCHEMA-1.1.0",
+ "browser_versions": {
+  "chromium": "156.0.8078.4",
+  "firefox": "157.0"
+ },
+ "engines": [
+  "chromium",
+  "firefox",
+  "firefox-strict-file-origin"
+ ],
+ "fixtures_are_synthetic": true,
+ "contains_human_judgements": false,
+ "contains_reviewer_evidence": false,
+ "scope_note": "Task-A only. These checks do NOT certify the private Task-B bundle, which was not browser-tested.",
+ "n_checks": 150,
+ "n_pass": 150,
+ "n_fail": 0,
+ "all_pass": true,
+ "network_requests_attempted": [],
+ "checks": [
+  {
+   "engine": "chromium",
+   "check": "bundle opens offline from file://",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "exposure wording covers same-day exposure",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "eligibility explanation shown",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "draft export is partial and marked draft",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "fresh session starts with empty storage",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "draft restored into a fresh browser without starting a session",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "restored alias equals the file's alias",
+   "pass": true,
+   "detail": "qa-draft"
+  },
+  {
+   "engine": "chromium",
+   "check": "restored declarations equal the file's declarations",
+   "pass": true,
+   "detail": "{'declared': True, 'other_exposure_note': 'synthetic note', 'prior_access_to_source_pairings': True, 'prior_access_to_condition_labels': False, 'image_specific_coaching_before_task_a': False}"
+  },
+  {
+   "engine": "chromium",
+   "check": "restored order variant equals the file's",
+   "pass": true,
+   "detail": "V2"
+  },
+  {
+   "engine": "chromium",
+   "check": "restored order equals the trusted reconstruction",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "restored raw answers equal the exported answers",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "resume offered after reload",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "resumed state still equals the imported state",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "Final disabled while answers are missing",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "Final enabled once all 40 are answered",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "final export has 40 complete answers",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "FINAL re-imported into a fresh session (not just validated)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "re-imported final: answers equal",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "re-imported final: metadata equal",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "re-imported final survives reload/resume",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "Final still enabled after re-import",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "companion validator accepts the browser final",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "engine": "chromium",
+   "check": "all-uncertain counts as complete and enables Final",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: wrong protocol (same package)",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong protocol: expected TEAPOT-HR-PROTO-1.0.0, found \"S' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: unsupported legacy schema",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Unsupported export version \"THR-EXPORT-SCHEMA-1.0.0\". Th' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: wrong package",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong package: expected THR-V1-A, found \"THR-V1-B\".' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: wrong stage",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong stage: this is Task A, the file says \"B\".' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: duplicate id",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Duplicate item ID A-001.' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: unknown id",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Unknown item ID \"A-999\".' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: invalid enum",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 A-003: invalid target \"definitely\".' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: wrong types (alias)",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 reviewer_alias is missing or empty.' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: missing declaration",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Declaration prior_access_to_source_pairings is missing.' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: non-boolean declaration",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Declaration prior_access_to_condition_labels must be tru' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: empty final",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 This is marked final but 40 of 40 images are not fully a' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: partial final",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 This is marked final but 1 of 40 images are not fully an' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: responses not a list",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 responses must be a list.' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "rejected without mutating state: malformed JSON",
+   "pass": true,
+   "detail": "msg='Rejected: the file is not valid JSON. Nothing was changed.' storage_changed=False"
+  },
+  {
+   "engine": "chromium",
+   "check": "viewer still usable after all rejections",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "import of another alias restores THAT alias, never merges",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "the original alias session is left intact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "imported answers are not reassigned to the active alias",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "navigation advances",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "navigation returns and keeps the answer",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "zoom enlarges beyond native",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "zoom reset returns to native 512",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "different alias starts clean (isolation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "storage namespaced by package::stage::alias",
+   "pass": true,
+   "detail": "['THR::THR-V1-A::A::iso-a', 'THR::THR-V1-A::A::iso-b']"
+  },
+  {
+   "engine": "chromium",
+   "check": "no horizontal overflow at 390px",
+   "pass": true,
+   "detail": "[390, 390]"
+  },
+  {
+   "engine": "chromium",
+   "check": "controls reachable on mobile",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "chromium",
+   "check": "no network requests attempted (all non-file:// aborted)",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "engine": "firefox",
+   "check": "bundle opens offline from file://",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "exposure wording covers same-day exposure",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "eligibility explanation shown",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "draft export is partial and marked draft",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "fresh session starts with empty storage",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "draft restored into a fresh browser without starting a session",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "restored alias equals the file's alias",
+   "pass": true,
+   "detail": "qa-draft"
+  },
+  {
+   "engine": "firefox",
+   "check": "restored declarations equal the file's declarations",
+   "pass": true,
+   "detail": "{'declared': True, 'other_exposure_note': 'synthetic note', 'prior_access_to_source_pairings': True, 'prior_access_to_condition_labels': False, 'image_specific_coaching_before_task_a': False}"
+  },
+  {
+   "engine": "firefox",
+   "check": "restored order variant equals the file's",
+   "pass": true,
+   "detail": "V2"
+  },
+  {
+   "engine": "firefox",
+   "check": "restored order equals the trusted reconstruction",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "restored raw answers equal the exported answers",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "resume offered after reload",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "resumed state still equals the imported state",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "Final disabled while answers are missing",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "Final enabled once all 40 are answered",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "final export has 40 complete answers",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "FINAL re-imported into a fresh session (not just validated)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "re-imported final: answers equal",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "re-imported final: metadata equal",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "re-imported final survives reload/resume",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "Final still enabled after re-import",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "companion validator accepts the browser final",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "engine": "firefox",
+   "check": "all-uncertain counts as complete and enables Final",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: wrong protocol (same package)",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong protocol: expected TEAPOT-HR-PROTO-1.0.0, found \"S' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: unsupported legacy schema",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Unsupported export version \"THR-EXPORT-SCHEMA-1.0.0\". Th' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: wrong package",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong package: expected THR-V1-A, found \"THR-V1-B\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: wrong stage",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong stage: this is Task A, the file says \"B\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: duplicate id",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Duplicate item ID A-001.' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: unknown id",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Unknown item ID \"A-999\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: invalid enum",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 A-003: invalid target \"definitely\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: wrong types (alias)",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 reviewer_alias is missing or empty.' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: missing declaration",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Declaration prior_access_to_source_pairings is missing.' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: non-boolean declaration",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Declaration prior_access_to_condition_labels must be tru' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: empty final",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 This is marked final but 40 of 40 images are not fully a' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: partial final",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 This is marked final but 1 of 40 images are not fully an' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: responses not a list",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 responses must be a list.' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "rejected without mutating state: malformed JSON",
+   "pass": true,
+   "detail": "msg='Rejected: the file is not valid JSON. Nothing was changed.' storage_changed=False"
+  },
+  {
+   "engine": "firefox",
+   "check": "viewer still usable after all rejections",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "import of another alias restores THAT alias, never merges",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "the original alias session is left intact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "imported answers are not reassigned to the active alias",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "navigation advances",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "navigation returns and keeps the answer",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "zoom enlarges beyond native",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "zoom reset returns to native 512",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "different alias starts clean (isolation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "storage namespaced by package::stage::alias",
+   "pass": true,
+   "detail": "['THR::THR-V1-A::A::iso-b', 'THR::THR-V1-A::A::iso-a']"
+  },
+  {
+   "engine": "firefox",
+   "check": "no horizontal overflow at 390px",
+   "pass": true,
+   "detail": "[390, 390]"
+  },
+  {
+   "engine": "firefox",
+   "check": "controls reachable on mobile",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox",
+   "check": "no network requests attempted (all non-file:// aborted)",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "bundle opens offline from file://",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "exposure wording covers same-day exposure",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "eligibility explanation shown",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "draft export is partial and marked draft",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "fresh session starts with empty storage",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "draft restored into a fresh browser without starting a session",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "restored alias equals the file's alias",
+   "pass": true,
+   "detail": "qa-draft"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "restored declarations equal the file's declarations",
+   "pass": true,
+   "detail": "{'declared': True, 'other_exposure_note': 'synthetic note', 'prior_access_to_source_pairings': True, 'prior_access_to_condition_labels': False, 'image_specific_coaching_before_task_a': False}"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "restored order variant equals the file's",
+   "pass": true,
+   "detail": "V2"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "restored order equals the trusted reconstruction",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "restored raw answers equal the exported answers",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "resume offered after reload",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "resumed state still equals the imported state",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "Final disabled while answers are missing",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "Final enabled once all 40 are answered",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "final export has 40 complete answers",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "FINAL re-imported into a fresh session (not just validated)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "re-imported final: answers equal",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "re-imported final: metadata equal",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "re-imported final survives reload/resume",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "Final still enabled after re-import",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "companion validator accepts the browser final",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "all-uncertain counts as complete and enables Final",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: wrong protocol (same package)",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong protocol: expected TEAPOT-HR-PROTO-1.0.0, found \"S' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: unsupported legacy schema",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Unsupported export version \"THR-EXPORT-SCHEMA-1.0.0\". Th' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: wrong package",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong package: expected THR-V1-A, found \"THR-V1-B\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: wrong stage",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Wrong stage: this is Task A, the file says \"B\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: duplicate id",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Duplicate item ID A-001.' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: unknown id",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Unknown item ID \"A-999\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: invalid enum",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 A-003: invalid target \"definitely\".' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: wrong types (alias)",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 reviewer_alias is missing or empty.' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: missing declaration",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Declaration prior_access_to_source_pairings is missing.' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: non-boolean declaration",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 Declaration prior_access_to_condition_labels must be tru' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: empty final",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 This is marked final but 40 of 40 images are not fully a' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: partial final",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 This is marked final but 1 of 40 images are not fully an' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: responses not a list",
+   "pass": true,
+   "detail": "msg='Rejected \u2014 nothing was changed.\\n\u2022 responses must be a list.' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "rejected without mutating state: malformed JSON",
+   "pass": true,
+   "detail": "msg='Rejected: the file is not valid JSON. Nothing was changed.' storage_changed=False"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "viewer still usable after all rejections",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "import of another alias restores THAT alias, never merges",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "the original alias session is left intact",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "imported answers are not reassigned to the active alias",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "navigation advances",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "navigation returns and keeps the answer",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "zoom enlarges beyond native",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "zoom reset returns to native 512",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "different alias starts clean (isolation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "storage namespaced by package::stage::alias",
+   "pass": true,
+   "detail": "['THR::THR-V1-A::A::iso-b', 'THR::THR-V1-A::A::iso-a']"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "no horizontal overflow at 390px",
+   "pass": true,
+   "detail": "[390, 390]"
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "controls reachable on mobile",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "engine": "firefox-strict-file-origin",
+   "check": "no network requests attempted (all non-file:// aborted)",
+   "pass": true,
+   "detail": "[]"
+  }
+ ]
+}

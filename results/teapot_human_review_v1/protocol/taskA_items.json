@@ -1,7 +1,7 @@
 {
  "package_id": "THR-V1-A",
  "protocol_id": "TEAPOT-HR-PROTO-1.0.0",
- "schema_id": "THR-EXPORT-SCHEMA-1.0.0",
+ "schema_id": "THR-EXPORT-SCHEMA-1.1.0",
  "stage": "A",
  "frozen_iso": "2026-10-18T13:09:00.335661-04:00",
  "n_items": 40,
@@ -178,7 +178,18 @@
  "min_pair_separation": 4,
  "alias_shuffle": {
   "enabled": true,
-  "rule": "order = stable sort of item_ids by sha256(alias + '|' + package_id + '|' + item_id); depends only on the reviewer alias and the public item IDs, and is independent of the arm mapping."
+  "rule": "order = stable sort of item_ids by sha256(alias + '|' + package_id + '|' + item_id); depends only on the reviewer alias and the public item IDs, and is independent of the arm mapping.",
+  "pairing_independent": true,
+  "guaranteed_min_separation": null
  },
- "note": "These IDs and orderings carry no condition, pairing or seed information. The association is held privately."
+ "note": "Item IDs carry no condition, pairing or seed information. The association is held privately. The fixed order variants were built with private pair membership to space pairs apart; see order_variant_provenance.",
+ "app_version": "1.1.0",
+ "bundle_build": "patch01",
+ "schema_history": {
+  "THR-EXPORT-SCHEMA-1.0.0": "superseded by patch01; legacy exports are rejected, not migrated"
+ },
+ "order_variant_provenance": {
+  "V1_V2_V3": "Constructed using PRIVATE pair membership to enforce at least four positions of separation between the two members of a pair. They are PAIR-AWARE: they are not computed from public IDs and alias alone and are not independent of pairing. They do not use which member is M0 versus edited; the spacing rule reveals negative pairing constraints (which items are NOT paired at close range), not the full key.",
+  "ALIAS": "Derived from the alias and the public item IDs only. Pairing-independent, with NO guaranteed minimum separation."
+ }
 }

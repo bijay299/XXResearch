@@ -25,8 +25,23 @@ and no such claim is made.**
 * In all three fixed order variants, the two members of a pair are kept **at
   least 4 positions apart**, so a pair is never shown back to back.
 * Task A shows **one image at a time**; there is no counterpart view.
-* Orderings depend only on the public IDs and the reviewer alias — never on the
-  arm mapping.
+
+### Ordering provenance — corrected
+
+An earlier version of this document said all orderings were computed from the
+public IDs and alias alone and were independent of the arm mapping. **That was
+wrong for the fixed variants**, and is corrected here:
+
+* **`V1`/`V2`/`V3` are pair-aware.** They were constructed **using private pair
+  membership** to enforce the four-position separation. They are **not**
+  derivable from public data alone and are **not** independent of pairing.
+  They do **not** use which member is M0 versus edited. The spacing rule
+  encodes **negative pairing constraints** — it tells you which items are *not*
+  each other's partner at close range — not the pairing key itself.
+* **The alias-derived shuffle is pairing-independent** (alias + public IDs
+  only) and has **no guaranteed minimum separation**; a pair can land adjacent.
+
+The permutations themselves were not regenerated and remain exactly as frozen.
 
 ## 3. Public integrity hashes — a deliberate, disclosed trade-off
 
@@ -139,9 +154,18 @@ told which model produced which image.
 * **The validator counts files, not people.** Identical content and repeated
   aliases are flagged precisely because they are **not** evidence of a second
   independent reviewer.
-* **Commitments prove existence and non-alteration, not privacy.** A salted
-  commitment shows the committed material existed at freeze time and has not
-  changed. It does not make the underlying images or their provenance private.
+* **Commitments prove existence and non-alteration, not privacy, and they do
+  not cover everything.** The published HMACs cover the **populated Task-A and
+  Task-B mappings, the order variants and the item-ID list** — they do **not**
+  cover every byte of the private Task-B package (its images, viewer files or
+  layout are not committed). A commitment shows the committed material has not
+  changed since it was written; it does not make the underlying images or their
+  provenance private.
+* **A future opening should be anchored to public publication, not to a
+  self-declared timestamp.** The commitments were published in this repository
+  at a commit anyone can see; that public publication is what a later reveal can
+  be checked against. The `frozen_iso` field inside the artifacts is
+  self-declared and is **not** independently proven.
 * **20 paired cases are not 40 independent comparisons**, and three reviewers
   judging the same images do not produce 120 independent observations.
 * **No outcome of any kind is reported here**, because none exists.

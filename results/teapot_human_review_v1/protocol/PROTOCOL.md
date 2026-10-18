@@ -8,7 +8,7 @@ from the completed `modern_object_assets_v1` asset build.
 | Protocol ID | `TEAPOT-HR-PROTO-1.0.0` |
 | Task-A package ID | `THR-V1-A` (public) |
 | Task-B package ID | `THR-V1-B` (**private**, not released) |
-| Export schema ID | `THR-EXPORT-SCHEMA-1.0.0` |
+| Export schema ID | `THR-EXPORT-SCHEMA-1.1.0` (app 1.1.0, patch01; `1.0.0` is legacy and rejected) |
 | Preparation clock started | `2026-10-18T13:05:57−04:00` |
 | IDs / orderings / commitments frozen | `2026-10-18T13:09:00−04:00` |
 | Preparation deadline | `2026-10-20T13:05:57−04:00` (48 h) |
@@ -171,9 +171,21 @@ text-only**; no actual case is coached, no AI-produced answer is shown, and no
 earlier practice images are reused.
 
 **Ordering.** Three fixed variants (`V1`/`V2`/`V3`) plus a reproducible
-alias-derived shuffle. All orderings are computed from the public neutral IDs
-and the alias only, and are **independent of the arm mapping**. The two members
-of a pair are kept at least 4 positions apart in every fixed variant.
+alias-derived shuffle.
+
+* **`V1`/`V2`/`V3` are pair-aware.** They were constructed **using private pair
+  membership** in order to enforce at least four positions of separation between
+  the two members of a pair. They are therefore **not** computed from the public
+  IDs and alias alone, and **not** independent of pairing. They do **not**
+  explicitly use which member is M0 and which is edited; the spacing rule
+  reveals **negative pairing constraints** (which items are *not* paired at close
+  range), not the full key.
+* **The alias-derived shuffle is pairing-independent** — it uses only the alias
+  and the public item IDs — and carries **no guaranteed minimum separation**
+  between the members of a pair.
+
+The permutations themselves are unchanged from the original freeze and remain
+covered by the published commitments.
 
 ## 6. Task B (private) — 20 matched comparisons
 

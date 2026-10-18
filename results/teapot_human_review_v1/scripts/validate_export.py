@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validator for THR-EXPORT-SCHEMA-1.0.0 reviewer exports.
+"""Validator for THR-EXPORT-SCHEMA-1.1.0 reviewer exports.
 
 Enforces the trusted package / protocol / schema / stage / ID sets by default.
 Recomputes completion from the raw choices and never trusts a supplied
@@ -19,10 +19,26 @@ import json
 import os
 import sys
 
-ROOT = "/data/bijaypandey/cuig_pilot/teapot_human_review_v1"
-
 PROTOCOL_ID = "TEAPOT-HR-PROTO-1.0.0"
-SCHEMA_ID = "THR-EXPORT-SCHEMA-1.0.0"
+SCHEMA_ID = "THR-EXPORT-SCHEMA-1.1.0"
+LEGACY_SCHEMAS = {"THR-EXPORT-SCHEMA-1.0.0"}
+APP_VERSION = "1.1.0"
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+
+# Candidate locations for the trusted Task-A item list, searched in order.
+# No absolute host path is baked in: the published command works from the
+# results directory, from inside an extracted reviewer bundle, or with an
+# explicit --items argument.
+_ITEM_CANDIDATES = [
+    os.path.join(_HERE, os.pardir, "protocol", "taskA_items.json"),
+    os.path.join(_HERE, "taskA_items.json"),
+    os.path.join(os.getcwd(), "protocol", "taskA_items.json"),
+    os.path.join(os.getcwd(), "taskA_items.json"),
+    os.path.join(os.getcwd(), "items.json"),
+    os.path.join(_HERE, os.pardir, "items.json"),
+]
+_ITEMS_OVERRIDE = None
 PACKAGES = {"A": "THR-V1-A", "B": "THR-V1-B"}
 
 TARGET_ENUM = {"present", "absent", "uncertain"}
@@ -39,13 +55,31 @@ B_EXPOSURE_KEYS = ["task_a_final_exported_before_task_b",
                    "image_specific_coaching_before_task_a"]
 
 
+def _find_items():
+    if _ITEMS_OVERRIDE:
+        return _ITEMS_OVERRIDE
+    for c in _ITEM_CANDIDATES:
+        c = os.path.normpath(c)
+        if os.path.isfile(c):
+            try:
+                if "item_ids" in json.load(open(c)):
+                    return c
+            except Exception:
+                continue
+    return None
+
+
 def expected_ids(stage):
+    """Trusted expected ID set.
+
+    Stage A is read from the bundle's own item list. Stage B falls back to the
+    canonical B-01..B-20 names: the private Task-B package is deliberately NOT
+    required to be present for this validator to run."""
     if stage == "A":
-        p = os.path.join(ROOT, "protocol", "taskA_items.json")
-        return list(json.load(open(p))["item_ids"])
-    p = os.path.join(ROOT, "private", "taskB_package", "items.json")
-    if os.path.isfile(p):
-        return list(json.load(open(p))["item_ids"])
+        p = _find_items()
+        if p:
+            return list(json.load(open(p))["item_ids"])
+        return [f"A-{i:03d}" for i in range(1, 41)]
     return [f"B-{i:02d}" for i in range(1, 21)]
 
 
@@ -85,13 +119,29 @@ def validate(path, expect_stage=None):
             f"untrusted package_id {d.get('package_id')!r}; expected {PACKAGES[stage]!r}")
     if d.get("protocol_id") != PROTOCOL_ID:
         res["errors"].append(f"untrusted protocol_id {d.get('protocol_id')!r}")
-    if d.get("schema_id") != SCHEMA_ID:
-        res["errors"].append(f"untrusted schema_id {d.get('schema_id')!r}")
+    sid = d.get("schema_id")
+    if sid in LEGACY_SCHEMAS:
+        res["errors"].append(
+            f"unsupported legacy export version {sid!r}; this validator reads "
+            f"{SCHEMA_ID} only and does not migrate older files")
+    elif sid != SCHEMA_ID:
+        res["errors"].append(f"untrusted schema_id {sid!r}")
     kind = d.get("export_kind")
     if kind not in KIND_ENUM:
         res["errors"].append(f"export_kind must be draft|final, got {kind!r}")
     if not isinstance(d.get("reviewer_alias"), str) or not d["reviewer_alias"].strip():
         res["errors"].append("reviewer_alias missing or empty")
+    ov = d.get("order_variant")
+    if not isinstance(ov, str) or ov not in {"V1", "V2", "V3", "ALIAS"}:
+        res["errors"].append(f"order_variant must be V1|V2|V3|ALIAS, got {ov!r}")
+    if "item_count_expected" in d and not isinstance(d["item_count_expected"], int):
+        res["errors"].append("item_count_expected must be an integer if present")
+    comp = d.get("completion")
+    if comp is not None and not isinstance(comp, dict):
+        res["errors"].append("completion must be an object if present")
+    elif isinstance(comp, dict) and "answered_items" in comp \
+            and not isinstance(comp["answered_items"], int):
+        res["errors"].append("completion.answered_items must be an integer if present")
 
     # ---- exposure declarations must be explicit ----
     exp = d.get("exposure")
@@ -106,6 +156,9 @@ def validate(path, expect_stage=None):
                 res["errors"].append(f"exposure.{k} missing")
             elif not isinstance(exp[k], bool):
                 res["errors"].append(f"exposure.{k} must be an explicit boolean")
+        if "other_exposure_note" in exp and not isinstance(
+                exp["other_exposure_note"], str):
+            res["errors"].append("exposure.other_exposure_note must be a string")
         res["exposure"] = {k: exp.get(k) for k in keys}
         res["exposure_other_note_present"] = bool((exp.get("other_exposure_note") or "").strip())
 
@@ -222,7 +275,12 @@ def main():
     ap.add_argument("--expect-stage", choices=["A", "B"])
     ap.add_argument("--cohort", action="store_true")
     ap.add_argument("--json")
+    ap.add_argument("--items", help="path to the trusted taskA_items.json "
+                                    "(otherwise auto-discovered)")
     a = ap.parse_args()
+    global _ITEMS_OVERRIDE
+    if a.items:
+        _ITEMS_OVERRIDE = a.items
 
     if a.cohort:
         rep = cohort(a.files)
