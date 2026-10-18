@@ -138,6 +138,13 @@ Distinguished deliberately, because the earlier report blurred them:
    and the **test helper** was reading an arbitrary `localStorage` key instead of
    the active session. The helper was fixed; no product change resulted.
 
+**Two mistakes of my own, both remediated and disclosed:** the original release
+asset was overwritten (reconstructed byte-for-byte and restored, verified by
+re-download), and two mapping-disclosing preview screenshots were briefly
+published on the patch01 release (removed; QA now writes them to the private
+area, the publisher uses an explicit allowlist, and the audit now covers staged
+previews and live release assets).
+
 **Genuine defects found and repaired:** the five listed in Amendment 01 — the
 Chromium loader failure (found by the user), weak import validation, truthiness
 completion, the validator's hard-coded path, and a mis-stated QA claim.

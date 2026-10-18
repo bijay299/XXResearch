@@ -182,13 +182,51 @@ def main():
             except OSError:
                 pass
 
+    # ---- staged preview assets + the LIVE release asset list ----
+    # A previous run published two item-view screenshots that each showed a
+    # real research image beside its neutral ID. The audit used to look only at
+    # the results tree and the ZIP, so it could not see them. It now checks the
+    # staged preview directory and what is actually live on each release.
+    ALLOWED_PREVIEWS = {
+        "preview_A1_instructions.png", "preview_A3_mobile_instructions.png",
+        "preview_A2_item_view_synthetic.png", "preview_A4_mobile_item_synthetic.png",
+    }
+    preview_report = {}
+    stage_dir = os.path.join(ROOT, "publish", "preview_assets")
+    if os.path.isdir(stage_dir):
+        staged = sorted(os.listdir(stage_dir))
+        preview_report["staged"] = staged
+        preview_report["staged_disallowed"] = sorted(set(staged) - ALLOWED_PREVIEWS)
+    live = {}
+    try:
+        import urllib.request
+        for tag in ("teapot-human-review-v1-taskA",
+                    "teapot-human-review-v1-taskA-patch01"):
+            rq = urllib.request.Request(
+                f"https://api.github.com/repos/bijay299/XXResearch/releases/tags/{tag}",
+                headers={"User-Agent": "thr-audit",
+                         "Accept": "application/vnd.github+json"})
+            rel = json.loads(urllib.request.urlopen(rq, timeout=60).read())
+            names = sorted(a["name"] for a in rel["assets"])
+            bad_live = [n for n in names
+                        if n.endswith(".png") and n not in ALLOWED_PREVIEWS]
+            live[tag] = {"assets": names, "disallowed_preview_assets": bad_live}
+    except Exception as e:
+        live["error"] = str(e)
+    preview_report["live_releases"] = live
+    preview_clean = (not preview_report.get("staged_disallowed")
+                     and all(not v.get("disallowed_preview_assets")
+                             for k, v in live.items() if isinstance(v, dict)))
+    preview_report["clean"] = preview_clean
+
     report = {
         "scanned_public_files": len(targets),
+        "preview_and_release_assets": preview_report,
         "content_leaks": hits,
         "filename_leaks": name_hits,
         "salt_appears_in_public_files": salt_leak,
         "zip": zip_report,
-        "clean": (not hits and not name_hits and not salt_leak
+        "clean": (preview_clean and not hits and not name_hits and not salt_leak
                   and not zip_report.get("content_leaks")
                   and not zip_report.get("member_name_leaks")
                   and not zip_report.get("taskB_members")

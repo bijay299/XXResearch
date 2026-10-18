@@ -153,12 +153,39 @@ independently proven.
 
 `freeze_ids.py` was **not** re-run.
 
-> **Disclosure.** Earlier in this session, before this repair was commissioned,
-> the original release asset was replaced in place by a corrected build. That
-> was a mistake: the original should have been preserved. Because the archive
-> build is deterministic, the original ZIP was reconstructed **byte-for-byte**
-> (13,917,868 bytes, sha256 `45e3eb7a…`) and restoration was attempted. See
-> §8 for the current state of that restoration.
+### Two mistakes made during this work, and how they were fixed
+
+**(a) The original release asset was overwritten.** Earlier in this session,
+before this repair was commissioned, the corrected bundle was uploaded *in
+place of* the original asset on the `teapot-human-review-v1-taskA` release. The
+original should have been preserved. Because the archive build is
+deterministic, the original ZIP was reconstructed **byte-for-byte** from the
+known source state and re-uploaded. The original release now carries exactly
+13,917,868 bytes, sha256
+`45e3eb7aeb9443e35a4ab990969eb9aa450e2f36b2238192244050b320dbd005`,
+with its tag target unchanged — **verified by re-downloading it**.
+
+**(b) Two preview screenshots that disclose a mapping were briefly published.**
+`preview_A2_item_view.png` and `preview_A4_mobile_item.png` each show a **real
+research image beside its neutral ID**, which discloses that mapping. They had
+been quarantined earlier in preparation, but restoring `browser_qa.py` from Git
+to refactor it re-created them, and the publisher was staging *every* file in
+the screenshots directory. They were uploaded to the patch01 release and
+**removed as soon as the asset list was reviewed**.
+
+Three changes make that class of mistake non-recurring:
+
+1. `browser_qa.py` now writes item-view screenshots **into the private area**,
+   never the public one.
+2. `build_publish.py` stages previews from an **explicit allowlist** of four
+   files — two instructions pages (no research image) and two
+   synthetic-placeholder item views — and fails loudly on anything else.
+3. The masking audit now also checks the **staged preview directory and the
+   live asset list of every release**, which is precisely the gap that let this
+   through: it previously scanned only the results tree and the ZIP.
+
+Both releases now carry only the four allowlisted preview images; the audit
+confirms this against the live API.
 
 ---
 

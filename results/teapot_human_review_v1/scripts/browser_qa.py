@@ -26,6 +26,11 @@ import tempfile
 ROOT = "/data/bijaypandey/cuig_pilot/teapot_human_review_v1"
 A = os.path.join(ROOT, "taskA")
 SHOTS = os.path.join(ROOT, "qa", "screenshots")
+# Screenshots of an ITEM VIEW show a real research image beside its neutral
+# ID, which discloses that mapping. They are written to the PRIVATE area and
+# must never be staged as a public preview. Only instructions screenshots
+# (no image) and synthetic-placeholder previews are publishable.
+PRIVATE_SHOTS = os.path.join(ROOT, "private", "screenshots_withreal")
 URL = "file://" + os.path.join(A, "index.html")
 
 TARGETS = ["present", "absent", "uncertain"]
@@ -82,6 +87,7 @@ def open_export(page):
 def run_engine(engine_name, launch):
     from playwright.sync_api import sync_playwright
     os.makedirs(SHOTS, exist_ok=True)
+    os.makedirs(PRIVATE_SHOTS, exist_ok=True)
     n_items = len(json.load(open(os.path.join(A, "items.json")))["item_ids"])
 
     ENGINE["name"] = engine_name
@@ -112,7 +118,7 @@ def run_engine(engine_name, launch):
               page.eval_on_selector("#theimage", "e=>e.clientWidth") == 512)
         check("only one image element is shown (no paired counterpart)",
               page.eval_on_selector_all("#app img", "els=>els.length") == 1)
-        page.screenshot(path=os.path.join(SHOTS, "A2_item_view.png"), full_page=True)
+        page.screenshot(path=os.path.join(PRIVATE_SHOTS, "A2_item_view.png"), full_page=True)
 
         page.click("#zoomin"); page.click("#zoomin")
         check("zoom in enlarges the image",
@@ -256,7 +262,7 @@ def run_engine(engine_name, launch):
         check("no horizontal page overflow at 390px", ow[0] <= ow[1] + 1, ow)
         check("question controls reachable on mobile",
               mp.is_visible('input[name="target"][value="present"]'))
-        mp.screenshot(path=os.path.join(SHOTS, "A4_mobile_item.png"), full_page=True)
+        mp.screenshot(path=os.path.join(PRIVATE_SHOTS, "A4_mobile_item.png"), full_page=True)
         mctx.close()
         br.close()
 

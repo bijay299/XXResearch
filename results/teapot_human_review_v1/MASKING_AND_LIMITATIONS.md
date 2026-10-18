@@ -98,11 +98,14 @@ prompts, and the private salt.
 
 | check | result |
 |---|---|
-| Public files scanned | 26 |
+| Public files scanned | 34 |
 | Content leaks | **0** |
 | Filename leaks | **0** |
 | Salt present in any public file | **no** |
 | ZIP members | 47 (40 PNG) |
+| Staged preview assets outside the allowlist | **0** |
+| Disallowed preview assets live on either release | **0** |
+| Synthetic test export or completed response inside the bundle | **none** |
 | ZIP member-name leaks | **0** |
 | ZIP content leaks | **0** |
 | Task-B members in the ZIP | **none** |
@@ -133,6 +136,17 @@ item-view previews therefore show the real UI layout but **no research image**.
 
 This is recorded in the preparation ledger as
 `quarantine_leaking_screenshots`.
+
+**It then recurred, briefly, and was fixed properly.** Restoring
+`browser_qa.py` from Git during the patch01 repair re-created those two
+screenshots, and the publisher was staging *everything* in the screenshots
+directory, so they were uploaded to the patch01 release. They were removed as
+soon as the asset list was reviewed. Three changes prevent recurrence: the QA
+script now writes item-view screenshots **into the private area**; the publisher
+stages previews from an **explicit four-file allowlist** and fails on anything
+else; and **this audit now also checks the staged preview directory and the live
+asset list of every release** — the gap that let it through, since it previously
+looked only at the results tree and the ZIP.
 
 ## 7. Attribution and licensing kept out of reviewer instructions
 

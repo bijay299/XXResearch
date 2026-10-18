@@ -134,9 +134,26 @@ def main():
     stage = os.path.join(ROOT, "publish", "preview_assets")
     shutil.rmtree(stage, ignore_errors=True)
     os.makedirs(stage, exist_ok=True)
-    for f in sorted(os.listdir(os.path.join(ROOT, "qa", "screenshots"))):
-        shutil.copyfile(os.path.join(ROOT, "qa", "screenshots", f),
-                        os.path.join(stage, "preview_" + f))
+    # EXPLICIT ALLOWLIST. Staging "everything in the screenshots directory"
+    # once published two item-view screenshots that each showed a real research
+    # image beside its neutral ID. Only these four files may ever be published:
+    # two instructions pages (no research image at all) and two item-view
+    # previews rendered against a clearly synthetic placeholder.
+    PUBLISHABLE_PREVIEWS = [
+        "A1_instructions.png",
+        "A3_mobile_instructions.png",
+        "A2_item_view_synthetic.png",
+        "A4_mobile_item_synthetic.png",
+    ]
+    for f in PUBLISHABLE_PREVIEWS:
+        src_p = os.path.join(ROOT, "qa", "screenshots", f)
+        if not os.path.isfile(src_p):
+            raise SystemExit(f"publishable preview missing: {f}")
+        shutil.copyfile(src_p, os.path.join(stage, "preview_" + f))
+    extra = [f for f in sorted(os.listdir(os.path.join(ROOT, "qa", "screenshots")))
+             if f not in PUBLISHABLE_PREVIEWS]
+    if extra:
+        print(f"[publish] NOT staging {len(extra)} non-allowlisted screenshot(s): {extra}")
     cp(os.path.join(ROOT, "ledger", "prep_ledger.jsonl"), "ledger/prep_ledger.jsonl")
     cp(os.path.join(ROOT, "ledger", "clock.json"), "ledger/clock.json")
 
