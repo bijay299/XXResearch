@@ -1,0 +1,32 @@
+{
+ "scheme": "HMAC-SHA256(secret_salt, canonical_bytes). The salt is held privately and is NOT published. These commit to the actual populated artifacts, not to placeholders.",
+ "package_a": "THR-V1-A",
+ "package_b": "THR-V1-B",
+ "protocol_id": "TEAPOT-HR-PROTO-1.0.0",
+ "schema_id": "THR-EXPORT-SCHEMA-1.0.0",
+ "committed_iso": "2026-10-18T13:09:00.335661-04:00",
+ "salt_bytes": 32,
+ "commitments": [
+  {
+   "label": "taskA_mapping_40_items",
+   "hmac_sha256": "4fbd0fef8f29425d13ba39cf53a4b24fdec0d25b89984433ae74755e27926282"
+  },
+  {
+   "label": "taskB_mapping_20_pairs",
+   "hmac_sha256": "c3f362a5e50f7a6c7d70dc7182a5f9e54d3da13a8fa9355d3ef9d26f3884aa4e"
+  },
+  {
+   "label": "order_variants_v1_v2_v3",
+   "hmac_sha256": "a74cdc0c73ff475b322b014db3a6b813c455924639cdfb6ffc0e2db925d88f85"
+  },
+  {
+   "label": "taskA_item_ids",
+   "hmac_sha256": "b7ed628b4e30d7692701d48653fea5362cf44a24d0b4c32637dd9dd177bdd4d3"
+  }
+ ],
+ "counts_committed": {
+  "taskA_items": 40,
+  "taskB_pairs": 20
+ },
+ "limitation": "A commitment proves the committed material existed and has not changed since. It does NOT make the underlying images or their provenance private -- those are already public in the modern-object-assets-v1 release."
+}

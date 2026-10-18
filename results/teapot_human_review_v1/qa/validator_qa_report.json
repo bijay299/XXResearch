@@ -1,0 +1,195 @@
+{
+ "suite": "mechanical validator QA",
+ "schema_id": "THR-EXPORT-SCHEMA-1.0.0",
+ "protocol_id": "TEAPOT-HR-PROTO-1.0.0",
+ "fixtures_are_synthetic": true,
+ "fixture_warning": "SYNTHETIC QA FIXTURE -- machine-generated, not a human judgement, not reviewer evidence. Choices follow a fixed rotation and encode no assessment of any image.",
+ "contains_human_judgements": false,
+ "contains_answer_keys": false,
+ "n_cases": 18,
+ "n_pass": 18,
+ "n_fail": 0,
+ "all_pass": true,
+ "cases": [
+  {
+   "fixture": "A_final_valid.json",
+   "expect_valid": true,
+   "got_valid": true,
+   "pass": true,
+   "why": "complete 40/40 final",
+   "validator_errors": []
+  },
+  {
+   "fixture": "A_final_all_uncertain.json",
+   "expect_valid": true,
+   "got_valid": true,
+   "pass": true,
+   "why": "uncertain / unable_to_judge are valid COMPLETED answers",
+   "validator_errors": []
+  },
+  {
+   "fixture": "A_draft_partial.json",
+   "expect_valid": true,
+   "got_valid": true,
+   "pass": true,
+   "why": "drafts may be partial",
+   "validator_errors": []
+  },
+  {
+   "fixture": "B_final_valid.json",
+   "expect_valid": true,
+   "got_valid": true,
+   "pass": true,
+   "why": "complete 20/20 final",
+   "validator_errors": []
+  },
+  {
+   "fixture": "A_final_missing_one.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "partial final with an inflated self-reported count",
+   "validator_errors": [
+    "FINAL is missing 1 expected ID(s)",
+    "FINAL requires all 40 items fully answered; 39 are complete"
+   ]
+  },
+  {
+   "fixture": "A_final_empty.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "empty final must fail",
+   "validator_errors": [
+    "FINAL is missing 40 expected ID(s)",
+    "FINAL requires all 40 items fully answered; 0 are complete",
+    "FINAL has no responses (empty final)"
+   ]
+  },
+  {
+   "fixture": "A_final_duplicate_id.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "duplicate ID",
+   "validator_errors": [
+    "duplicate IDs: ['A-001']"
+   ]
+  },
+  {
+   "fixture": "A_final_extra_id.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "unexpected/extra ID",
+   "validator_errors": [
+    "unexpected/extra IDs: ['A-999']"
+   ]
+  },
+  {
+   "fixture": "A_final_bad_enum.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "invalid enum value",
+   "validator_errors": [
+    "invalid enum values: [\"A-004.target='definitely_yes'\"]",
+    "FINAL requires all 40 items fully answered; 39 are complete"
+   ]
+  },
+  {
+   "fixture": "A_final_missing_answer.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "one answer missing",
+   "validator_errors": [
+    "FINAL requires all 40 items fully answered; 39 are complete"
+   ]
+  },
+  {
+   "fixture": "A_final_missing_exposure.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "required exposure declaration absent",
+   "validator_errors": [
+    "exposure.prior_access_to_source_pairings missing"
+   ]
+  },
+  {
+   "fixture": "A_final_nonbool_exposure.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "exposure declaration not an explicit boolean",
+   "validator_errors": [
+    "exposure.prior_access_to_source_pairings must be an explicit boolean"
+   ]
+  },
+  {
+   "fixture": "A_final_wrong_package.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "untrusted package_id",
+   "validator_errors": [
+    "untrusted package_id 'SOME-OTHER-PACKAGE'; expected 'THR-V1-A'"
+   ]
+  },
+  {
+   "fixture": "B_final_wrong_stage.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "stage/content mismatch",
+   "validator_errors": [
+    "untrusted package_id 'THR-V1-B'; expected 'THR-V1-A'",
+    "exposure.prior_access_to_source_pairings missing",
+    "duplicate IDs: [None]",
+    "unexpected/extra IDs: [None]",
+    "FINAL is missing 40 expected ID(s)",
+    "FINAL requires all 40 items fully answered; 0 are complete"
+   ]
+  },
+  {
+   "fixture": "A_final_wrong_schema.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "untrusted schema_id",
+   "validator_errors": [
+    "untrusted schema_id 'SOME-OLD-SCHEMA-0.1'"
+   ]
+  },
+  {
+   "fixture": "B_final_missing_one.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "partial B final",
+   "validator_errors": [
+    "FINAL is missing 1 expected ID(s)",
+    "FINAL requires all 20 items fully answered; 19 are complete"
+   ]
+  },
+  {
+   "fixture": "A_malformed.json",
+   "expect_valid": false,
+   "got_valid": false,
+   "pass": true,
+   "why": "malformed JSON",
+   "validator_errors": [
+    "malformed JSON: JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)"
+   ]
+  },
+  {
+   "fixture": "cohort_duplicate_audit",
+   "expect_valid": "flagged",
+   "got_valid": "flagged",
+   "pass": true,
+   "why": "two identical files / repeated alias must NOT count as two reviewers",
+   "validator_errors": []
+  }
+ ]
+}
