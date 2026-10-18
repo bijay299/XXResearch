@@ -1,9 +1,9 @@
 # Evidence index
 
 Generated after all other files were finalised; **this index excludes itself**.
-Generated (UTC): 2026-10-18T04:01:12Z
+Generated (UTC): 2026-10-18T04:24:49Z
 
-**128 tracked files, 16.33 MiB.** SHA256 of every tracked file below.
+**131 tracked files, 16.35 MiB.** SHA256 of every tracked file below.
 
 ## Full-resolution originals (GitHub release asset)
 
@@ -29,12 +29,15 @@ Not published: trained transcoder weights (2.0 GB, local scratch only) and all c
 
 | file | bytes | sha256 |
 |---|---:|---|
-| `BASELINE_VALIDATION.md` | 8021 | `e97fadef0c9ab21f9cb4a040e685009a87dc691b8444073ea4668878f7b2e18a` |
-| `INTEGRATION_AUDIT.md` | 10106 | `6a9e3ca547edb7a27bd961cc28acd0b1394f4922a36d678de94883733897baa0` |
-| `PROTOTYPE_DECISION.md` | 5448 | `3399db1e8869f6c5a8d82179165369097393cc823e07fcf53101460884f6505f` |
-| `REPORT.md` | 16927 | `894b1eaf802b0267c3af686461874ca05dd50b841dea0cd26eaf2cbb02c14563` |
+| `AMENDMENT_01_CLOSEOUT.md` | 17096 | `390c6ea94bd49be48b7a69b1515a8f9a415560529385781c8ac18e469de77e1b` |
+| `BASELINE_VALIDATION.md` | 9511 | `4aa62075dd173a5c88ad8e9f35e1e83e63709a825f6d7b0aed96cc9666101ee8` |
+| `INTEGRATION_AUDIT.md` | 11125 | `719df9feb07341bca13b307ce2b19b2e60c9b961ad451345154187faddf9a1f7` |
+| `PROTOTYPE_DECISION.md` | 7029 | `885189f51b52ce68e9c8de754382c420f56a151275082ca2e459e7ea474af5dc` |
+| `README.md` | 2522 | `3708e8b1e8598fcd6864122e7ccb4856b90b1e1c56c8b98190e1b5e854c91544` |
+| `REPORT.md` | 14974 | `77cfdec09a5e572f8a3f6f1818defb88991700e77ae69108fd06b1271a2d402f` |
 | `RUN_MANIFEST.md` | 9693 | `fac099abeaecef9c726c019a4df9548f26ee87f73eb50d57ce281047588b04d2` |
 | `cases.json` | 100060 | `2c6b4d0805b79c02206b636064b374c264d14b5bd66be50bfe70e48a9c10e532` |
+| `code/README.md` | 3295 | `45ce80549ecd6021d0ad60ff143f598f37b88f8d4f2f33719873e88365b7001e` |
 | `code/analyse.py` | 7699 | `e88c716f66964127964eb4a6f16e89abe4b6d3eafca8120c307ffb1b20e996f7` |
 | `code/apply_patches.py` | 12700 | `971a168eb90f2ae6857fb987af6d23d9b47373415bc5426bb2735f2f652e487f` |
 | `code/build_coco_assets.py` | 8609 | `8fa3058c9c98837d18b2a2c1638a150d370f85f4b377f5c572b7dd32999eeaa6` |

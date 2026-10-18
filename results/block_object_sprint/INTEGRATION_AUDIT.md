@@ -1,3 +1,20 @@
+> ## ⚠ SUPERSEDED IN PART — historical record
+>
+> **The sprint's final status is `BASELINE_UNQUALIFIED` — SPRINT CLOSED WITH CORRECTIONS.**
+> See [`AMENDMENT_01_CLOSEOUT.md`](AMENDMENT_01_CLOSEOUT.md), which is authoritative over any
+> conflicting wording below.
+>
+> The body of this document is **preserved unchanged**. The catalogue of release bugs and
+> paper/code discrepancies stands as recorded. One claim is **qualified**:
+>
+> - Section C states that the native update makes the decoded contribution of a target latent
+>   **"exactly"** the empty token's contribution. That identity holds only where the
+>   `clamp(..., min=1e-6)` on the target activation is **inactive**, and only for rows not
+>   subject to a **conflicting duplicate assignment**. This document itself records **7
+>   duplicate row writes of 64 for Bears**, whose scatter winner PyTorch leaves unspecified.
+>   The disclosed native scatter ambiguity is preserved; the update is **not** repaired and no
+>   replacement proof is offered.
+
 # Integration audit of the BLOCK release (source pin `db4ab11a5c0cefbc71dfaedba0df3e86dd0319d5`)
 
 Audit performed by reading every file in the release before running anything.

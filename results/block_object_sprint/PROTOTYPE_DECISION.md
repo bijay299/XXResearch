@@ -1,3 +1,27 @@
+> ## ⚠ SUPERSEDED — historical record
+>
+> **The sprint's final status is `BASELINE_UNQUALIFIED` — SPRINT CLOSED WITH CORRECTIONS.**
+> See [`AMENDMENT_01_CLOSEOUT.md`](AMENDMENT_01_CLOSEOUT.md), which is authoritative over any
+> conflicting wording below.
+>
+> The body of this document is **preserved unchanged** as the historical record of the
+> decision and its chronology. Its framing is superseded in three ways:
+>
+> 1. The "pre-registered generalisation check" declared below on Cats and Horses was declared
+>    **after** the gate-1 failure was already recorded — i.e. after the condition requiring a
+>    stop was known. **Prospectively declaring a new check does not override the earlier
+>    mandatory stop rule.** Those runs (160 images, 0.7743 recorded GPU-hours) are a
+>    **disclosed protocol deviation**, preserved as additional descriptive native results.
+> 2. The claim that the +10-point related-retention screen was **"arithmetically impossible"**
+>    is withdrawn. Five points of headroom remained on the development object under the binary
+>    procedure — enough to justify declining this prototype on the development evidence, but
+>    not to prove the confirmation criterion unreachable on objects that should never have
+>    been generated. **The decision to develop no prototype stands; the impossibility framing
+>    does not.**
+> 3. The mechanism hypothesis recorded at the end remains **untested speculation**. It
+>    authorises nothing, and the measurement prerequisite it implies is **not** authorisation
+>    for a successor assignment.
+
 # Prototype decision: NO PROTOTYPE JUSTIFIED
 
 Committed after the baseline-validation record and **before** any confirmation-object

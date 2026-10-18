@@ -1,3 +1,26 @@
+> ## ⚠ SUPERSEDED — historical record
+>
+> **The sprint's final status is `BASELINE_UNQUALIFIED` — SPRINT CLOSED WITH CORRECTIONS.**
+> See [`AMENDMENT_01_CLOSEOUT.md`](AMENDMENT_01_CLOSEOUT.md), which is authoritative over any
+> conflicting wording below.
+>
+> The body of this document is **preserved unchanged** as the historical record of what was
+> checked and when. Its framing is superseded in three ways:
+>
+> 1. This document's own §1 records an **unresolved** material generated-domain scoring
+>    failure. Gate 1 of the frozen manifest requires that there be none, so **gate 1 failed**
+>    and the baseline is **unqualified**. Any reading of this document as "baseline validation
+>    passed" or "the platform is validated for measuring the native baseline" is withdrawn.
+>    Gates 2–6 remain recorded as passed **at the scope actually tested**.
+> 2. The agent-versus-judge disagreements described here are **not** errors adjudicated
+>    against independent ground truth. No verified scorer error rate and no true suppression
+>    figure follows from them.
+> 3. The retention and causal statements here are corrected in the amendment §3 — in
+>    particular, "zero related damage under both instruments" is **false** (native forced
+>    choice records Cats 20/20 → 19/20 between T0 and N), unrelated retention already falls at
+>    T0 under the native procedure, and the claim that only a better transcoder could repair
+>    the Dogs/Bricks case is **withdrawn**.
+
 # Baseline-validation record
 
 Committed before any prototype code or tuning, as required. Budget state at the time of
