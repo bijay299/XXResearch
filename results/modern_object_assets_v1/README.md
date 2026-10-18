@@ -1,8 +1,12 @@
 # modern_object_assets_v1 — GEM / FLUX.1-dev `teapot`: trained checkpoint + 20 matched pairs
 
-**Status: `ASSETS_DELIVERED`** *(pending the remote-verification section below —
-see [REMOTE_VERIFICATION.json](REMOTE_VERIFICATION.json) and
-[EVIDENCE_INDEX.md](EVIDENCE_INDEX.md) for the confirmed state)*
+**Status: `ASSETS_DELIVERED`** — remote download, hash, lossless reconstruction
+and reload verification all passed
+(`REMOTE_VERIFICATION_PASSED`; [REMOTE_VERIFICATION.json](REMOTE_VERIFICATION.json),
+[EVIDENCE_INDEX.md](EVIDENCE_INDEX.md)).
+
+**Release:** [`modern-object-assets-v1`](https://github.com/bijay299/XXResearch/releases/tag/modern-object-assets-v1)
+— 31 assets, 23,861,453,027 bytes.
 
 An **infrastructure milestone**, not a method contribution and not a paper
 result: one existing baseline (GEM) was trained once on one ordinary,
@@ -42,6 +46,11 @@ published as downloadable release assets.
 | Trainable subset | native GEM LoRA, `qk_dual`, r=16 α=16 dropout=0.1 bias=none |
 | Trainable parameters | **7,471,104** across **76** modules (0.0628 % of the 11,901,408,320-parameter transformer) |
 | Training from | pristine M0 (no reuse of any earlier edited checkpoint, image, label or prediction) |
+
+*(PEFT's own log line reports `trainable%: 0.0443` because its denominator is the
+whole wrapped pipeline — 16,878,070,243 params including the T5/CLIP text
+encoders and VAE. Against the transformer alone it is 0.0628 %. Same 7,471,104
+trainable parameters either way.)*
 
 Full frozen configuration: [RUN_MANIFEST.md](RUN_MANIFEST.md) ·
 [configs/production_config.json](configs/production_config.json).
@@ -110,9 +119,23 @@ That is what is published.
 | **total merged transformer** | 5 | **23,803,075,855** |
 | `lora_adapter/` (pre-merge PEFT adapter) | 3 | 29,914,559 |
 
-Per-file sha256: [manifests/edited_transformer_sha256.txt](manifests/edited_transformer_sha256.txt).
+Per-file sha256: [manifests/edited_transformer_sha256.txt](manifests/edited_transformer_sha256.txt)
+(base, for comparison: [manifests/base_transformer_sha256.txt](manifests/base_transformer_sha256.txt)).
 Archive-level sha256 and per-part hashes:
 [manifests/ASSET_MANIFEST.json](manifests/ASSET_MANIFEST.json).
+
+**Where the 76 changed tensors live.** Mapping them through the shard index:
+**60** are in shard 1, **16** are in shard 2, and **0** are in shard 3 — so
+**shard 3 of 3 is byte-identical to the corresponding pristine base shard**
+(`0d9c7c66…`), as is `…index.json` (`780ee2ab…`). This is fully explained by the
+subset rule: `qk_dual` **excludes** `single_transformer_blocks`, and shard 3
+contains only those 192 single-block tensors plus `norm_out`/`proj_out` — it has
+no dual-block tensor at all, so no changed tensor can land there.
+
+`config.json` differs from the base's only in re-serialisation by the newer
+diffusers (`_diffusers_version` `0.30.0.dev0`→`0.37.1`, a local `_name_or_path`,
+and explicit defaults such as `axes_dims_rope` and `out_channels: null`). No
+architectural field changed.
 
 ## 5. Does the small adapter reproduce the endpoint? — measured
 
@@ -301,9 +324,20 @@ meets:
   for the benefit of public knowledge, with no direct or indirect payment
   arising from it (§1(c)(i)).
 
-### What is *not* published
-* **Pristine base weights are not republished.** Only the modified transformer
-  (and the adapter that produces it) are distributed.
+### What is *not* published — stated precisely
+* **The base model is not republished.** The release contains **only** the
+  modified `transformer` component (and the LoRA adapter that produces it). The
+  text encoders, VAE, tokenizers and scheduler are **not** included, and no
+  working pipeline can be assembled from this release alone — gated base access
+  is required.
+* **Honest qualification:** a merged derivative *inherently* carries the
+  unchanged base values for every tensor the training did not touch, and that is
+  true here — 1084 of 1160 tensors hold pristine base values, and as noted above
+  **one of the three published shards is byte-identical to its base shard**. This
+  is what the FLUX licence calls a Derivative (§1(a): "any customized or
+  fine-tuned version"), and distributing it is what §2(a)/§3 permit; it is not a
+  republication of the base model as such. The smaller 27.6 MiB adapter route is
+  offered precisely for anyone who prefers to carry no base bytes at all.
 * **No credentials** of any kind are published.
 
 ### Requirements to use the checkpoint
@@ -345,6 +379,28 @@ tar -xf gem-flux-teapot-v1-transformer.tar          # -> transformer/
 ```
 
 Nothing was quantized or cast to fit hosting; the parts are a lossless split.
+
+## 10b. Remote verification — performed, passed
+
+Every published asset was downloaded into a **fresh directory** and checked
+end-to-end (CPU only: **0 GPU device-hours, 0 decoded images**).
+
+| check | result |
+|---|---|
+| Assets downloaded | **31 / 31** (1321 s) |
+| Remote hashes verified against `ASSET_MANIFEST.json` | **30 / 30** |
+| Lossless reconstruction of the 23-part checkpoint | **yes** — `32d8202d0bdae636…` expected **=** got |
+| Inner checkpoint files match published per-file hashes | **5 / 5** |
+| Remote checkpoint loads via the documented pinned-base path | **yes** (`overwrite: ['transformer']`, 1.0 s) |
+| Remote reload vs local canonical post-merge | **bitwise-identical** — 0 of 1160 tensors differ, aggregate `71c8f08e…` |
+| Remote reloaded tensors finite | **yes** |
+| Primary file completeness | **40 / 40** PNGs (20 M0 + 20 edited) |
+| PNG hash mismatches | **0** |
+| Paired-input correspondence re-verified from the download | **yes** — 20 / 20 initial-noise tensors |
+| Download failures | **none** |
+
+Verdict: **`REMOTE_VERIFICATION_PASSED`**
+([REMOTE_VERIFICATION.json](REMOTE_VERIFICATION.json)).
 
 ## 11. Reproducing the pairs
 
