@@ -78,9 +78,9 @@ when they export a file.
 
 **Download:** `teapot-human-review-v1-taskA.zip` from the release
 [`teapot-human-review-v1-taskA`](https://github.com/bijay299/XXResearch/releases/tag/teapot-human-review-v1-taskA)
-— 13,917,868 bytes, sha256
-`45e3eb7aeb9443e35a4ab990969eb9aa450e2f36b2238192244050b320dbd005`,
-46 members, 40 PNGs. The archive build is deterministic: rebuilding from the
+— 13,919,126 bytes, sha256
+`e239f2d4d52ce75bd914a4c6073cb98da6c702b825f64f0394afbe9130a7f456`,
+47 members, 40 PNGs. The archive build is deterministic: rebuilding from the
 same inputs reproduces the same hash.
 
 UI preview: published as the release assets `preview_A1_instructions.png`,
@@ -145,9 +145,10 @@ run, and no automated judge was introduced.**
   **recomputes completion rather than trusting any supplied count**.
 * **Mechanical QA:** 18/18 synthetic cases pass —
   [`qa/validator_qa_report.json`](qa/validator_qa_report.json).
-* **Real-browser QA:** **30/30 checks pass** in headless Firefox (Playwright
-  standalone build) loading the bundle from `file://` with every non-`file://`
-  request aborted — offline opening, navigation, zoom, save/resume,
+* **Real-browser QA:** **88/88 checks pass** across **three engine
+  configurations** — Chromium (the Chrome engine), Firefox, and Firefox with a
+  strict file-origin policy — loading the bundle from `file://` with every
+  non-`file://` request aborted — offline opening, navigation, zoom, save/resume,
   alias/package/stage storage isolation, draft export + import round-trip,
   complete Final round-trip accepted by the validator, Final correctly
   unavailable while answers are missing, malformed and wrong-stage imports
@@ -159,6 +160,29 @@ fixture is a human judgement and none may be used as reviewer evidence.** No
 answer key or completed test response is present in any reviewer bundle. The
 public QA reports contain **mechanical results only** — no image-specific
 judgement.
+
+## Correction — bundle v2 (2026-10-18)
+
+The **first published bundle did not open in Chrome or Edge.** It loaded its
+item list with `XMLHttpRequest` over `file://`, which every Chromium browser
+blocks by CORS policy ("Cross origin requests are only supported for protocol
+schemes: … http, https"), and which Firefox's file-origin policy can block too.
+Reviewers saw *"Could not load items.json"* instead of the task.
+
+**Fixed:** the item list now ships as `items.js` and is loaded with a plain
+`<script src="items.js">`, which is not subject to that restriction and works
+from `file://` in every browser. No `XMLHttpRequest` or `fetch` remains in
+either viewer. `items.json` is retained for reference and tooling.
+
+**Why QA missed it:** the browser suite ran **only Firefox**, which permits the
+request, so it reported every check green against a bundle that was broken for
+most reviewers. The suite now runs **Chromium, Firefox and strict-file-origin
+Firefox** on every check, and the fresh-download verification runs in Chromium —
+the engine that failed.
+
+The replaced asset keeps the same tag and filename; its sha256 changed from
+`45e3eb7a…` to `e239f2d4…`. No image, ID, mapping, ordering or commitment
+changed — only the loader.
 
 ## Masking, privacy and limitations
 

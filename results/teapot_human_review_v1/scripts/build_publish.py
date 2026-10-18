@@ -33,7 +33,7 @@ def main():
 
     # ---- the reviewer ZIP (built first so it can be hashed into the manifest) ----
     src = os.path.join(ROOT, "taskA")
-    files = ["index.html", "app.js", "style.css", "items.json"]
+    files = ["index.html", "app.js", "items.js", "style.css", "items.json"]
     imgs = sorted(f for f in os.listdir(os.path.join(src, "images"))
                   if f.endswith(".png"))
     assert len(imgs) == 40, f"expected 40 images, found {len(imgs)}"

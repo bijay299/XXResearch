@@ -67,6 +67,10 @@ def main():
                  "Task-A associations."),
     }
     json.dump(items, open(os.path.join(B, "items.json"), "w"), indent=1)
+    with open(os.path.join(B, "items.js"), "w") as fh:
+        fh.write("window.THR_ITEMS = ")
+        json.dump(items, fh, indent=1)
+        fh.write(";\n")
     for f in ("index.html", "app.js", "style.css"):
         shutil.copyfile(os.path.join(SRCUI, f), os.path.join(B, f))
 

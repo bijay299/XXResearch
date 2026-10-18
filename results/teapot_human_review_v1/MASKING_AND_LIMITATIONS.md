@@ -87,7 +87,7 @@ prompts, and the private salt.
 | Content leaks | **0** |
 | Filename leaks | **0** |
 | Salt present in any public file | **no** |
-| ZIP members | 46 (40 PNG) |
+| ZIP members | 47 (40 PNG) |
 | ZIP member-name leaks | **0** |
 | ZIP content leaks | **0** |
 | Task-B members in the ZIP | **none** |

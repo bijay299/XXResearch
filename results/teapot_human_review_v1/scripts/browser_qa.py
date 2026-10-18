@@ -33,11 +33,13 @@ RENDERS = ["coherent", "localized_deformation", "whole_frame_breakdown", "unable
 
 results = []
 network_attempts = []
+ENGINE = {"name": "?"}
 
 
 def check(name, ok, detail=""):
-    results.append({"check": name, "pass": bool(ok), "detail": str(detail)[:400]})
-    print(f"  [{'PASS' if ok else 'FAIL'}] {name} {detail if not ok else ''}")
+    tagged = f"[{ENGINE['name']}] {name}"
+    results.append({"check": tagged, "pass": bool(ok), "detail": str(detail)[:400]})
+    print(f"  [{'PASS' if ok else 'FAIL'}] {tagged} {detail if not ok else ''}")
     return ok
 
 
@@ -77,13 +79,14 @@ def open_export(page):
     page.wait_for_timeout(100)
 
 
-def main():
+def run_engine(engine_name, launch):
     from playwright.sync_api import sync_playwright
     os.makedirs(SHOTS, exist_ok=True)
     n_items = len(json.load(open(os.path.join(A, "items.json")))["item_ids"])
 
+    ENGINE["name"] = engine_name
     with sync_playwright() as p:
-        br = p.firefox.launch()
+        br = launch(p)
 
         # ---------------- offline opening + first render ----------------
         ctx = br.new_context(viewport={"width": 1280, "height": 1000},
@@ -257,13 +260,30 @@ def main():
         mctx.close()
         br.close()
 
+
+def main():
+    # The reviewer bundle must work in whatever browser a reviewer actually
+    # has. Firefox alone is NOT enough: Chrome and Edge block file:// XHR by
+    # CORS policy, which broke the first published bundle while a Firefox-only
+    # suite reported every check green. Every engine is exercised here.
+    engines = [
+        ("chromium", lambda p: p.chromium.launch()),
+        ("firefox", lambda p: p.firefox.launch()),
+        ("firefox-strict-file-origin",
+         lambda p: p.firefox.launch(firefox_user_prefs={
+             "privacy.file_unique_origin": True,
+             "security.fileuri.strict_origin_policy": True})),
+    ]
+    for name, launch in engines:
+        run_engine(name, launch)
+
     check("viewer made no network requests (all non-file:// blocked)",
           not network_attempts, network_attempts[:5])
 
     n_pass = sum(1 for r in results if r["pass"])
     rep = {
-        "suite": "real-browser QA (Playwright + Firefox, headless)",
-        "browser": "Firefox (Playwright standalone build, not the system snap)",
+        "suite": "real-browser QA (Playwright, headless, every engine)",
+        "engines": ["chromium", "firefox", "firefox-strict-file-origin"],
         "url_scheme": "file:// (offline; every non-file request aborted)",
         "scope": ("Mechanical UI behaviour only. Contains no human judgement about "
                   "any image and no image-specific result. Clicked choices come "

@@ -69,6 +69,19 @@ def main():
     items["images_dir"] = "images"
     json.dump(items, open(os.path.join(A, "items.json"), "w"), indent=1)
 
+    # items.js is what the viewer actually loads, via <script src="items.js">.
+    # Over file://, Chrome and Edge block XMLHttpRequest/fetch by CORS policy
+    # and Firefox's file-origin policy can do the same, so a fetched JSON list
+    # cannot be relied on in an offline bundle. A script tag has no such
+    # restriction in any browser. items.json is kept for reference and tooling.
+    with open(os.path.join(A, "items.js"), "w") as fh:
+        fh.write("/* Loaded by index.html via <script src=\"items.js\">.\n"
+                 "   Not fetched: file:// XHR/fetch is blocked by browser CORS\n"
+                 "   policy, a script tag is not. Mirrors items.json. */\n")
+        fh.write("window.THR_ITEMS = ")
+        json.dump(items, fh, indent=1)
+        fh.write(";\n")
+
     n_png = len([f for f in os.listdir(IMG) if f.endswith(".png")])
     expected = set(pub["item_ids"])
     actual = {f[:-4] for f in os.listdir(IMG) if f.endswith(".png")}

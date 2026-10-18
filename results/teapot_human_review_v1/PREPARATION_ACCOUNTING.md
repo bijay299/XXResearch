@@ -47,7 +47,7 @@ The same 40 source images populate both stages; they were copied, not created.
 
 ## Work and failures
 
-8 ledger steps recorded, **0 failures**:
+12 ledger steps recorded, **0 failures** (one recorded defect, found by the user and fixed — see below):
 
 | step | outcome |
 |---|---|
@@ -56,12 +56,33 @@ The same 40 source images populate both stages; they were copied, not created.
 | `taskB_private_package` | 20 pairs / 40 images, byte-identical, private `0700` |
 | `validator_mechanical_qa` | 18/18 synthetic cases pass |
 | `quarantine_leaking_screenshots` | two previews showing a real image beside its neutral ID moved to private; replaced with synthetic-placeholder previews |
-| `browser_qa` | 30/30 real-browser checks pass |
+| `browser_qa` | 88/88 real-browser checks pass (3 engine configurations) |
 | `build_public_tree_and_zip` | deterministic ZIP, masking audit clean |
 | `private_backup_verified` | 49 files, host-performed hash comparison |
+| `published_and_verified` | release created, fresh-download verification passed |
+| `taskA_items_loader_fix` | **defect found by the user after publication** — see below |
+| `browser_qa_dual_engine` | suite extended to 3 engine configurations, 88/88 pass |
+| `republish_and_reverify` | asset replaced on the same tag, re-verified in Chromium |
 
-Four non-blocking obstacles were worked through during preparation and are noted
-for completeness rather than as failures:
+### One real defect, found by the user after publication
+
+The first published bundle **did not open in Chrome or Edge**. The viewer
+fetched its item list with `XMLHttpRequest` over `file://`, which every Chromium
+browser blocks by CORS policy; reviewers saw *"Could not load items.json"*
+instead of the task. It was fixed by shipping `items.js` and loading it with a
+plain `<script>` tag, which is not subject to that restriction.
+
+**The QA suite had reported 30/30 green on that broken bundle because it ran
+Firefox only.** Firefox permits the request; Chrome does not. The suite now runs
+**Chromium, Firefox and strict-file-origin Firefox** on every check (88/88), and
+the fresh-download verification runs in Chromium. This is a genuine QA gap, not
+an environment quirk: testing one engine was not sufficient to claim the bundle
+worked for reviewers.
+
+### Non-blocking obstacles
+
+Four obstacles were worked through during preparation and are noted for
+completeness rather than as failures:
 
 1. The system Firefox is a snap and cannot write its profile while the root
    filesystem is full; a Playwright **standalone** Firefox was installed instead.

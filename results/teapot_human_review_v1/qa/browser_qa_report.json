@@ -1,168 +1,464 @@
 {
- "suite": "real-browser QA (Playwright + Firefox, headless)",
- "browser": "Firefox (Playwright standalone build, not the system snap)",
+ "suite": "real-browser QA (Playwright, headless, every engine)",
+ "engines": [
+  "chromium",
+  "firefox",
+  "firefox-strict-file-origin"
+ ],
  "url_scheme": "file:// (offline; every non-file request aborted)",
  "scope": "Mechanical UI behaviour only. Contains no human judgement about any image and no image-specific result. Clicked choices come from a fixed rotation and are discarded.",
  "contains_reviewer_evidence": false,
- "n_checks": 30,
- "n_pass": 30,
+ "n_checks": 88,
+ "n_pass": 88,
  "n_fail": 0,
  "all_pass": true,
  "network_requests_attempted": [],
  "screenshots": [
   "A1_instructions.png",
   "A2_item_view.png",
+  "A2_item_view_synthetic.png",
   "A3_mobile_instructions.png",
-  "A4_mobile_item.png"
+  "A4_mobile_item.png",
+  "A4_mobile_item_synthetic.png"
  ],
  "checks": [
   {
-   "check": "offline opening from file:// renders the gate",
+   "check": "[chromium] offline opening from file:// renders the gate",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "instructions show the frozen target definition",
+   "check": "[chromium] instructions show the frozen target definition",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "gate blocks start without required declarations",
+   "check": "[chromium] gate blocks start without required declarations",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "item ID is neutral (A-nnn only)",
+   "check": "[chromium] item ID is neutral (A-nnn only)",
    "pass": true,
    "detail": "A-001"
   },
   {
-   "check": "image renders at native 512 at 100%",
+   "check": "[chromium] image renders at native 512 at 100%",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "only one image element is shown (no paired counterpart)",
+   "check": "[chromium] only one image element is shown (no paired counterpart)",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "zoom in enlarges the image",
+   "check": "[chromium] zoom in enlarges the image",
    "pass": true,
    "detail": "768"
   },
   {
-   "check": "zoom reset returns to native 512",
+   "check": "[chromium] zoom reset returns to native 512",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "navigation advances to a different item",
+   "check": "[chromium] navigation advances to a different item",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "previous returns to the first item",
+   "check": "[chromium] previous returns to the first item",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "answers persist across navigation",
+   "check": "[chromium] answers persist across navigation",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "Final export disabled while answers are missing",
+   "check": "[chromium] Final export disabled while answers are missing",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "resume offered for a known alias",
+   "check": "[chromium] resume offered for a known alias",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "resumed session restores a saved answer",
+   "check": "[chromium] resumed session restores a saved answer",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "different alias starts clean (alias isolation)",
+   "check": "[chromium] different alias starts clean (alias isolation)",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "storage keys namespaced by package+stage+alias",
+   "check": "[chromium] storage keys namespaced by package+stage+alias",
    "pass": true,
    "detail": "['THR::THR-V1-A::A::qa-beta', 'THR::THR-V1-A::A::qa-alpha']"
   },
   {
-   "check": "order variant V2 differs from V1",
+   "check": "[chromium] order variant V2 differs from V1",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "Final enabled once all items are answered",
+   "check": "[chromium] Final enabled once all items are answered",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "exported final has the expected shape",
+   "check": "[chromium] exported final has the expected shape",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "export carries explicit exposure declarations",
+   "check": "[chromium] export carries explicit exposure declarations",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "export contains no condition/pairing/seed fields",
+   "check": "[chromium] export contains no condition/pairing/seed fields",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "validator accepts the browser-produced final",
+   "check": "[chromium] validator accepts the browser-produced final",
    "pass": true,
    "detail": "[]"
   },
   {
-   "check": "draft export is marked draft and may be partial",
+   "check": "[chromium] draft export is marked draft and may be partial",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "draft import restores items",
+   "check": "[chromium] draft import restores items",
    "pass": true,
    "detail": "Restored 40 item(s) from the file."
   },
   {
-   "check": "malformed import rejected without crashing",
+   "check": "[chromium] malformed import rejected without crashing",
    "pass": true,
    "detail": "Rejected: the file is not valid JSON."
   },
   {
-   "check": "wrong-package/stage import rejected",
+   "check": "[chromium] wrong-package/stage import rejected",
    "pass": true,
    "detail": "Rejected: that file is for a different package or stage."
   },
   {
-   "check": "viewer still usable after bad imports",
+   "check": "[chromium] viewer still usable after bad imports",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "no horizontal page overflow at 390px",
+   "check": "[chromium] no horizontal page overflow at 390px",
    "pass": true,
    "detail": "[390, 390]"
   },
   {
-   "check": "question controls reachable on mobile",
+   "check": "[chromium] question controls reachable on mobile",
    "pass": true,
    "detail": ""
   },
   {
-   "check": "viewer made no network requests (all non-file:// blocked)",
+   "check": "[firefox] offline opening from file:// renders the gate",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] instructions show the frozen target definition",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] gate blocks start without required declarations",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] item ID is neutral (A-nnn only)",
+   "pass": true,
+   "detail": "A-001"
+  },
+  {
+   "check": "[firefox] image renders at native 512 at 100%",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] only one image element is shown (no paired counterpart)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] zoom in enlarges the image",
+   "pass": true,
+   "detail": "768"
+  },
+  {
+   "check": "[firefox] zoom reset returns to native 512",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] navigation advances to a different item",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] previous returns to the first item",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] answers persist across navigation",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] Final export disabled while answers are missing",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] resume offered for a known alias",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] resumed session restores a saved answer",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] different alias starts clean (alias isolation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] storage keys namespaced by package+stage+alias",
+   "pass": true,
+   "detail": "['THR::THR-V1-A::A::qa-beta', 'THR::THR-V1-A::A::qa-alpha']"
+  },
+  {
+   "check": "[firefox] order variant V2 differs from V1",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] Final enabled once all items are answered",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] exported final has the expected shape",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] export carries explicit exposure declarations",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] export contains no condition/pairing/seed fields",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] validator accepts the browser-produced final",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "check": "[firefox] draft export is marked draft and may be partial",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] draft import restores items",
+   "pass": true,
+   "detail": "Restored 40 item(s) from the file."
+  },
+  {
+   "check": "[firefox] malformed import rejected without crashing",
+   "pass": true,
+   "detail": "Rejected: the file is not valid JSON."
+  },
+  {
+   "check": "[firefox] wrong-package/stage import rejected",
+   "pass": true,
+   "detail": "Rejected: that file is for a different package or stage."
+  },
+  {
+   "check": "[firefox] viewer still usable after bad imports",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox] no horizontal page overflow at 390px",
+   "pass": true,
+   "detail": "[390, 390]"
+  },
+  {
+   "check": "[firefox] question controls reachable on mobile",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] offline opening from file:// renders the gate",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] instructions show the frozen target definition",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] gate blocks start without required declarations",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] item ID is neutral (A-nnn only)",
+   "pass": true,
+   "detail": "A-001"
+  },
+  {
+   "check": "[firefox-strict-file-origin] image renders at native 512 at 100%",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] only one image element is shown (no paired counterpart)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] zoom in enlarges the image",
+   "pass": true,
+   "detail": "768"
+  },
+  {
+   "check": "[firefox-strict-file-origin] zoom reset returns to native 512",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] navigation advances to a different item",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] previous returns to the first item",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] answers persist across navigation",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] Final export disabled while answers are missing",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] resume offered for a known alias",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] resumed session restores a saved answer",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] different alias starts clean (alias isolation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] storage keys namespaced by package+stage+alias",
+   "pass": true,
+   "detail": "['THR::THR-V1-A::A::qa-beta', 'THR::THR-V1-A::A::qa-alpha']"
+  },
+  {
+   "check": "[firefox-strict-file-origin] order variant V2 differs from V1",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] Final enabled once all items are answered",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] exported final has the expected shape",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] export carries explicit exposure declarations",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] export contains no condition/pairing/seed fields",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] validator accepts the browser-produced final",
+   "pass": true,
+   "detail": "[]"
+  },
+  {
+   "check": "[firefox-strict-file-origin] draft export is marked draft and may be partial",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] draft import restores items",
+   "pass": true,
+   "detail": "Restored 40 item(s) from the file."
+  },
+  {
+   "check": "[firefox-strict-file-origin] malformed import rejected without crashing",
+   "pass": true,
+   "detail": "Rejected: the file is not valid JSON."
+  },
+  {
+   "check": "[firefox-strict-file-origin] wrong-package/stage import rejected",
+   "pass": true,
+   "detail": "Rejected: that file is for a different package or stage."
+  },
+  {
+   "check": "[firefox-strict-file-origin] viewer still usable after bad imports",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] no horizontal page overflow at 390px",
+   "pass": true,
+   "detail": "[390, 390]"
+  },
+  {
+   "check": "[firefox-strict-file-origin] question controls reachable on mobile",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "[firefox-strict-file-origin] viewer made no network requests (all non-file:// blocked)",
    "pass": true,
    "detail": "[]"
   }
