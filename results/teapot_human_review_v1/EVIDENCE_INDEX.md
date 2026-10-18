@@ -1,0 +1,90 @@
+# EVIDENCE_INDEX — teapot_human_review_v1
+
+Complete file and hash index. Generated last.
+
+> File hashes and links below are pinned to the commit named here, which
+> contains every indexed file. This index file itself is added in the
+> immediately following commit, so it cannot list its own hash.
+
+* **Commit:** [`42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe`](https://github.com/bijay299/XXResearch/commit/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe)
+* **Branch:** `research/audit-and-matched-effectiveness-protocol`
+* **Release tag:** [`teapot-human-review-v1-taskA`](https://github.com/bijay299/XXResearch/releases/tag/teapot-human-review-v1-taskA) → target `28db2f48a209a0d072c3a294e8ca27a57d868831`
+* **Release assets:** 5, 15,244,961 bytes
+* **Status:** `READY_FOR_INDEPENDENT_REVIEW` — **Task A only**. No participant, no label, no outcome.
+
+## Verification summary
+
+| check | result |
+|---|---|
+| Source images verified against accepted hashes | **40 / 40** |
+| Source verdict | **`SOURCE_VERIFIED`** |
+| Pairs with byte-identical initial noise | **True** (20 distinct hashes) |
+| Task-A bundle images | **40 / 40**, 46 members |
+| Mechanical validator QA | **18 / 18** pass |
+| Real-browser QA | **30 / 30** pass |
+| Browser network requests attempted | **0** |
+| Masking audit | **clean** (26 public files, 46 ZIP members) |
+| Task-B members in the published ZIP | **0** |
+| Private backup | **`PRIVATE_BACKUP_VERIFIED`** (49 files, host-performed) |
+| Published-package verification | **`PUBLISHED_PACKAGE_VERIFIED`** |
+| — downloaded ZIP sha256 matches | **True** |
+| — neutral-file inventory complete | **True** (40 images) |
+| — no Task-B association or answer key | **True** |
+| — opens offline in a real browser | **True** |
+
+## Release assets
+
+| asset | bytes | download |
+|---|---|---|
+| `preview_A1_instructions.png` | 295,770 | [download](https://github.com/bijay299/XXResearch/releases/download/teapot-human-review-v1-taskA/preview_A1_instructions.png) |
+| `preview_A2_item_view_synthetic.png` | 120,101 | [download](https://github.com/bijay299/XXResearch/releases/download/teapot-human-review-v1-taskA/preview_A2_item_view_synthetic.png) |
+| `preview_A3_mobile_instructions.png` | 663,690 | [download](https://github.com/bijay299/XXResearch/releases/download/teapot-human-review-v1-taskA/preview_A3_mobile_instructions.png) |
+| `preview_A4_mobile_item_synthetic.png` | 247,532 | [download](https://github.com/bijay299/XXResearch/releases/download/teapot-human-review-v1-taskA/preview_A4_mobile_item_synthetic.png) |
+| `teapot-human-review-v1-taskA.zip` | 13,917,868 | [download](https://github.com/bijay299/XXResearch/releases/download/teapot-human-review-v1-taskA/teapot-human-review-v1-taskA.zip) |
+
+Reviewer bundle sha256: `45e3eb7aeb9443e35a4ab990969eb9aa450e2f36b2238192244050b320dbd005` (13,917,868 bytes, deterministic build).
+
+## Repository files at `42d2d24cc96e`
+
+| file | bytes | sha256 |
+|---|---|---|
+| [`MANIFEST_SHA256.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/MANIFEST_SHA256.md) | 4,514 | `79fb89fbf4c1ec606f4260ccf74f47405ce65e06da8902316f5979c1b2915173` |
+| [`MASKING_AND_LIMITATIONS.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/MASKING_AND_LIMITATIONS.md) | 7,297 | `7727651956ed2211745c8b3910b1f24f49a9c9965ffedf339909260a8be5316e` |
+| [`PREPARATION_ACCOUNTING.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/PREPARATION_ACCOUNTING.md) | 4,207 | `3afd1d51018005c41509ca4fb717ca0a93503b25d6dc8055ca33e599276a7d91` |
+| [`PRIVATE_RECOVERY.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/PRIVATE_RECOVERY.md) | 3,967 | `aae41c19061f7511603d178305b7b8b4bd06fbffcf9810f7dcb6ddfdfd274408` |
+| [`README.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/README.md) | 9,845 | `cdf56f2b13f10718a1dae5869fa9aa96daa67ccdedfc3fd1c86291e2c8c2c561` |
+| [`TASKA_ZIP_IDENTITY.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/TASKA_ZIP_IDENTITY.json) | 329 | `e5085ebb25880cd0c409e692e0cdf5218c82ce0af2999f7fd490481ea8790913` |
+| [`ledger/clock.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/ledger/clock.json) | 334 | `b013de414a235adf80a557a5c75e49a0a4a0830f5e43225a29a651387ecc5567` |
+| [`ledger/prep_ledger.jsonl`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/ledger/prep_ledger.jsonl) | 3,351 | `184b94c743e9f0daa71a1bc16caf775a99cf58482f522ce372d24feeb5d90842` |
+| [`protocol/COMMITMENTS.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/protocol/COMMITMENTS.json) | 1,225 | `e9c9dc150e5ac137ea701177db81595063847b73f81a1d4cd9b24b8f91c1bb5b` |
+| [`protocol/INSTRUCTIONS_TASK_A.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/protocol/INSTRUCTIONS_TASK_A.md) | 4,876 | `01a898ad45564e23a21b1962b9cee183c9f3cf349664b46a657518897cac95fa` |
+| [`protocol/PROTOCOL.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/protocol/PROTOCOL.md) | 11,628 | `a5219598cfe83f0acb3bf6ce3ecb0c77827c88950118452f4640e228a4a9ffa0` |
+| [`protocol/SCHEMA.md`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/protocol/SCHEMA.md) | 4,625 | `9a41d0360daa25442fdfe6d73c32a733223cdf33a5b50f3b044617b7fe35ce8b` |
+| [`protocol/taskA_items.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/protocol/taskA_items.json) | 2,543 | `02cea6db10e31e3f2087c2d2709de5a177b2077bc1b824fdc1e3ff7d5c738a7c` |
+| [`qa/browser_qa_report.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/qa/browser_qa_report.json) | 3,809 | `4a932c07adb9a59f41e9ccb563bcfb6c69a96accdae0559467478fd667c1470c` |
+| [`qa/validator_qa_report.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/qa/validator_qa_report.json) | 5,116 | `3e7aa6aad98c2cd8b81ee92916d14a445bf032eb7bb5b139fd9c69a405c0a366` |
+| [`scripts/browser_qa.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/browser_qa.py) | 12,827 | `2f913d2967b6a711f229fee13ab3d03e0b3b6eccd229eb358d9e9627c85221ad` |
+| [`scripts/build_publish.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/build_publish.py) | 7,393 | `6edf2dfe1c6c009004c497a322c8282a5c1d101e9dbcea036261bf3e7920abb5` |
+| [`scripts/build_taskA.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/build_taskA.py) | 3,982 | `4d8605c6dc2b402478ba303f0bc3e676af854bc095d175c4aea62afdd8561260` |
+| [`scripts/build_taskB.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/build_taskB.py) | 5,415 | `4f2d6c19227204995e620a6904195f35566a75802102c3f0e7748d671fe8a938` |
+| [`scripts/freeze_ids.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/freeze_ids.py) | 8,395 | `6eb79a6b87a3d6a349e9d2c8fd7ae37c38be318b7b8982ead76387539b5122fc` |
+| [`scripts/make_fixtures_and_qa.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/make_fixtures_and_qa.py) | 9,554 | `2b1c517261c775acc0dd8dab837580bac4c8dbcb38c8d61dab2826ca15f66ad6` |
+| [`scripts/masking_audit.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/masking_audit.py) | 8,835 | `3f9c29f625a1c5c1f47c612a1f6816d9ce8d3214d2741bc052dde681771c5397` |
+| [`scripts/prep_ledger.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/prep_ledger.py) | 5,224 | `6e82c09a6891223edb5e60bb234b7689d291fc0b27ff0213cbdac25903670117` |
+| [`scripts/private_backup.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/private_backup.py) | 4,466 | `e90a2b386a6e245c6dc9747ac0aea0259c44652b165902d1bdad9684615fa9cb` |
+| [`scripts/validate_export.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/validate_export.py) | 9,825 | `e83bf27ded448a15777512a3f3b4ef3e93ad515fb62f14403a44dc170060aeac` |
+| [`scripts/verify_source.py`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/scripts/verify_source.py) | 5,606 | `3ee104e99b598c147c7969f17f9d07c758b6f31524fa3d4fcd6d4b5401c1f507` |
+| [`verify/masking_audit.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/verify/masking_audit.json) | 1,087 | `63ddd5a945d3c13906c6937962c77f92d04bed7a69d77cda4bf4575a124bc8e9` |
+| [`verify/private_backup.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/verify/private_backup.json) | 995 | `744dfbcf9c98802a54d8a373c69d4cf4945e0e8eaf4823e93aa77db8a74baed9` |
+| [`verify/published_verification.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/verify/published_verification.json) | 1,492 | `ff53a35b48e16496c83f5009ae5827a8ea8b8150347d3f32251f052e6864db0e` |
+| [`verify/source_verification_summary.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/verify/source_verification_summary.json) | 1,028 | `f360789743c5235070629448131afba28b662fda0a8b78b04f5ec8c90154f54a` |
+| [`verify/taskA_completeness_summary.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/verify/taskA_completeness_summary.json) | 748 | `e3b7c43497e9165ddaf0197eeb7375ffe744bdef0a7e14156e9c74992c6ebda1` |
+| [`verify/taskB_completeness_summary.json`](https://github.com/bijay299/XXResearch/blob/42d2d24cc96eddd06c6a01ecd53d88ed48cd63fe/results/teapot_human_review_v1/verify/taskB_completeness_summary.json) | 601 | `c2c7a869d7ee0b1e951b4d993f66af021f33a2d71f80f8053de787d6e5fb7050` |
+
+**32 tracked files, 155,139 bytes.**
+
+## Scope reminder
+
+This index establishes **preparation and integrity only**: that the package was built from verified source material, that it is complete and masked as described, that it functions offline, and that the published artifact is the one produced.
+
+It establishes **nothing** about erasure efficacy, retention, quality, evaluator bias, novelty or paper readiness, and it does **not** establish that any participant exists, that any independent label was collected, or that the evaluation is scientifically valid. **No reviewer has been recruited or contacted and no response exists.** Task B is prepared but **not released**.
