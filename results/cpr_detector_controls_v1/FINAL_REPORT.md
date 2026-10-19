@@ -302,6 +302,28 @@ CUDA_VISIBLE_DEVICES=2 $CPRD_PY code/gate/bringup_gpu.py   # reproduces the bloc
 
 ---
 
+## 8. Publication and release verification
+
+Release **`cpr-detector-controls-v1-entrygate`** (id 417012770), target commit
+`00bc8ae0a3d98640cb49cbbe616d2101e827e64f`, six assets.
+
+All assets were **downloaded back from GitHub into a fresh verification area**
+and verified: `sha256sum -c` **OK on every asset**; both detectors' raw
+qualification files contain **280 rows over 7 classes** each; and the native
+PEFT adapter was **restored from the downloaded bytes** on a fresh FLUX build —
+**152/152 tensors loaded, recomputed hash `6ae4afdb…` matching the stored
+hash**, all finite.
+
+**Disclosed verification limits.** This verifies **effective-weight
+restoration** only; **merged/unmerged BF16 bit equality is not asserted**.
+There is **no production adapter and there are no generated images** to verify,
+because production never started. The download used the same host and token as
+the upload. COCO photographs are deliberately **not** redistributed, so their
+"counts" are verified as manifest entries (264 unique ids), not as published
+image bytes.
+
+---
+
 ### Attribution and licensing
 
 Native GEM trainer, wrapper and PEFT adaptation execute from a **fresh
