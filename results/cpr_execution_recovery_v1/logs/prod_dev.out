@@ -1,0 +1,45 @@
+[ok] gen.m0_dev ok held=129s
+[ok] score.m0_dev ok held=9s
+dev M0 eligibility (informational, not a gate) {'primary': {'target': 12, 'allowed': 12, 'per_allowed_class': {'oven': 3, 'sink': 3, 'bus': 3, 'train': 3}}, 'secondary': {'target': 12, 'allowed': 12, 'per_allowed_class': {'oven': 3, 'sink': 3, 'bus': 3, 'train': 3}}, 'common': {'target': 12, 'allowed': 12, 'per_allowed_class': {'oven': 3, 'sink': 3, 'bus': 3, 'train': 3}}}
+PHASE dev_m0 OK
+[ok] train.dev.native_gem.lr_1e-3 ok held=332s
+[ok] train.dev.cpr.lr_1e-3 ok held=332s
+[ok] train.dev.centered_radial.lr_1e-3 ok held=332s
+[ok] train.dev.truncated_anchor.lr_1e-3 ok held=335s
+[ok] gen.dev.native_gem.lr_1e-3 ok held=373s
+[ok] gen.dev.cpr.lr_1e-3 ok held=372s
+[ok] score.dev.native_gem.lr_1e-3 ok held=21s
+[ok] score.dev.cpr.lr_1e-3 ok held=17s
+[ok] gen.dev.centered_radial.lr_1e-3 ok held=371s
+[ok] score.dev.centered_radial.lr_1e-3 ok held=15s
+[ok] gen.dev.truncated_anchor.lr_1e-3 ok held=371s
+[ok] score.dev.truncated_anchor.lr_1e-3 ok held=15s
+[ok] train.dev.anchor_only.lr_1e-3 ok held=334s
+[ok] train.dev.axial_margin.lr_1e-3 ok held=335s
+[ok] train.dev.native_gem.lr_5e-4 ok held=333s
+[ok] train.dev.cpr.lr_5e-4 ok held=333s
+[ok] gen.dev.anchor_only.lr_1e-3 ok held=372s
+[ok] gen.dev.axial_margin.lr_1e-3 ok held=370s
+[ok] score.dev.anchor_only.lr_1e-3 ok held=15s
+[ok] score.dev.axial_margin.lr_1e-3 ok held=16s
+[ok] gen.dev.native_gem.lr_5e-4 ok held=373s
+[ok] score.dev.native_gem.lr_5e-4 ok held=15s
+[ok] gen.dev.cpr.lr_5e-4 ok held=371s
+[ok] score.dev.cpr.lr_5e-4 ok held=15s
+[ok] train.dev.centered_radial.lr_5e-4 ok held=339s
+[ok] train.dev.truncated_anchor.lr_5e-4 ok held=336s
+[ok] train.dev.anchor_only.lr_5e-4 ok held=337s
+[ok] train.dev.axial_margin.lr_5e-4 ok held=337s
+[ok] gen.dev.centered_radial.lr_5e-4 ok held=379s
+[ok] gen.dev.truncated_anchor.lr_5e-4 ok held=373s
+[ok] score.dev.centered_radial.lr_5e-4 ok held=21s
+[ok] score.dev.truncated_anchor.lr_5e-4 ok held=19s
+[ok] gen.dev.anchor_only.lr_5e-4 ok held=372s
+[ok] score.dev.anchor_only.lr_5e-4 ok held=15s
+[ok] gen.dev.axial_margin.lr_5e-4 ok held=370s
+[ok] score.dev.axial_margin.lr_5e-4 ok held=15s
+PHASE dev_train OK
+{"native_gem": ["dev.native_gem.lr_1e-3.terminal", 1.0, 0.6666666666666666, true], "cpr": ["dev.cpr.lr_1e-3.terminal", 0.75, 0.8333333333333334, false], "centered_radial": ["dev.centered_radial.lr_1e-3.terminal", 1.0, 0.8333333333333334, true], "truncated_anchor": ["dev.truncated_anchor.lr_1e-3.terminal", 0.8333333333333334, 0.75, true], "anchor_only": ["dev.anchor_only.lr_1e-3.terminal", 1.0, 0.8333333333333334, true], "axial_margin": ["dev.axial_margin.lr_1e-3.terminal", 0.9166666666666666, 0.8333333333333334, true]}
+comparator anchor_only | max R among S>=0.80 arm-selected controls
+PHASE dev_select OK
+DEV_PIPELINE_DONE

@@ -1,0 +1,15 @@
+{
+ "basis": "measured: eng3/eng4/valid 132-state native trajectory 184 s held (~13.7 s/update incl. load ~35 s -> 250 states ~ 23 updates ~ 6 min); 4-image dev technical batch 35.6 s held gen (~5 s/image + ~9.5 s load), 7.5 s scoring",
+ "images_primary": 1928,
+ "train_trajectories": 36,
+ "est_train_gpu_h": 3.6,
+ "est_gen_gpu_h": 2.68,
+ "est_total_gpu_h_no_margin": 6.28,
+ "est_total_gpu_h_with_30pct_margin": 8.16,
+ "ceilings": {
+  "cumulative_gpu_h": 24,
+  "eng_plus_main_gpu_h": 16
+ },
+ "carried_plus_engineering_gpu_h_so_far": 0.55,
+ "decision": "proceed: projected main-bucket cost far below the 16 GPU-h eng+main cap; 4 GPUs used in parallel (wall ~1.5-2.5 h)"
+}

@@ -13,3 +13,6 @@
 - 19:55:42Z eng2: native 132 st all checks PASS (wall 184s, peak RSS 1.6 GiB). CPR 44 st: only probe idx0 failed: reduction_bitwise recomputed on CPU (CUDA scalar divide is reciprocal-multiply, 1-ulp) -> now same-device recompute. Added saved-vs-restored key/shape check in load_adapter, AxialDomainViolation -> exit 7 failed-row handling. eng3 (native/cpr) + techbatch (4 dev technical images + score) launched.
 
 ## 2026-10-19T20:06Z FREEZE_01 prepared: eng3/eng4 gates PASS (all six arms on real trajectories); protocol/addendum/sample written; test_analysis re-run on CPU outside supervisor (gap). Next: commit+push freeze, then final validation valid.* (6 arms).
+- 2026-10-19T20:08Z FREEZE_01 pushed as c8d58bf8224f9d9ab8eca7092c3b407a1faea9a2; launching final validation valid.* (6 arms)
+- 20:11Z final validation valid.* PASS (6 arms; fresh seeds 6301-6306; indices native [0,12,121], others [0,12,33]; freeze commit was c8d58bf at 20:06:05Z — earlier 20:08Z note was approximate). Launching dev pipeline (dev_m0, dev_train, dev_select).
+- 2026-10-19T20:50:41Z dev pipeline done: selection lock written (configs/selection_lock.json); committing lock BEFORE any test-model output; then ho_m0/ho_run.

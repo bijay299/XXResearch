@@ -1,0 +1,934 @@
+/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/transformers/utils/hub.py:127: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/xformers/ops/fmha/flash.py:211: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.
+  @torch.library.impl_abstract("xformers_flash::flash_fwd")
+/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/xformers/ops/fmha/flash.py:344: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.
+  @torch.library.impl_abstract("xformers_flash::flash_bwd")
+{
+  "_allow_init": true,
+  "model_type": "flux",
+  "model_name_or_path": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--black-forest-labs--FLUX.1-dev/snapshots/3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+  "model_dtype": "float16",
+  "scheduler": "default",
+  "image_size": 512,
+  "num_inference_steps": 28,
+  "inference_guidance_scale": 3.5
+}
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]Loading pipeline components...:  14%|█▍        | 1/7 [00:00<00:01,  5.03it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:00<00:00,  4.83it/s]You set `add_prefix_space`. The tokenizer needs to be converted from the slow tokenizers
+Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  4.48it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  8.74it/s][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  8.74it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  8.73it/s]
+Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  5.11it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  4.95it/s]
+Finding Parameter Subset for the given conditions
+> startswith: ['transformer']
+> contains: None
+> contains_substring: None
+> endswith: ['add_q_proj', 'add_k_proj', 'to_q', 'to_k']
+Target modules:
+> transformer.transformer_blocks.0.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.0.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.0.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.0.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+trainable params: 7,471,104 || all params: 16,878,070,243 || trainable%: 0.0443
+Successfully added 'lora' adapters for parameter subset qk_dual!
+Using inference schedule (28 steps) instead of training schedule (1000 steps)
+Training GEM:   0%|          | 0/26 [00:00<?, ?step/s]/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.
+  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]
+Training GEM:   4%|▍         | 1/26 [00:14<05:56, 14.26s/step]Training GEM:   8%|▊         | 2/26 [00:28<05:39, 14.16s/step]Training GEM:  12%|█▏        | 3/26 [00:42<05:22, 14.01s/step]Training GEM:  15%|█▌        | 4/26 [00:55<05:06, 13.91s/step]Starting training with step budget: 250
+Using 1 as the max. number of timesteps to process in parallel.
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 250, Global Step: 0
+GEM Loss [Global Step: 1] 1254.342529296875
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 249, Global Step: 0
+GEM Loss [Global Step: 1] 640.3634643554688
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 248, Global Step: 0
+GEM Loss [Global Step: 1] 443.0180358886719
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 247, Global Step: 0
+GEM Loss [Global Step: 1] 446.18719482421875
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 246, Global Step: 0
+GEM Loss [Global Step: 1] 234.06536865234375
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 245, Global Step: 0
+GEM Loss [Global Step: 1] 90.2126235961914
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 244, Global Step: 0
+GEM Loss [Global Step: 1] 157.3165740966797
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 243, Global Step: 0
+GEM Loss [Global Step: 1] 103.6423568725586
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 242, Global Step: 0
+GEM Loss [Global Step: 1] 64.10491943359375
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 241, Global Step: 0
+GEM Loss [Global Step: 1] 54.418182373046875
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 240, Global Step: 0
+GEM Loss [Global Step: 1] 53.65549087524414
+GEM Loss [Global Step: 1] 3541.3267402648926
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 239, Global Step: 1
+GEM Loss [Global Step: 2] 1206.456298828125
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 238, Global Step: 1
+GEM Loss [Global Step: 2] 531.7247314453125
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 237, Global Step: 1
+GEM Loss [Global Step: 2] 620.0575561523438
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 236, Global Step: 1
+GEM Loss [Global Step: 2] 599.3710327148438
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 235, Global Step: 1
+GEM Loss [Global Step: 2] 515.56005859375
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 234, Global Step: 1
+GEM Loss [Global Step: 2] 295.42010498046875
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 233, Global Step: 1
+GEM Loss [Global Step: 2] 123.96781921386719
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 232, Global Step: 1
+GEM Loss [Global Step: 2] 97.2525405883789
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 231, Global Step: 1
+GEM Loss [Global Step: 2] 78.52912902832031
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 230, Global Step: 1
+GEM Loss [Global Step: 2] 71.35572052001953
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 229, Global Step: 1
+GEM Loss [Global Step: 2] 73.13551330566406
+GEM Loss [Global Step: 2] 4212.830505371094
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 228, Global Step: 2
+GEM Loss [Global Step: 3] 601.3949584960938
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 227, Global Step: 2
+GEM Loss [Global Step: 3] 524.540283203125
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 226, Global Step: 2
+GEM Loss [Global Step: 3] 502.88726806640625
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 225, Global Step: 2
+GEM Loss [Global Step: 3] 351.8683166503906
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 224, Global Step: 2
+GEM Loss [Global Step: 3] 426.8416442871094
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 223, Global Step: 2
+GEM Loss [Global Step: 3] 134.46070861816406
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 222, Global Step: 2
+GEM Loss [Global Step: 3] 101.61788177490234
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 221, Global Step: 2
+GEM Loss [Global Step: 3] 92.92893981933594
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 220, Global Step: 2
+GEM Loss [Global Step: 3] 80.66560363769531
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 219, Global Step: 2
+GEM Loss [Global Step: 3] 77.49961853027344
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 218, Global Step: 2
+GEM Loss [Global Step: 3] 66.12564849853516
+GEM Loss [Global Step: 3] 2960.8308715820312
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 217, Global Step: 3
+GEM Loss [Global Step: 4] 1125.525634765625
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 216, Global Step: 3
+GEM Loss [Global Step: 4] 901.9286499023438
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 215, Global Step: 3
+GEM Loss [Global Step: 4] 605.6414794921875
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 214, Global Step: 3
+GEM Loss [Global Step: 4] 216.3511505126953
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 213, Global Step: 3
+GEM Loss [Global Step: 4] 176.9417266845703
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 212, Global Step: 3
+GEM Loss [Global Step: 4] 138.25631713867188
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 211, Global Step: 3
+GEM Loss [Global Step: 4] 179.405029296875
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 210, Global Step: 3
+GEM Loss [Global Step: 4] 123.81720733642578
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 209, Global Step: 3
+GEM Loss [Global Step: 4] 111.94235229492188
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 208, Global Step: 3
+GEM Loss [Global Step: 4] 96.0646743774414
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 207, Global Step: 3
+GEM Loss [Global Step: 4] 90.54744720458984
+GEM Loss [Global Step: 4] 3766.4216690063477
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 206, Global Step: 4
+GEM Loss [Global Step: 5] 1391.032470703125
+Training GEM:  19%|█▉        | 5/26 [01:09<04:51, 13.88s/step]Training GEM:  23%|██▎       | 6/26 [01:23<04:37, 13.89s/step]Training GEM:  27%|██▋       | 7/26 [01:37<04:23, 13.87s/step]Training GEM:  31%|███       | 8/26 [01:51<04:09, 13.84s/step]Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 205, Global Step: 4
+GEM Loss [Global Step: 5] 730.1135864257812
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 204, Global Step: 4
+GEM Loss [Global Step: 5] 443.37542724609375
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 203, Global Step: 4
+GEM Loss [Global Step: 5] 393.4211730957031
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 202, Global Step: 4
+GEM Loss [Global Step: 5] 444.17181396484375
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 201, Global Step: 4
+GEM Loss [Global Step: 5] 318.8935546875
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 200, Global Step: 4
+GEM Loss [Global Step: 5] 219.95162963867188
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 199, Global Step: 4
+GEM Loss [Global Step: 5] 177.98594665527344
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 198, Global Step: 4
+GEM Loss [Global Step: 5] 160.32095336914062
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 197, Global Step: 4
+GEM Loss [Global Step: 5] 117.41532897949219
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 196, Global Step: 4
+GEM Loss [Global Step: 5] 99.4161148071289
+GEM Loss [Global Step: 5] 4496.097999572754
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 195, Global Step: 5
+GEM Loss [Global Step: 6] 933.5305786132812
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 194, Global Step: 5
+GEM Loss [Global Step: 6] 608.1871337890625
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 193, Global Step: 5
+GEM Loss [Global Step: 6] 364.8559265136719
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 192, Global Step: 5
+GEM Loss [Global Step: 6] 314.5856018066406
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 191, Global Step: 5
+GEM Loss [Global Step: 6] 175.7386474609375
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 190, Global Step: 5
+GEM Loss [Global Step: 6] 146.1798858642578
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 189, Global Step: 5
+GEM Loss [Global Step: 6] 115.80210876464844
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 188, Global Step: 5
+GEM Loss [Global Step: 6] 95.29794311523438
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 187, Global Step: 5
+GEM Loss [Global Step: 6] 93.70355987548828
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 186, Global Step: 5
+GEM Loss [Global Step: 6] 81.04130554199219
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 185, Global Step: 5
+GEM Loss [Global Step: 6] 74.14127349853516
+GEM Loss [Global Step: 6] 3003.06396484375
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 184, Global Step: 6
+GEM Loss [Global Step: 7] 538.5499877929688
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 183, Global Step: 6
+GEM Loss [Global Step: 7] 423.58709716796875
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 182, Global Step: 6
+GEM Loss [Global Step: 7] 396.983154296875
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 181, Global Step: 6
+GEM Loss [Global Step: 7] 517.6151733398438
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 180, Global Step: 6
+GEM Loss [Global Step: 7] 568.8817138671875
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 179, Global Step: 6
+GEM Loss [Global Step: 7] 201.06423950195312
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 178, Global Step: 6
+GEM Loss [Global Step: 7] 132.9082794189453
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 177, Global Step: 6
+GEM Loss [Global Step: 7] 86.44869232177734
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 176, Global Step: 6
+GEM Loss [Global Step: 7] 74.32347106933594
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 175, Global Step: 6
+GEM Loss [Global Step: 7] 76.82221221923828
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 174, Global Step: 6
+GEM Loss [Global Step: 7] 86.36345672607422
+GEM Loss [Global Step: 7] 3103.547477722168
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 173, Global Step: 7
+GEM Loss [Global Step: 8] 526.4296875
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 172, Global Step: 7
+GEM Loss [Global Step: 8] 521.7577514648438
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 171, Global Step: 7
+GEM Loss [Global Step: 8] 302.35498046875
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 170, Global Step: 7
+GEM Loss [Global Step: 8] 282.178955078125
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 169, Global Step: 7
+GEM Loss [Global Step: 8] 223.01473999023438
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 168, Global Step: 7
+GEM Loss [Global Step: 8] 146.69171142578125
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 167, Global Step: 7
+GEM Loss [Global Step: 8] 96.88525390625
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 166, Global Step: 7
+GEM Loss [Global Step: 8] 72.43766021728516
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 165, Global Step: 7
+GEM Loss [Global Step: 8] 66.46137237548828
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 164, Global Step: 7
+GEM Loss [Global Step: 8] 57.68207550048828
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 163, Global Step: 7
+GEM Loss [Global Step: 8] 56.748779296875
+GEM Loss [Global Step: 8] 2352.642967224121
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 162, Global Step: 8
+GEM Loss [Global Step: 9] 463.7175598144531
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 161, Global Step: 8
+GEM Loss [Global Step: 9] 382.9673767089844
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 160, Global Step: 8
+GEM Loss [Global Step: 9] 337.10321044921875
+Processing batch [3:4] with timestep indices [3]
+Training GEM:  35%|███▍      | 9/26 [02:05<03:54, 13.81s/step]Training GEM:  38%|███▊      | 10/26 [02:18<03:40, 13.79s/step]Training GEM:  42%|████▏     | 11/26 [02:32<03:26, 13.78s/step]Training GEM:  46%|████▌     | 12/26 [02:46<03:13, 13.82s/step]Processed 1 timesteps in parallel. Budget left: 159, Global Step: 8
+GEM Loss [Global Step: 9] 308.59869384765625
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 158, Global Step: 8
+GEM Loss [Global Step: 9] 328.35552978515625
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 157, Global Step: 8
+GEM Loss [Global Step: 9] 273.93359375
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 156, Global Step: 8
+GEM Loss [Global Step: 9] 237.64988708496094
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 155, Global Step: 8
+GEM Loss [Global Step: 9] 178.17864990234375
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 154, Global Step: 8
+GEM Loss [Global Step: 9] 160.814208984375
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 153, Global Step: 8
+GEM Loss [Global Step: 9] 148.0902862548828
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 152, Global Step: 8
+GEM Loss [Global Step: 9] 128.057373046875
+GEM Loss [Global Step: 9] 2947.4663696289062
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 151, Global Step: 9
+GEM Loss [Global Step: 10] 453.8125915527344
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 150, Global Step: 9
+GEM Loss [Global Step: 10] 388.3212890625
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 149, Global Step: 9
+GEM Loss [Global Step: 10] 421.5830993652344
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 148, Global Step: 9
+GEM Loss [Global Step: 10] 371.0845031738281
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 147, Global Step: 9
+GEM Loss [Global Step: 10] 283.625
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 146, Global Step: 9
+GEM Loss [Global Step: 10] 236.01669311523438
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 145, Global Step: 9
+GEM Loss [Global Step: 10] 175.21435546875
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 144, Global Step: 9
+GEM Loss [Global Step: 10] 129.95751953125
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 143, Global Step: 9
+GEM Loss [Global Step: 10] 87.7698974609375
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 142, Global Step: 9
+GEM Loss [Global Step: 10] 72.58081817626953
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 141, Global Step: 9
+GEM Loss [Global Step: 10] 71.24053955078125
+GEM Loss [Global Step: 10] 2691.2063064575195
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 140, Global Step: 10
+GEM Loss [Global Step: 11] 409.0687255859375
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 139, Global Step: 10
+GEM Loss [Global Step: 11] 520.4609985351562
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 138, Global Step: 10
+GEM Loss [Global Step: 11] 385.33551025390625
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 137, Global Step: 10
+GEM Loss [Global Step: 11] 207.52005004882812
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 136, Global Step: 10
+GEM Loss [Global Step: 11] 197.2072296142578
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 135, Global Step: 10
+GEM Loss [Global Step: 11] 146.66824340820312
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 134, Global Step: 10
+GEM Loss [Global Step: 11] 116.44855499267578
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 133, Global Step: 10
+GEM Loss [Global Step: 11] 103.30348205566406
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 132, Global Step: 10
+GEM Loss [Global Step: 11] 105.98380279541016
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 131, Global Step: 10
+GEM Loss [Global Step: 11] 92.91365051269531
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 130, Global Step: 10
+GEM Loss [Global Step: 11] 92.82354736328125
+GEM Loss [Global Step: 11] 2377.7337951660156
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 129, Global Step: 11
+GEM Loss [Global Step: 12] 334.7483825683594
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 128, Global Step: 11
+GEM Loss [Global Step: 12] 419.08642578125
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 127, Global Step: 11
+GEM Loss [Global Step: 12] 639.6361083984375
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 126, Global Step: 11
+GEM Loss [Global Step: 12] 521.2089233398438
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 125, Global Step: 11
+GEM Loss [Global Step: 12] 470.8614196777344
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 124, Global Step: 11
+GEM Loss [Global Step: 12] 364.911865234375
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 123, Global Step: 11
+GEM Loss [Global Step: 12] 182.2917022705078
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 122, Global Step: 11
+GEM Loss [Global Step: 12] 152.11573791503906
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 121, Global Step: 11
+GEM Loss [Global Step: 12] 142.4845733642578
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 120, Global Step: 11
+GEM Loss [Global Step: 12] 143.47830200195312
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 119, Global Step: 11
+GEM Loss [Global Step: 12] 121.18473052978516
+GEM Loss [Global Step: 12] 3492.008171081543
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 118, Global Step: 12
+GEM Loss [Global Step: 13] 368.9515686035156
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 117, Global Step: 12
+GEM Loss [Global Step: 13] 373.2049865722656
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 116, Global Step: 12
+GEM Loss [Global Step: 13] 365.2046813964844
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 115, Global Step: 12
+GEM Loss [Global Step: 13] 398.61279296875
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 114, Global Step: 12
+GEM Loss [Global Step: 13] 319.57232666015625
+Processing batch [5:6] with timestep indices [5]
+Training GEM:  50%|█████     | 13/26 [03:00<02:59, 13.80s/step]Training GEM:  54%|█████▍    | 14/26 [03:13<02:45, 13.80s/step]Training GEM:  58%|█████▊    | 15/26 [03:27<02:31, 13.79s/step]Training GEM:  62%|██████▏   | 16/26 [03:41<02:17, 13.77s/step]Processed 1 timesteps in parallel. Budget left: 113, Global Step: 12
+GEM Loss [Global Step: 13] 249.7162322998047
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 112, Global Step: 12
+GEM Loss [Global Step: 13] 190.49383544921875
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 111, Global Step: 12
+GEM Loss [Global Step: 13] 130.97567749023438
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 110, Global Step: 12
+GEM Loss [Global Step: 13] 117.08622741699219
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 109, Global Step: 12
+GEM Loss [Global Step: 13] 116.08322143554688
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 108, Global Step: 12
+GEM Loss [Global Step: 13] 115.26904296875
+GEM Loss [Global Step: 13] 2745.1705932617188
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 107, Global Step: 13
+GEM Loss [Global Step: 14] 309.61865234375
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 106, Global Step: 13
+GEM Loss [Global Step: 14] 338.52978515625
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 105, Global Step: 13
+GEM Loss [Global Step: 14] 367.2078552246094
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 104, Global Step: 13
+GEM Loss [Global Step: 14] 381.4872131347656
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 103, Global Step: 13
+GEM Loss [Global Step: 14] 366.919677734375
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 102, Global Step: 13
+GEM Loss [Global Step: 14] 355.59967041015625
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 101, Global Step: 13
+GEM Loss [Global Step: 14] 355.0771484375
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 100, Global Step: 13
+GEM Loss [Global Step: 14] 261.7907409667969
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 99, Global Step: 13
+GEM Loss [Global Step: 14] 191.6308135986328
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 98, Global Step: 13
+GEM Loss [Global Step: 14] 129.60977172851562
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 97, Global Step: 13
+GEM Loss [Global Step: 14] 125.1450424194336
+GEM Loss [Global Step: 14] 3182.616371154785
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 96, Global Step: 14
+GEM Loss [Global Step: 15] 327.4508361816406
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 95, Global Step: 14
+GEM Loss [Global Step: 15] 326.4175720214844
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 94, Global Step: 14
+GEM Loss [Global Step: 15] 454.1269226074219
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 93, Global Step: 14
+GEM Loss [Global Step: 15] 300.4427185058594
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 92, Global Step: 14
+GEM Loss [Global Step: 15] 129.42697143554688
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 91, Global Step: 14
+GEM Loss [Global Step: 15] 96.58642578125
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 90, Global Step: 14
+GEM Loss [Global Step: 15] 78.17216491699219
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 89, Global Step: 14
+GEM Loss [Global Step: 15] 81.30558013916016
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 88, Global Step: 14
+GEM Loss [Global Step: 15] 69.99766540527344
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 87, Global Step: 14
+GEM Loss [Global Step: 15] 78.50032043457031
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 86, Global Step: 14
+GEM Loss [Global Step: 15] 79.03458404541016
+GEM Loss [Global Step: 15] 2021.4617614746094
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 85, Global Step: 15
+GEM Loss [Global Step: 16] 233.7325897216797
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 84, Global Step: 15
+GEM Loss [Global Step: 16] 281.3617858886719
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 83, Global Step: 15
+GEM Loss [Global Step: 16] 352.97967529296875
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 82, Global Step: 15
+GEM Loss [Global Step: 16] 487.2301330566406
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 81, Global Step: 15
+GEM Loss [Global Step: 16] 332.6937561035156
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 80, Global Step: 15
+GEM Loss [Global Step: 16] 235.48773193359375
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 79, Global Step: 15
+GEM Loss [Global Step: 16] 172.67727661132812
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 78, Global Step: 15
+GEM Loss [Global Step: 16] 119.19730377197266
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 77, Global Step: 15
+GEM Loss [Global Step: 16] 106.59526062011719
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 76, Global Step: 15
+GEM Loss [Global Step: 16] 102.91674041748047
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 75, Global Step: 15
+GEM Loss [Global Step: 16] 97.041748046875
+GEM Loss [Global Step: 16] 2521.9140014648438
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 74, Global Step: 16
+GEM Loss [Global Step: 17] 197.52171325683594
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 73, Global Step: 16
+GEM Loss [Global Step: 17] 275.14923095703125
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 72, Global Step: 16
+GEM Loss [Global Step: 17] 265.6178894042969
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 71, Global Step: 16
+GEM Loss [Global Step: 17] 332.6868591308594
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 70, Global Step: 16
+GEM Loss [Global Step: 17] 217.4624481201172
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 69, Global Step: 16
+GEM Loss [Global Step: 17] 195.8738250732422
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 68, Global Step: 16
+GEM Loss [Global Step: 17] 164.22891235351562
+Processing batch [7:8] with timestep indices [7]
+Training GEM:  65%|██████▌   | 17/26 [03:55<02:03, 13.77s/step]Training GEM:  69%|██████▉   | 18/26 [04:09<01:50, 13.77s/step]Training GEM:  73%|███████▎  | 19/26 [04:22<01:36, 13.77s/step]Training GEM:  77%|███████▋  | 20/26 [04:36<01:22, 13.77s/step]Processed 1 timesteps in parallel. Budget left: 67, Global Step: 16
+GEM Loss [Global Step: 17] 121.46537780761719
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 66, Global Step: 16
+GEM Loss [Global Step: 17] 132.04129028320312
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 65, Global Step: 16
+GEM Loss [Global Step: 17] 124.47787475585938
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 64, Global Step: 16
+GEM Loss [Global Step: 17] 106.34452056884766
+GEM Loss [Global Step: 17] 2132.869941711426
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 63, Global Step: 17
+GEM Loss [Global Step: 18] 188.66209411621094
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 62, Global Step: 17
+GEM Loss [Global Step: 18] 228.92835998535156
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 61, Global Step: 17
+GEM Loss [Global Step: 18] 305.5833740234375
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 60, Global Step: 17
+GEM Loss [Global Step: 18] 409.23828125
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 59, Global Step: 17
+GEM Loss [Global Step: 18] 274.0099792480469
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 58, Global Step: 17
+GEM Loss [Global Step: 18] 118.73311614990234
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 57, Global Step: 17
+GEM Loss [Global Step: 18] 110.43160247802734
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 56, Global Step: 17
+GEM Loss [Global Step: 18] 76.09903717041016
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 55, Global Step: 17
+GEM Loss [Global Step: 18] 62.904449462890625
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 54, Global Step: 17
+GEM Loss [Global Step: 18] 59.723506927490234
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 53, Global Step: 17
+GEM Loss [Global Step: 18] 88.88394165039062
+GEM Loss [Global Step: 18] 1923.1977424621582
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 52, Global Step: 18
+GEM Loss [Global Step: 19] 193.6194610595703
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 51, Global Step: 18
+GEM Loss [Global Step: 19] 227.1266326904297
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 50, Global Step: 18
+GEM Loss [Global Step: 19] 285.77716064453125
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 49, Global Step: 18
+GEM Loss [Global Step: 19] 244.58029174804688
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 48, Global Step: 18
+GEM Loss [Global Step: 19] 300.059326171875
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 47, Global Step: 18
+GEM Loss [Global Step: 19] 130.928466796875
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 46, Global Step: 18
+GEM Loss [Global Step: 19] 103.2806396484375
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 45, Global Step: 18
+GEM Loss [Global Step: 19] 76.32691192626953
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 44, Global Step: 18
+GEM Loss [Global Step: 19] 60.973262786865234
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 43, Global Step: 18
+GEM Loss [Global Step: 19] 57.72936248779297
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 42, Global Step: 18
+GEM Loss [Global Step: 19] 52.32559585571289
+GEM Loss [Global Step: 19] 1732.7271118164062
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 41, Global Step: 19
+GEM Loss [Global Step: 20] 134.25875854492188
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 40, Global Step: 19
+GEM Loss [Global Step: 20] 199.550537109375
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 39, Global Step: 19
+GEM Loss [Global Step: 20] 246.9903106689453
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 38, Global Step: 19
+GEM Loss [Global Step: 20] 239.52951049804688
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 37, Global Step: 19
+GEM Loss [Global Step: 20] 335.4302673339844
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 36, Global Step: 19
+GEM Loss [Global Step: 20] 227.80198669433594
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 35, Global Step: 19
+GEM Loss [Global Step: 20] 145.80322265625
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 34, Global Step: 19
+GEM Loss [Global Step: 20] 80.62872314453125
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 33, Global Step: 19
+GEM Loss [Global Step: 20] 66.48324584960938
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 32, Global Step: 19
+GEM Loss [Global Step: 20] 67.8510513305664
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 31, Global Step: 19
+GEM Loss [Global Step: 20] 59.574310302734375
+GEM Loss [Global Step: 20] 1803.9019241333008
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 30, Global Step: 20
+GEM Loss [Global Step: 21] 197.9381561279297
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 29, Global Step: 20
+GEM Loss [Global Step: 21] 142.0113067626953
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 28, Global Step: 20
+GEM Loss [Global Step: 21] 147.17074584960938
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 27, Global Step: 20
+GEM Loss [Global Step: 21] 156.29891967773438
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 26, Global Step: 20
+GEM Loss [Global Step: 21] 253.01028442382812
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 25, Global Step: 20
+GEM Loss [Global Step: 21] 148.75823974609375
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 24, Global Step: 20
+GEM Loss [Global Step: 21] 125.38334655761719
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 23, Global Step: 20
+GEM Loss [Global Step: 21] 77.44708251953125
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 22, Global Step: 20
+GEM Loss [Global Step: 21] 68.60859680175781
+Processing batch [9:10] with timestep indices [9]
+Training GEM:  81%|████████  | 21/26 [04:50<01:08, 13.80s/step]Training GEM:  85%|████████▍ | 22/26 [05:04<00:55, 13.87s/step]Training GEM:  85%|████████▍ | 22/26 [05:15<00:57, 14.33s/step]
+Processed 1 timesteps in parallel. Budget left: 21, Global Step: 20
+GEM Loss [Global Step: 21] 59.935543060302734
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 20, Global Step: 20
+GEM Loss [Global Step: 21] 60.931026458740234
+GEM Loss [Global Step: 21] 1437.4932479858398
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 19, Global Step: 21
+GEM Loss [Global Step: 22] 182.4462127685547
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 18, Global Step: 21
+GEM Loss [Global Step: 22] 126.71183776855469
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 17, Global Step: 21
+GEM Loss [Global Step: 22] 120.08641052246094
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 16, Global Step: 21
+GEM Loss [Global Step: 22] 116.05436706542969
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 15, Global Step: 21
+GEM Loss [Global Step: 22] 100.75810241699219
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 14, Global Step: 21
+GEM Loss [Global Step: 22] 92.91796875
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 13, Global Step: 21
+GEM Loss [Global Step: 22] 72.78951263427734
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 12, Global Step: 21
+GEM Loss [Global Step: 22] 45.94415283203125
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 11, Global Step: 21
+GEM Loss [Global Step: 22] 50.555511474609375
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 10, Global Step: 21
+GEM Loss [Global Step: 22] 55.83636474609375
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 9, Global Step: 21
+GEM Loss [Global Step: 22] 64.58860778808594
+GEM Loss [Global Step: 22] 1028.6890487670898
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 8, Global Step: 22
+GEM Loss [Global Step: 23] 152.81858825683594
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 7, Global Step: 22
+GEM Loss [Global Step: 23] 114.10641479492188
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 6, Global Step: 22
+GEM Loss [Global Step: 23] 116.68893432617188
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 5, Global Step: 22
+GEM Loss [Global Step: 23] 92.59496307373047
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 4, Global Step: 22
+GEM Loss [Global Step: 23] 62.40439987182617
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 3, Global Step: 22
+GEM Loss [Global Step: 23] 58.702667236328125
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 2, Global Step: 22
+GEM Loss [Global Step: 23] 52.368896484375
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 1, Global Step: 22
+GEM Loss [Global Step: 23] 45.05682373046875
+Step budget (250) exhausted, breaking out of batch loop.
+GEM Loss [Global Step: 23] 694.7416877746582
+Step budget (250) exhausted. Stopping at global_step 22.
+TRAIN_DONE dev.anchor_only.lr_5e-4
