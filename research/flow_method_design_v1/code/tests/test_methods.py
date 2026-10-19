@@ -3,6 +3,8 @@ import numpy as np
 import pytest
 from conftest import FAMILIES, make
 
+from vau.contracts import dev_rng
+
 from vau import adamw as aw
 from vau.contracts import ContractViolation, Ops
 from vau.methods import ARMS, Batch, GateConfig, Gated, make_arm
@@ -61,7 +63,7 @@ def test_rollback_is_bit_exact(family, inner):
     task, rng, th0, R1 = setup(family)
     name = "vau" if inner == "vau_nogate" else f"gated_{inner}"
     arm = arm_of(name, task, tau2=1e12)
-    ms = arm.init_state(th0, R1, 0)
+    ms = arm.init_state(th0, R1, dev_rng(0))
     th, _ = arm.step(ms, th0, batch(task, rng))             # accepted step -> nontrivial state
     m_b, v_b, t_b, th_b = ms.adam.m.copy(), ms.adam.v.copy(), ms.adam.t, th.copy()
     adam_obj = ms.adam
@@ -77,7 +79,7 @@ def test_rollback_is_bit_exact(family, inner):
 def test_gate_accepts_within_budget_and_commits():
     task, rng, th0, R1 = setup("mlp")
     arm = arm_of("vau", task, tau2=1e12)
-    ms = arm.init_state(th0, R1, 0)
+    ms = arm.init_state(th0, R1, dev_rng(0))
     th1, info = arm.step(ms, th0, batch(task, rng))
     assert info["accepted"] and info["s"] == 1.0 and ms.adam.t == 1 and not np.array_equal(th1, th0)
 
@@ -86,7 +88,7 @@ def test_gate_backtracks_to_half_on_linear_model():
     """Linear model, same gate batch, no clipping: rho(s) = s^2 rho(1) exactly."""
     task, rng, th0, R1 = setup("linear")
     probe_arm = make_arm("adamw", task)
-    ms0 = probe_arm.init_state(th0, R1, 0)
+    ms0 = probe_arm.init_state(th0, R1, dev_rng(0))
     b = batch(task, rng, same_gate=True)
     prop = probe_arm.propose(ms0, th0, b)
     g = Gated(make_arm("adamw", task), gate_cfg(1.0))
@@ -96,7 +98,7 @@ def test_gate_backtracks_to_half_on_linear_model():
     cfg = gate_cfg(1.0)
     tau2 = cfg.slack + 0.5 * rho1                     # fails at s=1, passes at s=1/2
     g.gate = GateConfig(tau2=tau2, M=cfg.M, n2=N2, delta=cfg.delta, T=cfg.T, R=R)
-    ms = g.init_state(th0, R1, 0)
+    ms = g.init_state(th0, R1, dev_rng(0))
     th1, info = g.step(ms, th0, b)
     assert info["s"] == 0.5 and info["accepted"]
     assert np.allclose(th1, th0 + 0.5 * prop.delta, rtol=0, atol=1e-15)
@@ -132,7 +134,7 @@ def test_operation_counters(family, name):
     steps = 3
     task, rng, th0, R1 = setup(family)
     arm = arm_of(name, task, ref_norms=[1e-3] * steps) if name == "adamw_stepmatch" else arm_of(name, task)
-    ms = arm.init_state(th0, R1, 0)
+    ms = arm.init_state(th0, R1, dev_rng(0))
     th = th0
     infos = []
     for _ in range(steps):
@@ -150,7 +152,7 @@ def test_operation_counters(family, name):
 def test_counters_when_rejecting():
     task, rng, th0, R1 = setup("linear")
     arm = arm_of("vau", task, tau2=-1.0)
-    ms = arm.init_state(th0, R1, 0)
+    ms = arm.init_state(th0, R1, dev_rng(0))
     th = th0
     for _ in range(2):
         th, _ = arm.step(ms, th, batch(task, rng))
@@ -161,10 +163,14 @@ def test_counters_when_rejecting():
 
 def test_stepmatch_norm():
     task, rng, th0, R1 = setup("mlp")
-    arm = arm_of("adamw_stepmatch", task)
-    ms = arm.init_state(th0, R1, 0)
+    arm = arm_of("adamw_stepmatch", task, metric="euclid")
+    ms = arm.init_state(th0, R1, dev_rng(0))
     th1, info = arm.step(ms, th0, batch(task, rng, match_norm=2.5e-4))
     assert np.isclose(np.linalg.norm(th1 - th0), 2.5e-4, rtol=1e-12)
+    armH = arm_of("adamw_stepmatch", task)                             # protocol default: H-norm
+    msH = armH.init_state(th0, R1, dev_rng(0))
+    _, infoH = armH.step(msH, th0, batch(task, rng, match_norm=0.7))
+    assert np.isclose(infoH["step_Hnorm"], 0.7, rtol=1e-12)
     with pytest.raises(ContractViolation):
         arm.step(ms, th1, batch(task, rng))                 # no target available
 
@@ -172,7 +178,7 @@ def test_stepmatch_norm():
 def test_pre_proj_state_uses_projected_gradient():
     task, rng, th0, R1 = setup("linear")
     arm = arm_of("pre_proj", task)
-    ms = arm.init_state(th0, R1, 0)
+    ms = arm.init_state(th0, R1, dev_rng(0))
     b = batch(task, rng)
     arm.step(ms, th0, b)
     _, g = task.erasure_loss_grad(th0, b.erase, Ops())
@@ -187,7 +193,7 @@ def test_vau_nogate_exact_probe_zero_first_order_drift_linear():
     arms = {n: arm_of(n, task, probe="exact", K=1) for n in ("vau_nogate", "post_euclid", "adamw")}
     drift = {}
     for n, arm in arms.items():
-        ms = arm.init_state(th0, R1, 0)
+        ms = arm.init_state(th0, R1, dev_rng(0))
         r = np.random.default_rng(5)
         th = th0
         for _ in range(4):
@@ -200,7 +206,7 @@ def test_vau_nogate_exact_probe_zero_first_order_drift_linear():
 def test_invalid_inputs_rejected():
     task, rng, th0, R1 = setup("flow")
     arm = arm_of("vau", task)
-    ms = arm.init_state(th0, R1, 0)
+    ms = arm.init_state(th0, R1, dev_rng(0))
     b = batch(task, rng)
     with pytest.raises(ContractViolation):
         arm.step(ms, th0[:-1], b)
@@ -215,7 +221,7 @@ def test_invalid_inputs_rejected():
     with pytest.raises(ContractViolation):
         arm.step(ms, th0, Batch(erase=b.erase, gate=(task.retained_batch(rng, N2 + 1),) * R))
     with pytest.raises(ContractViolation):
-        arm.init_state(th0, R1, 100)                                   # not a development seed
+        arm.init_state(th0, R1, 0)                                     # sketch rng must be a Generator
     with pytest.raises(ContractViolation):
         make_arm("vau", task)                                          # gate config required
     with pytest.raises(ContractViolation):
@@ -227,3 +233,6 @@ def test_invalid_inputs_rejected():
 
 def test_arm_registry_complete():
     assert set(ARMS) | {"vau"} == set(ALL_ARMS)
+    task, _, _, _ = setup("linear")
+    assert make_arm("earlystop_penalty", task, gate=gate_cfg(1.0)).name == "earlystop_penalty"
+    assert make_arm("gated_vau_nogate", task, gate=gate_cfg(1.0)).name == "vau"   # identical rule

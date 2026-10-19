@@ -1,0 +1,82 @@
+diff --git a/gem/operators/erasure/erasure_gem.py b/gem/operators/erasure/erasure_gem.py
+index 96c0311..298be5f 100644
+--- a/gem/operators/erasure/erasure_gem.py
++++ b/gem/operators/erasure/erasure_gem.py
+@@ -14,6 +14,9 @@ from gem.wrappers import BasePipelineWrapper
+ from gem.utils.debug import assert_model_gradients_valid, assert_tensor_valid
+ from gem.utils.memory import memory_cleanup
+ 
++# VAU integration (STATIC, NOT EXECUTED): copy native/vau_torch.py to gem/operators/erasure/vau_torch.py
++from gem.operators.erasure.vau_torch import VAUAdamW, VAUConfig, RetainedStream, build_retained_pool
++
+ 
+ @dataclass
+ class GEMConfig(ErasureBaseConfig):
+@@ -44,6 +47,20 @@ class GEMConfig(ErasureBaseConfig):
+ 
+     max_parallel_timesteps: int = 6
+ 
++    # VAU (Verified Adam-metric Update); 'none' keeps native GEM behaviour bit-for-bit
++    retention_method: str = "none"          # "none" | "vau"
++    retained_prompts_probe: List[str] = field(default_factory=list)   # R1 pool (disjoint from gate pool)
++    retained_prompts_gate: List[str] = field(default_factory=list)    # R2 pool, consumed without reuse
++    vau_n1: int = 32                        # R1 items (latent, timestep, prompt) used by the probes
++    vau_k: int = 16
++    vau_refresh: int = 5
++    vau_tau2: float = 0.0                   # must be set when retention_method == "vau"
++    vau_M: float = 1.0
++    vau_n2: int = 8
++    vau_delta: float = 0.05
++    vau_max_tries: int = 4
++    vau_seed: int = 0
++
+     @staticmethod
+     def get_default_adaptation_config() -> Optional[AdaptationConfig]:
+         return AdaptationConfig(adapter_mode="lora", subset_name='qk_dual')
+@@ -84,6 +101,7 @@ class GEM(ErasureOperator):
+ 
+         # Define the optimizer and loss function
+         optimizer = torch.optim.AdamW(wrapper.parameters(), lr=config.learning_rate)
++        vau = None
+ 
+         # Determine number of inference steps used for GEM internal denoising
+         internal_gem_num_inference_steps = config.partial_denoising_inference_timesteps or wrapper.pipe_config.num_inference_steps
+@@ -127,6 +145,22 @@ class GEM(ErasureOperator):
+         if config.use_inference_timesteps:
+             print(f"Using inference schedule ({internal_gem_num_inference_steps} steps) instead of training schedule ({wrapper.scheduler.config.num_train_timesteps} steps)")
+ 
++        if config.retention_method == "vau":
++            # Retained pools: teacher (adapter disabled) prefix rollouts with their own generator, base outputs
++            # cached; built before training so GEM's train_generator stream is untouched.
++            pool_kw = dict(n_steps=internal_gem_num_inference_steps, end_idx=max_timestep,
++                           image_size=wrapper.pipe_config.image_size,
++                           guidance_scale=config.partial_denoising_guidance_scale)
++            r1_pool = build_retained_pool(wrapper, config.retained_prompts_probe, seed=config.vau_seed, **pool_kw)
++            gate_pool = build_retained_pool(wrapper, config.retained_prompts_gate, seed=config.vau_seed + 1, **pool_kw)
++            vau_cfg = VAUConfig(k=config.vau_k, refresh=config.vau_refresh, tau2=config.vau_tau2, M=config.vau_M,
++                                n2=config.vau_n2, delta=config.vau_delta, T=expected_n_iterations,
++                                R=config.vau_max_tries, seed=config.vau_seed)
++            vau = VAUAdamW(optimizer, wrapper, vau_cfg, R1=r1_pool[:config.vau_n1],
++                           gate_stream=RetainedStream(gate_pool), n_steps=internal_gem_num_inference_steps)
++        elif config.retention_method != "none":
++            raise ValueError(f"Unknown retention_method: {config.retention_method}")
++
+         # Training loop
+         progress_bar = tqdm(range(expected_n_iterations), desc="Training GEM", unit="step")
+ 
+@@ -285,7 +319,14 @@ class GEM(ErasureOperator):
+ 
+             assert_model_gradients_valid(wrapper)
+ 
+-            optimizer.step()
++            if vau is None:
++                optimizer.step()                    # native GEM (EG:288)
++            else:
++                vau_info = vau.step()               # replaces optimizer.step(); may reject and roll back
++                self.log_loss_and_metrics_to_wandb(loss=traj_loss, metrics={
++                    'vau_s': vau_info['s'], 'vau_accepted': float(vau_info['accepted']),
++                    'vau_progress_lin': vau_info['progress_lin'], 'vau_rho_hat_last': vau_info['rho_hat'][-1],
++                }, step=global_step + 1, use_wandb=config.use_wandb)
+ 
+             # Log to WandB
+             if config.use_wandb and (step_budget <= 0 or (global_step + 1) % config.steps_between_validation == 0):

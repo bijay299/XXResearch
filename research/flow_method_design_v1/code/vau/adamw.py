@@ -41,10 +41,10 @@ class AdamWHP:
     weight_decay: float = 1e-2
 
     def __post_init__(self):
-        for name in ("lr", "eps"):
-            v = getattr(self, name)
-            if not (math.isfinite(v) and v > 0):
-                raise ContractViolation(f"{name} must be > 0, got {v}")
+        if not (math.isfinite(self.lr) and self.lr >= 0):     # lr = 0 allowed (integrity check I5)
+            raise ContractViolation(f"lr must be >= 0, got {self.lr}")
+        if not (math.isfinite(self.eps) and self.eps > 0):
+            raise ContractViolation(f"eps must be > 0, got {self.eps}")
         for name in ("beta1", "beta2"):
             v = getattr(self, name)
             if not (0.0 <= v < 1.0):

@@ -49,10 +49,11 @@ def _unit(diff, dist):
     return out
 
 
-def gem_loss(v, a, b, n_latents, eta=1.0, gamma=100.0):
-    """Native GEM target loss. Returns (loss, dloss/dv with v's shape)."""
+def gem_loss(v, a, b, n_latents, eta=1.0, gamma=100.0, eps_n=EPS_N):
+    """Native GEM target loss. Returns (loss, dloss/dv with v's shape).
+    eps_n = 1e-6 is native; eps_n = 0 gives the unshifted norm with zero subgradient at v == b (G4 cell)."""
     vf, af, bf = _prep(v, a, b, n_latents)
-    dp_vec, dn_vec = vf - af + EPS_N, vf - bf + EPS_N
+    dp_vec, dn_vec = vf - af + eps_n, vf - bf + eps_n
     dp, dn = np.linalg.norm(dp_vec, axis=1), np.linalg.norm(dn_vec, axis=1)
     h = dp - eta * dn
     c = gamma / n_latents
@@ -62,11 +63,11 @@ def gem_loss(v, a, b, n_latents, eta=1.0, gamma=100.0):
     return float(loss), grad.reshape(v.shape)
 
 
-def anchor_regression_loss(v, a, b, n_latents, eta=0.0, gamma=100.0):
+def anchor_regression_loss(v, a, b, n_latents, eta=0.0, gamma=100.0, eps_n=EPS_N):
     """eta = 0 in the native loss (pure attraction to the anchor teacher); eta != 0 is rejected."""
     if eta != 0.0:
         raise ContractViolation("anchor_regression_loss is defined only at eta=0")
-    return gem_loss(v, a, b, n_latents, eta=0.0, gamma=gamma)
+    return gem_loss(v, a, b, n_latents, eta=0.0, gamma=gamma, eps_n=eps_n)
 
 
 def cpr_alpha(vf, af, bf, tau_L=TAU_L):
@@ -79,10 +80,10 @@ def cpr_alpha(vf, af, bf, tau_L=TAU_L):
     return alpha, e, L, live
 
 
-def cpr_loss(v, a, b, n_latents, eta=1.0, gamma=100.0, tau_L=TAU_L):
+def cpr_loss(v, a, b, n_latents, eta=1.0, gamma=100.0, eps_n=EPS_N, tau_L=TAU_L):
     """CPR: D- replaced by alpha = (b-v).e_tau, e_tau = (b-a)/||b-a|| (0 if ||b-a|| <= tau_L)."""
     vf, af, bf = _prep(v, a, b, n_latents)
-    dp_vec = vf - af + EPS_N
+    dp_vec = vf - af + eps_n
     dp = np.linalg.norm(dp_vec, axis=1)
     alpha, e, _, _ = cpr_alpha(vf, af, bf, tau_L)
     h = dp - eta * alpha
@@ -94,11 +95,13 @@ def cpr_loss(v, a, b, n_latents, eta=1.0, gamma=100.0, tau_L=TAU_L):
 
 
 def retention_penalty(fr, fr0, lam):
-    """lam/2 * ||fr - fr0||^2 (sum over all retained samples and entries). Returns (value, d/dfr)."""
-    check_array("fr", fr)
+    """lam/2 * mean_{x in R1} ||f_x - f_x(theta0)||^2 (eval_protocol arms.definitions.penalty).
+    fr, fr0: (N_r, d). Returns (value, d/dfr)."""
+    check_array("fr", fr, ndim=2)
     check_array("fr0", fr0, shape=fr.shape)
     r = fr - fr0
-    return float(0.5 * lam * np.sum(r * r)), lam * r
+    n = fr.shape[0]
+    return float(0.5 * lam * np.sum(r * r) / n), (lam / n) * r
 
 
 LOSSES = {"gem": gem_loss, "cpr": cpr_loss, "anchor": anchor_regression_loss}

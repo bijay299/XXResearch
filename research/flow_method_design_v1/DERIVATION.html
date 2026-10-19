@@ -297,18 +297,18 @@ Adam-metric correction: characterisation and a strict separation</h1>
 <p><strong>Proposition 3</strong> (trust-region characterisation;
 standard). <em>Let <span class="math inline">\(D\succ0\)</span>, <span
 class="math inline">\(S\)</span> full row rank, <span
-class="math inline">\(r&gt;0\)</span>, and <span
-class="math inline">\(u=D\hat m\)</span> with <span
-class="math inline">\(\hat m=g\)</span>. The problem <span
-class="math display">\[\max_x\ -g^\top x\quad\text{s.t.}\quad Sx=0,\
-\|x\|_H\le r\]</span> has the unique solution <span
-class="math inline">\(x^\star=-r\,\Pi_D Dg/\|\Pi_D Dg\|_H\)</span>
-whenever <span class="math inline">\(\Pi_D Dg\ne0\)</span>, and the
-optimal value is <span class="math inline">\(r\|\Pi_D Dg\|_H\)</span>.
-Moreover <span class="math display">\[-g^\top(-\Pi_D
-Dg)=\|(I-Q)D^{1/2}g\|^2\ \ge 0,\qquad
-Q=D^{1/2}S^\top(SDS^\top)^{-1}SD^{1/2}, \tag{2}\]</span> with equality
-iff <span
+class="math inline">\(r&gt;0\)</span>, <span class="math inline">\(\hat
+m=g\)</span> (e.g. <span class="math inline">\(\beta_1=0\)</span> or
+AdamW step 1) and <span class="math inline">\(\lambda_{wd}=0\)</span>.
+The problem <span class="math display">\[\max_x\ -g^\top
+x\quad\text{s.t.}\quad Sx=0,\ \|x\|_H\le r\]</span> has the unique
+solution <span class="math inline">\(x^\star=-r\,\Pi_D Dg/\|\Pi_D
+Dg\|_H\)</span> whenever <span class="math inline">\(\Pi_D
+Dg\ne0\)</span>, and the optimal value is <span
+class="math inline">\(r\|\Pi_D Dg\|_H\)</span>. Moreover <span
+class="math display">\[-g^\top(-\Pi_D Dg)=\|(I-Q)D^{1/2}g\|^2\ \ge
+0,\qquad Q=D^{1/2}S^\top(SDS^\top)^{-1}SD^{1/2}, \tag{2}\]</span> with
+equality iff <span
 class="math inline">\(g\in\operatorname{range}(S^\top)\)</span>. Also
 <span class="math inline">\(\|\Pi_D w\|_H\le\|w\|_H\)</span> for all
 <span class="math inline">\(w\)</span>, and <span
@@ -472,7 +472,11 @@ applied to <span class="math inline">\(A=J^\top\)</span>, <span
 class="math inline">\(\Omega=\Sigma^\top\)</span>) gives <span
 class="math inline">\(\mathbb{E}E_\Sigma\le\bigl(1+\sqrt{k_0/(p-1)}\bigr)\sigma_{k_0+1}+\frac{e\sqrt{k}}{p}\bigl(\sum_{j&gt;k_0}\sigma_j^2\bigr)^{1/2}\)</span>,
 so by Markov <span
-class="math inline">\(\Pr(E_\Sigma&gt;t\,\mathbb{E}E_\Sigma)\le1/t\)</span>.</em></p>
+class="math inline">\(\Pr(E_\Sigma&gt;t\,\mathbb{E}E_\Sigma)\le1/t\)</span>.
+Always <span class="math inline">\(E_\Sigma\ge\sigma_{k+1}(J)\)</span>:
+the bound is informative only for fast spectral decay, and it concerns
+the probe batch <span class="math inline">\(R_1\)</span> only (review
+F).</em></p>
 </div>
 <div class="proof">
 <p><em>Proof.</em> <span class="math inline">\(\Sigma Jx=0\iff
@@ -556,7 +560,14 @@ class="math inline">\(Sh=0\)</span>. Combine with the triangle
 inequality. ◻</p>
 </div>
 <div class="remark">
-<p><em>Remark 11</em>. Theorem <a href="#t:step"
+<p><em>Remark 11</em>. The bound is on the probe batch <span
+class="math inline">\(R_1\)</span> only. In zero-init LoRA under AdamW
+the <span class="math inline">\(\beta\|\Delta_1\|^2\)</span> term
+dominates and the metric correction can increase <span
+class="math inline">\(\|\Delta_1\|\)</span> by up to <span
+class="math inline">\(\sqrt{d_{\max}/d_{\min}}\)</span> (review F, f5:
+<span class="math inline">\(&gt;99.9\,\%\)</span> of the actual per-step
+retained change was the bilinear term). Theorem <a href="#t:step"
 data-reference-type="ref" data-reference="t:step">10</a> is a
 <em>prediction-side</em> bound: every constant (<span
 class="math inline">\(E_\Sigma\)</span>, <span
@@ -608,10 +619,18 @@ every accepted iterate satisfies <span
 class="math inline">\(\rho_M\le\tau^2\)</span>. If additionally <span
 class="math inline">\(\|f_x(\theta)-f_x(\theta_0)\|^2\le M\)</span>
 a.s. along the run, <span class="math inline">\(\rho_M\)</span> is the
-true mean drift. If on rejection <span
-class="math inline">\((\theta,m,v,t)\)</span> are restored, the accepted
-sequence is exactly an AdamW trajectory in which rejected steps are
-skipped (no optimizer-state contamination by rejected trials).</em></p>
+true mean drift. The cap <span class="math inline">\(TR\)</span> and
+<span class="math inline">\(\tau,M,\delta,n_2\)</span> must be fixed in
+advance; the <span class="math inline">\(R_2\)</span> draws must be
+fresh i.i.d. and never reused; the certified quantity is the clipped
+mean <span class="math inline">\(\rho_M\)</span> under the verification
+sampling law. Rejected trials leave <span
+class="math inline">\((\theta,m,v,c)\)</span> unchanged; accepted steps
+commit the AdamW state computed from the raw <span
+class="math inline">\(g\)</span> while <span
+class="math inline">\(\theta\)</span> moves by <span
+class="math inline">\(s\Delta_1\)</span>, so the trajectory is
+<em>not</em> an AdamW trajectory.</em></p>
 </div>
 <div class="proof">
 <p><em>Proof.</em> Let <span class="math inline">\(\mathcal
@@ -634,15 +653,13 @@ class="math inline">\(\bigcup_j\{\rho_M(\vartheta_j)&gt;\hat\rho_j+c\}\)</span>
 (acceptance means <span
 class="math inline">\(\hat\rho_j+c\le\tau^2\)</span>); at most <span
 class="math inline">\(TR\)</span> trials, so the union bound gives <span
-class="math inline">\(\le\delta\)</span>. The clipping statement is
-immediate. Rollback: the accepted update applies the tentative state
-<span class="math inline">\((m&#39;,v&#39;,t+1)\)</span> computed from
-the same <span class="math inline">\(g\)</span> that produced <span
-class="math inline">\(\Delta_0\)</span>; a rejected trial leaves <span
-class="math inline">\((\theta,m,v,t)\)</span> bitwise unchanged, so the
-state after each step equals that of AdamW run on the subsequence of
-accepted steps (with the projected/scaled displacement in place of the
-raw step). ◻</p>
+class="math inline">\(\le\delta\)</span>; the number of trials actually
+used may be random and adaptive, because the union is over the fixed cap
+of <span class="math inline">\(TR\)</span> potential trials (unused
+trials contribute nothing). The clipping statement is immediate.
+Rollback: a rejected trial restores <span
+class="math inline">\((\theta,m,v,c)\)</span> bitwise, so no rejected
+trial influences later state. ◻</p>
 </div>
 <div class="counterexample">
 <p><em>Counterexample 14</em> (adaptivity; why <span
@@ -665,17 +682,23 @@ class="math inline">\(n_2=200\)</span>); its drift is uncontrolled.</p>
 </div>
 <h1 id="limiting-cases">Limiting cases</h1>
 <p>(i) <span class="math inline">\(D=cI\)</span> (e.g. SGD, or AdamW
-when all <span class="math inline">\(|g_i|\)</span> equal): metric,
-Euclidean post- and (for <span class="math inline">\(\beta_1=0\)</span>,
-<span class="math inline">\(\lambda_{wd}=0\)</span>) pre-projection
-coincide. (ii) <span class="math inline">\(S=0\)</span> (no probes):
-<span class="math inline">\(\Delta_1=\Delta_0\)</span>, VAU-noGate is
-AdamW. (iii) <span
+when all <span class="math inline">\(|g_i|\)</span> equal): metric and
+Euclidean post-projection coincide, and (for <span
+class="math inline">\(\beta_1=0\)</span>, <span
+class="math inline">\(\lambda_{wd}=0\)</span>, and if the pre- and
+post-projection runs share <span class="math inline">\(D\)</span>) so
+does pre-projection. (ii) <span class="math inline">\(S=0\)</span> (no
+probes): the correction is skipped by specification (the ridge solve
+would be singular), <span
+class="math inline">\(\Delta_1=\Delta_0\)</span>, and VAU-noGate is
+AdamW bitwise. (iii) <span
 class="math inline">\(g\in\operatorname{range}(S^\top)\)</span>: <span
 class="math inline">\(\Delta_1\)</span> has zero first-order progress
 (Prop. <a href="#p:tr" data-reference-type="ref"
 data-reference="p:tr">3</a>); rejected. (iv) Rich retained set, <span
-class="math inline">\(\operatorname{rank}J=P\)</span>: the exact null
+class="math inline">\(\operatorname{rank}J=P\)</span>, with exact <span
+class="math inline">\(J\)</span> (<span
+class="math inline">\(k\ge\operatorname{rank}J\)</span>): the exact null
 space is <span class="math inline">\(\{0\}\)</span>, <span
 class="math inline">\(\Delta_1\approx0\)</span> (ridge only) — VAU
 erases nothing; a soft penalty or the gate alone is then the only
@@ -685,10 +708,95 @@ class="math inline">\(\tau\to0\)</span>: only steps with zero clipped
 empirical drift and <span class="math inline">\(c\le\tau^2\)</span>
 pass; for finite <span class="math inline">\(n_2\)</span>, <span
 class="math inline">\(c&gt;0\)</span>, so nothing passes.</p>
+<h1
+id="why-the-factor-wise-exact-alternative-was-declined-coordinator-review-f-objection-2">Why
+the factor-wise exact alternative was declined (coordinator; review F
+objection 2)</h1>
+<p>For one LoRA layer <span class="math inline">\(y=(W+BA)x\)</span> and
+a step <span class="math inline">\((dA,dB)\)</span> the <em>exact</em>
+change on inputs <span class="math inline">\(X\)</span> is <span
+class="math inline">\((B+dB)(A+dA)X-BAX=dB\,AX+(B+dB)\,dA\,X\)</span>
+(no remainder).</p>
+<div id="p:fx" class="proposition">
+<p><strong>Proposition 16</strong> (factor-wise exactness). <em>Let
+<span class="math inline">\(U\)</span> be an orthonormal basis with
+<span class="math inline">\(X\subseteq\operatorname{span}U\)</span>. If
+<span class="math inline">\(dA\,U=0\)</span> and <span
+class="math inline">\(dB\,(AU)=0\)</span> then the layer output on every
+column of <span class="math inline">\(X\)</span> is unchanged, for every
+step size. If every LoRA layer of a feed-forward composition (including
+per-token q/k projections inside attention) satisfies this with <span
+class="math inline">\(U_\ell\)</span> spanning that layer’s activations
+on the probed inputs at the current <span
+class="math inline">\(\theta\)</span>, the network outputs on the probed
+inputs are exactly unchanged, and so are all probed activations (the
+constraints stay valid at the next step for the same probes; only <span
+class="math inline">\(AU\)</span> must be recomputed).</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> <span class="math inline">\(dA\,X=dA\,UU^\top
+X=0\)</span> and <span class="math inline">\(dB\,AX=dB\,(AU)U^\top
+X=0\)</span>, so the exact change above vanishes. For the composition,
+induct in topological order: if all inputs of layer <span
+class="math inline">\(\ell\)</span> on probed data are unchanged, its
+output is unchanged; non-adapted operations (softmax, normalisation,
+nonlinearities) are deterministic functions of unchanged inputs. ◻</p>
+</div>
+<div id="p:collapse" class="proposition">
+<p><strong>Proposition 17</strong> (collapse under zero-init <span
+class="math inline">\(B\)</span>). <em>If <span
+class="math inline">\(B=0\)</span> and <span
+class="math inline">\(\operatorname{rank}(AU)=r\)</span> (generic once
+<span class="math inline">\(\dim\operatorname{span}U\ge r\)</span>), the
+constraints of Prop. <a href="#p:fx" data-reference-type="ref"
+data-reference="p:fx">16</a> force <span
+class="math inline">\(dB=0\)</span>, and since <span
+class="math inline">\(dA\,U=0\)</span> keeps <span
+class="math inline">\(AU\)</span> unchanged, <span
+class="math inline">\(B=0\)</span> for all later steps: the adapter
+output <span class="math inline">\(BAx\)</span> is <span
+class="math inline">\(0\)</span> for every input, so nothing is
+erased.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> <span class="math inline">\(dB\,(AU)=0\)</span> with
+<span class="math inline">\(AU\in\mathbb{R}^{r\times q}\)</span> of rank
+<span class="math inline">\(r\)</span> means the rows of <span
+class="math inline">\(dB\)</span> are orthogonal to <span
+class="math inline">\(\mathbb{R}^r\)</span>, so <span
+class="math inline">\(dB=0\)</span>. <span
+class="math inline">\((A+dA)U=AU\)</span>, so the rank condition
+persists; by induction <span
+class="math inline">\(B\equiv0\)</span>. ◻</p>
+</div>
+<div class="remark">
+<p><em>Remark 18</em> (the working construction is known). If instead
+the rows of <span class="math inline">\(A\)</span> satisfy <span
+class="math inline">\(AU=0\)</span> (and <span
+class="math inline">\(A\)</span> is frozen or <span
+class="math inline">\(dA\,U=0\)</span>), then <span
+class="math inline">\(BAX=0\)</span> for every <span
+class="math inline">\(B\)</span>, so <span
+class="math inline">\(B\)</span> trains freely with exact probed
+retention, and a target input <span class="math inline">\(x_t\)</span>
+can change only through its residual <span
+class="math inline">\((I-UU^\top)x_t\)</span>. This is the null-A /
+InfLoRA-style construction (UNVERIFIED this sprint), close to null-space
+edits such as SPEED and AlphaEdit (UNVERIFIED). It is used as the
+control <code>na_lora</code>, not as a candidate. Held-out retained
+inputs are protected only through their component inside <span
+class="math inline">\(\operatorname{span}U\)</span>: for one layer the
+change is <span class="math inline">\(BA(I-UU^\top)x\)</span>, unbounded
+in general (computed: drift <span class="math inline">\(14.1\)</span> on
+held-out inputs, <code>factor_exact_check.py</code>).</p>
+</div>
 <h1 id="standard-ingredients-versus-what-is-specific-here">Standard
 ingredients versus what is specific here</h1>
-<p>Standard: scaled/metric gradient projection and its trust-region form
-(Prop. <a href="#p:tr" data-reference-type="ref"
+<p>Under the change of variables <span
+class="math inline">\(y=D^{-1/2}\theta\)</span> the VAU correction is
+the Euclidean (Adam-NSCL/GPM-style) projection in Adam’s whitened
+coordinates. Standard: scaled/metric gradient projection and its
+trust-region form (Prop. <a href="#p:tr" data-reference-type="ref"
 data-reference="p:tr">3</a>; e.g. Bertsekas’ scaled gradient
 projection); null-space projection of an optimizer’s update for
 continual learning (Adam-NSCL; UNVERIFIED this sprint); GPM/OGD gradient

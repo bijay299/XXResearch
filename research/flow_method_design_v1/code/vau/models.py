@@ -70,6 +70,18 @@ class LoraLayout:
         return self.s * (B.T @ gW), self.s * (gW @ A.T)
 
 
+def lora_gauge_step(layout, theta, k_norm, rng):
+    """First-order-neutral LoRA gauge direction (C-X2): per module dB = B K, dA = -K A with K (r x r)
+    Gaussian rescaled to Frobenius norm k_norm. B dA + dB A = 0, exact map change -s B K^2 A."""
+    ab = layout.unpack(theta)
+    out = {}
+    for name, (A, B) in ab.items():
+        K = rng.normal(size=(layout.r, layout.r))
+        K *= k_norm / np.linalg.norm(K)
+        out[name] = (-K @ A, B @ K)
+    return layout.pack(out)
+
+
 class Model:
     P: int
     out_dim: int
@@ -110,17 +122,22 @@ class Model:
 # (a) exact linear reference: f_x(theta) = W0 x + Phi(x) theta
 # ---------------------------------------------------------------------------------------------
 class LinearModel(Model):
-    """f_x(theta) = W0 x + Phi(x) theta with Phi(x)[o,p] = sum_i T[i,o,p] x_i * scale[p].
+    """f_x(theta) = W0 x + Phi(x) theta, Phi(x)[o,p] = c_p * sum_i x_i T[i,o,p]  (theta0 = 0).
 
-    `aniso_decades` gives parameter p a column scale 10^(-decades*p/(P-1)) (gradient anisotropy).
-    theta0 = 0 (base output). Not a LoRA model: there is no adapter, 'teacher' = theta0.
+    This is the protocol's v_x(theta) = b_x + J_x (theta - theta0) with J_x = Phi(x), b_x = W0 x.
+    Column scales c_p = 10^U(-d/2, d/2), d = `aniso_decades` (eval_protocol models.a_linear), drawn from rng.
+    `T` may be supplied (e.g. from structured_T for the G2 retained-Jacobian construction).
+    Not a LoRA model: 'adapter disabled' = theta0 = 0.
     """
 
-    def __init__(self, rng, d_in, d_out, P, aniso_decades=0.0):
+    def __init__(self, rng, d_in, d_out, P, aniso_decades=0.0, T=None):
         self.d_in, self.out_dim, self.P = d_in, d_out, P
         self.W0 = rng.normal(size=(d_out, d_in)) / np.sqrt(d_in)
-        scale = 10.0 ** (-aniso_decades * np.arange(P) / max(P - 1, 1))
-        self.T = rng.normal(size=(d_in, d_out, P)) / np.sqrt(d_in) * scale
+        self.col_scale = 10.0 ** rng.uniform(-aniso_decades / 2, aniso_decades / 2, size=P)
+        if T is None:
+            T = rng.normal(size=(d_in, d_out, P)) / np.sqrt(d_in)
+        check_array("T", T, shape=(d_in, d_out, P))
+        self.T = T * self.col_scale
 
     def n(self, x):
         return x.shape[0]
@@ -153,6 +170,35 @@ class LinearModel(Model):
 # ---------------------------------------------------------------------------------------------
 # (b) 2-layer tanh MLP, LoRA on both layers (shared parameters, nonlinear)
 # ---------------------------------------------------------------------------------------------
+def rotation(rng, P, m, phi):
+    """P x P orthogonal R(phi): Givens rotations by angle phi mixing range coordinate j < m with null
+    coordinate m + j (j < min(m, P - m)); phi = 0 -> identity (coordinate-aligned null space);
+    phi = 'haar' -> Haar-random orthogonal matrix."""
+    if isinstance(phi, str):
+        if phi != "haar":
+            raise ContractViolation(f"phi must be a float or 'haar', got {phi!r}")
+        Q, Rr = np.linalg.qr(rng.normal(size=(P, P)))
+        return Q * np.sign(np.diag(Rr))
+    R = np.eye(P)
+    c, s_ = np.cos(phi), np.sin(phi)
+    for j in range(min(m, P - m)):
+        R[j, j], R[j, m + j], R[m + j, j], R[m + j, m + j] = c, -s_, s_, c
+    return R
+
+
+def structured_T(rng, n_rows_in, d_out, P, kappa, phi):
+    """Rows for `n_rows_in` input coordinates such that the stacked map Jr (m x P, m = n_rows_in*d_out) is
+    U diag(kappa^{-j/(m-1)}) V^T R(phi), V^T = first m coordinate rows (eval_protocol G2 construction).
+    Returns T (n_rows_in, d_out, P). Requires m < P (non-empty null space)."""
+    m = n_rows_in * d_out
+    if m >= P:
+        raise ContractViolation(f"structured_T needs m = {m} < P = {P}")
+    U, _ = np.linalg.qr(rng.normal(size=(m, m)))
+    sv = kappa ** (-np.arange(m) / max(m - 1, 1))
+    Jr = (U * sv) @ np.eye(m, P) @ rotation(rng, P, m, phi)
+    return Jr.reshape(n_rows_in, d_out, P)
+
+
 class LoraMLP(Model):
     """y = (W2 + s B2 A2) tanh((W1 + s B1 A1) x + c1) + c2."""
 
@@ -175,6 +221,15 @@ class LoraMLP(Model):
 
     def init_theta(self, rng):
         return self.lora.init(rng)
+
+    def gauge_step(self, theta, k_norm, rng):
+        return lora_gauge_step(self.lora, theta, k_norm, rng)
+
+    def lora_inputs(self, x, theta):
+        """Input feature rows seen by each LoRA module: {name: (rows, d_in)} (for na_lora)."""
+        self._check(x, theta)
+        _, W1, _ = self._weights(theta)
+        return {"fc1": x, "fc2": np.tanh(x @ W1.T + self.c1)}
 
     def _weights(self, theta):
         if theta is None:
@@ -264,6 +319,16 @@ class TinyFlowDiT(Model):
     def init_theta(self, rng):
         return self.lora.init(rng)
 
+    def gauge_step(self, theta, k_norm, rng):
+        return lora_gauge_step(self.lora, theta, k_norm, rng)
+
+    def lora_inputs(self, x, theta=None):
+        """Token rows entering each LoRA module (theta-independent: no LoRA upstream of q/k)."""
+        self.check_input(x)
+        Hi, Ht = self._streams(x)
+        hi, ht = Hi.reshape(-1, self.dm), Ht.reshape(-1, self.dm)
+        return {"to_q": hi, "to_k": hi, "add_q_proj": ht, "add_k_proj": ht}
+
     def _streams(self, x):
         Hi = x.z @ self.W_in + self.pos + np.tanh(x.sigma[:, None] * self.w_t + self.b_t)[:, None, :]
         return Hi, self.E[x.prompt]
@@ -341,24 +406,33 @@ def flux_sigmas(N, mu=0.630):
     return np.concatenate([s, [0.0]])
 
 
+def euler(model, theta, z0, prompts, sigmas, n_run):
+    """Batched Euler x <- x + (sigma_{k+1}-sigma_k) v(x, sigma_k, prompt), k = 0..n_run-1.
+    z0 (N, n_img, c), prompts (N,) ints. Returns states (n_run+1, N, n_img, c) with states[0] = z0
+    (states[k] is the state ENTERING step k, evaluated at sigma_k). theta=None -> teacher."""
+    check_array("z0", z0, ndim=3)
+    if not (0 <= n_run <= len(sigmas) - 1):
+        raise ContractViolation("n_run out of range")
+    N = z0.shape[0]
+    x, states = z0, [z0]
+    for k in range(n_run):
+        inp = FlowInput(x, np.full(N, sigmas[k]), prompts)
+        x = x + (sigmas[k + 1] - sigmas[k]) * model.forward(inp, theta).reshape(z0.shape)
+        states.append(x)
+    return np.stack(states)
+
+
 def rollout_prefix(model, theta, z0, prompt_id, sigmas, end_idx):
-    """GEM partial denoising: Euler x <- x + (sigma_{k+1}-sigma_k) v(x, sigma_k), keep the state AFTER
-    each step k = 0..end_idx (the callback raises StopIteration once step >= end_idx), so
-    end_idx+1 states, initial noise excluded (A_gem_code_facts.md section 2). theta=None -> teacher.
-    Returns (states (n_lat, n_img, c), n_forward_calls)."""
+    """GEM partial denoising: keep the state AFTER each step k = 0..end_idx (the callback raises
+    StopIteration once step >= end_idx), so end_idx+1 states, initial noise excluded
+    (A_gem_code_facts.md section 2). theta=None -> teacher. Returns (states (n_lat, n_img, c), n_forwards)."""
     check_array("z0", z0, shape=(model.n_img, model.c))
     if not (0 <= end_idx < len(sigmas) - 1):
         raise ContractViolation("end_idx out of range")
-    x, states = z0, []
-    for k in range(end_idx + 1):
-        inp = FlowInput(x[None], np.array([sigmas[k]]), np.array([prompt_id]))
-        vel = model.forward(inp, theta).reshape(model.n_img, model.c)
-        x = x + (sigmas[k + 1] - sigmas[k]) * vel
-        states.append(x)
-    return np.stack(states), end_idx + 1
+    st = euler(model, theta, z0[None], np.array([prompt_id]), sigmas, end_idx + 1)
+    return st[1:, 0], end_idx + 1
 
 
-def sample(model, theta, z0, prompt_id, sigmas):
-    """Full Euler sampler to sigma = 0 (for later evaluation)."""
-    states, _ = rollout_prefix(model, theta, z0, prompt_id, sigmas, len(sigmas) - 2)
-    return states[-1]
+def sample(model, theta, z0, prompts, sigmas):
+    """Full Euler sampler to sigma = 0, batched: z0 (N, n_img, c), prompts (N,). Returns endpoints."""
+    return euler(model, theta, z0, prompts, sigmas, len(sigmas) - 1)[-1]

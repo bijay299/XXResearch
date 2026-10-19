@@ -14,13 +14,14 @@ Own code; does not import code/vau."""
 import numpy as np, itertools, json, sys
 din, H, dout, r = 16, 24, 16, 4
 T = 23
-def setup(seed, Nr):
+def setup(seed, Nr, popdim=None):
     rng = np.random.default_rng(seed)
     W1 = rng.normal(size=(H, din)) / np.sqrt(din); W2 = rng.normal(size=(dout, H)) / np.sqrt(H)
     A0 = rng.uniform(-1, 1, size=(r, din)) / np.sqrt(din); B0 = np.zeros((H, r))
     c = rng.normal(size=din); c *= 2.5 / np.linalg.norm(c) * np.sqrt(1)  # concept direction
     Xe = c + 0.3 * rng.normal(size=(64, din)); Xe_test = c + 0.3 * rng.normal(size=(64, din))
     Xpop = rng.normal(size=(4000, din)) * 0.7
+    if popdim: Xpop = Xpop[:, :popdim] @ np.linalg.qr(rng.normal(size=(din, popdim)))[0].T * np.sqrt(din / popdim)
     Xr1 = Xpop[:Nr]; Xpop = Xpop[Nr:]
     xa = rng.normal(size=din) * 0.7
     a = W2 @ np.tanh(W1 @ xa)          # anchor output (base model on an 'anchor' input)
@@ -51,7 +52,14 @@ def pen_grad(E, th, X, f0):
     B, A = unpack(th); hcur = X @ (E['W1'] + B @ A).T; t = np.tanh(hcur); f = t @ E['W2'].T
     gf = (f - f0) / X.shape[0]; gh = (gf @ E['W2']) * (1 - t ** 2); gW = gh.T @ X
     return np.r_[(gW @ A.T).ravel(), (B.T @ gW).ravel()]
-def run(E, method, lr, lam=0.0, b1=0.9, stale=False, ksk=None, wd=0.01, diag=None):
+def run(E, *a, **k):
+    try:
+        with np.errstate(all='ignore'):
+            out = _run(E, *a, **k)
+        return out if np.all(np.isfinite(out)) else (0.0, np.inf, 1.0)
+    except np.linalg.LinAlgError:
+        return (0.0, np.inf, 1.0)
+def _run(E, method, lr, lam=0.0, b1=0.9, stale=False, ksk=None, wd=0.01, diag=None):
     th = np.r_[E['B0'].ravel(), E['A0'].ravel()]; th0 = th.copy(); Pn = th.size
     m = np.zeros(Pn); v = np.zeros(Pn); f0r = fwd(E, th0, E['Xr1'])
     rng = np.random.default_rng(99)
@@ -95,15 +103,19 @@ LAMS = [0.3, 1, 3, 10, 30, 100, 300, 1000]
 REGIMES = {
     'base_Nr4': dict(Nr=4), 'rich_Nr16': dict(Nr=16), 'stale_Nr4': dict(Nr=4, stale=True),
     'beta1_0.99_Nr4': dict(Nr=4, b1=0.99), 'sketch8_Nr8': dict(Nr=8, ksk=8),
+    'lowdim_pop3_Nr4': dict(Nr=4, popdim=3), 'lowdim_pop3_Nr4_beta1_0.99': dict(Nr=4, popdim=3, b1=0.99),
+    'lowdim_pop3_Nr4_stale': dict(Nr=4, popdim=3, stale=True), 'lowdim_pop3_Nr4_sketch2': dict(Nr=4, popdim=3, ksk=2),
 }
 def main():
     seeds = range(int(sys.argv[1]) if len(sys.argv) > 1 else 6)
     res = {}
+    sel = sys.argv[2].split(',') if len(sys.argv) > 2 else list(REGIMES)
     for rname, cfg in REGIMES.items():
-        Nr = cfg['Nr']; kw = {k: v for k, v in cfg.items() if k != 'Nr'}
+        if not any(rname.startswith(x) for x in sel): continue
+        Nr = cfg['Nr']; kw = {k: v for k, v in cfg.items() if k not in ('Nr', 'popdim')}
         allpts = {mth: [] for mth in ['adamw', 'pre', 'euclid', 'vau', 'penalty']}
         for seed in seeds:
-            E = setup(seed, Nr)
+            E = setup(seed, Nr, cfg.get('popdim'))
             for mth in ['adamw', 'pre', 'euclid', 'vau']:
                 pts = []
                 for lr in LRS:
@@ -126,9 +138,9 @@ def main():
         res[rname] = out
         print(rname, json.dumps(out), flush=True)
     # diagnostics at GEM lr 1e-3, base regime, seed 0
-    E = setup(0, 4); dg = {'neg': [], 'blow': [], 'lin_vs_exact': []}
-    run(E, 'vau', 1e-3, diag=dg)
-    dge = {'neg': [], 'blow': [], 'lin_vs_exact': []}; run(E, 'euclid', 1e-3, diag=dge)
+    E = setup(0, 4, 3 if 'lowdim' in sel else None); dg = {'neg': [], 'blow': [], 'lin_vs_exact': []}
+    _run(E, 'vau', 1e-3, diag=dg)
+    dge = {'neg': [], 'blow': [], 'lin_vs_exact': []}; _run(E, 'euclid', 1e-3, diag=dge)
     print('diag_vau: frac steps rejected (g.d1>=0)=', np.mean(dg['neg']), ' max ||d1||/||d0||=', max(dg['blow']),
           ' median ||d1||/||d0||=', np.median(dg['blow']))
     print('diag_vau: per-step retained change on R1 linear vs exact (first 6):',

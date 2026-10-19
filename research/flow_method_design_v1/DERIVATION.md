@@ -87,8 +87,8 @@ projection becomes more accurate.
 <div id="p:tr" class="proposition">
 
 **Proposition 3** (trust-region characterisation; standard). *Let
-$D\succ0$, $S$ full row rank, $r>0$, and $u=D\hat m$ with $\hat m=g$.
-The problem
+$D\succ0$, $S$ full row rank, $r>0$, $\hat m=g$ (e.g. $\beta_1=0$ or
+AdamW step 1) and $\lambda_{wd}=0$. The problem
 $$\max_x\ -g^\top x\quad\text{s.t.}\quad Sx=0,\ \|x\|_H\le r$$ has the
 unique solution $x^\star=-r\,\Pi_D Dg/\|\Pi_D Dg\|_H$ whenever
 $\Pi_D Dg\ne0$, and the optimal value is $r\|\Pi_D Dg\|_H$. Moreover
@@ -224,7 +224,9 @@ $k=k_0+p$, $p\ge2$, the randomized range-finder bound
 (Halko–Martinsson–Tropp 2011, §10, average spectral error theorem;
 applied to $A=J^\top$, $\Omega=\Sigma^\top$) gives
 $\mathbb{E}E_\Sigma\le\bigl(1+\sqrt{k_0/(p-1)}\bigr)\sigma_{k_0+1}+\frac{e\sqrt{k}}{p}\bigl(\sum_{j>k_0}\sigma_j^2\bigr)^{1/2}$,
-so by Markov $\Pr(E_\Sigma>t\,\mathbb{E}E_\Sigma)\le1/t$.*
+so by Markov $\Pr(E_\Sigma>t\,\mathbb{E}E_\Sigma)\le1/t$. Always
+$E_\Sigma\ge\sigma_{k+1}(J)$: the bound is informative only for fast
+spectral decay, and it concerns the probe batch $R_1$ only (review F).*
 
 </div>
 
@@ -288,7 +290,12 @@ Combine with the triangle inequality. ◻
 
 <div class="remark">
 
-*Remark 11*. Theorem <a href="#t:step" data-reference-type="ref"
+*Remark 11*. The bound is on the probe batch $R_1$ only. In zero-init
+LoRA under AdamW the $\beta\|\Delta_1\|^2$ term dominates and the metric
+correction can increase $\|\Delta_1\|$ by up to
+$\sqrt{d_{\max}/d_{\min}}$ (review F, f5: $>99.9\,\%$ of the actual
+per-step retained change was the bilinear term).
+Theorem <a href="#t:step" data-reference-type="ref"
 data-reference="t:step">10</a> is a *prediction-side* bound: every
 constant ($E_\Sigma$, $L_J$, $\beta$) is unknown for a real network.
 That is why the candidate does not rely on it for acceptance; it relies
@@ -326,10 +333,13 @@ $\hat\rho_j=\frac1{n_2}\sum_{x\in R_2^{(j)}}r_x(\vartheta_j)$,
 $c=M\sqrt{\ln(TR/\delta)/(2n_2)}$. Then with probability at least
 $1-\delta$ every accepted iterate satisfies $\rho_M\le\tau^2$. If
 additionally $\|f_x(\theta)-f_x(\theta_0)\|^2\le M$ a.s. along the run,
-$\rho_M$ is the true mean drift. If on rejection $(\theta,m,v,t)$ are
-restored, the accepted sequence is exactly an AdamW trajectory in which
-rejected steps are skipped (no optimizer-state contamination by rejected
-trials).*
+$\rho_M$ is the true mean drift. The cap $TR$ and $\tau,M,\delta,n_2$
+must be fixed in advance; the $R_2$ draws must be fresh i.i.d. and never
+reused; the certified quantity is the clipped mean $\rho_M$ under the
+verification sampling law. Rejected trials leave $(\theta,m,v,c)$
+unchanged; accepted steps commit the AdamW state computed from the raw
+$g$ while $\theta$ moves by $s\Delta_1$, so the trajectory is *not* an
+AdamW trajectory.*
 
 </div>
 
@@ -344,12 +354,11 @@ $\Pr(\rho_M(\vartheta_j)>\hat\rho_j+c\mid\mathcal F_j)\le\delta/(TR)$.
 The bad event “some accepted $\vartheta_j$ has $\rho_M>\tau^2$” is
 contained in $\bigcup_j\{\rho_M(\vartheta_j)>\hat\rho_j+c\}$ (acceptance
 means $\hat\rho_j+c\le\tau^2$); at most $TR$ trials, so the union bound
-gives $\le\delta$. The clipping statement is immediate. Rollback: the
-accepted update applies the tentative state $(m',v',t+1)$ computed from
-the same $g$ that produced $\Delta_0$; a rejected trial leaves
-$(\theta,m,v,t)$ bitwise unchanged, so the state after each step equals
-that of AdamW run on the subsequence of accepted steps (with the
-projected/scaled displacement in place of the raw step). ◻
+gives $\le\delta$; the number of trials actually used may be random and
+adaptive, because the union is over the fixed cap of $TR$ potential
+trials (unused trials contribute nothing). The clipping statement is
+immediate. Rollback: a rejected trial restores $(\theta,m,v,c)$ bitwise,
+so no rejected trial influences later state. ◻
 
 </div>
 
@@ -375,22 +384,96 @@ is uncontrolled.
 
 # Limiting cases
 
-\(i\) $D=cI$ (e.g. SGD, or AdamW when all $|g_i|$ equal): metric,
-Euclidean post- and (for $\beta_1=0$, $\lambda_{wd}=0$) pre-projection
-coincide. (ii) $S=0$ (no probes): $\Delta_1=\Delta_0$, VAU-noGate is
-AdamW. (iii) $g\in\operatorname{range}(S^\top)$: $\Delta_1$ has zero
-first-order progress
+\(i\) $D=cI$ (e.g. SGD, or AdamW when all $|g_i|$ equal): metric and
+Euclidean post-projection coincide, and (for $\beta_1=0$,
+$\lambda_{wd}=0$, and if the pre- and post-projection runs share $D$) so
+does pre-projection. (ii) $S=0$ (no probes): the correction is skipped
+by specification (the ridge solve would be singular),
+$\Delta_1=\Delta_0$, and VAU-noGate is AdamW bitwise. (iii)
+$g\in\operatorname{range}(S^\top)$: $\Delta_1$ has zero first-order
+progress
 (Prop. <a href="#p:tr" data-reference-type="ref" data-reference="p:tr">3</a>);
-rejected. (iv) Rich retained set, $\operatorname{rank}J=P$: the exact
-null space is $\{0\}$, $\Delta_1\approx0$ (ridge only) — VAU erases
-nothing; a soft penalty or the gate alone is then the only meaningful
-arm. (v) $\tau\to\infty$: the gate always accepts. (vi) $\tau\to0$: only
-steps with zero clipped empirical drift and $c\le\tau^2$ pass; for
-finite $n_2$, $c>0$, so nothing passes.
+rejected. (iv) Rich retained set, $\operatorname{rank}J=P$, with exact
+$J$ ($k\ge\operatorname{rank}J$): the exact null space is $\{0\}$,
+$\Delta_1\approx0$ (ridge only) — VAU erases nothing; a soft penalty or
+the gate alone is then the only meaningful arm. (v) $\tau\to\infty$: the
+gate always accepts. (vi) $\tau\to0$: only steps with zero clipped
+empirical drift and $c\le\tau^2$ pass; for finite $n_2$, $c>0$, so
+nothing passes.
+
+# Why the factor-wise exact alternative was declined (coordinator; review F objection 2)
+
+For one LoRA layer $y=(W+BA)x$ and a step $(dA,dB)$ the *exact* change
+on inputs $X$ is $(B+dB)(A+dA)X-BAX=dB\,AX+(B+dB)\,dA\,X$ (no
+remainder).
+
+<div id="p:fx" class="proposition">
+
+**Proposition 16** (factor-wise exactness). *Let $U$ be an orthonormal
+basis with $X\subseteq\operatorname{span}U$. If $dA\,U=0$ and
+$dB\,(AU)=0$ then the layer output on every column of $X$ is unchanged,
+for every step size. If every LoRA layer of a feed-forward composition
+(including per-token q/k projections inside attention) satisfies this
+with $U_\ell$ spanning that layer’s activations on the probed inputs at
+the current $\theta$, the network outputs on the probed inputs are
+exactly unchanged, and so are all probed activations (the constraints
+stay valid at the next step for the same probes; only $AU$ must be
+recomputed).*
+
+</div>
+
+<div class="proof">
+
+*Proof.* $dA\,X=dA\,UU^\top X=0$ and $dB\,AX=dB\,(AU)U^\top X=0$, so the
+exact change above vanishes. For the composition, induct in topological
+order: if all inputs of layer $\ell$ on probed data are unchanged, its
+output is unchanged; non-adapted operations (softmax, normalisation,
+nonlinearities) are deterministic functions of unchanged inputs. ◻
+
+</div>
+
+<div id="p:collapse" class="proposition">
+
+**Proposition 17** (collapse under zero-init $B$). *If $B=0$ and
+$\operatorname{rank}(AU)=r$ (generic once
+$\dim\operatorname{span}U\ge r$), the constraints of
+Prop. <a href="#p:fx" data-reference-type="ref" data-reference="p:fx">16</a>
+force $dB=0$, and since $dA\,U=0$ keeps $AU$ unchanged, $B=0$ for all
+later steps: the adapter output $BAx$ is $0$ for every input, so nothing
+is erased.*
+
+</div>
+
+<div class="proof">
+
+*Proof.* $dB\,(AU)=0$ with $AU\in\mathbb{R}^{r\times q}$ of rank $r$
+means the rows of $dB$ are orthogonal to $\mathbb{R}^r$, so $dB=0$.
+$(A+dA)U=AU$, so the rank condition persists; by induction $B\equiv0$. ◻
+
+</div>
+
+<div class="remark">
+
+*Remark 18* (the working construction is known). If instead the rows of
+$A$ satisfy $AU=0$ (and $A$ is frozen or $dA\,U=0$), then $BAX=0$ for
+every $B$, so $B$ trains freely with exact probed retention, and a
+target input $x_t$ can change only through its residual
+$(I-UU^\top)x_t$. This is the null-A / InfLoRA-style construction
+(UNVERIFIED this sprint), close to null-space edits such as SPEED and
+AlphaEdit (UNVERIFIED). It is used as the control `na_lora`, not as a
+candidate. Held-out retained inputs are protected only through their
+component inside $\operatorname{span}U$: for one layer the change is
+$BA(I-UU^\top)x$, unbounded in general (computed: drift $14.1$ on
+held-out inputs, `factor_exact_check.py`).
+
+</div>
 
 # Standard ingredients versus what is specific here
 
-Standard: scaled/metric gradient projection and its trust-region form
+Under the change of variables $y=D^{-1/2}\theta$ the VAU correction is
+the Euclidean (Adam-NSCL/GPM-style) projection in Adam’s whitened
+coordinates. Standard: scaled/metric gradient projection and its
+trust-region form
 (Prop. <a href="#p:tr" data-reference-type="ref" data-reference="p:tr">3</a>;
 e.g. Bertsekas’ scaled gradient projection); null-space projection of an
 optimizer’s update for continual learning (Adam-NSCL; UNVERIFIED this

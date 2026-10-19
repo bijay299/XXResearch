@@ -13,38 +13,42 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vau import tasks  # noqa: E402
-from vau.contracts import dev_rng  # noqa: E402
+from vau.seeds import streams  # noqa: E402
 from vau.methods import Batch, GateConfig, make_arm  # noqa: E402
 
 SEED, STEPS, NR, N2, R, K, KREF = 0, 5, 8, 16, 4, 8, 2
-ORDER = ("vau", "vau_nogate", "post_euclid", "pre_proj", "penalty", "adamw", "adamw_stepmatch", "gated_adamw")
+ORDER = ("vau", "vau_nogate", "post_euclid", "pre_proj", "penalty", "adamw", "adamw_stepmatch", "gated_adamw",
+         "gated_penalty", "earlystop_penalty")
+PROTOCOL_FAMILY = {"linear": "G1", "mlp": "G5", "flow": "G8"}   # stream derivation only
 
 
 def run(family):
     rows, ref_norms = [], None
     for name in ORDER:
-        rng = dev_rng(SEED)                                   # identical task/data stream for every arm
-        task = tasks.make_task(family, rng)
-        th0 = task.model.init_theta(rng)
-        R1 = task.retained_batch(rng, NR)
+        st = streams(PROTOCOL_FAMILY[family], SEED)          # common random numbers for every arm
+        task = tasks.make_task(family, st["fixture"])
+        th0 = task.model.init_theta(st["fixture"])
+        R1 = task.retained_batch(st["splits"], NR)
         gate = GateConfig(tau2=0.5, M=1.0, n2=N2, delta=0.1, T=STEPS, R=R)
         cfg = dict(k=K, K=KREF)
-        if name == "penalty":
+        if name.endswith("penalty"):
             cfg["lam"] = 1.0
         if name == "adamw_stepmatch":
             cfg["ref_norms"] = ref_norms
         arm = make_arm(name, task, gate=gate, **cfg)
-        ms = arm.init_state(th0, R1, SEED)
+        ms = arm.init_state(th0, R1, st["sketch"])
         th, acc, loss0, losses = th0, 0, None, []
-        c0 = time.process_time()
-        norms = []
+        cpu = 0.0                                             # arm.step only (batch generation excluded)
+        norms = []                                            # vau's H-norms feed adamw_stepmatch
         for _ in range(STEPS):
-            b = Batch(erase=task.erasure_batch(rng), gate=tuple(task.retained_batch(rng, N2) for _ in range(R)))
+            b = Batch(erase=task.erasure_batch(st["train"]),
+                      gate=tuple(task.retained_batch(st["gate"], N2) for _ in range(R)))
+            c0 = time.process_time()
             th, info = arm.step(ms, th, b)
+            cpu += time.process_time() - c0
             acc += bool(info["accepted"]) and info["s"] > 0
             losses.append(info["loss"])
-            norms.append(info["step_norm"])
-        cpu = time.process_time() - c0
+            norms.append(info["step_Hnorm"])
         if name == "vau":
             ref_norms = norms
         drift = float(np.mean(np.sum((task.model.forward(R1, th) - task.model.forward(R1, th0)) ** 2, 1)))
@@ -56,16 +60,16 @@ def run(family):
 
 def main():
     out = [r for fam in ("linear", "mlp", "flow") for r in run(fam)]
-    hdr = f"{'family':7s} {'arm':16s} {'P':>4s} {'cpu_s':>7s} {'acc':>3s} {'fwd':>9s} {'vjp':>9s} {'teach':>9s} " \
+    hdr = f"{'family':7s} {'arm':17s} {'P':>4s} {'cpu_s':>7s} {'acc':>3s} {'fwd':>9s} {'vjp':>9s} {'teach':>9s} " \
           f"{'roll':>7s} {'gate_f':>7s} {'solve':>5s} {'probe':>5s} {'rej':>3s} {'R1_drift':>9s}"
     print(hdr)
     for r in out:
         c, s = r["ops"]["calls"], r["ops"]["samples"]
         f = lambda k: f"{c[k]}/{s[k]}"
-        print(f"{r['family']:7s} {r['arm']:16s} {r['P']:4d} {r['cpu_s']:7.4f} {r['accepted']:3d} {f('forward'):>9s} "
+        print(f"{r['family']:7s} {r['arm']:17s} {r['P']:4d} {r['cpu_s']:7.4f} {r['accepted']:3d} {f('forward'):>9s} "
               f"{f('vjp'):>9s} {f('teacher'):>9s} {f('rollout_forward'):>7s} {f('gate_forward'):>7s} "
               f"{c['solve']:5d} {c['probe_build']:5d} {c['rejected_step']:3d} {r['R1_drift']:9.2e}")
-    print("ops shown as calls/samples; cpu_s = process CPU seconds for the 5 steps (measured)")
+    print("ops shown as calls/samples; cpu_s = process CPU seconds of arm.step over 5 steps (measured; retained-batch generation excluded)")
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "results", "E_smoke.json")
     with open(path, "w") as fh:
         json.dump(out, fh, indent=1)
