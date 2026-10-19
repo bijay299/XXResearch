@@ -27,8 +27,27 @@ def main():
     a = ap.parse_args()
 
     rdir = os.path.join(a.repo_dir, RESULTS)
-    tracked = subprocess.run(["git", "-C", a.repo_dir, "ls-files", RESULTS],
-                             capture_output=True, text=True, check=True).stdout.split()
+
+    # Read the file list and every byte from the GIT OBJECTS AT --commit, never
+    # from the working tree. Pairing working-tree bytes with an unrelated
+    # commit is exactly what produced stale rows in the previous index
+    # (see analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md section 9).
+    tracked = subprocess.run(
+        ["git", "-C", a.repo_dir, "ls-tree", "-r", "--name-only", a.commit,
+         "--", RESULTS],
+        capture_output=True, text=True, check=True).stdout.split()
+
+    # The index cannot verifiably list itself: it is generated here and
+    # published in a CHILD commit, so its own bytes do not exist at --commit.
+    # It is excluded rather than carrying an unverified historical self-hash.
+    SELF = RESULTS + "/EVIDENCE_INDEX.md"
+    excluded = [rp for rp in tracked if rp == SELF]
+    tracked = [rp for rp in tracked if rp != SELF]
+
+    def git_bytes(rp):
+        r = subprocess.run(["git", "-C", a.repo_dir, "show",
+                            f"{a.commit}:{rp}"], capture_output=True)
+        return r.stdout if r.returncode == 0 else None
 
     req = urllib.request.Request(
         f"https://api.github.com/repos/{REPO}/releases/tags/{a.tag}",
@@ -36,8 +55,14 @@ def main():
     rel = json.loads(urllib.request.urlopen(req, timeout=120).read())
 
     def load(name):
-        p = os.path.join(rdir, name)
-        return json.load(open(p)) if os.path.isfile(p) else {}
+        """Load a verification JSON from the GIT OBJECT at --commit."""
+        b = git_bytes(RESULTS + "/" + name)
+        if b is None:
+            return {}
+        try:
+            return json.loads(b)
+        except ValueError:
+            return {}
 
     pv = load("verify/published_verification_patch01.json")
     pv_old = load("verify/published_verification.json")
@@ -54,9 +79,11 @@ def main():
 
     w("# EVIDENCE_INDEX — teapot_human_review_v1\n")
     w("Complete file and hash index. Generated last.\n")
-    w("> File hashes and links below are pinned to the commit named here, which")
-    w("> contains every indexed file. This index file itself is added in the")
-    w("> immediately following commit, so it cannot list its own hash.\n")
+    w("> Every size, digest and link below is read from the **Git object at the")
+    w("> commit named here**, which contains every indexed file — never from a")
+    w("> working tree. This index is published in the **immediately following")
+    w("> child commit**, so it does not and cannot list its own hash. Coverage")
+    w("> and exclusions are stated explicitly in the repository-files section.\n")
     w(f"* **Commit:** [`{a.commit}`](https://github.com/{REPO}/commit/{a.commit})")
     w("* **Branch:** `research/audit-and-matched-effectiveness-protocol`")
     w(f"* **Release tag:** [`{rel['tag_name']}`]({rel['html_url']}) → target "
@@ -164,15 +191,40 @@ def main():
     w("| file | bytes | sha256 |")
     w("|---|---|---|")
     tot = 0
+    listed = 0
+    missing = []
     for rp in sorted(tracked):
-        p = os.path.join(a.repo_dir, rp)
-        if not os.path.isfile(p):
+        b = git_bytes(rp)
+        if b is None:
+            missing.append(rp)
             continue
-        s = os.path.getsize(p)
-        tot += s
-        w(f"| [`{os.path.relpath(rp, RESULTS)}`]({tree}/{rp}) | {s:,} | `{sh(p)}` |")
+        n = len(b)
+        tot += n
+        listed += 1
+        w(f"| [`{os.path.relpath(rp, RESULTS)}`]({tree}/{rp}) | {n:,} | "
+          f"`{hashlib.sha256(b).hexdigest()}` |")
     w("")
-    w(f"**{len(tracked)} tracked files, {tot:,} bytes.**\n")
+    w(f"**{listed} files, {tot:,} bytes — every size and digest read from the "
+      f"Git object at `{a.commit[:12]}`, not from a working tree.**\n")
+    if missing:
+        w(f"**{len(missing)} listed path(s) had no object at this commit:** "
+          + ", ".join(f"`{os.path.relpath(m, RESULTS)}`" for m in missing)
+          + "\n")
+
+    w("### Coverage and exclusions — stated, not implied\n")
+    w(f"This table covers **{listed}** of the "
+      f"**{listed + len(excluded)}** files tracked under `{RESULTS}` at "
+      f"`{a.commit[:12]}`. Explicitly **excluded**:\n")
+    w("* **`EVIDENCE_INDEX.md` — this file.** It is generated from the payload "
+      "commit above and published in the **child** commit, so its own bytes do "
+      "not exist at the commit it pins. **No self-hash is listed**, because "
+      "any such row would be unverifiable at the declared pin. To verify this "
+      "index, hash the file at the child commit that contains it.\n")
+    w("* **Anything written after this index** — including any post-index "
+      "verification report — is **not** covered here. Such a record states its "
+      "own coverage separately.\n")
+    w("No circular coverage is claimed: nothing in this table hashes itself, "
+      "and nothing here depends on bytes created after the pinned commit.\n")
 
     w("## Scope reminder\n")
     w("This index establishes **preparation, integrity and the provenance of "

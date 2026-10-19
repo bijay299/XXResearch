@@ -72,9 +72,61 @@
     "no follow-up study executed"
   ],
   "verification_nature": "All checks here are HOST-PERFORMED: this machine ran them on its own outputs. Not an independent attestation.",
-  "public_reproducibility_limit": "The case-level m0/edited join runs through the PRIVATE mapping. Published files allow rechecking every table's arithmetic, totals and joins, but not independent reproduction of the condition assignment.",
+  "public_reproducibility_limit": "TWO DIFFERENT LIMITS, which the original single sentence blurred. (a) CONDITION AND PAIR ASSIGNMENT IS RECOVERABLE: it can be reconstructed by hashing the already-public Task-A, Task-B and source-asset images, because the source release publishes each case's m0/edited filenames with their SHA256 and both bundles ship byte-identical images. An independent review reconstructed it that way. Withholding a direct crosswalk does NOT make the assignment unreproducible. The original wording -- that a third party could not independently reproduce the condition assignment -- was WRONG and is withdrawn. (b) EXPORT-LEVEL REPRODUCTION IS LIMITED: the exact original exports, free-text answers, original export metadata and the reviewer-to-R1/R2 linkage remain private, so the tables cannot be rebuilt from the original artifacts and the reviewer linkage cannot be verified. Published files do allow rechecking every table's arithmetic, totals and joins.",
   "git": {
     "branch": "research/audit-and-matched-effectiveness-protocol",
     "head_at_write": "f2709469818e27ce9cc305dafa37a04da61f88f7"
+  },
+  "masking_account": "PROCEDURAL ACCOUNT, NOT PROOF. Both reviewers declared no pre-Task-A access to source pairings or condition labels and no image-specific coaching; independence was user-reported. The protocol provided for masked judging and the declarations are consistent with it, but declarations and aliases cannot establish what a reviewer knew, so this is not proof that judging-time masking held. Nothing indicates it failed either; neither is asserted. Task B was deliberately unmasked. R1/R2 are pseudonyms, not anonymity: they do not erase the roster disclosure in AMENDMENT_03 section 7b and do not guarantee anonymity.",
+  "withheld_fields_clarification": "The withheld-fields list in the unchanged summary.json names 'case IDs' and 'neutral-ID -> condition associations'. That refers to PRIVATE SOURCE IDENTIFIERS AND DIRECT CROSSWALKS. It does not mean every case identifier is withheld, and it does not claim that no association is inferable: the Task-B pair IDs B-01..B-20 ARE published in tables/taskB_responses.csv and tables/paired_case_ledger.csv, and the condition assignment is inferable as described under public_reproducibility_limit (a). summary.json bytes are unchanged; this supersedes that wording.",
+  "record_and_answer_counts": "120 reviewer-item records carrying 200 categorical answers: 80 Task-A records (2 reviewers x 40 images) with TWO answers each (target and rendering) = 160, plus 40 Task-B records (2 reviewers x 20 pairs) with one comparison answer each = 40. Earlier prose said '120 individual categorical votes', conflating records with answers. Prose error only: no count, table or denominator depends on it.",
+  "withdrawn_interpretive_claims": [
+    "instrument ceiling / near-ceiling / 'almost no discriminative range' as established instrument findings -- WITHDRAWN; retained only as the observation that Task-B ratings were concentrated at about_the_same (36/40)",
+    "'badly under-powered' -- WITHDRAWN; no inferential test, estimand, meaningful effect or power calculation was ever specified, and none is computed now. Replaced by: small fixed descriptive panel with limited generalization",
+    "'one-directional' rendering difference -- WITHDRAWN; of six rendering disagreements five have R2 marking localized_deformation where R1 marked coherent and one runs the other way. A stricter-threshold explanation remains a HYPOTHESIS. The five disagreements inside the edited-absent subset do all share one direction -- that scoped statement is preserved",
+    "diagnosed calibration/anchor failure -- WITHDRAWN; no calibration study was run and no anchor failure is diagnosed",
+    "case count, reviewer count and calibration as proven binding constraints, and categorical claims that any method comparison is invalid or that no bounded efficacy description is permissible -- WITHDRAWN",
+    "the prescriptive larger/calibrated-panel recommendation -- REPLACED by closure of this fixed analysis; any enlargement, calibration or comparison is an unselected prospective option needing its own justified question, design and authorization. No follow-up launched"
+  ],
+  "supported_conclusion": "On this fixed panel both reviewers marked the target present in all 20 M0 images; the frozen consensus rule yields 18 edited-absent, one present and one unresolved, with 13 agreed-coherent and five rendering-unresolved among the 18 absent cases. Task-B ratings were concentrated at about_the_same. Genuine quality similarity, limited stimulus variation and limited instrument sensitivity remain different compatible explanations. This supports a BOUNDED DESCRIPTIVE FINDING about visible target depiction at one endpoint. It does not establish general unlearning, knowledge removal, retention, robustness, evaluator bias, novelty, superiority or paper readiness. The 13 coherent absences are NOT turned into a combined success score.",
+  "status": "ANALYSIS_COMPLETE; CLOSED WITH QUALIFIED CONCLUSIONS",
+  "closeout_note": "The accepted numerical findings stand and were independently verified. Several interpretive claims around them were overstated and are withdrawn or re-scoped. This is NOT a scientific failure and NOT a new success threshold.",
+  "amendment_01": {
+    "document": "AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md",
+    "amended_iso": "2026-10-18T20:52:50.536652-04:00",
+    "scope": "Documentation, provenance and evidence-index corrections only.",
+    "numerical_results_changed": false,
+    "analysis_rerun": false,
+    "responses_read_or_aggregated": false,
+    "fields_changed_here": [
+      "public_reproducibility_limit"
+    ],
+    "fields_added_here": [
+      "masking_account",
+      "withheld_fields_clarification",
+      "record_and_answer_counts",
+      "withdrawn_interpretive_claims",
+      "supported_conclusion",
+      "status",
+      "closeout_note",
+      "amendment_01"
+    ],
+    "fields_preserved_verbatim": [
+      "analysis_id",
+      "generated_iso",
+      "scope",
+      "chronology_disclosure",
+      "inputs",
+      "validator",
+      "code_sha256",
+      "results",
+      "principal_counts",
+      "preserved_unchanged",
+      "not_done",
+      "verification_nature",
+      "git"
+    ],
+    "original_generated_iso_preserved": "2026-10-18T20:09:49.358415-04:00",
+    "provenance_sha256_before_amendment": "50f5cafe9e6527936da4194fc61f97772a90d285b15a84ef0f4d60468541a849"
   }
 }

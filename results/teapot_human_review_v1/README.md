@@ -1,11 +1,21 @@
 # teapot_human_review_v1 — two-stage human review package
 
 **Status: Task A `CLOSED` (2 reviewers) · Task B `CLOSED` (2 reviewers) ·
-descriptive analysis `ANALYSIS_COMPLETE`.**
+descriptive analysis `ANALYSIS_COMPLETE`, `CLOSED WITH QUALIFIED
+CONCLUSIONS`.**
 
-> **Outcomes now exist.** Both stages are closed and the combined descriptive
-> analysis is published in **[`analysis_v1/`](analysis_v1/)** — start at
-> [`analysis_v1/FINAL_REPORT.md`](analysis_v1/FINAL_REPORT.md). Sections below
+> That closeout records that the **verified numbers stand** and that several
+> *interpretive* claims around them were overstated and are withdrawn. It is
+> **not** a finding of scientific failure and **not** a new success threshold.
+
+> **Outcomes now exist, and the analysis is closed.** Both stages are closed
+> and the combined descriptive analysis is published in
+> **[`analysis_v1/`](analysis_v1/)** — start at
+> [`analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md`](analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md),
+> which is **authoritative on interpretation**, then
+> [`analysis_v1/FINAL_REPORT.md`](analysis_v1/FINAL_REPORT.md). The verified
+> counts are unchanged; several interpretive claims around them are withdrawn.
+> Sections below
 > that describe this package as "preparation only" with "no outcomes" are
 > **historical** and are kept unrewritten; `analysis_v1/` is authoritative on
 > results.
@@ -297,32 +307,71 @@ release asset.
 
 ## Analysis v1 — combined Task-A and Task-B descriptive results (current)
 
-Both stages closed with **2** reviewers (3 planned). The combined descriptive
-analysis is in **[`analysis_v1/`](analysis_v1/)**:
+**`ANALYSIS_COMPLETE` · `CLOSED WITH QUALIFIED CONCLUSIONS`.** Both stages
+closed with **2** reviewers (3 planned). The analysis is in
+**[`analysis_v1/`](analysis_v1/)**:
+**[`AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md`](analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md)
+— authoritative on interpretation** ·
 [`FINAL_REPORT.md`](analysis_v1/FINAL_REPORT.md) ·
 [`ANALYSIS_CONTRACT.md`](analysis_v1/ANALYSIS_CONTRACT.md) ·
 [`summary.json`](analysis_v1/summary.json) ·
 [`tables/`](analysis_v1/tables/) ·
 [`verification.json`](analysis_v1/verification.json).
 
-Principal counts, each with its denominator: consensus that the teapot was
-present in **20/20** original-model images; conditional demonstrated-removal
-count **18/20** (denominator = all consensus m0-present cases, including the
-one whose edited status is unresolved); Task-A presence agreement **39/40**;
-Task-A rendering agreement **34/40**; Task-B exact per-pair agreement
-**18/20**, with **36/40** Task-B judgments `about_the_same` and
-`cannot_fairly_compare` unused.
+Principal counts, each with its denominator, **independently verified and
+unchanged**: consensus that the teapot was present in **20/20** original-model
+images; edited consensus **18 absent, 1 present, 1 unresolved**; conditional
+demonstrated-removal count **18/20** (denominator = all consensus m0-present
+cases, **including** the one whose edited status is unresolved); among those 18
+absent cases **13 agreed coherent, 5 rendering-unresolved**; Task-A presence
+agreement **39/40**; Task-A rendering agreement **34/40**; Task-B **36
+`about_the_same`, 3 `more`, 1 `less`, 0 `cannot_fairly_compare`** across 40
+ratings, exact per-pair agreement **18/20**. The data are **120 reviewer-item
+records carrying 200 categorical answers** (80 Task-A records with two answers
+each, plus 40 Task-B answers).
+
+**The supported conclusion is bounded.** On this fixed panel, the target was
+marked present in all 20 M0 images and the frozen rule yields 18 edited-absent,
+one present and one unresolved, with Task-B ratings **concentrated at
+`about_the_same`**. Genuine quality similarity, limited stimulus variation and
+limited instrument sensitivity remain **different compatible explanations**.
+This supports a **bounded descriptive finding about visible target depiction at
+one endpoint** — not general unlearning, knowledge removal, retention,
+robustness, evaluator bias, novelty, superiority or paper readiness. The 13
+coherent absences are **not** turned into a combined success score.
+
+**Withdrawn by the amendment** (the counts are untouched; the inferences were
+overstated): an instrument ceiling or "almost no discriminative range"; "badly
+under-powered" (no inferential test, estimand, effect size or power calculation
+was ever specified, and none is computed); a "one-directional" reviewer
+difference — of six rendering disagreements **five** have R2 marking localized
+deformation where R1 marked coherent and **one runs the other way**, so a
+stricter-threshold explanation stays a **hypothesis** (the five inside the
+edited-absent subset do share one direction); a diagnosed calibration/anchor
+failure; and case count, reviewer count or calibration as **proven** binding
+constraints. **This fixed analysis is closed** — any enlargement, calibration
+or comparison is an unselected prospective option needing its own justified
+question, design and authorization. **No follow-up is launched.**
 
 **Descriptive only.** No hypothesis test, interval, bootstrap, kappa,
-significance claim, pass/fail cutoff or method ranking — a scope choice for 20
-cases judged by two people, not a claim that such statistics are impossible.
-Human consensus is a reporting convention, **not ground truth**. Identity and
-independence of the two reviewers are **coordinator-reported, not proven**.
-Nothing is established about retention, adversarial robustness, concept-
-knowledge removal, evaluator bias, novelty, state-of-the-art standing or paper
-readiness. All four original responses are **preserved unchanged** and are not
-published; aliases, free text, timestamps and the private mappings stay
-private.
+significance claim, pass/fail cutoff or method ranking — a scope choice for a
+**small fixed descriptive panel with limited generalization**, not a claim that
+such statistics are impossible. Human consensus is a reporting convention,
+**not ground truth**. Reviewer identity and independence are
+**user-reported, not proven**; the declarations support a **procedural masking
+account, not proof that judging-time masking held** — and nothing indicates it
+failed either.
+
+**Reproducibility has two different limits.** Condition and pair assignment
+**is recoverable** by hashing the already-public A/B/source images, and an
+independent review reconstructed it that way; withholding a direct crosswalk
+does not make it unreproducible. **Export-level reproduction is limited**: the
+exact exports, free text, original metadata and the reviewer↔`R1`/`R2` linkage
+stay private. Public Task-B pair IDs `B-01`…`B-20` **are** published; the
+unchanged `summary.json` withheld-fields wording refers to private source
+identifiers and direct crosswalks, not every case identifier. Pseudonyms do
+**not** erase the earlier roster disclosure or guarantee anonymity. All four
+original responses are **preserved unchanged** and are not published.
 
 ## Stop point
 

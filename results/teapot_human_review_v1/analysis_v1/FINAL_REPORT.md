@@ -1,6 +1,18 @@
 # Combined Task-A / Task-B descriptive analysis — teapot human review v1
 
-**Status `ANALYSIS_COMPLETE`. Dated 2026-10-18.**
+**Status `ANALYSIS_COMPLETE` · `CLOSED WITH QUALIFIED CONCLUSIONS`.
+Dated 2026-10-18.**
+
+> **Read [`AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md`](AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md)
+> alongside this report — it is authoritative where the two differ.** The
+> numerical results below were independently verified and are **unchanged**.
+> Several *interpretive* claims in §9–§10 as first published were overstated —
+> an instrument ceiling, "badly under-powered," a diagnosed calibration
+> failure, a "one-directional" reviewer difference, and proven binding
+> constraints — and are **withdrawn or re-scoped** there and in the corrected
+> text below. The amendment also separates two different reproducibility
+> limits and corrects the masking account from proof to a procedural account.
+> Closure, not a larger panel, is the recorded outcome.
 
 Descriptive analysis of **existing** human judgments. **No new experiment, no
 new label, no model run, no image generation, no automated judging, no GPU.**
@@ -19,9 +31,14 @@ claiming a blind freeze.
 
 ## 1. What this is counting
 
-**20 paired cases, 80 Task-A judgments and 40 Task-B judgments from two
-people.** These are **not** independent replicated trials, and nothing below
-should be read as if they were.
+**20 paired cases and 120 reviewer-item records carrying 200 categorical
+answers, from two people:** 80 Task-A records (2 reviewers × 40 images), each
+with **two** answers — `target` and `rendering`, so 160 answers — plus 40
+Task-B records (2 reviewers × 20 pairs) with **one** `comparison` answer each,
+so 40 more. 160 + 40 = **200 answers across 120 records**.
+
+These are **not** independent replicated trials, and nothing below should be
+read as if they were.
 
 | | |
 |---|---|
@@ -195,8 +212,11 @@ consensus m0 `present` — a consequence of the empty m0-`absent` row, not a
 collapsing of the two subsets. They are reported separately regardless, because
 the frozen rules require it and because they would diverge on other data.
 
-**All 5 unresolved renderings come from the same direction:** R2 recorded
-`localized_deformation` where R1 recorded `coherent`. Neither reviewer reported
+**All 5 unresolved renderings *within this subset* come from the same
+direction:** R2 recorded `localized_deformation` where R1 recorded `coherent`.
+This is the correctly scoped statement — it holds for these five, **not** for
+all six rendering disagreements overall, one of which runs the other way
+(§9). Neither reviewer reported
 whole-frame breakdown or an inability to judge on any case.
 
 **This is not combined with §4 into a single score.**
@@ -269,11 +289,32 @@ The four input SHA256 digests **are** published, keyed by neutral ID and stage,
 for integrity. Anyone who separately holds the private filename manifest could
 use them to link `R1`/`R2` to an alias; that manifest is private.
 
-**Public end-to-end reproducibility is therefore partial.** The case-level join
-in §3–§5 runs through the **private** mapping. A third party can recheck every
-table's internal arithmetic, totals and joins from the published files, but
-**cannot independently reproduce the m0/edited assignment** without the private
-mapping.
+**Two different reproducibility limits, which earlier wording blurred into
+one.** They point in opposite directions and must be kept apart:
+
+* **Condition and pair assignment IS recoverable.** It can be reconstructed by
+  hashing the already-public Task-A, Task-B and source-asset images — see
+  below. **An independent review reconstructed it that way.** Withholding a
+  direct crosswalk **does not make the assignment unreproducible**, and this
+  report does not claim it does. (Earlier text said a third party "cannot
+  independently reproduce the m0/edited assignment"; **that was wrong** —
+  recovering it needs only the public bytes, not the private mapping.)
+* **Export-level reproduction IS limited.** The exact original export files,
+  free-text answers, original export metadata and the reviewer↔`R1`/`R2`
+  linkage are **private**, so a third party cannot rebuild the tables from the
+  original artifacts or verify the reviewer linkage.
+
+A third party can recheck every table's internal arithmetic, totals and joins
+from the published files, and can recover the condition assignment from public
+image bytes.
+
+**On the withheld list above.** It names "case IDs" and "neutral-ID→condition
+associations". That means **private source identifiers and direct
+crosswalks** — it does **not** mean every case identifier is withheld, and it
+does **not** claim no association is inferable. **The Task-B pair IDs
+`B-01`…`B-20` are published** in
+[`tables/taskB_responses.csv`](tables/taskB_responses.csv) and
+[`tables/paired_case_ledger.csv`](tables/paired_case_ledger.csv).
 
 ### Pseudonymity here is weak, and saying otherwise would be false
 
@@ -291,11 +332,19 @@ Consequences stated plainly:
 * Publishing votes keyed by `A-xxx` is, in disclosure terms, equivalent to
   publishing them keyed by case and condition. **No direct crosswalk is added
   here**, but withholding one buys little.
-* **The masking that actually mattered was masking at judging time** — Task-A
-  reviewers did not know conditions or pairings while judging. That was real
-  and is unaffected by any of this. Task B was **deliberately** unmasked.
-* `R1`/`R2` are pseudonyms, not anonymity. They do not undo the earlier roster
-  disclosure recorded in Amendment 03 §7b.
+* **Masking at judging time rests on a procedural account, not on proof.**
+  Both reviewers **declared** no pre-Task-A access to source pairings or
+  condition labels and no image-specific coaching, and independence was
+  **user-reported**. The protocol provided for masked judging and those
+  declarations are consistent with it — but declarations and aliases **cannot
+  establish what a reviewer knew**, so this is not proof that judging-time
+  masking held. Equally, **nothing here indicates that it failed**; this report
+  asserts neither. (Earlier text called it "real and unaffected"; that
+  overstated a declaration as a verified fact.) Task B was **deliberately**
+  unmasked.
+* `R1`/`R2` are pseudonyms, **not anonymity**. They do not undo the earlier
+  roster disclosure recorded in Amendment 03 §7b and do not guarantee
+  anonymity.
 
 ---
 
@@ -305,7 +354,9 @@ Consequences stated plainly:
 §2 and §6 — the raw per-reviewer distributions, the 0 uses of `uncertain`,
 `whole_frame_breakdown`, `unable_to_judge` and `cannot_fairly_compare`, the
 39/40 presence agreement, the 34/40 rendering agreement, the 18/20 Task-B exact
-agreement, and all 120 individual categorical votes in the published tables.
+agreement, and all **200 categorical answers across 120 reviewer-item
+records** in the published tables. (Earlier text said "120 individual
+categorical votes"; that conflated records with answers — §1.)
 
 **Convention-derived (true given the frozen rules, and only given them):** the
 derived `present`/`absent`/`unresolved` labels, the 3×3 table, the **18/20**
@@ -314,15 +365,23 @@ removal count, and the §5 rendering breakdowns. These depend on the rule that
 a reporting convention, not ground truth** — it does not establish what is
 actually in an image.
 
-**Speculation, and labelled as such:** that R2 applied a stricter rendering
-threshold than R1 (R2: 6 `localized_deformation` vs R1: 2; **5 of the 6
-disagreements** have R2 flagging deformation where R1 saw coherence). Note the
-sixth runs the **other** way, so the pattern is not uniform. It is visible in
-the counts, but with two reviewers and 40 images it is **equally consistent
-with ordinary rater variation**, and nothing here distinguishes the two.
-All 6 disagreements are `coherent` ↔ `localized_deformation`; no other pair of
-rendering values was ever in conflict.
-Also speculation: any explanation of *why* the `challenging` stratum holds
+**Hypothesis, and labelled as such:** that R2 applied a stricter rendering
+threshold than R1. The **observation** is that R2 recorded 6
+`localized_deformation` against R1's 2, and that **of the six rendering
+disagreements, five** have R2 marking `localized_deformation` where R1 marked
+`coherent` — while **the sixth runs the other way**. So the pattern is **not
+one-directional**, and the earlier description of it as such is withdrawn. A
+stricter-threshold explanation **remains a hypothesis**: it is equally
+consistent with ordinary rater variation, and nothing here separates the two.
+
+Correctly scoped and retained: the **five** disagreements that fall **inside
+the 18 edited-absent subset** do all run the same direction (§5). All six
+disagreements are `coherent` ↔ `localized_deformation`; no other pair of
+rendering values was ever in conflict. **That the six arose from absent shared
+anchors is also only a hypothesis** — no calibration study was run, and no
+anchor failure is diagnosed here.
+
+Also hypothesis only: any explanation of *why* the `challenging` stratum holds
 every non-`about_the_same` Task-B vote.
 
 ### What this does not establish
@@ -339,39 +398,52 @@ are impossible in principle.
 
 ---
 
-## 10. One recommended next scientific decision
+## 10. The supported conclusion, and closure
 
-**Recommendation: do not proceed to a method comparison or any efficacy claim.
-Re-run the same frozen two-stage instrument on a substantially larger case set
-with more reviewers, adding a rendering-calibration step before judging.**
+**On this fixed panel:** both reviewers marked the target **present in all 20
+M0 images**. Applying the frozen consensus rule to the edited images yields
+**18 absent, one present and one unresolved**; among the 18 absent cases, **13
+are agreed coherent and five are rendering-unresolved**. Task-B ratings were
+**concentrated at `about_the_same`** — 36 of 40, with 3 `more`, 1 `less` and 0
+`cannot_fairly_compare`.
 
-The honest reading of this evidence is **positive but badly under-powered, and
-near the ceiling of what this instrument can resolve**:
+**Three explanations of the Task-B concentration remain compatible**, and this
+analysis does not choose between them:
 
-* Removal at the Task-A endpoint was observed in **18 of 20** cases, with
-  consensus that the teapot was present in **all 20** original-model images —
-  so the endpoint discriminated, and the denominator did not have to be
-  qualified away.
-* But **36 of 40** Task-B judgments were `about_the_same` and
-  `cannot_fairly_compare` went unused, so **Task B as designed has almost no
-  discriminative range on this material**. That is a finding about the
-  instrument, not about the method.
-* The only real variance sits in **one unresolved case, one still-present case,
-  and a one-directional rendering-strictness difference between two people**.
-  With n=2 reviewers, that difference cannot be separated from rater noise.
+1. genuine similarity in quality between the two conditions;
+2. limited stimulus variation across this particular 20-case panel;
+3. limited sensitivity of the comparison instrument.
 
-So the binding constraint is now **case count, reviewer count and rendering
-calibration** — not the absence of a baseline comparison. Adding methods or
-baselines on top of a 20-case, 2-reviewer, near-ceiling measurement would
-produce rankings that this design cannot support.
+**This supports a bounded descriptive finding about visible target depiction at
+one fixed endpoint**, on this panel, as judged by these two reviewers. It does
+**not** establish general unlearning, removal of concept knowledge, retention,
+adversarial robustness, evaluator bias, novelty, superiority over any method,
+or paper readiness.
 
-Concretely, the next study should fix the rendering-anchor problem (shared
-worked examples of `coherent` vs `localized_deformation` before judging, which
-is where 6 of the 6 unresolved labels came from), enlarge the case set enough
-that the `challenging` stratum alone can carry an analysis, and recruit enough
-reviewers that a single rater's threshold does not move the derived labels.
+**The 13 agreed-coherent absences are not a success score** and are not
+combined with the 18/20 count, or with each other, into any composite figure.
 
-**No follow-up is executed here.** This is a recommendation only.
+This is a **small fixed descriptive panel with limited generalization**: 20
+paired cases, 200 categorical answers across 120 records, two reviewers, one
+object, one endpoint. It is deliberately **not** described as under-powered —
+no inferential test, estimand, meaningful effect size or power calculation was
+ever specified for it, and none is computed now.
+
+### Closure
+
+**This fixed analysis is closed.** No next step is prescribed.
+
+Any future enlargement of the panel, calibration pass, additional reviewers or
+method comparison is an **unselected prospective option** that would need its
+own justified question, design, resourcing and authorization. None is selected
+here, none is claimed to be required, and **no follow-up is launched**.
+
+Earlier wording recommended a larger calibrated panel as the necessary next
+step and named case count, reviewer count and calibration as binding
+constraints. **Both are withdrawn** — see
+[`AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md`](AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md)
+§3.5 and §5. Nothing here forecloses whether some other bounded comparison
+could be justified; this analysis simply did not examine that question.
 
 ---
 
@@ -393,7 +465,10 @@ reviewers that a single rater's threshold does not move the derived labels.
 
 | what | file | result |
 |---|---|---|
-| Frozen rules | [`ANALYSIS_CONTRACT.md`](ANALYSIS_CONTRACT.md) | incl. honest chronology disclosure |
+| **Conclusions/provenance amendment** | [`AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md`](AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md) | **authoritative on interpretation** |
+| Frozen rules | [`ANALYSIS_CONTRACT.md`](ANALYSIS_CONTRACT.md) | incl. honest chronology disclosure, preserved unchanged |
+| Amendment preservation check | [`preservation_check.json`](preservation_check.json) | before/after, mechanical |
+| Amendment change-set scan | [`amendment_public_audit.json`](amendment_public_audit.json) | separate from the historical audit |
 | Machine-readable summary | [`summary.json`](summary.json) | — |
 | Synthetic edge cases | [`synthetic_checks.json`](synthetic_checks.json) | **35 / 35** |
 | Arithmetic, joins, reproducibility | [`verification.json`](verification.json) | **54 / 54** `ANALYSIS_CHECKS_PASS` |
@@ -432,5 +507,10 @@ private records at run time, and a missing private record makes a scan report
 | New images, labels or experiments | **0** | 0 |
 | Original responses modified | **0** | 0 |
 
-All historical preparation, release and maintenance clocks are preserved
-unchanged.
+The documentation/provenance/index amendment is accounted for **separately**
+against its own 2 h allowance in
+[`AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md`](AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md)
+§12. This analysis-phase row is **not** extended to cover it.
+
+All historical preparation, release, maintenance and analysis clocks are
+preserved unchanged and were not reset or retroactively extended.

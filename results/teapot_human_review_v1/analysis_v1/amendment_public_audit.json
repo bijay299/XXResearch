@@ -1,0 +1,208 @@
+{
+  "generated_iso": "2026-10-18T21:00:03.533435-04:00",
+  "what_this_is": "NEW scoped public-content scan over the actual change set of the documentation/provenance/evidence-index amendment. It does NOT overwrite or supersede analysis_v1/public_audit.json, which remains as published for the original analysis.",
+  "baseline_commit": "5b252193aac601f9653132cec370b93850dbd549",
+  "scope": "files differing from the baseline under results/, plus untracked files there",
+  "n_files_in_change_set": 12,
+  "files_in_change_set": [
+    "results/README.md",
+    "results/teapot_human_review_v1/README.md",
+    "results/teapot_human_review_v1/analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md",
+    "results/teapot_human_review_v1/analysis_v1/FINAL_REPORT.md",
+    "results/teapot_human_review_v1/analysis_v1/MANIFEST_SHA256.md",
+    "results/teapot_human_review_v1/analysis_v1/amendment_public_audit.json",
+    "results/teapot_human_review_v1/analysis_v1/preservation_check.json",
+    "results/teapot_human_review_v1/analysis_v1/provenance.json",
+    "results/teapot_human_review_v1/scripts/audit_amendment_changeset.py",
+    "results/teapot_human_review_v1/scripts/gen_analysis_manifest.py",
+    "results/teapot_human_review_v1/scripts/gen_evidence_index.py",
+    "results/teapot_human_review_v1/scripts/preservation_check.py"
+  ],
+  "n_binary_or_undecodable_skipped": 0,
+  "binary_or_undecodable_skipped": [],
+  "scans": [
+    {
+      "scan": "reviewer aliases",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "token",
+      "n_needles": 2,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "original export filenames",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 4,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "free-text reviewer prose",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 1,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "other_exposure_note text",
+      "layer": "SECRETS",
+      "status": "NOT_APPLICABLE",
+      "reason": "the originals hold no such value, so there is nothing to leak"
+    },
+    {
+      "scan": "export timestamps",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 4,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "source image filenames",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 40,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "source image hashes",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 40,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "case IDs",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 20,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "initial-noise hashes",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 20,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "direct neutral-ID-to-condition crosswalk rows",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 80,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "randomization salt (hex)",
+      "layer": "SECRETS",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 1,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "private paths / record names / key material",
+      "layer": "PATHS",
+      "status": "RAN",
+      "scope": "lines added by this amendment",
+      "precedent_in_published_scripts_at_baseline": {
+        "private host path": 21,
+        "private record filename": 9,
+        "private key material": 1
+      },
+      "n_files_with_new_findings": 0
+    }
+  ],
+  "n_scans_ran": 11,
+  "n_scans_not_applicable": 1,
+  "n_scans_skipped_private_record_unavailable": 0,
+  "all_secret_scans_ran": true,
+  "findings": [],
+  "n_findings": 0,
+  "pre_existing_or_informational": [
+    {
+      "file": "results/README.md",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/README.md",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/analysis_v1/FINAL_REPORT.md",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/analysis_v1/preservation_check.json",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/analysis_v1/provenance.json",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/audit_amendment_changeset.py",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/gen_evidence_index.py",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/preservation_check.py",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier inside an ordinary word; reviewed as a false positive"
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/audit_amendment_changeset.py",
+      "kind": "private host path",
+      "note": "self-match: this scanner's own pattern table contains the literal it searches for"
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/audit_amendment_changeset.py",
+      "kind": "private record filename",
+      "note": "self-match: this scanner's own pattern table contains the literal it searches for"
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/audit_amendment_changeset.py",
+      "kind": "private key material",
+      "note": "self-match: this scanner's own pattern table contains the literal it searches for"
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/gen_analysis_manifest.py",
+      "kind": "private host path",
+      "note": "established practice: the same pattern already appears in 21 previously published script(s) in this package at the baseline, and PRIVATE_RECOVERY.md documents these locations. Not a secret: the path/record NAME reveals no content."
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/preservation_check.py",
+      "kind": "private host path",
+      "note": "established practice: the same pattern already appears in 21 previously published script(s) in this package at the baseline, and PRIVATE_RECOVERY.md documents these locations. Not a secret: the path/record NAME reveals no content."
+    },
+    {
+      "file": "results/teapot_human_review_v1/scripts/preservation_check.py",
+      "kind": "private record filename",
+      "note": "established practice: the same pattern already appears in 9 previously published script(s) in this package at the baseline, and PRIVATE_RECOVERY.md documents these locations. Not a secret: the path/record NAME reveals no content."
+    }
+  ],
+  "n_pre_existing_or_informational": 15,
+  "verdict": "AMENDMENT_CHANGESET_AUDIT_CLEAN"
+}
