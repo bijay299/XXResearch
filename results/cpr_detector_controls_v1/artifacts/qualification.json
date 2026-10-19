@@ -1,0 +1,1072 @@
+{
+  "detectors": {
+    "detr_resnet50_no_timm": {
+      "all_classes_passed": true,
+      "failing_classes": [],
+      "label_map": {
+        "coco_id_to_detector_id": {
+          "1": {
+            "coco_name": "person",
+            "detector_label_id": 1,
+            "detector_label_str": "person"
+          },
+          "2": {
+            "coco_name": "bicycle",
+            "detector_label_id": 2,
+            "detector_label_str": "bicycle"
+          },
+          "3": {
+            "coco_name": "car",
+            "detector_label_id": 3,
+            "detector_label_str": "car"
+          },
+          "4": {
+            "coco_name": "motorcycle",
+            "detector_label_id": 4,
+            "detector_label_str": "motorcycle"
+          },
+          "5": {
+            "coco_name": "airplane",
+            "detector_label_id": 5,
+            "detector_label_str": "airplane"
+          },
+          "6": {
+            "coco_name": "bus",
+            "detector_label_id": 6,
+            "detector_label_str": "bus"
+          },
+          "7": {
+            "coco_name": "train",
+            "detector_label_id": 7,
+            "detector_label_str": "train"
+          },
+          "8": {
+            "coco_name": "truck",
+            "detector_label_id": 8,
+            "detector_label_str": "truck"
+          },
+          "9": {
+            "coco_name": "boat",
+            "detector_label_id": 9,
+            "detector_label_str": "boat"
+          },
+          "10": {
+            "coco_name": "traffic light",
+            "detector_label_id": 10,
+            "detector_label_str": "traffic light"
+          },
+          "11": {
+            "coco_name": "fire hydrant",
+            "detector_label_id": 11,
+            "detector_label_str": "fire hydrant"
+          },
+          "13": {
+            "coco_name": "stop sign",
+            "detector_label_id": 13,
+            "detector_label_str": "stop sign"
+          },
+          "14": {
+            "coco_name": "parking meter",
+            "detector_label_id": 14,
+            "detector_label_str": "parking meter"
+          },
+          "15": {
+            "coco_name": "bench",
+            "detector_label_id": 15,
+            "detector_label_str": "bench"
+          },
+          "16": {
+            "coco_name": "bird",
+            "detector_label_id": 16,
+            "detector_label_str": "bird"
+          },
+          "17": {
+            "coco_name": "cat",
+            "detector_label_id": 17,
+            "detector_label_str": "cat"
+          },
+          "18": {
+            "coco_name": "dog",
+            "detector_label_id": 18,
+            "detector_label_str": "dog"
+          },
+          "19": {
+            "coco_name": "horse",
+            "detector_label_id": 19,
+            "detector_label_str": "horse"
+          },
+          "20": {
+            "coco_name": "sheep",
+            "detector_label_id": 20,
+            "detector_label_str": "sheep"
+          },
+          "21": {
+            "coco_name": "cow",
+            "detector_label_id": 21,
+            "detector_label_str": "cow"
+          },
+          "22": {
+            "coco_name": "elephant",
+            "detector_label_id": 22,
+            "detector_label_str": "elephant"
+          },
+          "23": {
+            "coco_name": "bear",
+            "detector_label_id": 23,
+            "detector_label_str": "bear"
+          },
+          "24": {
+            "coco_name": "zebra",
+            "detector_label_id": 24,
+            "detector_label_str": "zebra"
+          },
+          "25": {
+            "coco_name": "giraffe",
+            "detector_label_id": 25,
+            "detector_label_str": "giraffe"
+          },
+          "27": {
+            "coco_name": "backpack",
+            "detector_label_id": 27,
+            "detector_label_str": "backpack"
+          },
+          "28": {
+            "coco_name": "umbrella",
+            "detector_label_id": 28,
+            "detector_label_str": "umbrella"
+          },
+          "31": {
+            "coco_name": "handbag",
+            "detector_label_id": 31,
+            "detector_label_str": "handbag"
+          },
+          "32": {
+            "coco_name": "tie",
+            "detector_label_id": 32,
+            "detector_label_str": "tie"
+          },
+          "33": {
+            "coco_name": "suitcase",
+            "detector_label_id": 33,
+            "detector_label_str": "suitcase"
+          },
+          "34": {
+            "coco_name": "frisbee",
+            "detector_label_id": 34,
+            "detector_label_str": "frisbee"
+          },
+          "35": {
+            "coco_name": "skis",
+            "detector_label_id": 35,
+            "detector_label_str": "skis"
+          },
+          "36": {
+            "coco_name": "snowboard",
+            "detector_label_id": 36,
+            "detector_label_str": "snowboard"
+          },
+          "37": {
+            "coco_name": "sports ball",
+            "detector_label_id": 37,
+            "detector_label_str": "sports ball"
+          },
+          "38": {
+            "coco_name": "kite",
+            "detector_label_id": 38,
+            "detector_label_str": "kite"
+          },
+          "39": {
+            "coco_name": "baseball bat",
+            "detector_label_id": 39,
+            "detector_label_str": "baseball bat"
+          },
+          "40": {
+            "coco_name": "baseball glove",
+            "detector_label_id": 40,
+            "detector_label_str": "baseball glove"
+          },
+          "41": {
+            "coco_name": "skateboard",
+            "detector_label_id": 41,
+            "detector_label_str": "skateboard"
+          },
+          "42": {
+            "coco_name": "surfboard",
+            "detector_label_id": 42,
+            "detector_label_str": "surfboard"
+          },
+          "43": {
+            "coco_name": "tennis racket",
+            "detector_label_id": 43,
+            "detector_label_str": "tennis racket"
+          },
+          "44": {
+            "coco_name": "bottle",
+            "detector_label_id": 44,
+            "detector_label_str": "bottle"
+          },
+          "46": {
+            "coco_name": "wine glass",
+            "detector_label_id": 46,
+            "detector_label_str": "wine glass"
+          },
+          "47": {
+            "coco_name": "cup",
+            "detector_label_id": 47,
+            "detector_label_str": "cup"
+          },
+          "48": {
+            "coco_name": "fork",
+            "detector_label_id": 48,
+            "detector_label_str": "fork"
+          },
+          "49": {
+            "coco_name": "knife",
+            "detector_label_id": 49,
+            "detector_label_str": "knife"
+          },
+          "50": {
+            "coco_name": "spoon",
+            "detector_label_id": 50,
+            "detector_label_str": "spoon"
+          },
+          "51": {
+            "coco_name": "bowl",
+            "detector_label_id": 51,
+            "detector_label_str": "bowl"
+          },
+          "52": {
+            "coco_name": "banana",
+            "detector_label_id": 52,
+            "detector_label_str": "banana"
+          },
+          "53": {
+            "coco_name": "apple",
+            "detector_label_id": 53,
+            "detector_label_str": "apple"
+          },
+          "54": {
+            "coco_name": "sandwich",
+            "detector_label_id": 54,
+            "detector_label_str": "sandwich"
+          },
+          "55": {
+            "coco_name": "orange",
+            "detector_label_id": 55,
+            "detector_label_str": "orange"
+          },
+          "56": {
+            "coco_name": "broccoli",
+            "detector_label_id": 56,
+            "detector_label_str": "broccoli"
+          },
+          "57": {
+            "coco_name": "carrot",
+            "detector_label_id": 57,
+            "detector_label_str": "carrot"
+          },
+          "58": {
+            "coco_name": "hot dog",
+            "detector_label_id": 58,
+            "detector_label_str": "hot dog"
+          },
+          "59": {
+            "coco_name": "pizza",
+            "detector_label_id": 59,
+            "detector_label_str": "pizza"
+          },
+          "60": {
+            "coco_name": "donut",
+            "detector_label_id": 60,
+            "detector_label_str": "donut"
+          },
+          "61": {
+            "coco_name": "cake",
+            "detector_label_id": 61,
+            "detector_label_str": "cake"
+          },
+          "62": {
+            "coco_name": "chair",
+            "detector_label_id": 62,
+            "detector_label_str": "chair"
+          },
+          "63": {
+            "coco_name": "couch",
+            "detector_label_id": 63,
+            "detector_label_str": "couch"
+          },
+          "64": {
+            "coco_name": "potted plant",
+            "detector_label_id": 64,
+            "detector_label_str": "potted plant"
+          },
+          "65": {
+            "coco_name": "bed",
+            "detector_label_id": 65,
+            "detector_label_str": "bed"
+          },
+          "67": {
+            "coco_name": "dining table",
+            "detector_label_id": 67,
+            "detector_label_str": "dining table"
+          },
+          "70": {
+            "coco_name": "toilet",
+            "detector_label_id": 70,
+            "detector_label_str": "toilet"
+          },
+          "72": {
+            "coco_name": "tv",
+            "detector_label_id": 72,
+            "detector_label_str": "tv"
+          },
+          "73": {
+            "coco_name": "laptop",
+            "detector_label_id": 73,
+            "detector_label_str": "laptop"
+          },
+          "74": {
+            "coco_name": "mouse",
+            "detector_label_id": 74,
+            "detector_label_str": "mouse"
+          },
+          "75": {
+            "coco_name": "remote",
+            "detector_label_id": 75,
+            "detector_label_str": "remote"
+          },
+          "76": {
+            "coco_name": "keyboard",
+            "detector_label_id": 76,
+            "detector_label_str": "keyboard"
+          },
+          "77": {
+            "coco_name": "cell phone",
+            "detector_label_id": 77,
+            "detector_label_str": "cell phone"
+          },
+          "78": {
+            "coco_name": "microwave",
+            "detector_label_id": 78,
+            "detector_label_str": "microwave"
+          },
+          "79": {
+            "coco_name": "oven",
+            "detector_label_id": 79,
+            "detector_label_str": "oven"
+          },
+          "80": {
+            "coco_name": "toaster",
+            "detector_label_id": 80,
+            "detector_label_str": "toaster"
+          },
+          "81": {
+            "coco_name": "sink",
+            "detector_label_id": 81,
+            "detector_label_str": "sink"
+          },
+          "82": {
+            "coco_name": "refrigerator",
+            "detector_label_id": 82,
+            "detector_label_str": "refrigerator"
+          },
+          "84": {
+            "coco_name": "book",
+            "detector_label_id": 84,
+            "detector_label_str": "book"
+          },
+          "85": {
+            "coco_name": "clock",
+            "detector_label_id": 85,
+            "detector_label_str": "clock"
+          },
+          "86": {
+            "coco_name": "vase",
+            "detector_label_id": 86,
+            "detector_label_str": "vase"
+          },
+          "87": {
+            "coco_name": "scissors",
+            "detector_label_id": 87,
+            "detector_label_str": "scissors"
+          },
+          "88": {
+            "coco_name": "teddy bear",
+            "detector_label_id": 88,
+            "detector_label_str": "teddy bear"
+          },
+          "89": {
+            "coco_name": "hair drier",
+            "detector_label_id": 89,
+            "detector_label_str": "hair drier"
+          },
+          "90": {
+            "coco_name": "toothbrush",
+            "detector_label_id": 90,
+            "detector_label_str": "toothbrush"
+          }
+        },
+        "detector": "detr_resnet50_no_timm",
+        "n_detector_labels": 91,
+        "unsupported_coco_categories": [],
+        "unused_detector_label_ids": [
+          0,
+          12,
+          26,
+          29,
+          30,
+          45,
+          66,
+          68,
+          69,
+          71,
+          83
+        ]
+      },
+      "per_class": {
+        "airplane": {
+          "coco_id": 5,
+          "detector_label_id": 5,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 19,
+          "positives_detected": 19,
+          "sensitivity": 0.95,
+          "specificity": 1.0
+        },
+        "bench": {
+          "coco_id": 15,
+          "detector_label_id": 15,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 19,
+          "passed": true,
+          "positives_box_matched_iou50": 15,
+          "positives_detected": 17,
+          "sensitivity": 0.85,
+          "specificity": 0.95
+        },
+        "car": {
+          "coco_id": 3,
+          "detector_label_id": 3,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 19,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 0.95
+        },
+        "fire hydrant": {
+          "coco_id": 11,
+          "detector_label_id": 11,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 18,
+          "positives_detected": 18,
+          "sensitivity": 0.9,
+          "specificity": 1.0
+        },
+        "motorcycle": {
+          "coco_id": 4,
+          "detector_label_id": 4,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 1.0
+        },
+        "person": {
+          "coco_id": 1,
+          "detector_label_id": 1,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 19,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 0.95
+        },
+        "stop sign": {
+          "coco_id": 13,
+          "detector_label_id": 13,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 1.0
+        }
+      },
+      "spec": {
+        "repo": "facebook/detr-resnet-50",
+        "revision": "70120ba84d68ca1211e007c4fb61d0cd5424be54",
+        "revision_note": "the officially documented `no_timm` revision. Chosen over `main` (1d5f47bd3bdd2c4bbfa585418ffe6da5028b4c0b) to avoid depending on the installed timm 1.0.15, which is far newer than the version DETR's timm backbone was published against; both revisions load in this environment, and this choice is frozen before any scoring.",
+        "role": "secondary_diagnostic"
+      },
+      "verdict": "QUALIFIED"
+    },
+    "rtdetr_r50vd": {
+      "all_classes_passed": true,
+      "failing_classes": [],
+      "label_map": {
+        "coco_id_to_detector_id": {
+          "1": {
+            "coco_name": "person",
+            "detector_label_id": 0,
+            "detector_label_str": "person"
+          },
+          "2": {
+            "coco_name": "bicycle",
+            "detector_label_id": 1,
+            "detector_label_str": "bicycle"
+          },
+          "3": {
+            "coco_name": "car",
+            "detector_label_id": 2,
+            "detector_label_str": "car"
+          },
+          "4": {
+            "coco_name": "motorcycle",
+            "detector_label_id": 3,
+            "detector_label_str": "motorbike"
+          },
+          "5": {
+            "coco_name": "airplane",
+            "detector_label_id": 4,
+            "detector_label_str": "aeroplane"
+          },
+          "6": {
+            "coco_name": "bus",
+            "detector_label_id": 5,
+            "detector_label_str": "bus"
+          },
+          "7": {
+            "coco_name": "train",
+            "detector_label_id": 6,
+            "detector_label_str": "train"
+          },
+          "8": {
+            "coco_name": "truck",
+            "detector_label_id": 7,
+            "detector_label_str": "truck"
+          },
+          "9": {
+            "coco_name": "boat",
+            "detector_label_id": 8,
+            "detector_label_str": "boat"
+          },
+          "10": {
+            "coco_name": "traffic light",
+            "detector_label_id": 9,
+            "detector_label_str": "traffic light"
+          },
+          "11": {
+            "coco_name": "fire hydrant",
+            "detector_label_id": 10,
+            "detector_label_str": "fire hydrant"
+          },
+          "13": {
+            "coco_name": "stop sign",
+            "detector_label_id": 11,
+            "detector_label_str": "stop sign"
+          },
+          "14": {
+            "coco_name": "parking meter",
+            "detector_label_id": 12,
+            "detector_label_str": "parking meter"
+          },
+          "15": {
+            "coco_name": "bench",
+            "detector_label_id": 13,
+            "detector_label_str": "bench"
+          },
+          "16": {
+            "coco_name": "bird",
+            "detector_label_id": 14,
+            "detector_label_str": "bird"
+          },
+          "17": {
+            "coco_name": "cat",
+            "detector_label_id": 15,
+            "detector_label_str": "cat"
+          },
+          "18": {
+            "coco_name": "dog",
+            "detector_label_id": 16,
+            "detector_label_str": "dog"
+          },
+          "19": {
+            "coco_name": "horse",
+            "detector_label_id": 17,
+            "detector_label_str": "horse"
+          },
+          "20": {
+            "coco_name": "sheep",
+            "detector_label_id": 18,
+            "detector_label_str": "sheep"
+          },
+          "21": {
+            "coco_name": "cow",
+            "detector_label_id": 19,
+            "detector_label_str": "cow"
+          },
+          "22": {
+            "coco_name": "elephant",
+            "detector_label_id": 20,
+            "detector_label_str": "elephant"
+          },
+          "23": {
+            "coco_name": "bear",
+            "detector_label_id": 21,
+            "detector_label_str": "bear"
+          },
+          "24": {
+            "coco_name": "zebra",
+            "detector_label_id": 22,
+            "detector_label_str": "zebra"
+          },
+          "25": {
+            "coco_name": "giraffe",
+            "detector_label_id": 23,
+            "detector_label_str": "giraffe"
+          },
+          "27": {
+            "coco_name": "backpack",
+            "detector_label_id": 24,
+            "detector_label_str": "backpack"
+          },
+          "28": {
+            "coco_name": "umbrella",
+            "detector_label_id": 25,
+            "detector_label_str": "umbrella"
+          },
+          "31": {
+            "coco_name": "handbag",
+            "detector_label_id": 26,
+            "detector_label_str": "handbag"
+          },
+          "32": {
+            "coco_name": "tie",
+            "detector_label_id": 27,
+            "detector_label_str": "tie"
+          },
+          "33": {
+            "coco_name": "suitcase",
+            "detector_label_id": 28,
+            "detector_label_str": "suitcase"
+          },
+          "34": {
+            "coco_name": "frisbee",
+            "detector_label_id": 29,
+            "detector_label_str": "frisbee"
+          },
+          "35": {
+            "coco_name": "skis",
+            "detector_label_id": 30,
+            "detector_label_str": "skis"
+          },
+          "36": {
+            "coco_name": "snowboard",
+            "detector_label_id": 31,
+            "detector_label_str": "snowboard"
+          },
+          "37": {
+            "coco_name": "sports ball",
+            "detector_label_id": 32,
+            "detector_label_str": "sports ball"
+          },
+          "38": {
+            "coco_name": "kite",
+            "detector_label_id": 33,
+            "detector_label_str": "kite"
+          },
+          "39": {
+            "coco_name": "baseball bat",
+            "detector_label_id": 34,
+            "detector_label_str": "baseball bat"
+          },
+          "40": {
+            "coco_name": "baseball glove",
+            "detector_label_id": 35,
+            "detector_label_str": "baseball glove"
+          },
+          "41": {
+            "coco_name": "skateboard",
+            "detector_label_id": 36,
+            "detector_label_str": "skateboard"
+          },
+          "42": {
+            "coco_name": "surfboard",
+            "detector_label_id": 37,
+            "detector_label_str": "surfboard"
+          },
+          "43": {
+            "coco_name": "tennis racket",
+            "detector_label_id": 38,
+            "detector_label_str": "tennis racket"
+          },
+          "44": {
+            "coco_name": "bottle",
+            "detector_label_id": 39,
+            "detector_label_str": "bottle"
+          },
+          "46": {
+            "coco_name": "wine glass",
+            "detector_label_id": 40,
+            "detector_label_str": "wine glass"
+          },
+          "47": {
+            "coco_name": "cup",
+            "detector_label_id": 41,
+            "detector_label_str": "cup"
+          },
+          "48": {
+            "coco_name": "fork",
+            "detector_label_id": 42,
+            "detector_label_str": "fork"
+          },
+          "49": {
+            "coco_name": "knife",
+            "detector_label_id": 43,
+            "detector_label_str": "knife"
+          },
+          "50": {
+            "coco_name": "spoon",
+            "detector_label_id": 44,
+            "detector_label_str": "spoon"
+          },
+          "51": {
+            "coco_name": "bowl",
+            "detector_label_id": 45,
+            "detector_label_str": "bowl"
+          },
+          "52": {
+            "coco_name": "banana",
+            "detector_label_id": 46,
+            "detector_label_str": "banana"
+          },
+          "53": {
+            "coco_name": "apple",
+            "detector_label_id": 47,
+            "detector_label_str": "apple"
+          },
+          "54": {
+            "coco_name": "sandwich",
+            "detector_label_id": 48,
+            "detector_label_str": "sandwich"
+          },
+          "55": {
+            "coco_name": "orange",
+            "detector_label_id": 49,
+            "detector_label_str": "orange"
+          },
+          "56": {
+            "coco_name": "broccoli",
+            "detector_label_id": 50,
+            "detector_label_str": "broccoli"
+          },
+          "57": {
+            "coco_name": "carrot",
+            "detector_label_id": 51,
+            "detector_label_str": "carrot"
+          },
+          "58": {
+            "coco_name": "hot dog",
+            "detector_label_id": 52,
+            "detector_label_str": "hot dog"
+          },
+          "59": {
+            "coco_name": "pizza",
+            "detector_label_id": 53,
+            "detector_label_str": "pizza"
+          },
+          "60": {
+            "coco_name": "donut",
+            "detector_label_id": 54,
+            "detector_label_str": "donut"
+          },
+          "61": {
+            "coco_name": "cake",
+            "detector_label_id": 55,
+            "detector_label_str": "cake"
+          },
+          "62": {
+            "coco_name": "chair",
+            "detector_label_id": 56,
+            "detector_label_str": "chair"
+          },
+          "63": {
+            "coco_name": "couch",
+            "detector_label_id": 57,
+            "detector_label_str": "sofa"
+          },
+          "64": {
+            "coco_name": "potted plant",
+            "detector_label_id": 58,
+            "detector_label_str": "pottedplant"
+          },
+          "65": {
+            "coco_name": "bed",
+            "detector_label_id": 59,
+            "detector_label_str": "bed"
+          },
+          "67": {
+            "coco_name": "dining table",
+            "detector_label_id": 60,
+            "detector_label_str": "diningtable"
+          },
+          "70": {
+            "coco_name": "toilet",
+            "detector_label_id": 61,
+            "detector_label_str": "toilet"
+          },
+          "72": {
+            "coco_name": "tv",
+            "detector_label_id": 62,
+            "detector_label_str": "tvmonitor"
+          },
+          "73": {
+            "coco_name": "laptop",
+            "detector_label_id": 63,
+            "detector_label_str": "laptop"
+          },
+          "74": {
+            "coco_name": "mouse",
+            "detector_label_id": 64,
+            "detector_label_str": "mouse"
+          },
+          "75": {
+            "coco_name": "remote",
+            "detector_label_id": 65,
+            "detector_label_str": "remote"
+          },
+          "76": {
+            "coco_name": "keyboard",
+            "detector_label_id": 66,
+            "detector_label_str": "keyboard"
+          },
+          "77": {
+            "coco_name": "cell phone",
+            "detector_label_id": 67,
+            "detector_label_str": "cell phone"
+          },
+          "78": {
+            "coco_name": "microwave",
+            "detector_label_id": 68,
+            "detector_label_str": "microwave"
+          },
+          "79": {
+            "coco_name": "oven",
+            "detector_label_id": 69,
+            "detector_label_str": "oven"
+          },
+          "80": {
+            "coco_name": "toaster",
+            "detector_label_id": 70,
+            "detector_label_str": "toaster"
+          },
+          "81": {
+            "coco_name": "sink",
+            "detector_label_id": 71,
+            "detector_label_str": "sink"
+          },
+          "82": {
+            "coco_name": "refrigerator",
+            "detector_label_id": 72,
+            "detector_label_str": "refrigerator"
+          },
+          "84": {
+            "coco_name": "book",
+            "detector_label_id": 73,
+            "detector_label_str": "book"
+          },
+          "85": {
+            "coco_name": "clock",
+            "detector_label_id": 74,
+            "detector_label_str": "clock"
+          },
+          "86": {
+            "coco_name": "vase",
+            "detector_label_id": 75,
+            "detector_label_str": "vase"
+          },
+          "87": {
+            "coco_name": "scissors",
+            "detector_label_id": 76,
+            "detector_label_str": "scissors"
+          },
+          "88": {
+            "coco_name": "teddy bear",
+            "detector_label_id": 77,
+            "detector_label_str": "teddy bear"
+          },
+          "89": {
+            "coco_name": "hair drier",
+            "detector_label_id": 78,
+            "detector_label_str": "hair drier"
+          },
+          "90": {
+            "coco_name": "toothbrush",
+            "detector_label_id": 79,
+            "detector_label_str": "toothbrush"
+          }
+        },
+        "detector": "rtdetr_r50vd",
+        "n_detector_labels": 80,
+        "unsupported_coco_categories": [],
+        "unused_detector_label_ids": []
+      },
+      "per_class": {
+        "airplane": {
+          "coco_id": 5,
+          "detector_label_id": 4,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 1.0
+        },
+        "bench": {
+          "coco_id": 15,
+          "detector_label_id": 13,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 19,
+          "passed": true,
+          "positives_box_matched_iou50": 16,
+          "positives_detected": 17,
+          "sensitivity": 0.85,
+          "specificity": 0.95
+        },
+        "car": {
+          "coco_id": 3,
+          "detector_label_id": 2,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 19,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 0.95
+        },
+        "fire hydrant": {
+          "coco_id": 11,
+          "detector_label_id": 10,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 1.0
+        },
+        "motorcycle": {
+          "coco_id": 4,
+          "detector_label_id": 3,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 1.0
+        },
+        "person": {
+          "coco_id": 1,
+          "detector_label_id": 0,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 19,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 0.95
+        },
+        "stop sign": {
+          "coco_id": 13,
+          "detector_label_id": 11,
+          "n_negatives": 20,
+          "n_positives": 20,
+          "negatives_clean": 20,
+          "passed": true,
+          "positives_box_matched_iou50": 20,
+          "positives_detected": 20,
+          "sensitivity": 1.0,
+          "specificity": 1.0
+        }
+      },
+      "spec": {
+        "repo": "PekingU/rtdetr_r50vd",
+        "revision": "df939e661d8c52e80608d1ec566561aabd25a4e7",
+        "role": "primary"
+      },
+      "verdict": "QUALIFIED"
+    }
+  },
+  "elapsed_s": 54.5,
+  "iou_match": 0.5,
+  "label_ids_differ_across_detectors": {
+    "all_scored_classes_supported": true,
+    "label_ids_agree_across_detectors": {
+      "airplane": false,
+      "bench": false,
+      "car": false,
+      "fire hydrant": false,
+      "motorcycle": false,
+      "person": false,
+      "stop sign": false
+    },
+    "per_detector_label_ids": {
+      "detr_resnet50_no_timm": {
+        "airplane": 5,
+        "bench": 15,
+        "car": 3,
+        "fire hydrant": 11,
+        "motorcycle": 4,
+        "person": 1,
+        "stop sign": 13
+      },
+      "rtdetr_r50vd": {
+        "airplane": 4,
+        "bench": 13,
+        "car": 2,
+        "fire hydrant": 10,
+        "motorcycle": 3,
+        "person": 0,
+        "stop sign": 11
+      }
+    }
+  },
+  "limits": [
+    "Both detectors were developed and evaluated on COCO; this is a benchmark/implementation check, NOT independent out-of-domain validation.",
+    "Annotation-negative is an imperfect absence reference.",
+    "Real-photo qualification does NOT establish accuracy on edited generations.",
+    "Detector agreement is not ground truth.",
+    "Prompts, Claude judgments and the failed pilot's calibration images are not qualification labels and were not used.",
+    "Detector scores are not calibrated presence probabilities and the two models' score scales are not directly comparable."
+  ],
+  "min_hit": 16,
+  "n_per_group": 20,
+  "primary_verdict": "QUALIFIED",
+  "secondary_verdict": "QUALIFIED",
+  "threshold": 0.3
+}

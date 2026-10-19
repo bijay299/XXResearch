@@ -1,0 +1,97 @@
+{
+  "_summary": {
+    "elapsed_s": 4.0,
+    "failures": [],
+    "verdict": "BRINGUP_CPU_PASS"
+  },
+  "adapter_save_reload": {
+    "note": "effective-weight restoration of native PEFT adapter state; merged/unmerged BF16 bit equality is NOT assumed",
+    "pass": true,
+    "perturbation_detectable": true,
+    "restored": true,
+    "size_mib": 28.55
+  },
+  "backbone_bf16": {
+    "base_param_dtypes": [
+      "torch.bfloat16"
+    ],
+    "pass": true
+  },
+  "base_frozen": {
+    "n_base_trainable": 0,
+    "pass": true,
+    "trainable_params": 7471104
+  },
+  "dispatch_candidate_returns_tensor": {
+    "dtype": "torch.float32",
+    "pass": true,
+    "shape": [
+      2
+    ]
+  },
+  "dispatch_native_returns_none": {
+    "note": "native arm -> trainer executes its ORIGINAL loss block",
+    "pass": true
+  },
+  "flux_revision_pinned": {
+    "build_seconds": 1.4,
+    "pass": true,
+    "resolved": [
+      "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21"
+    ]
+  },
+  "lora_config": {
+    "bias": "none",
+    "lora_alpha": 16,
+    "lora_dropout": 0.1,
+    "pass": true,
+    "r": 16,
+    "subset": "qk_dual"
+  },
+  "lora_init_and_dtype": {
+    "A_all_nonzero": true,
+    "B_all_zero": true,
+    "adapter_dtype": "torch.float32",
+    "n_A": 76,
+    "n_B": 76,
+    "note": "native cast_training_params upcasts trainable params to FP32 on a BF16 backbone",
+    "pass": true
+  },
+  "native_gem_defaults": {
+    "budget": 250,
+    "empty_concept": "''",
+    "end_at": 10,
+    "eta": 1.0,
+    "gamma": 100.0,
+    "internal_steps_fallback": 28,
+    "lr": 0.001,
+    "mode": "student",
+    "pass": true,
+    "sampler_guidance": 3.0
+  },
+  "native_peft_model": {
+    "pass": true,
+    "type": "PeftModel"
+  },
+  "pipeline_config": {
+    "config_dtype": "float16",
+    "guidance": 3.5,
+    "image_size": 512,
+    "model": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--black-forest-labs--FLUX.1-dev/snapshots/3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+    "note": "config dtype is float16; the contract freezes BF16 and we pass model_dtype=torch.bfloat16 explicitly (recorded deviation)",
+    "pass": true,
+    "steps": 28
+  },
+  "qk_dual_subset": {
+    "endswith": [
+      "add_k_proj",
+      "add_q_proj",
+      "to_k",
+      "to_q"
+    ],
+    "example": "base_model.model.transformer.transformer_blocks.0.attn.add_k_proj",
+    "n_modules": 76,
+    "pass": true,
+    "single_block_leak": 0
+  }
+}

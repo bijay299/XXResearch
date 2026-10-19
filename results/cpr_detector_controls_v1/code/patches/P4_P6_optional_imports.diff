@@ -1,0 +1,87 @@
+--- patches/prompt_augmentation.py.orig2	2026-10-19 01:33:17.537009099 -0400
++++ GEM_src/gem/common/prompt_augmentation.py	2026-10-19 01:33:17.589008880 -0400
+@@ -3,7 +3,16 @@
+ from dataclasses import dataclass
+ from typing import List, Dict, Any
+ import numpy as np
+-from datasets import load_dataset
++# [cpr_detector_controls_v1 P4] optional-import fix. `datasets` backs HFDatasetPromptAugmentation only;
++# this study runs with prompt_augmentation=None.
++# Behaviour is unchanged whenever the feature is actually used; this only
++# avoids a hard ImportError for a feature this study never enables.
++try:
++    from datasets import load_dataset
++except ModuleNotFoundError:  # pragma: no cover
++    def load_dataset(*a, **k):
++        raise ModuleNotFoundError(
++            'HFDatasetPromptAugmentation requires the optional `datasets` package')
+ 
+ 
+ class PromptAugmentation:
+--- patches/operator.py.orig2	2026-10-19 01:33:17.545009065 -0400
++++ GEM_src/gem/operators/operator.py	2026-10-19 01:33:17.589008880 -0400
+@@ -1,6 +1,19 @@
+ from typing import Optional
+ 
+-import wandb
++# [cpr_detector_controls_v1 P5a] optional-import fix. `wandb` is only used behind use_wandb.
++# Behaviour is unchanged whenever the feature is actually used; this only
++# avoids a hard ImportError for a feature this study never enables.
++try:
++    import wandb
++except ModuleNotFoundError:  # pragma: no cover
++    class _WandbDisabled:  # pragma: no cover
++        """Inert stand-in: this study runs with use_wandb=False throughout and the
++        contract forbids telemetry/W&B. Any real use raises instead of logging."""
++        def __getattr__(self, name):
++            def _blocked(*a, **k):
++                raise RuntimeError('W&B is disabled for this study (no telemetry)')
++            return _blocked
++    wandb = _WandbDisabled()
+ from gem.configs import OperatorConfig
+ from gem.utils.logging import get_logger
+ from gem.utils.memory import get_gpu_memory_percent
+--- patches/base_pipeline_wrapper.py.orig2	2026-10-19 01:33:17.553009032 -0400
++++ GEM_src/gem/wrappers/base_pipeline_wrapper.py	2026-10-19 01:33:17.589008880 -0400
+@@ -4,7 +4,20 @@
+ 
+ import torch
+ import torchvision
+-import wandb
++# [cpr_detector_controls_v1 P5b] optional-import fix. `wandb` is only used behind use_wandb.
++# Behaviour is unchanged whenever the feature is actually used; this only
++# avoids a hard ImportError for a feature this study never enables.
++try:
++    import wandb
++except ModuleNotFoundError:  # pragma: no cover
++    class _WandbDisabled:  # pragma: no cover
++        """Inert stand-in: this study runs with use_wandb=False throughout and the
++        contract forbids telemetry/W&B. Any real use raises instead of logging."""
++        def __getattr__(self, name):
++            def _blocked(*a, **k):
++                raise RuntimeError('W&B is disabled for this study (no telemetry)')
++            return _blocked
++    wandb = _WandbDisabled()
+ 
+ from diffusers import FluxPipeline, StableDiffusion3Pipeline, QwenImagePipeline
+ from diffusers.training_utils import compute_snr
+--- patches/factory.py.orig2	2026-10-19 01:33:17.569008964 -0400
++++ GEM_src/gem/wrappers/factory.py	2026-10-19 01:33:17.589008880 -0400
+@@ -4,7 +4,16 @@
+ 
+ import torch
+ 
+-from diffusers import Flux2Pipeline, StableDiffusionPipeline, StableDiffusion3Pipeline, QwenImagePipeline
++# [cpr_detector_controls_v1 P6] optional-import fix. `Flux2Pipeline` does not exist in the pinned
++# diffusers 0.30.2; it is only referenced for a model type this study never uses.
++# Behaviour is unchanged whenever the feature is actually used; this only
++# avoids a hard ImportError for a feature this study never enables.
++from diffusers import StableDiffusionPipeline, StableDiffusion3Pipeline, QwenImagePipeline
++try:
++    from diffusers import Flux2Pipeline
++except ImportError:  # pragma: no cover
++    class Flux2Pipeline:  # sentinel: never matches an isinstance() check
++        pass
+ from diffusers import DDIMScheduler
+ 
+ from peft import get_peft_model, LoraConfig, PeftModel

@@ -1,0 +1,56 @@
+{
+  "_summary": {
+    "elapsed_s": 103.0,
+    "failures": [
+      "dispatch_off_on_agreement_native_arm"
+    ],
+    "verdict": "BRINGUP_GPU_FAIL"
+  },
+  "budget_projection_fits": {
+    "already_used_gpu_h": 1.517,
+    "detector_gpu_h": 0.09,
+    "generate_gpu_h": 2.68,
+    "load_gpu_h": 0.14,
+    "note": "a projection does NOT replace enforcement; the ledger refuses any reservation that would breach a cap or the protected reserve",
+    "pass": true,
+    "projected_gpu_h": 8.16,
+    "protected_reserve_h": 8.0,
+    "seconds_per_processed_timestep": 1.3499,
+    "train_gpu_h": 3.37,
+    "usable_non_eval_gpu_h": 16.0
+  },
+  "candidate_arm_changes_result": {
+    "hash_cpr": "88012e1a199319d9ef3fccd0545f262f8a147fb1a4d43da1bef20378ab61b98d",
+    "hash_native": "c05be7b17614d1866962c07408274ba4809b31d2f21ddefe548e0aff7c2641f4",
+    "note": "the CPR dispatch produces a different trained adapter than the native block under identical seeds, confirming the hook is live",
+    "pass": true
+  },
+  "dispatch_off_on_agreement_native_arm": {
+    "declared_tolerance": "EXACT equality of the resulting native PEFT adapter state hash after identical seeds and identical budget. This is agreement of the trained adapter state, NOT a claim of bit-exact agreement of intermediate tensors.",
+    "hash_dispatch_off": "c05be7b17614d1866962c07408274ba4809b31d2f21ddefe548e0aff7c2641f4",
+    "hash_dispatch_on": "ed373817cf779b79d0f4b58a2b7e8e0f0a120da715ad056316752a227888140e",
+    "pass": false,
+    "seconds_off": 29.8,
+    "seconds_on": 29.5
+  },
+  "finite_intended_updates": {
+    "all_finite": true,
+    "max_abs_update": 0.002001347951591015,
+    "pass": true,
+    "peak_gpu_gib": 32.34
+  },
+  "gpu_build": {
+    "device": "cuda:0",
+    "gradient_checkpointing": true,
+    "load_seconds": 10.9,
+    "pass": true,
+    "resident_gib": 31.45
+  },
+  "mode_during_student_sampling": {
+    "dropout_p": 0.1,
+    "grad_enabled": false,
+    "note": "native GEM samples the student trajectory after wrapper.train(); torch.no_grad() does NOT put the module in eval, so native LoRA dropout (p=0.1) is ACTIVE during sampling. Preserved as native.",
+    "pass": true,
+    "transformer_training": true
+  }
+}
