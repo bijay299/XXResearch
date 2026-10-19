@@ -308,7 +308,7 @@ def fixtures():
     out = {}
     (V, A, B), t1 = build_fixture(7001, 32, 8, "mixed")
     out["mixed_d32"] = (V, A, B, {"tries": t1})
-    (V, A, B), t2 = build_fixture(7002, 256, 6, "mixed")
+    (V, A, B), t2 = build_fixture(7002, 256, 6, "mixed", min_grad_frac=0.0)  # REPAIR-1: filter infeasible at d=256 (0/3000 rows pass), see artifacts/repairs/repair_1.md
     out["mixed_d256"] = (V, A, B, {"tries": t2})
     (V, A, B), t3 = build_fixture(7003, 64, 4, "inactive")
     out["all_inactive_d64"] = (V, A, B, {"tries": t3})

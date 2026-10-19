@@ -36,6 +36,9 @@ def ex(path):
 
 def run(job, bucket, devs, argv, wall, kind="planned", ip=0, it=0, cycle=None, workers=None, note=None):
     job = job + SUFFIX
+    if cycle is None and os.environ.get("CPRD2_CYCLE"):
+        cycle = int(os.environ["CPRD2_CYCLE"])
+        kind = "repair"
     while True:
         try:
             r = LG.run_job(job, bucket, devs, argv, max_wall_s=wall, grace_s=60,

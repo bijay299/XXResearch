@@ -11,6 +11,6 @@ rsync -a --delete-excluded --exclude='__pycache__' --exclude='*.pyc' \
   --include='/artifacts/ledger_snapshot_at_freeze/***' --include='/artifacts/gate/***' --include='/artifacts/qualification/***' \
   --include='/artifacts/analysis/***' --include='/artifacts/traj/***' --include='/artifacts/gen_records/***' \
   --include='/artifacts/scores/***' --include='/artifacts/plans/***' --include='/artifacts/decode_counts/***' \
-  --include='/artifacts/orch/***' --include='/artifacts/projection/***' --include='/artifacts/verify/***' \
+  --include='/artifacts/orch/***' --include='/artifacts/repairs/***' --include='/artifacts/projection/***' --include='/artifacts/verify/***' \
   --include='/FINAL_REPORT.md' --include='/EVIDENCE_INDEX*' --include='/RELEASE_ASSETS.json' \
   --exclude='__pycache__' --exclude='*.pyc' --exclude='*' "$SRC/" "$DST/"
