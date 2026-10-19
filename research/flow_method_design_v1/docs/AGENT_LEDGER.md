@@ -16,3 +16,8 @@ Coordinator model switched by user from claude-sonnet-5-5 to claude-opus-5-5 at 
 Environment events: torch install attempted — pytorch CPU index blocked (403); PyPI CUDA wheel download aborted at 2.7 GB pip cache (deleted, uncounted toward final files). Sprint is numpy/scipy only.
 Git push to origin failed with HTTP 403 (no GitHub App write access) at ~22:58; commits accumulate locally.
 | 1 | C (end) | | | | ~23:10 | verdict: method novelty NONE; testable ablation C-H1 "VAU-AdamW"; ~5 core-min (ledger C_*) |
+| 1b | D (end) | | | | ~23:17 | 143.0k tokens, 18 tool uses, 819 s; verdict NONE (diagnosis H-D; uniform-t ablation P-D4 INCONCLUSIVE); ~2.8 core-min |
+| — | Coordinator | Selection (C-H1 → VAU), CANDIDATES.md, DERIVATION.tex (self-found error in Thm 7 proof fixed before review), sign pre-check | | 23:15 | 23:22 | coord_sign_check 2.8 core-s |
+| 2 | E | Prototype engineer (core library, tests, native interface) | code/vau, code/tests, native/ | 23:19 | | |
+| 2 | G | Evaluation protocol + real-model protocol | configs/eval_protocol.json, docs/EVAL_PROTOCOL.md, docs/REAL_MODEL_PROTOCOL.md | 23:19 | | |
+| 2 | F | Adversarial proof/novelty review | review/ | 23:22 | | |

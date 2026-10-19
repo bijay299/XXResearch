@@ -13,3 +13,15 @@ P-D3: SHARED + native prefix achieves <= 0.3 on UNI (parameter sharing transport
 Falsification of H-D1: P-D2 fails in either direction (BI_FINE prefix-LOCAL score < 0.5, or BI_COARSE > 0.6),
    or the commitment-time diagnostic sigma* fails to order the three cases.
 Exploratory, no prediction: on-policy vs off-policy (noised target data) states; stale refresh R=5; unweighted contrast-IS.
+ADDENDUM (appended before first run of d_window_toy.py; noticed that bimodal teachers already score 0.5):
+"endpoint concept score" := (fraction of student endpoints whose nearest anchor mode is the concept mode)
+   / (same fraction for the frozen target teacher). Teacher = 1.0 by construction in every case. Thresholds above
+   refer to this normalised score. No threshold changed.
+ADDENDUM 2 (2026-10-19, after d_window_toy.py v2 results; BEFORE running d_matched_compute.py on fresh seeds 20-27):
+Observed outcome of the original predictions: P-D1 held (LOCAL UNI prefix 1.0) but is non-discriminating (LOCAL fails in
+every window); P-D2 FALSIFIED (BI_COARSE LOCAL prefix 1.02; commitment sigma* = 0.68 and 0.13, both outside the window,
+so its premise was also wrong); P-D3 FALSIFIED at lr 0.05 (1.0) and borderline at lr 0.2 (0.32).
+New prospective prediction P-D4 (matched FORWARD compute, not matched timestep budget): native prefix = 23 iters x 66
+forward-equivalents; uniform 11-of-28 on-policy = 82 F/iter -> 18 iters. Over 12 cells {UNI,BI_FINE,BI_COARSE} x
+{SMOOTH,SHARED} x lr {0.05,0.2}, 8 fresh seeds each: uniform11 mean normalised score is lower than native prefix by
+> 0.05 in >= 7 of 12 cells. Falsified if <= 4 of 12.

@@ -1,0 +1,212 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}[proposition]{Theorem}
+\newtheorem{lemma}[proposition]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[proposition]{Remark}
+\newtheorem{counterexample}[proposition]{Counterexample}
+\title{VAU: Adam-metric correction of the actual AdamW step for LoRA concept erasure,\\ with fresh-batch certified acceptance --- derivation}
+\author{XXResearch flow\_method\_design\_v1 (coordinator synthesis; Props.~1 and~6 from Agent C)}
+\date{2026-10-19}
+\begin{document}
+\maketitle
+
+\paragraph{Status.} Every ingredient below is standard (Section~7 lists them). What is offered is (i) a precise
+statement of which retention guarantees survive the \emph{actual} AdamW update used by native GEM (LoRA, no retention
+term; \texttt{agents/A\_gem\_code\_facts.md} \S5--6), (ii) a strict first-order separation between the Adam-metric correction
+and its closest published primitive (Euclidean projection of the Adam update, Adam-NSCL-style; UNVERIFIED source), and (iii) a
+finite-step drift bound for one corrected step that makes the sketch, ridge, staleness and curvature errors explicit.
+The results are about a linearised retained map plus explicitly bounded remainders; they say nothing about image
+semantics, object removal, or FLUX.
+
+\section{Notation and exact objects}
+$\theta\in\mathbb{R}^P$: trainable LoRA parameters (all $A,B$ factors flattened), base weights frozen, $\theta_0$ the
+initialisation ($B=0$). $L_e(\theta)$: the native GEM erasure loss (detached teachers), $g=\nabla L_e(\theta)$.
+Retained map $f_r:\mathbb{R}^P\to\mathbb{R}^{n}$ stacks the student outputs on a retained probe batch $R_1$ ($n=N_r d$);
+$J=\partial f_r(\theta)\in\mathbb{R}^{n\times P}$ (never formed densely at scale).
+AdamW (torch semantics, $\beta_1,\beta_2,\epsilon,\lambda_{wd}$, step $t$):
+$m'=\beta_1 m+(1-\beta_1)g$, $v'=\beta_2 v+(1-\beta_2)g^{\odot2}$, $\hat m=m'/(1-\beta_1^t)$, $\hat v=v'/(1-\beta_2^t)$,
+\[ D=\operatorname{diag}(d),\quad d_i=\frac{1}{\sqrt{\hat v_i}+\epsilon}>0,\qquad
+\Delta_0=-\eta\,D\hat m-\eta\lambda_{wd}\theta\quad(\text{the actual step}). \]
+Sketch: $\Sigma\in\mathbb{R}^{k\times n}$ with i.i.d.\ $\mathcal N(0,1/k)$ entries, $S=\Sigma J\in\mathbb{R}^{k\times P}$
+(computed with $k$ VJPs). Metric $H=D^{-1}$, $\|x\|_H^2=x^\top D^{-1}x$.
+Candidate correction (exact, with ridge $\mu\ge0$):
+\[ \Delta_1=\Delta_0-DS^\top (SDS^\top+\mu I)^{-1}S\Delta_0 . \tag{1}\]
+For $\mu=0$ and $S$ of full row rank write $\Pi_D=I-DS^\top(SDS^\top)^{-1}S$; Euclidean analogue
+$\Pi=I-S^\top(SS^\top)^{-1}S$. Pre-optimizer projection (GPM/OGD-style) feeds $\Pi g$ into AdamW instead of $g$.
+\emph{Idealised} statements set $\mu=0$, $\Sigma=I$ (exact $J$) and fresh $J$; Section~5 removes each idealisation.
+
+\section{Pre-optimizer projection is not retention-neutral under AdamW (Agent C, T1)}
+\begin{proposition}\label{p:pre}
+Fix $J$ and suppose every gradient fed to AdamW lies in $\mathcal N=\operatorname{null}(J)$ (pre-projection). Then the
+momentum $\hat m\in\mathcal N$ and the first-order retained change of the step $\Delta_0$ is
+$J\Delta_0=-\eta JD\hat m-\eta\lambda_{wd}J\theta$. (a) $JD\hat m=0$ for every $\hat m\in\mathcal N$ iff
+$D\mathcal N\subseteq\mathcal N$. (b) For every $c\in\mathbb{R}$, $\|JD\hat m\|\le\|J\|\,\|D-cI\|\,\|\hat m\|$; with
+$c=(d_{\max}+d_{\min})/2$ this gives $\|JD\hat m\|\le\|J\|\frac{d_{\max}-d_{\min}}{2}\|\hat m\|$. (c) The weight-decay
+term $\eta\lambda_{wd}J\theta$ is untouched by any gradient projection.
+\end{proposition}
+\begin{proof}
+$\hat m$ is a linear combination of past (projected) gradients, all in the subspace $\mathcal N$, so $\hat m\in\mathcal N$.
+(a) $JD\hat m=0\ \forall \hat m\in\mathcal N$ iff $D\mathcal N\subseteq\operatorname{null}(J)=\mathcal N$.
+(b) $J\hat m=0$ gives $JD\hat m=J(D-cI)\hat m$; take norms; $\|D-cI\|=\max_i|d_i-c|$, minimised at the midrange.
+(c) The term does not depend on $g$.
+\end{proof}
+\begin{remark} Since $D$ is diagonal with (generically) distinct entries, $D$-invariant subspaces are sums of coordinate
+subspaces; a null space that is \emph{rotated} relative to the coordinate axes is generically not invariant. At AdamW step
+1, $\hat m/\sqrt{\hat v}=\operatorname{sign}(g)$ entrywise ($|g_i|\gg\epsilon$), so the retained change is
+$\eta\|J\operatorname{sign}(\Pi g)\|$, which does not shrink as the projection becomes more accurate. \end{remark}
+
+\section{The Adam-metric correction: characterisation and a strict separation}
+\begin{proposition}[trust-region characterisation; standard]\label{p:tr}
+Let $D\succ0$, $S$ full row rank, $r>0$, and $u=D\hat m$ with $\hat m=g$. The problem
+\[ \max_x\ -g^\top x\quad\text{s.t.}\quad Sx=0,\ \|x\|_H\le r \]
+has the unique solution $x^\star=-r\,\Pi_D Dg/\|\Pi_D Dg\|_H$ whenever $\Pi_D Dg\ne0$, and the optimal value is
+$r\|\Pi_D Dg\|_H$. Moreover
+\[ -g^\top(-\Pi_D Dg)=\|(I-Q)D^{1/2}g\|^2\ \ge 0,\qquad Q=D^{1/2}S^\top(SDS^\top)^{-1}SD^{1/2}, \tag{2}\]
+with equality iff $g\in\operatorname{range}(S^\top)$. Also $\|\Pi_D w\|_H\le\|w\|_H$ for all $w$, and $S\Pi_D=0$.
+\end{proposition}
+\begin{proof}
+Substitute $x=D^{1/2}y$: maximise $-(D^{1/2}g)^\top y$ s.t.\ $(SD^{1/2})y=0$, $\|y\|\le r$. The feasible set is the ball
+intersected with $\operatorname{null}(SD^{1/2})$, whose orthogonal projector is $I-Q$ ($Q$ is the orthogonal projector onto
+$\operatorname{range}(D^{1/2}S^\top)$). By Cauchy--Schwarz on that subspace the unique maximiser is
+$y^\star=-r(I-Q)D^{1/2}g/\|(I-Q)D^{1/2}g\|$, and $D^{1/2}(I-Q)D^{1/2}g=\Pi_D Dg$, giving $x^\star$. Then
+$g^\top\Pi_D Dg=(D^{1/2}g)^\top(I-Q)(D^{1/2}g)=\|(I-Q)D^{1/2}g\|^2$ since $I-Q$ is an orthogonal projector. Equality
+iff $D^{1/2}g\in\operatorname{range}(D^{1/2}S^\top)$ iff $g\in\operatorname{range}(S^\top)$. In $y$-coordinates
+$\Pi_D$ acts as the orthogonal projector $I-Q$, hence non-expansive in $\|\cdot\|_H$; $S\Pi_D=S-SDS^\top(SDS^\top)^{-1}S=0$.
+\end{proof}
+
+\begin{proposition}[strict separation from Euclidean post-projection]\label{p:sep}
+For the Euclidean correction $\Delta_E=\Pi\Delta_0$ of the same AdamW step ($\hat m=g$, $\lambda_{wd}=0$), the first-order
+erasure progress $-g^\top\Delta_E=\eta\,g^\top\Pi Dg$ \emph{can be negative}; the Adam-metric progress
+$-g^\top\Pi_D\Delta_0=\eta\,g^\top\Pi_DDg$ never is (Prop.~\ref{p:tr}). The two coincide when $D=cI$.
+Explicit instance: $P=2$, $S=[1,1]$, $D=\operatorname{diag}(0.01,1)$, $g=(1,0.5)$:
+$g^\top\Pi Dg=\tfrac12(d_1g_1-d_2g_2)(g_1-g_2)=\tfrac12(-0.49)(0.5)=-0.1225<0$, while
+$g^\top\Pi_DDg=\|(I-Q)D^{1/2}g\|^2=\frac{d_1d_2(g_1-g_2)^2}{d_1+d_2}=\frac{0.01\cdot0.25}{1.01}\approx0.002475>0$.
+\end{proposition}
+\begin{proof}
+For $S=[1,1]$, $\Pi=\frac12\begin{psmallmatrix}1&-1\\-1&1\end{psmallmatrix}$, so $\Pi Dg=\frac12(d_1g_1-d_2g_2)(1,-1)^\top$ and
+$g^\top\Pi Dg=\frac12(d_1g_1-d_2g_2)(g_1-g_2)$. For the metric version, $SDS^\top=d_1+d_2$ and
+$\Pi_DDg=Dg-\frac{d_1g_1+d_2g_2}{d_1+d_2}(d_1,d_2)^\top=\frac{d_1d_2(g_1-g_2)}{d_1+d_2}(1,-1)^\top$, so
+$g^\top\Pi_DDg=\frac{d_1d_2(g_1-g_2)^2}{d_1+d_2}$. Substitute. If $D=cI$ then $\Pi_D=\Pi$.
+\end{proof}
+\begin{remark}[what Prop.~\ref{p:sep} does \emph{not} say] It does not say the metric correction always yields more
+progress: with $g=(1,-0.5)$ in the same instance the Euclidean progress is larger (0.3825 vs 0.0223 in units of $\eta$;
+\texttt{code/scratch\_checks/sign\_check.py}). Prop.~\ref{p:tr} gives optimality only at equal $H$-norm (Adam's own trust
+region). Comparisons must therefore be made at tuned or matched step size --- the protocol does so.
+Under random draws (development only) the Euclidean sign failure occurred in 3.5\,\% of cases (same script).\end{remark}
+
+\begin{counterexample}[momentum]\label{c:mom}
+With $\hat m\ne g$, $-g^\top\Pi_D D\hat m$ can be negative (take $\hat m$ dominated by an old gradient opposite to $g$
+outside $\operatorname{range}(S^\top)$). Hence the rule ``if $g^\top\Delta_1\ge0$ set $\Delta_1=0$''; Prop.~\ref{p:tr}'s
+sign guarantee covers only $\beta_1=0$ or $\hat m\parallel g$ on $\operatorname{null}(S)$-relevant directions.
+\end{counterexample}
+
+\begin{remark}[weight decay] Because (1) acts on the whole $\Delta_0$, the first-order retained change of the decoupled
+weight-decay term is also removed ($S\Delta_1=0$ exactly for $\mu=0$), unlike Prop.~\ref{p:pre}(c). For LoRA the
+weight-decay map change is exactly $((1-\eta\lambda)^2-1)BA$ (both factors scale), whose second-order part is not removed.
+\end{remark}
+
+\section{Exact finite-step behaviour of one corrected step}
+Let $\theta^+=\theta+s\Delta_1$. The exact retained change is $f_r(\theta^+)-f_r(\theta)$; write the full (unsketched)
+Jacobian at the current point $J_\theta$ and at the probe refresh point $J_{\theta_s}$ (staleness).
+Assumptions: (A1) $\|J_\theta-J_{\theta_s}\|\le L_J\|\theta-\theta_s\|$; (A2) along the segment $[\theta,\theta^+]$ the
+second derivative of $f_r$ is bounded: $\|f_r(\theta+h)-f_r(\theta)-J_\theta h\|\le\frac{\beta}{2}\|h\|^2$.
+
+\begin{lemma}[ridge residual]\label{l:ridge}
+With $S$ any $k\times P$ matrix, (1) gives $S\Delta_1=\mu(SDS^\top+\mu I)^{-1}S\Delta_0$, hence
+$\|S\Delta_1\|\le\frac{\mu}{\lambda_{\min}(SDS^\top)+\mu}\|S\Delta_0\|$.
+\end{lemma}
+\begin{proof} $S\Delta_1=S\Delta_0-SDS^\top(G+\mu I)^{-1}S\Delta_0$ with $G=SDS^\top$; $I-G(G+\mu I)^{-1}=\mu(G+\mu I)^{-1}$;
+the eigenvalues of $\mu(G+\mu I)^{-1}$ are $\mu/(\lambda_i+\mu)$. \end{proof}
+
+\begin{lemma}[sketch residual]\label{l:sketch}
+Let $J=J_{\theta_s}$ have singular values $\sigma_1\ge\sigma_2\ge\dots$, $\Sigma$ Gaussian $k\times n$, and $Y=\operatorname{range}(J^\top\Sigma^\top)\subseteq\mathbb{R}^P$. Every $x$ with $\Sigma Jx=0$ satisfies $x\perp Y$ and
+$\|Jx\|\le E_\Sigma\|x\|$ with $E_\Sigma=\|J(I-P_Y)\|$. (a) If $k\ge\operatorname{rank}J$ then $E_\Sigma=0$ almost surely.
+(b) For $k=k_0+p$, $p\ge2$, the randomized range-finder bound (Halko--Martinsson--Tropp 2011, \S10, average spectral error
+theorem; applied to $A=J^\top$, $\Omega=\Sigma^\top$) gives
+$\mathbb{E}E_\Sigma\le\bigl(1+\sqrt{k_0/(p-1)}\bigr)\sigma_{k_0+1}+\frac{e\sqrt{k}}{p}\bigl(\sum_{j>k_0}\sigma_j^2\bigr)^{1/2}$,
+so by Markov $\Pr(E_\Sigma>t\,\mathbb{E}E_\Sigma)\le1/t$.
+\end{lemma}
+\begin{proof}
+$\Sigma Jx=0\iff x\perp\operatorname{range}(J^\top\Sigma^\top)=Y$, so $x=(I-P_Y)x$ and $\|Jx\|=\|J(I-P_Y)x\|\le E_\Sigma\|x\|$.
+(a) A Gaussian $\Sigma^\top$ restricted to $\operatorname{range}(J)$ (dimension $\operatorname{rank}J\le k$) is a.s.\ of full
+rank $\operatorname{rank}J$, so $Y=\operatorname{range}(J^\top)$ and $J(I-P_Y)=0$. (b) $\|J(I-P_Y)\|=\|(I-P_Y)J^\top\|$, which is
+exactly the quantity bounded in HMT \S10 for $A=J^\top$ with Gaussian test matrix $\Omega=\Sigma^\top$ (scaling of $\Omega$ does
+not change $Y$). The constant is quoted from that theorem from memory (UNVERIFIED theorem number in this sprint; arXiv
+unreachable); Markov's inequality gives the tail. Note: the bound requires $\Sigma$ independent of $J$, which holds
+because $\Sigma$ is drawn fresh at each refresh before $J$-products are taken; it does \emph{not} require independence from
+$x$, because the bound is uniform over $x\perp Y$.
+\end{proof}
+
+\begin{theorem}[finite-step retained drift of one VAU step]\label{t:step}
+Under (A1)--(A2), with $S=\Sigma J_{\theta_s}$ and $\Delta_1$ from (1),
+\[ \|f_r(\theta+s\Delta_1)-f_r(\theta)\|\ \le\ s\Bigl(E_\Sigma\|\Delta_1\|+\kappa_\Sigma\|S\Delta_1\|\Bigr)
+ + s\,L_J\|\theta-\theta_s\|\,\|\Delta_1\| + \tfrac{\beta}{2}s^2\|\Delta_1\|^2 , \]
+where $\|S\Delta_1\|$ is bounded by Lemma~\ref{l:ridge} (zero if $\mu=0$), $E_\Sigma$ by Lemma~\ref{l:sketch} (zero a.s.\ if
+$k\ge\operatorname{rank}J_{\theta_s}$), and $\kappa_\Sigma=1/\sigma_{\min}(\Sigma|_V)$ with $V=J_{\theta_s}Y$, finite (shown in the proof).
+\end{theorem}
+\begin{proof}
+Write $f_r(\theta+h)-f_r(\theta)=J_\theta h+\rho$ with $\|\rho\|\le\frac\beta2\|h\|^2$ (A2), $h=s\Delta_1$. Split
+$J_\theta h=J_{\theta_s}h+(J_\theta-J_{\theta_s})h$; the second term is bounded by (A1). Decompose $h=h_\perp+h_Y$ with $h_\perp\perp Y$, $h_Y\in Y$ ($\|h_\perp\|,\|h_Y\|\le\|h\|$). Then
+$\|J_{\theta_s}h_\perp\|\le E_\Sigma\|h\|$ (Lemma~\ref{l:sketch}) and $Sh=\Sigma J_{\theta_s}h_Y$ because $\Sigma J_{\theta_s}h_\perp=0$.
+$J_{\theta_s}h_Y\in V=J_{\theta_s}Y=\operatorname{range}(J_{\theta_s}J_{\theta_s}^\top\Sigma^\top)$. $\Sigma$ is injective on $V$:
+if $z=J_{\theta_s}J_{\theta_s}^\top\Sigma^\top w$ and $\Sigma z=0$ then $w^\top\Sigma z=\|J_{\theta_s}^\top\Sigma^\top w\|^2=0$, so $z=0$.
+Hence $\sigma_{\min}(\Sigma|_V)>0$ and $\|J_{\theta_s}h_Y\|\le\kappa_\Sigma\|Sh\|$. If $\mu=0$ then $Sh=0$. Combine with the
+triangle inequality. \end{proof}
+\begin{remark} Theorem~\ref{t:step} is a \emph{prediction-side} bound: every constant ($E_\Sigma$, $L_J$, $\beta$) is
+unknown for a real network. That is why the candidate does not rely on it for acceptance; it relies on Theorem~\ref{t:gate}.\end{remark}
+
+\begin{counterexample}[LoRA gauge; outside the first-order guarantee]\label{c:gauge}
+For a LoRA layer $W+BA$ and any $K$, the step $dB=BK$, $dA=-KA$ has first-order map change $dB\,A+B\,dA=0$ for every input,
+so it passes any exact first-order constraint, yet the exact change is $dB\,dA=-BK^2A\ne0$ (Agent C, C-X2; computed
+2.3\,\% of $\|BAx\|$ at $\|K\|=0.3$). Only an evaluation of the actual finite step detects it.
+\end{counterexample}
+
+\section{Certified acceptance under adaptivity, with optimizer-state rollback}
+Clipped per-sample drift $r_x(\theta)=\min(\|f_x(\theta)-f_x(\theta_0)\|^2,M)\in[0,M]$; population
+$\rho_M(\theta)=\mathbb{E}_{x\sim\mathcal R}r_x(\theta)$ over the retained distribution $\mathcal R$.
+\begin{theorem}[gate]\label{t:gate}
+Run any update rule for $T$ steps with at most $R$ trials per step. At each trial $j$ draw a fresh batch $R_2^{(j)}$ of
+$n_2$ i.i.d.\ samples from $\mathcal R$, independent of everything used to construct the trial point $\vartheta_j$
+(conditionally on the history), and accept iff $\hat\rho_j+c\le\tau^2$, $\hat\rho_j=\frac1{n_2}\sum_{x\in R_2^{(j)}}r_x(\vartheta_j)$,
+$c=M\sqrt{\ln(TR/\delta)/(2n_2)}$. Then with probability at least $1-\delta$ every accepted iterate satisfies
+$\rho_M\le\tau^2$. If additionally $\|f_x(\theta)-f_x(\theta_0)\|^2\le M$ a.s.\ along the run, $\rho_M$ is the true mean drift.
+If on rejection $(\theta,m,v,t)$ are restored, the accepted sequence is exactly an AdamW trajectory in which rejected
+steps are skipped (no optimizer-state contamination by rejected trials).
+\end{theorem}
+\begin{proof}
+Let $\mathcal F_{j}$ be the $\sigma$-field of everything before batch $j$ is drawn; $\vartheta_j$ is $\mathcal F_j$-measurable
+and $R_2^{(j)}$ is independent of $\mathcal F_j$. Conditionally on $\mathcal F_j$, the $r_x(\vartheta_j)$ are i.i.d.\ in $[0,M]$ with
+mean $\rho_M(\vartheta_j)$, so Hoeffding gives $\Pr(\rho_M(\vartheta_j)>\hat\rho_j+c\mid\mathcal F_j)\le\delta/(TR)$. The bad
+event ``some accepted $\vartheta_j$ has $\rho_M>\tau^2$'' is contained in $\bigcup_j\{\rho_M(\vartheta_j)>\hat\rho_j+c\}$ (acceptance
+means $\hat\rho_j+c\le\tau^2$); at most $TR$ trials, so the union bound gives $\le\delta$. The clipping statement is immediate.
+Rollback: the accepted update applies the tentative state $(m',v',t+1)$ computed from the same $g$ that produced
+$\Delta_0$; a rejected trial leaves $(\theta,m,v,t)$ bitwise unchanged, so the state after each step equals that of AdamW
+run on the subsequence of accepted steps (with the projected/scaled displacement in place of the raw step).
+\end{proof}
+\begin{counterexample}[adaptivity; why $R_1\ne R_2$] If the trial point is constructed in the null space of the same
+batch used to verify it, the empirical drift can be zero while population drift is not (Agent C computed $3\cdot10^{-30}$
+vs $1.1\cdot10^{-3}$). Theorem~\ref{t:gate} requires independence.\end{counterexample}
+\begin{counterexample}[rare subgroup] The gate certifies a mean. A retained subgroup of mass $q$ is absent from
+$n_2$ samples with probability $(1-q)^{n_2}$ ($0.37$ for $q=0.005$, $n_2=200$); its drift is uncontrolled.\end{counterexample}
+
+\section{Limiting cases}
+(i) $D=cI$ (e.g.\ SGD, or AdamW when all $|g_i|$ equal): metric, Euclidean post- and (for $\beta_1=0$, $\lambda_{wd}=0$)
+pre-projection coincide. (ii) $S=0$ (no probes): $\Delta_1=\Delta_0$, VAU-noGate is AdamW. (iii) $g\in\operatorname{range}(S^\top)$:
+$\Delta_1$ has zero first-order progress (Prop.~\ref{p:tr}); rejected. (iv) Rich retained set, $\operatorname{rank}J=P$: the
+exact null space is $\{0\}$, $\Delta_1\approx0$ (ridge only) --- VAU erases nothing; a soft penalty or the gate alone is
+then the only meaningful arm. (v) $\tau\to\infty$: the gate always accepts. (vi) $\tau\to0$: only steps with zero
+clipped empirical drift and $c\le\tau^2$ pass; for finite $n_2$, $c>0$, so nothing passes.
+
+\section{Standard ingredients versus what is specific here}
+Standard: scaled/metric gradient projection and its trust-region form (Prop.~\ref{p:tr}; e.g.\ Bertsekas' scaled gradient
+projection); null-space projection of an optimizer's update for continual learning (Adam-NSCL; UNVERIFIED this sprint);
+GPM/OGD gradient projection; HMT randomized range finder (Lemma~\ref{l:sketch}); Taylor/Lipschitz remainders
+(Theorem~\ref{t:step}); Hoeffding with union bound and backtracking (Theorem~\ref{t:gate}; TRPO/CPO-style line search).
+Specific to this sprint (not claimed as a general contribution): the identification that native GEM's verified training
+configuration (AdamW, zero-init LoRA, no retention) sits in the regime of Prop.~\ref{p:pre}; the explicit sign
+separation of Prop.~\ref{p:sep} between the metric and Euclidean corrections of the \emph{same} Adam step; the
+combination of those with Theorem~\ref{t:gate}'s rollback semantics; and the prospective, falsifiable predictions tested
+in \texttt{results/}. Whether any of this improves real erasure/preservation is unknown.
+\end{document}

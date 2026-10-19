@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="XXResearch flow_method_design_v1 (coordinator synthesis; Props. 1 and 6 from Agent C)" />
+  <meta name="dcterms.date" content="2026-10-19" />
+  <title>VAU: Adam-metric correction of the actual AdamW step for LoRA concept erasure, with fresh-batch certified acceptance — derivation</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="/usr/share/javascript/mathjax/MathJax.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">VAU: Adam-metric correction of the actual AdamW step
+for LoRA concept erasure,<br />
+with fresh-batch certified acceptance — derivation</h1>
+<p class="author">XXResearch flow_method_design_v1 (coordinator
+synthesis; Props. 1 and 6 from Agent C)</p>
+<p class="date">2026-10-19</p>
+</header>
+<h4 id="status.">Status.</h4>
+<p>Every ingredient below is standard (Section 7 lists them). What is
+offered is (i) a precise statement of which retention guarantees survive
+the <em>actual</em> AdamW update used by native GEM (LoRA, no retention
+term; <code>agents/A_gem_code_facts.md</code> §5–6), (ii) a strict
+first-order separation between the Adam-metric correction and its
+closest published primitive (Euclidean projection of the Adam update,
+Adam-NSCL-style; UNVERIFIED source), and (iii) a finite-step drift bound
+for one corrected step that makes the sketch, ridge, staleness and
+curvature errors explicit. The results are about a linearised retained
+map plus explicitly bounded remainders; they say nothing about image
+semantics, object removal, or FLUX.</p>
+<h1 id="notation-and-exact-objects">Notation and exact objects</h1>
+<p><span class="math inline">\(\theta\in\mathbb{R}^P\)</span>: trainable
+LoRA parameters (all <span class="math inline">\(A,B\)</span> factors
+flattened), base weights frozen, <span
+class="math inline">\(\theta_0\)</span> the initialisation (<span
+class="math inline">\(B=0\)</span>). <span
+class="math inline">\(L_e(\theta)\)</span>: the native GEM erasure loss
+(detached teachers), <span class="math inline">\(g=\nabla
+L_e(\theta)\)</span>. Retained map <span
+class="math inline">\(f_r:\mathbb{R}^P\to\mathbb{R}^{n}\)</span> stacks
+the student outputs on a retained probe batch <span
+class="math inline">\(R_1\)</span> (<span class="math inline">\(n=N_r
+d\)</span>); <span class="math inline">\(J=\partial
+f_r(\theta)\in\mathbb{R}^{n\times P}\)</span> (never formed densely at
+scale). AdamW (torch semantics, <span
+class="math inline">\(\beta_1,\beta_2,\epsilon,\lambda_{wd}\)</span>,
+step <span class="math inline">\(t\)</span>): <span
+class="math inline">\(m&#39;=\beta_1 m+(1-\beta_1)g\)</span>, <span
+class="math inline">\(v&#39;=\beta_2 v+(1-\beta_2)g^{\odot2}\)</span>,
+<span class="math inline">\(\hat m=m&#39;/(1-\beta_1^t)\)</span>, <span
+class="math inline">\(\hat v=v&#39;/(1-\beta_2^t)\)</span>, <span
+class="math display">\[D=\operatorname{diag}(d),\quad
+d_i=\frac{1}{\sqrt{\hat v_i}+\epsilon}&gt;0,\qquad
+\Delta_0=-\eta\,D\hat m-\eta\lambda_{wd}\theta\quad(\text{the actual
+step}).\]</span> Sketch: <span
+class="math inline">\(\Sigma\in\mathbb{R}^{k\times n}\)</span> with
+i.i.d. <span class="math inline">\(\mathcal N(0,1/k)\)</span> entries,
+<span class="math inline">\(S=\Sigma J\in\mathbb{R}^{k\times P}\)</span>
+(computed with <span class="math inline">\(k\)</span> VJPs). Metric
+<span class="math inline">\(H=D^{-1}\)</span>, <span
+class="math inline">\(\|x\|_H^2=x^\top D^{-1}x\)</span>. Candidate
+correction (exact, with ridge <span
+class="math inline">\(\mu\ge0\)</span>): <span
+class="math display">\[\Delta_1=\Delta_0-DS^\top (SDS^\top+\mu
+I)^{-1}S\Delta_0 . \tag{1}\]</span> For <span
+class="math inline">\(\mu=0\)</span> and <span
+class="math inline">\(S\)</span> of full row rank write <span
+class="math inline">\(\Pi_D=I-DS^\top(SDS^\top)^{-1}S\)</span>;
+Euclidean analogue <span
+class="math inline">\(\Pi=I-S^\top(SS^\top)^{-1}S\)</span>.
+Pre-optimizer projection (GPM/OGD-style) feeds <span
+class="math inline">\(\Pi g\)</span> into AdamW instead of <span
+class="math inline">\(g\)</span>. <em>Idealised</em> statements set
+<span class="math inline">\(\mu=0\)</span>, <span
+class="math inline">\(\Sigma=I\)</span> (exact <span
+class="math inline">\(J\)</span>) and fresh <span
+class="math inline">\(J\)</span>; Section 5 removes each
+idealisation.</p>
+<h1
+id="pre-optimizer-projection-is-not-retention-neutral-under-adamw-agent-c-t1">Pre-optimizer
+projection is not retention-neutral under AdamW (Agent C, T1)</h1>
+<div id="p:pre" class="proposition">
+<p><strong>Proposition 1</strong>. <em>Fix <span
+class="math inline">\(J\)</span> and suppose every gradient fed to AdamW
+lies in <span class="math inline">\(\mathcal
+N=\operatorname{null}(J)\)</span> (pre-projection). Then the momentum
+<span class="math inline">\(\hat m\in\mathcal N\)</span> and the
+first-order retained change of the step <span
+class="math inline">\(\Delta_0\)</span> is <span
+class="math inline">\(J\Delta_0=-\eta JD\hat
+m-\eta\lambda_{wd}J\theta\)</span>. (a) <span
+class="math inline">\(JD\hat m=0\)</span> for every <span
+class="math inline">\(\hat m\in\mathcal N\)</span> iff <span
+class="math inline">\(D\mathcal N\subseteq\mathcal N\)</span>. (b) For
+every <span class="math inline">\(c\in\mathbb{R}\)</span>, <span
+class="math inline">\(\|JD\hat m\|\le\|J\|\,\|D-cI\|\,\|\hat
+m\|\)</span>; with <span
+class="math inline">\(c=(d_{\max}+d_{\min})/2\)</span> this gives <span
+class="math inline">\(\|JD\hat
+m\|\le\|J\|\frac{d_{\max}-d_{\min}}{2}\|\hat m\|\)</span>. (c) The
+weight-decay term <span
+class="math inline">\(\eta\lambda_{wd}J\theta\)</span> is untouched by
+any gradient projection.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> <span class="math inline">\(\hat m\)</span> is a
+linear combination of past (projected) gradients, all in the subspace
+<span class="math inline">\(\mathcal N\)</span>, so <span
+class="math inline">\(\hat m\in\mathcal N\)</span>. (a) <span
+class="math inline">\(JD\hat m=0\ \forall \hat m\in\mathcal N\)</span>
+iff <span class="math inline">\(D\mathcal
+N\subseteq\operatorname{null}(J)=\mathcal N\)</span>. (b) <span
+class="math inline">\(J\hat m=0\)</span> gives <span
+class="math inline">\(JD\hat m=J(D-cI)\hat m\)</span>; take norms; <span
+class="math inline">\(\|D-cI\|=\max_i|d_i-c|\)</span>, minimised at the
+midrange. (c) The term does not depend on <span
+class="math inline">\(g\)</span>. ◻</p>
+</div>
+<div class="remark">
+<p><em>Remark 2</em>. Since <span class="math inline">\(D\)</span> is
+diagonal with (generically) distinct entries, <span
+class="math inline">\(D\)</span>-invariant subspaces are sums of
+coordinate subspaces; a null space that is <em>rotated</em> relative to
+the coordinate axes is generically not invariant. At AdamW step 1, <span
+class="math inline">\(\hat m/\sqrt{\hat
+v}=\operatorname{sign}(g)\)</span> entrywise (<span
+class="math inline">\(|g_i|\gg\epsilon\)</span>), so the retained change
+is <span class="math inline">\(\eta\|J\operatorname{sign}(\Pi
+g)\|\)</span>, which does not shrink as the projection becomes more
+accurate.</p>
+</div>
+<h1
+id="the-adam-metric-correction-characterisation-and-a-strict-separation">The
+Adam-metric correction: characterisation and a strict separation</h1>
+<div id="p:tr" class="proposition">
+<p><strong>Proposition 3</strong> (trust-region characterisation;
+standard). <em>Let <span class="math inline">\(D\succ0\)</span>, <span
+class="math inline">\(S\)</span> full row rank, <span
+class="math inline">\(r&gt;0\)</span>, and <span
+class="math inline">\(u=D\hat m\)</span> with <span
+class="math inline">\(\hat m=g\)</span>. The problem <span
+class="math display">\[\max_x\ -g^\top x\quad\text{s.t.}\quad Sx=0,\
+\|x\|_H\le r\]</span> has the unique solution <span
+class="math inline">\(x^\star=-r\,\Pi_D Dg/\|\Pi_D Dg\|_H\)</span>
+whenever <span class="math inline">\(\Pi_D Dg\ne0\)</span>, and the
+optimal value is <span class="math inline">\(r\|\Pi_D Dg\|_H\)</span>.
+Moreover <span class="math display">\[-g^\top(-\Pi_D
+Dg)=\|(I-Q)D^{1/2}g\|^2\ \ge 0,\qquad
+Q=D^{1/2}S^\top(SDS^\top)^{-1}SD^{1/2}, \tag{2}\]</span> with equality
+iff <span
+class="math inline">\(g\in\operatorname{range}(S^\top)\)</span>. Also
+<span class="math inline">\(\|\Pi_D w\|_H\le\|w\|_H\)</span> for all
+<span class="math inline">\(w\)</span>, and <span
+class="math inline">\(S\Pi_D=0\)</span>.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Substitute <span
+class="math inline">\(x=D^{1/2}y\)</span>: maximise <span
+class="math inline">\(-(D^{1/2}g)^\top y\)</span> s.t. <span
+class="math inline">\((SD^{1/2})y=0\)</span>, <span
+class="math inline">\(\|y\|\le r\)</span>. The feasible set is the ball
+intersected with <span
+class="math inline">\(\operatorname{null}(SD^{1/2})\)</span>, whose
+orthogonal projector is <span class="math inline">\(I-Q\)</span> (<span
+class="math inline">\(Q\)</span> is the orthogonal projector onto <span
+class="math inline">\(\operatorname{range}(D^{1/2}S^\top)\)</span>). By
+Cauchy–Schwarz on that subspace the unique maximiser is <span
+class="math inline">\(y^\star=-r(I-Q)D^{1/2}g/\|(I-Q)D^{1/2}g\|\)</span>,
+and <span class="math inline">\(D^{1/2}(I-Q)D^{1/2}g=\Pi_D Dg\)</span>,
+giving <span class="math inline">\(x^\star\)</span>. Then <span
+class="math inline">\(g^\top\Pi_D
+Dg=(D^{1/2}g)^\top(I-Q)(D^{1/2}g)=\|(I-Q)D^{1/2}g\|^2\)</span> since
+<span class="math inline">\(I-Q\)</span> is an orthogonal projector.
+Equality iff <span
+class="math inline">\(D^{1/2}g\in\operatorname{range}(D^{1/2}S^\top)\)</span>
+iff <span
+class="math inline">\(g\in\operatorname{range}(S^\top)\)</span>. In
+<span class="math inline">\(y\)</span>-coordinates <span
+class="math inline">\(\Pi_D\)</span> acts as the orthogonal projector
+<span class="math inline">\(I-Q\)</span>, hence non-expansive in <span
+class="math inline">\(\|\cdot\|_H\)</span>; <span
+class="math inline">\(S\Pi_D=S-SDS^\top(SDS^\top)^{-1}S=0\)</span>. ◻</p>
+</div>
+<div id="p:sep" class="proposition">
+<p><strong>Proposition 4</strong> (strict separation from Euclidean
+post-projection). <em>For the Euclidean correction <span
+class="math inline">\(\Delta_E=\Pi\Delta_0\)</span> of the same AdamW
+step (<span class="math inline">\(\hat m=g\)</span>, <span
+class="math inline">\(\lambda_{wd}=0\)</span>), the first-order erasure
+progress <span class="math inline">\(-g^\top\Delta_E=\eta\,g^\top\Pi
+Dg\)</span> <em>can be negative</em>; the Adam-metric progress <span
+class="math inline">\(-g^\top\Pi_D\Delta_0=\eta\,g^\top\Pi_DDg\)</span>
+never is (Prop. <a href="#p:tr" data-reference-type="ref"
+data-reference="p:tr">3</a>). The two coincide when <span
+class="math inline">\(D=cI\)</span>. Explicit instance: <span
+class="math inline">\(P=2\)</span>, <span
+class="math inline">\(S=[1,1]\)</span>, <span
+class="math inline">\(D=\operatorname{diag}(0.01,1)\)</span>, <span
+class="math inline">\(g=(1,0.5)\)</span>: <span
+class="math inline">\(g^\top\Pi
+Dg=\tfrac12(d_1g_1-d_2g_2)(g_1-g_2)=\tfrac12(-0.49)(0.5)=-0.1225&lt;0\)</span>,
+while <span
+class="math inline">\(g^\top\Pi_DDg=\|(I-Q)D^{1/2}g\|^2=\frac{d_1d_2(g_1-g_2)^2}{d_1+d_2}=\frac{0.01\cdot0.25}{1.01}\approx0.002475&gt;0\)</span>.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> For <span class="math inline">\(S=[1,1]\)</span>,
+<span
+class="math inline">\(\Pi=\frac12\begin{psmallmatrix}1&amp;-1\\-1&amp;1\end{psmallmatrix}\)</span>,
+so <span class="math inline">\(\Pi
+Dg=\frac12(d_1g_1-d_2g_2)(1,-1)^\top\)</span> and <span
+class="math inline">\(g^\top\Pi
+Dg=\frac12(d_1g_1-d_2g_2)(g_1-g_2)\)</span>. For the metric version,
+<span class="math inline">\(SDS^\top=d_1+d_2\)</span> and <span
+class="math inline">\(\Pi_DDg=Dg-\frac{d_1g_1+d_2g_2}{d_1+d_2}(d_1,d_2)^\top=\frac{d_1d_2(g_1-g_2)}{d_1+d_2}(1,-1)^\top\)</span>,
+so <span
+class="math inline">\(g^\top\Pi_DDg=\frac{d_1d_2(g_1-g_2)^2}{d_1+d_2}\)</span>.
+Substitute. If <span class="math inline">\(D=cI\)</span> then <span
+class="math inline">\(\Pi_D=\Pi\)</span>. ◻</p>
+</div>
+<div class="remark">
+<p><em>Remark 5</em> (what Prop. <a href="#p:sep"
+data-reference-type="ref" data-reference="p:sep">4</a> does <em>not</em>
+say). It does not say the metric correction always yields more progress:
+with <span class="math inline">\(g=(1,-0.5)\)</span> in the same
+instance the Euclidean progress is larger (0.3825 vs 0.0223 in units of
+<span class="math inline">\(\eta\)</span>;
+<code>code/scratch_checks/sign_check.py</code>). Prop. <a href="#p:tr"
+data-reference-type="ref" data-reference="p:tr">3</a> gives optimality
+only at equal <span class="math inline">\(H\)</span>-norm (Adam’s own
+trust region). Comparisons must therefore be made at tuned or matched
+step size — the protocol does so. Under random draws (development only)
+the Euclidean sign failure occurred in 3.5 % of cases (same script).</p>
+</div>
+<div id="c:mom" class="counterexample">
+<p><em>Counterexample 6</em> (momentum). With <span
+class="math inline">\(\hat m\ne g\)</span>, <span
+class="math inline">\(-g^\top\Pi_D D\hat m\)</span> can be negative
+(take <span class="math inline">\(\hat m\)</span> dominated by an old
+gradient opposite to <span class="math inline">\(g\)</span> outside
+<span class="math inline">\(\operatorname{range}(S^\top)\)</span>).
+Hence the rule “if <span
+class="math inline">\(g^\top\Delta_1\ge0\)</span> set <span
+class="math inline">\(\Delta_1=0\)</span>”; Prop. <a href="#p:tr"
+data-reference-type="ref" data-reference="p:tr">3</a>’s sign guarantee
+covers only <span class="math inline">\(\beta_1=0\)</span> or <span
+class="math inline">\(\hat m\parallel g\)</span> on <span
+class="math inline">\(\operatorname{null}(S)\)</span>-relevant
+directions.</p>
+</div>
+<div class="remark">
+<p><em>Remark 7</em> (weight decay). Because (1) acts on the whole <span
+class="math inline">\(\Delta_0\)</span>, the first-order retained change
+of the decoupled weight-decay term is also removed (<span
+class="math inline">\(S\Delta_1=0\)</span> exactly for <span
+class="math inline">\(\mu=0\)</span>), unlike Prop. <a href="#p:pre"
+data-reference-type="ref" data-reference="p:pre">1</a>(c). For LoRA the
+weight-decay map change is exactly <span
+class="math inline">\(((1-\eta\lambda)^2-1)BA\)</span> (both factors
+scale), whose second-order part is not removed.</p>
+</div>
+<h1 id="exact-finite-step-behaviour-of-one-corrected-step">Exact
+finite-step behaviour of one corrected step</h1>
+<p>Let <span class="math inline">\(\theta^+=\theta+s\Delta_1\)</span>.
+The exact retained change is <span
+class="math inline">\(f_r(\theta^+)-f_r(\theta)\)</span>; write the full
+(unsketched) Jacobian at the current point <span
+class="math inline">\(J_\theta\)</span> and at the probe refresh point
+<span class="math inline">\(J_{\theta_s}\)</span> (staleness).
+Assumptions: (A1) <span
+class="math inline">\(\|J_\theta-J_{\theta_s}\|\le
+L_J\|\theta-\theta_s\|\)</span>; (A2) along the segment <span
+class="math inline">\([\theta,\theta^+]\)</span> the second derivative
+of <span class="math inline">\(f_r\)</span> is bounded: <span
+class="math inline">\(\|f_r(\theta+h)-f_r(\theta)-J_\theta
+h\|\le\frac{\beta}{2}\|h\|^2\)</span>.</p>
+<div id="l:ridge" class="lemma">
+<p><strong>Lemma 8</strong> (ridge residual). <em>With <span
+class="math inline">\(S\)</span> any <span class="math inline">\(k\times
+P\)</span> matrix, (1) gives <span
+class="math inline">\(S\Delta_1=\mu(SDS^\top+\mu
+I)^{-1}S\Delta_0\)</span>, hence <span
+class="math inline">\(\|S\Delta_1\|\le\frac{\mu}{\lambda_{\min}(SDS^\top)+\mu}\|S\Delta_0\|\)</span>.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> <span
+class="math inline">\(S\Delta_1=S\Delta_0-SDS^\top(G+\mu
+I)^{-1}S\Delta_0\)</span> with <span
+class="math inline">\(G=SDS^\top\)</span>; <span
+class="math inline">\(I-G(G+\mu I)^{-1}=\mu(G+\mu I)^{-1}\)</span>; the
+eigenvalues of <span class="math inline">\(\mu(G+\mu I)^{-1}\)</span>
+are <span class="math inline">\(\mu/(\lambda_i+\mu)\)</span>. ◻</p>
+</div>
+<div id="l:sketch" class="lemma">
+<p><strong>Lemma 9</strong> (sketch residual). <em>Let <span
+class="math inline">\(J=J_{\theta_s}\)</span> have singular values <span
+class="math inline">\(\sigma_1\ge\sigma_2\ge\dots\)</span>, <span
+class="math inline">\(\Sigma\)</span> Gaussian <span
+class="math inline">\(k\times n\)</span>, and <span
+class="math inline">\(Y=\operatorname{range}(J^\top\Sigma^\top)\subseteq\mathbb{R}^P\)</span>.
+Every <span class="math inline">\(x\)</span> with <span
+class="math inline">\(\Sigma Jx=0\)</span> satisfies <span
+class="math inline">\(x\perp Y\)</span> and <span
+class="math inline">\(\|Jx\|\le E_\Sigma\|x\|\)</span> with <span
+class="math inline">\(E_\Sigma=\|J(I-P_Y)\|\)</span>. (a) If <span
+class="math inline">\(k\ge\operatorname{rank}J\)</span> then <span
+class="math inline">\(E_\Sigma=0\)</span> almost surely. (b) For <span
+class="math inline">\(k=k_0+p\)</span>, <span
+class="math inline">\(p\ge2\)</span>, the randomized range-finder bound
+(Halko–Martinsson–Tropp 2011, §10, average spectral error theorem;
+applied to <span class="math inline">\(A=J^\top\)</span>, <span
+class="math inline">\(\Omega=\Sigma^\top\)</span>) gives <span
+class="math inline">\(\mathbb{E}E_\Sigma\le\bigl(1+\sqrt{k_0/(p-1)}\bigr)\sigma_{k_0+1}+\frac{e\sqrt{k}}{p}\bigl(\sum_{j&gt;k_0}\sigma_j^2\bigr)^{1/2}\)</span>,
+so by Markov <span
+class="math inline">\(\Pr(E_\Sigma&gt;t\,\mathbb{E}E_\Sigma)\le1/t\)</span>.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> <span class="math inline">\(\Sigma Jx=0\iff
+x\perp\operatorname{range}(J^\top\Sigma^\top)=Y\)</span>, so <span
+class="math inline">\(x=(I-P_Y)x\)</span> and <span
+class="math inline">\(\|Jx\|=\|J(I-P_Y)x\|\le E_\Sigma\|x\|\)</span>.
+(a) A Gaussian <span class="math inline">\(\Sigma^\top\)</span>
+restricted to <span
+class="math inline">\(\operatorname{range}(J)\)</span> (dimension <span
+class="math inline">\(\operatorname{rank}J\le k\)</span>) is a.s. of
+full rank <span class="math inline">\(\operatorname{rank}J\)</span>, so
+<span class="math inline">\(Y=\operatorname{range}(J^\top)\)</span> and
+<span class="math inline">\(J(I-P_Y)=0\)</span>. (b) <span
+class="math inline">\(\|J(I-P_Y)\|=\|(I-P_Y)J^\top\|\)</span>, which is
+exactly the quantity bounded in HMT §10 for <span
+class="math inline">\(A=J^\top\)</span> with Gaussian test matrix <span
+class="math inline">\(\Omega=\Sigma^\top\)</span> (scaling of <span
+class="math inline">\(\Omega\)</span> does not change <span
+class="math inline">\(Y\)</span>). The constant is quoted from that
+theorem from memory (UNVERIFIED theorem number in this sprint; arXiv
+unreachable); Markov’s inequality gives the tail. Note: the bound
+requires <span class="math inline">\(\Sigma\)</span> independent of
+<span class="math inline">\(J\)</span>, which holds because <span
+class="math inline">\(\Sigma\)</span> is drawn fresh at each refresh
+before <span class="math inline">\(J\)</span>-products are taken; it
+does <em>not</em> require independence from <span
+class="math inline">\(x\)</span>, because the bound is uniform over
+<span class="math inline">\(x\perp Y\)</span>. ◻</p>
+</div>
+<div id="t:step" class="theorem">
+<p><strong>Theorem 10</strong> (finite-step retained drift of one VAU
+step). <em>Under (A1)–(A2), with <span class="math inline">\(S=\Sigma
+J_{\theta_s}\)</span> and <span class="math inline">\(\Delta_1\)</span>
+from (1), <span
+class="math display">\[\|f_r(\theta+s\Delta_1)-f_r(\theta)\|\ \le\
+s\Bigl(E_\Sigma\|\Delta_1\|+\kappa_\Sigma\|S\Delta_1\|\Bigr)
++ s\,L_J\|\theta-\theta_s\|\,\|\Delta_1\| +
+\tfrac{\beta}{2}s^2\|\Delta_1\|^2 ,\]</span> where <span
+class="math inline">\(\|S\Delta_1\|\)</span> is bounded by Lemma <a
+href="#l:ridge" data-reference-type="ref" data-reference="l:ridge">8</a>
+(zero if <span class="math inline">\(\mu=0\)</span>), <span
+class="math inline">\(E_\Sigma\)</span> by Lemma <a href="#l:sketch"
+data-reference-type="ref" data-reference="l:sketch">9</a> (zero a.s. if
+<span
+class="math inline">\(k\ge\operatorname{rank}J_{\theta_s}\)</span>), and
+<span
+class="math inline">\(\kappa_\Sigma=1/\sigma_{\min}(\Sigma|_V)\)</span>
+with <span class="math inline">\(V=J_{\theta_s}Y\)</span>, finite (shown
+in the proof).</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Write <span
+class="math inline">\(f_r(\theta+h)-f_r(\theta)=J_\theta h+\rho\)</span>
+with <span class="math inline">\(\|\rho\|\le\frac\beta2\|h\|^2\)</span>
+(A2), <span class="math inline">\(h=s\Delta_1\)</span>. Split <span
+class="math inline">\(J_\theta
+h=J_{\theta_s}h+(J_\theta-J_{\theta_s})h\)</span>; the second term is
+bounded by (A1). Decompose <span
+class="math inline">\(h=h_\perp+h_Y\)</span> with <span
+class="math inline">\(h_\perp\perp Y\)</span>, <span
+class="math inline">\(h_Y\in Y\)</span> (<span
+class="math inline">\(\|h_\perp\|,\|h_Y\|\le\|h\|\)</span>). Then <span
+class="math inline">\(\|J_{\theta_s}h_\perp\|\le E_\Sigma\|h\|\)</span>
+(Lemma <a href="#l:sketch" data-reference-type="ref"
+data-reference="l:sketch">9</a>) and <span
+class="math inline">\(Sh=\Sigma J_{\theta_s}h_Y\)</span> because <span
+class="math inline">\(\Sigma J_{\theta_s}h_\perp=0\)</span>. <span
+class="math inline">\(J_{\theta_s}h_Y\in
+V=J_{\theta_s}Y=\operatorname{range}(J_{\theta_s}J_{\theta_s}^\top\Sigma^\top)\)</span>.
+<span class="math inline">\(\Sigma\)</span> is injective on <span
+class="math inline">\(V\)</span>: if <span
+class="math inline">\(z=J_{\theta_s}J_{\theta_s}^\top\Sigma^\top
+w\)</span> and <span class="math inline">\(\Sigma z=0\)</span> then
+<span class="math inline">\(w^\top\Sigma
+z=\|J_{\theta_s}^\top\Sigma^\top w\|^2=0\)</span>, so <span
+class="math inline">\(z=0\)</span>. Hence <span
+class="math inline">\(\sigma_{\min}(\Sigma|_V)&gt;0\)</span> and <span
+class="math inline">\(\|J_{\theta_s}h_Y\|\le\kappa_\Sigma\|Sh\|\)</span>.
+If <span class="math inline">\(\mu=0\)</span> then <span
+class="math inline">\(Sh=0\)</span>. Combine with the triangle
+inequality. ◻</p>
+</div>
+<div class="remark">
+<p><em>Remark 11</em>. Theorem <a href="#t:step"
+data-reference-type="ref" data-reference="t:step">10</a> is a
+<em>prediction-side</em> bound: every constant (<span
+class="math inline">\(E_\Sigma\)</span>, <span
+class="math inline">\(L_J\)</span>, <span
+class="math inline">\(\beta\)</span>) is unknown for a real network.
+That is why the candidate does not rely on it for acceptance; it relies
+on Theorem <a href="#t:gate" data-reference-type="ref"
+data-reference="t:gate">13</a>.</p>
+</div>
+<div id="c:gauge" class="counterexample">
+<p><em>Counterexample 12</em> (LoRA gauge; outside the first-order
+guarantee). For a LoRA layer <span class="math inline">\(W+BA\)</span>
+and any <span class="math inline">\(K\)</span>, the step <span
+class="math inline">\(dB=BK\)</span>, <span
+class="math inline">\(dA=-KA\)</span> has first-order map change <span
+class="math inline">\(dB\,A+B\,dA=0\)</span> for every input, so it
+passes any exact first-order constraint, yet the exact change is <span
+class="math inline">\(dB\,dA=-BK^2A\ne0\)</span> (Agent C, C-X2;
+computed 2.3 % of <span class="math inline">\(\|BAx\|\)</span> at <span
+class="math inline">\(\|K\|=0.3\)</span>). Only an evaluation of the
+actual finite step detects it.</p>
+</div>
+<h1
+id="certified-acceptance-under-adaptivity-with-optimizer-state-rollback">Certified
+acceptance under adaptivity, with optimizer-state rollback</h1>
+<p>Clipped per-sample drift <span
+class="math inline">\(r_x(\theta)=\min(\|f_x(\theta)-f_x(\theta_0)\|^2,M)\in[0,M]\)</span>;
+population <span
+class="math inline">\(\rho_M(\theta)=\mathbb{E}_{x\sim\mathcal
+R}r_x(\theta)\)</span> over the retained distribution <span
+class="math inline">\(\mathcal R\)</span>.</p>
+<div id="t:gate" class="theorem">
+<p><strong>Theorem 13</strong> (gate). <em>Run any update rule for <span
+class="math inline">\(T\)</span> steps with at most <span
+class="math inline">\(R\)</span> trials per step. At each trial <span
+class="math inline">\(j\)</span> draw a fresh batch <span
+class="math inline">\(R_2^{(j)}\)</span> of <span
+class="math inline">\(n_2\)</span> i.i.d. samples from <span
+class="math inline">\(\mathcal R\)</span>, independent of everything
+used to construct the trial point <span
+class="math inline">\(\vartheta_j\)</span> (conditionally on the
+history), and accept iff <span
+class="math inline">\(\hat\rho_j+c\le\tau^2\)</span>, <span
+class="math inline">\(\hat\rho_j=\frac1{n_2}\sum_{x\in
+R_2^{(j)}}r_x(\vartheta_j)\)</span>, <span
+class="math inline">\(c=M\sqrt{\ln(TR/\delta)/(2n_2)}\)</span>. Then
+with probability at least <span class="math inline">\(1-\delta\)</span>
+every accepted iterate satisfies <span
+class="math inline">\(\rho_M\le\tau^2\)</span>. If additionally <span
+class="math inline">\(\|f_x(\theta)-f_x(\theta_0)\|^2\le M\)</span>
+a.s. along the run, <span class="math inline">\(\rho_M\)</span> is the
+true mean drift. If on rejection <span
+class="math inline">\((\theta,m,v,t)\)</span> are restored, the accepted
+sequence is exactly an AdamW trajectory in which rejected steps are
+skipped (no optimizer-state contamination by rejected trials).</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Let <span class="math inline">\(\mathcal
+F_{j}\)</span> be the <span class="math inline">\(\sigma\)</span>-field
+of everything before batch <span class="math inline">\(j\)</span> is
+drawn; <span class="math inline">\(\vartheta_j\)</span> is <span
+class="math inline">\(\mathcal F_j\)</span>-measurable and <span
+class="math inline">\(R_2^{(j)}\)</span> is independent of <span
+class="math inline">\(\mathcal F_j\)</span>. Conditionally on <span
+class="math inline">\(\mathcal F_j\)</span>, the <span
+class="math inline">\(r_x(\vartheta_j)\)</span> are i.i.d. in <span
+class="math inline">\([0,M]\)</span> with mean <span
+class="math inline">\(\rho_M(\vartheta_j)\)</span>, so Hoeffding gives
+<span
+class="math inline">\(\Pr(\rho_M(\vartheta_j)&gt;\hat\rho_j+c\mid\mathcal
+F_j)\le\delta/(TR)\)</span>. The bad event “some accepted <span
+class="math inline">\(\vartheta_j\)</span> has <span
+class="math inline">\(\rho_M&gt;\tau^2\)</span>” is contained in <span
+class="math inline">\(\bigcup_j\{\rho_M(\vartheta_j)&gt;\hat\rho_j+c\}\)</span>
+(acceptance means <span
+class="math inline">\(\hat\rho_j+c\le\tau^2\)</span>); at most <span
+class="math inline">\(TR\)</span> trials, so the union bound gives <span
+class="math inline">\(\le\delta\)</span>. The clipping statement is
+immediate. Rollback: the accepted update applies the tentative state
+<span class="math inline">\((m&#39;,v&#39;,t+1)\)</span> computed from
+the same <span class="math inline">\(g\)</span> that produced <span
+class="math inline">\(\Delta_0\)</span>; a rejected trial leaves <span
+class="math inline">\((\theta,m,v,t)\)</span> bitwise unchanged, so the
+state after each step equals that of AdamW run on the subsequence of
+accepted steps (with the projected/scaled displacement in place of the
+raw step). ◻</p>
+</div>
+<div class="counterexample">
+<p><em>Counterexample 14</em> (adaptivity; why <span
+class="math inline">\(R_1\ne R_2\)</span>). If the trial point is
+constructed in the null space of the same batch used to verify it, the
+empirical drift can be zero while population drift is not (Agent C
+computed <span class="math inline">\(3\cdot10^{-30}\)</span> vs <span
+class="math inline">\(1.1\cdot10^{-3}\)</span>). Theorem <a
+href="#t:gate" data-reference-type="ref" data-reference="t:gate">13</a>
+requires independence.</p>
+</div>
+<div class="counterexample">
+<p><em>Counterexample 15</em> (rare subgroup). The gate certifies a
+mean. A retained subgroup of mass <span class="math inline">\(q\)</span>
+is absent from <span class="math inline">\(n_2\)</span> samples with
+probability <span class="math inline">\((1-q)^{n_2}\)</span> (<span
+class="math inline">\(0.37\)</span> for <span
+class="math inline">\(q=0.005\)</span>, <span
+class="math inline">\(n_2=200\)</span>); its drift is uncontrolled.</p>
+</div>
+<h1 id="limiting-cases">Limiting cases</h1>
+<p>(i) <span class="math inline">\(D=cI\)</span> (e.g. SGD, or AdamW
+when all <span class="math inline">\(|g_i|\)</span> equal): metric,
+Euclidean post- and (for <span class="math inline">\(\beta_1=0\)</span>,
+<span class="math inline">\(\lambda_{wd}=0\)</span>) pre-projection
+coincide. (ii) <span class="math inline">\(S=0\)</span> (no probes):
+<span class="math inline">\(\Delta_1=\Delta_0\)</span>, VAU-noGate is
+AdamW. (iii) <span
+class="math inline">\(g\in\operatorname{range}(S^\top)\)</span>: <span
+class="math inline">\(\Delta_1\)</span> has zero first-order progress
+(Prop. <a href="#p:tr" data-reference-type="ref"
+data-reference="p:tr">3</a>); rejected. (iv) Rich retained set, <span
+class="math inline">\(\operatorname{rank}J=P\)</span>: the exact null
+space is <span class="math inline">\(\{0\}\)</span>, <span
+class="math inline">\(\Delta_1\approx0\)</span> (ridge only) — VAU
+erases nothing; a soft penalty or the gate alone is then the only
+meaningful arm. (v) <span class="math inline">\(\tau\to\infty\)</span>:
+the gate always accepts. (vi) <span
+class="math inline">\(\tau\to0\)</span>: only steps with zero clipped
+empirical drift and <span class="math inline">\(c\le\tau^2\)</span>
+pass; for finite <span class="math inline">\(n_2\)</span>, <span
+class="math inline">\(c&gt;0\)</span>, so nothing passes.</p>
+<h1 id="standard-ingredients-versus-what-is-specific-here">Standard
+ingredients versus what is specific here</h1>
+<p>Standard: scaled/metric gradient projection and its trust-region form
+(Prop. <a href="#p:tr" data-reference-type="ref"
+data-reference="p:tr">3</a>; e.g. Bertsekas’ scaled gradient
+projection); null-space projection of an optimizer’s update for
+continual learning (Adam-NSCL; UNVERIFIED this sprint); GPM/OGD gradient
+projection; HMT randomized range finder (Lemma <a href="#l:sketch"
+data-reference-type="ref" data-reference="l:sketch">9</a>);
+Taylor/Lipschitz remainders (Theorem <a href="#t:step"
+data-reference-type="ref" data-reference="t:step">10</a>); Hoeffding
+with union bound and backtracking (Theorem <a href="#t:gate"
+data-reference-type="ref" data-reference="t:gate">13</a>; TRPO/CPO-style
+line search). Specific to this sprint (not claimed as a general
+contribution): the identification that native GEM’s verified training
+configuration (AdamW, zero-init LoRA, no retention) sits in the regime
+of Prop. <a href="#p:pre" data-reference-type="ref"
+data-reference="p:pre">1</a>; the explicit sign separation of Prop. <a
+href="#p:sep" data-reference-type="ref" data-reference="p:sep">4</a>
+between the metric and Euclidean corrections of the <em>same</em> Adam
+step; the combination of those with Theorem <a href="#t:gate"
+data-reference-type="ref" data-reference="t:gate">13</a>’s rollback
+semantics; and the prospective, falsifiable predictions tested in
+<code>results/</code>. Whether any of this improves real
+erasure/preservation is unknown.</p>
+</body>
+</html>
