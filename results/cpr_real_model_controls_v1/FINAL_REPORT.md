@@ -250,6 +250,27 @@ Scoring and qualification reproduce from the published
 
 ---
 
+## 8. Publication and release verification
+
+Release **`cpr-real-model-controls-v1-entrygate`**, target commit
+`a462b94800d44441c6c056c4cd220350862741ad`.
+
+All six assets were **downloaded back from GitHub** and verified:
+`sha256sum -c` **OK on every asset**; counts confirmed (**64** calibration
+PNGs, **1** M0 dev PNG, **8** contact sheets); and the adapter was
+**reconstructed from the downloaded bytes** on a fresh FLUX.1-dev load —
+152/152 keys, no missing/unexpected/nonfinite/shape mismatch, all finite,
+recomputed state hash `0b3e4536…` **matching the stored hash**.
+
+**Disclosed verification limits.** The adapter check proves the snapshot
+reloads into the intended effective weights; it does **not** assert
+unmerged/merged bit-equivalence. The PNGs are verified by archive hash and
+file count, not by re-generating them (re-generation would consume image
+budget and is unnecessary — they are the published primary artifacts). The
+download used the same host and token as the upload.
+
+---
+
 ### Attribution
 
 Native GEM arithmetic and training procedure are **re-implemented by reading**
