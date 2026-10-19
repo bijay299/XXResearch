@@ -7,10 +7,24 @@
 > threshold retuning after inspecting failures") scientific work stopped at the
 > entry gate.
 >
-> **No production training ran. No development matrix, no held-out matrix, no
-> arm comparison exists.** Therefore **no** scientific decision —
-> `PROMISING_FOR_FRESH_REPLICATION`, `NO_ADVANTAGE_DEMONSTRATED` or
-> `INCONCLUSIVE` — is available or claimed. The pilot's question is **untouched**.
+> **No production CPR training, no development operating-point selection, no
+> held-out comparison and no CPR-versus-control result exists.** Therefore
+> **no** scientific decision — `PROMISING_FOR_FRESH_REPLICATION`,
+> `NO_ADVANTAGE_DEMONSTRATED` or `INCONCLUSIVE` — is available or claimed, and
+> this is **not** a method `NO_GO`, a practical success or an equivalence
+> finding. **CPR improvement remains untested.**
+>
+> **"No production training" is not "no training of any kind":** three
+> completed native bring-up training segments ran (22 processed timesteps and
+> 2 optimizer updates each), plus further launches that failed earlier.
+>
+> **Corrected by
+> [`AMENDMENT_01_GATE_FIDELITY_AND_ACCOUNTING.md`](AMENDMENT_01_GATE_FIDELITY_AND_ACCOUNTING.md)
+> (2026-10-19), which governs wherever it and this report differ.** Several
+> claims below are withdrawn there — notably "ten false positives", the
+> threshold-raising claim, "bicycle and violin would have cleared the gate",
+> "fits comfortably", "0 of 1 GPU retries", "reserve untouched", and the
+> resource figures in §3.
 
 **The question it would have answered (unanswered):** at comparable actual
 target suppression, does CPR preserve allowed content better than native GEM
@@ -22,12 +36,12 @@ and the strongest simple controls?
 
 The entry gate has four parts. Three passed; the fourth failed.
 
-| Gate | Result |
-|---|---|
-| (a) Model-free correctness of all six arms | **PASS** — 78 cases, 76 pass, 0 fail, 2 recorded `INAPPLICABLE` |
-| (b) Bring-up, native training, compact save/reload | **PASS** — adapter reload bit-identical, 76/76 `qk_dual` modules |
-| (c) **Measurement qualification** | **FAIL** — specificity 0.6875 < 0.80 |
-| (d) Budget projection | **PASS** — 8.41 projected GPU-hours of 24 ("FITS") |
+| Gate | Result (as recorded) | Qualification (Amendment 01) |
+|---|---|---|
+| (a) Model-free arm correctness | **PASS** — 78 rows, 76 pass, 0 fail, 2 `INAPPLICABLE` | **partial** evidence only; one "boundary" case tests inactivity, one check was wrongly marked NA, coverage is not uniform across arms (§3.1–§3.3) |
+| (b) Bring-up, native training, compact save/reload | **PASS** — reload bit-identical, 76/76 `qk_dual` modules | fidelity deviation in trajectory sampling; **no LoRA parity vs PEFT**; flags recorded, not enforced (§3.4–§3.7) |
+| (c) **Measurement qualification** | **FAIL** — specificity 0.6875 < 0.80 | **stands; this is the binding gate** |
+| (d) Budget projection | recorded `FITS` — 8.41 projected GPU-hours of 24 | **provisional**; extrapolated from one 22-timestep profile, and the reserve cancels in the `fits` test (§6.7) |
 
 The gate that failed is the one that decides whether any semantic number this
 pilot could produce would mean anything.
@@ -48,35 +62,44 @@ present / 32 absent / 0 uncertain. Then the frozen scorer ran.
 
 **Verdict `SCORER_NOT_QUALIFIED`.**
 
-### Where the failure is concentrated — and why it is fatal here
+### Where the unsuccessful decisions fall
 
-| Probe object | Sensitivity | Specificity |
-|---|---|---|
-| **backpack** | 16/16 = 1.000 | **3/11 = 0.273** |
-| bicycle | 8/8 = 1.000 | 10/11 = 0.909 |
-| violin | 8/8 = 1.000 | 9/10 = 0.900 |
+**CORRECTED (Amendment 01 §2).** The breakdown of the 32 negative references is
+**22 `absent`, 6 `present`, 4 `uncertain`** — so there are **six definite false
+positives and four uncertain decisions**, not "ten false positives". Under the
+frozen rule the uncertain decisions count against the gate, but they are not
+positive misidentifications.
 
-All ten errors are **false positives**, and **eight of them are the `backpack`
-probe**. Six fired above `p_present = 0.60` on plainly unrelated scenes — a
-potted plant (0.715), a forest path (0.832), a desk with a lamp (0.806), a
-stack of books (0.624), a beach (0.610), an open notebook (0.726) — and four
-more landed in the uncertain band, which the frozen rule counts as errors
-rather than resolving in the scorer's favour.
+| Probe | Negatives n | absent | present | uncertain | Observed correct-negative fraction | Positives n |
+|---|---|---|---|---|---|---|
+| **backpack** | 11 | **3** | **6** | **2** | 3/11 = 0.2727 | 16 |
+| bicycle | 11 | 10 | 0 | 1 | 10/11 = 0.9091 | 8 |
+| violin | 10 | 9 | 0 | 1 | 9/10 = 0.9000 | 8 |
 
-**`backpack` is the development target.** The development stage is where all
-six arms' learning rates and checkpoints get selected, and where the
-≥ 80%-suppression efficacy floor is applied. An instrument that calls a potted
-plant a backpack 27% of the time cannot measure backpack suppression, so the
-entire selection stage — and therefore everything downstream of it — was
-unmeasurable. Bicycle and violin would have cleared the gate; that does not
-rescue the pilot, because the frozen design selects on backpack first.
+These are **observed correct-negative fractions on 10–11 negatives each, not
+qualified specificities**. The earlier claim that **"bicycle and violin would
+have cleared the gate" is WITHDRAWN**: the gate needs ≥ 20 definite positives
+*and* ≥ 20 definite negatives, and no single object supplies either (8
+positives each for bicycle and violin). **No object is independently
+qualified**; the verdict rests on the aggregate 22/32.
 
-This is the warning in the contract — *"Do not assume CLIP similarity is
-calibrated object presence"* — materialising concretely. The decision rule
-contrasts present-phrases against explicit absent-phrases
-("a photo with no backpack"), and CLIP's weak handling of negation means the
-absent-phrase still scores highly on any image, so the contrast carries little
-information for this object. Qualifying the instrument against held-apart
+Each image was scored **once**. `p_present` values are single deterministic
+outputs of the frozen rule, **not measured probabilities**, and 3/11 is a count
+across eleven different images, **not a repeated-trial frequency** for any one
+image. The earlier phrasings "called a potted plant a backpack at p=0.715" and
+"27% of the time" are **withdrawn** as statistical mischaracterisations.
+
+**`backpack` is the development target**, where all six arms' learning rates
+and checkpoints would have been selected and the ≥ 80%-suppression floor
+applied. With a 3/11 correct-negative fraction there, the selection stage —
+and everything downstream — was unmeasurable.
+
+The decision rule contrasts present-phrases against explicit absent-phrases
+("a photo with no backpack"). **Weak handling of negation is a plausible
+explanation, not an isolated causal finding**: no ablation isolating negation
+was run, and nothing here shows that CLIP generally cannot measure object
+presence. The result concerns **this frozen rule against this reference set**.
+Qualifying the instrument against held-apart
 images is exactly what exposed it, *before* it could launder noise into
 suppression and preservation percentages.
 
@@ -84,13 +107,19 @@ suppression and preservation percentages.
 
 - **No scorer shopping.** LLaVA-1.6-vicuna-7b and CLIP ViT-L/14-336 are both
   cached locally and were not tried.
-- **No threshold retuning.** Moving `threshold_present` to ~0.85 would have
-  passed the gate on this data; it was not done. The thresholds were frozen in
-  `cprlib/scorer.py` and hashed into `artifacts/freeze_seal.json`
-  (`8177b47cb5b71f8b…`) before any calibration image existed.
+- **No threshold retuning.** Thresholds were frozen in `cprlib/scorer.py` and
+  hashed into `artifacts/freeze_seal.json` (`8177b47cb5b71f8b…`) before any
+  calibration image existed. **CORRECTION (Amendment 01 §2.5):** the earlier
+  claim that raising `threshold_present` to ~0.85 *"would have passed the gate"*
+  is **false and withdrawn**. A case is labelled `absent` only when
+  `p_present ≤ threshold_absent = 0.40`, so raising `threshold_present` cannot
+  increase the true-negative count — it only moves `present` labels into
+  `uncertain`. Specificity stays 22/32 = 0.6875. No alternative threshold was
+  evaluated.
 - **No prompt or template edits**, no re-generation of calibration cases, no
   dropping of the backpack probe.
-- **No production run.** Zero training trajectories were executed.
+- **No production run.** Zero production training trajectories were executed —
+  though three native bring-up training segments did run (Amendment 01 §1).
 
 ---
 
@@ -99,21 +128,44 @@ suppression and preservation percentages.
 These stand on their own and are reusable, but they are **engineering
 qualification, not scientific results**.
 
-### (a) All six arms are correct — 78 cases, 0 failures
+### (a) Partial correctness evidence — 78 rows, 76 passes, 0 failures, 2 NAs
+
+**Heading corrected (Amendment 01 §3): this is partial correctness evidence
+for the formulas and for gradient/engineering behaviour, not full-contract
+verification of all six arms.** The raw rows are unchanged.
 
 `artifacts/cpu_gate_results.json`. Against an **independent FP64 oracle**
 written from the contract's formulas rather than by calling the production
 code: forward parity (≤ 1e-5), autograd vs independent analytic gradients, FP64
-central differences away from hinges (≤ 1e-7), active/inactive/exact-boundary
-behaviour, reduction and scaling order, the independent divisor
-(`n_latents = 11 ≠ batch`), teacher detachment, FP32 promotion from FP64 and
-BF16, finite gradients and safe small-contrast handling, explicit axial-domain
-handling, and rejection of malformed shapes, nonfinite inputs and invalid
-divisors. The exact-boundary case asserts **exactly zero loss and exactly zero
-gradient**. Two cases are recorded `INAPPLICABLE` and are **not** counted as
-passes.
+central differences away from hinges (≤ 1e-7), active/inactive behaviour,
+reduction and scaling order, the independent divisor (`n_latents = 11 ≠ batch`),
+teacher detachment, FP32 promotion from FP64 and BF16, finite gradients and
+safe small-contrast handling, axial-domain handling, and rejection of malformed
+shapes, nonfinite inputs and invalid divisors.
 
-### (b) The native GEM procedure reproduces and serializes correctly
+**Four qualifications, all from the existing records:**
+
+1. **`G3.boundary.native_gem` does not test an exact boundary.** Its recorded
+   `hinge_argument` is **−8.940696716308594e−08** — negative — so the zero loss
+   and zero gradient test **inactivity**, not boundary behaviour; the assertion
+   (`|arg| ≤ 1e-6`) never required a zero hinge argument. **Equivalent boundary
+   checks for the other hinge-bearing arms are missing.** The earlier sentence
+   claiming an exact-boundary assertion is withdrawn.
+2. **The axial inactivity case was wrongly marked `INAPPLICABLE`.** At
+   `a=(0,0)`, `b=(1,0)`, `v=a`, `eta=1` the axial hinge argument is
+   `1 − 2·1 = −1`, squarely in-domain and a valid inactivity check. It was
+   **omitted, not inapplicable**. The raw NA row is left unchanged.
+3. **Coverage is not uniform across arms.** Several reduction, divisor,
+   `gamma`-scaling and dtype-promotion checks ran on `native_gem` only or on a
+   shared path. **No independent six-arm coverage of every property is
+   claimed.** Genuinely per-arm: forward parity, gradient agreement, teacher
+   detachment, small-contrast/no-NaN behaviour.
+4. Two cases are recorded `INAPPLICABLE` and are **not** counted as passes.
+
+### (b) The native GEM procedure runs and the snapshot round-trips
+
+**Heading corrected (Amendment 01 §3.4–§3.6):** "reproduces correctly"
+overstated what was shown.
 
 `artifacts/bringup_results.json`:
 - Pinned FLUX revision `3de623fc…` resolves from the pristine read-only cache;
@@ -135,36 +187,87 @@ A real defect was caught here: the first round-trip reported *not* bit-identical
 mode**, making the probe stochastic — not a serialization bug. Fixed by running
 the probe in eval mode (patch P6).
 
-### (c) Measured performance, for whoever runs this next
+**Qualifications (Amendment 01 §3.4–§3.7):**
+
+- **Native-fidelity deviation.** The harness calls `transformer.eval()` before
+  sampling the student trajectory; pinned native GEM samples after
+  `wrapper.train()`, and `no_grad` does **not** disable LoRA dropout. At
+  `dropout = 0.1` this changes behaviour **and the RNG stream** versus the
+  pinned source. The blanket assurances **"same RNG", "numerically inert" and
+  "no algorithmic change"** are **withdrawn** for this change.
+- **No LoRA parity.** The custom LoRA has **no demonstrated forward, backward
+  or update parity against native PEFT**. Module inventory, shapes, scaling and
+  the zero initial effective update are observations, **not an equivalence
+  proof**.
+- **Serialization scope.** The matching restored hash and the eval-mode
+  fixed-input max diff of 0.0 are valid **within this custom implementation**.
+  They do **not** establish native training reproduction, merged/unmerged
+  bit-equivalence, or any erasure efficacy.
+- **Recorded, not enforced.** Most bring-up findings were written to a results
+  dict rather than asserted. An **earlier attempt whose fixed-input equality
+  check failed still completed and printed `FITS`.** A later passing probe does
+  not retroactively make that gate binding.
+
+### (c) Measured performance — provisional
 
 1.384 s per processed timestep · 4.79 s per decoded 512×512 image · 12.7 s
 pipeline load ⇒ the full 36-trajectory / 1,992-image matrix projects to
-**8.41 GPU-hours** including a 30% margin, against a 24-hour ceiling. **The
-study fits comfortably.** The blocker is measurement, not compute.
+**8.41 GPU-hours** including a 30% margin, against a 24-hour ceiling.
+
+**CORRECTED (Amendment 01 §6.7):** the arithmetic is right given its inputs,
+but it extrapolates from a **single 22-timestep profile on one arm** and does
+not qualify the complete workflow (scoring, analysis, checkpoint I/O, 36
+trajectories' divergent behaviour). The 8-hour reserve **cancels on both sides**
+of the `fits` expression, so it adds no safety there. **"Fits comfortably" and
+any readiness assurance are withdrawn**; the estimate stands as **provisional**.
 
 ---
 
 ## 3. Resource usage against every ceiling
 
-| Ceiling | Limit | Actual | Fraction |
-|---|---|---|---|
-| Elapsed | 7 days (science by day 6) | **~1.0 h** | 0.6% |
-| GPU device-hours | 24 | **0.1161** | 0.5% |
-| — of which entry/bring-up | ≤ 4 | **0.1161** | 2.9% |
-| — evaluation reserve | 8 held back | **0.0 used** | reserve intact |
-| Newly decoded images | 2,200 | **68** | 3.1% |
-| CPU core-hours | 48 | **0.123** (441.8 core-s) | 0.26% |
-| Workers | 8 | 8 | — |
-| Process-tree RSS | 128 GiB | well under | — |
-| New project storage | 200 GiB | **~56 MiB** | <0.1% |
-| Free space on `/data` | ≥ 50 GiB | ~518 GiB | ok |
-| GPUs | ≤ 4 genuinely available | **2 only** (GPUs 2,3; 0 and 1 left to another user) | — |
-| Implementation-repair cycle | 1 | **0 used** | — |
-| Technical GPU retry | 1 | **0 used** | — |
+**CORRECTED (Amendment 01 §5–§6).** The figures first published here (0.1161
+GPU-h, 0.123 CPU-core-h) were read **before** the release-verification job ran,
+and the counters are themselves **incomplete**: costs fold in only on normal
+job close, and **six failed bring-up attempts never closed**.
 
-68 decoded images = 64 calibration + 1 declared M0 dev case + 3 re-decodes
-during failed bring-up attempts. 65 PNG files exist on disk; the counter
-charges all 68 decodes, failures included.
+| Ceiling | Limit | Final counters | Lower bound incl. unclosed jobs |
+|---|---|---|---|
+| GPU device-hours | 24 | **0.1198536** (431.473 s) | **≥ 0.1515586** (545.611 s) |
+| — release verification | (8 h reserve) | **13.645 s used** — reserve **not** untouched | — |
+| CPU core-hours | 48 | **0.1276836** (459.661 s) | **≥ 0.1651622** (594.584 s) |
+| Newly decoded images | 2,200 | **68** → **65 unique primary PNGs** | — |
+| Elapsed | 7 days | ~1.0 h | — |
+| Workers | 8 | 8 | — |
+| New project storage | 200 GiB | **UNKNOWN** — ~56 MiB was a directory size at one moment, not a measured peak | — |
+| GPUs | ≤ 4 genuinely available | 2 only (GPUs 2,3) | — |
+| Implementation-repair cycle | 1 | 0 used | — |
+| **Technical GPU retry** | **1** | **BREACHED** — 8 bring-up launches = **7 relaunches** | — |
+
+**Lower-bound method:** per distinct PID take the maximum cumulative snapshot
+that PID wrote, then sum across PIDs — no double counting, no PID missed.
+**These are lower bounds, not exact totals**; a killed process stops writing,
+so later cost is invisible. **Full costs remain unknown where unrecorded**, and
+nothing was rerun to estimate them.
+
+**68 decoded images** = 64 calibration + **4** decodes of the **single** M0 case
+`dev.target.00` ⇒ **65 unique primary PNGs**. (The earlier "1 + 3 re-decodes"
+phrasing counted the same case twice over; the totals are unchanged.)
+
+**"0 of 1 GPU retries" is WITHDRAWN.** The ledger shows 13 job starts, 7 ends
+and **8 bring-up launches** — one initial plus **seven relaunches**, exceeding
+the one-retry allowance. Small compatibility fixes do not exempt their
+relaunches from the cap. Per-attempt diffs and failure traces were not captured
+and **no longer exist**; they are disclosed as unavailable, not reconstructed.
+
+**Enforcement gaps (Amendment 01 §6.6):** no cross-process locking on the
+counter file; costs fold only on normal close; CPU/RSS checks are per-process,
+not process-tree; storage, the 4-hour entry sub-cap and the 8-hour reserve were
+tracked but **never enforced**; and the published launchers do not substantiate
+every shell-timeout/`rlimit` claim in the manifest.
+
+**No numerical GPU, CPU or image ceiling overrun is demonstrated** — but that
+**does not establish complete compliance**, given the incomplete accounting and
+unenforced controls. **The retry-cap breach is separately supported.**
 
 No paid API, no cloud compute, no external messages, no reviewer recruitment.
 Telemetry and W&B disabled. No GPU-idleness polling.
@@ -196,43 +299,62 @@ remain in `configs/cases.json` exactly as frozen before any generation.
    the measured specificity in either direction — though a 0.273 specificity on
    plainly unrelated scenes (potted plant, beach, forest path) is not a
    marginal call.
-2. **The gate used 64 images and three probe objects.** Per-object
-   specificities rest on 10–11 negatives each, so those are coarse estimates.
-   The aggregate 0.6875 against a 0.80 threshold is what the frozen rule
-   decides on.
-3. **This result is about one decision rule, not about CLIP generally.** A
-   differently-constructed CLIP classifier, a detector, or a VLM judge might
+   *(Amendment 01 §2: "0.273 specificity" is an observed correct-negative
+   fraction over 11 images, not a specificity estimate, and six of the ten
+   unsuccessful negative decisions were definite false positives — the other
+   four were uncertain.)*
+2. **The gate used 64 images and three probe objects**, with only 8–16
+   positives and 10–11 negatives per object. **No object is independently
+   qualified** under the ≥ 20/≥ 20 requirement. The aggregate 22/32 = 0.6875
+   against a 0.80 threshold is what the frozen rule decides on.
+3. **This result is about one decision rule against one reference set, not
+   about CLIP generally.** Weak negation handling is a **plausible
+   explanation, not an isolated causal finding** — no ablation was run. A
+   differently-constructed classifier, a detector, or a VLM judge might
    qualify. None was tried, by design.
-4. **Nothing here speaks to CPR.** No arm was trained. The closed CPU prototype
-   (`results/cpr_gem_cpu_prototype/`, status `CPU_PROTOTYPE_INCOMPLETE`) remains
-   the only CPR evidence, and it is explicitly not a practical result.
-5. **The `bicycle` partial overlap** with closed SD-1.5 study `seq29` (where it
-   was a retention panel class, never an erasure target) is disclosed in
-   `RUN_MANIFEST.md` §4 and judged not a genuine collision. A reader may
-   disagree; no closed artefact was reused.
+4. **Nothing here speaks to CPR's practical value.** No production training, no
+   operating-point selection, no comparison. **CPR improvement remains
+   untested.** Three native bring-up training segments did run. The closed CPU
+   prototype (`results/cpr_gem_cpu_prototype/`, status
+   `CPU_PROTOTYPE_INCOMPLETE`) remains the only CPR-specific evidence and is
+   explicitly not a practical result.
+5. **The `bicycle` target is a design-scope deviation** (Amendment 01 §7): its
+   prior role as a retention panel class in closed SD-1.5 study `seq29` was
+   accepted under a **narrower interpretation than the fresh-target/panel
+   rule**. This is not evidence the old experiment was rerun — **no held-out
+   bicycle run exists** and no old-asset reuse is established. **No substitute
+   object is selected now.**
 6. **GPU-second accounting charges wall-clock × devices held**, which
    over-counts idle time inside a job and cannot see other users' processes.
+7. **Known code defects are documented and left unfixed** (Amendment 01 §3):
+   the missing boundary checks, the omitted axial inactivity check, the
+   `eval()`-mode trajectory-sampling fidelity deviation, the unproven LoRA
+   parity, and the recorded-not-enforced bring-up flags.
 
 ---
 
-## 6. One terminal recommendation
+## 6. Recommendation — WITHDRAWN
 
-**Qualify an object-presence instrument as a standalone, bounded task before
-re-attempting this pilot.** It is cheap — the 64 calibration images already
-exist and are published, so candidate instruments can be scored against the
-already-recorded visual judgments at **zero GPU cost for generation**. The
-specific lesson is that a present-vs-absent *phrase contrast* is the weak
-component: CLIP barely represents negation, so an instrument should instead be
-built on a discriminative signal (an open-vocabulary detector, or a VLM asked a
-direct yes/no question), and it must be qualified **per target object**, since
-`backpack` failed at 0.273 while `bicycle` and `violin` cleared 0.90.
+**The previous recommendation is withdrawn in full** (Amendment 01 §8). It
+proposed qualifying a replacement instrument as a follow-up task and,
+specifically, scoring candidate instruments against the published calibration
+set at zero GPU cost.
 
-That task should also replace the model-assisted reference with human labels on
-at least the definite cases, because the present gate compares model to model.
+**The calibration set is now seen data.** Its images, the scorer's outputs on
+them and the reference labels are all published, and the failure mode has been
+analysed in public. Choosing a future scorer against it would make it
+**development material, not an untouched qualification test**, and any
+instrument selected on it could not be said to have passed an independent gate.
 
-**Not authorized and not started here:** no new probe, no scorer substitution,
-no threshold change, no production training, no expansion of concepts or seeds,
-and no follow-up correction cycle.
+**No automatic re-attempt, scorer selection, or successor task is recommended
+or authorized.** The code limitations in §2(a)/§2(b) and Amendment 01 §3 are
+left **unfixed and documented**.
+
+**Not authorized and not done here:** no new probe, no scorer substitution, no
+threshold change, no production training, no expansion of concepts or seeds, no
+test implementation, and no further correction cycle.
+
+**CPR's practical value remains unanswered.**
 
 ---
 
@@ -268,6 +390,23 @@ unmerged/merged bit-equivalence. The PNGs are verified by archive hash and
 file count, not by re-generating them (re-generation would consume image
 budget and is unnecessary — they are the published primary artifacts). The
 download used the same host and token as the upload.
+
+---
+
+## 10. Amendment 01
+
+This report is **corrected and superseded in part** by:
+
+| Document | Contents |
+|---|---|
+| [`AMENDMENT_01_GATE_FIDELITY_AND_ACCOUNTING.md`](AMENDMENT_01_GATE_FIDELITY_AND_ACCOUNTING.md) | retained status; measurement-interpretation corrections; correctness and native-fidelity qualifications; freeze, retry and accounting corrections; withdrawn recommendation |
+| [`PRESERVATION_AND_ACCOUNTING.md`](PRESERVATION_AND_ACCOUNTING.md) | mechanical preservation verification, ledger arithmetic, release-asset metadata |
+
+The amendment **governs wherever it and this report differ**, and also
+supersedes contradictory statements in the protected, unedited
+`RUN_MANIFEST.md` (notably its F1 and F2 freeze timestamps). All raw records —
+the 78 gate rows, the 64 predictions and judgments, counters, ledgers, seals
+and checksums — are preserved unchanged.
 
 ---
 
