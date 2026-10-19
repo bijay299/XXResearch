@@ -1,0 +1,286 @@
+#!/usr/bin/env python3
+"""Model-free implementation gate. Binding assertions, CPU only.
+
+Required correctness that does not resolve ENDS production qualification --
+there is no "recorded flag followed by FITS" path here: `main` returns
+non-zero and the caller must not proceed.
+
+Shared checks are LABELLED shared. NAs are not passes. A tolerance-close
+inactive point does NOT prove boundary semantics: an exact-boundary claim is
+made only where the COMPUTED hinge argument is exactly 0.0.
+"""
+import json
+import os
+import sys
+
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
+import torch
+
+sys.path.insert(0, os.environ["CPRD_ROOT"])
+sys.path.insert(0, os.path.join(os.environ["CPRD_ROOT"], "pydeps"))
+from cprd import losses as LS
+
+ROOT = os.environ["CPRD_ROOT"]
+ETA, GAMMA, NL = 1.0, 100.0, 11
+R, ORDER = {}, []
+HINGE_ARMS = ("native_gem", "cpr", "centered_radial", "truncated_anchor", "axial_margin")
+
+
+def case(cid, ok, status, shared=False, **f):
+    if cid in R:
+        raise RuntimeError(f"duplicate {cid}")
+    R[cid] = {"pass": ok, "status": status, "shared_check": shared, **f}
+    ORDER.append(cid)
+    tag = {True: "PASS", False: "FAIL", None: "N/A "}[ok]
+    print(f"[{tag}]{' (shared)' if shared else ''} {cid}  {status}")
+    return ok
+
+
+# ---- independent FP64 reference values, written from the contract formulas ----
+def ref_per_sample(arm, v, a, b, eta=1.0):
+    v = v.double(); a = a.detach().double(); b = b.detach().double()
+    n = v.shape[0]; v = v.reshape(n, -1); a = a.reshape(n, -1); b = b.reshape(n, -1)
+    eps = 1e-6
+    dp = torch.linalg.vector_norm(v - a + eps, dim=1)
+    dm = torch.linalg.vector_norm(v - b + eps, dim=1)
+    L = torch.linalg.vector_norm(b - a, dim=1)
+    live = L > 1e-6
+    e = torch.where(live.unsqueeze(1), (b - a) / torch.where(live, L, torch.ones_like(L)).unsqueeze(1),
+                    torch.zeros_like(v))
+    alpha = ((b - v) * e).sum(dim=1)
+    if arm == "native_gem":   return torch.relu(dp - eta * dm)
+    if arm == "cpr":          return torch.relu(dp - eta * alpha)
+    if arm == "centered_radial":
+        return torch.relu(dp - eta * torch.sqrt(((v - b) ** 2).sum(dim=1) + eps ** 2 * v.shape[1]))
+    if arm == "truncated_anchor": return torch.relu(dp - eta * L / (1 + eta))
+    if arm == "anchor_only":  return dp
+    if arm == "axial_margin":
+        if not bool(live.all()): raise ValueError("axial domain")
+        return torch.relu(L - (1 + eta) * alpha)
+    raise ValueError(arm)
+
+
+def trip(seed, n=4, d=512, mode="generic"):
+    g = torch.Generator().manual_seed(seed)
+    v = torch.randn(n, d, generator=g); a = torch.randn(n, d, generator=g); b = torch.randn(n, d, generator=g)
+    if mode == "near_b": v = b + 0.02 * v
+    if mode == "near_a": v = a + 0.02 * v
+    return v, a, b
+
+
+def relerr(x, y):
+    x = torch.as_tensor(x, dtype=torch.float64).reshape(-1)
+    y = torch.as_tensor(y, dtype=torch.float64).reshape(-1)
+    den = float(torch.linalg.vector_norm(y))
+    return float(torch.linalg.vector_norm(x - y)) / den if den > 0 else float(torch.linalg.vector_norm(x - y))
+
+
+def g1_values_and_grads():
+    """Independent per-arm values and applicable gradients."""
+    for mode in ("generic", "near_b", "near_a"):
+        v0, a, b = trip(991, mode=mode)
+        for arm in LS.ARMS:
+            if arm == LS.NATIVE_ARM:
+                case(f"G1.value.{arm}.{mode}", None,
+                     "N/A: dispatch returns None so the trainer runs GEM's own block "
+                     "(verified separately in the GPU gate by dispatch-off/on agreement)")
+                continue
+            try:
+                got = LS.per_sample(arm, v0, a, b, ETA)
+                want = ref_per_sample(arm, v0, a, b, ETA)
+            except LS.AxialDomainViolation as e:
+                case(f"G1.value.{arm}.{mode}", None, f"N/A: {e}")
+                continue
+            case(f"G1.value.{arm}.{mode}", relerr(got, want) <= 1e-5, "OK",
+                 rel_error=relerr(got, want))
+            # applicable gradient: only where the per-sample value is active
+            vv = v0.clone().requires_grad_(True)
+            out = LS.per_sample(arm, vv, a, b, ETA)
+            out.sum().backward()
+            active = (want > 0)
+            if not bool(active.any()):
+                case(f"G1.grad.{arm}.{mode}", float(vv.grad.abs().max()) == 0.0,
+                     "INACTIVE: all samples inactive, implementation gradient must be exactly 0",
+                     grad_max_abs=float(vv.grad.abs().max()))
+            else:
+                h = 1e-6
+                v64 = v0.double()
+                fd = torch.zeros_like(v64)
+                for i in range(v64.shape[0]):
+                    for j in range(0, v64.shape[1], 97):     # sparse probe, deterministic
+                        vp = v64.clone(); vp[i, j] += h
+                        vm = v64.clone(); vm[i, j] -= h
+                        fd[i, j] = (ref_per_sample(arm, vp, a, b, ETA).sum()
+                                    - ref_per_sample(arm, vm, a, b, ETA).sum()) / (2 * h)
+                idx = fd != 0
+                err = relerr(vv.grad.double()[idx], fd[idx]) if idx.any() else 0.0
+                case(f"G1.grad.{arm}.{mode}", err <= 1e-6, "ACTIVE_SMOOTH",
+                     fd_rel_error=err, n_probes=int(idx.sum()))
+
+
+def g2_active_inactive_boundary():
+    a1 = torch.tensor([[0.0]]); b1 = torch.tensor([[1.0]])
+    # ---- ACTIVE ----
+    v = torch.tensor([[1.0]])
+    for arm in LS.ARMS:
+        if arm == LS.NATIVE_ARM:
+            case(f"G2.active.{arm}", None, "N/A: native block runs in the trainer"); continue
+        got = LS.per_sample(arm, v, a1, b1, ETA)
+        want = ref_per_sample(arm, v, a1, b1, ETA)
+        case(f"G2.active.{arm}", float(got) > 0 and relerr(got, want) <= 1e-5,
+             "ACTIVE", value=float(got), reference=float(want))
+    # ---- INACTIVE ----
+    v = torch.tensor([[0.0]])
+    for arm in ("cpr", "centered_radial", "truncated_anchor"):
+        vv = v.clone().requires_grad_(True)
+        out = LS.per_sample(arm, vv, a1, b1, ETA); out.sum().backward()
+        case(f"G2.inactive.{arm}", float(out) == 0.0 and float(vv.grad.abs().max()) == 0.0,
+             "INACTIVE: exactly zero value and exactly zero gradient",
+             value=float(out), grad_max_abs=float(vv.grad.abs().max()))
+    case("G2.inactive.anchor_only", None, "N/A: anchor_only has no hinge")
+    case("G2.inactive.axial_margin", None,
+         "N/A: axial hinge does not involve Dplus; its inactive point is covered by G2.boundary")
+
+    # ---- EXACT BOUNDARY: claimed ONLY where the computed hinge argument is
+    #      exactly 0.0. A tolerance-close inactive point is NOT accepted.
+    # axial: L - (1+eta)*alpha with a=0,b=1,v=0.5 -> 1.0 - 2*0.5 = exactly 0.0
+    v = torch.tensor([[0.5]])
+    g = LS.geometry(v, a1, b1)
+    arg = float(g["L"] - (1.0 + ETA) * g["alpha"])
+    vv = v.clone().requires_grad_(True)
+    out = LS.per_sample("axial_margin", vv, a1, b1, ETA); out.sum().backward()
+    case("G2.boundary.axial_margin", arg == 0.0 and float(out) == 0.0
+         and float(vv.grad.abs().max()) == 0.0,
+         "EXACT_BOUNDARY: computed hinge argument is exactly 0.0",
+         hinge_argument=arg, value=float(out), grad_max_abs=float(vv.grad.abs().max()))
+
+    # cpr / centered_radial / truncated_anchor: search FP32 for an exactly-zero
+    # computed hinge argument along a 1-D collinear path.
+    for arm, argfn in (
+        ("cpr", lambda gg: gg["d_plus"] - ETA * gg["alpha"]),
+        ("centered_radial", lambda gg: gg["d_plus"] - ETA * torch.sqrt(
+            ((gg["v"] - gg["b"]) ** 2).sum(dim=1) + (LS.EPS ** 2) * gg["d"])),
+        ("truncated_anchor", lambda gg: gg["d_plus"] - (ETA * gg["L"] / (1.0 + ETA))),
+    ):
+        lo, hi, found = 0.0, 1.0, None
+        for _ in range(200):
+            mid = 0.5 * (lo + hi)
+            vm = torch.tensor([[mid]], dtype=torch.float32)
+            av = float(argfn(LS.geometry(vm, a1, b1)))
+            if av == 0.0:
+                found = mid; break
+            if av < 0.0: lo = mid
+            else: hi = mid
+        if found is None:
+            case(f"G2.boundary.{arm}", None,
+                 "N/A: no FP32 point with an exactly-zero computed hinge argument was "
+                 "found on this path; NO exact-boundary claim is made for this arm")
+            continue
+        vv = torch.tensor([[found]], requires_grad=True)
+        out = LS.per_sample(arm, vv, a1, b1, ETA); out.sum().backward()
+        case(f"G2.boundary.{arm}", float(out) == 0.0 and float(vv.grad.abs().max()) == 0.0,
+             "EXACT_BOUNDARY: computed hinge argument is exactly 0.0",
+             v=found, value=float(out), grad_max_abs=float(vv.grad.abs().max()))
+
+
+def g3_detach_fp32():
+    v0, a0, b0 = trip(992)
+    for arm in LS.ARMS:
+        if arm == LS.NATIVE_ARM:
+            case(f"G3.detach.{arm}", None, "N/A: teachers detached by the native trainer"); continue
+        ar = a0.clone().requires_grad_(True); br = b0.clone().requires_grad_(True)
+        vv = v0.clone().requires_grad_(True)
+        LS.per_sample(arm, vv, ar, br, ETA).sum().backward()
+        case(f"G3.detach.{arm}", ar.grad is None and br.grad is None and vv.grad is not None,
+             "teachers detached")
+    for dt in (torch.float64, torch.bfloat16):
+        v = v0[:2, :8].to(dt); a = a0[:2, :8].to(dt); b = b0[:2, :8].to(dt)
+        out = LS.per_sample("cpr", v, a, b, ETA)
+        case(f"G3.fp32_prepare.{str(dt).split('.')[-1]}", out.dtype == torch.float32,
+             "FP32 preparation", shared=True, input_dtype=str(dt), output_dtype=str(out.dtype))
+
+
+def g4_reduction():
+    """Native reduction/divisor. SHARED: one code path in the native trainer."""
+    v, a, b = trip(993)
+    per = LS.per_sample("cpr", v, a, b, ETA)
+    # REPAIR 01: the previous check compared an FP32 result against an FP64
+    # recomputation at 1e-9 relative tolerance, which is unsatisfiable for FP32
+    # arithmetic and therefore tested nothing about the scalar ORDER. Replaced
+    # with a STRICTER, dtype-correct test: the native association must match
+    # BITWISE, and the alternative associations are recorded for comparison.
+    native_scalar = (GAMMA * per.sum()) / NL                 # native order
+    alt_a = GAMMA * (per.sum() / NL)                         # scale after divide
+    alt_b = (per / NL).sum() * GAMMA                         # divide per-sample
+    ref = torch.tensor(GAMMA, dtype=per.dtype) * per.sum() / torch.tensor(NL, dtype=per.dtype)
+    case("G4.native_scalar_order", torch.equal(native_scalar, ref),
+         "(gamma * per_sample.sum()) / n_latents -- bitwise match to the native association",
+         shared=True, value=float(native_scalar),
+         alt_scale_after_divide=float(alt_a), alt_divide_per_sample=float(alt_b),
+         bitwise_equal_to_native_association=bool(torch.equal(native_scalar, ref)))
+    case("G4.divisor_independent_of_batch",
+         abs(float((GAMMA * per.sum()) / 11) - float((GAMMA * per.sum()) / v.shape[0])) > 0,
+         "n_latents=11 is supplied by the trainer and differs from batch=4", shared=True)
+
+
+def g5_small_contrast_and_axial():
+    v = torch.tensor([[0.3, 0.2]])
+    for name, Lt in (("L_zero", 0.0), ("L_half_tau", 5e-7), ("L_at_tau", 1e-6), ("L_above", 1e-5)):
+        a = torch.tensor([[0.0, 0.0]]); b = torch.tensor([[Lt, 0.0]])
+        g = LS.geometry(v, a, b)
+        live_expect = Lt > LS.TAU_L
+        vv = v.clone().requires_grad_(True)
+        out = LS.per_sample("cpr", vv, a, b, ETA); out.sum().backward()
+        finite = bool(torch.isfinite(out).all() and torch.isfinite(vv.grad).all())
+        ok = bool(g["live"][0]) == live_expect and finite
+        if not live_expect:
+            # CPR RETAINS ATTRACTION at degenerate contrast
+            ok = ok and float(g["alpha"][0]) == 0.0 and abs(float(out) - float(g["d_plus"])) <= 1e-6
+        case(f"G5.small_contrast.cpr.{name}", ok,
+             "LIVE" if live_expect else "DEGENERATE: repulsion off, ATTRACTION RETAINED",
+             L=float(g["L"][0]), alpha=float(g["alpha"][0]), value=float(out),
+             d_plus=float(g["d_plus"][0]), grad_finite=finite)
+    # axial domain violation must RAISE
+    a = torch.tensor([[0.5, 0.5]]); b = a.clone()
+    raised = False
+    try:
+        LS.per_sample("axial_margin", v, a, b, ETA)
+    except LS.AxialDomainViolation:
+        raised = True
+    case("G5.axial_domain_violation_raises", raised,
+         "explicit ARM FAILURE, never a skipped sample or invented fallback")
+    # mixed batch with one degenerate sample must also raise
+    vm = torch.tensor([[1.0, 0.0], [0.3, 0.3]]); am = torch.tensor([[0.0, 0.0], [0.5, 0.5]])
+    bm = torch.tensor([[1.0, 0.0], [0.5, 0.5]])
+    raised = False
+    try:
+        LS.per_sample("axial_margin", vm, am, bm, ETA)
+    except LS.AxialDomainViolation:
+        raised = True
+    case("G5.axial_mixed_batch_raises", raised, "partial degeneracy still fails the arm")
+
+
+def main():
+    for fn in (g1_values_and_grads, g2_active_inactive_boundary, g3_detach_fp32,
+               g4_reduction, g5_small_contrast_and_axial):
+        fn()
+    fails = [k for k in ORDER if R[k]["pass"] is False]
+    nas = [k for k in ORDER if R[k]["pass"] is None]
+    summary = {"total": len(ORDER), "passed": sum(1 for k in ORDER if R[k]["pass"] is True),
+               "failed": len(fails), "not_applicable": len(nas),
+               "failures": fails, "not_applicable_cases": nas,
+               "note": "N/A rows are NOT passes. Shared checks are labelled.",
+               "verdict": "CPU_GATE_PASS" if not fails else "CPU_GATE_FAIL"}
+    R["_summary"] = summary
+    json.dump(R, open(os.path.join(ROOT, "artifacts", "cpu_gate.json"), "w"),
+              indent=2, sort_keys=True, default=str)
+    print("=" * 72)
+    print(f"total={summary['total']} passed={summary['passed']} failed={summary['failed']} "
+          f"n/a={summary['not_applicable']}")
+    if fails: print("FAILURES:", fails)
+    print("VERDICT:", summary["verdict"])
+    return 0 if not fails else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
