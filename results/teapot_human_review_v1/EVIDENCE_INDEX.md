@@ -10,12 +10,26 @@ Complete file and hash index. Generated last.
 * **Branch:** `research/audit-and-matched-effectiveness-protocol`
 * **Release tag:** [`teapot-human-review-v1-taskB`](https://github.com/bijay299/XXResearch/releases/tag/teapot-human-review-v1-taskB) → target `898c5525d9bc3db71324914281243ba0d9ad4336`
 * **Release assets:** 3, 14,389,748 bytes
-* **Status:** `READY_FOR_INDEPENDENT_REVIEW` — **Task A only**. This repository holds no participant information, label or outcome.
+* **Status:** `ANALYSIS_COMPLETE` — both stages CLOSED with **2** reviewers (3 planned) and the combined **descriptive** analysis of the existing human judgments published under [`analysis_v1/`](analysis_v1/FINAL_REPORT.md). Outcomes are now reported here. The **original responses are preserved unchanged and are NOT published**; aliases, free text, timestamps and the private mappings stay private.
 
 ## Verification summary
 
 | check | result |
 |---|---|
+| **ANALYSIS v1 — descriptive outcomes** | |
+| Reviewers (planned / actual) | **3 / 2** |
+| Judgment counts | **20 paired cases, 80 Task-A, 40 Task-B, 2 reviewers** |
+| All four exports valid under `validator-r3` | **yes, 0 errors** |
+| 3x3 m0-by-edited presence table total | **20 / 20** |
+| Conditional demonstrated-removal count | **18 / 20** (denominator = all consensus m0-present cases, incl. edited unresolved) |
+| Task-A presence agreement | **39 / 40** definite consensus |
+| Task-A rendering agreement | **34 / 40** |
+| Task-B exact per-pair agreement | **18 / 20** (descriptive; no B consensus rule was frozen) |
+| Input SHA256 identical before and after analysis | **True** |
+| Synthetic aggregation edge cases | **35 / 35** pass |
+| Arithmetic, join and reproducibility checks | **54 / 54** — **`ANALYSIS_CHECKS_PASS`** |
+| Private mapping integrity (commitments re-verified) | **20 / 20** — **`MAPPINGS_VERIFIED_UNCHANGED`** |
+| Analysis public leak audit | **0 findings** — **`ANALYSIS_PUBLIC_AUDIT_CLEAN`** (9 secret scans ran) |
 | Source images verified against accepted hashes | **40 / 40** |
 | Source verdict | **`SOURCE_VERIFIED`** |
 | Pairs with byte-identical initial noise | **True** (20 distinct hashes) |
@@ -55,7 +69,7 @@ Reviewer bundle sha256: `837770ae23e6b1fb56b7269a87e2a2bc23f40f6e2090e5e172ea57a
 | [`AMENDMENT_01_TASKA_PATCH01.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/AMENDMENT_01_TASKA_PATCH01.md) | 12,531 | `40fd70e1d42b4409d36254724b469cebf5fccc946eea91d18b89133cef65856d` |
 | [`AMENDMENT_02_COORDINATOR_CLEANUP.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/AMENDMENT_02_COORDINATOR_CLEANUP.md) | 11,075 | `7c7342b629337c5da49a9bfed0b79ac228337246c368d22f107efd488f3a1794` |
 | [`AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/AMENDMENT_03_TASKA_CLOSURE_AND_TASKB_RELEASE.md) | 10,493 | `5f31a1eb357cdc5f5b1a4b8eb7426fef89dbdeae17009116d5a49d25a8a7abae` |
-| [`EVIDENCE_INDEX.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/EVIDENCE_INDEX.md) | 21,291 | `1f8a3d518611955d1eb5632313e565985580c35a63bf51a51d704d03c8295845` |
+| [`EVIDENCE_INDEX.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/EVIDENCE_INDEX.md) | 27,517 | `3025207418e12272265fd094f95bc75262bff2fb427753e2e1ef4ece72664fd0` |
 | [`MANIFEST_SHA256.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/MANIFEST_SHA256.md) | 8,514 | `7ef6a54268aa9c8ad93c8661197cef1e3b44e8327b4894f93048583b44bf7d93` |
 | [`MASKING_AND_LIMITATIONS.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/MASKING_AND_LIMITATIONS.md) | 9,691 | `e4b995e9be861c9a2c7f47eeb920b5565a359729d3a52e7407d8471d86e29c9c` |
 | [`PREPARATION_ACCOUNTING.md`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/PREPARATION_ACCOUNTING.md) | 7,904 | `81df2f5124dcb12c7fb593a97274ed9b94a6c1dde3bc5e55d94de5cb9c0ca47d` |
@@ -120,7 +134,7 @@ Reviewer bundle sha256: `837770ae23e6b1fb56b7269a87e2a2bc23f40f6e2090e5e172ea57a
 | [`scripts/build_taskB.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/build_taskB.py) | 7,190 | `f003d73af6dfe4b487e50c3050b2f1b5286f4a97d65c9b5ba4dbd02291f76496` |
 | [`scripts/finalize_analysis.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/finalize_analysis.py) | 7,809 | `24021f81b2d746f82516f81d174a334f2245b06404edc8bf1fce7df62f58883b` |
 | [`scripts/freeze_ids.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/freeze_ids.py) | 8,395 | `6eb79a6b87a3d6a349e9d2c8fd7ae37c38be318b7b8982ead76387539b5122fc` |
-| [`scripts/gen_evidence_index.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/gen_evidence_index.py) | 7,409 | `e638079d73869bb2b2134dd96bfe123b182033294fef3bfc5cf6af1bf431ab60` |
+| [`scripts/gen_evidence_index.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/gen_evidence_index.py) | 11,618 | `20210c61e4c49d77678a6ed571996b55521f83f36a0919b1bda19c8f37008db1` |
 | [`scripts/make_fixtures_and_qa.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/make_fixtures_and_qa.py) | 9,554 | `2b1c517261c775acc0dd8dab837580bac4c8dbcb38c8d61dab2826ca15f66ad6` |
 | [`scripts/masking_audit.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/masking_audit.py) | 11,325 | `174f530bd88b352bcc5335e046ac2eb8c09b151acdbe29dc62ff8ab86a5eab80` |
 | [`scripts/prep_ledger.py`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/scripts/prep_ledger.py) | 5,224 | `6e82c09a6891223edb5e60bb234b7689d291fc0b27ff0213cbdac25903670117` |
@@ -143,12 +157,14 @@ Reviewer bundle sha256: `837770ae23e6b1fb56b7269a87e2a2bc23f40f6e2090e5e172ea57a
 | [`verify/taskA_completeness_summary.json`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/verify/taskA_completeness_summary.json) | 748 | `e3b7c43497e9165ddaf0197eeb7375ffe744bdef0a7e14156e9c74992c6ebda1` |
 | [`verify/taskB_completeness_summary.json`](https://github.com/bijay299/XXResearch/blob/55ccc4cbab3429f368960c10a8a392a1f4da1257/results/teapot_human_review_v1/verify/taskB_completeness_summary.json) | 601 | `c2c7a869d7ee0b1e951b4d993f66af021f33a2d71f80f8053de787d6e5fb7050` |
 
-**90 tracked files, 672,435 bytes.**
+**90 tracked files, 682,870 bytes.**
 
 ## Scope reminder
 
-This index establishes **preparation and integrity only**: that the package was built from verified source material, that it is complete and masked as described, that it functions offline, and that the published artifact is the one produced.
+This index establishes **preparation, integrity and the provenance of the published analysis**: that the package was built from verified source material, that it is complete and masked as described, that it functions offline, that the published artifacts are the ones produced, and that the analysis under [`analysis_v1/`](analysis_v1/) was computed from four hash-verified exports by published code under published rules.
 
-It establishes **nothing** about erasure efficacy, retention, quality, evaluator bias, novelty or paper readiness, and it does **not** establish that any independent label was collected or that the evaluation is scientifically valid.
+**Outcomes are reported, in [`analysis_v1/`](analysis_v1/FINAL_REPORT.md) and nowhere else in this index.** They are **descriptive counts with explicit denominators** over 20 paired cases, 80 Task-A judgments and 40 Task-B judgments from **two** people -- not independent replicated trials. Human consensus there is a **reporting convention, not ground truth**, and reviewer identity and independence are **coordinator-reported, not provable in software**.
 
-Distribution of the corrected Task A is handled by the user independently of this repository. **This package collects no responses and reports no outcomes**, and no participant information, label or result is held or described here. Task B is prepared but **not released**.
+Neither this index nor the analysis establishes anything about erasure efficacy beyond the single fixed endpoint measured, retention, adversarial robustness, concept-knowledge removal, quality, evaluator bias, novelty, state-of-the-art standing, generalization to other objects or models, or paper readiness. **No hypothesis test, interval, bootstrap, kappa, significance claim, pass/fail cutoff or method ranking** is reported -- a descriptive scope choice for this design, not a claim such statistics are impossible.
+
+Distribution of the questionnaires was handled by the user independently of this repository. **No raw response, alias, free-text answer or private crosswalk is published**, and the case-level join runs through the **private** mapping, so public end-to-end reproducibility is **partial**. Task B was released under explicit authorization and is **partially unmasked by design**; because both bundles ship images byte-identical to the public per-case images whose condition and sha256 are published, the neutral IDs **do not hide condition**. The masking that mattered was masking **at judging time**.

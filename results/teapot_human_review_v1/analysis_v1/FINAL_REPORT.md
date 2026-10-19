@@ -425,7 +425,7 @@ private records at run time, and a missing private record makes a scan report
 
 | | used | cap |
 |---|---|---|
-| Elapsed (analysis phase) | within cap | 4 h |
+| Elapsed (analysis phase) | **0.4 h** | 4 h |
 | Worker threads | 1 (CPU only) | 8 |
 | Additional scratch under `/data` | far under cap | 1 GiB |
 | GPU / model / generation / automated judging / paid API | **0** | 0 |

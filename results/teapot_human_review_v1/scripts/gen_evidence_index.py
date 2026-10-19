@@ -63,12 +63,58 @@ def main():
       f"`{rel.get('target_commitish')}`")
     w(f"* **Release assets:** {len(rel['assets'])}, "
       f"{sum(x['size'] for x in rel['assets']):,} bytes")
-    w("* **Status:** `READY_FOR_INDEPENDENT_REVIEW` — **Task A only**. This "
-      "repository holds no participant information, label or outcome.\n")
+    w("* **Status:** `ANALYSIS_COMPLETE` — both stages CLOSED with **2** "
+      "reviewers (3 planned) and the combined **descriptive** analysis of the "
+      "existing human judgments published under "
+      "[`analysis_v1/`](analysis_v1/FINAL_REPORT.md). Outcomes are now "
+      "reported here. The **original responses are preserved unchanged and "
+      "are NOT published**; aliases, free text, timestamps and the private "
+      "mappings stay private.\n")
 
     w("## Verification summary\n")
     w("| check | result |")
     w("|---|---|")
+    an = load("analysis_v1/verification.json")
+    sy = load("analysis_v1/synthetic_checks.json")
+    mv = load("analysis_v1/mapping_verification.json")
+    aa = load("analysis_v1/public_audit.json")
+    su = load("analysis_v1/summary.json")
+    if su:
+        dr = su.get("demonstrated_removal", {})
+        pt = su.get("presence_table_m0_by_edited", {})
+        ta = su.get("taskA", {})
+        tb = su.get("taskB", {})
+        w("| **ANALYSIS v1 — descriptive outcomes** | |")
+        w(f"| Reviewers (planned / actual) | **{su.get('cohort',{}).get('planned')} / "
+          f"{su.get('cohort',{}).get('actual')}** |")
+        w(f"| Judgment counts | **20 paired cases, 80 Task-A, 40 Task-B, 2 reviewers** |")
+        w(f"| All four exports valid under `{su.get('validator_revision')}` | "
+          f"**yes, 0 errors** |")
+        w(f"| 3x3 m0-by-edited presence table total | **{pt.get('total')} / 20** |")
+        w(f"| Conditional demonstrated-removal count | **{dr.get('value_text')}** "
+          f"(denominator = all consensus m0-present cases, incl. edited unresolved) |")
+        w(f"| Task-A presence agreement | **"
+          f"{ta.get('presence_agreement',{}).get('all_40_images',{}).get('definite_consensus')} / 40** definite consensus |")
+        w(f"| Task-A rendering agreement | **"
+          f"{ta.get('rendering_agreement',{}).get('all_40_images',{}).get('agreement')} / 40** |")
+        w(f"| Task-B exact per-pair agreement | **"
+          f"{tb.get('exact_per_pair_agreement',{}).get('agreeing_pairs')} / "
+          f"{tb.get('exact_per_pair_agreement',{}).get('denominator')}** "
+          f"(descriptive; no B consensus rule was frozen) |")
+        w(f"| Input SHA256 identical before and after analysis | **"
+          f"{su.get('integrity',{}).get('inputs_unchanged_by_analysis')}** |")
+    if sy:
+        w(f"| Synthetic aggregation edge cases | **{sy.get('n_passed')} / "
+          f"{sy.get('n_checks')}** pass |")
+    if an:
+        w(f"| Arithmetic, join and reproducibility checks | **{an.get('n_passed')} / "
+          f"{an.get('n_checks')}** — **`{an.get('verdict')}`** |")
+    if mv:
+        w(f"| Private mapping integrity (commitments re-verified) | **"
+          f"{mv.get('n_passed')} / {mv.get('n_checks')}** — **`{mv.get('verdict')}`** |")
+    if aa:
+        w(f"| Analysis public leak audit | **{aa.get('n_findings')} findings** — "
+          f"**`{aa.get('verdict')}`** ({aa.get('n_scans_ran')} secret scans ran) |")
     w(f"| Source images verified against accepted hashes | **{sv.get('pngs_verified')} / {sv.get('pngs_expected')}** |")
     w(f"| Source verdict | **`{sv.get('verdict')}`** |")
     w(f"| Pairs with byte-identical initial noise | **{sv.get('all_noise_identical_across_conditions')}** ({sv.get('distinct_noise_hashes')} distinct hashes) |")
@@ -129,19 +175,38 @@ def main():
     w(f"**{len(tracked)} tracked files, {tot:,} bytes.**\n")
 
     w("## Scope reminder\n")
-    w("This index establishes **preparation and integrity only**: that the "
-      "package was built from verified source material, that it is complete and "
-      "masked as described, that it functions offline, and that the published "
-      "artifact is the one produced.\n")
-    w("It establishes **nothing** about erasure efficacy, retention, quality, "
-      "evaluator bias, novelty or paper readiness, and it does **not** "
-      "establish that any independent label was collected or that the "
-      "evaluation is scientifically valid.\n")
-    w("Distribution of the corrected Task A is handled by the user "
-      "independently of this repository. **This package collects no responses "
-      "and reports no outcomes**, and no participant information, label or "
-      "result is held or described here. Task B is prepared but **not "
-      "released**.\n")
+    w("This index establishes **preparation, integrity and the provenance of "
+      "the published analysis**: that the package was built from verified "
+      "source material, that it is complete and masked as described, that it "
+      "functions offline, that the published artifacts are the ones produced, "
+      "and that the analysis under [`analysis_v1/`](analysis_v1/) was computed "
+      "from four hash-verified exports by published code under published "
+      "rules.\n")
+    w("**Outcomes are reported, in [`analysis_v1/`](analysis_v1/FINAL_REPORT.md)"
+      " and nowhere else in this index.** They are **descriptive counts with "
+      "explicit denominators** over 20 paired cases, 80 Task-A judgments and "
+      "40 Task-B judgments from **two** people -- not independent replicated "
+      "trials. Human consensus there is a **reporting convention, not ground "
+      "truth**, and reviewer identity and independence are "
+      "**coordinator-reported, not provable in software**.\n")
+    w("Neither this index nor the analysis establishes anything about erasure "
+      "efficacy beyond the single fixed endpoint measured, retention, "
+      "adversarial robustness, concept-knowledge removal, quality, evaluator "
+      "bias, novelty, state-of-the-art standing, generalization to other "
+      "objects or models, or paper readiness. **No hypothesis test, interval, "
+      "bootstrap, kappa, significance claim, pass/fail cutoff or method "
+      "ranking** is reported -- a descriptive scope choice for this design, "
+      "not a claim such statistics are impossible.\n")
+    w("Distribution of the questionnaires was handled by the user "
+      "independently of this repository. **No raw response, alias, free-text "
+      "answer or private crosswalk is published**, and the case-level join "
+      "runs through the **private** mapping, so public end-to-end "
+      "reproducibility is **partial**. Task B was released under explicit "
+      "authorization and is **partially unmasked by design**; because both "
+      "bundles ship images byte-identical to the public per-case images whose "
+      "condition and sha256 are published, the neutral IDs **do not hide "
+      "condition**. The masking that mattered was masking **at judging "
+      "time**.\n")
 
     out = os.path.join(rdir, "EVIDENCE_INDEX.md")
     open(out, "w").write("\n".join(L))
