@@ -1,0 +1,425 @@
+{
+  "accounting": {
+    "coco_photographs": 264,
+    "cpu_core_hours_supervised_children_subtotal": 0.057551679722222214,
+    "cpu_seconds_supervised_children_subtotal": 207.18604699999997,
+    "entry_subcap_hours": 4.0,
+    "eval_bucket_charged_gpu_s": 0.0,
+    "eval_reserve_hours": 8.0,
+    "generated_images": 0,
+    "gpu_ceiling_hours": 24.0,
+    "gpu_device_hours_total": 0.046632944875293306,
+    "gpu_device_seconds_total": 167.8786015510559,
+    "gpu_devices_used": [
+      2
+    ],
+    "ledger_created_utc": "2026-10-19T05:27:52Z",
+    "open_reservations": {},
+    "retries": {
+      "cpu_repair": 1,
+      "gpu_technical": 1
+    },
+    "supervised_jobs": [
+      {
+        "below_reservation": true,
+        "charged_gpu_s": 58.685038566589355,
+        "cpu_seconds": 94.864291,
+        "job": "qualify_detectors",
+        "reserved_gpu_s": 3600.0,
+        "status": "ok"
+      },
+      {
+        "below_reservation": true,
+        "charged_gpu_s": 2.6522905826568604,
+        "cpu_seconds": 2.821559,
+        "job": "bringup",
+        "reserved_gpu_s": 5400.0,
+        "status": "exit_1"
+      },
+      {
+        "below_reservation": true,
+        "charged_gpu_s": 106.54127240180969,
+        "cpu_seconds": 109.500197,
+        "job": "bringup_gpu",
+        "reserved_gpu_s": 5400.0,
+        "status": "exit_1"
+      }
+    ],
+    "unreconciled": []
+  },
+  "commits_touching_study": [
+    {
+      "author_date_iso": "2026-10-19T03:28:24-04:00",
+      "sha": "9940e9403452e2b382c108c2d4d50bd3d054d707",
+      "subject": "results(cpr-detector-controls-v1): EVIDENCE_INDEX.md -- index-only child"
+    },
+    {
+      "author_date_iso": "2026-10-19T03:27:57-04:00",
+      "sha": "42614565cd79f911c194d9f7c8d1dea017fbe17c",
+      "subject": "results(cpr-detector-controls-v1): release verification from downloaded assets"
+    },
+    {
+      "author_date_iso": "2026-10-19T03:25:04-04:00",
+      "sha": "00bc8ae0a3d98640cb49cbbe616d2101e827e64f",
+      "subject": "results(cpr-detector-controls-v1): entry gate unresolved -- native dispatch agreement not established"
+    },
+    {
+      "author_date_iso": "2026-10-19T01:27:52-04:00",
+      "sha": "67d8b74d4d571d1641bd840a9adc5f7b4139ca35",
+      "subject": "results(cpr-detector-controls-v1): additive repair-01 freeze -- CPU implementation gate"
+    },
+    {
+      "author_date_iso": "2026-10-19T01:24:37-04:00",
+      "sha": "3fba0ff3e4eaba65f1f6466249e4dfb939a29a72",
+      "subject": "results(cpr-detector-controls-v1): PROSPECTIVE FREEZE -- categories, cases, detectors, formulas, budgets"
+    }
+  ],
+  "cpu_gate_final": {
+    "exact_zero_boundary_fixtures": [
+      "G2.boundary.axial_margin",
+      "G2.boundary.centered_radial",
+      "G2.boundary.cpr",
+      "G2.boundary.truncated_anchor"
+    ],
+    "failed": 0,
+    "not_applicable": 7,
+    "not_applicable_cases": [
+      "G1.value.native_gem.generic",
+      "G1.value.native_gem.near_b",
+      "G1.value.native_gem.near_a",
+      "G2.active.native_gem",
+      "G2.inactive.anchor_only",
+      "G2.inactive.axial_margin",
+      "G3.detach.native_gem"
+    ],
+    "passed": 57,
+    "rows": 64,
+    "total": 64,
+    "verdict": "CPU_GATE_PASS"
+  },
+  "files_added_at_each_pre_release_commit": {
+    "00bc8ae": [
+      "ENFORCEMENT_GAPS.md",
+      "FINAL_REPORT.md",
+      "artifacts/allocation_journal.jsonl",
+      "artifacts/allocation_ledger.json",
+      "artifacts/bringup_cpu.json",
+      "artifacts/bringup_gpu.json",
+      "artifacts/qualification.json",
+      "artifacts/qualification_raw_detr_resnet50_no_timm.json",
+      "artifacts/qualification_raw_rtdetr_r50vd.json",
+      "code/gate/bringup.py",
+      "code/gate/bringup_cpu.py",
+      "code/gate/bringup_gpu.py",
+      "code/gate/qualify_detectors.py",
+      "code/patches/P4_P6_optional_imports.diff",
+      "code/patches/P7_factory_path.diff",
+      "code/runenv.sh"
+    ],
+    "3fba0ff": [
+      "RUN_MANIFEST.md",
+      "code/cprd/__init__.py",
+      "code/cprd/detect.py",
+      "code/cprd/labels.py",
+      "code/cprd/ledger.py",
+      "code/cprd/losses.py",
+      "code/patches/P1_P3_erasure_gem.diff",
+      "code/patches/P2_base_pipeline_wrapper.diff",
+      "code/runenv.sh",
+      "code/scripts/build_cases.py",
+      "code/scripts/select_categories.py",
+      "configs/cases.json",
+      "configs/categories_and_qualification.json"
+    ],
+    "67d8b74": [
+      "artifacts/cpu_gate.json",
+      "artifacts/repair_01/README.md",
+      "artifacts/repair_01/cpu_gate.py.before",
+      "artifacts/repair_01/cpu_gate_FAILED.json",
+      "artifacts/repair_01/cpu_gate_PASSED.json",
+      "artifacts/repair_01/repair_01.diff",
+      "code/gate/cpu_gate.py"
+    ]
+  },
+  "freeze_3fba0ff_manifest": {
+    "identical_to_reviewed_head": true,
+    "mentions_dispatch_agreement_tolerance": false,
+    "mentions_exact_hash_equality": false
+  },
+  "gpu_gate": {
+    "cpr_probe_ran_after_failed_native_agreement_check": true,
+    "elapsed_s": 103.0,
+    "failures": [
+      "dispatch_off_on_agreement_native_arm"
+    ],
+    "hash_cpr": "88012e1a199319d9ef3fccd0545f262f8a147fb1a4d43da1bef20378ab61b98d",
+    "hash_off": "c05be7b17614d1866962c07408274ba4809b31d2f21ddefe548e0aff7c2641f4",
+    "hash_on": "ed373817cf779b79d0f4b58a2b7e8e0f0a120da715ad056316752a227888140e",
+    "probe_processed_timesteps_each": 22,
+    "probes": [
+      "native OFF",
+      "native ON",
+      "CPR ON"
+    ]
+  },
+  "journal_machine_timestamps": [
+    {
+      "event": "retry",
+      "job": null,
+      "ts_utc": "2026-10-19T05:27:52Z"
+    },
+    {
+      "event": "reserve",
+      "job": "qualify_detectors",
+      "ts_utc": "2026-10-19T05:28:47Z"
+    },
+    {
+      "event": "settle",
+      "job": null,
+      "ts_utc": "2026-10-19T05:29:46Z"
+    },
+    {
+      "event": "reserve",
+      "job": "bringup",
+      "ts_utc": "2026-10-19T05:31:38Z"
+    },
+    {
+      "event": "settle",
+      "job": null,
+      "ts_utc": "2026-10-19T05:31:41Z"
+    },
+    {
+      "event": "retry",
+      "job": null,
+      "ts_utc": "2026-10-19T05:41:30Z"
+    },
+    {
+      "event": "reserve",
+      "job": "bringup_gpu",
+      "ts_utc": "2026-10-19T05:41:30Z"
+    },
+    {
+      "event": "settle",
+      "job": null,
+      "ts_utc": "2026-10-19T05:43:17Z"
+    },
+    {
+      "event": "ENTRY_GATE_UNRESOLVED",
+      "job": null,
+      "ts_utc": "2026-10-19T05:45:01Z"
+    }
+  ],
+  "projection": {
+    "already_used_equals_two_settled_jobs_plus_open_5400s_reservation": true,
+    "already_used_gpu_h": 1.517,
+    "detector_gpu_h": 0.09,
+    "generate_gpu_h": 2.68,
+    "load_gpu_h": 0.14,
+    "projected_gpu_h": 8.16,
+    "seconds_per_processed_timestep": 1.3499,
+    "train_gpu_h": 3.37,
+    "usable_non_eval_gpu_h": 16.0
+  },
+  "qualification_note": "Counts re-aggregated from the published per-image records and checked equal to qualification.json. No inference was re-run; the records hold no predicted boxes/labels, so IoU matching cannot be independently reconstructed from them.",
+  "qualification_recount_from_published_records": {
+    "detr_resnet50_no_timm": {
+      "frozen_gate_all_classes": false,
+      "frozen_gate_failing_classes": [
+        "bench"
+      ],
+      "missing_measurements": 0,
+      "per_class": {
+        "airplane": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 19,
+          "positives_image_level_detected": 19,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "bench": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": false,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 19,
+          "positives_box_matched_iou50": 15,
+          "positives_image_level_detected": 17,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "car": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 19,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "fire hydrant": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 18,
+          "positives_image_level_detected": 18,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "motorcycle": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "person": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 19,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "stop sign": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        }
+      },
+      "published_verdict": "QUALIFIED",
+      "raw_record_fields": [
+        "best_iou",
+        "best_score",
+        "box_match_iou50",
+        "detected",
+        "group",
+        "image_id",
+        "is_supercategory_confounder",
+        "missing_measurement",
+        "n_detections"
+      ],
+      "records": 280,
+      "unique_photographs": 264
+    },
+    "rtdetr_r50vd": {
+      "frozen_gate_all_classes": true,
+      "frozen_gate_failing_classes": [],
+      "missing_measurements": 0,
+      "per_class": {
+        "airplane": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "bench": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 19,
+          "positives_box_matched_iou50": 16,
+          "positives_image_level_detected": 17,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "car": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 19,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "fire hydrant": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "motorcycle": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "person": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 19,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        },
+        "stop sign": {
+          "frozen_gate": "positives_box_matched_iou50>=16 and negatives_clean>=16",
+          "frozen_gate_passed": true,
+          "n_neg": 20,
+          "n_pos": 20,
+          "negatives_clean": 20,
+          "positives_box_matched_iou50": 20,
+          "positives_image_level_detected": 20,
+          "published_flag_passed": true,
+          "published_predicate": "positives_image_level_detected>=16 and negatives_clean>=16"
+        }
+      },
+      "published_verdict": "QUALIFIED",
+      "raw_record_fields": [
+        "best_iou",
+        "best_score",
+        "box_match_iou50",
+        "detected",
+        "group",
+        "image_id",
+        "is_supercategory_confounder",
+        "missing_measurement",
+        "n_detections"
+      ],
+      "records": 280,
+      "unique_photographs": 264
+    }
+  },
+  "reviewed_head": "9940e9403452e2b382c108c2d4d50bd3d054d707"
+}
