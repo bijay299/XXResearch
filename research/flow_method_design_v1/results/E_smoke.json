@@ -3,7 +3,7 @@
   "family": "linear",
   "arm": "vau",
   "P": 40,
-  "cpu_s": 0.0057,
+  "cpu_s": 0.0063,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 96.5619,
@@ -33,13 +33,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "linear",
   "arm": "vau_nogate",
   "P": 40,
-  "cpu_s": 0.0038,
+  "cpu_s": 0.0042,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 96.5619,
@@ -69,13 +71,20 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "linear",
+  "arm": "vau_blocksplit",
+  "status": "NOT_APPLICABLE"
  },
  {
   "family": "linear",
   "arm": "post_euclid",
   "P": 40,
-  "cpu_s": 0.0038,
+  "cpu_s": 0.0042,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 96.7975,
@@ -105,13 +114,53 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "linear",
+  "arm": "post_euclid_reject",
+  "P": 40,
+  "cpu_s": 0.0043,
+  "accepted": 5,
+  "loss_first": 100.0053,
+  "loss_last": 96.7975,
+  "R1_drift": 0.000840924628558038,
+  "ops": {
+   "calls": {
+    "forward": 8,
+    "vjp": 29,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 0,
+    "gate_forward": 0,
+    "gate_base": 0,
+    "solve": 5,
+    "probe_build": 3,
+    "gate_try": 0,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 79,
+    "vjp": 247,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 0,
+    "gate_forward": 0,
+    "gate_base": 0
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "linear",
   "arm": "pre_proj",
   "P": 40,
-  "cpu_s": 0.004,
+  "cpu_s": 0.0042,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 96.0113,
@@ -141,13 +190,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "linear",
   "arm": "penalty",
   "P": 40,
-  "cpu_s": 0.0023,
+  "cpu_s": 0.0024,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 93.7587,
@@ -177,13 +228,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "linear",
   "arm": "adamw",
   "P": 40,
-  "cpu_s": 0.0019,
+  "cpu_s": 0.0021,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 93.7586,
@@ -213,13 +266,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "linear",
   "arm": "adamw_stepmatch",
   "P": 40,
-  "cpu_s": 0.002,
+  "cpu_s": 0.0021,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 94.4511,
@@ -249,13 +304,25 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "linear",
+  "arm": "na_lora",
+  "status": "NOT_APPLICABLE"
+ },
+ {
+  "family": "linear",
+  "arm": "gated_na_lora",
+  "status": "NOT_APPLICABLE"
  },
  {
   "family": "linear",
   "arm": "gated_adamw",
   "P": 40,
-  "cpu_s": 0.0025,
+  "cpu_s": 0.0026,
   "accepted": 5,
   "loss_first": 100.0053,
   "loss_last": 93.7586,
@@ -285,11 +352,51 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "linear",
   "arm": "gated_penalty",
+  "P": 40,
+  "cpu_s": 0.0031,
+  "accepted": 5,
+  "loss_first": 100.0053,
+  "loss_last": 93.7587,
+  "R1_drift": 0.0031867196072924465,
+  "ops": {
+   "calls": {
+    "forward": 10,
+    "vjp": 10,
+    "jvp": 0,
+    "teacher": 11,
+    "rollout_forward": 0,
+    "gate_forward": 5,
+    "gate_base": 5,
+    "solve": 0,
+    "probe_build": 0,
+    "gate_try": 5,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 95,
+    "vjp": 95,
+    "jvp": 0,
+    "teacher": 118,
+    "rollout_forward": 0,
+    "gate_forward": 80,
+    "gate_base": 80
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "linear",
+  "arm": "earlystop_penalty",
   "P": 40,
   "cpu_s": 0.003,
   "accepted": 5,
@@ -321,49 +428,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
- },
- {
-  "family": "linear",
-  "arm": "earlystop_penalty",
-  "P": 40,
-  "cpu_s": 0.0032,
-  "accepted": 5,
-  "loss_first": 100.0053,
-  "loss_last": 93.7587,
-  "R1_drift": 0.0031867196072924465,
-  "ops": {
-   "calls": {
-    "forward": 10,
-    "vjp": 10,
-    "jvp": 0,
-    "teacher": 11,
-    "rollout_forward": 0,
-    "gate_forward": 5,
-    "gate_base": 5,
-    "solve": 0,
-    "probe_build": 0,
-    "gate_try": 5,
-    "rejected_step": 0,
-    "nonprogress_zeroed": 0,
-    "step": 5
-   },
-   "samples": {
-    "forward": 95,
-    "vjp": 95,
-    "jvp": 0,
-    "teacher": 118,
-    "rollout_forward": 0,
-    "gate_forward": 80,
-    "gate_base": 80
-   }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "vau",
   "P": 88,
-  "cpu_s": 0.0064,
+  "cpu_s": 0.0066,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.4945,
@@ -393,13 +466,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "vau_nogate",
   "P": 88,
-  "cpu_s": 0.0053,
+  "cpu_s": 0.0055,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.4945,
@@ -429,13 +504,53 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "mlp",
+  "arm": "vau_blocksplit",
+  "P": 88,
+  "cpu_s": 0.0062,
+  "accepted": 5,
+  "loss_first": 94.4188,
+  "loss_last": 94.4953,
+  "R1_drift": 2.9888295291905087e-05,
+  "ops": {
+   "calls": {
+    "forward": 8,
+    "vjp": 29,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 0,
+    "gate_forward": 5,
+    "gate_base": 5,
+    "solve": 5,
+    "probe_build": 3,
+    "gate_try": 5,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 79,
+    "vjp": 247,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 0,
+    "gate_forward": 80,
+    "gate_base": 80
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "post_euclid",
   "P": 88,
-  "cpu_s": 0.0051,
+  "cpu_s": 0.0053,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.6675,
@@ -465,13 +580,53 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "mlp",
+  "arm": "post_euclid_reject",
+  "P": 88,
+  "cpu_s": 0.0056,
+  "accepted": 5,
+  "loss_first": 94.4188,
+  "loss_last": 94.6675,
+  "R1_drift": 1.5902472414254245e-05,
+  "ops": {
+   "calls": {
+    "forward": 8,
+    "vjp": 29,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 0,
+    "gate_forward": 0,
+    "gate_base": 0,
+    "solve": 5,
+    "probe_build": 3,
+    "gate_try": 0,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 79,
+    "vjp": 247,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 0,
+    "gate_forward": 0,
+    "gate_base": 0
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "pre_proj",
   "P": 88,
-  "cpu_s": 0.0051,
+  "cpu_s": 0.0054,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.5795,
@@ -501,13 +656,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "penalty",
   "P": 88,
-  "cpu_s": 0.0029,
+  "cpu_s": 0.0032,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.2828,
@@ -537,13 +694,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "adamw",
   "P": 88,
-  "cpu_s": 0.0021,
+  "cpu_s": 0.0022,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.2828,
@@ -573,13 +732,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "adamw_stepmatch",
   "P": 88,
-  "cpu_s": 0.0022,
+  "cpu_s": 0.0024,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.4173,
@@ -609,13 +770,109 @@
     "gate_forward": 0,
     "gate_base": 0
    }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "mlp",
+  "arm": "na_lora",
+  "P": 88,
+  "cpu_s": 0.0024,
+  "accepted": 5,
+  "loss_first": 94.4188,
+  "loss_last": 94.5669,
+  "R1_drift": 6.295383505715777e-32,
+  "ops": {
+   "calls": {
+    "forward": 6,
+    "vjp": 5,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 0,
+    "gate_forward": 0,
+    "gate_base": 0,
+    "solve": 0,
+    "probe_build": 1,
+    "gate_try": 0,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 63,
+    "vjp": 55,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 0,
+    "gate_forward": 0,
+    "gate_base": 0
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": {
+   "fc1": [
+    6,
+    8
+   ],
+   "fc2": [
+    8,
+    16
+   ]
+  }
+ },
+ {
+  "family": "mlp",
+  "arm": "gated_na_lora",
+  "P": 88,
+  "cpu_s": 0.0031,
+  "accepted": 5,
+  "loss_first": 94.4188,
+  "loss_last": 94.5669,
+  "R1_drift": 6.295383505715777e-32,
+  "ops": {
+   "calls": {
+    "forward": 6,
+    "vjp": 5,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 0,
+    "gate_forward": 5,
+    "gate_base": 5,
+    "solve": 0,
+    "probe_build": 1,
+    "gate_try": 5,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 63,
+    "vjp": 55,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 0,
+    "gate_forward": 80,
+    "gate_base": 80
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": {
+   "fc1": [
+    6,
+    8
+   ],
+   "fc2": [
+    8,
+    16
+   ]
   }
  },
  {
   "family": "mlp",
   "arm": "gated_adamw",
   "P": 88,
-  "cpu_s": 0.003,
+  "cpu_s": 0.0029,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.2828,
@@ -645,13 +902,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
   "arm": "gated_penalty",
   "P": 88,
-  "cpu_s": 0.0037,
+  "cpu_s": 0.0038,
   "accepted": 5,
   "loss_first": 94.4188,
   "loss_last": 94.2828,
@@ -681,7 +940,9 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "mlp",
@@ -717,13 +978,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "vau",
   "P": 128,
-  "cpu_s": 0.0275,
+  "cpu_s": 0.0287,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 329.4034,
@@ -753,13 +1016,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "vau_nogate",
   "P": 128,
-  "cpu_s": 0.0236,
+  "cpu_s": 0.0256,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 329.4034,
@@ -789,13 +1054,53 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "flow",
+  "arm": "vau_blocksplit",
+  "P": 128,
+  "cpu_s": 0.031,
+  "accepted": 5,
+  "loss_first": 464.1641,
+  "loss_last": 329.4419,
+  "R1_drift": 1.4996936308441776e-05,
+  "ops": {
+   "calls": {
+    "forward": 8,
+    "vjp": 29,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 55,
+    "gate_forward": 5,
+    "gate_base": 5,
+    "solve": 5,
+    "probe_build": 3,
+    "gate_try": 5,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 79,
+    "vjp": 247,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 55,
+    "gate_forward": 80,
+    "gate_base": 80
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "post_euclid",
   "P": 128,
-  "cpu_s": 0.0234,
+  "cpu_s": 0.029,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 329.2242,
@@ -825,13 +1130,53 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "flow",
+  "arm": "post_euclid_reject",
+  "P": 128,
+  "cpu_s": 0.0258,
+  "accepted": 5,
+  "loss_first": 464.1641,
+  "loss_last": 329.2242,
+  "R1_drift": 5.151313871355424e-06,
+  "ops": {
+   "calls": {
+    "forward": 8,
+    "vjp": 29,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 55,
+    "gate_forward": 0,
+    "gate_base": 0,
+    "solve": 5,
+    "probe_build": 3,
+    "gate_try": 0,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 79,
+    "vjp": 247,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 55,
+    "gate_forward": 0,
+    "gate_base": 0
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "pre_proj",
   "P": 128,
-  "cpu_s": 0.0234,
+  "cpu_s": 0.0258,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 329.3729,
@@ -861,13 +1206,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "penalty",
   "P": 128,
-  "cpu_s": 0.016,
+  "cpu_s": 0.0186,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 326.5041,
@@ -897,13 +1244,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "adamw",
   "P": 128,
-  "cpu_s": 0.0137,
+  "cpu_s": 0.0157,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 326.5038,
@@ -933,13 +1282,15 @@
     "gate_forward": 0,
     "gate_base": 0
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "adamw_stepmatch",
   "P": 128,
-  "cpu_s": 0.014,
+  "cpu_s": 0.0151,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 326.7832,
@@ -969,13 +1320,125 @@
     "gate_forward": 0,
     "gate_base": 0
    }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
+ },
+ {
+  "family": "flow",
+  "arm": "na_lora",
+  "P": 128,
+  "cpu_s": 0.0155,
+  "accepted": 5,
+  "loss_first": 464.1641,
+  "loss_last": 330.8481,
+  "R1_drift": 0.0,
+  "ops": {
+   "calls": {
+    "forward": 6,
+    "vjp": 5,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 55,
+    "gate_forward": 0,
+    "gate_base": 0,
+    "solve": 0,
+    "probe_build": 1,
+    "gate_try": 0,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 63,
+    "vjp": 55,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 55,
+    "gate_forward": 0,
+    "gate_base": 0
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": {
+   "to_q": [
+    8,
+    8
+   ],
+   "to_k": [
+    8,
+    8
+   ],
+   "add_q_proj": [
+    8,
+    8
+   ],
+   "add_k_proj": [
+    8,
+    8
+   ]
+  }
+ },
+ {
+  "family": "flow",
+  "arm": "gated_na_lora",
+  "P": 128,
+  "cpu_s": 0.0176,
+  "accepted": 5,
+  "loss_first": 464.1641,
+  "loss_last": 330.8481,
+  "R1_drift": 0.0,
+  "ops": {
+   "calls": {
+    "forward": 6,
+    "vjp": 5,
+    "jvp": 0,
+    "teacher": 10,
+    "rollout_forward": 55,
+    "gate_forward": 5,
+    "gate_base": 5,
+    "solve": 0,
+    "probe_build": 1,
+    "gate_try": 5,
+    "rejected_step": 0,
+    "nonprogress_zeroed": 0,
+    "step": 5
+   },
+   "samples": {
+    "forward": 63,
+    "vjp": 55,
+    "jvp": 0,
+    "teacher": 110,
+    "rollout_forward": 55,
+    "gate_forward": 80,
+    "gate_base": 80
+   }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": {
+   "to_q": [
+    8,
+    8
+   ],
+   "to_k": [
+    8,
+    8
+   ],
+   "add_q_proj": [
+    8,
+    8
+   ],
+   "add_k_proj": [
+    8,
+    8
+   ]
   }
  },
  {
   "family": "flow",
   "arm": "gated_adamw",
   "P": 128,
-  "cpu_s": 0.0165,
+  "cpu_s": 0.0181,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 326.5038,
@@ -1005,13 +1468,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "gated_penalty",
   "P": 128,
-  "cpu_s": 0.0202,
+  "cpu_s": 0.0214,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 326.5041,
@@ -1041,13 +1506,15 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  },
  {
   "family": "flow",
   "arm": "earlystop_penalty",
   "P": 128,
-  "cpu_s": 0.0193,
+  "cpu_s": 0.0213,
   "accepted": 5,
   "loss_first": 464.1641,
   "loss_last": 326.5041,
@@ -1077,6 +1544,8 @@
     "gate_forward": 80,
     "gate_base": 80
    }
-  }
+  },
+  "status": "OK",
+  "na_lora_feature_ranks": null
  }
 ]

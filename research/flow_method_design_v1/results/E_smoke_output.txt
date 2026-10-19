@@ -1,33 +1,45 @@
 family  arm                  P   cpu_s acc       fwd       vjp     teach    roll  gate_f solve probe rej  R1_drift
-linear  vau                 40  0.0057   5      8/79    29/247    10/110     0/0    5/80     5     3   0  1.28e-03
-linear  vau_nogate          40  0.0038   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.28e-03
-linear  post_euclid         40  0.0038   5      8/79    29/247    10/110     0/0     0/0     5     3   0  8.41e-04
-linear  pre_proj            40  0.0040   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.93e-03
-linear  penalty             40  0.0023   5     10/95     10/95    11/118     0/0     0/0     0     0   0  3.19e-03
-linear  adamw               40  0.0019   5      5/55      5/55    10/110     0/0     0/0     0     0   0  3.19e-03
-linear  adamw_stepmatch     40  0.0020   5      5/55      5/55    10/110     0/0     0/0     0     0   0  2.38e-03
-linear  gated_adamw         40  0.0025   5      5/55      5/55    10/110     0/0    5/80     0     0   0  3.19e-03
-linear  gated_penalty       40  0.0030   5     10/95     10/95    11/118     0/0    5/80     0     0   0  3.19e-03
-linear  earlystop_penalty   40  0.0032   5     10/95     10/95    11/118     0/0    5/80     0     0   0  3.19e-03
-mlp     vau                 88  0.0064   5      8/79    29/247    10/110     0/0    5/80     5     3   0  1.52e-05
-mlp     vau_nogate          88  0.0053   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.52e-05
-mlp     post_euclid         88  0.0051   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.59e-05
-mlp     pre_proj            88  0.0051   5      8/79    29/247    10/110     0/0     0/0     5     3   0  2.75e-05
-mlp     penalty             88  0.0029   5     10/95     10/95    11/118     0/0     0/0     0     0   0  6.49e-05
-mlp     adamw               88  0.0021   5      5/55      5/55    10/110     0/0     0/0     0     0   0  6.49e-05
-mlp     adamw_stepmatch     88  0.0022   5      5/55      5/55    10/110     0/0     0/0     0     0   0  4.38e-05
-mlp     gated_adamw         88  0.0030   5      5/55      5/55    10/110     0/0    5/80     0     0   0  6.49e-05
-mlp     gated_penalty       88  0.0037   5     10/95     10/95    11/118     0/0    5/80     0     0   0  6.49e-05
+linear  vau                 40  0.0063   5      8/79    29/247    10/110     0/0    5/80     5     3   0  1.28e-03
+linear  vau_nogate          40  0.0042   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.28e-03
+linear  vau_blocksplit     NOT_APPLICABLE (no LoRA in the linear reference)
+linear  post_euclid         40  0.0042   5      8/79    29/247    10/110     0/0     0/0     5     3   0  8.41e-04
+linear  post_euclid_reject   40  0.0043   5      8/79    29/247    10/110     0/0     0/0     5     3   0  8.41e-04
+linear  pre_proj            40  0.0042   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.93e-03
+linear  penalty             40  0.0024   5     10/95     10/95    11/118     0/0     0/0     0     0   0  3.19e-03
+linear  adamw               40  0.0021   5      5/55      5/55    10/110     0/0     0/0     0     0   0  3.19e-03
+linear  adamw_stepmatch     40  0.0021   5      5/55      5/55    10/110     0/0     0/0     0     0   0  2.38e-03
+linear  na_lora            NOT_APPLICABLE (no LoRA in the linear reference)
+linear  gated_na_lora      NOT_APPLICABLE (no LoRA in the linear reference)
+linear  gated_adamw         40  0.0026   5      5/55      5/55    10/110     0/0    5/80     0     0   0  3.19e-03
+linear  gated_penalty       40  0.0031   5     10/95     10/95    11/118     0/0    5/80     0     0   0  3.19e-03
+linear  earlystop_penalty   40  0.0030   5     10/95     10/95    11/118     0/0    5/80     0     0   0  3.19e-03
+mlp     vau                 88  0.0066   5      8/79    29/247    10/110     0/0    5/80     5     3   0  1.52e-05
+mlp     vau_nogate          88  0.0055   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.52e-05
+mlp     vau_blocksplit      88  0.0062   5      8/79    29/247    10/110     0/0    5/80     5     3   0  2.99e-05
+mlp     post_euclid         88  0.0053   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.59e-05
+mlp     post_euclid_reject   88  0.0056   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.59e-05
+mlp     pre_proj            88  0.0054   5      8/79    29/247    10/110     0/0     0/0     5     3   0  2.75e-05
+mlp     penalty             88  0.0032   5     10/95     10/95    11/118     0/0     0/0     0     0   0  6.49e-05
+mlp     adamw               88  0.0022   5      5/55      5/55    10/110     0/0     0/0     0     0   0  6.49e-05
+mlp     adamw_stepmatch     88  0.0024   5      5/55      5/55    10/110     0/0     0/0     0     0   0  4.38e-05
+mlp     na_lora             88  0.0024   5      6/63      5/55    10/110     0/0     0/0     0     1   0  6.30e-32
+mlp     gated_na_lora       88  0.0031   5      6/63      5/55    10/110     0/0    5/80     0     1   0  6.30e-32
+mlp     gated_adamw         88  0.0029   5      5/55      5/55    10/110     0/0    5/80     0     0   0  6.49e-05
+mlp     gated_penalty       88  0.0038   5     10/95     10/95    11/118     0/0    5/80     0     0   0  6.49e-05
 mlp     earlystop_penalty   88  0.0036   5     10/95     10/95    11/118     0/0    5/80     0     0   0  6.49e-05
-flow    vau                128  0.0275   5      8/79    29/247    10/110   55/55    5/80     5     3   0  1.70e-05
-flow    vau_nogate         128  0.0236   5      8/79    29/247    10/110   55/55     0/0     5     3   0  1.70e-05
-flow    post_euclid        128  0.0234   5      8/79    29/247    10/110   55/55     0/0     5     3   0  5.15e-06
-flow    pre_proj           128  0.0234   5      8/79    29/247    10/110   55/55     0/0     5     3   0  2.91e-05
-flow    penalty            128  0.0160   5     10/95     10/95    11/118   55/55     0/0     0     0   0  4.48e-04
-flow    adamw              128  0.0137   5      5/55      5/55    10/110   55/55     0/0     0     0   0  4.48e-04
-flow    adamw_stepmatch    128  0.0140   5      5/55      5/55    10/110   55/55     0/0     0     0   0  3.68e-04
-flow    gated_adamw        128  0.0165   5      5/55      5/55    10/110   55/55    5/80     0     0   0  4.48e-04
-flow    gated_penalty      128  0.0202   5     10/95     10/95    11/118   55/55    5/80     0     0   0  4.48e-04
-flow    earlystop_penalty  128  0.0193   5     10/95     10/95    11/118   55/55    5/80     0     0   0  4.48e-04
+flow    vau                128  0.0287   5      8/79    29/247    10/110   55/55    5/80     5     3   0  1.70e-05
+flow    vau_nogate         128  0.0256   5      8/79    29/247    10/110   55/55     0/0     5     3   0  1.70e-05
+flow    vau_blocksplit     128  0.0310   5      8/79    29/247    10/110   55/55    5/80     5     3   0  1.50e-05
+flow    post_euclid        128  0.0290   5      8/79    29/247    10/110   55/55     0/0     5     3   0  5.15e-06
+flow    post_euclid_reject  128  0.0258   5      8/79    29/247    10/110   55/55     0/0     5     3   0  5.15e-06
+flow    pre_proj           128  0.0258   5      8/79    29/247    10/110   55/55     0/0     5     3   0  2.91e-05
+flow    penalty            128  0.0186   5     10/95     10/95    11/118   55/55     0/0     0     0   0  4.48e-04
+flow    adamw              128  0.0157   5      5/55      5/55    10/110   55/55     0/0     0     0   0  4.48e-04
+flow    adamw_stepmatch    128  0.0151   5      5/55      5/55    10/110   55/55     0/0     0     0   0  3.68e-04
+flow    na_lora            128  0.0155   5      6/63      5/55    10/110   55/55     0/0     0     1   0  0.00e+00
+flow    gated_na_lora      128  0.0176   5      6/63      5/55    10/110   55/55    5/80     0     1   0  0.00e+00
+flow    gated_adamw        128  0.0181   5      5/55      5/55    10/110   55/55    5/80     0     0   0  4.48e-04
+flow    gated_penalty      128  0.0214   5     10/95     10/95    11/118   55/55    5/80     0     0   0  4.48e-04
+flow    earlystop_penalty  128  0.0213   5     10/95     10/95    11/118   55/55    5/80     0     0   0  4.48e-04
 ops shown as calls/samples; cpu_s = process CPU seconds of arm.step over 5 steps (measured; retained-batch generation excluded)
-{"label": "E_smoke", "cmd": "/tmp/claude-0/venv/bin/python code/smoke.py", "rc": 0, "status": "ok", "wall_s": 1.676, "cpu_s": 2.185, "peak_rss_kib": 61628, "utc": "2026-10-19T23:38:47Z"}
+{"label": "E_smoke_v3", "cmd": "/tmp/claude-0/venv/bin/python code/smoke.py", "rc": 0, "status": "ok", "wall_s": 2.331, "cpu_s": 2.853, "peak_rss_kib": 62480, "utc": "2026-10-19T23:45:51Z"}

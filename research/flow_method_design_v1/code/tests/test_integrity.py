@@ -14,7 +14,9 @@ from vau.models import sample
 from vau.projections import euclid_project, metric_project
 from vau.tasks import ANCHOR, TARGET, input_hashes
 
-UNGATED = ("adamw", "adamw_stepmatch", "penalty", "pre_proj", "post_euclid", "vau_nogate")
+UNGATED = ("adamw", "adamw_stepmatch", "penalty", "pre_proj", "post_euclid", "post_euclid_reject", "vau_nogate",
+           "vau_blocksplit_nogate", "na_lora")
+LORA_ONLY = ("vau_blocksplit_nogate", "na_lora")
 NR, N2, R = 8, 5, 3
 
 
@@ -26,7 +28,7 @@ def stream(task, T, seed=1):
 
 def run(arm, task, th0, R1, batches, sketch_seed=3):
     ms = arm.init_state(th0, R1, dev_rng(sketch_seed))
-    th, traj = th0, []
+    th, traj = arm.initial_theta(ms), []
     for b in batches:
         th, info = arm.step(ms, th, b)
         traj.append(th)
@@ -90,9 +92,11 @@ def test_I4_exact_J_residual(name):
 @pytest.mark.parametrize("name", list(UNGATED) + ["vau", "gated_adamw", "earlystop_penalty"])
 def test_I5_lr_zero(family, name):
     task, th0, R1 = fixture(family)
+    if family == "linear" and name in LORA_ONLY:
+        pytest.skip("NOT_APPLICABLE on the linear family")
     arm = make_arm(name, task, hp=aw.AdamWHP(lr=0.0), gate=gate(1.0), k=4, K=2)
-    tr, _ = run(arm, task, th0, R1, stream(task, 4))
-    assert all(np.array_equal(t, th0) for t in tr)
+    tr, ms = run(arm, task, th0, R1, stream(task, 4))
+    assert all(np.array_equal(t, arm.initial_theta(ms)) for t in tr)
 
 
 # ---- I6: gate with tau = inf == ungated arm bitwise ------------------------------------------------
@@ -102,7 +106,7 @@ def test_I6_infinite_budget_gate_is_identity(family, name):
     task, th0, R1 = fixture(family)
     bs = stream(task, 6)
     a, _ = run(make_arm(name, task, k=4, K=2), task, th0, R1, bs)
-    gname = "vau" if name == "vau_nogate" else f"gated_{name}"
+    gname = {"vau_nogate": "vau", "vau_blocksplit_nogate": "vau_blocksplit"}.get(name, f"gated_{name}")
     b, ms = run(make_arm(gname, task, gate=gate(np.inf), k=4, K=2), task, th0, R1, bs)
     assert np.array_equal(a, b) and ms.ops.calls["rejected_step"] == 0
 

@@ -9,7 +9,15 @@ Each arm is split into `propose` (proposal step + tentative AdamW state, nothing
 of (theta, m, v, t) on rejection; VAU = Gated(VAUNoGate). `EarlyStop(arm, gate)` is penalty_earlystop's
 wrapper (s = 1 tries only, the run stops permanently at the first failure).
 
-Arms: adamw, adamw_stepmatch, penalty, pre_proj, post_euclid, vau_nogate; vau, gated_<arm>, earlystop_<arm>.
+Arms: adamw, adamw_stepmatch, penalty, pre_proj, post_euclid (no reject rule), post_euclid_reject, vau_nogate,
+vau_blocksplit_nogate, na_lora; wrappers vau (= Gated(vau_nogate)), vau_blocksplit, gated_<arm>, earlystop_<arm>.
+LoRA-only arms (na_lora, vau_blocksplit*) raise NotApplicable (status 'NOT_APPLICABLE') on the linear family;
+`arm_status(name, task)` returns 'OK' | 'NOT_APPLICABLE' without raising.
+
+Spec fixes (F_REVIEW 4.2): the Adam counter t advances only on commit (AdamState.t; bias correction uses it);
+when the reject rule zeroes Delta1 the step is a NULL step: no gate evaluation, no state commit, theta unchanged;
+mu = max(1e-6 tr(G0)/k, 1e-12); when S is empty or zero the correction (projection AND reject rule) is skipped,
+so VAU with no probes and no gate is bitwise AdamW.
 Common config: probe ('sketch' | 'exact'), k (0..64; k = 0 means no probes), K (refresh period in step
 calls; K = None means build once at the first call), ridge_rel (default 1e-6), reject_nonprogress,
 inject (hook (ms, theta, delta) -> delta applied to the final proposed step, e.g. the G5 gauge injection).
@@ -25,6 +33,7 @@ import numpy as np
 from . import adamw as aw
 from . import losses
 from .contracts import ContractViolation, Ops, check_vec
+from .models import LoraLayout
 from .projections import RIDGE_REL, euclid_project, exact_probe, metric_project, sketch_probe
 
 
@@ -55,6 +64,12 @@ class Proposal:
     D: np.ndarray                       # Adam diagonal of the tentative state (for H-norms)
     loss: float
     info: dict
+    null_step: bool = False             # reject rule fired: no gate, no commit, theta unchanged
+
+
+class NotApplicable(Exception):
+    """Arm not applicable to this model family (e.g. LoRA-specific arms on the linear reference)."""
+    status = "NOT_APPLICABLE"
 
 
 @dataclass(frozen=True)
@@ -85,8 +100,13 @@ class Arm:
     name = "base"
     uses_probe = False
 
+    default_reject = False
+    needs_lora = False
+
     def __init__(self, task, hp=aw.AdamWHP(), probe="sketch", k=16, K=5, ridge_rel=RIDGE_REL,
-                 reject_nonprogress=True, inject=None):
+                 reject_nonprogress=None, inject=None):
+        if self.needs_lora and not isinstance(getattr(task.model, "lora", None), LoraLayout):
+            raise NotApplicable(f"{self.name} needs a LoRA model; family {task.family!r} has none")
         if probe not in ("sketch", "exact"):
             raise ContractViolation(f"probe must be 'sketch' or 'exact', got {probe!r}")
         if not (K is None or (isinstance(K, int) and K >= 1)):
@@ -95,7 +115,8 @@ class Arm:
             raise ContractViolation("ridge_rel must be >= 0")
         self.task, self.model, self.hp = task, task.model, hp
         self.probe_kind, self.k, self.K, self.ridge_rel = probe, k, K, ridge_rel
-        self.reject_nonprogress, self.inject = reject_nonprogress, inject
+        self.reject_nonprogress = self.default_reject if reject_nonprogress is None else reject_nonprogress
+        self.inject = inject
 
     # --- lifecycle ---------------------------------------------------------------------------
     def init_state(self, theta0, R1, sketch_rng):
@@ -104,6 +125,10 @@ class Arm:
         if not isinstance(sketch_rng, np.random.Generator):
             raise ContractViolation("sketch_rng must be a numpy Generator (protocol stream 3)")
         return MethodState(adam=aw.init_state(self.model.P), theta0=theta0.copy(), R1=R1, rng=sketch_rng)
+
+    def initial_theta(self, ms):
+        """The parameters the run must start from (na_lora projects A at init; others: theta0)."""
+        return ms.theta0.copy()
 
     def _check_step_inputs(self, ms, theta, batch):
         if not isinstance(ms, MethodState) or not isinstance(batch, Batch):
@@ -126,16 +151,17 @@ class Arm:
         return ms.probe
 
     def _project(self, ms, x, S, w=None):
-        if S.shape[0] == 0:
-            return x.copy(), {"mu": 0.0}
+        """Correction; skipped (x returned as a bitwise copy, reject rule disabled) when S is empty or zero."""
+        if S.shape[0] == 0 or not np.any(S):
+            return x.copy(), {"mu": 0.0, "correction_skipped": True}
         ms.ops.add("solve")
         y, info = (euclid_project(x, S, ridge_rel=self.ridge_rel) if w is None
                    else metric_project(x, S, w, ridge_rel=self.ridge_rel))
-        return y, {"mu": info["mu"]}
+        return y, {"mu": info["mu"], "correction_skipped": False}
 
     def _nonprogress(self, ms, g, d1, info):
         info["progress_lin"] = float(-g @ d1)
-        if self.reject_nonprogress and g @ d1 >= 0:
+        if self.reject_nonprogress and not info.get("correction_skipped") and g @ d1 >= 0:
             ms.ops.add("nonprogress_zeroed")
             info["nonprogress_zeroed"] = True
             return np.zeros_like(d1)
@@ -157,9 +183,12 @@ class Arm:
     def step(self, ms, theta, batch):
         self._check_step_inputs(ms, theta, batch)
         prop = self.propose_final(ms, theta, batch)
-        ms.adam = aw.commit(ms.adam, prop.adam_next)
         ms.calls += 1
         ms.ops.add("step")
+        if prop.null_step:
+            return theta.copy(), dict(prop.info, arm=self.name, loss=prop.loss, s=0.0, accepted=False,
+                                      step_norm=0.0, step_Hnorm=0.0)
+        ms.adam = aw.commit(ms.adam, prop.adam_next)
         info = dict(prop.info, arm=self.name, loss=prop.loss, s=1.0, accepted=True,
                     step_norm=float(np.linalg.norm(prop.delta)), step_Hnorm=h_norm(prop.delta, prop.D))
         return theta + prop.delta, info
@@ -241,29 +270,96 @@ class PreProjArm(Arm):
 
 
 class PostEuclidArm(Arm):
-    """Adam-NSCL-style / VAU-Euclid: Euclidean projection of the ACTUAL AdamW step, with the reject rule."""
+    """Adam-NSCL-style: Euclidean projection of the ACTUAL AdamW step, NO reject rule."""
     name = "post_euclid"
     uses_probe = True
 
+    def _metric(self, ms, D):
+        return None                      # Euclidean
+
     def propose(self, ms, theta, batch):
         loss, g = self._grad(ms, theta, batch)
         d0, nxt, D = aw.peek(ms.adam, g, theta, self.hp)
-        d1, info = self._project(ms, d0, self._probe(ms, theta))
+        d1, info = self._project(ms, d0, self._probe(ms, theta), w=self._metric(ms, D))
         d1 = self._nonprogress(ms, g, d1, info)
-        return Proposal(d1, nxt, g, D, loss, info)
+        return Proposal(d1, nxt, g, D, loss, info, null_step=info["nonprogress_zeroed"])
 
 
-class VAUNoGate(Arm):
+class PostEuclidRejectArm(PostEuclidArm):
+    """VAU-Euclid: Euclidean post-projection WITH VAU's reject rule (g.Delta1 >= 0 -> null step)."""
+    name = "post_euclid_reject"
+    default_reject = True
+
+
+class VAUNoGate(PostEuclidArm):
     """D-metric projection of the actual AdamW step, reject rule, s = 1 always."""
     name = "vau_nogate"
-    uses_probe = True
+    default_reject = True
+
+    def _metric(self, ms, D):
+        return D
+
+
+class VAUBlockSplitNoGate(VAUNoGate):
+    """Ablation (F_REVIEW 2.3): metric D normalised per LoRA factor block and layer, D_A/mean(D_A),
+    D_B/mean(D_B), so the 1/eps entries of D_A under zero-init B no longer route the correction through A."""
+    name = "vau_blocksplit_nogate"
+    needs_lora = True
+
+    def _metric(self, ms, D):
+        w = np.empty_like(D)
+        for sa, sb, _, _ in self.model.lora.slices.values():
+            for sl in (sa, sb):
+                w[sl] = D[sl] / np.mean(D[sl])
+        return w
+
+
+class NALoraArm(Arm):
+    """Null-A LoRA (InfLoRA-style; a KNOWN method used as a strong control). At init, per LoRA module l, the
+    retained input-feature basis U_l (left singular vectors of the module's input rows on R1, relative tol
+    rel_tol) is computed with ONE forward at theta0; A_l <- A_l (I - U_l U_l^T) and A is FROZEN; only the B
+    blocks are trained with plain AdamW (state over B only; no weight decay on A). LoRA output is then exactly
+    0 on every probed input for every B (exact retention on R1), at a probe cost of 1 forward and 0 VJPs.
+    The run must start from arm.initial_theta(ms)."""
+    name = "na_lora"
+    needs_lora = True
+
+    def __init__(self, task, hp=aw.AdamWHP(), rel_tol=1e-10, **kw):
+        super().__init__(task, hp, **kw)
+        self.rel_tol = rel_tol
+
+    def init_state(self, theta0, R1, sketch_rng):
+        ms = super().init_state(theta0, R1, sketch_rng)
+        lay = self.model.lora
+        feats = self.model.lora_inputs(R1, theta0)
+        ms.ops.add("forward", self.model.n(R1))
+        ms.ops.add("probe_build")
+        theta = theta0.copy()
+        ranks = {}
+        for name, (sa, sb, do, di) in lay.slices.items():
+            U, sv, _ = np.linalg.svd(feats[name].T, full_matrices=False)
+            U = U[:, sv > self.rel_tol * sv.max()] if sv.size and sv.max() > 0 else U[:, :0]
+            A = theta[sa].reshape(lay.r, di)
+            theta[sa] = (A - (A @ U) @ U.T).ravel()
+            ranks[name] = (U.shape[1], di)
+        idx_B = np.concatenate([np.arange(sb.start, sb.stop) for _, sb, _, _ in lay.slices.values()])
+        idx_A = np.setdiff1d(np.arange(self.model.P), idx_B)
+        ms.cache.update(theta_start=theta, idx_B=idx_B, idx_A=idx_A, feature_ranks=ranks)
+        ms.adam = aw.init_state(idx_B.size)
+        return ms
+
+    def initial_theta(self, ms):
+        return ms.cache["theta_start"].copy()
 
     def propose(self, ms, theta, batch):
+        idx_A, idx_B = ms.cache["idx_A"], ms.cache["idx_B"]
+        if not np.array_equal(theta[idx_A], ms.cache["theta_start"][idx_A]):
+            raise ContractViolation("na_lora: A must stay at its projected init (start from arm.initial_theta)")
         loss, g = self._grad(ms, theta, batch)
-        d0, nxt, D = aw.peek(ms.adam, g, theta, self.hp)
-        d1, info = self._project(ms, d0, self._probe(ms, theta), w=D)
-        d1 = self._nonprogress(ms, g, d1, info)
-        return Proposal(d1, nxt, g, D, loss, info)
+        dB, nxt, DB = aw.peek(ms.adam, g[idx_B], theta[idx_B], self.hp)
+        delta = np.zeros(self.model.P); delta[idx_B] = dB
+        D = np.ones(self.model.P); D[idx_B] = DB
+        return Proposal(delta, nxt, g, D, loss, {"progress_lin": float(-g @ delta)})
 
 
 class Gated(Arm):
@@ -285,11 +381,16 @@ class Gated(Arm):
             raise ContractViolation("gate must be a GateConfig")
         self.inner, self.gate = inner, gate
         self.task, self.model, self.hp = inner.task, inner.model, inner.hp
-        self.name = "vau" if (isinstance(inner, VAUNoGate) and type(self) is Gated) else self.prefix + inner.name
+        gated_names = {"vau_nogate": "vau", "vau_blocksplit_nogate": "vau_blocksplit"}
+        self.name = (gated_names[inner.name] if (inner.name in gated_names and type(self) is Gated)
+                     else self.prefix + inner.name)
         self.uses_probe = inner.uses_probe
 
     def init_state(self, theta0, R1, sketch_rng):
         return self.inner.init_state(theta0, R1, sketch_rng)
+
+    def initial_theta(self, ms):
+        return self.inner.initial_theta(ms)
 
     def propose(self, ms, theta, batch):
         return self.inner.propose_final(ms, theta, batch)
@@ -310,6 +411,12 @@ class Gated(Arm):
         if len(batch.gate) < self._n_tries():
             raise ContractViolation(f"gated step needs {self._n_tries()} fresh gate batches, got {len(batch.gate)}")
         prop = self.propose(ms, theta, batch)
+        if prop.null_step:                 # reject rule fired: skip the gate, commit nothing
+            ms.calls += 1
+            ms.ops.add("step")
+            return theta.copy(), dict(prop.info, arm=self.name, loss=prop.loss, s=0.0, accepted=False,
+                                      rho_hat=[], slack=self.gate.slack, step_norm=0.0, step_Hnorm=0.0,
+                                      progress_applied=0.0)
         s_acc, rhos = 0.0, []
         for i in range(self._n_tries()):
             s = 0.5 ** i
@@ -349,18 +456,30 @@ class EarlyStop(Gated):
             return theta.copy(), {"arm": self.name, "stopped": True, "accepted": False, "s": 0.0,
                                   "step_norm": 0.0, "step_Hnorm": 0.0}
         theta_new, info = super().step(ms, theta, batch)
-        if not info["accepted"]:
+        if not info["accepted"] and info.get("rho_hat"):     # a gate failure (not a reject-rule null step)
             ms.cache["stopped"] = True
         info["stopped"] = bool(ms.cache.get("stopped"))
         return theta_new, info
 
 
 ARMS = {"adamw": AdamWArm, "adamw_stepmatch": AdamWStepMatch, "penalty": PenaltyArm,
-        "pre_proj": PreProjArm, "post_euclid": PostEuclidArm, "vau_nogate": VAUNoGate}
+        "pre_proj": PreProjArm, "post_euclid": PostEuclidArm, "post_euclid_reject": PostEuclidRejectArm,
+        "vau_nogate": VAUNoGate, "vau_blocksplit_nogate": VAUBlockSplitNoGate, "na_lora": NALoraArm}
+GATED_ALIASES = {"vau": "vau_nogate", "vau_blocksplit": "vau_blocksplit_nogate"}
+
+
+def arm_status(name, task):
+    """'OK' or 'NOT_APPLICABLE' (explicit status instead of an exception)."""
+    try:
+        make_arm(name, task, gate=GateConfig(tau2=1.0, M=1.0, n2=1, delta=0.5, T=1))
+        return "OK"
+    except NotApplicable:
+        return NotApplicable.status
 
 
 def make_arm(name, task, hp=aw.AdamWHP(), gate: GateConfig | None = None, **cfg):
-    """'vau' = Gated(VAUNoGate); 'gated_<arm>' = Gated(<arm>); 'earlystop_<arm>' = EarlyStop(<arm>)."""
+    """'vau' = Gated(vau_nogate); 'vau_blocksplit' = Gated(vau_blocksplit_nogate); 'gated_<arm>' = Gated(<arm>);
+    'earlystop_<arm>' = EarlyStop(<arm>). Raises NotApplicable for LoRA-only arms on a non-LoRA model."""
     for prefix, wrapper in (("gated_", Gated), ("earlystop_", EarlyStop)):
         if name.startswith(prefix):
             if gate is None:
@@ -369,10 +488,10 @@ def make_arm(name, task, hp=aw.AdamWHP(), gate: GateConfig | None = None, **cfg)
             if inner not in ARMS:
                 raise ContractViolation(f"unknown arm {inner!r}")
             return wrapper(ARMS[inner](task, hp, **cfg), gate)
-    if name == "vau":
+    if name in GATED_ALIASES:
         if gate is None:
-            raise ContractViolation("vau needs a GateConfig")
-        return Gated(VAUNoGate(task, hp, **cfg), gate)
+            raise ContractViolation(f"{name} needs a GateConfig")
+        return Gated(ARMS[GATED_ALIASES[name]](task, hp, **cfg), gate)
     if name not in ARMS:
         raise ContractViolation(f"unknown arm {name!r}")
     return ARMS[name](task, hp, **cfg)

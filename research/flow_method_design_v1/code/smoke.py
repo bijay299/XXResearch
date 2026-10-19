@@ -14,11 +14,11 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vau import tasks  # noqa: E402
 from vau.seeds import streams  # noqa: E402
-from vau.methods import Batch, GateConfig, make_arm  # noqa: E402
+from vau.methods import Batch, GateConfig, arm_status, make_arm  # noqa: E402
 
 SEED, STEPS, NR, N2, R, K, KREF = 0, 5, 8, 16, 4, 8, 2
-ORDER = ("vau", "vau_nogate", "post_euclid", "pre_proj", "penalty", "adamw", "adamw_stepmatch", "gated_adamw",
-         "gated_penalty", "earlystop_penalty")
+ORDER = ("vau", "vau_nogate", "vau_blocksplit", "post_euclid", "post_euclid_reject", "pre_proj", "penalty", "adamw",
+         "adamw_stepmatch", "na_lora", "gated_na_lora", "gated_adamw", "gated_penalty", "earlystop_penalty")
 PROTOCOL_FAMILY = {"linear": "G1", "mlp": "G5", "flow": "G8"}   # stream derivation only
 
 
@@ -35,9 +35,12 @@ def run(family):
             cfg["lam"] = 1.0
         if name == "adamw_stepmatch":
             cfg["ref_norms"] = ref_norms
+        if arm_status(name, task) != "OK":
+            rows.append(dict(family=family, arm=name, status="NOT_APPLICABLE"))
+            continue
         arm = make_arm(name, task, gate=gate, **cfg)
         ms = arm.init_state(th0, R1, st["sketch"])
-        th, acc, loss0, losses = th0, 0, None, []
+        th, acc, loss0, losses = arm.initial_theta(ms), 0, None, []
         cpu = 0.0                                             # arm.step only (batch generation excluded)
         norms = []                                            # vau's H-norms feed adamw_stepmatch
         for _ in range(STEPS):
@@ -54,7 +57,8 @@ def run(family):
         drift = float(np.mean(np.sum((task.model.forward(R1, th) - task.model.forward(R1, th0)) ** 2, 1)))
         rows.append(dict(family=family, arm=arm.name, P=task.model.P, cpu_s=round(cpu, 4), accepted=acc,
                          loss_first=round(losses[0], 4), loss_last=round(losses[-1], 4), R1_drift=drift,
-                         ops=ms.ops.snapshot()))
+                         ops=ms.ops.snapshot(), status="OK",
+                         na_lora_feature_ranks=ms.cache.get("feature_ranks")))
     return rows
 
 
@@ -64,6 +68,9 @@ def main():
           f"{'roll':>7s} {'gate_f':>7s} {'solve':>5s} {'probe':>5s} {'rej':>3s} {'R1_drift':>9s}"
     print(hdr)
     for r in out:
+        if r.get("status") == "NOT_APPLICABLE":
+            print(f"{r['family']:7s} {r['arm']:17s}  NOT_APPLICABLE (no LoRA in the linear reference)")
+            continue
         c, s = r["ops"]["calls"], r["ops"]["samples"]
         f = lambda k: f"{c[k]}/{s[k]}"
         print(f"{r['family']:7s} {r['arm']:17s} {r['P']:4d} {r['cpu_s']:7.4f} {r['accepted']:3d} {f('forward'):>9s} "

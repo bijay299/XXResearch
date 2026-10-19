@@ -29,6 +29,7 @@ from typing import List, Optional
 import torch
 
 RIDGE_REL = 1e-6
+MU_FLOOR = 1e-12
 
 
 class ContractViolation(ValueError):
@@ -124,19 +125,20 @@ def adamw_peek(m, v, step, g, theta, lr, beta1, beta2, eps, wd):
 
 def weighted_null_project(x, S, w):
     """[projections.weighted_null_project] x1 = x - w*(S^T (S diag(w) S^T + mu I)^{-1} S x),
-    mu = 1e-6 tr(G0)/k. k x k Gram and solve in fp64; P-sized products in fp32."""
+    mu = max(1e-6 tr(G0)/k, 1e-12). k x k Gram and solve in fp64; P-sized products in fp32.
+    Returns (x1, mu, skipped); skipped = True (x returned unchanged) when S is empty or zero."""
     if S.shape[1] != x.shape[0] or w.shape != x.shape:
         raise ContractViolation("shape mismatch in projection")
     if not (torch.isfinite(x).all() and torch.isfinite(S).all() and (w > 0).all()):
         raise ContractViolation("nonfinite input or nonpositive metric")
+    if S.shape[0] == 0 or not bool(S.any()):
+        return x.clone(), 0.0, True
     G0 = ((S * w) @ S.T).double()
     tr = float(torch.trace(G0))
-    if tr == 0.0:
-        return x.clone(), 0.0
-    mu = RIDGE_REL * tr / S.shape[0]
+    mu = max(RIDGE_REL * tr / S.shape[0], MU_FLOOR)
     L = torch.linalg.cholesky(G0 + mu * torch.eye(S.shape[0], dtype=G0.dtype, device=G0.device))
     y = torch.cholesky_solve((S @ x).double().unsqueeze(1), L).squeeze(1).to(x.dtype)
-    return x - w * (S.T @ y), mu
+    return x - w * (S.T @ y), mu, False
 
 
 # --------------------------------------------------------------------------------------------------
@@ -270,13 +272,15 @@ class VAUAdamW:
         delta0, m1, v1, t1, D = adamw_peek(m, v, t, g, theta, lr, b1, b2, eps, wd)
         if self.S is None or self.calls % self.cfg.refresh == 0:
             self.S = self.build_probe()
-        delta1, mu = weighted_null_project(delta0, self.S, D)
-        self.ops["solve"] += 1
+        delta1, mu, skipped = weighted_null_project(delta0, self.S, D)
+        self.ops["solve"] += 0 if skipped else 1
         info = {"progress_lin": float(-(g @ delta1)), "mu": mu, "nonprogress_zeroed": False}
-        if self.cfg.reject_nonprogress and float(g @ delta1) >= 0.0:
-            delta1 = torch.zeros_like(delta1)
+        if self.cfg.reject_nonprogress and not skipped and float(g @ delta1) >= 0.0:
+            # NULL step (F_REVIEW 4.2): no gate evaluation, nothing committed, params untouched
             self.ops["nonprogress_zeroed"] += 1
-            info["nonprogress_zeroed"] = True
+            self.calls += 1
+            info.update(nonprogress_zeroed=True, s=0.0, rho_hat=[], slack=self.cfg.slack, accepted=False)
+            return info
         s_acc, rhos = 0.0, []
         for i in range(self.cfg.R):
             s = 0.5 ** i
@@ -286,7 +290,7 @@ class VAUAdamW:
                 s_acc = s
                 break
         self.calls += 1
-        if s_acc > 0:
+        if s_acc > 0:                        # the AdamW step counter advances ONLY here (t1 = committed t + 1)
             self._write_params(theta + s_acc * delta1)
             self._commit_state(m1, v1, t1)
         else:

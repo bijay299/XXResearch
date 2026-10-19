@@ -33,6 +33,7 @@ uniform-t ablation changes only the timestep subset.
 | A0 | native GEM c328fc6 | none | lr ∈ {5e-4, 1e-3, 2e-3} × wd ∈ {0.01, 0.1} |
 | A1 | **VAU** wrapping GEM's AdamW step: k = 8 sketch rows, K = 5, gate n2 = 32 retained (prompt, latent, σ) samples per try, R_max = 3, δ = 0.05, M = 2τ² clip | R1, R2 | lr × τ² ∈ {τ0², 2τ0²} |
 | A2 | **strongest simple control**: whichever of `penalty` or `penalty+gate` was the more frequent best control in synthetic G8. This is frozen before step 0. Penalty = λ/2 · mean over R1 of ‖v_θ − v_θ0‖² on base retained-trajectory states; the gate is identical to A1's | R1 (+R2) | lr × λ ∈ {λ0, 10λ0} (or τ² if gated) |
+| A2n | **na_lora**, a KNOWN InfLoRA-style null-A LoRA (amendment A1). It uses the same qk_dual modules. Per module, A's rows are made orthogonal to the span of the R1 retained-token inputs and then frozen; B is trained with the native GEM loss. The A1 gate is added if `na_lora+gate` was the better of the two in synthetic G8 | R1 (+R2) | lr × feature-energy threshold ∈ {0.99, 0.9999} |
 | A3 | **published comparator: EraseAnything** `tomguluson92/EraseAnything @ 67d8c0b` (arXiv 2412.20413v1), author code unchanged | its own regulariser | author default + lr × 0.5 (2 configs; **not budget-equal**; descriptive only) |
 | A4 (optional) | D's ablation: native GEM with a random 11-of-28 subset, 18 iterations (matched forwards) | none | native defaults only; diagnostic |
 
@@ -110,7 +111,7 @@ All sets are disjoint, which is checked by hashing. R_test is never used for tra
    50 and 60. At each checkpoint, detection is measured on 20 X_T^sel images and velocity drift on R_sel (no images).
 3. **Selection.** For each arm and concept, pick the (config, checkpoint) with the lowest R_sel velocity drift among
    those with detection ≤ r*. An arm that never reaches r* is recorded as "not reached".
-4. **Replication.** The selected config of A0, A1 and A2 is retrained at **2 further training seeds**, at its selected
+4. **Replication.** The selected config of A0, A1, A2 and A2n is retrained at **2 further training seeds**, at its selected
    checkpoint iteration. That gives 3 seeds × 4 concepts = 12 pairs. A3 and A4 use 1 seed.
 5. **Evaluation.** Each final model is evaluated on X_T^test, X_para, R_test and the COCO-300 set.
 
@@ -127,6 +128,7 @@ All sets are disjoint, which is checked by hashing. R_test is never used for tra
 | C6 | scorer qualification, as in §4; neighbour discrimination AUROC ≥ 0.9 |
 | C7 | measured F time, VAU per-iteration overhead and image time; rescale the plan with the ladder (drop A4, then EA's second config, then X_para seeds) to stay under the cap; freeze |
 | C8 | regenerated base images are identical, or DINOv2 distance ≤ 1e-3 |
+| C9 | **probe-coverage gate** (amendment A1). Before any training, measure C_probe on each concept at θ0: the share of held-out R_test velocity-Jacobian energy (256-row sketch) that lies in the row space of the k = 8 R1 probe sketch. It must be ≥ 0.90, with k ≥ eff_rank_99. If it fails on 2 or more concepts, the protocol is **not launched**, because the narrowed hypothesis does not apply to FLUX at this probe budget. C_probe and C_feat are reported either way |
 
 Any failure stops the protocol before any training on the 4 concepts.
 
@@ -139,12 +141,12 @@ at 512 px with 28 steps.
 |---|---|
 | step 0 checks and calibration | 3 |
 | base images (4 × 360 + 300) | 1.5 |
-| tuning: 4 concepts × 18 GEM-family runs + checkpoint detection images | 26 |
+| tuning: 4 concepts × 24 GEM-family runs (A0, A1, A2, A2n) + checkpoint detection images | 33 |
 | EraseAnything (author code, about 2 GPU-h per run, extrapolated from the REF pilot and withdrawn as a cost claim there) | 11 |
-| replication: 2 seeds × 3 arms × 4 concepts | 6 |
-| final evaluation: 44 models × 660 images | 24 |
+| replication: 2 seeds × 4 arms × 4 concepts | 8 |
+| final evaluation: 56 models × 660 images | 31 |
 | A4 | 0.3 |
-| **total** | **about 72**, plus 15% contingency, about 83 |
+| **total** | **about 88**; the only contingency is the headroom up to the 96 cap |
 
 The hard cap is **96 GPU-h**. On reaching it, the run stops and is reported as INCOMPLETE, which counts as INCONCLUSIVE.
 
@@ -160,7 +162,7 @@ The hard cap is **96 GPU-h**. On reaching it, the run stops and is reported as I
 
 ## 10. Decisive outcomes
 
-The unit of analysis is a (concept, training seed) pair; there are 12. The comparison is A1 against the best of {A0, A2}
+The unit of analysis is a (concept, training seed) pair; there are 12. The comparison is A1 against the best of {A0, A2, A2n}
 on R_sel. The statistic is a paired GMR, tested with an exact sign-flip permutation test (4096 flips).
 
 **ADVANTAGE DEMONSTRATED** requires all of the following:
@@ -177,6 +179,7 @@ on R_sel. The statistic is a paired GMR, tested with an exact sign-flip permutat
 
 **HYPOTHESIS REJECTED (FLUX, this scale)** if any of the following holds:
 - A2 is more than 10% better (GMR(A2/A1) ≤ 0.90 with ≥ 8/12 wins).
+- A2n matches or beats A1 (GMR(A1/A2n) ≥ 0.95). This is the FLUX analogue of F5.
 - A1's point GMR against the best control is ≥ 0.97.
 - A1 fails to reach r* on ≥ 2 concepts while A2 reaches it.
 - The overhead is > 5×.

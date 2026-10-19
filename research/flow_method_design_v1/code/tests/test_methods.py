@@ -7,9 +7,11 @@ from vau.contracts import dev_rng
 
 from vau import adamw as aw
 from vau.contracts import ContractViolation, Ops
-from vau.methods import ARMS, Batch, GateConfig, Gated, make_arm
+from vau.methods import ARMS, GATED_ALIASES, Batch, GateConfig, Gated, NotApplicable, arm_status, make_arm
 
-ALL_ARMS = ("adamw", "adamw_stepmatch", "penalty", "pre_proj", "post_euclid", "vau_nogate", "vau")
+ALL_ARMS = ("adamw", "adamw_stepmatch", "penalty", "pre_proj", "post_euclid", "post_euclid_reject", "vau_nogate",
+            "vau_blocksplit_nogate", "na_lora", "vau", "vau_blocksplit")
+LORA_ONLY = ("na_lora", "vau_blocksplit_nogate", "vau_blocksplit", "gated_na_lora")
 NR, K_SK, K_REF, N2, R = 8, 4, 2, 5, 3
 
 
@@ -105,13 +107,13 @@ def test_gate_backtracks_to_half_on_linear_model():
     assert ms.adam.t == 1
 
 
-def _expected(name, family, steps, accepted=True):
+def _expected(name, family, steps, accepted=True, null_steps=0):
     e = {"forward": [steps, 11 * steps], "teacher": [2 * steps, 22 * steps], "vjp": [steps, 11 * steps]}
     ev = {"step": steps, "solve": 0, "probe_build": 0, "gate_try": 0, "rejected_step": 0}
-    inner = {"vau": "vau_nogate"}.get(name, name.replace("gated_", ""))
+    inner = GATED_ALIASES.get(name, name.replace("gated_", ""))
     if family == "flow":
         e["rollout_forward"] = [11 * steps, 11 * steps]
-    if inner in ("pre_proj", "post_euclid", "vau_nogate"):
+    if inner in ("pre_proj", "post_euclid", "post_euclid_reject", "vau_nogate", "vau_blocksplit_nogate"):
         builds = len([c for c in range(steps) if c % K_REF == 0])
         e["forward"][0] += builds; e["forward"][1] += builds * NR
         e["vjp"][0] += builds * K_SK; e["vjp"][1] += builds * K_SK * NR
@@ -120,27 +122,36 @@ def _expected(name, family, steps, accepted=True):
         e["teacher"][0] += 1; e["teacher"][1] += NR
         e["forward"][0] += steps; e["forward"][1] += steps * NR
         e["vjp"][0] += steps; e["vjp"][1] += steps * NR
-    if name == "vau" or name.startswith("gated_"):
-        tries = steps if accepted else steps * R
+    if inner == "na_lora":                       # one feature forward on R1 at init, no VJPs
+        e["forward"][0] += 1; e["forward"][1] += NR
+        ev["probe_build"] = 1
+    if name in GATED_ALIASES or name.startswith("gated_"):
+        live = steps - null_steps               # reject-rule null steps skip the gate
+        tries = live if accepted else live * R
         e["gate_forward"] = [tries, tries * N2]; e["gate_base"] = [tries, tries * N2]
         ev["gate_try"] = tries
-        ev["rejected_step"] = 0 if accepted else steps
+        ev["rejected_step"] = 0 if accepted else live
     return e, ev
 
 
-@pytest.mark.parametrize("family", ["linear", "flow"])
-@pytest.mark.parametrize("name", list(ALL_ARMS) + ["gated_adamw", "gated_post_euclid"])
+@pytest.mark.parametrize("family", ["linear", "mlp", "flow"])
+@pytest.mark.parametrize("name", list(ALL_ARMS) + ["gated_adamw", "gated_post_euclid", "gated_na_lora"])
 def test_operation_counters(family, name):
     steps = 3
     task, rng, th0, R1 = setup(family)
+    if family == "linear" and name in LORA_ONLY:
+        assert arm_status(name, task) == "NOT_APPLICABLE"
+        with pytest.raises(NotApplicable):
+            arm_of(name, task)
+        return
     arm = arm_of(name, task, ref_norms=[1e-3] * steps) if name == "adamw_stepmatch" else arm_of(name, task)
     ms = arm.init_state(th0, R1, dev_rng(0))
-    th = th0
+    th = arm.initial_theta(ms)
     infos = []
     for _ in range(steps):
         th, info = arm.step(ms, th, batch(task, rng))
         infos.append(info)
-    e, ev = _expected(name, family, steps)
+    e, ev = _expected(name, family, steps, null_steps=ms.ops.calls["nonprogress_zeroed"])
     for op in ("forward", "teacher", "vjp", "jvp", "rollout_forward", "gate_forward", "gate_base"):
         exp = e.get(op, [0, 0])
         assert [ms.ops.calls[op], ms.ops.samples[op]] == exp, (op, ms.ops.snapshot())
@@ -232,7 +243,107 @@ def test_invalid_inputs_rejected():
 
 
 def test_arm_registry_complete():
-    assert set(ARMS) | {"vau"} == set(ALL_ARMS)
+    assert set(ARMS) | set(GATED_ALIASES) == set(ALL_ARMS)
     task, _, _, _ = setup("linear")
     assert make_arm("earlystop_penalty", task, gate=gate_cfg(1.0)).name == "earlystop_penalty"
     assert make_arm("gated_vau_nogate", task, gate=gate_cfg(1.0)).name == "vau"   # identical rule
+
+
+# ---- F_REVIEW 4.2 spec fixes -----------------------------------------------------------------------
+@pytest.mark.parametrize("name", ["vau", "vau_nogate", "post_euclid_reject"])
+def test_null_step_skips_gate_and_commits_nothing(name, monkeypatch):
+    task, rng, th0, R1 = setup("mlp")
+    arm = arm_of(name, task)
+    ms = arm.init_state(th0, R1, dev_rng(0))
+    th, _ = arm.step(ms, th0, batch(task, rng))           # one ordinary step first
+    adam_obj, t_before = ms.adam, ms.adam.t
+    inner = arm.inner if hasattr(arm, "inner") else arm
+    monkeypatch.setattr(inner, "_nonprogress",
+                        lambda ms_, g, d1, info: (ms_.ops.add("nonprogress_zeroed"),
+                                                  info.update(nonprogress_zeroed=True, progress_lin=0.0),
+                                                  np.zeros_like(d1))[-1])
+    tries_before = ms.ops.calls["gate_try"]
+    th2, info = arm.step(ms, th, batch(task, rng))
+    assert np.array_equal(th2, th) and ms.adam is adam_obj and ms.adam.t == t_before
+    assert ms.ops.calls["gate_try"] == tries_before and not info["accepted"]
+    assert ms.ops.calls["rejected_step"] == 0 and ms.calls == 2
+
+
+def test_adam_counter_advances_only_on_commit():
+    task, rng, th0, R1 = setup("linear")
+    arm = arm_of("vau", task, tau2=-1.0)
+    ms = arm.init_state(th0, R1, dev_rng(0))
+    th = th0
+    for _ in range(3):
+        th, _ = arm.step(ms, th, batch(task, rng))         # all rejected
+    assert ms.adam.t == 0 and ms.calls == 3
+    arm.gate = gate_cfg(1e12)
+    b = batch(task, rng)
+    _, g = task.erasure_loss_grad(th, b.erase, Ops())
+    _, tent, _ = aw.peek(ms.adam, g, th, arm.hp)
+    arm.step(ms, th, b)
+    assert ms.adam.t == 1 and tent.t == 1                  # bias correction of the first COMMITTED step
+
+
+def test_mu_floor_and_empty_probe():
+    from vau.projections import ridge_mu, weighted_null_project
+    assert ridge_mu(np.zeros((2, 2)) + 1e-30 * np.eye(2)) == 1e-12
+    x = np.arange(4.0)
+    y, info = weighted_null_project(x, np.zeros((0, 4)), np.ones(4))
+    assert np.array_equal(y, x)
+
+
+def test_blocksplit_metric_is_blockwise_normalised():
+    task, rng, th0, R1 = setup("mlp")
+    arm = make_arm("vau_blocksplit_nogate", task)
+    D = 10.0 ** rng.uniform(-3, 8, size=task.model.P)
+    w = arm._metric(None, D)
+    for sa, sb, _, _ in task.model.lora.slices.values():
+        for sl in (sa, sb):
+            assert np.isclose(w[sl].mean(), 1.0) and np.allclose(w[sl] / w[sl][0], D[sl] / D[sl][0])
+    assert make_arm("vau_blocksplit", task, gate=gate_cfg(1.0)).name == "vau_blocksplit"
+
+
+# ---- na_lora ------------------------------------------------------------------------------------------
+@pytest.mark.parametrize("family,nr", [("mlp", 8), ("flow", 1)])
+def test_na_lora_exact_retention_large_lr(family, nr):
+    """Probed retained outputs unchanged to ~1e-12 after many large-lr AdamW steps; target outputs move."""
+    task, rng = make(family)
+    th0 = task.model.init_theta(rng)
+    R1 = task.retained_batch(rng, nr)
+    arm = make_arm("na_lora", task, hp=aw.AdamWHP(lr=0.1))
+    ms = arm.init_state(th0, R1, dev_rng(0))
+    th = arm.initial_theta(ms)
+    f0 = task.model.forward(R1, th0)
+    assert np.array_equal(task.model.forward(R1, th), f0)      # B = 0 still
+    xs, _ = task.erasure_inputs(th, task.erasure_batch(dev_rng(3)), Ops())
+    v0 = task.model.forward(xs, th0)
+    for _ in range(40):
+        th, _ = arm.step(ms, th, batch(task, rng))
+    scale = np.max(np.abs(f0))
+    assert np.max(np.abs(task.model.forward(R1, th) - f0)) <= 1e-12 * max(1.0, scale) * 10
+    assert np.max(np.abs(task.model.forward(xs, th) - v0)) > 1e-3               # erasure capacity remains
+    assert all(r < d for r, d in ms.cache["feature_ranks"].values())
+    with pytest.raises(ContractViolation):
+        arm.step(ms, th0, batch(task, rng))                   # must start from initial_theta (projected A)
+
+
+def test_factorwise_constraints_freeze_B_under_zero_init():
+    """dA U = 0 and dB (A U) = 0 with B = 0 at init and rank(AU) = r force B to stay exactly 0, so the LoRA
+    output is 0 on every input (no erasure); cf. code/scratch_checks/factor_collapse_check.py."""
+    rng = np.random.default_rng(4)
+    d_in, d_out, r, q = 12, 8, 3, 5
+    U, _ = np.linalg.qr(rng.normal(size=(d_in, q)))
+    A, B = rng.normal(size=(r, d_in)), np.zeros((d_out, r))
+    P_U = np.eye(d_in) - U @ U.T
+    for _ in range(50):
+        AU = A @ U
+        Z, sv, _ = np.linalg.svd(AU, full_matrices=False)
+        Z = Z[:, sv > 1e-10 * sv.max()]
+        assert Z.shape[1] == r
+        dA = rng.normal(size=A.shape) @ P_U
+        dB = rng.normal(size=B.shape) @ (np.eye(r) - Z @ Z.T)
+        assert np.allclose(dA @ U, 0, atol=1e-12) and np.allclose(dB @ AU, 0, atol=1e-12)
+        A, B = A + 0.1 * dA, B + 0.1 * dB
+    assert np.max(np.abs(B)) <= 1e-13
+    assert np.max(np.abs(B @ A @ rng.normal(size=d_in))) <= 1e-12

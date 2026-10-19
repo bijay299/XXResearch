@@ -1,5 +1,5 @@
 diff --git a/gem/operators/erasure/erasure_gem.py b/gem/operators/erasure/erasure_gem.py
-index 96c0311..298be5f 100644
+index 96c0311..5f39291 100644
 --- a/gem/operators/erasure/erasure_gem.py
 +++ b/gem/operators/erasure/erasure_gem.py
 @@ -14,6 +14,9 @@ from gem.wrappers import BasePipelineWrapper
@@ -75,7 +75,7 @@ index 96c0311..298be5f 100644
 +                vau_info = vau.step()               # replaces optimizer.step(); may reject and roll back
 +                self.log_loss_and_metrics_to_wandb(loss=traj_loss, metrics={
 +                    'vau_s': vau_info['s'], 'vau_accepted': float(vau_info['accepted']),
-+                    'vau_progress_lin': vau_info['progress_lin'], 'vau_rho_hat_last': vau_info['rho_hat'][-1],
++                    'vau_progress_lin': vau_info['progress_lin'], 'vau_rho_hat_last': (vau_info['rho_hat'] or [float('nan')])[-1],  # empty on null steps
 +                }, step=global_step + 1, use_wandb=config.use_wandb)
  
              # Log to WandB
