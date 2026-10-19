@@ -1,0 +1,26 @@
+{
+  "area": "/data/bijaypandey/cuig_pilot/cpr_direct_agreement_controls_v1/verify/ (fresh, emptied before use)",
+  "counted_additional": {
+    "adapter_loads_cpu": "counted in artifacts/verify/counts.json",
+    "model_generated_images": 0,
+    "png_decodes_cpu": "counted in artifacts/verify/counts.json"
+  },
+  "frozen_before": "publication; additional loads/decodes performed by verification are counted and disclosed",
+  "gpu_use": "none planned; reserved allowance 0.75 GPU-h inside the protected 8 h only for an unexpected need, charged if used",
+  "never_uploaded": [
+    "pristine base weights",
+    "COCO photographs",
+    "credentials",
+    "private responses"
+  ],
+  "steps": [
+    "1 push study commits (live remote SHA via git ls-remote must equal local HEAD)",
+    "2 create release/tag cpr-direct-agreement-controls-v1 targeting the pushed commit; upload assets",
+    "3 download every release asset via the public browser_download_url into the fresh area",
+    "4 compare every downloaded asset SHA-256 and byte size with the manifest; compare counts (adapters, PNG archives, score files)",
+    "5 CPU-only adapter restoration: build fresh PEFT qk_dual r16 skeleton on CPU (no GPU, no generation), load each published selected adapter plus each trajectory's terminal adapter, assert state hash equals the hash recorded at generation time",
+    "6 decode every published primary PNG once on CPU with PIL (file decode, not model decode), assert 512x512 RGB and sha256 equals the generation record",
+    "7 build the noncircular evidence index from committed payload bytes in an index-only child commit; verify pinned links resolve to the claimed commit",
+    "8 preservation checks: every path in records/protected_git_paths_at_30f9559.txt unchanged vs 30f95590; every pre-task release/tag/asset unchanged"
+  ]
+}

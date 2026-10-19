@@ -1,0 +1,55 @@
+--- a/gem/operators/erasure/erasure_gem.py
++++ b/gem/operators/erasure/erasure_gem.py
+@@ -235,11 +235,31 @@
+                 pos_flat = anchor_score.float().reshape(anchor_score.shape[0], -1)
+                 neg_flat = target_score.float().reshape(target_score.shape[0], -1)
+ 
+-                # Calculate Distances
+-                dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
+-                dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
+-
+-                target_loss = torch.relu(dist_pos - config.eta * dist_neg).sum()
++                # [cpr_direct_agreement_controls_v1 P1a] READ-ONLY capture hook: receives detached clones of the three
++                # FP32 operands BEFORE the loss; its return value is ignored. It draws no random
++                # numbers and cannot touch the live tensors.
++                _cpr_capture = getattr(config, "cpr_capture_hook", None)
++                if _cpr_capture is not None:
++                    _cpr_capture(processed_index=config.max_step_budget - step_budget,
++                                 global_step=global_step, batch_start=batch_start,
++                                 pred=pred_flat.detach().clone(), anchor=pos_flat.detach().clone(),
++                                 target=neg_flat.detach().clone())
++
++                # [cpr_direct_agreement_controls_v1 P1b] small attributed loss dispatch. No hook, or a hook that returns
++                # None (the `native_gem` arm), executes the ORIGINAL native block below unchanged.
++                _cpr_hook = getattr(config, "cpr_loss_hook", None)
++                _cpr_per_sample = (_cpr_hook(pred_flat, pos_flat, neg_flat)
++                                   if _cpr_hook is not None else None)
++                if _cpr_per_sample is None:
++                    # ---------- ORIGINAL NATIVE LOSS BLOCK, UNCHANGED ----------
++                    # Calculate Distances
++                    dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
++                    dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
++
++                    target_loss = torch.relu(dist_pos - config.eta * dist_neg).sum()
++                    # -------- END ORIGINAL NATIVE LOSS BLOCK, UNCHANGED --------
++                else:
++                    target_loss = _cpr_per_sample.sum()
+ 
+                 # Reset timesteps (skip if already using inference timesteps)
+                 if not config.use_inference_timesteps:
+@@ -286,6 +306,15 @@
+             assert_model_gradients_valid(wrapper)
+ 
+             optimizer.step()
++
++            # [cpr_direct_agreement_controls_v1 P3] logging/checkpoint hook only. Runs AFTER the native optimizer step;
++            # read-only access to the wrapper/optimizer; never alters the loop, the budget, the sampler or the optimizer.
++            _cpr_step_hook = getattr(config, "cpr_step_hook", None)
++            if _cpr_step_hook is not None:
++                _cpr_step_hook(global_step=global_step,
++                               processed_timesteps=config.max_step_budget - step_budget,
++                               step_budget_left=step_budget,
++                               wrapper=wrapper, optimizer=optimizer)
+ 
+             # Log to WandB
+             if config.use_wandb and (step_budget <= 0 or (global_step + 1) % config.steps_between_validation == 0):

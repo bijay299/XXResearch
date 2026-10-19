@@ -1,0 +1,68 @@
+{
+  "buckets": {
+    "entry": "entry/qualification/technical work (cap 4 GPU-h, includes the gate trajectory, qualification, technical batch and any repair GPU work)",
+    "main": "development M0, development trajectories, development generation and scoring, held-out training",
+    "reserve": "protected 8 GPU-h: held-out M0/generation/scoring and publication verification"
+  },
+  "caps": {
+    "aggregate_workers": 8,
+    "coco_photographs": 600,
+    "cpu_core_hours": 48.0,
+    "elapsed_days": 7.0,
+    "gpu_device_hours": 24.0,
+    "gpu_entry_technical_hours": 4.0,
+    "gpu_protected_eval_publication_hours": 8.0,
+    "images_primary": 1928,
+    "images_technical": 272,
+    "images_total": 2200,
+    "min_free_gib": 50.0,
+    "repair_cycles": 2,
+    "repair_engineering_minutes": 30,
+    "rss_gib": 128.0,
+    "science_stop_days": 6.0,
+    "storage_gib": 200.0
+  },
+  "decode_accounting": "artifacts/decode_counts/<job>.jsonl, per-image, kinds primary|technical; unexpected decodes charged as technical",
+  "frozen_before": "any numerical loss test, detector inference or FLUX output",
+  "gpu_device_hours_note": "charged = (allocated devices) x (wall from launch to confirmed reaping), never clipped; reservations = max_wall + grace per device before launch",
+  "image_caps": {
+    "dev_edited": 864,
+    "dev_m0": 24,
+    "ho_edited": 960,
+    "ho_m0": 80,
+    "primary_total": 1928,
+    "technical_allowance": 272,
+    "total_cap": 2200
+  },
+  "monitoring_coverage": "documented in artifacts/ledger coverage_and_gaps(); unknown totals are not exact compliance claims",
+  "per_job_wall_allowance_s": {
+    "gate.replay": 1800,
+    "gate.synthetic": 1800,
+    "gen.*": "900 + 25 x images",
+    "grace": 60,
+    "qualify": 3000,
+    "score.*": "900 + 12 x images",
+    "train.*": 3000
+  },
+  "projection": {
+    "conservatism": "all 36 trajectories projected at 250 states; gate trajectory counted again",
+    "formula": "see code/cprd2/project.py (committed); fits iff all four inequalities hold: non_reserve_fits, reserve_fits, total_fits, wall_fits_before_day6_stop; otherwise RESOURCE_BLOCKED",
+    "inputs": "measured seconds/state from the native gate trajectory, measured seconds/image from the 4-case technical batch, measured detector load + per-image time",
+    "margin": 1.3,
+    "verify_reserve_allowance_gpu_h": 0.75
+  },
+  "repair_policy": {
+    "committed_additively_before_retest": true,
+    "max_cycles": 2,
+    "max_engineering_minutes_per_cycle": 30,
+    "no_scientific_adjustment": true,
+    "one_patch_plus_one_rerun": true
+  },
+  "rss_kill_threshold_gib": 120.0,
+  "time": {
+    "elapsed_days_cap": 7,
+    "first_task_action_utc": "2026-10-19T17:31:02Z",
+    "preflight_deadline_utc": "2026-10-19T21:31:02Z",
+    "science_stop_day": 6
+  }
+}

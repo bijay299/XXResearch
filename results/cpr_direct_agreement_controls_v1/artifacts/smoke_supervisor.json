@@ -1,0 +1,111 @@
+{
+ "ledger_dir": "/data/bijaypandey/claude_tmp/smoke_ledger_m7i_0x5r",
+ "checks": [
+  {
+   "check": "success_charged_actual",
+   "pass": true,
+   "charged": 2.4479990005493164,
+   "held": 2.4479990005493164
+  },
+  {
+   "check": "failure_charged_x2_devices",
+   "pass": true,
+   "delta": 3.2747082710266113
+  },
+  {
+   "check": "timeout_kills_tree_and_charges",
+   "pass": true,
+   "held": 5.765962362289429,
+   "hard_kill": true,
+   "grandchild_alive": false
+  },
+  {
+   "check": "no_clipping_overrun_charged_in_full",
+   "pass": true,
+   "charged": 30.00220823287964,
+   "reserved": 2.0
+  },
+  {
+   "check": "cap_refusal",
+   "pass": true,
+   "message": "entry/technical subcap would be exceeded"
+  },
+  {
+   "check": "image_cap_refusal",
+   "pass": true,
+   "message": "primary image cap would be exceeded"
+  },
+  {
+   "check": "supervisor_failure_reconcile",
+   "pass": true,
+   "child_survived_supervisor": true,
+   "launches_blocked_until_reconcile": true,
+   "closed": 1,
+   "child_dead_after": true
+  },
+  {
+   "check": "rss_limit_kills",
+   "pass": true,
+   "status": "killed_aggregate",
+   "peak_rss_gib": 0.13332748413085938
+  },
+  {
+   "check": "aggregate_worker_cap",
+   "pass": true
+  },
+  {
+   "check": "no_third_repair_cycle",
+   "pass": true
+  }
+ ],
+ "all_pass": true,
+ "totals": {
+  "charged_gpu_h": {
+   "entry": 0.011525243851873609,
+   "main": 0.0,
+   "reserve": 0.0003839153713650174
+  },
+  "charged_gpu_h_total": 0.011909159223238626,
+  "open_reserved_gpu_h": {
+   "entry": 0.0,
+   "main": 0.0,
+   "reserve": 0.0
+  },
+  "cpu_core_h": 4.97925e-05,
+  "images": {
+   "primary": 0,
+   "reserved_primary": 0,
+   "reserved_technical": 0,
+   "technical": 0
+  },
+  "coco_photographs": 0,
+  "repair_cycles": 2,
+  "n_open": 0,
+  "overruns": 2,
+  "peak": {
+   "min_free_gib": 516.9608955383301,
+   "rss_gib": 0.13332748413085938,
+   "storage_gib_growth": 0.0,
+   "threads": 1
+  }
+ },
+ "coverage_and_gaps": {
+  "monitored": [
+   "GPU: wall-clock x allocated devices from launch to confirmed process-tree termination",
+   "RSS: psutil sum over the launched process tree, every 5 s; aggregate over all live jobs; supervisor kills the tree above 120 GiB aggregate (cap 128 GiB)",
+   "CPU: max(psutil process-tree cpu_times incl. reaped children, wait4 rusage of the direct child)",
+   "threads: sampled process-tree num_threads, peak recorded (advisory; BLAS/OMP worker count is enforced only by OMP/MKL/OPENBLAS_NUM_THREADS=2 per job and <=4 concurrent jobs)",
+   "storage: `du -sb` of the task root every 120 s while jobs run; growth vs. first sample recorded; free space on /data polled every 5 s (kill below 50 GiB)",
+   "images: reserved before launch, actual decodes from per-job append-only decode counters"
+  ],
+  "gaps": [
+   "Storage is polled at 120 s granularity and only for the task root; transient spikes between polls and files written outside the root (TMPDIR/XDG caches on /data) are not attributed. Reported storage peaks are lower bounds, not exact compliance claims.",
+   "CPU core-hours exclude CPU used by processes that escaped the launched session and were not descendants at a sampling instant; reported CPU is a lower bound.",
+   "Thread count is not a BLAS-worker count; the 8-worker aggregate is enforced by launch-time reservation of declared workers (2/job) plus env thread limits, not by cgroup.",
+   "GPU memory (40 GB/device) is not monitored by the supervisor; OOM surfaces as a child failure and is charged like any failure.",
+   "RSS counts resident file-backed mapped pages (safetensors mmap) as RSS; this overstates the private footprint (conservative for the cap).",
+   "Other users' processes on the same machine are invisible to the accounting except through the pre-launch foreign-process probe on the requested devices.",
+   "If the supervisor is killed uncleanly, children whose end time was unobserved are charged at their full reservation (conservative over-charge, flagged)."
+  ]
+ }
+}

@@ -1,0 +1,16 @@
+--- a/gem/common/prompt_augmentation.py
++++ b/gem/common/prompt_augmentation.py
+@@ -3,7 +3,12 @@
+ from dataclasses import dataclass
+ from typing import List, Dict, Any
+ import numpy as np
+-from datasets import load_dataset
++# [cpr_direct_agreement_controls_v1 P4] optional-import fix: `datasets` backs HFDatasetPromptAugmentation only (unused here).
++try:
++    from datasets import load_dataset
++except ModuleNotFoundError:  # pragma: no cover
++    def load_dataset(*a, **k):
++        raise ModuleNotFoundError('HFDatasetPromptAugmentation needs `datasets`')
+ 
+ 
+ class PromptAugmentation:

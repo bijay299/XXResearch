@@ -1,0 +1,94 @@
+{
+  "all_pass": true,
+  "checks": {
+    "adapter_roundtrip_bitwise": {
+      "file_sha256": "fcde80c9eb815680",
+      "n_tensors": 152,
+      "pass": true
+    },
+    "base_digest_deterministic": {
+      "n": 1819,
+      "pass": true
+    },
+    "case_ids_unique_per_group": {
+      "pass": true
+    },
+    "decode_counter_wrap_restore": {
+      "pass": true
+    },
+    "detector_label_resolution_offline": {
+      "note": "resolved at qualification; detectors load from HF cache offline",
+      "pass": true
+    },
+    "disable_adapter_ctx": {
+      "pass": true
+    },
+    "gate_traj_is_first_planned_native_dev": {
+      "pass": true
+    },
+    "gem_config_defaults": {
+      "eta": 1.0,
+      "gamma": 100.0,
+      "max_gradient_norm": null,
+      "n_param_defaults": {
+        "partial_denoising_end_at_timestep": 10,
+        "partial_denoising_guidance_scale": 3.0
+      },
+      "pass": true
+    },
+    "init_B_zero_A_nonzero": {
+      "n_tensors": 152,
+      "pass": true
+    },
+    "ledger_importable": {
+      "pass": true
+    },
+    "lora_r_alpha": {
+      "alpha": 16,
+      "dropout": 0.1,
+      "pass": true,
+      "r": 16
+    },
+    "noise_hashes_reproduce": {
+      "bad": [],
+      "n": 108,
+      "pass": true
+    },
+    "patched_hooks_present": {
+      "pass": true
+    },
+    "peft_inventory": {
+      "first_module": "base_model.model.transformer.transformer_blocks.0.attn.add_k_proj",
+      "load_seconds": 1.5,
+      "lora_dropout_p": [
+        0.1
+      ],
+      "lora_dtypes": [
+        "torch.float32"
+      ],
+      "n_base_trainable": 0,
+      "n_lora_modules": 76,
+      "n_lora_tensors": 152,
+      "pass": true,
+      "trainable_params": 7471104
+    },
+    "sampler_method_present": {
+      "pass": true
+    },
+    "seeded_init_deterministic": {
+      "pass": true
+    },
+    "trajectory_counts": {
+      "pass": true
+    },
+    "versions": {
+      "diffusers": "0.30.2",
+      "pass": true,
+      "peft": "0.12.0",
+      "py": "3.10.12",
+      "torch": "2.4.0+cu121",
+      "transformers": "4.44.2"
+    }
+  },
+  "utc": "2026-10-19T18:29:34Z"
+}
