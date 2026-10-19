@@ -1,0 +1,279 @@
+{
+  "generated_iso": "2026-10-18T20:05:05.652173-04:00",
+  "what_this_is": "Host-performed arithmetic, join, input-integrity and reproducibility verification of analysis_v1.",
+  "n_checks": 54,
+  "n_passed": 54,
+  "checks": [
+    {
+      "check": "input SHA256 identical before and after analysis",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "exactly four allowlisted inputs",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "check": "Task-A table has 40 rows",
+      "ok": true,
+      "detail": "40"
+    },
+    {
+      "check": "Task-A item IDs are the 40 public IDs, each once",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "derived Task-A presence labels sum to 40",
+      "ok": true,
+      "detail": "{'present': 21, 'absent': 18, 'unresolved': 1}"
+    },
+    {
+      "check": "derived presence matches summary",
+      "ok": true,
+      "detail": "{'present': 21, 'absent': 18, 'unresolved': 1}"
+    },
+    {
+      "check": "definite-vote coverage sums to 40",
+      "ok": true,
+      "detail": "{'0': 0, '1': 0, '2': 40}"
+    },
+    {
+      "check": "presence agreement classes sum to 40",
+      "ok": true,
+      "detail": "{'definite_consensus': 39, 'disagreement': 1, 'n': 40, 'raw_agreement_any': 39, 'uncertain_agreement': 0}"
+    },
+    {
+      "check": "m0 + edited presence denominators sum to 40",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "rendering agreement classes sum to 40",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "raw Task-A presence votes sum to 40 for R1",
+      "ok": true,
+      "detail": "{'absent': 18, 'present': 22, 'uncertain': 0}"
+    },
+    {
+      "check": "raw Task-A presence votes sum to 40 for R2",
+      "ok": true,
+      "detail": "{'absent': 19, 'present': 21, 'uncertain': 0}"
+    },
+    {
+      "check": "raw Task-A rendering votes sum to 40 for R1",
+      "ok": true,
+      "detail": "{'coherent': 38, 'localized_deformation': 2, 'unable_to_judge': 0, 'whole_frame_breakdown': 0}"
+    },
+    {
+      "check": "raw Task-A rendering votes sum to 40 for R2",
+      "ok": true,
+      "detail": "{'coherent': 34, 'localized_deformation': 6, 'unable_to_judge': 0, 'whole_frame_breakdown': 0}"
+    },
+    {
+      "check": "3x3 presence table has nine cells",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "3x3 presence table sums to 20",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "check": "published 3x3 CSV row totals agree with the cells",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "published 3x3 CSV grand total is 20",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "paired ledger has 20 rows",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "check": "paired ledger covers B-01..B-20 exactly once",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "ledger denominator flags match the reported denominator",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "check": "ledger numerator flags match the reported numerator",
+      "ok": true,
+      "detail": "18"
+    },
+    {
+      "check": "numerator is a subset of the denominator",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "every denominator row has m0 present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "every numerator row is m0 present -> edited absent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "NO absent->absent case is counted as demonstrated removal",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "denominator RETAINS cases whose edited status is unresolved",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "denominator breakdown sums to the denominator",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "removal is reported as a count with a denominator, not a bare rate",
+      "ok": true,
+      "detail": "18 / 20"
+    },
+    {
+      "check": "removal numerator equals the 3x3 present->absent cell",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "edited-absent subset size matches the ledger",
+      "ok": true,
+      "detail": "18"
+    },
+    {
+      "check": "absence-rendering counts sum to the subset size for all_edited_absent_cases",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "absence-rendering reports unable_to_judge separately from unresolved for all_edited_absent_cases",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "absence-rendering counts sum to the subset size for qualified_m0_present_to_edited_absent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "absence-rendering reports unable_to_judge separately from unresolved for qualified_m0_present_to_edited_absent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "qualified subset is no larger than the edited-absent subset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Task-B table has 20 rows",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "check": "Task-B distribution sums to 20 for R1",
+      "ok": true,
+      "detail": "{'about_the_same': 18, 'cannot_fairly_compare': 0, 'less': 1, 'more': 1}"
+    },
+    {
+      "check": "all four Task-B categories reported for R1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Task-B distribution sums to 20 for R2",
+      "ok": true,
+      "detail": "{'about_the_same': 18, 'cannot_fairly_compare': 0, 'less': 0, 'more': 2}"
+    },
+    {
+      "check": "all four Task-B categories reported for R2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "published Task-B distribution CSV totals are 20",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "published Task-B CSV totals equal the sum of the four categories",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Task-B exact agreement count matches the table",
+      "ok": true,
+      "detail": "18"
+    },
+    {
+      "check": "ledger and Task-B table give the same per-pair votes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "no Task-B consensus label is published",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "by_class strata case counts sum to 20",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "check": "by_category strata case counts sum to 20",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "check": "strata numerators never exceed their denominators",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "second analysis run exits cleanly",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "check": "all public tables are byte-identical across two runs",
+      "ok": true,
+      "detail": "no diff"
+    },
+    {
+      "check": "summary.json is identical across two runs apart from its timestamp",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "no test statistic, interval, kappa or significance claim is reported",
+      "ok": true,
+      "detail": "none"
+    },
+    {
+      "check": "the statistics exclusion list is still published",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "verdict": "ANALYSIS_CHECKS_PASS"
+}

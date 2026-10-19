@@ -1,6 +1,14 @@
 # teapot_human_review_v1 — two-stage human review package
 
-**Status: Task A `CLOSED` (2 reviewers) · Task B `READY_FOR_TASK_B_REVIEW`.**
+**Status: Task A `CLOSED` (2 reviewers) · Task B `CLOSED` (2 reviewers) ·
+descriptive analysis `ANALYSIS_COMPLETE`.**
+
+> **Outcomes now exist.** Both stages are closed and the combined descriptive
+> analysis is published in **[`analysis_v1/`](analysis_v1/)** — start at
+> [`analysis_v1/FINAL_REPORT.md`](analysis_v1/FINAL_REPORT.md). Sections below
+> that describe this package as "preparation only" with "no outcomes" are
+> **historical** and are kept unrewritten; `analysis_v1/` is authoritative on
+> results.
 
 > ### What this status does and does not mean
 >
@@ -287,7 +295,42 @@ model-generated images, 40 imported images.**
 [`MANIFEST_SHA256.md`](MANIFEST_SHA256.md) — sha256 of every published file and
 release asset.
 
+## Analysis v1 — combined Task-A and Task-B descriptive results (current)
+
+Both stages closed with **2** reviewers (3 planned). The combined descriptive
+analysis is in **[`analysis_v1/`](analysis_v1/)**:
+[`FINAL_REPORT.md`](analysis_v1/FINAL_REPORT.md) ·
+[`ANALYSIS_CONTRACT.md`](analysis_v1/ANALYSIS_CONTRACT.md) ·
+[`summary.json`](analysis_v1/summary.json) ·
+[`tables/`](analysis_v1/tables/) ·
+[`verification.json`](analysis_v1/verification.json).
+
+Principal counts, each with its denominator: consensus that the teapot was
+present in **20/20** original-model images; conditional demonstrated-removal
+count **18/20** (denominator = all consensus m0-present cases, including the
+one whose edited status is unresolved); Task-A presence agreement **39/40**;
+Task-A rendering agreement **34/40**; Task-B exact per-pair agreement
+**18/20**, with **36/40** Task-B judgments `about_the_same` and
+`cannot_fairly_compare` unused.
+
+**Descriptive only.** No hypothesis test, interval, bootstrap, kappa,
+significance claim, pass/fail cutoff or method ranking — a scope choice for 20
+cases judged by two people, not a claim that such statistics are impossible.
+Human consensus is a reporting convention, **not ground truth**. Identity and
+independence of the two reviewers are **coordinator-reported, not proven**.
+Nothing is established about retention, adversarial robustness, concept-
+knowledge removal, evaluator bias, novelty, state-of-the-art standing or paper
+readiness. All four original responses are **preserved unchanged** and are not
+published; aliases, free text, timestamps and the private mappings stay
+private.
+
 ## Stop point
 
 Preparation ends here. **Not done and not authorized:** recruiting reviewers,
 collecting responses, releasing Task B, unblinding, and analyzing outcomes.
+
+> **Historical.** This stop point describes the state at first publication.
+> Task B was later released under explicit authorization (Amendment 03) and
+> both stages are now closed and analyzed (`analysis_v1/`). The constraint that
+> still stands: **no participant contact, no revised judgments, no response
+> replacement, no new experiment and no reopening of closed work.**

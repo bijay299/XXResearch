@@ -1,0 +1,125 @@
+{
+  "generated_iso": "2026-10-18T20:05:05.761356-04:00",
+  "what_this_is": "Leak audit of files staged for publication under analysis_v1/. Secrets are loaded from private records at run time and never appear as literals in this script.",
+  "staged_dir": "results/teapot_human_review_v1/analysis_v1",
+  "n_staged_files": 16,
+  "staged_files": [
+    "ANALYSIS_CONTRACT.md",
+    "FINAL_REPORT.md",
+    "MANIFEST_SHA256.md",
+    "mapping_verification.json",
+    "provenance.json",
+    "public_audit.json",
+    "summary.json",
+    "synthetic_checks.json",
+    "tables/descriptive_strata.csv",
+    "tables/paired_case_ledger.csv",
+    "tables/presence_table_m0_by_edited.csv",
+    "tables/target_absence_rendering.csv",
+    "tables/taskA_responses.csv",
+    "tables/taskB_distributions.csv",
+    "tables/taskB_responses.csv",
+    "verification.json"
+  ],
+  "scans": [
+    {
+      "scan": "reviewer aliases",
+      "status": "RAN",
+      "match_mode": "token",
+      "n_needles": 2,
+      "n_files_with_findings": 0,
+      "n_files_substring_only_informational": 4
+    },
+    {
+      "scan": "original export filenames",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 4,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "free-text reviewer prose",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 1,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "other_exposure_note text",
+      "status": "NOT_APPLICABLE",
+      "reason": "the originals contain no such value, so there is nothing to leak"
+    },
+    {
+      "scan": "export timestamps",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 4,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "source image filenames",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 40,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "source image hashes",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 40,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "case IDs",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 20,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "initial-noise hashes",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 20,
+      "n_files_with_findings": 0
+    },
+    {
+      "scan": "randomization salt (hex)",
+      "status": "RAN",
+      "match_mode": "substring",
+      "n_needles": 1,
+      "n_files_with_findings": 0
+    }
+  ],
+  "n_scans_ran": 9,
+  "n_scans_not_applicable": 1,
+  "n_scans_skipped_private_record_unavailable": 0,
+  "all_secret_scans_ran": true,
+  "findings": [],
+  "n_findings": 0,
+  "informational_non_findings": [
+    {
+      "file": "ANALYSIS_CONTRACT.md",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier appearing inside an ordinary word, reviewed as a false positive"
+    },
+    {
+      "file": "FINAL_REPORT.md",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier appearing inside an ordinary word, reviewed as a false positive"
+    },
+    {
+      "file": "provenance.json",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier appearing inside an ordinary word, reviewed as a false positive"
+    },
+    {
+      "file": "summary.json",
+      "kind": "reviewer alias",
+      "note": "substring match only, not a whole token -- a short identifier appearing inside an ordinary word, reviewed as a false positive"
+    }
+  ],
+  "n_informational": 4,
+  "verdict": "ANALYSIS_PUBLIC_AUDIT_CLEAN"
+}

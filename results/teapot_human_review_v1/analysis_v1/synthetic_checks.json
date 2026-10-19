@@ -1,0 +1,148 @@
+{
+  "n_checks": 35,
+  "n_passed": 35,
+  "all_pass": true,
+  "note": "Synthetic data only. No real response is read by this suite.",
+  "checks": [
+    {
+      "check": "both present -> present",
+      "ok": true
+    },
+    {
+      "check": "both absent -> absent",
+      "ok": true
+    },
+    {
+      "check": "present/absent disagreement -> unresolved",
+      "ok": true
+    },
+    {
+      "check": "BOTH UNCERTAIN -> unresolved (never a presence label)",
+      "ok": true
+    },
+    {
+      "check": "present + uncertain -> unresolved",
+      "ok": true
+    },
+    {
+      "check": "absent + uncertain -> unresolved",
+      "ok": true
+    },
+    {
+      "check": "only one vote -> unresolved",
+      "ok": true
+    },
+    {
+      "check": "uncertain/uncertain is agreement but NOT definite consensus",
+      "ok": true
+    },
+    {
+      "check": "present/present is definite consensus",
+      "ok": true
+    },
+    {
+      "check": "present/absent is disagreement",
+      "ok": true
+    },
+    {
+      "check": "definite coverage counts only present/absent",
+      "ok": true
+    },
+    {
+      "check": "definite coverage 0 when both uncertain",
+      "ok": true
+    },
+    {
+      "check": "definite coverage 2 when both definite",
+      "ok": true
+    },
+    {
+      "check": "AGREED unable_to_judge derives unable_to_judge, not unresolved",
+      "ok": true
+    },
+    {
+      "check": "unable_to_judge vs coherent -> unresolved",
+      "ok": true
+    },
+    {
+      "check": "both whole_frame_breakdown -> whole_frame_breakdown",
+      "ok": true
+    },
+    {
+      "check": "localized vs coherent -> unresolved",
+      "ok": true
+    },
+    {
+      "check": "rendering distribution keeps unable_to_judge and unresolved apart",
+      "ok": true
+    },
+    {
+      "check": "3x3 table has nine cells",
+      "ok": true
+    },
+    {
+      "check": "3x3 table total equals case count",
+      "ok": true
+    },
+    {
+      "check": "present->absent cell",
+      "ok": true
+    },
+    {
+      "check": "present->unresolved cell",
+      "ok": true
+    },
+    {
+      "check": "unresolved->unresolved cell",
+      "ok": true
+    },
+    {
+      "check": "zero cell is still reported",
+      "ok": true
+    },
+    {
+      "check": "removal numerator",
+      "ok": true
+    },
+    {
+      "check": "EDITED-UNRESOLVED STAYS IN THE DENOMINATOR",
+      "ok": true
+    },
+    {
+      "check": "removal is a count with a denominator",
+      "ok": true
+    },
+    {
+      "check": "denominator breakdown retains the unresolved edited case",
+      "ok": true
+    },
+    {
+      "check": "ZERO m0-present denominator -> not estimable",
+      "ok": true
+    },
+    {
+      "check": "zero denominator flagged not estimable",
+      "ok": true
+    },
+    {
+      "check": "absent->absent contributes nothing to the numerator",
+      "ok": true
+    },
+    {
+      "check": "CANNOT_FAIRLY_COMPARE IS ITS OWN CATEGORY",
+      "ok": true
+    },
+    {
+      "check": "B distribution keeps all four categories",
+      "ok": true
+    },
+    {
+      "check": "B distribution sums to the number of answers",
+      "ok": true
+    },
+    {
+      "check": "absent B category reported as zero, not omitted",
+      "ok": true
+    }
+  ]
+}

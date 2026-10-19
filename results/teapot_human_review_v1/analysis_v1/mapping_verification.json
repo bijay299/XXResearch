@@ -1,0 +1,129 @@
+{
+  "generated_iso": "2026-10-18T20:05:05.701509-04:00",
+  "what_this_is": "Host-performed verification that the private Task-A/Task-B mappings are unchanged and structurally sound before they are used to join responses. Mappings were NOT regenerated. No key, salt, filename or neutral-ID-to-condition association is published.",
+  "mapping_generated_iso": "2026-10-18T13:09:00.335661-04:00",
+  "mapping_schema_id_recorded": "THR-EXPORT-SCHEMA-1.0.0",
+  "commitment_scheme": "HMAC-SHA256(secret_salt, canonical_bytes). The salt is held privately and is NOT published. These commit to the actual populated artifacts, not to placeholders.",
+  "committed_iso": "2026-10-18T13:09:00.335661-04:00",
+  "counts": {
+    "taskA_images": 40,
+    "taskB_cases": 20,
+    "m0_images": 20,
+    "edited_images": 20
+  },
+  "case_category_counts": {
+    "composition": 4,
+    "occlusion": 3,
+    "plain": 10,
+    "style": 3
+  },
+  "case_class_counts": {
+    "challenging": 10,
+    "ordinary": 10
+  },
+  "checks": [
+    {
+      "check": "taskA_mapping_40_items commitment matches",
+      "ok": true,
+      "detail": "4fbd0fef8f29425d13ba39cf53a4b24fdec0d25b89984433ae74755e27926282"
+    },
+    {
+      "check": "taskB_mapping_20_pairs commitment matches",
+      "ok": true,
+      "detail": "c3f362a5e50f7a6c7d70dc7182a5f9e54d3da13a8fa9355d3ef9d26f3884aa4e"
+    },
+    {
+      "check": "taskA_item_ids commitment matches",
+      "ok": true,
+      "detail": "b7ed628b4e30d7692701d48653fea5362cf44a24d0b4c32637dd9dd177bdd4d3"
+    },
+    {
+      "check": "Task-A mapping has 40 images",
+      "ok": true,
+      "detail": "40"
+    },
+    {
+      "check": "Task-B mapping has 20 cases",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "check": "Task-A IDs are A-001..A-040 contiguous",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Task-B IDs are B-01..B-20 contiguous",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "public taskA_items.json agrees with the private mapping IDs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Task-A source filenames are one-to-one with neutral IDs",
+      "ok": true,
+      "detail": "40 distinct"
+    },
+    {
+      "check": "Task-A source hashes are 40 distinct images",
+      "ok": true,
+      "detail": "40 distinct"
+    },
+    {
+      "check": "Task-A conditions are exactly {m0, edited}",
+      "ok": true,
+      "detail": "edited,m0"
+    },
+    {
+      "check": "Task-A splits 20 m0 / 20 edited",
+      "ok": true,
+      "detail": "m0=20 edited=20"
+    },
+    {
+      "check": "every pair has m0 = reference and edited = candidate",
+      "ok": true,
+      "detail": "20 / 20"
+    },
+    {
+      "check": "Task-A covers 20 distinct cases",
+      "ok": true,
+      "detail": "20 cases"
+    },
+    {
+      "check": "every Task-A case has exactly one m0 and one edited image",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Task-B case set equals the Task-A case set",
+      "ok": true,
+      "detail": "20 vs 20"
+    },
+    {
+      "check": "pair reference/candidate hashes equal the Task-A m0/edited hashes",
+      "ok": true,
+      "detail": "20 / 20"
+    },
+    {
+      "check": "pair class/category agree with the Task-A record",
+      "ok": true,
+      "detail": "20 / 20"
+    },
+    {
+      "check": "case categories recorded in the frozen mapping sum to 20",
+      "ok": true,
+      "detail": "{\"composition\": 4, \"occlusion\": 3, \"plain\": 10, \"style\": 3}"
+    },
+    {
+      "check": "case strata (ordinary/challenging) recorded in the frozen mapping sum to 20",
+      "ok": true,
+      "detail": "{\"challenging\": 10, \"ordinary\": 10}"
+    }
+  ],
+  "n_checks": 20,
+  "n_passed": 20,
+  "verdict": "MAPPINGS_VERIFIED_UNCHANGED"
+}

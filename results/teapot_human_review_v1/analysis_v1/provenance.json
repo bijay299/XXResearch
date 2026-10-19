@@ -1,0 +1,80 @@
+{
+  "analysis_id": "THR-ANALYSIS-V1",
+  "generated_iso": "2026-10-18T20:05:05.807338-04:00",
+  "scope": "Descriptive analysis of existing human judgments. No new experiment, label, model run or image generation.",
+  "chronology_disclosure": "The four answer files were already open in the working context when the analysis contract was written: they arrived attached to the request. The contract was frozen BEFORE any aggregation, table or count was computed, but NOT before the raw rows could be seen. See ANALYSIS_CONTRACT.md section 0. This is recorded as implementation of existing frozen rules plus clarification of their shorthand -- not a new retrospective preregistration.",
+  "inputs": {
+    "n_allowlisted": 4,
+    "keyed_by": "neutral reviewer ID and stage",
+    "sha256": {
+      "R1_taskA_final": "630cb4b522bd3a93740b39231382503e46e85323264ede9a5e4d939936052758",
+      "R1_taskB_final": "3dc00a2eb0731a0c439fe50c3cc0a6013b8b8ef2eee69e17386bbc29cb04faa6",
+      "R2_taskA_final": "d57fb70873b7909c6d8964e8314dcdb2b56168c99279c5dec78e7e58d1e34b09",
+      "R2_taskB_final": "2ddae4d6fb742c0d1d147d0b88e33637cb0a3f110680c7d72305206b1a3f1fcf"
+    },
+    "unchanged_by_analysis": true,
+    "originals_modified": false,
+    "note": "Original filenames embed reviewer aliases and are withheld. Private read-only copies (mode 0400) and a private SHA256 input manifest were made, with a host-verified private backup. The user's originals were not modified.",
+    "backup_verification": "host-performed, not independent attestation"
+  },
+  "validator": {
+    "revision": "validator-r3",
+    "all_four_valid": true,
+    "errors": 0,
+    "warnings": 0
+  },
+  "code_sha256": {
+    "analysis_rules.py": "d1150960871d4feb52c9250a737c0c3d5d0ea4b003543db4b7d418540784b8ab",
+    "analyze_v1.py": "665345ab0bb02b9f554dbde4289ed2475bb858570486aa04cb789e92f1c78aac",
+    "test_analysis_synthetic.py": "ebf20296ab1387cfac77d50596495c6cf2942a7959d5bc7b3f585e671e01c3bf",
+    "verify_analysis.py": "7a6f6b98108f1cfa0c25db070aa75d0478d47a6a2323ac98308fda566fa37286",
+    "verify_mappings_for_analysis.py": "c47c6f705f09e6831918ee927da34e4291262a2f5f3eaa2cc850a1986948a059",
+    "audit_analysis_public.py": "9cfbecc653598e6bae75b552b7674e6727f7718ce55188cfe3fe844630ef5d06",
+    "finalize_analysis.py": "24021f81b2d746f82516f81d174a334f2245b06404edc8bf1fce7df62f58883b"
+  },
+  "results": {
+    "synthetic_checks": "35/35",
+    "analysis_checks": "54/54 ANALYSIS_CHECKS_PASS",
+    "mapping_verification": "20/20 MAPPINGS_VERIFIED_UNCHANGED",
+    "public_audit": "0 findings ANALYSIS_PUBLIC_AUDIT_CLEAN",
+    "reproducibility": "public tables byte-identical across two runs; summary.json identical apart from timestamp"
+  },
+  "principal_counts": {
+    "cases": 20,
+    "taskA_judgments": 80,
+    "taskB_judgments": 40,
+    "reviewers_planned": 3,
+    "reviewers_actual": 2,
+    "demonstrated_removal": "18 / 20",
+    "presence_table_total": 20,
+    "taskB_exact_agreement": "18/20"
+  },
+  "preserved_unchanged": [
+    "all four original responses (byte-verified before and after)",
+    "private mappings, salt and both published commitments (re-verified, mappings NOT regenerated)",
+    "Task-A item IDs, Task-B pair IDs, role assignments",
+    "both Task-A releases and the Task-B release: assets and tag targets",
+    "both questionnaire viewers (neither rebuilt)",
+    "the asset-build findings (not updated)",
+    "all closed-project files"
+  ],
+  "not_done": [
+    "no new experiment, model run, training or GPU allocation",
+    "no image generation",
+    "no new labels",
+    "no automated or AI judging / adjudication",
+    "no re-review, relabelling or outcome-chosen exclusion",
+    "no participant contact",
+    "no revised judgments",
+    "no response replacement",
+    "no reopening of closed work",
+    "no hypothesis test, interval, bootstrap, kappa or significance claim",
+    "no follow-up study executed"
+  ],
+  "verification_nature": "All checks here are HOST-PERFORMED: this machine ran them on its own outputs. Not an independent attestation.",
+  "public_reproducibility_limit": "The case-level m0/edited join runs through the PRIVATE mapping. Published files allow rechecking every table's arithmetic, totals and joins, but not independent reproduction of the condition assignment.",
+  "git": {
+    "branch": "research/audit-and-matched-effectiveness-protocol",
+    "head_at_write": "447317606f62346a243cf39290f1336b21129ee9"
+  }
+}

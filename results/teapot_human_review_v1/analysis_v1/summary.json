@@ -1,0 +1,394 @@
+{
+  "analysis_id": "THR-ANALYSIS-V1",
+  "app_version": "1.1.0",
+  "cohort": {
+    "actual": 2,
+    "change_recorded": "Amendment 03 \u00a71, at Task-A closure -- before any outcome analysis and before Task B was released",
+    "frozen_minimum": 2,
+    "id_assignment_rule": "Task-A exported_iso ascending; earlier = R1. Answer-independent. Same linkage used for both stages.",
+    "identity_and_independence": "Coordinator-reported. Matching A/B aliases and the user's handoff link each Task-B return to the same person who filed the corresponding Task-A return. Software cannot independently prove identity or independence.",
+    "meets_frozen_minimum": true,
+    "planned": 3,
+    "reviewer_ids": [
+      "R1",
+      "R2"
+    ]
+  },
+  "demonstrated_removal": {
+    "definition": "numerator = derived m0 present AND derived edited absent; denominator = ALL derived m0 present cases, including those whose edited status is unresolved. absent->absent is not demonstrated removal.",
+    "denominator": 20,
+    "denominator_breakdown_by_edited_status": {
+      "absent": 18,
+      "present": 1,
+      "unresolved": 1
+    },
+    "estimable": true,
+    "numerator": 18,
+    "numerator_case_ids": [
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-04",
+      "B-05",
+      "B-06",
+      "B-07",
+      "B-08",
+      "B-09",
+      "B-10",
+      "B-11",
+      "B-12",
+      "B-13",
+      "B-14",
+      "B-16",
+      "B-18",
+      "B-19",
+      "B-20"
+    ],
+    "value_text": "18 / 20"
+  },
+  "descriptive_strata": {
+    "by_category": {
+      "composition": {
+        "B_about_the_same": 7,
+        "B_cannot_fairly_compare": 0,
+        "B_less": 0,
+        "B_more": 1,
+        "edited_absent": 3,
+        "m0_present": 4,
+        "n_cases": 4,
+        "removal_denominator": 4,
+        "removal_numerator": 3
+      },
+      "occlusion": {
+        "B_about_the_same": 5,
+        "B_cannot_fairly_compare": 0,
+        "B_less": 1,
+        "B_more": 0,
+        "edited_absent": 3,
+        "m0_present": 3,
+        "n_cases": 3,
+        "removal_denominator": 3,
+        "removal_numerator": 3
+      },
+      "plain": {
+        "B_about_the_same": 20,
+        "B_cannot_fairly_compare": 0,
+        "B_less": 0,
+        "B_more": 0,
+        "edited_absent": 10,
+        "m0_present": 10,
+        "n_cases": 10,
+        "removal_denominator": 10,
+        "removal_numerator": 10
+      },
+      "style": {
+        "B_about_the_same": 4,
+        "B_cannot_fairly_compare": 0,
+        "B_less": 0,
+        "B_more": 2,
+        "edited_absent": 2,
+        "m0_present": 3,
+        "n_cases": 3,
+        "removal_denominator": 3,
+        "removal_numerator": 2
+      }
+    },
+    "by_class": {
+      "challenging": {
+        "B_about_the_same": 16,
+        "B_cannot_fairly_compare": 0,
+        "B_less": 1,
+        "B_more": 3,
+        "edited_absent": 8,
+        "m0_present": 10,
+        "n_cases": 10,
+        "removal_denominator": 10,
+        "removal_numerator": 8
+      },
+      "ordinary": {
+        "B_about_the_same": 20,
+        "B_cannot_fairly_compare": 0,
+        "B_less": 0,
+        "B_more": 0,
+        "edited_absent": 10,
+        "m0_present": 10,
+        "n_cases": 10,
+        "removal_denominator": 10,
+        "removal_numerator": 10
+      }
+    }
+  },
+  "generated_iso": "2026-10-18T20:05:05.643559-04:00",
+  "integrity": {
+    "code_sha256": {
+      "analysis_rules.py": "d1150960871d4feb52c9250a737c0c3d5d0ea4b003543db4b7d418540784b8ab",
+      "analyze_v1.py": "665345ab0bb02b9f554dbde4289ed2475bb858570486aa04cb789e92f1c78aac",
+      "test_analysis_synthetic.py": "ebf20296ab1387cfac77d50596495c6cf2942a7959d5bc7b3f585e671e01c3bf",
+      "verify_mappings_for_analysis.py": "c47c6f705f09e6831918ee927da34e4291262a2f5f3eaa2cc850a1986948a059"
+    },
+    "input_key_note": "Keyed by neutral reviewer ID and stage. Original filenames embed aliases and are withheld; the filename -> hash mapping is in the private input manifest.",
+    "input_sha256_after": {
+      "R1_taskA_final": "630cb4b522bd3a93740b39231382503e46e85323264ede9a5e4d939936052758",
+      "R1_taskB_final": "3dc00a2eb0731a0c439fe50c3cc0a6013b8b8ef2eee69e17386bbc29cb04faa6",
+      "R2_taskA_final": "d57fb70873b7909c6d8964e8314dcdb2b56168c99279c5dec78e7e58d1e34b09",
+      "R2_taskB_final": "2ddae4d6fb742c0d1d147d0b88e33637cb0a3f110680c7d72305206b1a3f1fcf"
+    },
+    "input_sha256_before": {
+      "R1_taskA_final": "630cb4b522bd3a93740b39231382503e46e85323264ede9a5e4d939936052758",
+      "R1_taskB_final": "3dc00a2eb0731a0c439fe50c3cc0a6013b8b8ef2eee69e17386bbc29cb04faa6",
+      "R2_taskA_final": "d57fb70873b7909c6d8964e8314dcdb2b56168c99279c5dec78e7e58d1e34b09",
+      "R2_taskB_final": "2ddae4d6fb742c0d1d147d0b88e33637cb0a3f110680c7d72305206b1a3f1fcf"
+    },
+    "inputs_unchanged_by_analysis": true
+  },
+  "judgment_counts": {
+    "cases": 20,
+    "note": "20 paired cases, 80 Task-A judgments and 40 Task-B judgments from two people -- not independent replicated trials.",
+    "reviewers": 2,
+    "taskA_images": 40,
+    "taskA_judgments": 80,
+    "taskB_judgments": 40
+  },
+  "package_a": "THR-V1-A",
+  "package_b": "THR-V1-B",
+  "participation": {
+    "R1": {
+      "exposure_declared_A": true,
+      "exposure_declared_B": true,
+      "free_text_reason_fields_present_withheld": 1,
+      "image_specific_coaching_before_A": false,
+      "other_exposure_note_present_withheld": false,
+      "prior_access_to_condition_labels_before_A": false,
+      "prior_access_to_source_pairings_before_A": false,
+      "reference_identity_disclosed_in_this_stage": true,
+      "taskA_app_version": "1.1.0",
+      "taskA_complete": true,
+      "taskA_expected": 40,
+      "taskA_export_kind": "final",
+      "taskA_order_variant": "ALIAS",
+      "taskA_rows": 40,
+      "taskA_schema_id": "THR-EXPORT-SCHEMA-1.1.0",
+      "taskB_app_build": "taskB-b1",
+      "taskB_app_version": "1.1.0",
+      "taskB_complete": true,
+      "taskB_declares_coaching_before_A": false,
+      "taskB_declares_prior_condition_access_before_A": false,
+      "taskB_expected": 20,
+      "taskB_export_kind": "final",
+      "taskB_order_variant": "ALIAS",
+      "taskB_rows": 20,
+      "taskB_schema_id": "THR-EXPORT-SCHEMA-1.1.0",
+      "task_a_final_exported_before_task_b": true
+    },
+    "R2": {
+      "exposure_declared_A": true,
+      "exposure_declared_B": true,
+      "free_text_reason_fields_present_withheld": 0,
+      "image_specific_coaching_before_A": false,
+      "other_exposure_note_present_withheld": false,
+      "prior_access_to_condition_labels_before_A": false,
+      "prior_access_to_source_pairings_before_A": false,
+      "reference_identity_disclosed_in_this_stage": true,
+      "taskA_app_version": "1.1.0",
+      "taskA_complete": true,
+      "taskA_expected": 40,
+      "taskA_export_kind": "final",
+      "taskA_order_variant": "ALIAS",
+      "taskA_rows": 40,
+      "taskA_schema_id": "THR-EXPORT-SCHEMA-1.1.0",
+      "taskB_app_build": "taskB-b1",
+      "taskB_app_version": "1.1.0",
+      "taskB_complete": true,
+      "taskB_declares_coaching_before_A": false,
+      "taskB_declares_prior_condition_access_before_A": false,
+      "taskB_expected": 20,
+      "taskB_export_kind": "final",
+      "taskB_order_variant": "ALIAS",
+      "taskB_rows": 20,
+      "taskB_schema_id": "THR-EXPORT-SCHEMA-1.1.0",
+      "task_a_final_exported_before_task_b": true
+    }
+  },
+  "presence_table_m0_by_edited": {
+    "axes": [
+      "present",
+      "absent",
+      "unresolved"
+    ],
+    "table": {
+      "absent": {
+        "absent": 0,
+        "present": 0,
+        "unresolved": 0
+      },
+      "present": {
+        "absent": 18,
+        "present": 1,
+        "unresolved": 1
+      },
+      "unresolved": {
+        "absent": 0,
+        "present": 0,
+        "unresolved": 0
+      }
+    },
+    "total": 20
+  },
+  "protocol_id": "TEAPOT-HR-PROTO-1.0.0",
+  "schema_id": "THR-EXPORT-SCHEMA-1.1.0",
+  "scope": "Descriptive analysis of existing human judgments. No new experiment, label, model run or image generation.",
+  "statistics_excluded": [
+    "hypothesis tests",
+    "p-values",
+    "confidence intervals",
+    "bootstrap",
+    "kappa / chance-corrected agreement",
+    "significance claims",
+    "new pass/fail cutoff",
+    "method ranking"
+  ],
+  "statistics_note": "Descriptive scope choice for 20 cases judged by two people. NOT a claim that such statistics are universally impossible or improper.",
+  "target_absence_rendering": {
+    "all_edited_absent_cases": {
+      "edited_image_rendering": {
+        "coherent": 13,
+        "localized_deformation": 0,
+        "unable_to_judge": 0,
+        "unresolved": 5,
+        "whole_frame_breakdown": 0
+      },
+      "n": 18
+    },
+    "qualified_m0_present_to_edited_absent": {
+      "edited_image_rendering": {
+        "coherent": 13,
+        "localized_deformation": 0,
+        "unable_to_judge": 0,
+        "unresolved": 5,
+        "whole_frame_breakdown": 0
+      },
+      "n": 18
+    }
+  },
+  "taskA": {
+    "definite_target_vote_coverage_per_image": {
+      "0": 0,
+      "1": 0,
+      "2": 40
+    },
+    "derived_presence_counts_over_40_images": {
+      "absent": 18,
+      "present": 21,
+      "unresolved": 1
+    },
+    "derived_rendering_counts_over_40_images": {
+      "coherent": 33,
+      "localized_deformation": 1,
+      "unable_to_judge": 0,
+      "unresolved": 6,
+      "whole_frame_breakdown": 0
+    },
+    "presence_agreement": {
+      "all_40_images": {
+        "definite_consensus": 39,
+        "disagreement": 1,
+        "n": 40,
+        "raw_agreement_any": 39,
+        "uncertain_agreement": 0
+      },
+      "edited_images": {
+        "definite_consensus": 19,
+        "disagreement": 1,
+        "n": 20,
+        "raw_agreement_any": 19,
+        "uncertain_agreement": 0
+      },
+      "m0_images": {
+        "definite_consensus": 20,
+        "disagreement": 0,
+        "n": 20,
+        "raw_agreement_any": 20,
+        "uncertain_agreement": 0
+      }
+    },
+    "raw_presence_per_reviewer": {
+      "R1": {
+        "absent": 18,
+        "present": 22,
+        "uncertain": 0
+      },
+      "R2": {
+        "absent": 19,
+        "present": 21,
+        "uncertain": 0
+      }
+    },
+    "raw_rendering_per_reviewer": {
+      "R1": {
+        "coherent": 38,
+        "localized_deformation": 2,
+        "unable_to_judge": 0,
+        "whole_frame_breakdown": 0
+      },
+      "R2": {
+        "coherent": 34,
+        "localized_deformation": 6,
+        "unable_to_judge": 0,
+        "whole_frame_breakdown": 0
+      }
+    },
+    "rendering_agreement": {
+      "all_40_images": {
+        "agreement": 34,
+        "disagreement": 6,
+        "n": 40
+      },
+      "edited_images": {
+        "agreement": 15,
+        "disagreement": 5,
+        "n": 20
+      },
+      "m0_images": {
+        "agreement": 19,
+        "disagreement": 1,
+        "n": 20
+      }
+    }
+  },
+  "taskB": {
+    "distributions": {
+      "R1": {
+        "about_the_same": 18,
+        "cannot_fairly_compare": 0,
+        "less": 1,
+        "more": 1
+      },
+      "R2": {
+        "about_the_same": 18,
+        "cannot_fairly_compare": 0,
+        "less": 0,
+        "more": 2
+      }
+    },
+    "exact_per_pair_agreement": {
+      "agreeing_pairs": 18,
+      "denominator": 20,
+      "note": "Descriptive only. No Task-B consensus rule was frozen and none is invented; disagreements are not forced into a majority label."
+    }
+  },
+  "validator_revision": "validator-r3",
+  "withheld_from_public_artifacts": [
+    "reviewer aliases",
+    "alias -> R1/R2 linkage",
+    "original export filenames",
+    "free-text `reason` values",
+    "`other_exposure_note` values",
+    "`exported_iso` timestamps",
+    "source image filenames and hashes",
+    "case IDs",
+    "neutral-ID -> condition associations",
+    "randomization salt and commitment keys",
+    "private input manifest and backup contents"
+  ],
+  "withheld_note": "These fields exist in the originals and were NOT deleted from them. They are withheld from public artifacts only."
+}
