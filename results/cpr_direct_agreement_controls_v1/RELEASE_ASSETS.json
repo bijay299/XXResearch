@@ -1,0 +1,38 @@
+{
+ "tag": "cpr-direct-agreement-controls-v1",
+ "assets": [
+  {
+   "name": "adapters_gate_run2.tar",
+   "sha256": "102ac5bdbe0c532677e883b8e97e9c778f6541f242a16a7b308d74c6d92435ea",
+   "bytes": 89753600
+  },
+  {
+   "name": "adapters_gate_run1_superseded.tar",
+   "sha256": "1ec9f9640d16d7956f2e088c963913679cb3ad9921969fd35a0ce6c8d6a5b6de",
+   "bytes": 89753600
+  },
+  {
+   "name": "captured_triplets.pt",
+   "sha256": "6d65743cace5bedc42a777a698b213e3982a1b54790e4fa5aeef64e5eb141ace",
+   "bytes": 1575532
+  },
+  {
+   "name": "SHA256SUMS",
+   "sha256": null,
+   "bytes": 276,
+   "note": "self-referential file; hash of the three payload assets listed above"
+  }
+ ],
+ "contents": {
+  "adapters_gate_run2.tar": "dev.native_gem.lr_1e-3/{pct25,pct50,terminal}/{adapter_model.safetensors,adapter_meta.json} (6, 12, 23 optimizer updates at 66/132/250 states; FINAL run)",
+  "adapters_gate_run1_superseded.tar": "adapters/{pct25,pct50,terminal}/... from the first GPU-gate run (failed a harness assertion; superseded by run 2; preserved as evidence of run-to-run nondeterminism)",
+  "captured_triplets.pt": "real FP32 student/anchor/target operands at processed indices 0 and 7; byte-identical in both runs"
+ },
+ "not_uploaded": [
+  "pristine base weights",
+  "COCO photographs",
+  "credentials",
+  "private responses"
+ ],
+ "license_notice": "LoRA adapters are derivatives of FLUX.1-dev (non-commercial licence); research verification only; licence text not verified locally"
+}

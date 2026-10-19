@@ -1,0 +1,111 @@
+{
+  "all_pass": false,
+  "checks": {
+    "captured_digests_match_run_record": {
+      "pass": true
+    },
+    "captured_indices_match_predeclared": {
+      "got": [
+        0,
+        7
+      ],
+      "pass": true
+    },
+    "meta": {
+      "note": true,
+      "predeclared_indices": [
+        0,
+        7
+      ],
+      "scope": "real-model FP32 operands (student velocity, anchor teacher, target teacher) replayed on CPU",
+      "started_utc": "2026-10-19T18:53:42Z",
+      "tolerances": {
+        "grad": {
+          "atol": 1e-07,
+          "rtol": 0.0001
+        },
+        "loss": {
+          "atol": 1e-06,
+          "rtol": 1e-05
+        }
+      }
+    },
+    "native_three_way::idx0": {
+      "B_vs_A": {
+        "bitwise_grad": true,
+        "bitwise_scalar": true,
+        "grad_err": 0.0,
+        "grad_ok": true,
+        "scalar_err": 0.0,
+        "scalar_ok": true
+      },
+      "C_vs_A": {
+        "bitwise_grad": true,
+        "bitwise_scalar": true,
+        "grad_err": 0.0,
+        "grad_ok": true,
+        "scalar_err": 0.0,
+        "scalar_ok": true
+      },
+      "D_vs_A": {
+        "bitwise_grad": true,
+        "bitwise_scalar": true,
+        "grad_err": 0.0,
+        "grad_ok": true,
+        "scalar_err": 0.0,
+        "scalar_ok": true
+      },
+      "finite_equal_shape": true,
+      "fp64_ref": {
+        "away_from_boundary_all_rows": true,
+        "compared": true,
+        "grad_err": 1.5447562563344897e-06,
+        "grad_ok": false,
+        "per_sample_err": 0.0003150358209893511,
+        "per_sample_ok": true,
+        "scalar_err": 0.002880607960719317,
+        "scalar_ok": true
+      },
+      "hook_protocol": {
+        "all_return_none": true,
+        "arg_dtypes": [
+          "torch.float32",
+          "torch.float32",
+          "torch.float32"
+        ],
+        "calls": 1,
+        "violations": []
+      },
+      "inputs_unchanged": true,
+      "pass": false,
+      "per_sample_B_vs_A": {
+        "bitwise": true,
+        "err": 0.0,
+        "ok": true
+      },
+      "per_sample_C_vs_A": {
+        "bitwise": true,
+        "err": 0.0,
+        "ok": true
+      },
+      "per_sample_D_singleton_vs_batch": {
+        "err": 0.0,
+        "ok": true
+      },
+      "per_sample_D_vs_A": {
+        "bitwise": true,
+        "err": 0.0,
+        "ok": true
+      },
+      "reduction_bitwise": true
+    },
+    "triplet_fp32_finite::idx0": {
+      "pass": true,
+      "shape": [
+        1,
+        65536
+      ]
+    }
+  },
+  "failed": "native_three_way::idx0"
+}

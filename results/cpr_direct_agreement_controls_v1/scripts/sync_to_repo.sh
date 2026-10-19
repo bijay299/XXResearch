@@ -12,5 +12,5 @@ rsync -a --delete-excluded --exclude='__pycache__' --exclude='*.pyc' --exclude='
   --include='/artifacts/analysis/***' --include='/artifacts/traj/***' --include='/artifacts/gen_records/***' \
   --include='/artifacts/scores/***' --include='/artifacts/plans/***' --include='/artifacts/decode_counts/***' \
   --include='/artifacts/orch/***' --include='/artifacts/repairs/***' --include='/artifacts/failed_attempts/***' --include='/artifacts/projection/***' --include='/artifacts/verify/***' \
-  --include='/FINAL_REPORT.md' --include='/EVIDENCE_INDEX*' --include='/RELEASE_ASSETS.json' \
+  --include='/FINAL_REPORT.md' --include='/release/' --include='/release/SHA256SUMS' --include='/EVIDENCE_INDEX*' --include='/RELEASE_ASSETS.json' \
   --exclude='__pycache__' --exclude='*.pyc' --exclude='*' "$SRC/" "$DST/"
