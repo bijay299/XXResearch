@@ -21,7 +21,7 @@ Covers the **28** files listed below. Explicitly **not** covered:
 | `../scripts/audit_analysis_public.py` | 10107 | `9cfbecc653598e6bae75b552b7674e6727f7718ce55188cfe3fe844630ef5d06` |
 | `../scripts/finalize_analysis.py` | 7809 | `24021f81b2d746f82516f81d174a334f2245b06404edc8bf1fce7df62f58883b` |
 | `../scripts/gen_analysis_manifest.py` | 3701 | `7e0b12b9831d8120503cebd2664cda6c814fa9ea9bfa96eb75c6c35217eaf13c` |
-| `../scripts/gen_evidence_index.py` | 14217 | `c54857d309844a48126dde7573570bbe5113383e1ae1213035da507c0b59d7e0` |
+| `../scripts/gen_evidence_index.py` | 17167 | `7138a3b593cd9530281cddccbf3048ec1db4aa27b485768388d7833de797e1a6` |
 | `../scripts/preservation_check.py` | 11757 | `9f0b1d4cceec9c1deb862490c7ed7306dba2b1c97bbc4c1d8c4ce5c4f00b4868` |
 | `../scripts/test_analysis_synthetic.py` | 6736 | `ebf20296ab1387cfac77d50596495c6cf2942a7959d5bc7b3f585e671e01c3bf` |
 | `../scripts/verify_analysis.py` | 12139 | `7a6f6b98108f1cfa0c25db070aa75d0478d47a6a2323ac98308fda566fa37286` |
@@ -44,4 +44,4 @@ Covers the **28** files listed below. Explicitly **not** covered:
 | `tables/taskB_responses.csv` | 923 | `c0d8e68ad0ae9877d0071226730459bb646956e87e96e3210da83b74e7d0718a` |
 | `verification.json` | 7241 | `c5eb720e9185b21939eb8a22c1a525e873cda6d21a8c9c6a64691e60073f6f1d` |
 
-28 files. Generated 2026-10-18T21:00:02.725509-04:00.
+28 files. Generated 2026-10-18T21:02:10.488638-04:00.

@@ -90,13 +90,33 @@ def main():
       f"`{rel.get('target_commitish')}`")
     w(f"* **Release assets:** {len(rel['assets'])}, "
       f"{sum(x['size'] for x in rel['assets']):,} bytes")
-    w("* **Status:** `ANALYSIS_COMPLETE` — both stages CLOSED with **2** "
-      "reviewers (3 planned) and the combined **descriptive** analysis of the "
-      "existing human judgments published under "
-      "[`analysis_v1/`](analysis_v1/FINAL_REPORT.md). Outcomes are now "
-      "reported here. The **original responses are preserved unchanged and "
-      "are NOT published**; aliases, free text, timestamps and the private "
-      "mappings stay private.\n")
+    w("* **Status:** `ANALYSIS_COMPLETE` · **`CLOSED WITH QUALIFIED "
+      "CONCLUSIONS`** — both stages CLOSED with **2** reviewers (3 planned), "
+      "the combined **descriptive** analysis published under "
+      "[`analysis_v1/`](analysis_v1/FINAL_REPORT.md), and the analysis now "
+      "**closed**. Outcomes are reported here. The **original responses are "
+      "preserved unchanged and are NOT published**; aliases, free text, "
+      "timestamps and the private mappings stay private.\n")
+    w("* **Read first:** "
+      "[`analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md`]"
+      "(analysis_v1/AMENDMENT_01_CONCLUSIONS_AND_PROVENANCE.md) — "
+      "**authoritative on interpretation.** The verified counts are "
+      "**unchanged**; several *interpretive* claims around them were "
+      "overstated and are **withdrawn** there: an instrument ceiling or "
+      "\"almost no discriminative range\"; \"badly under-powered\" (no "
+      "inferential test, estimand, effect size or power calculation was ever "
+      "specified, and none is computed); a \"one-directional\" reviewer "
+      "difference (of six rendering disagreements **five** run one way and "
+      "**one the other**, so a stricter-threshold explanation stays a "
+      "**hypothesis**); a diagnosed calibration/anchor failure; and case "
+      "count, reviewer count or calibration as **proven** binding "
+      "constraints. `CLOSED WITH QUALIFIED CONCLUSIONS` is **not** a "
+      "scientific failure and **not** a new success threshold.\n")
+    w("* **Data shape:** **120 reviewer-item records carrying 200 categorical "
+      "answers** — 80 Task-A records with **two** answers each (`target` and "
+      "`rendering`) plus 40 Task-B answers. Earlier prose saying \"120 "
+      "categorical votes\" conflated records with answers; no count or "
+      "denominator depended on it.\n")
 
     w("## Verification summary\n")
     w("| check | result |")
@@ -114,7 +134,9 @@ def main():
         w("| **ANALYSIS v1 — descriptive outcomes** | |")
         w(f"| Reviewers (planned / actual) | **{su.get('cohort',{}).get('planned')} / "
           f"{su.get('cohort',{}).get('actual')}** |")
-        w(f"| Judgment counts | **20 paired cases, 80 Task-A, 40 Task-B, 2 reviewers** |")
+        w("| Data shape | **20 paired cases; 120 reviewer-item records "
+          "carrying 200 categorical answers** (80 Task-A records x 2 answers = "
+          "160, plus 40 Task-B answers); **2** reviewers |")
         w(f"| All four exports valid under `{su.get('validator_revision')}` | "
           f"**yes, 0 errors** |")
         w(f"| 3x3 m0-by-edited presence table total | **{pt.get('total')} / 20** |")
@@ -249,16 +271,34 @@ def main():
       "bootstrap, kappa, significance claim, pass/fail cutoff or method "
       "ranking** is reported -- a descriptive scope choice for this design, "
       "not a claim such statistics are impossible.\n")
+    w("**The supported conclusion is bounded.** On this fixed panel the "
+      "target was marked present in all 20 M0 images; the frozen consensus "
+      "rule yields **18 edited-absent, one present, one unresolved**, with "
+      "**13 agreed-coherent and five rendering-unresolved** among the 18 "
+      "absent cases; Task-B ratings were **concentrated at "
+      "`about_the_same`** (36/40). Genuine quality similarity, limited "
+      "stimulus variation and limited instrument sensitivity remain "
+      "**different compatible explanations**. The 13 coherent absences are "
+      "**not** turned into a combined success score. **This fixed analysis is "
+      "closed**; any enlargement, calibration or comparison is an "
+      "**unselected prospective option** needing its own justified question, "
+      "design and authorization, and **no follow-up is launched**.\n")
     w("Distribution of the questionnaires was handled by the user "
       "independently of this repository. **No raw response, alias, free-text "
-      "answer or private crosswalk is published**, and the case-level join "
-      "runs through the **private** mapping, so public end-to-end "
-      "reproducibility is **partial**. Task B was released under explicit "
-      "authorization and is **partially unmasked by design**; because both "
-      "bundles ship images byte-identical to the public per-case images whose "
-      "condition and sha256 are published, the neutral IDs **do not hide "
-      "condition**. The masking that mattered was masking **at judging "
-      "time**.\n")
+      "answer or private crosswalk is published.** Reproducibility has **two "
+      "distinct limits**: condition/pair assignment **IS recoverable** by "
+      "hashing the already-public Task-A, Task-B and source images — an "
+      "independent review reconstructed it that way, and withholding a direct "
+      "crosswalk does **not** make it unreproducible — whereas "
+      "**export-level reproduction is limited**, because the exact exports, "
+      "free text, original metadata and the reviewer↔`R1`/`R2` linkage stay "
+      "private. Public Task-B pair IDs `B-01`…`B-20` **are** published. Task B "
+      "was released under explicit authorization and is **partially unmasked "
+      "by design**, so the neutral IDs **do not hide condition**. "
+      "Judging-time masking rests on a **procedural account** — reviewers' "
+      "declarations and user-reported independence — **not on proof that it "
+      "held**; nothing indicates it failed either. Pseudonyms do **not** erase "
+      "the earlier roster disclosure or guarantee anonymity.\n")
 
     out = os.path.join(rdir, "EVIDENCE_INDEX.md")
     open(out, "w").write("\n".join(L))
