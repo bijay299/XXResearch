@@ -1,0 +1,273 @@
+/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/transformers/utils/hub.py:127: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/xformers/ops/fmha/flash.py:211: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.
+  @torch.library.impl_abstract("xformers_flash::flash_fwd")
+/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/xformers/ops/fmha/flash.py:344: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.
+  @torch.library.impl_abstract("xformers_flash::flash_bwd")
+{
+  "_allow_init": true,
+  "model_type": "flux",
+  "model_name_or_path": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--black-forest-labs--FLUX.1-dev/snapshots/3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+  "model_dtype": "float16",
+  "scheduler": "default",
+  "image_size": 512,
+  "num_inference_steps": 28,
+  "inference_guidance_scale": 3.5
+}
+Loading pipeline components...:   0%|          | 0/7 [00:00<?, ?it/s]You set `add_prefix_space`. The tokenizer needs to be converted from the slow tokenizers
+Loading pipeline components...:  29%|██▊       | 2/7 [00:00<00:00,  6.27it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  6.56it/s][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  7.45it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  7.29it/s]
+Loading pipeline components...:  43%|████▎     | 3/7 [00:00<00:00,  4.12it/s]Loading pipeline components...:  57%|█████▋    | 4/7 [00:01<00:01,  2.67it/s]Loading pipeline components...:  71%|███████▏  | 5/7 [00:01<00:00,  3.34it/s]Loading pipeline components...: 100%|██████████| 7/7 [00:01<00:00,  4.61it/s]
+Finding Parameter Subset for the given conditions
+> startswith: ['transformer']
+> contains: None
+> contains_substring: None
+> endswith: ['add_q_proj', 'add_k_proj', 'to_q', 'to_k']
+Target modules:
+> transformer.transformer_blocks.0.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.0.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.0.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.0.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.1.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.2.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.3.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.4.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.5.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.6.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.7.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.8.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.9.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.10.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.11.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.12.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.13.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.14.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.15.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.16.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.17.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.to_q -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.to_k -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.add_k_proj -> <class 'torch.nn.modules.linear.Linear'>
+> transformer.transformer_blocks.18.attn.add_q_proj -> <class 'torch.nn.modules.linear.Linear'>
+trainable params: 7,471,104 || all params: 16,878,070,243 || trainable%: 0.0443
+Successfully added 'lora' adapters for parameter subset qk_dual!
+Using inference schedule (28 steps) instead of training schedule (1000 steps)
+Training GEM:   0%|          | 0/5 [00:00<?, ?step/s]/data/bijaypandey/cuig_pilot/venv-cuig/lib/python3.10/site-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.
+  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]
+Training GEM:  20%|██        | 1/5 [00:14<00:56, 14.15s/step]Training GEM:  40%|████      | 2/5 [00:27<00:41, 13.97s/step]Training GEM:  60%|██████    | 3/5 [00:41<00:27, 13.94s/step]Training GEM:  60%|██████    | 3/5 [00:55<00:37, 18.63s/step]
+Starting training with step budget: 44
+Using 1 as the max. number of timesteps to process in parallel.
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 44, Global Step: 0
+GEM Loss [Global Step: 1] 293.0254821777344
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 43, Global Step: 0
+GEM Loss [Global Step: 1] 305.1376037597656
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 42, Global Step: 0
+GEM Loss [Global Step: 1] 307.4377746582031
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 41, Global Step: 0
+GEM Loss [Global Step: 1] 137.3434295654297
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 40, Global Step: 0
+GEM Loss [Global Step: 1] 98.74472045898438
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 39, Global Step: 0
+GEM Loss [Global Step: 1] 79.712890625
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 38, Global Step: 0
+GEM Loss [Global Step: 1] 68.2730484008789
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 37, Global Step: 0
+GEM Loss [Global Step: 1] 41.51921844482422
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 36, Global Step: 0
+GEM Loss [Global Step: 1] 35.44532012939453
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 35, Global Step: 0
+GEM Loss [Global Step: 1] 35.49110794067383
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 34, Global Step: 0
+GEM Loss [Global Step: 1] 35.41557693481445
+GEM Loss [Global Step: 1] 1437.5461730957031
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 33, Global Step: 1
+GEM Loss [Global Step: 2] 372.7499084472656
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 32, Global Step: 1
+GEM Loss [Global Step: 2] 249.52706909179688
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 31, Global Step: 1
+GEM Loss [Global Step: 2] 195.740966796875
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 30, Global Step: 1
+GEM Loss [Global Step: 2] 125.29362487792969
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 29, Global Step: 1
+GEM Loss [Global Step: 2] 72.95721435546875
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 28, Global Step: 1
+GEM Loss [Global Step: 2] 51.05219268798828
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 27, Global Step: 1
+GEM Loss [Global Step: 2] 46.619930267333984
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 26, Global Step: 1
+GEM Loss [Global Step: 2] 48.90243911743164
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 25, Global Step: 1
+GEM Loss [Global Step: 2] 46.27598190307617
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 24, Global Step: 1
+GEM Loss [Global Step: 2] 40.23759841918945
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 23, Global Step: 1
+GEM Loss [Global Step: 2] 42.32847595214844
+GEM Loss [Global Step: 2] 1291.685401916504
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 22, Global Step: 2
+GEM Loss [Global Step: 3] 699.2366333007812
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 21, Global Step: 2
+GEM Loss [Global Step: 3] 278.5626220703125
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 20, Global Step: 2
+GEM Loss [Global Step: 3] 268.111083984375
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 19, Global Step: 2
+GEM Loss [Global Step: 3] 97.78541564941406
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 18, Global Step: 2
+GEM Loss [Global Step: 3] 61.95854187011719
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 17, Global Step: 2
+GEM Loss [Global Step: 3] 45.59995651245117
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 16, Global Step: 2
+GEM Loss [Global Step: 3] 37.80792999267578
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 15, Global Step: 2
+GEM Loss [Global Step: 3] 30.28738021850586
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 14, Global Step: 2
+GEM Loss [Global Step: 3] 31.050212860107422
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 13, Global Step: 2
+GEM Loss [Global Step: 3] 31.21390151977539
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 12, Global Step: 2
+GEM Loss [Global Step: 3] 28.868465423583984
+GEM Loss [Global Step: 3] 1610.4821434020996
+Partial denoising will end at timestep index: 10 / 28
+Processing 11 latents in batches of 1 due to GPU memory constraints.
+Processing batch [0:1] with timestep indices [0]
+Processed 1 timesteps in parallel. Budget left: 11, Global Step: 3
+GEM Loss [Global Step: 4] 225.7831268310547
+Processing batch [1:2] with timestep indices [1]
+Processed 1 timesteps in parallel. Budget left: 10, Global Step: 3
+GEM Loss [Global Step: 4] 365.96038818359375
+Processing batch [2:3] with timestep indices [2]
+Processed 1 timesteps in parallel. Budget left: 9, Global Step: 3
+GEM Loss [Global Step: 4] 193.97128295898438
+Processing batch [3:4] with timestep indices [3]
+Processed 1 timesteps in parallel. Budget left: 8, Global Step: 3
+GEM Loss [Global Step: 4] 202.99085998535156
+Processing batch [4:5] with timestep indices [4]
+Processed 1 timesteps in parallel. Budget left: 7, Global Step: 3
+GEM Loss [Global Step: 4] 138.20323181152344
+Processing batch [5:6] with timestep indices [5]
+Processed 1 timesteps in parallel. Budget left: 6, Global Step: 3
+GEM Loss [Global Step: 4] 105.81221771240234
+Processing batch [6:7] with timestep indices [6]
+Processed 1 timesteps in parallel. Budget left: 5, Global Step: 3
+GEM Loss [Global Step: 4] 96.32051849365234
+Processing batch [7:8] with timestep indices [7]
+Processed 1 timesteps in parallel. Budget left: 4, Global Step: 3
+GEM Loss [Global Step: 4] 61.50624465942383
+Processing batch [8:9] with timestep indices [8]
+Processed 1 timesteps in parallel. Budget left: 3, Global Step: 3
+GEM Loss [Global Step: 4] 52.81377410888672
+Processing batch [9:10] with timestep indices [9]
+Processed 1 timesteps in parallel. Budget left: 2, Global Step: 3
+GEM Loss [Global Step: 4] 47.9362907409668
+Processing batch [10:11] with timestep indices [10]
+Processed 1 timesteps in parallel. Budget left: 1, Global Step: 3
+GEM Loss [Global Step: 4] 47.84724807739258
+Step budget (44) exhausted, breaking out of batch loop.
+GEM Loss [Global Step: 4] 1539.1451835632324
+Step budget (44) exhausted. Stopping at global_step 3.
+[PASS] peft_inventory {"n_lora_tensors": 152, "n_lora_modules": 76, "n_base_trainable": 0, "trainable_params": 7471104, "lora_dropout_p": [0.1], "lora_dtypes": ["torch.float32"], "first_module": "base_model.model.transformer.transformer_blocks.0.attn.add_k_proj"}
+[PASS] adapter_init_fresh {}
+[PASS] frozen_base_unchanged {"note": "aggregate float64 sum/sumsq/absmax per tensor, NOT a hash of every weight byte"}
+[PASS] student_sampling_train_mode_no_grad {"windows": 4, "first": {"transformer_training": true, "grad_enabled": false, "lora_dropout_modules_training": true, "n_lora_dropout_modules": 76}}
+[PASS] frozen_base_cannot_be_updated_by_optimizer_fresh_optimizer_each_call {"first": {"global_step": 0, "processed": 11, "budget_left": 33, "finite": true, "optimizer_step_counts": [1], "n_state_tensors": 152, "n_param_groups": 1, "lr": 0.001, "optimizer_n_params_in_group": 1971, "optimizer_n_requires_grad": 152, "optimizer_requires_
+[PASS] finite_intended_updates {"max_abs_adapter_move": 0.00401160167530179}
+[PASS] native_window_budget_behaviour {"states": 44, "updates": 4, "expected_updates": 4}
+[PASS] preview_decode_skipped_and_counted {"decodes": 0, "skips": 4, "windows": 4}
+[PASS] loss_hook_calls_equal_states {"calls": 44, "states": 44}
+[PASS] probe_coverage_predeclared {"requested": [0, 11, 24], "captured": [0, 11, 24], "updates_before": [0, 1, 2]}
+[PASS] probe_index_0_ok {"updates_before": 0, "student_equals_target_bitwise": true, "norm_v_minus_b": 0.0, "graph_vs_fp64": "PASS", "agreement": {"graph_vs_hooked": true, "native_source_vs_hooked_native_reference": true}, "hooked_all_arms": {"native_gem": "PASS", "cpr": "PASS", "cen
+[PASS] probe_index_11_ok {"updates_before": 1, "student_equals_target_bitwise": false, "norm_v_minus_b": 1.6775675025787427, "graph_vs_fp64": "PASS", "agreement": {"graph_vs_hooked": true, "native_source_vs_hooked_native_reference": true}, "hooked_all_arms": {"native_gem": "PASS", "cp
+[PASS] probe_index_24_ok {"updates_before": 2, "student_equals_target_bitwise": false, "norm_v_minus_b": 1.975661138583166, "graph_vs_fp64": "PASS", "agreement": {"graph_vs_hooked": true, "native_source_vs_hooked_native_reference": true}, "hooked_all_arms": {"native_gem": "PASS", "cpr
+[PASS] adapter_restoration_from_saved_terminal {"trained": "b76a376952dc1ba9", "restored": "b76a376952dc1ba9"}
+TRAIN_DONE eng4.truncated_anchor

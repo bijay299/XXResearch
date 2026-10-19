@@ -1,0 +1,47 @@
+--- a/gem/wrappers/base_pipeline_wrapper.py
++++ b/gem/wrappers/base_pipeline_wrapper.py
+@@ -4,9 +4,26 @@
+ 
+ import torch
+ import torchvision
+-import wandb
+-
+-from diffusers import FluxPipeline, StableDiffusion3Pipeline, QwenImagePipeline
++# [cpr_execution_recovery_v1 P5b] optional-import fix (W&B is only used behind use_wandb).
++try:
++    import wandb
++except ModuleNotFoundError:  # pragma: no cover
++    class _WandbDisabled:  # pragma: no cover
++        """Inert stand-in: W&B/telemetry is disabled for this study; real use raises."""
++        def __getattr__(self, name):
++            def _blocked(*a, **k):
++                raise RuntimeError('W&B is disabled for this study (no telemetry)')
++            return _blocked
++    wandb = _WandbDisabled()
++
++# [cpr_execution_recovery_v1 P8] optional-import fix: `QwenImagePipeline` is absent from the pinned diffusers 0.30.2 and only
++# referenced for a model type this study never uses.
++from diffusers import FluxPipeline, StableDiffusion3Pipeline
++try:
++    from diffusers import QwenImagePipeline
++except ImportError:  # pragma: no cover
++    class QwenImagePipeline:  # sentinel: never matches an isinstance() check
++        pass
+ from diffusers.training_utils import compute_snr
+ 
+ from gem.configs import PipelineConfig
+@@ -182,6 +199,14 @@
+                 self.set_timesteps(image_seq_len, num_steps_before)
+ 
+         latents = latents_per_step[-1]
++
++        # [cpr_execution_recovery_v1 P2] OUTPUT-ONLY: skip the preview decode when the caller asked for all latents.
++        # GEM's training loop calls this as `_, all_latents = ...` and DISCARDS the decoded image.
++        # The skipped block draws no random numbers and never touches `latents_per_step`, the
++        # sampler, the loss or the optimizer. Skips are counted on the wrapper (`_cpr_preview_skips`).
++        if return_all_latents:
++            self._cpr_preview_skips = getattr(self, "_cpr_preview_skips", 0) + 1
++            return None, latents_per_step
+ 
+         with torch.no_grad():
+             # Unpack first for Flux

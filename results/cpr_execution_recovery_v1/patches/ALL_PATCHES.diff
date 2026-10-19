@@ -1,0 +1,214 @@
+--- a/gem/operators/erasure/erasure_gem.py
++++ b/gem/operators/erasure/erasure_gem.py
+@@ -13,6 +13,15 @@
+ 
+ from gem.utils.debug import assert_model_gradients_valid, assert_tensor_valid
+ from gem.utils.memory import memory_cleanup
++
++
++# [cpr_execution_recovery_v1 P1c] the ORIGINAL native distance/ReLU expressions, moved verbatim into a module-level function so that
++# a read-only probe can evaluate the very same source on cloned operands. Returns the per-sample vector; the caller
++# applies `.sum()` exactly as the pinned code does.
++def _cpr_native_loss_block(pred_flat, pos_flat, neg_flat, eta):
++    dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
++    dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
++    return torch.relu(dist_pos - eta * dist_neg)
+ 
+ 
+ @dataclass
+@@ -235,11 +244,26 @@
+                 pos_flat = anchor_score.float().reshape(anchor_score.shape[0], -1)
+                 neg_flat = target_score.float().reshape(target_score.shape[0], -1)
+ 
+-                # Calculate Distances
+-                dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
+-                dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
+-
+-                target_loss = torch.relu(dist_pos - config.eta * dist_neg).sum()
++                # [cpr_execution_recovery_v1 P1a] READ-ONLY capture hook: receives detached clones of the three
++                # FP32 operands BEFORE the loss; its return value is ignored. It draws no random
++                # numbers and cannot touch the live tensors.
++                _cpr_capture = getattr(config, "cpr_capture_hook", None)
++                if _cpr_capture is not None:
++                    _cpr_capture(processed_index=config.max_step_budget - step_budget,
++                                 global_step=global_step, batch_start=batch_start,
++                                 pred=pred_flat.detach().clone(), anchor=pos_flat.detach().clone(),
++                                 target=neg_flat.detach().clone())
++
++                # [cpr_execution_recovery_v1 P1b] small attributed loss dispatch. No hook, or a hook that returns
++                # None (the `native_gem` arm), executes the ORIGINAL native block below unchanged.
++                _cpr_hook = getattr(config, "cpr_loss_hook", None)
++                _cpr_per_sample = (_cpr_hook(pred_flat, pos_flat, neg_flat)
++                                   if _cpr_hook is not None else None)
++                if _cpr_per_sample is None:
++                    # ---------- NATIVE LOSS BLOCK (verbatim expressions, moved into `_cpr_native_loss_block`) ----------
++                    target_loss = _cpr_native_loss_block(pred_flat, pos_flat, neg_flat, config.eta).sum()
++                else:
++                    target_loss = _cpr_per_sample.sum()
+ 
+                 # Reset timesteps (skip if already using inference timesteps)
+                 if not config.use_inference_timesteps:
+@@ -248,6 +272,16 @@
+                 loss = target_loss
+                 loss = (config.gamma * loss) / n_latents
+                 assert_tensor_valid(loss)
++
++                # [cpr_execution_recovery_v1 P1c] READ-ONLY probe, called with the LIVE graph (pred_flat requires grad) BEFORE loss.backward().
++                # The hook must use autograd.grad(..., retain_graph=True), must not call .backward(), must not change
++                # parameter .grad buffers, operands or RNG state (asserted by the caller). Its return value is ignored.
++                _cpr_probe = getattr(config, "cpr_probe_hook", None)
++                if _cpr_probe is not None:
++                    _cpr_probe(processed_index=config.max_step_budget - step_budget, global_step=global_step,
++                               batch_start=batch_start, n_latents=n_latents, pred=pred_flat, anchor=pos_flat,
++                               target=neg_flat, target_loss=target_loss, loss=loss,
++                               native_block=_cpr_native_loss_block, config=config, wrapper=wrapper)
+ 
+                 torch.cuda.empty_cache()
+ 
+@@ -286,6 +320,15 @@
+             assert_model_gradients_valid(wrapper)
+ 
+             optimizer.step()
++
++            # [cpr_execution_recovery_v1 P3] logging/checkpoint hook only. Runs AFTER the native optimizer step;
++            # read-only access to the wrapper/optimizer; never alters the loop, the budget, the sampler or the optimizer.
++            _cpr_step_hook = getattr(config, "cpr_step_hook", None)
++            if _cpr_step_hook is not None:
++                _cpr_step_hook(global_step=global_step,
++                               processed_timesteps=config.max_step_budget - step_budget,
++                               step_budget_left=step_budget,
++                               wrapper=wrapper, optimizer=optimizer)
+ 
+             # Log to WandB
+             if config.use_wandb and (step_budget <= 0 or (global_step + 1) % config.steps_between_validation == 0):
+--- a/gem/wrappers/base_pipeline_wrapper.py
++++ b/gem/wrappers/base_pipeline_wrapper.py
+@@ -4,9 +4,26 @@
+ 
+ import torch
+ import torchvision
+-import wandb
+-
+-from diffusers import FluxPipeline, StableDiffusion3Pipeline, QwenImagePipeline
++# [cpr_execution_recovery_v1 P5b] optional-import fix (W&B is only used behind use_wandb).
++try:
++    import wandb
++except ModuleNotFoundError:  # pragma: no cover
++    class _WandbDisabled:  # pragma: no cover
++        """Inert stand-in: W&B/telemetry is disabled for this study; real use raises."""
++        def __getattr__(self, name):
++            def _blocked(*a, **k):
++                raise RuntimeError('W&B is disabled for this study (no telemetry)')
++            return _blocked
++    wandb = _WandbDisabled()
++
++# [cpr_execution_recovery_v1 P8] optional-import fix: `QwenImagePipeline` is absent from the pinned diffusers 0.30.2 and only
++# referenced for a model type this study never uses.
++from diffusers import FluxPipeline, StableDiffusion3Pipeline
++try:
++    from diffusers import QwenImagePipeline
++except ImportError:  # pragma: no cover
++    class QwenImagePipeline:  # sentinel: never matches an isinstance() check
++        pass
+ from diffusers.training_utils import compute_snr
+ 
+ from gem.configs import PipelineConfig
+@@ -182,6 +199,14 @@
+                 self.set_timesteps(image_seq_len, num_steps_before)
+ 
+         latents = latents_per_step[-1]
++
++        # [cpr_execution_recovery_v1 P2] OUTPUT-ONLY: skip the preview decode when the caller asked for all latents.
++        # GEM's training loop calls this as `_, all_latents = ...` and DISCARDS the decoded image.
++        # The skipped block draws no random numbers and never touches `latents_per_step`, the
++        # sampler, the loss or the optimizer. Skips are counted on the wrapper (`_cpr_preview_skips`).
++        if return_all_latents:
++            self._cpr_preview_skips = getattr(self, "_cpr_preview_skips", 0) + 1
++            return None, latents_per_step
+ 
+         with torch.no_grad():
+             # Unpack first for Flux
+--- a/gem/operators/operator.py
++++ b/gem/operators/operator.py
+@@ -1,6 +1,16 @@
+ from typing import Optional
+ 
+-import wandb
++# [cpr_execution_recovery_v1 P5a] optional-import fix (W&B is only used behind use_wandb).
++try:
++    import wandb
++except ModuleNotFoundError:  # pragma: no cover
++    class _WandbDisabled:  # pragma: no cover
++        """Inert stand-in: W&B/telemetry is disabled for this study; real use raises."""
++        def __getattr__(self, name):
++            def _blocked(*a, **k):
++                raise RuntimeError('W&B is disabled for this study (no telemetry)')
++            return _blocked
++    wandb = _WandbDisabled()
+ from gem.configs import OperatorConfig
+ from gem.utils.logging import get_logger
+ from gem.utils.memory import get_gpu_memory_percent
+--- a/gem/wrappers/factory.py
++++ b/gem/wrappers/factory.py
+@@ -1,10 +1,30 @@
+ import os
+-from huggingface_hub import list_repo_tree, RepoFolder
++# [cpr_execution_recovery_v1 P9] optional-import fix: `RepoFolder` is absent from the installed huggingface_hub; it is only used
++# when listing a remote checkpoint tree (never in this study, which uses a local snapshot path).
++from huggingface_hub import list_repo_tree
++try:
++    from huggingface_hub import RepoFolder
++except ImportError:  # pragma: no cover
++    class RepoFolder:  # sentinel: never matches an isinstance() check
++        pass
+ from typing import Optional, List, Union
+ 
+ import torch
+ 
+-from diffusers import Flux2Pipeline, StableDiffusionPipeline, StableDiffusion3Pipeline, QwenImagePipeline
++# [cpr_execution_recovery_v1 P6] optional-import fix: `Flux2Pipeline` is absent from the pinned diffusers and only
++# referenced for a model type this study never uses.
++from diffusers import StableDiffusionPipeline, StableDiffusion3Pipeline
++try:
++    from diffusers import Flux2Pipeline
++except ImportError:  # pragma: no cover
++    class Flux2Pipeline:  # sentinel: never matches an isinstance() check
++        pass
++# [cpr_execution_recovery_v1 P8] optional-import fix for `QwenImagePipeline` (absent from diffusers 0.30.2).
++try:
++    from diffusers import QwenImagePipeline
++except ImportError:  # pragma: no cover
++    class QwenImagePipeline:  # sentinel: never matches an isinstance() check
++        pass
+ from diffusers import DDIMScheduler
+ 
+ from peft import get_peft_model, LoraConfig, PeftModel
+@@ -19,6 +39,12 @@
+ 
+ 
+ def get_base_model_name_or_path(model_type):
++    # [cpr_execution_recovery_v1 P7] PATH FIX ONLY: the pristine read-only FLUX cache holds the pinned snapshot
++    # but no `refs/main`; an explicit local snapshot PATH may be supplied per model type via
++    # CPRD_BASE_MODEL_PATH__<MODEL_TYPE>. Same pinned bytes, different lookup path.
++    override = os.environ.get(f"CPRD_BASE_MODEL_PATH__{str(model_type).upper()}")
++    if override:
++        return override
+     return MODEL_CONFIGS.get(model_type)['model_name_or_path']
+ 
+ 
+--- a/gem/common/prompt_augmentation.py
++++ b/gem/common/prompt_augmentation.py
+@@ -3,7 +3,12 @@
+ from dataclasses import dataclass
+ from typing import List, Dict, Any
+ import numpy as np
+-from datasets import load_dataset
++# [cpr_execution_recovery_v1 P4] optional-import fix: `datasets` backs HFDatasetPromptAugmentation only (unused here).
++try:
++    from datasets import load_dataset
++except ModuleNotFoundError:  # pragma: no cover
++    def load_dataset(*a, **k):
++        raise ModuleNotFoundError('HFDatasetPromptAugmentation needs `datasets`')
+ 
+ 
+ class PromptAugmentation:

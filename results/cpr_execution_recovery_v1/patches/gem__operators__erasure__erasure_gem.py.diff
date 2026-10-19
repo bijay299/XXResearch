@@ -1,0 +1,83 @@
+--- a/gem/operators/erasure/erasure_gem.py
++++ b/gem/operators/erasure/erasure_gem.py
+@@ -13,6 +13,15 @@
+ 
+ from gem.utils.debug import assert_model_gradients_valid, assert_tensor_valid
+ from gem.utils.memory import memory_cleanup
++
++
++# [cpr_execution_recovery_v1 P1c] the ORIGINAL native distance/ReLU expressions, moved verbatim into a module-level function so that
++# a read-only probe can evaluate the very same source on cloned operands. Returns the per-sample vector; the caller
++# applies `.sum()` exactly as the pinned code does.
++def _cpr_native_loss_block(pred_flat, pos_flat, neg_flat, eta):
++    dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
++    dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
++    return torch.relu(dist_pos - eta * dist_neg)
+ 
+ 
+ @dataclass
+@@ -235,11 +244,26 @@
+                 pos_flat = anchor_score.float().reshape(anchor_score.shape[0], -1)
+                 neg_flat = target_score.float().reshape(target_score.shape[0], -1)
+ 
+-                # Calculate Distances
+-                dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
+-                dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
+-
+-                target_loss = torch.relu(dist_pos - config.eta * dist_neg).sum()
++                # [cpr_execution_recovery_v1 P1a] READ-ONLY capture hook: receives detached clones of the three
++                # FP32 operands BEFORE the loss; its return value is ignored. It draws no random
++                # numbers and cannot touch the live tensors.
++                _cpr_capture = getattr(config, "cpr_capture_hook", None)
++                if _cpr_capture is not None:
++                    _cpr_capture(processed_index=config.max_step_budget - step_budget,
++                                 global_step=global_step, batch_start=batch_start,
++                                 pred=pred_flat.detach().clone(), anchor=pos_flat.detach().clone(),
++                                 target=neg_flat.detach().clone())
++
++                # [cpr_execution_recovery_v1 P1b] small attributed loss dispatch. No hook, or a hook that returns
++                # None (the `native_gem` arm), executes the ORIGINAL native block below unchanged.
++                _cpr_hook = getattr(config, "cpr_loss_hook", None)
++                _cpr_per_sample = (_cpr_hook(pred_flat, pos_flat, neg_flat)
++                                   if _cpr_hook is not None else None)
++                if _cpr_per_sample is None:
++                    # ---------- NATIVE LOSS BLOCK (verbatim expressions, moved into `_cpr_native_loss_block`) ----------
++                    target_loss = _cpr_native_loss_block(pred_flat, pos_flat, neg_flat, config.eta).sum()
++                else:
++                    target_loss = _cpr_per_sample.sum()
+ 
+                 # Reset timesteps (skip if already using inference timesteps)
+                 if not config.use_inference_timesteps:
+@@ -248,6 +272,16 @@
+                 loss = target_loss
+                 loss = (config.gamma * loss) / n_latents
+                 assert_tensor_valid(loss)
++
++                # [cpr_execution_recovery_v1 P1c] READ-ONLY probe, called with the LIVE graph (pred_flat requires grad) BEFORE loss.backward().
++                # The hook must use autograd.grad(..., retain_graph=True), must not call .backward(), must not change
++                # parameter .grad buffers, operands or RNG state (asserted by the caller). Its return value is ignored.
++                _cpr_probe = getattr(config, "cpr_probe_hook", None)
++                if _cpr_probe is not None:
++                    _cpr_probe(processed_index=config.max_step_budget - step_budget, global_step=global_step,
++                               batch_start=batch_start, n_latents=n_latents, pred=pred_flat, anchor=pos_flat,
++                               target=neg_flat, target_loss=target_loss, loss=loss,
++                               native_block=_cpr_native_loss_block, config=config, wrapper=wrapper)
+ 
+                 torch.cuda.empty_cache()
+ 
+@@ -286,6 +320,15 @@
+             assert_model_gradients_valid(wrapper)
+ 
+             optimizer.step()
++
++            # [cpr_execution_recovery_v1 P3] logging/checkpoint hook only. Runs AFTER the native optimizer step;
++            # read-only access to the wrapper/optimizer; never alters the loop, the budget, the sampler or the optimizer.
++            _cpr_step_hook = getattr(config, "cpr_step_hook", None)
++            if _cpr_step_hook is not None:
++                _cpr_step_hook(global_step=global_step,
++                               processed_timesteps=config.max_step_budget - step_budget,
++                               step_budget_left=step_budget,
++                               wrapper=wrapper, optimizer=optimizer)
+ 
+             # Log to WandB
+             if config.use_wandb and (step_budget <= 0 or (global_step + 1) % config.steps_between_validation == 0):

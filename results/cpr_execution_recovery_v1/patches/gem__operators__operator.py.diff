@@ -1,0 +1,20 @@
+--- a/gem/operators/operator.py
++++ b/gem/operators/operator.py
+@@ -1,6 +1,16 @@
+ from typing import Optional
+ 
+-import wandb
++# [cpr_execution_recovery_v1 P5a] optional-import fix (W&B is only used behind use_wandb).
++try:
++    import wandb
++except ModuleNotFoundError:  # pragma: no cover
++    class _WandbDisabled:  # pragma: no cover
++        """Inert stand-in: W&B/telemetry is disabled for this study; real use raises."""
++        def __getattr__(self, name):
++            def _blocked(*a, **k):
++                raise RuntimeError('W&B is disabled for this study (no telemetry)')
++            return _blocked
++    wandb = _WandbDisabled()
+ from gem.configs import OperatorConfig
+ from gem.utils.logging import get_logger
+ from gem.utils.memory import get_gpu_memory_percent

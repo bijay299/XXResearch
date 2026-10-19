@@ -1,0 +1,206 @@
+{
+  "all_updates_finite": true,
+  "base_digest_after": {
+    "n_params": 1819,
+    "sha256": "899556d4bed8f520bdf954bd3c9191b882dd9ecf5e844d7ff8fc8e0341f2c54f"
+  },
+  "base_digest_before": {
+    "n_params": 1819,
+    "sha256": "899556d4bed8f520bdf954bd3c9191b882dd9ecf5e844d7ff8fc8e0341f2c54f"
+  },
+  "checkpoints": {
+    "terminal": {
+      "file_sha256": "ae36f115876ce4291b1a74da417fe92de669e3858f3936a435f22ccef5ae9350",
+      "optimizer_updates": 4,
+      "processed_states": 44,
+      "tensor_state_sha256": "1acb1b255cb96a766ad3b1d9b614fac80caa8ce4c27b669fe17582af6efed078"
+    }
+  },
+  "decodes_during_training": 0,
+  "expected_updates": 4,
+  "final_adapter_sha256": "1acb1b255cb96a766ad3b1d9b614fac80caa8ce4c27b669fe17582af6efed078",
+  "finished_utc": "2026-10-19T19:53:36Z",
+  "gate_all_pass": false,
+  "hinge_active_fraction_mean": 1.0,
+  "host_rss_gib_after_load": 0.79,
+  "host_rss_gib_peak_self": 1.56,
+  "init_A_nonzero": true,
+  "init_B_all_zero": true,
+  "init_adapter_sha256": "d40b9f4fe166c5017ace0959969a39db1ce2a4702dc42eb921c5a835c81323c3",
+  "inventory": {
+    "first_module": "base_model.model.transformer.transformer_blocks.0.attn.add_k_proj",
+    "lora_dropout_p": [
+      0.1
+    ],
+    "lora_dtypes": [
+      "torch.float32"
+    ],
+    "n_base_trainable": 0,
+    "n_lora_modules": 76,
+    "n_lora_tensors": 152,
+    "trainable_params": 7471104
+  },
+  "job": "eng2.train.cpr",
+  "load_seconds": 9.7,
+  "loss_hook_calls": 44,
+  "max_abs_adapter_move": 0.0040115551091730595,
+  "native_config": {
+    "adaptation_config": "{\n  \"subset_name\": \"qk_dual\",\n  \"adapter_mode\": \"lora\",\n  \"lora_config\": {\n    \"r\": 16,\n    \"lora_alpha\": 16,\n    \"lora_dropout\": 0.1,\n    \"bias\": \"none\"\n  }\n}",
+    "anchors": [
+      ""
+    ],
+    "cpr_loss_hook": "<function train.<locals>.loss_hook at 0x7f84d0567e20>",
+    "cpr_probe_hook": "<cprx.gate.Probe object at 0x7f84d4a5f880>",
+    "cpr_step_hook": "<function train.<locals>.step_hook at 0x7f84d05640d0>",
+    "eta": 1.0,
+    "gamma": 100.0,
+    "gradient_accumulation_steps": 1,
+    "id": null,
+    "initial_validation": true,
+    "learning_rate": 0.001,
+    "max_gradient_norm": null,
+    "max_parallel_timesteps": 1,
+    "max_step_budget": 44,
+    "method": "gem",
+    "n_iterations": 30,
+    "negative_guidance_scale": 1.0,
+    "partial_denoising_end_at_timestep": 10,
+    "partial_denoising_guidance_scale": 3.0,
+    "partial_denoising_ignore_until_timestep": 0,
+    "partial_denoising_inference_timesteps": null,
+    "partial_denoising_mode": "student",
+    "prompt_augmentation": null,
+    "run_save_path": null,
+    "save_pipeline_after_operator": true,
+    "steps_between_validation": 10,
+    "steps_to_save_checkpoints": [],
+    "targets": [
+      "refrigerator"
+    ],
+    "train_seed": 6901,
+    "use_inference_timesteps": true,
+    "use_wandb": false,
+    "val_seed": 6901,
+    "validation_concepts": [
+      "a gem",
+      "a cat",
+      "a tree"
+    ],
+    "validation_templates": [
+      "{}",
+      "an image of {}",
+      "an artwork of {}"
+    ]
+  },
+  "optimizer_updates": 4,
+  "peak_gpu_gib": 32.34,
+  "peft_config": "{'default': LoraConfig(peft_type=<PeftType.LORA: 'LORA'>, auto_mapping=None, base_model_name_or_path=None, revision=None, task_type=None, inference_mode=False, r=16, target_modules={'transformer.transformer_blocks.11.attn.to_k', 'transformer.transformer_blocks.18.attn.to_q', 'transformer.transformer_blocks.14.attn.add_k_proj', 'transformer.transformer_blocks.2.attn.to_q', 'transformer.transformer_blocks.16.attn.to_k', 'transformer.transformer_blocks.9.attn.to_k', 'transformer.transformer_blocks.12.attn.add_k_proj', 'transformer.transformer_blocks.12.attn.to_q', 'transformer.transformer_blocks.3.attn.to_k', 'transformer.transformer_blocks.5.attn.add_k_proj', 'transformer.transformer_blocks.2.attn.to_k', 'transformer.transformer_blocks.4.attn.to_q', 'transformer.transformer_blocks.2.attn.add_q_proj', 'transformer.transformer_blocks.11.attn.to_q', 'transformer.transformer_blocks.4.attn.to_k', 'transformer.transformer_blocks.6.attn.to_k', 'transformer.transformer_blocks.13.attn.add_q_proj', 'transformer.transformer_blocks.13.attn.to_k', 'transformer.transformer_blocks.16.attn.to_q', 'transformer.transformer_blocks.16.attn.add_k_proj', 'transformer.transformer_blocks.6.attn.to_q', 'transformer.transformer_blocks.17.attn.add_k_proj', 'transformer.transformer_blocks.9.attn.add_q_proj', 'transformer.transformer_blocks.7.attn.to_q', 'transformer.transformer_blocks.13.attn.add_k_proj', 'transformer.transformer_blocks.3.attn.add_q_proj', 'transformer.transformer_blocks.4.attn.add_q_proj', 'transformer.transformer_blocks.16.attn.add_q_proj', 'transformer.transformer_blocks.1.attn.to_k', 'transformer.transformer_blocks.3.attn.add_k_proj', 'transformer.transformer_blocks.18.attn.add_k_proj', 'transformer.transformer_blocks.18.attn.add_q_proj', 'transformer.transformer_blocks.0.attn.to_k', 'transformer.transformer_blocks.5.attn.to_q', 'transformer.transformer_blocks.18.attn.to_k', 'transformer.transformer_blocks.1.attn.add_q_proj', 'transformer.transformer_blocks.14.attn.to_q', 'transformer.transformer_blocks.12.attn.add_q_proj', 'transformer.transformer_blocks.4.attn.add_k_proj', 'transformer.transformer_blocks.1.attn.to_q', 'transformer.transformer_blocks.10.attn.add_q_proj', 'transformer.transformer_blocks.13.attn.to_q', 'transformer.transformer_blocks.17.attn.add_q_proj', 'transformer.transformer_blocks.8.attn.add_q_proj', 'transformer.transformer_blocks.5.attn.to_k', 'transformer.transformer_blocks.8.attn.to_k', 'transformer.transformer_blocks.5.attn.add_q_proj', 'transformer.transformer_blocks.3.attn.to_q', 'transformer.transformer_blocks.15.attn.add_k_proj', 'transformer.transformer_blocks.1.attn.add_k_proj', 'transformer.transformer_blocks.14.attn.add_q_proj', 'transformer.transformer_blocks.10.attn.add_k_proj', 'transformer.transformer_blocks.11.attn.add_q_proj', 'transformer.transformer_blocks.9.attn.to_q', 'transformer.transformer_blocks.7.attn.add_q_proj', 'transformer.transformer_blocks.8.attn.to_q', 'transformer.transformer_blocks.8.attn.add_k_proj', 'transformer.transformer_blocks.15.attn.to_k', 'transformer.transformer_blocks.6.attn.add_q_proj', 'transformer.transformer_blocks.7.attn.add_k_proj', 'transformer.transformer_blocks.11.attn.add_k_proj', 'transformer.transformer_blocks.10.attn.to_q', 'transformer.transformer_blocks.0.attn.add_k_proj', 'transformer.transformer_blocks.2.attn.add_k_proj', 'transformer.transformer_blocks.9.attn.add_k_proj', 'transformer.transformer_blocks.17.attn.to_k', 'transformer.transformer_blocks.7.attn.to_k', 'transformer.transformer_blocks.12.attn.to_k', 'transformer.transformer_blocks.17.attn.to_q', 'transformer.transformer_blocks.0.attn.to_q', 'transformer.transformer_blocks.15.attn.to_q', 'transformer.transformer_blocks.0.attn.add_q_proj', 'transformer.transformer_blocks.15.attn.add_q_proj', 'transformer.transformer_blocks.6.attn.add_k_proj', 'transformer.transformer_blocks.14.attn.to_k', 'transformer.transformer_blocks.10.attn.to_k'}, lora_alpha=16, lora_dropout=0.1, fan_in_fan_out=False, bias='none', use_rslora=False, modules_to_save=None, init_lora_weights=True, layers_to_transform=None, layers_pattern=None, rank_pattern={}, alpha_pattern={}, megatron_config=None, megatron_core='megatron.core', loftq_config={}, use_dora=False, layer_replication=None, runtime_config=LoraRuntimeConfig(ephemeral_gpu_offload=False))}",
+  "preview_decode_skips": 4,
+  "processed_states": 44,
+  "rng_at_end": {
+    "numpy": "ddbdb7372ed83a80",
+    "python": "5939e54d5a13bae9",
+    "torch_cpu": "de3bdc0f5482f6f3",
+    "torch_cuda": "7216d69fd638e15c"
+  },
+  "rng_at_start": {
+    "numpy": "ddbdb7372ed83a80",
+    "python": "5939e54d5a13bae9",
+    "torch_cpu": "f5e8ebffd7491560",
+    "torch_cuda": "79dd853aa278d32b"
+  },
+  "sampling_windows": 4,
+  "scheduler_config_sha256": "cd7d1620d0c7d5e3a10de12f4ca3220731b5f3868bdaf608811eb3274108da01",
+  "seconds_per_state": 1.265,
+  "spec": {
+    "arm": "cpr",
+    "budget": 44,
+    "checkpoints": [],
+    "lr": 0.001,
+    "lr_name": "lr_1e-3",
+    "probe_indices": [
+      0,
+      11,
+      24
+    ],
+    "save_terminal": true,
+    "stage": "engineering",
+    "target": "refrigerator",
+    "train_seed": 6901,
+    "traj_id": "eng2.cpr"
+  },
+  "spec_file_sha256": "e4929194ba3acdaa33a29addb973d4d9b2845a26394fba0e60015c26604c6b1d",
+  "started_utc": "2026-10-19T19:52:28Z",
+  "total_seconds": 68.0,
+  "train_seconds": 55.7,
+  "traj_id": "eng2.cpr",
+  "updates": [
+    {
+      "budget_left": 33,
+      "finite": true,
+      "global_step": 0,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_class": "AdamW",
+      "optimizer_defaults": {
+        "amsgrad": "False",
+        "betas": "(0.9, 0.999)",
+        "capturable": "False",
+        "differentiable": "False",
+        "eps": "1e-08",
+        "foreach": "None",
+        "fused": "None",
+        "lr": "0.001",
+        "maximize": "False",
+        "weight_decay": "0.01"
+      },
+      "optimizer_n_frozen_in_group_without_grad": 1819,
+      "optimizer_n_params_in_group": 1971,
+      "optimizer_n_requires_grad": 152,
+      "optimizer_requires_grad_are_exactly_lora": true,
+      "optimizer_step_counts": [
+        1
+      ],
+      "optimizer_trainable_param_count": 7471104,
+      "processed": 11
+    },
+    {
+      "budget_left": 22,
+      "finite": true,
+      "global_step": 1,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        2
+      ],
+      "processed": 22
+    },
+    {
+      "budget_left": 11,
+      "finite": true,
+      "global_step": 2,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        3
+      ],
+      "processed": 33
+    },
+    {
+      "budget_left": 0,
+      "finite": true,
+      "global_step": 3,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        4
+      ],
+      "processed": 44
+    }
+  ],
+  "window_behaviour_confirmed": true
+}
