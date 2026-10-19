@@ -13,18 +13,19 @@ import scipy.linalg as sla
 from .contracts import ContractViolation, Ops, check_array
 
 RIDGE_REL = 1e-6
+MU_FLOOR = 1e-12   # F_REVIEW 4.2: mu = max(ridge_rel*tr(G0)/k, 1e-12)
 
 
 K_MAX = 64     # sketch rows drawn per refresh (eval_protocol stream 3); an arm uses the first k
 
 
-def ridge_mu(G0, ridge_rel=RIDGE_REL):
-    return ridge_rel * float(np.trace(G0)) / G0.shape[0]
+def ridge_mu(G0, ridge_rel=RIDGE_REL, mu_floor=MU_FLOOR):
+    return max(ridge_rel * float(np.trace(G0)) / G0.shape[0], mu_floor)
 
 
 def weighted_null_project(x, S, w, mu="auto", ridge_rel=RIDGE_REL):
     """Returns (x1, info). info: mu, tr(G0), degenerate (S == 0 or k == 0 -> no constraint, x returned
-    as a copy, bitwise equal). mu='auto' -> ridge_rel * tr(G0)/k; ridge_rel = 0 is the exact projection."""
+    as a copy, bitwise equal). mu='auto' -> max(ridge_rel * tr(G0)/k, 1e-12); pass mu=0.0 for the exact projection."""
     P = x.shape[0]
     check_array("x", x, shape=(P,))
     check_array("S", S, ndim=2)
