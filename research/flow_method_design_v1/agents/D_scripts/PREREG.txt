@@ -1,0 +1,15 @@
+Agent D pre-registration, written 2026-10-19 BEFORE running d_window_toy.py (S3). Not edited after running.
+Toy: 2D conditional flow, closed-form GMM teachers, GEM eta=1 hinge, student = target teacher + correction Delta_theta,
+Flux-like shifted 28-step sigma schedule (mu=0.63), native GEM prefix = latents k=0..10 (sigma ~0.77-1.0), ~23 Adam iters.
+Parametrisations: LOCAL (independent affine correction per step index), SHARED (one affine correction for all t),
+SMOOTH (RBF-in-sigma basis). Target teachers: UNI (unimodal concept), BI_COARSE (concept vs benign mode, separation 6),
+BI_FINE (separation 0.6, s=0.1).
+P-D1 (theorem consequence): LOCAL + native prefix on UNI: endpoint concept score >= 0.9 (essentially unchanged),
+   because the untouched late target-teacher flow contracts by s/sigma_{t1}.
+P-D2 (H-D1): LOCAL + native prefix: BI_COARSE score <= 0.3 (commitment sigma* inside window) while BI_FINE score >= 0.7
+   (commitment sigma* < 0.772, outside window). Full on-policy window (all 28 steps, matched timestep budget) gives
+   <= 0.3 on all three.
+P-D3: SHARED + native prefix achieves <= 0.3 on UNI (parameter sharing transports the edit to late steps).
+Falsification of H-D1: P-D2 fails in either direction (BI_FINE prefix-LOCAL score < 0.5, or BI_COARSE > 0.6),
+   or the commitment-time diagnostic sigma* fails to order the three cases.
+Exploratory, no prediction: on-policy vs off-policy (noised target data) states; stale refresh R=5; unweighted contrast-IS.
