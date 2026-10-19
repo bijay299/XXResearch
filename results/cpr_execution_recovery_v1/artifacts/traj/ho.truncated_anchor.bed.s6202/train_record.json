@@ -1,0 +1,426 @@
+{
+  "all_updates_finite": true,
+  "checkpoints": {
+    "selected": {
+      "file_sha256": "d10e5187231e59c9fa485fb4cc67543da6270a5a0a32f812b3a234489251f93f",
+      "optimizer_updates": 23,
+      "processed_states": 250,
+      "tensor_state_sha256": "1519c3106afbc9886b2ee14d4542b5ee54b6cc5d687a326bddadeef80adb7e35"
+    }
+  },
+  "decodes_during_training": 0,
+  "expected_updates": 23,
+  "final_adapter_sha256": "1519c3106afbc9886b2ee14d4542b5ee54b6cc5d687a326bddadeef80adb7e35",
+  "finished_utc": "2026-10-19T21:32:35Z",
+  "hinge_active_fraction_mean": 0.68,
+  "host_rss_gib_after_load": 0.79,
+  "host_rss_gib_peak_self": 1.53,
+  "init_A_nonzero": true,
+  "init_B_all_zero": true,
+  "init_adapter_sha256": "7402141be845fd7ed075107d6d5ea77fc5b5c4050e91d25e817014f8b0a411e9",
+  "inventory": {
+    "first_module": "base_model.model.transformer.transformer_blocks.0.attn.add_k_proj",
+    "lora_dropout_p": [
+      0.1
+    ],
+    "lora_dtypes": [
+      "torch.float32"
+    ],
+    "n_base_trainable": 0,
+    "n_lora_modules": 76,
+    "n_lora_tensors": 152,
+    "trainable_params": 7471104
+  },
+  "job": "train.ho.truncated_anchor.bed.s6202",
+  "load_seconds": 9.7,
+  "loss_hook_calls": 250,
+  "max_abs_adapter_move": 0.020402058959007263,
+  "native_config": {
+    "adaptation_config": "{\n  \"subset_name\": \"qk_dual\",\n  \"adapter_mode\": \"lora\",\n  \"lora_config\": {\n    \"r\": 16,\n    \"lora_alpha\": 16,\n    \"lora_dropout\": 0.1,\n    \"bias\": \"none\"\n  }\n}",
+    "anchors": [
+      ""
+    ],
+    "cpr_loss_hook": "<function train.<locals>.loss_hook at 0x7fea38103f40>",
+    "cpr_step_hook": "<function train.<locals>.step_hook at 0x7fea381025f0>",
+    "eta": 1.0,
+    "gamma": 100.0,
+    "gradient_accumulation_steps": 1,
+    "id": null,
+    "initial_validation": true,
+    "learning_rate": 0.001,
+    "max_gradient_norm": null,
+    "max_parallel_timesteps": 1,
+    "max_step_budget": 250,
+    "method": "gem",
+    "n_iterations": 30,
+    "negative_guidance_scale": 1.0,
+    "partial_denoising_end_at_timestep": 10,
+    "partial_denoising_guidance_scale": 3.0,
+    "partial_denoising_ignore_until_timestep": 0,
+    "partial_denoising_inference_timesteps": null,
+    "partial_denoising_mode": "student",
+    "prompt_augmentation": null,
+    "run_save_path": null,
+    "save_pipeline_after_operator": true,
+    "steps_between_validation": 10,
+    "steps_to_save_checkpoints": [],
+    "targets": [
+      "bed"
+    ],
+    "train_seed": 6202,
+    "use_inference_timesteps": true,
+    "use_wandb": false,
+    "val_seed": 6202,
+    "validation_concepts": [
+      "a gem",
+      "a cat",
+      "a tree"
+    ],
+    "validation_templates": [
+      "{}",
+      "an image of {}",
+      "an artwork of {}"
+    ]
+  },
+  "optimizer_updates": 23,
+  "peak_gpu_gib": 32.34,
+  "peft_config": "{'default': LoraConfig(peft_type=<PeftType.LORA: 'LORA'>, auto_mapping=None, base_model_name_or_path=None, revision=None, task_type=None, inference_mode=False, r=16, target_modules={'transformer.transformer_blocks.18.attn.add_k_proj', 'transformer.transformer_blocks.4.attn.add_q_proj', 'transformer.transformer_blocks.11.attn.add_k_proj', 'transformer.transformer_blocks.5.attn.to_q', 'transformer.transformer_blocks.18.attn.add_q_proj', 'transformer.transformer_blocks.10.attn.to_k', 'transformer.transformer_blocks.3.attn.add_q_proj', 'transformer.transformer_blocks.6.attn.add_k_proj', 'transformer.transformer_blocks.1.attn.add_q_proj', 'transformer.transformer_blocks.13.attn.add_k_proj', 'transformer.transformer_blocks.16.attn.to_k', 'transformer.transformer_blocks.14.attn.add_q_proj', 'transformer.transformer_blocks.8.attn.to_q', 'transformer.transformer_blocks.4.attn.add_k_proj', 'transformer.transformer_blocks.10.attn.to_q', 'transformer.transformer_blocks.11.attn.add_q_proj', 'transformer.transformer_blocks.6.attn.to_k', 'transformer.transformer_blocks.13.attn.to_q', 'transformer.transformer_blocks.17.attn.to_k', 'transformer.transformer_blocks.8.attn.add_q_proj', 'transformer.transformer_blocks.2.attn.to_q', 'transformer.transformer_blocks.5.attn.add_k_proj', 'transformer.transformer_blocks.5.attn.add_q_proj', 'transformer.transformer_blocks.8.attn.add_k_proj', 'transformer.transformer_blocks.16.attn.to_q', 'transformer.transformer_blocks.15.attn.to_k', 'transformer.transformer_blocks.0.attn.add_k_proj', 'transformer.transformer_blocks.5.attn.to_k', 'transformer.transformer_blocks.15.attn.to_q', 'transformer.transformer_blocks.15.attn.add_q_proj', 'transformer.transformer_blocks.6.attn.add_q_proj', 'transformer.transformer_blocks.13.attn.to_k', 'transformer.transformer_blocks.1.attn.add_k_proj', 'transformer.transformer_blocks.2.attn.to_k', 'transformer.transformer_blocks.1.attn.to_k', 'transformer.transformer_blocks.11.attn.to_q', 'transformer.transformer_blocks.9.attn.to_q', 'transformer.transformer_blocks.6.attn.to_q', 'transformer.transformer_blocks.12.attn.to_q', 'transformer.transformer_blocks.7.attn.to_k', 'transformer.transformer_blocks.9.attn.add_k_proj', 'transformer.transformer_blocks.8.attn.to_k', 'transformer.transformer_blocks.10.attn.add_k_proj', 'transformer.transformer_blocks.17.attn.to_q', 'transformer.transformer_blocks.17.attn.add_k_proj', 'transformer.transformer_blocks.0.attn.to_q', 'transformer.transformer_blocks.13.attn.add_q_proj', 'transformer.transformer_blocks.0.attn.to_k', 'transformer.transformer_blocks.9.attn.to_k', 'transformer.transformer_blocks.16.attn.add_q_proj', 'transformer.transformer_blocks.7.attn.to_q', 'transformer.transformer_blocks.14.attn.to_q', 'transformer.transformer_blocks.17.attn.add_q_proj', 'transformer.transformer_blocks.11.attn.to_k', 'transformer.transformer_blocks.2.attn.add_k_proj', 'transformer.transformer_blocks.3.attn.add_k_proj', 'transformer.transformer_blocks.1.attn.to_q', 'transformer.transformer_blocks.0.attn.add_q_proj', 'transformer.transformer_blocks.7.attn.add_q_proj', 'transformer.transformer_blocks.12.attn.add_q_proj', 'transformer.transformer_blocks.2.attn.add_q_proj', 'transformer.transformer_blocks.3.attn.to_k', 'transformer.transformer_blocks.4.attn.to_q', 'transformer.transformer_blocks.7.attn.add_k_proj', 'transformer.transformer_blocks.4.attn.to_k', 'transformer.transformer_blocks.15.attn.add_k_proj', 'transformer.transformer_blocks.16.attn.add_k_proj', 'transformer.transformer_blocks.18.attn.to_q', 'transformer.transformer_blocks.14.attn.to_k', 'transformer.transformer_blocks.10.attn.add_q_proj', 'transformer.transformer_blocks.12.attn.to_k', 'transformer.transformer_blocks.12.attn.add_k_proj', 'transformer.transformer_blocks.18.attn.to_k', 'transformer.transformer_blocks.9.attn.add_q_proj', 'transformer.transformer_blocks.14.attn.add_k_proj', 'transformer.transformer_blocks.3.attn.to_q'}, lora_alpha=16, lora_dropout=0.1, fan_in_fan_out=False, bias='none', use_rslora=False, modules_to_save=None, init_lora_weights=True, layers_to_transform=None, layers_pattern=None, rank_pattern={}, alpha_pattern={}, megatron_config=None, megatron_core='megatron.core', loftq_config={}, use_dora=False, layer_replication=None, runtime_config=LoraRuntimeConfig(ephemeral_gpu_offload=False))}",
+  "preview_decode_skips": 23,
+  "processed_states": 250,
+  "rng_at_end": {
+    "numpy": "88dca3d120aa2d52",
+    "python": "b58998a8e096d5d1",
+    "torch_cpu": "941c8474da8204fc",
+    "torch_cuda": "b5ee8ac6aab7e56c"
+  },
+  "rng_at_start": {
+    "numpy": "88dca3d120aa2d52",
+    "python": "b58998a8e096d5d1",
+    "torch_cpu": "f26343d83c7c8c5f",
+    "torch_cuda": "728d02e2fe1db9b9"
+  },
+  "sampling_windows": 23,
+  "scheduler_config_sha256": "cd7d1620d0c7d5e3a10de12f4ca3220731b5f3868bdaf608811eb3274108da01",
+  "seconds_per_state": 1.272,
+  "spec": {
+    "arm": "truncated_anchor",
+    "budget": 250,
+    "checkpoints": [
+      [
+        "selected",
+        250
+      ]
+    ],
+    "lr": 0.001,
+    "lr_name": "lr_1e-3",
+    "probe_indices": [],
+    "save_terminal": false,
+    "selected_from": "dev.truncated_anchor.lr_1e-3.terminal",
+    "stage": "heldout",
+    "target": "bed",
+    "train_seed": 6202,
+    "traj_id": "ho.truncated_anchor.bed.s6202"
+  },
+  "spec_file_sha256": "05ea435f154dde10d1522c8f98a01f459d22580574e162058f1c299ea50397d3",
+  "started_utc": "2026-10-19T21:27:07Z",
+  "total_seconds": 327.9,
+  "train_seconds": 318.1,
+  "traj_id": "ho.truncated_anchor.bed.s6202",
+  "updates": [
+    {
+      "budget_left": 239,
+      "finite": true,
+      "global_step": 0,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_class": "AdamW",
+      "optimizer_defaults": {
+        "amsgrad": "False",
+        "betas": "(0.9, 0.999)",
+        "capturable": "False",
+        "differentiable": "False",
+        "eps": "1e-08",
+        "foreach": "None",
+        "fused": "None",
+        "lr": "0.001",
+        "maximize": "False",
+        "weight_decay": "0.01"
+      },
+      "optimizer_n_frozen_in_group_without_grad": 1819,
+      "optimizer_n_params_in_group": 1971,
+      "optimizer_n_requires_grad": 152,
+      "optimizer_requires_grad_are_exactly_lora": true,
+      "optimizer_step_counts": [
+        1
+      ],
+      "optimizer_trainable_param_count": 7471104,
+      "processed": 11
+    },
+    {
+      "budget_left": 228,
+      "finite": true,
+      "global_step": 1,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        2
+      ],
+      "processed": 22
+    },
+    {
+      "budget_left": 217,
+      "finite": true,
+      "global_step": 2,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        3
+      ],
+      "processed": 33
+    },
+    {
+      "budget_left": 206,
+      "finite": true,
+      "global_step": 3,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        4
+      ],
+      "processed": 44
+    },
+    {
+      "budget_left": 195,
+      "finite": true,
+      "global_step": 4,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        5
+      ],
+      "processed": 55
+    },
+    {
+      "budget_left": 184,
+      "finite": true,
+      "global_step": 5,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        6
+      ],
+      "processed": 66
+    },
+    {
+      "budget_left": 173,
+      "finite": true,
+      "global_step": 6,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        7
+      ],
+      "processed": 77
+    },
+    {
+      "budget_left": 162,
+      "finite": true,
+      "global_step": 7,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        8
+      ],
+      "processed": 88
+    },
+    {
+      "budget_left": 151,
+      "finite": true,
+      "global_step": 8,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        9
+      ],
+      "processed": 99
+    },
+    {
+      "budget_left": 140,
+      "finite": true,
+      "global_step": 9,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        10
+      ],
+      "processed": 110
+    },
+    {
+      "budget_left": 129,
+      "finite": true,
+      "global_step": 10,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        11
+      ],
+      "processed": 121
+    },
+    {
+      "budget_left": 118,
+      "finite": true,
+      "global_step": 11,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        12
+      ],
+      "processed": 132
+    },
+    {
+      "budget_left": 107,
+      "finite": true,
+      "global_step": 12,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        13
+      ],
+      "processed": 143
+    },
+    {
+      "budget_left": 96,
+      "finite": true,
+      "global_step": 13,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        14
+      ],
+      "processed": 154
+    },
+    {
+      "budget_left": 85,
+      "finite": true,
+      "global_step": 14,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        15
+      ],
+      "processed": 165
+    },
+    {
+      "budget_left": 74,
+      "finite": true,
+      "global_step": 15,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        16
+      ],
+      "processed": 176
+    },
+    {
+      "budget_left": 63,
+      "finite": true,
+      "global_step": 16,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        17
+      ],
+      "processed": 187
+    },
+    {
+      "budget_left": 52,
+      "finite": true,
+      "global_step": 17,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        18
+      ],
+      "processed": 198
+    },
+    {
+      "budget_left": 41,
+      "finite": true,
+      "global_step": 18,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        19
+      ],
+      "processed": 209
+    },
+    {
+      "budget_left": 30,
+      "finite": true,
+      "global_step": 19,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        20
+      ],
+      "processed": 220
+    },
+    {
+      "budget_left": 19,
+      "finite": true,
+      "global_step": 20,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        21
+      ],
+      "processed": 231
+    },
+    {
+      "budget_left": 8,
+      "finite": true,
+      "global_step": 21,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        22
+      ],
+      "processed": 242
+    },
+    {
+      "budget_left": 0,
+      "finite": true,
+      "global_step": 22,
+      "lr": 0.001,
+      "n_param_groups": 1,
+      "n_state_tensors": 152,
+      "optimizer_step_counts": [
+        23
+      ],
+      "processed": 250
+    }
+  ],
+  "window_behaviour_confirmed": true
+}

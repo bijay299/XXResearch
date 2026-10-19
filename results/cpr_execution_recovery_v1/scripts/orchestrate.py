@@ -19,7 +19,7 @@ from cprx.common import ROOT, dump, load, utc
 PY = os.environ["CPRD_PY"]
 S = os.path.join(ROOT, "scripts")
 A = os.path.join(ROOT, "artifacts")
-GPUS = [0, 1, 2, 3]
+GPUS = [0, 1, 2, 3][:int(os.environ.get("CPRX_MAX_GPUS", "2"))]   # user limit 2026-10-19T22:00Z: at most two concurrent GPUs
 CASES = load(os.path.join(ROOT, "configs", "cases.json"))
 SUFFIX = ""
 STOP = threading.Event()

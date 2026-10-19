@@ -1,3 +1,12 @@
+> **CORRECTION NOTICE (2026-10-19, UTC).** This report is retained in full, unchanged, below the line. Its terminal status `ENTRY_NOT_PASSED/CLOSED`
+> stands and no historical failure is converted to a pass. Several descriptions below are corrected by
+> [`AMENDMENT_01_SCOPE_AND_PROTOCOL.md`](AMENDMENT_01_SCOPE_AND_PROTOCOL.md) — notably: detector qualification counts (RT-DETR oven 15/20; DETR refrigerator 15/20, couch 14/20),
+> GPU work continuing after the failed qualification (strict stopping not achieved), the `min_grad_frac` change in repair 1, the CPU-only index-0 replay (no GPU gradients captured;
+> both captured indices preceded the first update), post-hoc numerical tests, incomplete CPU/storage accounting, estimate-vs-measurement repair times, and unverified licensing at publication time.
+> Current work continuing this question: [`../cpr_execution_recovery_v1/`](../cpr_execution_recovery_v1/).
+
+---
+
 # FINAL_REPORT — cpr_direct_agreement_controls_v1
 
 > **Terminal status: `ENTRY_NOT_PASSED` — two independent, individually sufficient entry failures, both retained:**

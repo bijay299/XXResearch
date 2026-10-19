@@ -1,3 +1,6 @@
+> **CORRECTION NOTICE (2026-10-19, UTC).** The original index below is retained unchanged. The terminal status stands; see [`AMENDMENT_01_SCOPE_AND_PROTOCOL.md`](AMENDMENT_01_SCOPE_AND_PROTOCOL.md) for nine corrections to the report text. The question is continued in [`../cpr_execution_recovery_v1/`](../cpr_execution_recovery_v1/). The commit-pinned links below still point at the original payload commit, whose report text predates the notice.
+
+---
 # EVIDENCE_INDEX — cpr_direct_agreement_controls_v1
 
 > **Status: `ENTRY_NOT_PASSED` — attempt CLOSED.** Detector qualification failed and the direct replay gate failed (FP64 elementwise gradient tolerance); no comparison was run, 0 generated images. See `FINAL_REPORT.md`.
