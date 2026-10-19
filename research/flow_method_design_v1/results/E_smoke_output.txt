@@ -1,0 +1,27 @@
+family  arm                 P   cpu_s acc       fwd       vjp     teach    roll  gate_f solve probe rej  R1_drift
+linear  vau                40  0.0063   5      8/79    29/247    10/110     0/0    5/80     5     3   0  1.71e-03
+linear  vau_nogate         40  0.0046   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.71e-03
+linear  post_euclid        40  0.0042   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.19e-03
+linear  pre_proj           40  0.0042   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.43e-03
+linear  penalty            40  0.0026   5     10/95     10/95    11/118     0/0     0/0     0     0   0  4.10e-03
+linear  adamw              40  0.0022   5      5/55      5/55    10/110     0/0     0/0     0     0   0  4.11e-03
+linear  adamw_stepmatch    40  0.0021   5      5/55      5/55    10/110     0/0     0/0     0     0   0  4.59e-03
+linear  gated_adamw        40  0.0029   5      5/55      5/55    10/110     0/0    5/80     0     0   0  4.11e-03
+mlp     vau                88  0.0070   5      8/79    29/247    10/110     0/0    5/80     5     3   0  2.18e-05
+mlp     vau_nogate         88  0.0059   5      8/79    29/247    10/110     0/0     0/0     5     3   0  2.18e-05
+mlp     post_euclid        88  0.0057   5      8/79    29/247    10/110     0/0     0/0     5     3   0  1.59e-05
+mlp     pre_proj           88  0.0055   5      8/79    29/247    10/110     0/0     0/0     5     3   0  4.74e-05
+mlp     penalty            88  0.0034   5     10/95     10/95    11/118     0/0     0/0     0     0   0  2.21e-04
+mlp     adamw              88  0.0027   5      5/55      5/55    10/110     0/0     0/0     0     0   0  2.21e-04
+mlp     adamw_stepmatch    88  0.0027   5      5/55      5/55    10/110     0/0     0/0     0     0   0  2.83e-04
+mlp     gated_adamw        88  0.0033   5      5/55      5/55    10/110     0/0    5/80     0     0   0  2.21e-04
+flow    vau               128  0.0283   5      8/79    29/247    10/110   55/55    5/80     5     3   0  4.08e-05
+flow    vau_nogate        128  0.0284   5      8/79    29/247    10/110   55/55     0/0     5     3   0  4.08e-05
+flow    post_euclid       128  0.0269   5      8/79    29/247    10/110   55/55     0/0     5     3   0  1.70e-05
+flow    pre_proj          128  0.0246   5      8/79    29/247    10/110   55/55     0/0     5     3   0  4.08e-05
+flow    penalty           128  0.0178   5     10/95     10/95    11/118   55/55     0/0     0     0   0  6.69e-05
+flow    adamw             128  0.0150   5      5/55      5/55    10/110   55/55     0/0     0     0   0  6.69e-05
+flow    adamw_stepmatch   128  0.0175   5      5/55      5/55    10/110   55/55     0/0     0     0   0  1.25e-04
+flow    gated_adamw       128  0.0205   5      5/55      5/55    10/110   55/55    5/80     0     0   0  6.69e-05
+ops shown as calls/samples; cpu_s = process CPU seconds for the 5 steps (measured)
+{"label": "E_smoke", "cmd": "/tmp/claude-0/venv/bin/python code/smoke.py", "rc": 0, "status": "ok", "wall_s": 0.62, "cpu_s": 1.176, "peak_rss_kib": 61340, "utc": "2026-10-19T23:29:08Z"}

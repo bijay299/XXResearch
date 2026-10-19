@@ -1,0 +1,265 @@
+{
+  "protocol_id": "flow_method_design_v1/eval_protocol",
+  "version": "1.0",
+  "author": "Agent G (evaluation and robustness designer)",
+  "status": "DRAFT_FOR_FREEZE: becomes binding when configs/FREEZE.json records its sha256; any later edit is a labelled amendment and cannot change thresholds for runs already made",
+  "candidate": "vau (configs/candidate.json); hypothesis C-H1 (agents/C_candidate_spec.md)",
+  "human_doc": "docs/EVAL_PROTOCOL.md",
+
+  "seeds": {
+    "development": {"range": [0, 99], "use": "debugging, integrity checks I1-I12, calibration of lr0/lambda0/tau0 and timing; never used in any verdict"},
+    "validation": {"range": [7000, 7011], "n_per_family": 12, "rule": "never run before FREEZE.json exists; the runner must refuse seeds >= 7000 unless sha256(configs/eval_protocol.json) and sha256(configs/candidate.json) and the code/vau tree hash equal the values in FREEZE.json"},
+    "reserved_unused": "no other seed range may be used for any validation or retest; post-repair retests reuse 7000..7011",
+    "derivation": {
+      "root": "np.random.SeedSequence(entropy=[20261019, FAMILY_CODE, seed])",
+      "family_codes": {"G1": 1, "G2": 2, "G3": 3, "G4": 4, "G5": 5, "G6": 6, "G7": 7, "G8": 8, "GD_B": 21, "GD_D": 22},
+      "streams": {"0": "fixture parameters (Jacobian bases, scales, teacher maps, rotations)", "1": "input sets and splits (target train/sel/test, retained R1/R_sel/R_test/R_shift/R_rare)", "2": "erasure minibatch order and sampler noise for training", "3": "probe sketch Sigma (drawn at k_max=64 rows; arm uses first k rows)", "4": "gate batch pool R2 (batch j of a run is the j-th draw, identical for every arm)", "5": "evaluation noises for full-sampler endpoints (model c)", "6": "population draws for gate coverage", "7": "spare"},
+      "spawn": "root.spawn(8) in the stream order above; cells within a family apply their parameters deterministically to the SAME draws (paired cells); sizes that vary by cell are drawn at their maximum and truncated",
+      "common_random_numbers": "all arms and configs of one (family, cell, seed) consume identical streams 1-5; arm code must not draw randomness from any other source",
+      "bootstrap_seed": 424242
+    }
+  },
+
+  "models": {
+    "a_linear": {"desc": "exact linear-in-theta reference: v_x(theta) = b_x + J_x (theta - theta0); J_x columns scaled by c_j = 10^U(-d/2, d/2)", "T_steps": 60, "checkpoint_every": 1, "dims_hint": {"P": 300, "d_out": 8}},
+    "b_lora_mlp": {"desc": "LoRA tanh MLP, zero-init B, AdamW torch defaults", "T_steps": 60, "checkpoint_every": 2},
+    "c_flow": {"desc": "tiny conditional rectified-flow attention model, LoRA on q/k, 28-step shifted schedule, GEM prefix loss on student rollout steps 0..10", "T_iters": 40, "native_iters": 23, "checkpoint_every": 4, "extra_checkpoints": [23]}
+  },
+
+  "splits": {
+    "target_train": 32, "target_sel": 128, "target_test": 512,
+    "R1_probe": 32, "R2_gate_batch": 256, "R_sel": 512, "R_test": 2048, "R_shift": 1024, "R_rare": 512,
+    "population_rare_mass": 0.005,
+    "rare_subgroup": "retained component whose mean has cosine 0.8 with the target mean; included in the population that R1, R2, R_sel, R_test are sampled from",
+    "shift": "R_shift drawn from the retained population with every component mean shifted by 1.0 within-component sd along a fixed random direction (stream 0)",
+    "disjointness": "all sets drawn independently; harness asserts no input hash appears in two sets (I10)",
+    "model_c_overrides": {"target_test_conditions": 8, "retained_test_conditions": 32, "eval_noises_per_condition": 64, "R2_gate_batch": 64}
+  },
+
+  "observables": {
+    "per_input_hinge_progress": "p_i = 1 - relu(D+_i - eta*D-_i)/L_i with eps_n = 0 at evaluation, L_i = ||b_i - a_i||, floor L_i >= 1e-3*median(L); p_i(theta0) = 0, p_i = 1 iff past the GEM hinge",
+    "per_input_axial_progress": "q_i = clip(s_i/(L_i/2), 0, 1), s_i = (v_i - a_i).e_i measured from the anchor towards the target; reaching the bisector gives 1",
+    "E_hinge": "mean_i p_i over held-out target inputs (models a, b); PRIMARY erasure for a, b",
+    "E_axial": "mean_i q_i (robustness check against transverse escape, B-F1)",
+    "E_pass": "fraction of held-out target inputs with p_i = 1 (reported)",
+    "E_end": "model c PRIMARY: p_i computed on full-sampler endpoints: v -> student endpoint x^_0, a -> base endpoint on anchor condition, b -> base endpoint on target condition, same noise; held-out target conditions x eval noises",
+    "E_end_axial": "model c: axial version on endpoints",
+    "E_mode": "model c, only if fixture has labelled modes: fraction of endpoints nearest the concept mode divided by the base teacher's fraction (D PREREG addendum definition)",
+    "E_prefix_local": "model c: held-out normalized prefix GEM loss; REPORTED ONLY, never a success criterion",
+    "drift_normaliser": "Z = mean over target_test of L_i^2 (computed at theta0)",
+    "rho_mean": "mean over R_test of ||f_x(theta) - f_x(theta0)||^2 / Z; PRIMARY preservation",
+    "rho_max": "max over R_test of the per-input normalised drift",
+    "rho_q99": "99th percentile of per-input normalised drift over R_test",
+    "rho_rare": "mean over R_rare",
+    "rho_shift": "mean over R_shift (G6 primary)",
+    "rho_R1_gap": "rho on R1 minus rho_mean (probe overfitting diagnostic)",
+    "model_c_retained_output": "PRIMARY drift = endpoint drift of the full 28-step sampler on held-out retained conditions with eval noises; SECONDARY = velocity drift on base retained trajectories at all 28 sigma; the f_x used by probes, penalty and gate in model c = velocity at (state of base retained trajectory, sigma index drawn uniformly from 0..27)",
+    "collateral_r": "transverse distance r_i of student output from the anchor-target axis on target_test, divided by L_i (diagnostic, B H-B1)",
+    "trajectory_record": "every checkpoint logs E_* on target_sel and target_test, rho_* on R_sel and on all test sets, cumulative forward-equivalents, accepted/rejected tries, NaN flags"
+  },
+
+  "arms": {
+    "candidate": "vau",
+    "ablations": ["vau_nogate"],
+    "controls_ungated": ["adamw", "adamw_stepmatch", "penalty", "pre_proj", "post_euclid"],
+    "controls_gated": ["adamw+gate", "penalty+gate", "pre_proj+gate", "post_euclid+gate", "penalty_earlystop"],
+    "diagnostic_only": ["penalty_oracle (G1 exact-J cells only; 28 lambda x 4 lr; not budget-equal)"],
+    "definitions": {
+      "adamw": "native GEM optimizer, torch defaults beta=(0.9,0.999), eps=1e-8, wd=0.01 unless secondary grid says otherwise; no retained information",
+      "adamw_stepmatch": "AdamW step rescaled each step to ||Delta||_H = c * ||s_t Delta1_t||_H of the paired vau run (same seed, same lr, middle tau); zero when vau rejected; controls 'VAU just takes smaller or rarer steps'",
+      "penalty": "erasure loss + lambda/2 * mean_{x in R1} ||f_x(theta) - f_x(theta0)||^2 with ordinary AdamW (full R1 outputs, recomputed each step)",
+      "pre_proj": "Euclidean projection of g onto null(S_J) before AdamW (GPM-like); same S_J, k, K as vau",
+      "post_euclid": "VAU-Euclid: Delta1 with D replaced by 1 in the projector (Adam-NSCL-style); same S_J; includes the g.Delta1>=0 reject rule",
+      "vau_nogate": "vau with s = 1 always",
+      "vau": "exact rule in configs/candidate.json",
+      "+gate": "the identical two-point gate of vau (same tau, n2, M, delta, R, same R2 batch sequence, same rollback of theta,m,v,t) wrapped around the arm's proposed step",
+      "penalty_earlystop": "penalty; the run stops permanently at the first gate failure (s=1 tries only)"
+    },
+    "gate_parameters": {"n2": 256, "M": "2*tau^2 per-sample clip", "delta": 0.05, "R_max": 4, "union_bound": "ln(T*R_max/delta)", "source": "configs/candidate.json values override these for vau; gated controls copy vau's values"},
+    "probe_defaults": {"k": 16, "K": 5, "n1": 32, "ridge_mu": "1e-6*tr(G0)/k unless secondary grid"}
+  },
+
+  "tuning_budget": {
+    "configs_per_arm": 12,
+    "lr_grid": "lr0 * 10^{-1, -0.5, 0, 0.5}",
+    "secondary_grid_3_values": {
+      "adamw": "wd in {0, 0.01, 0.1}",
+      "adamw_stepmatch": "c in {0.5, 1, 2}",
+      "penalty": "lambda in lambda0 * {0.1, 1, 10}",
+      "penalty_earlystop": "lambda in lambda0 * {0.1, 1, 10} at tau = tau0",
+      "pre_proj": "ridge multiplier in {1e-6, 1e-3, 1} * tr(G)/k",
+      "post_euclid": "ridge multiplier in {1e-6, 1e-3, 1} * tr(G)/k",
+      "vau_nogate": "ridge multiplier in {1e-6, 1e-3, 1} * tr(G)/k",
+      "vau": "tau^2 in tau0^2 * {0.5, 1, 2}",
+      "adamw+gate": "tau^2 in tau0^2 * {0.5, 1, 2}",
+      "penalty+gate": "lambda = lambda0 and tau^2 in tau0^2 * {0.5, 1, 2}",
+      "pre_proj+gate": "tau^2 in tau0^2 * {0.5, 1, 2}",
+      "post_euclid+gate": "tau^2 in tau0^2 * {0.5, 1, 2}"
+    },
+    "model_c_reduction": "G8 uses 8 configs per arm (4 lr x secondary values {low, mid}) and arms {adamw, adamw_stepmatch, penalty, penalty+gate, adamw+gate, pre_proj+gate, post_euclid+gate, vau_nogate, vau}",
+    "calibration_before_freeze": "on development seeds 0..7 only: lr0 = value in {1e-4, 3e-4, 1e-3, 3e-3, 1e-2} for which native adamw median E_sel first reaches 0.8 closest to step 23; lambda0 = value in 10^{-3..3} for which penalty (lr0) has median rho_sel at E_sel=0.8 closest to half of adamw's; tau0^2 = 0.25 * adamw median rho_sel at E_sel = 0.8; all recorded per family in FREEZE.json",
+    "probes_and_gate_identical": "every arm that uses retained information uses the same R1 inputs, the same sketch Sigma rows (stream 3) and the same gate batch sequence (stream 4)"
+  },
+
+  "matched_efficacy": {
+    "levels": {"primary": 0.8, "secondary": [0.5, 0.95]},
+    "crossing": "first checkpoint pair (t-1, t) at which E_sel (E_hinge on target_sel; E_end on sel conditions for model c) crosses e; linear interpolation weight w = (e - E_{t-1})/(E_t - E_{t-1}) applied to every test metric",
+    "config_selection": "per (arm, family, cell, seed): choose the config minimising interpolated rho on R_sel at the crossing; report its test metrics; never select on any test set",
+    "best_control": "per (family, cell, seed): the control (any ungated or gated control, all configs) with the lowest R_sel drift at the crossing; selection on R_sel, comparison on R_test. Conservative: controls get 11x the candidate's configs",
+    "not_reached": "an arm that never reaches e has rho = +inf at that seed; candidate unreached = loss; control unreached and candidate reached = win; both unreached = tie (excluded from ratios, counted as non-win)",
+    "fallback_ladder": "if both vau and best control fail to reach e=0.8 in >= 6 of 12 seeds of a cell, that cell's primary level becomes 0.5, then 0.2; recorded automatically, applies to all arms",
+    "efficacy_match_check": "at the selected crossings report E_test; flag cell if median |E_test(vau) - E_test(best)| > 0.03",
+    "tradeoff_curve": "per arm: lower envelope over configs of (E_sel, rho_sel), mapped to test metrics at each envelope point; median and IQR across seeds; drift at e in {0.2, 0.5, 0.8, 0.95}"
+  },
+
+  "families": {
+    "G1": {"role": "advantage (cells d>=2) + safety (d=0) + falsification of C-H1(i)", "model": "a_linear",
+      "cells": {"anisotropy_decades": [0, 1, 2, 3], "probe": ["exact (all R1 rows, K=1)", "sketch k=16, K=5"]},
+      "primary_cells": "d in {2,3} x both probe modes", "safety_cells": "d = 0",
+      "applicability": "model a exposes per-parameter column scales c_j",
+      "substitute": "model b with input-feature scales spread over d decades; report measured decade spread of sqrt(vhat) at step 10"},
+    "G2": {"role": "advantage (phi != 0) + safety (phi = 0)", "model": "a_linear",
+      "cells": {"retained_condition_number": [1e2, 1e6], "null_space_rotation": ["0 (coordinate-aligned)", "pi/8", "pi/4", "Haar"]},
+      "construction": "retained Jacobian = U diag(kappa^{-j/(m-1)}) V^T R(phi), V coordinate-aligned, R(phi) rotation mixing null and range coordinates; anisotropy fixed at 2 decades",
+      "expectation": "phi = 0: pre_proj exact (C-T1), candidate must be non-inferior; gap vs pre_proj should grow with phi (diagnostic)",
+      "applicability": "model a only (requires direct control of the Jacobian)",
+      "substitute": "model b with retained inputs in a low-rank subspace with decaying covariance rotated by phi relative to coordinate axes; report measured kappa of S_J"},
+    "G3": {"role": "safety", "model": "a_linear",
+      "cells": {"null_fraction_cos_psi": [1.0, 0.1, 0.01, 0.0], "rich_retained_null_empty": "N_r*d_out >= P with psi generic"},
+      "construction": "erasure gradient direction g = cos(psi) g_null + sin(psi) g_range at theta0",
+      "observable": "no NaN/Inf; reject rule fires when g.Delta1 >= 0; gate holds budget; drift at the reachable matched level via fallback ladder",
+      "applicability": "all arms", "substitute": "model b with N_r*d_out >= P for the rich cell"},
+    "G4": {"role": "safety", "model": "a_linear (4 cells) + b_lora_mlp (1 cell L/L_ref=1e-4)",
+      "cells": {"contrast_ratio_L_over_Lref": [1.0, 1e-2, 1e-4, 1e-6], "eps_n_training": "1e-6 native in all 4 cells; additionally eps_n = 0 with zero subgradient at v=b in cells 1e-4 and 1e-6 (6 model-a cells)"},
+      "observable": "no NaN/Inf; drift per unit erasure distance; step-1 sign-step drift (C: lr*sign(g) independent of scale); E uses L floor",
+      "applicability": "all arms", "substitute": "none needed"},
+    "G5": {"role": "advantage", "model": "b_lora_mlp",
+      "cells": {"tanh_gain": [0.5, 1.0, 2.0]},
+      "lr_curves": "per-lr tradeoff curves reported without selection (finite-step behaviour)",
+      "gauge_subtest": "inject the LoRA gauge step dB = B K, dA = -K A (|K| = 0.3, first-order neutral) into the proposed step of vau_nogate and vau; report exact drift vs gate decision (C-X2); pass = gate rejects or scales whenever true drift > tau^2",
+      "applicability": "model b (needs LoRA factorisation)", "substitute": "gauge subtest inapplicable to model a: mark N/A"},
+    "G6": {"role": "advantage (rho_shift) + safety (rho_rare)", "model": "evaluation-only family on the G5 gain=1 runs and the G1 d=2 sketch runs (no extra training)",
+      "primary_metric": "rho_shift at matched efficacy", "safety_metric": "rho_rare and rho_max non-inferior",
+      "applicability": "models a, b", "substitute": "model c: held-out retained conditions only (no rare subgroup); report, not counted"},
+    "G7": {"role": "advantage (cells with K<=5) + robustness (stale cells)", "model": "b_lora_mlp",
+      "cells": {"(K, k)": [[1, 32], [5, 32], [20, 8], ["inf (once at t=0)", 32]]},
+      "primary_cells": "(1,32), (5,32)",
+      "arms_rerun": "only probe-using arms (vau, vau_nogate, pre_proj, post_euclid, pre_proj+gate, post_euclid+gate, adamw_stepmatch); other controls reused from G5 gain=1",
+      "report": "staleness error ||S_J(theta_s) - S_J(theta_t)||_F / ||S_J(theta_t)||_F; expectation (C c4): candidate may lose to penalty at K = inf",
+      "applicability": "models a, b", "substitute": "model a if b lacks VJP probes"},
+    "G8": {"role": "advantage (end-to-end, REQUIRED for READY)", "model": "c_flow",
+      "observable": "E_end and endpoint rho_mean of the student's own full 28-step sampler on held-out conditions; local prefix loss reported only",
+      "applicability": "model c passes integrity checks I1 and I12", "substitute": "none; if inapplicable G8 = UNRUN and the verdict is capped at HYPOTHESIS_UNRESOLVED"},
+    "GD_B": {"role": "secondary diagnostic (not a candidate criterion)", "model": "free output flow + a_linear",
+      "cells": {"eps_over_L": [1e-6, 1e-4, 1e-2], "stiffness_kappa": [1, 10, 100]},
+      "arms": ["GEM eta=1 hinge", "axial margin (REF losses.py)"], "optimizer": "SGD small lr (gradient-flow proxy) and adamw lr0",
+      "prediction_P2": "r_end(GEM)/r_end(axial) >= 5 at eps/L <= 1e-3, kappa <= 1", "falsified_if": "ratio < 2 at eps/L <= 1e-3 and kappa <= 1 (median over 12 seeds)"},
+    "GD_D": {"role": "secondary diagnostic (not a candidate criterion)", "model": "c_flow",
+      "arms": ["adamw at lr0", "vau at lr0 and tau0 (fixed, not selected on validation)"],
+      "schemes": {"prefix": "steps 0..10, 23 iterations", "uniform": "random 11-of-28 per iteration, 18 iterations (matched forwards, D table)"},
+      "report": "E_end, endpoint rho, rho_late = mean_{k>=11}||Delta|| / mean_{k<=10}||Delta||",
+      "prediction_P_D5": "Spearman(prefix - uniform E_end difference, 1 - rho_late) >= 0.5; falsified if < 0.2"}
+  },
+
+  "family_classes": {
+    "advantage": ["G1", "G2", "G5", "G6", "G7", "G8"],
+    "safety": ["G1:d=0", "G2:phi=0", "G3", "G4", "G6:rho_rare"],
+    "diagnostic": ["GD_B", "GD_D"]
+  },
+
+  "statistics": {
+    "unit": "paired per seed; per-seed statistic = mean over the family's primary cells of log(rho_test(vau)/rho_test(best_control)) at e_primary",
+    "point_estimate": "geometric-mean ratio GMR = exp(mean_s log ratio)",
+    "test": "exact one-sided paired sign-flip permutation test on the 12 per-seed log ratios (4096 flips)",
+    "ci": "paired percentile bootstrap over seeds, 10000 resamples, seed 424242, 95% two-sided",
+    "multiplicity": "Holm across the 6 advantage families at family-wise alpha = 0.05 (one-sided); everything else unadjusted and labelled exploratory",
+    "ties_and_inf": "pairs with both unreached are dropped from log ratios; a pair with only one side reached contributes log ratio = +/- log(100)"
+  },
+
+  "qualification": {
+    "advantage_family_qualifies_if_all": {
+      "Q1_drift": "GMR(rho_mean) <= 0.90 AND Holm-adjusted permutation p < 0.05 AND bootstrap 95% upper bound of GMR < 1.0 AND vau wins >= 9 of 12 seeds",
+      "Q2_worst_case": "GMR(rho_max) <= 1.05 AND GMR(rho_q99) <= 1.05 AND GMR(rho_rare) <= 1.05 (point estimates)",
+      "Q3_efficacy_match": "median |E_test(vau) - E_test(best)| <= 0.03 AND Q1 point condition re-evaluated with E_axial (model c: E_end_axial) as the matching observable gives GMR <= 0.95",
+      "Q4_integrity": "vau crashes (NaN/Inf/exception) in <= 1 of 12 seeds; no control crashes in > 1 seed; gate coverage not falsified"
+    },
+    "safety_family_passes_if": "GMR(rho_mean vs best control) <= 1.10 AND bootstrap upper bound <= 1.25 AND no vau crash AND no gate-coverage violation beyond the coverage rule",
+    "compute_rule": "FE overhead = (vau cumulative forward-equivalents to reach e_primary)/(best control FE to reach e_primary), median over seeds; must be <= 4.0 in G5 and G8 for READY",
+    "forward_equivalent_units": {
+      "FE": "one model forward on one input (model c: one transformer forward on one latent at one sigma); backward = 2 FE",
+      "adamw_step_ab": "3 * n_target_batch",
+      "adamw_iter_c": "rollout 11 + 11 * (2 teacher + 3 student) = 66 per noise (D table)",
+      "penalty_extra": "3 * n1 per step",
+      "probe_refresh": "k * 3 * n1 per refresh (one VJP over R1 per sketch row), amortised /K",
+      "gate_try": "n2 per try, every try counted, rejected tries included",
+      "stepmatch": "same FE as adamw (plus the paired vau run, reported separately)",
+      "one_time_caches": "base outputs on R1/R2/eval sets: reported, not charged (identical across arms)",
+      "eval": "not charged"
+    }
+  },
+
+  "falsification": {
+    "F1_CH1_i_metric": "G1 exact-J cells, ungated, lr = lr0, wd = 0.01: progress ratio R_s = P(vau_nogate)/P(post_euclid), P = E_test(hinge) after T_p = 10 steps (or at the first step either arm reaches 0.95); C-H1(i) FALSIFIED if R_s < 1.2 in >= 8 of 12 seeds at d = 2 OR at d = 3. Secondary (reported): C's cumulative first-order progress sum_t -g_t.Delta_t",
+    "F2_penalty_better": "in any advantage family: best of {penalty, penalty+gate, penalty_earlystop} has GMR(rho_mean penalty/vau) <= 0.90 at matched e AND wins >= 8 of 12 seeds -> C-H1 FALSIFIED in that family. penalty_oracle flipping the G1 conclusion caps the verdict at HYPOTHESIS_UNRESOLVED",
+    "F3_gate_coverage": "over all runs of vau and gated controls in G1-G7: a run violates if any accepted iterate has population clipped drift (20000 fresh draws, stream 6) > tau^2; C-H1(ii) FALSIFIED if the violating-run fraction exceeds delta = 0.05 with exact one-sided binomial p < 0.01; unclipped and rare-subgroup violation rates reported",
+    "F4_gate_value": "C-H1(ii) value claim FALSIFIED if in G5 and G8 vau does not have lower rho_mean than penalty_earlystop and penalty+gate at matched e (GMR >= 1.0)",
+    "GD_B_P2": "see families.GD_B (diagnostic only)",
+    "GD_D_P_D5": "see families.GD_D (diagnostic only)"
+  },
+
+  "verdict_rules": {
+    "NO_SUPPORTED_CANDIDATE_if_any": [
+      "F1 triggered",
+      "F2 triggered in G1 (primary cells) or G8",
+      "F3 triggered",
+      "no advantage family has point GMR(rho_mean) <= 0.95",
+      "safety failure in >= 2 safety families"
+    ],
+    "READY_FOR_SMALL_REAL_MODEL_TEST_if_all": [
+      "no NO_SUPPORTED_CANDIDATE condition",
+      "G1 and G8 qualify (Q1-Q4)",
+      ">= 2 of {G2, G5, G6, G7} qualify",
+      "all safety families pass",
+      "F2 and F4 not triggered anywhere",
+      "compute_rule satisfied",
+      "every family RUN; integrity checks passed; no control-crash flag; no repair touching the vau arm or any threshold"
+    ],
+    "HYPOTHESIS_UNRESOLVED": "every other outcome (including UNRUN families, budget stop, harness repairs that touch the candidate, penalty_oracle flip, G8 inapplicable)"
+  },
+
+  "integrity_checks_before_freeze": {
+    "I1": "finite-difference check of erasure-loss gradients and retained VJPs for models a, b, c (float64, rel err <= 1e-6)",
+    "I2": "vau with k = 0 and gate off reproduces adamw bitwise (max abs diff <= 1e-12) for 20 steps",
+    "I3": "with D forced constant, vau projection equals post_euclid projection to 1e-12",
+    "I4": "exact J: ||J Delta1|| / ||J Delta0|| <= 1e-8 for vau_nogate and post_euclid",
+    "I5": "lr = 0: every arm has E = 0 and rho = 0 exactly",
+    "I6": "gate wrapper with tau = inf equals the ungated arm bitwise",
+    "I7": "AdamW reference matches the closed-form torch AdamW (decoupled wd, bias correction) for 3 steps",
+    "I8": "two arms with identical update rules give identical trajectories (common random numbers)",
+    "I9": "after a rejected step (theta, m, v, t) equal their pre-step values",
+    "I10": "evaluation sets are disjoint from each other and from R1, R2 (input hashes)",
+    "I11": "runner refuses validation seeds without a matching FREEZE.json",
+    "I12": "model c: LoRA zero -> student endpoint equals base endpoint exactly; E_end(theta0) = 0, endpoint rho(theta0) = 0",
+    "failure": "any failing check blocks the freeze; fixes are made on development seeds only"
+  },
+
+  "freeze_procedure": "after I1-I12 pass and calibration is done on development seeds, write configs/FREEZE.json = {sha256 of eval_protocol.json, candidate.json, code/vau tree; per-family lr0, lambda0, tau0; measured per-run timings; reduction-ladder steps applied; UTC}; coordinator commits it before the first validation run",
+
+  "stopping_and_failures": {
+    "order": ["G1", "G2", "G3", "G4", "G5 (+G6 evaluation)", "G7", "G8", "GD_B", "GD_D"],
+    "single_pass": "each (family, cell, seed, arm, config) is run exactly once; no early stopping on results",
+    "crash": "NaN/Inf/exception/timeout (> 10x median run time) = failed run: E = 0 from the failure point onward and rho = +inf; counted for every arm alike",
+    "no_reruns": "no new seeds, cells, configs or arms after any validation result is seen",
+    "repairs": "a bug found after the freeze is logged as REPAIR-n in results/validation/REPAIRS.md with diff and reason; original results stay and are reported; the retest uses the same seeds and is reported separately; a repair that touches the vau arm, the gate or any threshold caps the verdict at HYPOTHESIS_UNRESOLVED",
+    "budget": "estimate 3.9 CPU-core-hours; hard stop at 6.0 metered core-hours; families not finished = UNRUN",
+    "reduction_ladder_pre_freeze_only": ["L1: model c eval noises 64 -> 32", "L2: models a,b T 60 -> 40", "L3: drop G7 cell (20, 8)", "L4: model c T_iters 40 -> 28"]
+  },
+
+  "compute_estimate_core_hours": {
+    "assumed_per_run_s": {"a_linear": 0.1, "b_lora_mlp": 0.5, "c_flow": 3.0},
+    "runs_per_cell_seed": "13 arms x 12 configs = 156 (G8: 9 arms x 8 configs = 72)",
+    "G1": 0.42, "G2": 0.42, "G3": 0.26, "G4": 0.57, "G5": 0.78, "G6": 0.05, "G7": 0.56, "G8": 0.72, "GD_B": 0.02, "GD_D": 0.04, "penalty_oracle": 0.08,
+    "total": 3.92,
+    "note": "ASSUMED timings; measured on development seed 0 before the freeze; if projected total > 4.0, apply ladder L1..L4 in order and record in FREEZE.json"
+  }
+}
