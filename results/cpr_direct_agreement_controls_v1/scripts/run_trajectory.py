@@ -131,8 +131,13 @@ def train(args):
         tr = self.transformer
         sampling.append({"transformer_training": bool(tr.training), "grad_enabled": torch.is_grad_enabled(),
                          "lora_dropout_modules_training": all(m.training for n, m in tr.named_modules() if "lora_dropout" in n),
-                         "n_lora_dropout_modules": sum(1 for n, m in tr.named_modules() if "lora_dropout" in n),
-                         "adapter_disabled_flag": bool(getattr(self.transformer, "disable_adapters", False))})
+                         # REPAIR-2: count only actual nn.Dropout instances inside lora_dropout containers (the old count
+                         # also matched the ModuleDict container name, giving 2 per layer = 152)
+                         "n_lora_dropout_modules": sum(1 for n, m in tr.named_modules()
+                                                       if "lora_dropout" in n and isinstance(m, torch.nn.Dropout)),
+                         # REPAIR-2: diagnostic only: the old flag read diffusers' PeftAdapterMixin.disable_adapters METHOD (always truthy)
+                         "n_lora_layers_adapter_disabled": sum(1 for _, m in tr.named_modules()
+                                                               if hasattr(m, "lora_A") and getattr(m, "disable_adapters", False) is True)})
         return orig_pd(self, *a, **k)
 
     cls.partially_denoise_until_timestep = spy

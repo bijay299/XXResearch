@@ -177,7 +177,7 @@ def phase_entry_gpu():
     def b():
         time.sleep(30)
         if ex("artifacts/qualification/qualification_summary.json"):
-            res["qual"] = True
+            res["qual"] = bool(load(j("artifacts", "qualification", "qualification_summary.json"))["entry_qualification_pass"])
             return
         ok, _ = run("qualify", "entry", [GPUS[1]], [PY, j("scripts", "qualify.py")], wall=3000)
         if ok or ex("artifacts/qualification/qualification_summary.json"):
@@ -187,6 +187,11 @@ def phase_entry_gpu():
     ta.start(); tb.start(); ta.join(); tb.join()
     print(res)
     return all(res.values())
+
+
+def phase_gpu_gate():
+    """Repair-2 rerun of the GPU native gate trajectory only (qualification result is final and is not re-run)."""
+    return train_job(P.GATE_NATIVE_TRAJ, GPUS[0], "entry", gate=True)
 
 
 def phase_replay():
@@ -351,7 +356,7 @@ def phase_final():
     return True
 
 
-PHASES = {"synthetic": phase_synthetic, "entry_gpu": phase_entry_gpu, "replay": phase_replay, "techbatch": phase_techbatch,
+PHASES = {"synthetic": phase_synthetic, "entry_gpu": phase_entry_gpu, "gpu_gate": phase_gpu_gate, "replay": phase_replay, "techbatch": phase_techbatch,
           "project": phase_project, "entry_decision": phase_entry_decision, "dev_m0": phase_dev_m0,
           "dev_train": phase_dev_train, "dev_select": phase_dev_select, "ho_m0": phase_ho_m0, "ho_run": phase_ho_run,
           "final": phase_final}

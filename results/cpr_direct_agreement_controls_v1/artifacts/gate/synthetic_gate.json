@@ -1,0 +1,1387 @@
+{
+  "all_pass": true,
+  "checks": {
+    "activity::all_active_d64": {
+      "note": true,
+      "rows": {
+        "anchor_only": {
+          "active": 4,
+          "inactive": 0
+        },
+        "axial_margin": {
+          "active": 4,
+          "inactive": 0
+        },
+        "centered_radial": {
+          "active": 4,
+          "inactive": 0
+        },
+        "cpr": {
+          "active": 4,
+          "inactive": 0
+        },
+        "native_gem": {
+          "active": 4,
+          "inactive": 0
+        },
+        "truncated_anchor": {
+          "active": 4,
+          "inactive": 0
+        }
+      }
+    },
+    "activity::all_inactive_d64": {
+      "note": true,
+      "rows": {
+        "anchor_only": {
+          "active": 4,
+          "inactive": 0
+        },
+        "axial_margin": {
+          "active": 0,
+          "inactive": 4
+        },
+        "centered_radial": {
+          "active": 0,
+          "inactive": 4
+        },
+        "cpr": {
+          "active": 0,
+          "inactive": 4
+        },
+        "native_gem": {
+          "active": 0,
+          "inactive": 4
+        },
+        "truncated_anchor": {
+          "active": 0,
+          "inactive": 4
+        }
+      }
+    },
+    "activity::mixed_d256": {
+      "note": true,
+      "rows": {
+        "anchor_only": {
+          "active": 6,
+          "inactive": 0
+        },
+        "axial_margin": {
+          "active": 3,
+          "inactive": 3
+        },
+        "centered_radial": {
+          "active": 3,
+          "inactive": 3
+        },
+        "cpr": {
+          "active": 3,
+          "inactive": 3
+        },
+        "native_gem": {
+          "active": 3,
+          "inactive": 3
+        },
+        "truncated_anchor": {
+          "active": 3,
+          "inactive": 3
+        }
+      }
+    },
+    "activity::mixed_d32": {
+      "note": true,
+      "rows": {
+        "anchor_only": {
+          "active": 8,
+          "inactive": 0
+        },
+        "axial_margin": {
+          "active": 4,
+          "inactive": 4
+        },
+        "centered_radial": {
+          "active": 4,
+          "inactive": 4
+        },
+        "cpr": {
+          "active": 4,
+          "inactive": 4
+        },
+        "native_gem": {
+          "active": 4,
+          "inactive": 4
+        },
+        "truncated_anchor": {
+          "active": 4,
+          "inactive": 4
+        }
+      }
+    },
+    "activity_mixed::axial_margin::mixed_d256": {
+      "active": 3,
+      "inactive": 3,
+      "pass": true
+    },
+    "activity_mixed::axial_margin::mixed_d32": {
+      "active": 4,
+      "inactive": 4,
+      "pass": true
+    },
+    "activity_mixed::centered_radial::mixed_d256": {
+      "active": 3,
+      "inactive": 3,
+      "pass": true
+    },
+    "activity_mixed::centered_radial::mixed_d32": {
+      "active": 4,
+      "inactive": 4,
+      "pass": true
+    },
+    "activity_mixed::cpr::mixed_d256": {
+      "active": 3,
+      "inactive": 3,
+      "pass": true
+    },
+    "activity_mixed::cpr::mixed_d32": {
+      "active": 4,
+      "inactive": 4,
+      "pass": true
+    },
+    "activity_mixed::native_gem::mixed_d256": {
+      "active": 3,
+      "inactive": 3,
+      "pass": true
+    },
+    "activity_mixed::native_gem::mixed_d32": {
+      "active": 4,
+      "inactive": 4,
+      "pass": true
+    },
+    "activity_mixed::truncated_anchor::mixed_d256": {
+      "active": 3,
+      "inactive": 3,
+      "pass": true
+    },
+    "activity_mixed::truncated_anchor::mixed_d32": {
+      "active": 4,
+      "inactive": 4,
+      "pass": true
+    },
+    "arm_vs_fp64::anchor_only::all_active_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 4.178498893558924e-07,
+      "grad_ok": true,
+      "hinge": false,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 1.5826985766409507e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 7.433882274199277e-06,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::anchor_only::all_inactive_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 3.222612785513945e-07,
+      "grad_ok": true,
+      "hinge": false,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 1.437867909181989e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 5.902998552187455e-06,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::anchor_only::mixed_d256": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 2.6891925841709963e-07,
+      "grad_ok": true,
+      "hinge": false,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 1.1051554196228608e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 6,
+      "rows_away_from_boundary": 6,
+      "scalar_err": 3.7860548331991595e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::anchor_only::mixed_d32": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 6.014290510059084e-07,
+      "grad_ok": true,
+      "hinge": false,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 2.3632253709493511e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 8,
+      "rows_away_from_boundary": 8,
+      "scalar_err": 2.4435078046280978e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::axial_margin::all_active_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 6.335316680150527e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 6.314607645663273e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 1.9315082226967206e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::axial_margin::all_inactive_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 0.0,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 0.0,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::axial_margin::mixed_d256": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 3.579767278161228e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 2.231368636529396e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 6,
+      "rows_away_from_boundary": 6,
+      "scalar_err": 4.320284756431647e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::axial_margin::mixed_d32": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 7.967045636547709e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 2.211666476625851e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 8,
+      "rows_away_from_boundary": 8,
+      "scalar_err": 2.121252740039381e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::centered_radial::all_active_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 6.120322750824414e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 2.187648465934444e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 1.7357714796162327e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::centered_radial::all_inactive_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 0.0,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 0.0,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::centered_radial::mixed_d256": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 2.3858958941858077e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 1.6382218106514301e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 6,
+      "rows_away_from_boundary": 6,
+      "scalar_err": 4.243089500732822e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::centered_radial::mixed_d32": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 3.859661541483206e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 2.9592620887086696e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 8,
+      "rows_away_from_boundary": 8,
+      "scalar_err": 4.941123705748396e-07,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::cpr::all_active_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 4.453866084830338e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 1.3426578107100795e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 1.6803033986434457e-06,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::cpr::all_inactive_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 0.0,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 0.0,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::cpr::mixed_d256": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 3.548630425065369e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 3.5099377626579553e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 6,
+      "rows_away_from_boundary": 6,
+      "scalar_err": 3.269181161158485e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::cpr::mixed_d32": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 8.473700869870981e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 1.2483086031522816e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 8,
+      "rows_away_from_boundary": 8,
+      "scalar_err": 1.1319005267296234e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::native_gem::all_active_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 6.459123969015934e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 2.5340265096929215e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::native_gem::all_inactive_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 0.0,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 0.0,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::native_gem::mixed_d256": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 2.675756558545572e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 6,
+      "rows_away_from_boundary": 6,
+      "scalar_err": 8.952325572408881e-06,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::native_gem::mixed_d32": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 7.042873577667308e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 8,
+      "rows_away_from_boundary": 8,
+      "scalar_err": 1.1001632032048292e-06,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::truncated_anchor::all_active_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 4.178498893558924e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 2.0242752007959552e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 1.9179733556029532e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::truncated_anchor::all_inactive_d64": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 0.0,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 0.0,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 0.0,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::truncated_anchor::mixed_d256": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 2.5099348843760083e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 1.503249826839692e-06,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 6,
+      "rows_away_from_boundary": 6,
+      "scalar_err": 1.1090387886270037e-05,
+      "scalar_ok": true
+    },
+    "arm_vs_fp64::truncated_anchor::mixed_d32": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 3.402240533745271e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 2.2417104261762688e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 8,
+      "rows_away_from_boundary": 8,
+      "scalar_err": 7.127415813101834e-07,
+      "scalar_ok": true
+    },
+    "bf16_student_path::anchor_only": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "grad_cosine_vs_fp64": 0.999998668721889,
+      "note": "forward value at the loss tolerance; gradient passes through BF16 rounding at the student output, so only direction (cosine>0.999) is asserted here",
+      "pass": true,
+      "scalar_err": 9.64186483543017e-06
+    },
+    "bf16_student_path::axial_margin": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "grad_cosine_vs_fp64": 0.9999987054585684,
+      "note": "forward value at the loss tolerance; gradient passes through BF16 rounding at the student output, so only direction (cosine>0.999) is asserted here",
+      "pass": true,
+      "scalar_err": 1.3205234353108608e-05
+    },
+    "bf16_student_path::centered_radial": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "grad_cosine_vs_fp64": 0.9999984964395617,
+      "note": "forward value at the loss tolerance; gradient passes through BF16 rounding at the student output, so only direction (cosine>0.999) is asserted here",
+      "pass": true,
+      "scalar_err": 7.842130074209308e-06
+    },
+    "bf16_student_path::cpr": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "grad_cosine_vs_fp64": 0.9999985595339763,
+      "note": "forward value at the loss tolerance; gradient passes through BF16 rounding at the student output, so only direction (cosine>0.999) is asserted here",
+      "pass": true,
+      "scalar_err": 5.99092686570657e-07
+    },
+    "bf16_student_path::native_gem": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "grad_cosine_vs_fp64": 0.9999984938611222,
+      "note": "forward value at the loss tolerance; gradient passes through BF16 rounding at the student output, so only direction (cosine>0.999) is asserted here",
+      "pass": true,
+      "scalar_err": 6.702791949919629e-06
+    },
+    "bf16_student_path::truncated_anchor": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "grad_cosine_vs_fp64": 0.9999986137994307,
+      "note": "forward value at the loss tolerance; gradient passes through BF16 rounding at the student output, so only direction (cosine>0.999) is asserted here",
+      "pass": true,
+      "scalar_err": 1.6258700270554982e-06
+    },
+    "exact_boundary::axial_margin": {
+      "computed_hinge": 0.0,
+      "grad_abs_max": 0.0,
+      "pass": true,
+      "target_loss": 0.0
+    },
+    "exact_boundary::centered_radial": {
+      "computed_hinge": 0.0,
+      "grad_abs_max": 0.0,
+      "pass": true,
+      "target_loss": 0.0
+    },
+    "exact_boundary::cpr": {
+      "computed_hinge": 0.0,
+      "grad_abs_max": 0.0,
+      "pass": true,
+      "target_loss": 0.0
+    },
+    "exact_boundary::native_gem": {
+      "computed_hinge": 0.0,
+      "grad_abs_max": 0.0,
+      "pass": true,
+      "target_loss": 0.0
+    },
+    "exact_boundary::truncated_anchor": {
+      "computed_hinge": 0.0,
+      "grad_abs_max": 0.0,
+      "pass": true,
+      "target_loss": 0.0
+    },
+    "exact_boundary_coverage": {
+      "anchor_only": "no hinge (N/A)",
+      "claimed": [
+        "native_gem",
+        "truncated_anchor",
+        "cpr",
+        "axial_margin",
+        "centered_radial"
+      ],
+      "not_exactly_zero": {},
+      "note": true,
+      "statement": "claims restricted to arms whose computed FP32 hinge argument was exactly 0.0; no root search"
+    },
+    "fixtures": {
+      "meta": {
+        "all_active_d64": {
+          "tries": 672
+        },
+        "all_inactive_d64": {
+          "tries": 27
+        },
+        "mixed_d256": {
+          "tries": 8
+        },
+        "mixed_d32": {
+          "tries": 61
+        }
+      },
+      "names": [
+        "mixed_d32",
+        "mixed_d256",
+        "all_inactive_d64",
+        "all_active_d64"
+      ],
+      "note": true,
+      "selection": "rows accepted by FP64-reference margin>=0.1*scale for every arm and no near-zero active gradient element; independent of the system under test",
+      "shapes": {
+        "all_active_d64": [
+          4,
+          64
+        ],
+        "all_inactive_d64": [
+          4,
+          64
+        ],
+        "mixed_d256": [
+          6,
+          256
+        ],
+        "mixed_d32": [
+          8,
+          32
+        ]
+      }
+    },
+    "fp32_preparation::anchor_only": {
+      "dtype": "torch.float32",
+      "pass": true
+    },
+    "fp32_preparation::axial_margin": {
+      "dtype": "torch.float32",
+      "pass": true
+    },
+    "fp32_preparation::centered_radial": {
+      "dtype": "torch.float32",
+      "pass": true
+    },
+    "fp32_preparation::cpr": {
+      "dtype": "torch.float32",
+      "pass": true
+    },
+    "fp32_preparation::truncated_anchor": {
+      "dtype": "torch.float32",
+      "pass": true
+    },
+    "hook_protocol_over_window": {
+      "capture_violations": [],
+      "hook_violations": [],
+      "pass": true
+    },
+    "meta": {
+      "eta": 1.0,
+      "gamma": 100.0,
+      "harness_stubs": [
+        "memory_cleanup -> no-op (CUDA cache management only)"
+      ],
+      "n_latents": 11,
+      "note": true,
+      "scope": "synthetic FP32 fixtures through the real native trainer loop on CPU (FakeWrapper supplies only the three network outputs); real-model operands are replayed in gate_replay.py",
+      "started_utc": "2026-10-19T18:39:52Z",
+      "tolerances": {
+        "grad": {
+          "atol": 1e-07,
+          "rtol": 0.0001
+        },
+        "loss": {
+          "atol": 1e-06,
+          "rtol": 1e-05
+        }
+      }
+    },
+    "native_agreement::all_active_d64": {
+      "bitwise": {
+        "B_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "C_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "D_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "per_sample_B_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_C_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_D_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        }
+      },
+      "fp64_ref": {
+        "away_from_boundary_all_rows": true,
+        "compared": true,
+        "grad_err": 6.459123969015934e-07,
+        "grad_ok": true,
+        "per_sample_err": 2.4408882772775087e-06,
+        "per_sample_ok": true,
+        "scalar_err": 2.5340265096929215e-05,
+        "scalar_ok": true
+      },
+      "hook_protocol": {
+        "all_return_none": true,
+        "arg_dtypes": [
+          "torch.float32",
+          "torch.float32",
+          "torch.float32"
+        ],
+        "calls": 1,
+        "violations": []
+      },
+      "pass": true
+    },
+    "native_agreement::all_inactive_d64": {
+      "bitwise": {
+        "B_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "C_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "D_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "per_sample_B_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_C_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_D_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        }
+      },
+      "fp64_ref": {
+        "away_from_boundary_all_rows": true,
+        "compared": true,
+        "grad_err": 0.0,
+        "grad_ok": true,
+        "per_sample_err": 0.0,
+        "per_sample_ok": true,
+        "scalar_err": 0.0,
+        "scalar_ok": true
+      },
+      "hook_protocol": {
+        "all_return_none": true,
+        "arg_dtypes": [
+          "torch.float32",
+          "torch.float32",
+          "torch.float32"
+        ],
+        "calls": 1,
+        "violations": []
+      },
+      "pass": true
+    },
+    "native_agreement::mixed_d256": {
+      "bitwise": {
+        "B_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "C_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "D_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "per_sample_B_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_C_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_D_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        }
+      },
+      "fp64_ref": {
+        "away_from_boundary_all_rows": true,
+        "compared": true,
+        "grad_err": 2.675756558545572e-07,
+        "grad_ok": true,
+        "per_sample_err": 1.3212729506051346e-06,
+        "per_sample_ok": true,
+        "scalar_err": 8.952325572408881e-06,
+        "scalar_ok": true
+      },
+      "hook_protocol": {
+        "all_return_none": true,
+        "arg_dtypes": [
+          "torch.float32",
+          "torch.float32",
+          "torch.float32"
+        ],
+        "calls": 1,
+        "violations": []
+      },
+      "pass": true
+    },
+    "native_agreement::mixed_d32": {
+      "bitwise": {
+        "B_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "C_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "D_vs_A": {
+          "bitwise_grad": true,
+          "bitwise_scalar": true,
+          "grad_err": 0.0,
+          "grad_ok": true,
+          "scalar_err": 0.0,
+          "scalar_ok": true
+        },
+        "per_sample_B_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_C_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        },
+        "per_sample_D_vs_A": {
+          "bitwise": true,
+          "err": 0.0,
+          "ok": true
+        }
+      },
+      "fp64_ref": {
+        "away_from_boundary_all_rows": true,
+        "compared": true,
+        "grad_err": 7.042873577667308e-07,
+        "grad_ok": true,
+        "per_sample_err": 2.481541736543136e-07,
+        "per_sample_ok": true,
+        "scalar_err": 1.1001632032048292e-06,
+        "scalar_ok": true
+      },
+      "hook_protocol": {
+        "all_return_none": true,
+        "arg_dtypes": [
+          "torch.float32",
+          "torch.float32",
+          "torch.float32"
+        ],
+        "calls": 1,
+        "violations": []
+      },
+      "pass": true
+    },
+    "patched_retains_original_native_block_verbatim": {
+      "pass": true,
+      "patched_file": "/data/bijaypandey/cuig_pilot/cpr_direct_agreement_controls_v1/GEM_src/gem/operators/erasure/erasure_gem.py"
+    },
+    "pristine_source_native_block_present": {
+      "pass": true
+    },
+    "relu_scalar_semantics_at_zero": {
+      "pass": true
+    },
+    "small_contrast_finite::anchor_only": {
+      "L": 1.9999999949504854e-06,
+      "pass": true
+    },
+    "small_contrast_finite::axial_margin": {
+      "L": 1.9999999949504854e-06,
+      "pass": true
+    },
+    "small_contrast_finite::centered_radial": {
+      "L": 1.9999999949504854e-06,
+      "pass": true
+    },
+    "small_contrast_finite::cpr": {
+      "L": 1.9999999949504854e-06,
+      "pass": true
+    },
+    "small_contrast_finite::native_gem": {
+      "L": 1.9999999949504854e-06,
+      "pass": true
+    },
+    "small_contrast_finite::truncated_anchor": {
+      "L": 1.9999999949504854e-06,
+      "pass": true
+    },
+    "summary": {
+      "finished_utc": "2026-10-19T18:39:55Z",
+      "note": true
+    },
+    "teacher_detached::anchor_only": {
+      "pass": true,
+      "ps_requires_grad": true
+    },
+    "teacher_detached::axial_margin": {
+      "pass": true,
+      "ps_requires_grad": true
+    },
+    "teacher_detached::centered_radial": {
+      "pass": true,
+      "ps_requires_grad": true
+    },
+    "teacher_detached::cpr": {
+      "pass": true,
+      "ps_requires_grad": true
+    },
+    "teacher_detached::truncated_anchor": {
+      "pass": true,
+      "ps_requires_grad": true
+    },
+    "trainer_mode_train_during_student": {
+      "pass": true
+    },
+    "window_invariance_hooks_on_vs_off": {
+      "capture_calls": 11,
+      "capture_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "hook_calls": 11,
+      "note": "optimizer state, update and RNG identical with the capture and native-dispatch hooks attached",
+      "pass": true,
+      "states": 11
+    },
+    "window_one_update_divisor_eleven": {
+      "pass": true,
+      "student_calls": 11,
+      "student_modes_train": [
+        true,
+        true,
+        true
+      ],
+      "teacher_calls": 22
+    },
+    "zero_contrast::anchor_only": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 5.284020634377384e-07,
+      "grad_ok": true,
+      "hinge": false,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 4.2664811239490064e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 4.046523343959052e-06,
+      "scalar_ok": true
+    },
+    "zero_contrast::axial_raises_arm_failure_via_trainer": {
+      "pass": true
+    },
+    "zero_contrast::axial_raises_direct": {
+      "pass": true
+    },
+    "zero_contrast::centered_radial_finite": {
+      "note": "hinge is O(eps) by construction at zero contrast (boundary regime); finiteness only, no FP64 value claim",
+      "pass": true
+    },
+    "zero_contrast::cpr": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 5.284020634377384e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 4.2664811239490064e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 4.046523343959052e-06,
+      "scalar_ok": true
+    },
+    "zero_contrast::native_gem": {
+      "fp64_ref": {
+        "away_from_boundary_all_rows": false,
+        "compared": true,
+        "grad_err": 0.0,
+        "grad_ok": true,
+        "per_sample_err": 0.0,
+        "per_sample_ok": true,
+        "scalar_err": 0.0,
+        "scalar_ok": true
+      },
+      "pass": true
+    },
+    "zero_contrast::truncated_anchor": {
+      "arg_dtypes": [
+        "torch.float32",
+        "torch.float32",
+        "torch.float32"
+      ],
+      "compared": true,
+      "eta_in_hook": 1.0,
+      "finite_equal_shape": true,
+      "grad_err": 5.284020634377384e-07,
+      "grad_ok": true,
+      "hinge": true,
+      "hook_protocol_ok": true,
+      "hook_violations": [],
+      "inputs_unchanged": true,
+      "pass": true,
+      "per_sample_err": 4.2664811239490064e-07,
+      "per_sample_ok": true,
+      "reduction_bitwise": true,
+      "rows": 4,
+      "rows_away_from_boundary": 4,
+      "scalar_err": 4.046523343959052e-06,
+      "scalar_ok": true
+    }
+  },
+  "failed": null
+}

@@ -1,0 +1,93 @@
+{
+  "all_pass": false,
+  "capture_digests": [
+    "f424d35e3a46686e8edec7f0e18fde8999e5460ec2cc5a35862835e3dcefa01e",
+    "b8c52ce36560dc817b97ea1c5757e6aa03555181384ee593930d4b146c143f4a"
+  ],
+  "capture_file_sha256": "6d65743cace5bedc42a777a698b213e3982a1b54790e4fa5aeef64e5eb141ace",
+  "captured_indices": [
+    0,
+    7
+  ],
+  "checks": {
+    "adapter_init_fresh": {
+      "pass": true
+    },
+    "adapter_restoration_from_saved_terminal": {
+      "pass": true,
+      "restored": "906029ba9ff8c9cf",
+      "trained": "906029ba9ff8c9cf"
+    },
+    "capture_hook_read_only_and_predeclared": {
+      "captured": [
+        0,
+        7
+      ],
+      "pass": true,
+      "rng_violations": []
+    },
+    "finite_intended_updates": {
+      "max_abs_adapter_move": 0.021384727209806442,
+      "pass": true
+    },
+    "fresh_optimizer_each_call": {
+      "first": [
+        1
+      ],
+      "last": [
+        23
+      ],
+      "n_updates": 23,
+      "pass": true
+    },
+    "frozen_base_unchanged": {
+      "after": "899556d4bed8f520",
+      "before": "899556d4bed8f520",
+      "pass": true
+    },
+    "loss_hook_calls_equal_states": {
+      "calls": 250,
+      "pass": true,
+      "states": 250
+    },
+    "native_window_budget_behaviour": {
+      "expected_updates": 23,
+      "pass": true,
+      "states": 250,
+      "updates": 23
+    },
+    "peft_inventory": {
+      "first_module": "base_model.model.transformer.transformer_blocks.0.attn.add_k_proj",
+      "lora_dropout_p": [
+        0.1
+      ],
+      "lora_dtypes": [
+        "torch.float32"
+      ],
+      "n_base_trainable": 0,
+      "n_lora_modules": 76,
+      "n_lora_tensors": 152,
+      "pass": true,
+      "trainable_params": 7471104
+    },
+    "preview_decode_skipped_and_counted": {
+      "decodes": 0,
+      "pass": true,
+      "skips": 23,
+      "windows": 23
+    },
+    "student_sampling_train_mode_no_grad": {
+      "first": {
+        "adapter_disabled_flag": true,
+        "grad_enabled": false,
+        "lora_dropout_modules_training": true,
+        "n_lora_dropout_modules": 152,
+        "transformer_training": true
+      },
+      "note": "torch.no_grad() is not eval(): native LoRA dropout p=0.1 is ACTIVE while sampling the student trajectory",
+      "pass": false,
+      "windows": 23
+    }
+  },
+  "traj_id": "dev.native_gem.lr_1e-3"
+}
