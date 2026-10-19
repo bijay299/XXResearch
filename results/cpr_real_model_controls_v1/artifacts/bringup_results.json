@@ -1,0 +1,99 @@
+{
+  "_elapsed_s": 45.2,
+  "adapter_starts_inert": {
+    "inert": true,
+    "max_abs_effective_delta": 0.0
+  },
+  "budget_projection": {
+    "entry_gpu_hours_used": 0.026,
+    "eval_reserve_h": 8.0,
+    "fits": true,
+    "generate_gpu_hours": 2.65,
+    "images": 1992,
+    "jobs": 98,
+    "load_gpu_hours": 0.36,
+    "overhead_factor": 1.3,
+    "pipeline_load_seconds": 13.1,
+    "projected_gpu_hours": 8.41,
+    "remaining_gpu_hours": 23.97,
+    "seconds_per_image": 4.79,
+    "seconds_per_processed_timestep": 1.3841,
+    "train_gpu_hours": 3.46,
+    "trajectories": 36,
+    "verdict": "FITS"
+  },
+  "checkpoint_roundtrip": {
+    "ckpt": "/data/bijaypandey/cuig_pilot/cpr_real_model_controls_v1/ckpt/bringup_native_probe.pt",
+    "fixed_input_forward_bit_identical": true,
+    "fixed_input_max_abs_diff": 0.0,
+    "hash_after_reload": "0b3e4536d104d81e04e83a6c17bd47bb3219d99029ff1f1d7382f32633794c25",
+    "hash_before": "0b3e4536d104d81e04e83a6c17bd47bb3219d99029ff1f1d7382f32633794c25",
+    "hash_match": true,
+    "keys_loaded": 152,
+    "missing": [],
+    "nonfinite": [],
+    "note": "compact adapter snapshot only; no transformer copy. Unmerged/merged bit-equivalence is NOT asserted -- only that reload restores the intended effective weights and the fixed-input forward.",
+    "perturbation_was_detectable": true,
+    "shape_mismatch": [],
+    "size_mib": 28.55,
+    "unexpected": []
+  },
+  "load": {
+    "dtype": "bfloat16",
+    "guidance_embeds": true,
+    "image_seq_len_512": 256,
+    "seconds": 13.1,
+    "vae_scale_factor": 16
+  },
+  "lora": {
+    "bias": "none",
+    "init": "lora_A kaiming_uniform_(a=sqrt(5)); lora_B zeros",
+    "lora_alpha": 16,
+    "lora_dropout": 0.1,
+    "n_dual_blocks": 19,
+    "n_modules": 76,
+    "r": 16,
+    "scaling": 1.0,
+    "single_block_leak": 0,
+    "trainable_params": 7471104
+  },
+  "m0_inference": {
+    "case_id": "dev.target.00",
+    "image_reused_not_redecoded": true,
+    "initial_noise_sha256": "f8f65f3b6fa6dcad6c104d95b0f8eb89dbcf033c3fe960448895e78a99f9d659",
+    "path": "/data/bijaypandey/cuig_pilot/cpr_real_model_controls_v1/images/m0/dev/dev.target.00.png",
+    "prompt": "a photo of a backpack",
+    "seconds": 4.79,
+    "seed": 900000
+  },
+  "model_pin": {
+    "matches_pin": true,
+    "model": "black-forest-labs/FLUX.1-dev",
+    "resolved": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+    "revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+    "snapshot_path": "/data/bijaypandey/cuig_pilot/hf_home/hub/models--black-forest-labs--FLUX.1-dev/snapshots/3de623fc3c33e44ffbe2bad470d0f45bccf2eb21"
+  },
+  "train_profile": {
+    "arm": "native_gem",
+    "first_losses": [
+      2943.1901,
+      2892.5113
+    ],
+    "last_losses": [
+      2943.1901,
+      2892.5113
+    ],
+    "lr": 0.001,
+    "optimizer_updates": 2,
+    "processed_timesteps": 22,
+    "seconds": 30.4,
+    "seconds_per_processed_timestep": 1.3841,
+    "status": "PROFILE_TRUNCATED",
+    "traj_id": "dev.native_gem.native"
+  },
+  "updates_finite_and_nonzero": {
+    "all_finite": true,
+    "changed": true,
+    "max_abs_effective_delta": 0.00041224347660318017
+  }
+}
