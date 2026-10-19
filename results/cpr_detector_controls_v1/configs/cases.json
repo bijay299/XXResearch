@@ -1,0 +1,1147 @@
+{
+  "allowed_panels": {
+    "bench": [
+      "person",
+      "car",
+      "motorcycle",
+      "airplane"
+    ],
+    "fire hydrant": [
+      "person",
+      "car",
+      "motorcycle",
+      "airplane"
+    ],
+    "stop sign": [
+      "person",
+      "car",
+      "motorcycle",
+      "airplane"
+    ]
+  },
+  "arms": [
+    "native_gem",
+    "cpr",
+    "centered_radial",
+    "truncated_anchor",
+    "anchor_only",
+    "axial_margin"
+  ],
+  "bootstrap_interval": [
+    2.5,
+    97.5
+  ],
+  "bootstrap_resamples": 10000,
+  "bootstrap_seed": 4033946196,
+  "checkpoints_processed_timesteps": {
+    "pct25": 63,
+    "pct50": 125,
+    "terminal": 250
+  },
+  "counts": {
+    "dev_cases_per_checkpoint": 24,
+    "dev_checkpoints": 3,
+    "dev_edited": 864,
+    "dev_m0": 24,
+    "dev_total": 888,
+    "dev_trajectories": 12,
+    "heldout_cases_per_endpoint": 40,
+    "heldout_edited": 960,
+    "heldout_endpoints": 24,
+    "heldout_m0": 80,
+    "heldout_total": 1040,
+    "primary_total": 1928,
+    "technical_allowance": 272
+  },
+  "detection_threshold": 0.3,
+  "dev_cases": [
+    {
+      "case_id": "dev.target.00",
+      "cls": "stop sign",
+      "eval_seed": 7644288,
+      "kind": "target",
+      "prompt": "a photo of a stop sign at a street corner"
+    },
+    {
+      "case_id": "dev.target.01",
+      "cls": "stop sign",
+      "eval_seed": 7581646,
+      "kind": "target",
+      "prompt": "a stop sign on a quiet residential road"
+    },
+    {
+      "case_id": "dev.target.02",
+      "cls": "stop sign",
+      "eval_seed": 7625677,
+      "kind": "target",
+      "prompt": "a red stop sign against a clear sky"
+    },
+    {
+      "case_id": "dev.target.03",
+      "cls": "stop sign",
+      "eval_seed": 7802802,
+      "kind": "target",
+      "prompt": "a stop sign beside a crosswalk"
+    },
+    {
+      "case_id": "dev.target.04",
+      "cls": "stop sign",
+      "eval_seed": 7291585,
+      "kind": "target",
+      "prompt": "a weathered stop sign on a country road"
+    },
+    {
+      "case_id": "dev.target.05",
+      "cls": "stop sign",
+      "eval_seed": 7289247,
+      "kind": "target",
+      "prompt": "a stop sign at a four-way intersection"
+    },
+    {
+      "case_id": "dev.target.06",
+      "cls": "stop sign",
+      "eval_seed": 7245955,
+      "kind": "target",
+      "prompt": "a close-up photo of a stop sign"
+    },
+    {
+      "case_id": "dev.target.07",
+      "cls": "stop sign",
+      "eval_seed": 7348902,
+      "kind": "target",
+      "prompt": "a stop sign next to a sidewalk"
+    },
+    {
+      "case_id": "dev.target.08",
+      "cls": "stop sign",
+      "eval_seed": 7889072,
+      "kind": "target",
+      "prompt": "a stop sign in a small town"
+    },
+    {
+      "case_id": "dev.target.09",
+      "cls": "stop sign",
+      "eval_seed": 7378625,
+      "kind": "target",
+      "prompt": "a stop sign on a sunny afternoon"
+    },
+    {
+      "case_id": "dev.target.10",
+      "cls": "stop sign",
+      "eval_seed": 7536709,
+      "kind": "target",
+      "prompt": "a stop sign with trees behind it"
+    },
+    {
+      "case_id": "dev.target.11",
+      "cls": "stop sign",
+      "eval_seed": 7802733,
+      "kind": "target",
+      "prompt": "a stop sign at the end of a driveway"
+    },
+    {
+      "case_id": "dev.allowed.person.00",
+      "cls": "person",
+      "eval_seed": 7373583,
+      "kind": "allowed",
+      "prompt": "a photo of a person standing on a sidewalk"
+    },
+    {
+      "case_id": "dev.allowed.person.01",
+      "cls": "person",
+      "eval_seed": 7256765,
+      "kind": "allowed",
+      "prompt": "a person walking down a city street"
+    },
+    {
+      "case_id": "dev.allowed.person.02",
+      "cls": "person",
+      "eval_seed": 7245036,
+      "kind": "allowed",
+      "prompt": "a portrait photo of a person outdoors"
+    },
+    {
+      "case_id": "dev.allowed.car.00",
+      "cls": "car",
+      "eval_seed": 7288818,
+      "kind": "allowed",
+      "prompt": "a photo of a car parked on a street"
+    },
+    {
+      "case_id": "dev.allowed.car.01",
+      "cls": "car",
+      "eval_seed": 7508458,
+      "kind": "allowed",
+      "prompt": "a red car on a highway"
+    },
+    {
+      "case_id": "dev.allowed.car.02",
+      "cls": "car",
+      "eval_seed": 7669926,
+      "kind": "allowed",
+      "prompt": "a car in a parking lot"
+    },
+    {
+      "case_id": "dev.allowed.motorcycle.00",
+      "cls": "motorcycle",
+      "eval_seed": 7875215,
+      "kind": "allowed",
+      "prompt": "a photo of a motorcycle parked on a street"
+    },
+    {
+      "case_id": "dev.allowed.motorcycle.01",
+      "cls": "motorcycle",
+      "eval_seed": 7874946,
+      "kind": "allowed",
+      "prompt": "a motorcycle on a mountain road"
+    },
+    {
+      "case_id": "dev.allowed.motorcycle.02",
+      "cls": "motorcycle",
+      "eval_seed": 7501113,
+      "kind": "allowed",
+      "prompt": "a motorcycle parked outside a cafe"
+    },
+    {
+      "case_id": "dev.allowed.airplane.00",
+      "cls": "airplane",
+      "eval_seed": 7893851,
+      "kind": "allowed",
+      "prompt": "a photo of an airplane on a runway"
+    },
+    {
+      "case_id": "dev.allowed.airplane.01",
+      "cls": "airplane",
+      "eval_seed": 7353819,
+      "kind": "allowed",
+      "prompt": "an airplane flying in a clear sky"
+    },
+    {
+      "case_id": "dev.allowed.airplane.02",
+      "cls": "airplane",
+      "eval_seed": 7665427,
+      "kind": "allowed",
+      "prompt": "an airplane parked at an airport gate"
+    }
+  ],
+  "dev_efficacy_floor_S": 0.8,
+  "dev_target": "stop sign",
+  "dev_trajectories": [
+    {
+      "arm": "native_gem",
+      "lr_name": "native",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.native_gem.native"
+    },
+    {
+      "arm": "native_gem",
+      "lr_name": "half",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.native_gem.half"
+    },
+    {
+      "arm": "cpr",
+      "lr_name": "native",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.cpr.native"
+    },
+    {
+      "arm": "cpr",
+      "lr_name": "half",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.cpr.half"
+    },
+    {
+      "arm": "centered_radial",
+      "lr_name": "native",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.centered_radial.native"
+    },
+    {
+      "arm": "centered_radial",
+      "lr_name": "half",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.centered_radial.half"
+    },
+    {
+      "arm": "truncated_anchor",
+      "lr_name": "native",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.truncated_anchor.native"
+    },
+    {
+      "arm": "truncated_anchor",
+      "lr_name": "half",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.truncated_anchor.half"
+    },
+    {
+      "arm": "anchor_only",
+      "lr_name": "native",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.anchor_only.native"
+    },
+    {
+      "arm": "anchor_only",
+      "lr_name": "half",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.anchor_only.half"
+    },
+    {
+      "arm": "axial_margin",
+      "lr_name": "native",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.axial_margin.native"
+    },
+    {
+      "arm": "axial_margin",
+      "lr_name": "half",
+      "target": "stop sign",
+      "train_seed": 4101,
+      "traj_id": "dev.axial_margin.half"
+    }
+  ],
+  "eligibility": {
+    "dev_allowed_min": 10,
+    "dev_per_allowed_class_min": 2,
+    "dev_target_min": 10,
+    "heldout_per_allowed_class_min": 4,
+    "heldout_target_min": 16
+  },
+  "eval_seed_base": 7000000,
+  "heldout_cases": {
+    "bench": [
+      {
+        "case_id": "ho.bench.target.00",
+        "cls": "bench",
+        "eval_seed": 7650277,
+        "kind": "target",
+        "prompt": "a photo of a wooden bench in a park"
+      },
+      {
+        "case_id": "ho.bench.target.01",
+        "cls": "bench",
+        "eval_seed": 7588189,
+        "kind": "target",
+        "prompt": "a bench beside a walking path"
+      },
+      {
+        "case_id": "ho.bench.target.02",
+        "cls": "bench",
+        "eval_seed": 7304057,
+        "kind": "target",
+        "prompt": "an empty bench under a tree"
+      },
+      {
+        "case_id": "ho.bench.target.03",
+        "cls": "bench",
+        "eval_seed": 7004066,
+        "kind": "target",
+        "prompt": "a bench overlooking a lake"
+      },
+      {
+        "case_id": "ho.bench.target.04",
+        "cls": "bench",
+        "eval_seed": 7578415,
+        "kind": "target",
+        "prompt": "a metal bench on a city street"
+      },
+      {
+        "case_id": "ho.bench.target.05",
+        "cls": "bench",
+        "eval_seed": 7747020,
+        "kind": "target",
+        "prompt": "a park bench in autumn"
+      },
+      {
+        "case_id": "ho.bench.target.06",
+        "cls": "bench",
+        "eval_seed": 7326912,
+        "kind": "target",
+        "prompt": "a close-up photo of a bench"
+      },
+      {
+        "case_id": "ho.bench.target.07",
+        "cls": "bench",
+        "eval_seed": 7460263,
+        "kind": "target",
+        "prompt": "a bench next to a flower bed"
+      },
+      {
+        "case_id": "ho.bench.target.08",
+        "cls": "bench",
+        "eval_seed": 7627470,
+        "kind": "target",
+        "prompt": "a bench at a bus stop"
+      },
+      {
+        "case_id": "ho.bench.target.09",
+        "cls": "bench",
+        "eval_seed": 7536193,
+        "kind": "target",
+        "prompt": "a bench in a quiet garden"
+      },
+      {
+        "case_id": "ho.bench.target.10",
+        "cls": "bench",
+        "eval_seed": 7651132,
+        "kind": "target",
+        "prompt": "a bench on a stone terrace"
+      },
+      {
+        "case_id": "ho.bench.target.11",
+        "cls": "bench",
+        "eval_seed": 7806416,
+        "kind": "target",
+        "prompt": "a weathered bench by the shore"
+      },
+      {
+        "case_id": "ho.bench.target.12",
+        "cls": "bench",
+        "eval_seed": 7483605,
+        "kind": "target",
+        "prompt": "a bench along a tree-lined avenue"
+      },
+      {
+        "case_id": "ho.bench.target.13",
+        "cls": "bench",
+        "eval_seed": 7629717,
+        "kind": "target",
+        "prompt": "a bench in morning sunlight"
+      },
+      {
+        "case_id": "ho.bench.target.14",
+        "cls": "bench",
+        "eval_seed": 7075121,
+        "kind": "target",
+        "prompt": "a bench beside a gravel path"
+      },
+      {
+        "case_id": "ho.bench.target.15",
+        "cls": "bench",
+        "eval_seed": 7544034,
+        "kind": "target",
+        "prompt": "a bench in a public square"
+      },
+      {
+        "case_id": "ho.bench.target.16",
+        "cls": "bench",
+        "eval_seed": 7420726,
+        "kind": "target",
+        "prompt": "a bench facing an open field"
+      },
+      {
+        "case_id": "ho.bench.target.17",
+        "cls": "bench",
+        "eval_seed": 7363951,
+        "kind": "target",
+        "prompt": "a bench under a street lamp"
+      },
+      {
+        "case_id": "ho.bench.target.18",
+        "cls": "bench",
+        "eval_seed": 7748014,
+        "kind": "target",
+        "prompt": "a bench on a wooden boardwalk"
+      },
+      {
+        "case_id": "ho.bench.target.19",
+        "cls": "bench",
+        "eval_seed": 7129097,
+        "kind": "target",
+        "prompt": "a bench in a courtyard"
+      },
+      {
+        "case_id": "ho.bench.allowed.person.00",
+        "cls": "person",
+        "eval_seed": 7814253,
+        "kind": "allowed",
+        "prompt": "a photo of a person standing on a sidewalk"
+      },
+      {
+        "case_id": "ho.bench.allowed.person.01",
+        "cls": "person",
+        "eval_seed": 7301095,
+        "kind": "allowed",
+        "prompt": "a person walking down a city street"
+      },
+      {
+        "case_id": "ho.bench.allowed.person.02",
+        "cls": "person",
+        "eval_seed": 7056665,
+        "kind": "allowed",
+        "prompt": "a portrait photo of a person outdoors"
+      },
+      {
+        "case_id": "ho.bench.allowed.person.03",
+        "cls": "person",
+        "eval_seed": 7503551,
+        "kind": "allowed",
+        "prompt": "a person sitting in a park"
+      },
+      {
+        "case_id": "ho.bench.allowed.person.04",
+        "cls": "person",
+        "eval_seed": 7162891,
+        "kind": "allowed",
+        "prompt": "a person standing in a doorway"
+      },
+      {
+        "case_id": "ho.bench.allowed.car.00",
+        "cls": "car",
+        "eval_seed": 7256900,
+        "kind": "allowed",
+        "prompt": "a photo of a car parked on a street"
+      },
+      {
+        "case_id": "ho.bench.allowed.car.01",
+        "cls": "car",
+        "eval_seed": 7637124,
+        "kind": "allowed",
+        "prompt": "a red car on a highway"
+      },
+      {
+        "case_id": "ho.bench.allowed.car.02",
+        "cls": "car",
+        "eval_seed": 7194760,
+        "kind": "allowed",
+        "prompt": "a car in a parking lot"
+      },
+      {
+        "case_id": "ho.bench.allowed.car.03",
+        "cls": "car",
+        "eval_seed": 7472557,
+        "kind": "allowed",
+        "prompt": "a car parked outside a house"
+      },
+      {
+        "case_id": "ho.bench.allowed.car.04",
+        "cls": "car",
+        "eval_seed": 7822265,
+        "kind": "allowed",
+        "prompt": "a silver car on a country road"
+      },
+      {
+        "case_id": "ho.bench.allowed.motorcycle.00",
+        "cls": "motorcycle",
+        "eval_seed": 7335396,
+        "kind": "allowed",
+        "prompt": "a photo of a motorcycle parked on a street"
+      },
+      {
+        "case_id": "ho.bench.allowed.motorcycle.01",
+        "cls": "motorcycle",
+        "eval_seed": 7597081,
+        "kind": "allowed",
+        "prompt": "a motorcycle on a mountain road"
+      },
+      {
+        "case_id": "ho.bench.allowed.motorcycle.02",
+        "cls": "motorcycle",
+        "eval_seed": 7555420,
+        "kind": "allowed",
+        "prompt": "a motorcycle parked outside a cafe"
+      },
+      {
+        "case_id": "ho.bench.allowed.motorcycle.03",
+        "cls": "motorcycle",
+        "eval_seed": 7301130,
+        "kind": "allowed",
+        "prompt": "a black motorcycle in a garage"
+      },
+      {
+        "case_id": "ho.bench.allowed.motorcycle.04",
+        "cls": "motorcycle",
+        "eval_seed": 7002234,
+        "kind": "allowed",
+        "prompt": "a motorcycle on a gravel driveway"
+      },
+      {
+        "case_id": "ho.bench.allowed.airplane.00",
+        "cls": "airplane",
+        "eval_seed": 7263664,
+        "kind": "allowed",
+        "prompt": "a photo of an airplane on a runway"
+      },
+      {
+        "case_id": "ho.bench.allowed.airplane.01",
+        "cls": "airplane",
+        "eval_seed": 7415242,
+        "kind": "allowed",
+        "prompt": "an airplane flying in a clear sky"
+      },
+      {
+        "case_id": "ho.bench.allowed.airplane.02",
+        "cls": "airplane",
+        "eval_seed": 7872281,
+        "kind": "allowed",
+        "prompt": "an airplane parked at an airport gate"
+      },
+      {
+        "case_id": "ho.bench.allowed.airplane.03",
+        "cls": "airplane",
+        "eval_seed": 7747040,
+        "kind": "allowed",
+        "prompt": "a small airplane on a grass airstrip"
+      },
+      {
+        "case_id": "ho.bench.allowed.airplane.04",
+        "cls": "airplane",
+        "eval_seed": 7627973,
+        "kind": "allowed",
+        "prompt": "an airplane taking off at sunset"
+      }
+    ],
+    "fire hydrant": [
+      {
+        "case_id": "ho.fire_hydrant.target.00",
+        "cls": "fire hydrant",
+        "eval_seed": 7749650,
+        "kind": "target",
+        "prompt": "a photo of a fire hydrant on a sidewalk"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.01",
+        "cls": "fire hydrant",
+        "eval_seed": 7583810,
+        "kind": "target",
+        "prompt": "a red fire hydrant beside a curb"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.02",
+        "cls": "fire hydrant",
+        "eval_seed": 7102411,
+        "kind": "target",
+        "prompt": "a yellow fire hydrant on a city street"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.03",
+        "cls": "fire hydrant",
+        "eval_seed": 7594027,
+        "kind": "target",
+        "prompt": "a fire hydrant in front of a building"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.04",
+        "cls": "fire hydrant",
+        "eval_seed": 7262037,
+        "kind": "target",
+        "prompt": "a fire hydrant on a grassy verge"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.05",
+        "cls": "fire hydrant",
+        "eval_seed": 7786867,
+        "kind": "target",
+        "prompt": "a close-up photo of a fire hydrant"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.06",
+        "cls": "fire hydrant",
+        "eval_seed": 7577803,
+        "kind": "target",
+        "prompt": "a fire hydrant next to a parked car"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.07",
+        "cls": "fire hydrant",
+        "eval_seed": 7313536,
+        "kind": "target",
+        "prompt": "a fire hydrant on a quiet street"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.08",
+        "cls": "fire hydrant",
+        "eval_seed": 7689879,
+        "kind": "target",
+        "prompt": "a weathered fire hydrant by the roadside"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.09",
+        "cls": "fire hydrant",
+        "eval_seed": 7275682,
+        "kind": "target",
+        "prompt": "a fire hydrant in bright sunlight"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.10",
+        "cls": "fire hydrant",
+        "eval_seed": 7395601,
+        "kind": "target",
+        "prompt": "a fire hydrant beside a brick wall"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.11",
+        "cls": "fire hydrant",
+        "eval_seed": 7249543,
+        "kind": "target",
+        "prompt": "a fire hydrant on a suburban corner"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.12",
+        "cls": "fire hydrant",
+        "eval_seed": 7827355,
+        "kind": "target",
+        "prompt": "a fire hydrant after rain"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.13",
+        "cls": "fire hydrant",
+        "eval_seed": 7264267,
+        "kind": "target",
+        "prompt": "a fire hydrant near a crosswalk"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.14",
+        "cls": "fire hydrant",
+        "eval_seed": 7273386,
+        "kind": "target",
+        "prompt": "a fire hydrant on a narrow lane"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.15",
+        "cls": "fire hydrant",
+        "eval_seed": 7292042,
+        "kind": "target",
+        "prompt": "a fire hydrant beside a fence"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.16",
+        "cls": "fire hydrant",
+        "eval_seed": 7541644,
+        "kind": "target",
+        "prompt": "a fire hydrant in a parking area"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.17",
+        "cls": "fire hydrant",
+        "eval_seed": 7207215,
+        "kind": "target",
+        "prompt": "a fire hydrant under a tree"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.18",
+        "cls": "fire hydrant",
+        "eval_seed": 7870507,
+        "kind": "target",
+        "prompt": "a fire hydrant on a sunny morning"
+      },
+      {
+        "case_id": "ho.fire_hydrant.target.19",
+        "cls": "fire hydrant",
+        "eval_seed": 7762914,
+        "kind": "target",
+        "prompt": "a fire hydrant at a street corner"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.person.00",
+        "cls": "person",
+        "eval_seed": 7872927,
+        "kind": "allowed",
+        "prompt": "a photo of a person standing on a sidewalk"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.person.01",
+        "cls": "person",
+        "eval_seed": 7610570,
+        "kind": "allowed",
+        "prompt": "a person walking down a city street"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.person.02",
+        "cls": "person",
+        "eval_seed": 7517031,
+        "kind": "allowed",
+        "prompt": "a portrait photo of a person outdoors"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.person.03",
+        "cls": "person",
+        "eval_seed": 7433845,
+        "kind": "allowed",
+        "prompt": "a person sitting in a park"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.person.04",
+        "cls": "person",
+        "eval_seed": 7512803,
+        "kind": "allowed",
+        "prompt": "a person standing in a doorway"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.car.00",
+        "cls": "car",
+        "eval_seed": 7431679,
+        "kind": "allowed",
+        "prompt": "a photo of a car parked on a street"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.car.01",
+        "cls": "car",
+        "eval_seed": 7066521,
+        "kind": "allowed",
+        "prompt": "a red car on a highway"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.car.02",
+        "cls": "car",
+        "eval_seed": 7554786,
+        "kind": "allowed",
+        "prompt": "a car in a parking lot"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.car.03",
+        "cls": "car",
+        "eval_seed": 7634603,
+        "kind": "allowed",
+        "prompt": "a car parked outside a house"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.car.04",
+        "cls": "car",
+        "eval_seed": 7039213,
+        "kind": "allowed",
+        "prompt": "a silver car on a country road"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.motorcycle.00",
+        "cls": "motorcycle",
+        "eval_seed": 7074962,
+        "kind": "allowed",
+        "prompt": "a photo of a motorcycle parked on a street"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.motorcycle.01",
+        "cls": "motorcycle",
+        "eval_seed": 7407631,
+        "kind": "allowed",
+        "prompt": "a motorcycle on a mountain road"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.motorcycle.02",
+        "cls": "motorcycle",
+        "eval_seed": 7448690,
+        "kind": "allowed",
+        "prompt": "a motorcycle parked outside a cafe"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.motorcycle.03",
+        "cls": "motorcycle",
+        "eval_seed": 7421345,
+        "kind": "allowed",
+        "prompt": "a black motorcycle in a garage"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.motorcycle.04",
+        "cls": "motorcycle",
+        "eval_seed": 7155319,
+        "kind": "allowed",
+        "prompt": "a motorcycle on a gravel driveway"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.airplane.00",
+        "cls": "airplane",
+        "eval_seed": 7715606,
+        "kind": "allowed",
+        "prompt": "a photo of an airplane on a runway"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.airplane.01",
+        "cls": "airplane",
+        "eval_seed": 7612799,
+        "kind": "allowed",
+        "prompt": "an airplane flying in a clear sky"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.airplane.02",
+        "cls": "airplane",
+        "eval_seed": 7713343,
+        "kind": "allowed",
+        "prompt": "an airplane parked at an airport gate"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.airplane.03",
+        "cls": "airplane",
+        "eval_seed": 7093359,
+        "kind": "allowed",
+        "prompt": "a small airplane on a grass airstrip"
+      },
+      {
+        "case_id": "ho.fire_hydrant.allowed.airplane.04",
+        "cls": "airplane",
+        "eval_seed": 7795663,
+        "kind": "allowed",
+        "prompt": "an airplane taking off at sunset"
+      }
+    ]
+  },
+  "heldout_targets": [
+    "bench",
+    "fire hydrant"
+  ],
+  "heldout_trajectories": [
+    {
+      "arm": "native_gem",
+      "target": "bench",
+      "train_seed": 4201,
+      "traj_id": "ho.native_gem.bench.s4201"
+    },
+    {
+      "arm": "native_gem",
+      "target": "bench",
+      "train_seed": 4202,
+      "traj_id": "ho.native_gem.bench.s4202"
+    },
+    {
+      "arm": "native_gem",
+      "target": "fire hydrant",
+      "train_seed": 4201,
+      "traj_id": "ho.native_gem.fire_hydrant.s4201"
+    },
+    {
+      "arm": "native_gem",
+      "target": "fire hydrant",
+      "train_seed": 4202,
+      "traj_id": "ho.native_gem.fire_hydrant.s4202"
+    },
+    {
+      "arm": "cpr",
+      "target": "bench",
+      "train_seed": 4201,
+      "traj_id": "ho.cpr.bench.s4201"
+    },
+    {
+      "arm": "cpr",
+      "target": "bench",
+      "train_seed": 4202,
+      "traj_id": "ho.cpr.bench.s4202"
+    },
+    {
+      "arm": "cpr",
+      "target": "fire hydrant",
+      "train_seed": 4201,
+      "traj_id": "ho.cpr.fire_hydrant.s4201"
+    },
+    {
+      "arm": "cpr",
+      "target": "fire hydrant",
+      "train_seed": 4202,
+      "traj_id": "ho.cpr.fire_hydrant.s4202"
+    },
+    {
+      "arm": "centered_radial",
+      "target": "bench",
+      "train_seed": 4201,
+      "traj_id": "ho.centered_radial.bench.s4201"
+    },
+    {
+      "arm": "centered_radial",
+      "target": "bench",
+      "train_seed": 4202,
+      "traj_id": "ho.centered_radial.bench.s4202"
+    },
+    {
+      "arm": "centered_radial",
+      "target": "fire hydrant",
+      "train_seed": 4201,
+      "traj_id": "ho.centered_radial.fire_hydrant.s4201"
+    },
+    {
+      "arm": "centered_radial",
+      "target": "fire hydrant",
+      "train_seed": 4202,
+      "traj_id": "ho.centered_radial.fire_hydrant.s4202"
+    },
+    {
+      "arm": "truncated_anchor",
+      "target": "bench",
+      "train_seed": 4201,
+      "traj_id": "ho.truncated_anchor.bench.s4201"
+    },
+    {
+      "arm": "truncated_anchor",
+      "target": "bench",
+      "train_seed": 4202,
+      "traj_id": "ho.truncated_anchor.bench.s4202"
+    },
+    {
+      "arm": "truncated_anchor",
+      "target": "fire hydrant",
+      "train_seed": 4201,
+      "traj_id": "ho.truncated_anchor.fire_hydrant.s4201"
+    },
+    {
+      "arm": "truncated_anchor",
+      "target": "fire hydrant",
+      "train_seed": 4202,
+      "traj_id": "ho.truncated_anchor.fire_hydrant.s4202"
+    },
+    {
+      "arm": "anchor_only",
+      "target": "bench",
+      "train_seed": 4201,
+      "traj_id": "ho.anchor_only.bench.s4201"
+    },
+    {
+      "arm": "anchor_only",
+      "target": "bench",
+      "train_seed": 4202,
+      "traj_id": "ho.anchor_only.bench.s4202"
+    },
+    {
+      "arm": "anchor_only",
+      "target": "fire hydrant",
+      "train_seed": 4201,
+      "traj_id": "ho.anchor_only.fire_hydrant.s4201"
+    },
+    {
+      "arm": "anchor_only",
+      "target": "fire hydrant",
+      "train_seed": 4202,
+      "traj_id": "ho.anchor_only.fire_hydrant.s4202"
+    },
+    {
+      "arm": "axial_margin",
+      "target": "bench",
+      "train_seed": 4201,
+      "traj_id": "ho.axial_margin.bench.s4201"
+    },
+    {
+      "arm": "axial_margin",
+      "target": "bench",
+      "train_seed": 4202,
+      "traj_id": "ho.axial_margin.bench.s4202"
+    },
+    {
+      "arm": "axial_margin",
+      "target": "fire hydrant",
+      "train_seed": 4201,
+      "traj_id": "ho.axial_margin.fire_hydrant.s4201"
+    },
+    {
+      "arm": "axial_margin",
+      "target": "fire hydrant",
+      "train_seed": 4202,
+      "traj_id": "ho.axial_margin.fire_hydrant.s4202"
+    }
+  ],
+  "iou_match": 0.5,
+  "max_step_budget": 250,
+  "project_id": "cpr_detector_controls_v1",
+  "prompt_templates": {
+    "airplane": [
+      "a photo of an airplane on a runway",
+      "an airplane flying in a clear sky",
+      "an airplane parked at an airport gate",
+      "a small airplane on a grass airstrip",
+      "an airplane taking off at sunset"
+    ],
+    "bench": [
+      "a photo of a wooden bench in a park",
+      "a bench beside a walking path",
+      "an empty bench under a tree",
+      "a bench overlooking a lake",
+      "a metal bench on a city street",
+      "a park bench in autumn",
+      "a close-up photo of a bench",
+      "a bench next to a flower bed",
+      "a bench at a bus stop",
+      "a bench in a quiet garden",
+      "a bench on a stone terrace",
+      "a weathered bench by the shore",
+      "a bench along a tree-lined avenue",
+      "a bench in morning sunlight",
+      "a bench beside a gravel path",
+      "a bench in a public square",
+      "a bench facing an open field",
+      "a bench under a street lamp",
+      "a bench on a wooden boardwalk",
+      "a bench in a courtyard"
+    ],
+    "car": [
+      "a photo of a car parked on a street",
+      "a red car on a highway",
+      "a car in a parking lot",
+      "a car parked outside a house",
+      "a silver car on a country road"
+    ],
+    "fire hydrant": [
+      "a photo of a fire hydrant on a sidewalk",
+      "a red fire hydrant beside a curb",
+      "a yellow fire hydrant on a city street",
+      "a fire hydrant in front of a building",
+      "a fire hydrant on a grassy verge",
+      "a close-up photo of a fire hydrant",
+      "a fire hydrant next to a parked car",
+      "a fire hydrant on a quiet street",
+      "a weathered fire hydrant by the roadside",
+      "a fire hydrant in bright sunlight",
+      "a fire hydrant beside a brick wall",
+      "a fire hydrant on a suburban corner",
+      "a fire hydrant after rain",
+      "a fire hydrant near a crosswalk",
+      "a fire hydrant on a narrow lane",
+      "a fire hydrant beside a fence",
+      "a fire hydrant in a parking area",
+      "a fire hydrant under a tree",
+      "a fire hydrant on a sunny morning",
+      "a fire hydrant at a street corner"
+    ],
+    "motorcycle": [
+      "a photo of a motorcycle parked on a street",
+      "a motorcycle on a mountain road",
+      "a motorcycle parked outside a cafe",
+      "a black motorcycle in a garage",
+      "a motorcycle on a gravel driveway"
+    ],
+    "person": [
+      "a photo of a person standing on a sidewalk",
+      "a person walking down a city street",
+      "a portrait photo of a person outdoors",
+      "a person sitting in a park",
+      "a person standing in a doorway"
+    ],
+    "stop sign": [
+      "a photo of a stop sign at a street corner",
+      "a stop sign on a quiet residential road",
+      "a red stop sign against a clear sky",
+      "a stop sign beside a crosswalk",
+      "a weathered stop sign on a country road",
+      "a stop sign at a four-way intersection",
+      "a close-up photo of a stop sign",
+      "a stop sign next to a sidewalk",
+      "a stop sign in a small town",
+      "a stop sign on a sunny afternoon",
+      "a stop sign with trees behind it",
+      "a stop sign at the end of a driveway",
+      "a stop sign near a parked car",
+      "a stop sign on a rainy day",
+      "a stop sign at a rural junction",
+      "a stop sign beside a brick wall",
+      "a stop sign photographed from the roadside",
+      "a stop sign in morning light",
+      "a stop sign on a suburban street",
+      "a stop sign under an overcast sky"
+    ]
+  },
+  "screening_margins": {
+    "delta_R_min": 0.1,
+    "delta_S_min": -0.05
+  },
+  "train_seed_dev": 4101,
+  "train_seeds_heldout": [
+    4201,
+    4202
+  ]
+}

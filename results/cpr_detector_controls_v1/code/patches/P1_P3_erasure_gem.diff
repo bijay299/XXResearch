@@ -1,0 +1,48 @@
+--- patches/erasure_gem.py.orig	2026-10-19 01:19:46.684299692 -0400
++++ GEM_src/gem/operators/erasure/erasure_gem.py	2026-10-19 01:19:46.716299570 -0400
+@@ -235,11 +235,23 @@
+                 pos_flat = anchor_score.float().reshape(anchor_score.shape[0], -1)
+                 neg_flat = target_score.float().reshape(target_score.shape[0], -1)
+ 
+-                # Calculate Distances
+-                dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
+-                dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
+-
+-                target_loss = torch.relu(dist_pos - config.eta * dist_neg).sum()
++                # [cpr_detector_controls_v1 P1] small attributed loss dispatch.
++                # When no hook is installed, or the hook returns None (the
++                # `native_gem` arm), the ORIGINAL native block below executes
++                # unchanged. Nothing else in this file is altered.
++                _cpr_hook = getattr(config, "cpr_loss_hook", None)
++                _cpr_per_sample = (_cpr_hook(pred_flat, pos_flat, neg_flat)
++                                   if _cpr_hook is not None else None)
++                if _cpr_per_sample is None:
++                    # ---------- ORIGINAL NATIVE LOSS BLOCK, UNCHANGED ----------
++                    # Calculate Distances
++                    dist_pos = torch.nn.functional.pairwise_distance(pred_flat, pos_flat, p=2)
++                    dist_neg = torch.nn.functional.pairwise_distance(pred_flat, neg_flat, p=2)
++
++                    target_loss = torch.relu(dist_pos - config.eta * dist_neg).sum()
++                    # -------- END ORIGINAL NATIVE LOSS BLOCK, UNCHANGED --------
++                else:
++                    target_loss = _cpr_per_sample.sum()
+ 
+                 # Reset timesteps (skip if already using inference timesteps)
+                 if not config.use_inference_timesteps:
+@@ -287,6 +299,16 @@
+ 
+             optimizer.step()
+ 
++            # [cpr_detector_controls_v1 P3] logging/checkpoint hook only.
++            # Runs AFTER the native optimizer step; never alters the loop,
++            # the budget, the sampler or the optimizer.
++            _cpr_step_hook = getattr(config, "cpr_step_hook", None)
++            if _cpr_step_hook is not None:
++                _cpr_step_hook(global_step=global_step,
++                               processed_timesteps=config.max_step_budget - step_budget,
++                               step_budget_left=step_budget,
++                               wrapper=wrapper)
++
+             # Log to WandB
+             if config.use_wandb and (step_budget <= 0 or (global_step + 1) % config.steps_between_validation == 0):
+                 wrapper.log_samples_to_wandb(concepts=config.targets + list(config.validation_concepts),

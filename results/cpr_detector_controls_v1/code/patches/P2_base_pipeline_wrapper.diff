@@ -1,0 +1,19 @@
+--- patches/base_pipeline_wrapper.py.orig	2026-10-19 01:19:46.692299662 -0400
++++ GEM_src/gem/wrappers/base_pipeline_wrapper.py	2026-10-19 01:19:46.716299570 -0400
+@@ -183,6 +183,16 @@
+ 
+         latents = latents_per_step[-1]
+ 
++        # [cpr_detector_controls_v1 P2] OUTPUT-ONLY: skip the preview decode when
++        # the caller asked for all latents. GEM's training loop calls this as
++        # `_, all_latents_of_trajectory = ...` (erasure_gem.py), i.e. it DISCARDS
++        # the decoded image. The block below draws no random numbers and never
++        # touches `latents_per_step`, the sampler, the loss or the optimizer, so
++        # skipping it changes no training state -- it only avoids ~828 discarded
++        # VAE decodes that would otherwise be charged to the image ceiling.
++        if return_all_latents:
++            return None, latents_per_step
++
+         with torch.no_grad():
+             # Unpack first for Flux
+             if isinstance(self.pipe, (FluxPipeline, QwenImagePipeline)):
