@@ -5,6 +5,13 @@ Agent spawning was AVAILABLE; roles ran as genuine agents. Concurrency cap: 3 sp
 
 | Wave | Agent | Role | Output path | Start (UTC) | End (UTC) | Notes |
 |---|---|---|---|---|---|---|
-| 1 | A | Sources / competitive evidence | agents/A_* | 2026-10-19T22:58 | | |
-| 1 | B | Loss geometry | agents/B_* | 2026-10-19T22:58 | | |
-| 1 | C | Optimizer / shared params | agents/C_* | 2026-10-19T22:58 | | |
+| 1 | A | Sources / competitive evidence | agents/A_* | 2026-10-19T22:55 | | |
+| 1 | B | Loss geometry | agents/B_* | 2026-10-19T22:55 | ~23:01 | 105.9k subagent tokens, 11 tool uses, 314 s; verdict NONE (diagnostic H-B1) |
+| 1 | C | Optimizer / shared params | agents/C_* | 2026-10-19T22:55 | | |
+| 1b | D | Trajectories / representations | agents/D_* | ~23:02 | | spawned when B finished |
+
+Coordinator model switched by user from claude-sonnet-5-5 to claude-opus-5-5 at ~23:02; agents spawned after that inherit it.
+| 1 | A (end) | | | | ~23:01 | 153.1k subagent tokens, 49 tool uses, 342 s; arXiv/HF/S2 unreachable (Bash 403, WebFetch DNS) — paper equations UNVERIFIED this sprint |
+
+Environment events: torch install attempted — pytorch CPU index blocked (403); PyPI CUDA wheel download aborted at 2.7 GB pip cache (deleted, uncounted toward final files). Sprint is numpy/scipy only.
+Git push to origin failed with HTTP 403 (no GitHub App write access) at ~22:58; commits accumulate locally.

@@ -1,0 +1,23 @@
+T1 identity: drift=1.698526e-01  lr||J(D-dbar)Pg||=1.698526e-01  bound=4.306e+00  (drift<=bound: True)
+   uniform D (spread 0): drift = 5.21e-13
+   residual rho=1e-02 : drift ||J step||=9.608e-02 (pre-proj step 1 = lr*sign(Pg+rho*h): O(lr) drift independent of rho; this is T1 non-neutrality, not a residual effect)
+   residual rho=1e-04 : drift ||J step||=9.808e-02 (pre-proj step 1 = lr*sign(Pg+rho*h): O(lr) drift independent of rho; this is T1 non-neutrality, not a residual effect)
+   residual rho=1e-06 : drift ||J step||=9.808e-02 (pre-proj step 1 = lr*sign(Pg+rho*h): O(lr) drift independent of rho; this is T1 non-neutrality, not a residual effect)
+   residual rho=1e-08 : drift ||J step||=9.808e-02 (pre-proj step 1 = lr*sign(Pg+rho*h): O(lr) drift independent of rho; this is T1 non-neutrality, not a residual effect)
+T1 exception (null(J) coordinate-aligned): drift=4.95e-17
+T2 post-H: ||J d_corr||=2.21e-17 (raw 2.72e-02); H-norm ratio 0.841 (<=1)
+T3 feasibility: LoRA P=98304 params/layer; exact null space of stacked retained Jacobian nonempty only if rank(J_r)<P; rank<=N_r*d_out (e.g. N_r=64,d_out=4096 tokens*chans -> 262144)
+T3 feasibility: LoRA P=245760 params/layer; exact null space of stacked retained Jacobian nonempty only if rank(J_r)<P; rank<=N_r*d_out (e.g. N_r=64,d_out=4096 tokens*chans -> 262144)
+   N=4,dout=8,P=120: rank=32 null dim=88
+   N=16,dout=8,P=120: rank=120 null dim=0
+   N=64,dout=8,P=120: rank=120 null dim=0
+T4 pop drift^2 / train-batch drift^2 (train drift ~0 by construction): mean pop=1.114e-03 train=2.778e-30 fresh-batch est=1.117e-03
+   Hoeffding cert (delta=0.05, ORACLE M; last-step max per-sample a^2=0.0074; slack/mean = 0.57): coverage 1.000 (>=0.95 required); median cert/pop = 1.0
+   fresh estimate unbiased: mean est/pop = 1.003
+   rare-subgroup counterexample: mass p=0.005, n2=200 -> P(no member in fresh batch)=0.367 ; certificate silent on it
+C-X1 f=th1*th2 at origin: J d = 0.00e+00 but f(th+d)-f(th)=0.090 (curvature; first-order projection/gate is blind)
+C-X2 LoRA gauge step |K|=0.01: first-order drift 2.3e-17, exact drift 7.581e-04 (= |B K^2 A X| = 7.581e-04), rel to |BAX|=0.000
+C-X2 LoRA gauge step |K|=0.03: first-order drift 7.4e-17, exact drift 6.823e-03 (= |B K^2 A X| = 6.823e-03), rel to |BAX|=0.000
+C-X2 LoRA gauge step |K|=0.10: first-order drift 2.1e-16, exact drift 7.581e-02 (= |B K^2 A X| = 7.581e-02), rel to |BAX|=0.003
+C-X2 LoRA gauge step |K|=0.30: first-order drift 6.7e-16, exact drift 6.823e-01 (= |B K^2 A X| = 6.823e-01), rel to |BAX|=0.023
+{"label": "C_c3_theory_checks", "cmd": "/tmp/claude-0/venv/bin/python research/flow_method_design_v1/agents/C_scripts/c3_theory_checks.py", "rc": 0, "status": "ok", "wall_s": 27.175, "cpu_s": 91.63, "peak_rss_kib": 263844, "utc": "2026-10-19T23:01:42Z"}

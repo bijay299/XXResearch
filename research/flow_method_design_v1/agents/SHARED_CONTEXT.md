@@ -13,8 +13,9 @@ Real-model superiority is NOT claimed or tested. Do not manufacture novelty. A n
   (appends to `results/ledger.jsonl`). Keep your own usage small (a few core-minutes unless told otherwise).
 - Work ONLY under `/home/user/XXResearch/research/flow_method_design_v1/` (the "sprint dir"). Do NOT edit anything
   outside it. Do NOT run git commit/push/checkout/branch (the coordinator does all git). Never touch other studies.
-- Python: `/tmp/claude-0/venv/bin/python` (numpy, scipy, pytest, sympy; torch CPU may appear shortly — check
-  `import torch`). Run Python reading untrusted downloaded files with `-I`.
+- Python: `/tmp/claude-0/venv/bin/python` (numpy 2.5.3, scipy 1.18.1, pytest, sympy). torch is NOT available
+  (pytorch CPU index blocked; PyPI CUDA wheel exceeds the file budget) — use numpy with hand-derived gradients
+  checked by finite differences. Run Python reading untrusted downloaded files with `-I`.
 - Each agent writes ONLY to its own output path given in its task (e.g. `agents/B_*`), and returns a SHORT
   (<= 400 words) summary to the coordinator. Put detail in files, not in the reply.
 
