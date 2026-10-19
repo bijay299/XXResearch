@@ -89,8 +89,10 @@ With `retention_method="none"` the code path is native GEM: the only addition is
   one param group, a non-PD Gram (Cholesky error), or an exhausted gate pool all raise `ContractViolation`. Gate items are
   never reused, because reuse would void the Hoeffding argument. The pool must hold at least T·R·n2 items: at
   T = 23, R = 4, n2 = 8 that is 736 items, about 67 gate prompts × 11 latents.
-- g·Δ1 >= 0 gives a zero step. The gate is still evaluated (literal pseudocode) and its decision decides whether
-  (m, v, t) commit.
+- g·Δ1 >= 0 gives a NULL step (F_REVIEW §4.2 fix): no gate evaluation (so no union-bound budget is spent), no write
+  to params or optimizer state, and `calls` still advances. The AdamW `step` counter advances only on commit, and bias
+  correction uses that counter. When S is empty or zero, both the correction and the reject rule are skipped, so VAU
+  with no probes and no gate is plain AdamW. Ridge μ = max(1e-6·tr(G0)/k, 1e-12).
 
 ## 9. Required integration changes (beyond the patch)
 1. Copy `vau_torch.py` to `gem/operators/erasure/`.

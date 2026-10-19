@@ -14,9 +14,9 @@ belongs to a later wave.
 | `code/vau/models.py` | (a) `LinearModel` b_x + J_x θ with column scales 10^U(-d/2,d/2), `structured_T` (G2: U diag(κ^{-j/(m-1)}) Vᵀ R(φ)), (b) `LoraMLP`, (c) `TinyFlowDiT`, plus `flux_sigmas`, batched `euler`, `rollout_prefix`, `sample`, `lora_gauge_step`. Each model has forward / jvp / vjp / guarded dense `jacobian` |
 | `code/vau/tasks.py` | GEM-style erasure tasks; concept coordinates; rare subgroup (cos 0.8, mass 0.005); shift; contrast scale; held-out flow prompts; `input_hashes` (I10) |
 | `code/vau/projections.py` | `weighted_null_project` / `metric_project` / `euclid_project` (ridge `ridge_rel·tr(G0)/k`), `sketch_probe` (k_max = 64 rows drawn per refresh, first k used, k = 0 allowed), `exact_probe` |
-| `code/vau/methods.py` | arms `adamw, adamw_stepmatch, penalty, pre_proj, post_euclid, vau_nogate`; wrappers `Gated` (`vau` = Gated(vau_nogate), `gated_<arm>`) and `EarlyStop` (`earlystop_penalty`); `inject` hook (G5 gauge) |
-| `code/tests/` | 176 pytest tests |
-| `code/smoke.py` | 10 arms × 3 families × 5 steps, dev seed 0 |
+| `code/vau/methods.py` | arms `adamw, adamw_stepmatch, penalty, pre_proj, post_euclid` (no reject rule), `post_euclid_reject`, `vau_nogate`, `vau_blocksplit_nogate`, `na_lora`; wrappers `Gated` (`vau`, `vau_blocksplit`, `gated_<arm>` incl. `gated_na_lora`) and `EarlyStop` (`earlystop_penalty`); `inject` hook (G5 gauge); `arm_status` / `NotApplicable` |
+| `code/tests/` | 224 pytest tests (222 pass, 2 skipped = NOT_APPLICABLE cells) |
+| `code/smoke.py` | 14 arms × 3 families × 5 steps, dev seed 0 |
 | `native/` | `vau_torch.py`, `gem_integration.patch`, `INTEGRATION_NOTES.md` (static, not executed) |
 
 ## API
@@ -36,14 +36,27 @@ nonprogress_zeroed. Counters are in `ms.ops`. Arm config: `probe='sketch'|'exact
 "build once"), `ridge_rel`, `reject_nonprogress`, `inject`, `lam` (penalty), and `ref_norms`/`c`/`metric='H'|'euclid'`
 (stepmatch).
 
-Semantics fixed in code:
+Semantics fixed in code (including the F_REVIEW §4.2 fixes):
 - Probe refresh is driven by `ms.calls`, the data index, which is never rolled back. The refresh rule is `calls % K == 0`.
+- The Adam counter t advances only on commit (`AdamState.t`), and bias correction uses it.
 - Rollback restores (θ, m, v, t) and returns `theta.copy()`. The `AdamState` object is left untouched, so rollback is
   bit-exact. The probe block is not rolled back.
-- When g·Δ1 >= 0, Δ1 is set to 0, the gate still runs, and on acceptance (m, v, t) commit. This is the literal pseudocode.
+- If g·Δ1 >= 0, the step is a **null step**: no gate tries, nothing committed, θ unchanged. It is counted as
+  `nonprogress_zeroed`, not as `rejected_step`.
+- Ridge μ = max(1e-6·tr(G0)/k, 1e-12).
+- When S is empty or all-zero (k = 0) the correction and the reject rule are both skipped, so the result is bitwise
+  AdamW (I2, unconditional).
+- `vau_blocksplit*`: D is normalised per LoRA factor block per layer, D_A/mean(D_A) and D_B/mean(D_B). This is used only
+  as the projection metric; Δ0 is still the true AdamW step.
+- `na_lora` (InfLoRA-style null-A LoRA, a known method):
+  - At init, U_l is computed from one feature forward on R1 per LoRA module (SVD, relative tol 1e-10), and
+    A_l ← A_l(I − U_lU_lᵀ). A is frozen; AdamW state is kept over the B blocks only.
+  - Runs must start from `arm.initial_theta(ms)`. Passing an unprojected A raises.
+  - Probe cost: 1 forward, 0 VJPs.
+- LoRA-only arms raise `NotApplicable` on the linear family; `arm_status()` returns `'NOT_APPLICABLE'`.
 - adamw_stepmatch commits AdamW state from the raw g even when the target norm is 0.
 
-## Test status (`meter.py E_tests_final`, 176 passed / 0 failed, 6.0 CPU-s)
+## Test status (`meter.py E_tests_final2`, 222 passed / 0 failed / 2 skipped (NOT_APPLICABLE), 7.8 CPU-s)
 - **FD (I1):** central differences in FP64, rel err <= 1e-6. Covered: GEM/CPR/anchor/penalty gradients; JVP, VJP and the
   dense Jacobian for all 3 families; the full-chain erasure gradient; the adjoint identity. A mutation check (×1.0001 in
   the attention VJP) is caught.
@@ -69,6 +82,15 @@ Semantics fixed in code:
   - Also: v = b exactly at init; knobs (anisotropy, κ/φ, rare, shift, contrast down to 1e-6, eps_n = 0, gauge
     first-order neutral but drifting, inject hook, early stop, K = None).
   - Native: static AST checks, and `adamw_peek` transliterated and checked bitwise against numpy.
+- **F_REVIEW additions:**
+  - A null step skips the gate and commits nothing (vau, vau_nogate, post_euclid_reject).
+  - The Adam counter advances only on commit.
+  - The μ floor holds.
+  - The blocksplit metric is normalised per block.
+  - na_lora: probed retained outputs are unchanged to 1e-12 after 40 AdamW steps at lr 0.1, while target outputs move
+    (MLP, and the attention model with N_r = 1).
+  - The factor-wise constraints dA U = 0, dB(AU) = 0 with B = 0 and rank(AU) = r keep B ≡ 0.
+  - Op counters for all new arms on 3 families; NOT_APPLICABLE on linear.
 
 ## Smoke (`meter.py E_smoke`; `results/E_smoke_output.txt`, `results/E_smoke.json`)
 Measured CPU time of `arm.step` over 5 steps (placeholder hyper-parameters, nothing tuned):
@@ -76,6 +98,8 @@ Measured CPU time of `arm.step` over 5 steps (placeholder hyper-parameters, noth
 |---|---|---|---|
 | adamw | 1.9 ms | 2.1 ms | 13.7 ms |
 | vau | 5.7 ms | 6.4 ms | 27.5 ms |
+
+na_lora: 2.4 ms (mlp) and 15.5 ms (flow). Its ops per 5 steps are forward 6/63, vjp 5/55, 1 probe build.
 
 Per 5 steps for vau with k = 8, K = 2, N_r = 8, n2 = 16 (calls/samples):
 - forward 8/79, vjp 29/247, teacher 10/110, gate_forward 5/80, 5 solves, 3 probe builds.
@@ -105,14 +129,26 @@ is about 14 metered CPU-s plus a few unmetered seconds.
 7. **AdamW:** `theta + delta0` equals torch's `theta*(1-lr·wd) - step_size·m/denom` only up to the last ulp. The
    foreach/fused kernels can also differ in the last ulp. Torch source line numbers are UNVERIFIED.
 8. **I4 versus the frozen ridge.** With μ = 1e-6·tr(G0)/k the exact-J residual ||JΔ1||/||JΔ0|| is about 3e-6, not
-   <= 1e-8. The residual identity μ(G0+μI)⁻¹SΔ0 is tested. I4 passes (<= 1e-15) only with `ridge_rel = 0`, which also
-   requires J to have full row rank (that test uses 4 R1 samples). **Coordinator decision needed:** either amend I4 to
-   use ridge_rel = 0, or accept about 1e-5.
-9. **I2 holds only when the reject rule does not fire.** If g·Δ0 >= 0 (possible with momentum or WD), vau with k = 0
-   zeroes the step while AdamW does not. The test asserts that the rule did not fire on its stream.
+   <= 1e-8. The residual identity μ(G0+μI)⁻¹SΔ0 is tested. I4 passes (<= 1e-15) only with `ridge_rel = 0`, which leaves
+   only the 1e-12 floor and requires J to have full row rank (that test uses 4 R1 samples). **Coordinator decision
+   needed:** either amend I4 to use ridge_rel = 0, or accept about 1e-5.
+9. **I2 is now unconditional.** The reject rule is skipped together with the correction when S is empty. This is my
+   reading of "skip the correction when S = 0"; it is a spec interpretation and should be stated in the candidate.
 10. **Native compute.** At GEM defaults with n1 = 32, the probe charge 3k·n1/K is about 307 FE/step against 66 FE/step
     for native GEM, i.e. above the protocol's 4× compute rule (INTEGRATION_NOTES §10). In this toy n1 = 8.
 11. **Sketch draw order differs** between numpy (one row-major Z of k_max × N_r·d) and the torch sketch. The two are
     equal in distribution but not in values.
-12. **Not built in this wave:** G3's construction g = cos ψ g_null + sin ψ g_range (needs fixture teacher maps in the
+12. **Protocol naming conflict.** eval_protocol.json defines `post_euclid` WITH the reject rule. The coordinator's
+    update asked for a separate `post_euclid_reject`. Here `post_euclid` has no reject rule and `post_euclid_reject`
+    is the protocol's "VAU-Euclid" with the rule. The runner must map the names accordingly.
+13. **na_lora degenerates when probe features have full rank.** If U_l spans all of d_in then A_l = 0 and there is no
+    erasure capacity. In the toys:
+    - flow, N_r = 8: rank 8 of dm = 8 for all four modules, so A = 0 and drift and erasure are both exactly 0 in the
+      smoke run;
+    - mlp fc2, N_r = 32: rank 16 of 16;
+    - mlp fc1 is never full rank, because the concept coordinates are absent from retained inputs.
+    At Flux scale, 32 items × ~1.5k tokens of width 3072 make a full numerical rank at tol 1e-10 likely (UNVERIFIED).
+    na_lora then needs an energy threshold (InfLoRA/GPM-style) rather than 1e-10. That changes the method; it is a
+    coordinator/protocol decision and is not implemented.
+14. **Not built in this wave:** G3's construction g = cos ψ g_null + sin ψ g_range (needs fixture teacher maps in the
     runner), evaluation observables (E_hinge, E_end, rho_*), FE accounting, penalty_oracle, and the runner itself.
