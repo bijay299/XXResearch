@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/data/bijaypandey/llada_rwku/scripts/verify_objective.py", line 260, in <module>
+    main()
+  File "/data/bijaypandey/llada_rwku/scripts/verify_objective.py", line 214, in main
+    native_loss, _ = shim2._random_sft_null_anchor_loss(student, ids, labels, attn)
+  File "<string>", line 15, in _random_sft_null_anchor_loss
+  File "/data/bijaypandey/llada_rwku/scripts/verify_objective.py", line 206, in fixed_rand
+    out = torch.rand(*shape, generator=g, dtype=torch.float64) if isinstance(shape, tuple) \
+  File "/data/bijaypandey/llada_rwku/scripts/verify_objective.py", line 206, in fixed_rand
+    out = torch.rand(*shape, generator=g, dtype=torch.float64) if isinstance(shape, tuple) \
+  File "/data/bijaypandey/llada_rwku/scripts/verify_objective.py", line 206, in fixed_rand
+    out = torch.rand(*shape, generator=g, dtype=torch.float64) if isinstance(shape, tuple) \
+  [Previous line repeated 993 more times]
+  File "/data/bijaypandey/llada_rwku/scripts/verify_objective.py", line 202, in fixed_rand
+    k.pop("generator", None)
+RecursionError: maximum recursion depth exceeded while calling a Python object

@@ -1,0 +1,11 @@
+  PASS  em_is_not_substring                7/7
+  PASS  normalization                      6/6
+  PASS  aliases_conservative               4/4
+  FAIL  parser                             9/10
+  PASS  mmlu_parser                        5/5
+  PASS  secondary_metrics                  8/8
+  FAIL  no_ar_likelihood                   3/4
+    FAILED: [parser] cuts at sentence end: got='Paris.' want='Paris'
+    FAILED: [no_ar_likelihood] right_shift_logits is False: got=False want=True
+
+EVALUATOR CHECKS: 42/44 passed -> all=False

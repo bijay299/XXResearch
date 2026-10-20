@@ -1,0 +1,9 @@
+attempt_id	phase	label	start_iso	dur_s	rc	gpu_charged	log	note
+a001	recall	screen10_primary	2026-10-20T00:41:50-04:00	200	0	yes	a001_recall_screen10_primary.log	timeout=2400s
+a002	objective	verify_native	2026-10-20T00:46:38-04:00	3	1	no	a002_objective_verify_native.log	timeout=900s
+a003	objective	verify_native_retry	2026-10-20T00:47:05-04:00	2	0	no	a003_objective_verify_native_retry.log	timeout=900s
+a004	objective	verify_native_fp32tol	2026-10-20T00:48:08-04:00	2	0	no	a004_objective_verify_native_fp32tol.log	timeout=900s
+a002	recall	screen10_secondary_and_mmlu	2026-10-20T00:46:36-04:00	114	0	yes	a002_recall_screen10_secondary_and_mmlu.log	timeout=2400s
+a006	evaluator	verify_scoring	2026-10-20T00:49:06-04:00	2	0	no	a006_evaluator_verify_scoring.log	timeout=600s
+a007	evaluator	verify_scoring_v2	2026-10-20T00:49:55-04:00	2	0	no	a007_evaluator_verify_scoring_v2.log	timeout=600s
+a008	wiring	teacher_equivalence	2026-10-20T00:50:44-04:00	9	0	yes	a008_wiring_teacher_equivalence.log	timeout=900s
