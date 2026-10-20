@@ -1117,7 +1117,8 @@ def holm(pvals):
 
 def binom_sf(k, n, p):
     """P(X >= k), X ~ Bin(n, p)."""
-    return float(sum(math.comb(n, j) * p ** j * (1 - p) ** (n - j) for j in range(k, n + 1)))
+    from scipy.stats import binom
+    return float(binom.sf(k - 1, n, p)) if k > 0 else 1.0
 
 
 def spearman(x, y):

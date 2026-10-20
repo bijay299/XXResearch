@@ -73,6 +73,7 @@ def test_holm_and_binomial():
     assert math.isclose(rv.binom_sf(1, 1, 0.05), 0.05)
     assert rv.binom_sf(0, 10, 0.3) == pytest.approx(1.0)
     assert math.isclose(rv.binom_sf(2, 3, 0.5), 0.5)
+    assert 0.0 <= rv.binom_sf(60, 2000, 0.05) <= 1.0                    # large n: no overflow
 
 
 def test_fallback_and_family_stats():
