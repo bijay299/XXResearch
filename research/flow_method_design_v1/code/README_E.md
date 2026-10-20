@@ -152,3 +152,37 @@ is about 14 metered CPU-s plus a few unmetered seconds.
     coordinator/protocol decision and is not implemented.
 14. **Not built in this wave:** G3's construction g = cos ψ g_null + sin ψ g_range (needs fixture teacher maps in the
     runner), evaluation observables (E_hinge, E_end, rho_*), FE accounting, penalty_oracle, and the runner itself.
+
+## Wave 3: validation runner (`code/run_validation.py`)
+- **Command:** `python code/run_validation.py --phase dev|validation`. It re-executes itself under `code/meter.py`
+  (wall limit 6 h) and runs ≤ 4 fork workers, one work unit per (family, cell, seed).
+- **Validation guard:** the phase refuses unless `configs/FREEZE.json` exists, its sha256 of eval_protocol.json,
+  candidate.json, the code/vau tree and run_validation.py all match, and it carries `calibration` and `timings`.
+- **Outputs:** `results/<phase>/raw/<family>/<cell>__s<seed>.jsonl.gz` (one run per line: cfg, checkpoint
+  trajectory, per-step log, mechanism log, F3 record, ops); `units.jsonl`; `summary.json` (coverage classes,
+  matched tables, Q1–Q4, safety, F1–F5, compute rule, G9 mechanism, GD-B/GD-D, verdict, DECISIONS D1–D23).
+- **Covered:** families G1–G9, GD_B, GD_D, penalty_oracle, the G5 gauge subtest, G9 measurement runs, the stepmatch
+  paired vau runs, θ0 coverage (C_probe, C_probe_D, eff_rank_99, C_feat) and coverage drift along one vau run per
+  unit, the full statistics, the budget hard stop at 6.0 core-h, and crash/timeout recorded as failures (never
+  retried).
+- **Tests:** `code/tests/test_runner_stats.py` checks crossing/interpolation, config selection, log-ratio rules, the
+  exact sign-flip test, bootstrap, Holm, binomial, fallback ladder, Spearman and FE on synthetic inputs.
+- **Candidate:** `configs/candidate.json` written. Amendment A2 is recorded in `configs/eval_protocol.json` (v1.2)
+  and `docs/EVAL_PROTOCOL.md`.
+
+### Library changes in this wave
+- fast linear model (contract θ first), with exact-J and sketch probes via `phi` / `vjp_rows`
+- `probe_forward` / `probe_vjp` op categories
+- cached gate base outputs
+- na_lora energy threshold
+- vau_blocksplit on a single block
+- `mu_floor` knob
+- covered-population and concept-target task modes
+- flow erasure batch `(z0, target_id, idx)`
+- `TinyFlowDiT.sample_fast`
+- G9 seed code
+
+### Dev phase results (DEVELOPMENT ONLY; dev seeds; not evidence)
+- `results/dev/integrity.json`: all I1–I15 pass, plus the runner-level I5/I10/I11/I12 checks.
+- `results/dev/calibration.json`: seeds 0..7.
+- `results/dev/compute_projection.json`: 4.03 core-h before the ladder, 3.69 after L1.
