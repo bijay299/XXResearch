@@ -1,0 +1,53 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:00,  7.91it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00,  6.39it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  6.05it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00,  5.97it/s]Loading checkpoint shards:  83%|████████▎ | 5/6 [00:00<00:00,  6.00it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  6.10it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  6.16it/s]
+[load] 7.0s  dtype=torch.bfloat16
+[ids] mask=126336 eos=126081 pad=126081 vocab=126464
+
+--- prompt 0: 'What is the capital of France?'
+    runtime=2.32s forwards=64 monotone=True masks_left=0 nonempty=True
+    traj[:6]=[64, 63, 62, 61, 60, 59] ... traj[-3:]=[3, 2, 1]
+    output: 'The capital of France is Paris.'
+
+--- prompt 1: 'Name three primary colors.'
+    runtime=1.91s forwards=64 monotone=True masks_left=0 nonempty=True
+    traj[:6]=[64, 63, 62, 61, 60, 59] ... traj[-3:]=[3, 2, 1]
+    output: 'Three primary colors are red, blue, and yellow.'
+
+--- prompt 2: 'Explain in one sentence what photosynthesis is.'
+    runtime=1.90s forwards=64 monotone=True masks_left=0 nonempty=True
+    traj[:6]=[64, 63, 62, 61, 60, 59] ... traj[-3:]=[3, 2, 1]
+    output: 'Photosynthesis is the process by which plants, algae, and some bacteria convert light energy from the sun into chemical energy stored in glucose, using carbon dioxide and water.'
+
+--- prompt 3: 'What is 17 plus 25?'
+    runtime=1.92s forwards=64 monotone=True masks_left=0 nonempty=True
+    traj[:6]=[64, 63, 62, 61, 60, 59] ... traj[-3:]=[3, 2, 1]
+    output: '17 plus 25 equals 42.'
+
+[peak_gpu_mem] 15.004 GiB
+[all_passed] True
+[written] /data/bijaypandey/llada_smoke/artifacts/inference_results.json
+[bounded] label=gpu_inference rc=0 duration_s=18 timeout_s=1800 charged_gpu=yes
+	Command being timed: "/data/bijaypandey/llada_smoke/bounded.sh 1800 gpu_inference /data/bijaypandey/llada_smoke/venv_llada/bin/python /data/bijaypandey/llada_smoke/scripts/run_inference.py"
+	User time (seconds): 31.57
+	System time (seconds): 12.52
+	Percent of CPU this job got: 242%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:18.17
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 14882424
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 233
+	Minor (reclaiming a frame) page faults: 546860
+	Voluntary context switches: 2961
+	Involuntary context switches: 548
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 320
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

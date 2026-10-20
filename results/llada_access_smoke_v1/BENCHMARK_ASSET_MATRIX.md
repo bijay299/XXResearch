@@ -27,7 +27,7 @@ Pinned repositories:
 | **TOFU `full.json`** (for the SFT backbone MDU requires) | same rev, `full.json` (1,077,844 B) | ✅ listed at pinned rev | input to the **missing** TOFU SFT stage | Blocked downstream — no SFT code (see below) |
 | **RWKU data** | `hf.co/datasets/jinzhuoran/RWKU` @ `d72f493d481d1b0a9bdc6e869d32baeffad8904f`, 4,424 files, CC-BY-4.0 | ✅ API 200, `gated=false`; 23 configs enumerated incl. `forget_level1/2/3`, `neighbor_level1/2`, `utility_general/truthfulness/factuality` | `load_dataset("jinzhuoran/RWKU", <config>)`; per-entity dirs under `Target/<N>_<Name>/`; MDU's `convert_rwku_to_tofu.py` to reshape | **No LLaDA path.** MDU ships only `rwku_dream`; see §"RWKU is Dream-only" |
 | **RWKU eval dependencies** | `rouge-score`, `scikit-learn`, `datasets` (MDU `requirements.txt`) | ✅ all public PyPI; `rouge-score` + `sklearn` installable | install into the eval env | None |
-| **TOFU starting checkpoint (author-matched)** | **does not exist publicly** | ✅ checked — searched HF for `llada`+`tofu`; MDU repo read in full | would require running the unreleased TOFU SFT (LLaDA, **1000 epochs** on `full.json`) | 🔴 **BLOCKING — see §1** |
+| **TOFU starting checkpoint (author-matched)** | **not located in the inspected release or recorded search** | ✅ checked — recorded HF search for `llada`+`tofu`; MDU repo read in full | would require running the unreleased TOFU SFT (LLaDA, **1000 epochs** on `full.json` = 4,000 QA pairs) | 🔴 **BLOCKING — see §1** |
 | **LLaDA-8B-Instruct** (off-the-shelf backbone) | `hf.co/GSAI-ML/LLaDA-8B-Instruct` @ `08b83a6feb34df1a6011b80c3c00c7563e963b07`, MIT | ✅ **downloaded and used**; all 6 shard SHA-256 verified vs pinned LFS digests | none — present at `/data/bijaypandey/llada_smoke/model/` | None, **but it is not a TOFU backbone** (§1) |
 | **LLaDA-8B-Base** | `hf.co/GSAI-ML/LLaDA-8B-Base` @ `0f2787f2d87eac5eed8a087d5ecd24277e6255b2`, MIT | ✅ metadata only (`gated=false`, 16 files) — deliberately **not** downloaded | ~15 GiB download if ever needed | None |
 | **Native baseline code — MDU LLaDA train** | `MDU@e5e8e82:src/unlearn_mdu_llada.py` (1,668 lines) | ✅ source read in full | must be executed **inside a `dllm` checkout** | 🔴 **`dllm` undeclared — see §2** |
@@ -42,6 +42,10 @@ Pinned repositories:
 ---
 
 ## 1. 🔴 The TOFU starting checkpoint is the primary blocker
+
+> **Scope of this claim.** What follows is a conclusion about the **inspected pinned MDU release
+> and a recorded HF search**, not a universal non-existence proof. Phrased precisely:
+> *no author-matched TOFU checkpoint was located in the inspected release and recorded search.*
 
 This was checked carefully, as it determines whether a TOFU comparison is possible at all.
 
@@ -61,9 +65,12 @@ LLADA_BASE_SFT=${LLADA_BASE_SFT:-/path/to/LLaDA-TOFU-SFT-1000ep}
 and the `unlearn_mdu_llada.py` docstring likewise expects a locally produced
 `./checkpoints/llada-tofu-sft/checkpoint-final`.
 
-**Conclusion: no author-matched LLaDA TOFU checkpoint is published.** Reproducing MDU on TOFU
-therefore requires re-deriving a backbone from unreleased SFT code at an unusual scale
-(1000 epochs over the 200-row TOFU corpus) — with no reference artifact to validate it against.
+**Conclusion: no author-matched LLaDA TOFU checkpoint was located in the inspected release or
+the recorded search.** Reproducing MDU on TOFU therefore requires re-deriving a backbone from
+**unavailable** SFT code at an unusual scale — 1000 epochs over the full TOFU corpus of
+**200 fictional authors × 20 question–answer pairs = 4,000 pairs** (verified:
+`evidence/tofu_row_counts.json`, `full` = 4,000 rows) — with no reference artifact to validate
+it against.
 
 **The ordinary `LLaDA-8B-Instruct` checkpoint is not a substitute.** TOFU's facts concern
 fictional authors invented for the benchmark; they are not in the pre-training corpus, and
@@ -86,11 +93,15 @@ Specifically:
   `Jameszhiwei` nor `guanmingchiu` is an identifiable MDU author, and MDU never references them.
 - **Epoch count undocumented.** MDU specifies 1000 epochs. Neither SFT repo documents its
   recipe, epochs, LR, or seed, so the "instil the knowledge" step cannot be shown to match.
-- **Observable structural difference:** both ship **4 safetensors shards** where the official
-  LLaDA-8B-Instruct ships **6**. This alone does not prove a dtype or architecture change
-  (re-sharding is routine), but it is an unexplained divergence that would need verification
-  against `config.json` and tensor dtypes before use.
-- **No license on the two SFT candidates**, which blocks redistribution and complicates use.
+- **Shard count differs, which proves nothing on its own.** Both ship **4 safetensors shards**
+  where the official LLaDA-8B-Instruct ships **6**. **A 4-vs-6 shard count alone does not
+  establish model incompatibility** — shard layout is a packaging choice independent of
+  architecture and dtype, and re-sharding is routine. It is an unverified detail worth checking
+  against `config.json` and tensor dtypes before use, **not** a defect.
+- **Declared license metadata is absent on the two SFT candidates**, so **permission and
+  provenance remain unresolved**. That is a reason to seek clarification from the uploaders
+  before use or redistribution — it is **not** a determination of what is or is not legally
+  permitted, and no such conclusion is drawn here.
 
 Using one of these would be a *different experiment* — a comparison against a third-party
 backbone of unknown provenance — and must be reported as such, never as reproducing MDU.
@@ -135,21 +146,42 @@ by the authors.
 
 ## 3. RWKU is Dream-only; and a memory caveat
 
-- **No `rwku_llada` preset exists.** `run_main.sh` offers `tofu_llada`, `tofu_dream`,
+- **The pinned MDU release contains no `rwku_llada` preset or LLaDA RWKU evaluator; its
+  released RWKU path is Dream-specific.** `run_main.sh` offers `tofu_llada`, `tofu_dream`,
   `rwku_dream`. The RWKU evaluator shipped is `scripts/eval_rwku_dream.py`; there is no
   `eval_rwku_llada.py`. `configs/mdu_rwku.yaml` states the backbone is
   "Dream-7B-Instruct (off-the-shelf, no SFT)". A LLaDA-on-RWKU comparison would require
   **writing new code**, not configuring existing code — and would no longer be MDU's
   published RWKU setup.
 - **One upside:** RWKU needs *no* SFT backbone (off-the-shelf + no retain set), so it avoids
-  the §1 blocker entirely. That makes RWKU the cheaper path to a *native* baseline — but only
-  for Dream as published.
-- **Memory caveat (unverified):** MDU uses `frozen_unconditional: true`, i.e. a second frozen
-  copy of the model for the anchor, plus full-parameter AdamW at per-device batch 4 ×
-  grad-accum 4, on an H200 (141 GB). Full-parameter AdamW on 8 B params needs roughly
-  8 B × (4 bytes master + 4 + 4 Adam moments) ≈ **~128 GB of optimizer/master state alone**,
-  before a frozen 16 GB anchor copy and activations. This **will not fit** on a single
-  A100-40GB and is not addressed by the LoRA feasibility result in this report.
+  the §1 blocker entirely. That makes RWKU **one** cheaper route to a *native* baseline — but
+  only for Dream as published. A LLaDA RWKU adaptation would be **one possible future route
+  among others**, not an already-qualified baseline, and it carries its own precondition:
+  **pristine LLaDA must first demonstrate recall of the selected target facts**, since
+  forgetting can only be measured for knowledge the model demonstrably holds.
+- **Memory caveat (rough, unverified):** MDU uses `frozen_unconditional: true`, i.e. a second
+  frozen copy of the model for the anchor, plus full-parameter AdamW at per-device batch 4 ×
+  grad-accum 4, on an H200 (141 GB). Order-of-magnitude FP32 state accounting at
+  8,023,969,792 parameters:
+
+  | Accounting | Bytes/param | Total |
+  |---|---|---|
+  | 3 arrays: FP32 master + 2 FP32 moments | 12 | **96.3 GB** (89.7 GiB) |
+  | 4 arrays: FP32 params + grads + 2 FP32 moments | 16 | **128.4 GB** (119.6 GiB) |
+
+  A conventional **four-array** FP32 accounting is what reaches ~128 GB; the three-array subset
+  is ~96 GB. Either way this is **before** a frozen anchor copy and activations.
+
+  Two caveats on that estimate: **FP32 master weights and FP32 optimizer moments are not
+  automatic in every BF16 AdamW configuration** (moments may be BF16, master weights may be
+  absent in pure-BF16 training), and actual memory depends on parameter/state precision,
+  gradient storage, activations and checkpointing, the frozen anchor model, and any
+  sharding (FSDP/ZeRO) or CPU offload.
+
+  **Conclusion, appropriately scoped:** these figures are far above a single A100-40GB's
+  capacity, so MDU's full-parameter two-model setup is **not addressed** by the LoRA
+  feasibility result in this report. A rough calculation of this kind **cannot** establish
+  exact multi-GPU feasibility or infeasibility, and none is claimed here.
 
 ---
 
@@ -168,8 +200,15 @@ by the authors.
 - Resolve MDU's full-parameter two-model memory footprint against A100-40GB (quantified above; likely needs multi-GPU sharding, or a parameter-efficient deviation from the published method)
 
 **Missing or not verified**:
-- 🔴 **Author-matched LLaDA TOFU SFT checkpoint — missing.** SFT code unreleased; no published artifact. Hard blocker for TOFU reproduction.
-- 🔴 **MDU's exact `dllm` revision — not verified.** Upstream identified by symbol match only.
-- 🔴 **Native LLaDA RWKU baseline — does not exist** in the release (Dream only).
-- 🟡 Third-party TOFU checkpoints exist but are unmatched, mostly unlicensed, and undocumented; one is an empty repo.
+- 🔴 **Author-matched LLaDA TOFU SFT checkpoint — not located** in the inspected release or the recorded search. MDU's TOFU SFT code is **unavailable** in the pinned release; no published artifact was found. Hard blocker for TOFU reproduction.
+- 🔴 **The exact `dllm` dependency revision used by MDU remains unverified.** Upstream identified by symbol match only; not cloned or executed.
+- 🔴 **The pinned MDU release contains no LLaDA RWKU preset/evaluator**; its released RWKU path is Dream-specific.
+- 🟡 Third-party TOFU checkpoints were found but are not author-matched and are undocumented; two lack declared license metadata, leaving permission and provenance unresolved; one repo is empty. Internals were never inspected (metadata only).
 - 🟡 MDU's own pinned environment (torch 2.7.0 / transformers 4.57.0) was **not** exercised here.
+- 🟡 **Whether pristine LLaDA recalls any specific TOFU or RWKU target fact is unmeasured.** No recall baseline was run.
+
+---
+
+*Amended 2026-10-20 — see [`AMENDMENT_01.md`](AMENDMENT_01.md) for the corrected memory
+arithmetic, narrowed absence claims, TOFU corpus size, and license/shard wording. No new model
+execution occurred.*
