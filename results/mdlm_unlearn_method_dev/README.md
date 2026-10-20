@@ -85,6 +85,52 @@ its own continuous predictor sat at r = 0.014. A standing rule is now recorded: 
 prediction is confirmed only by a within-stratum continuous correlation, computed before the
 group comparison is reported.
 
+## Findings 2 and 3 — the metric and the candidate target both failed their own tests
+
+[`docs/FINDING3_no_ignorance_reference.md`](docs/FINDING3_no_ignorance_reference.md).
+
+**The candidate's target does not exist as specified.** It was to match `P_ign`, the answer
+distribution of a reference at a *verified-unknown* subject, estimated by substitution. Its
+designer pre-registered the fatal condition. Measured (512 forwards, 16 s), the **validity
+gate failed: mean p(true answer | stranger) = 0.228 against a 0.02 threshold.** The model
+confidently confabulates a memorized answer for any name-like string — `"Durnesse
+Corbridge"` in a cello frame returns ` cello` at **p = 0.949** — and which answer it picks
+depends on the stranger's name. That is not ignorance. A first attempt failed because the
+strangers shared surnames with trained entities; rerunning with wholly novel name components
+left the gate failing identically. The surviving route is a reference trained on the
+**retain facts only**, which the critic independently judged the best idea in the design.
+
+**The IGNORANT metric does not measure ignorance.** All 28 generations it scored IGNORANT for
+the best arm were printed: **28 of 28 assert a value; zero are non-asserting.** They escaped
+the REPLACE cell by a *morpheme* — `seismoology` ×8, `mycological`, `harpa`, `clarion`,
+`tympani`, `oboes`. Corrected: **REPLACE ≈ 0.938, IGNORANT ≈ 0.000.** The metric is also
+gameable in the wrong direction (nudging substitutes from `Tbilisi` to `Troms` scores a large
+gain while making the model worse), it **conflicts with our own formalization** (which says an
+ignorant model still answers *about* the subject — scored here as REPLACE), and the claim "no
+method exceeds 0.438" is unsupportable: the two datasets' answer pools differ (7/5/4 vs
+16/8/8) so the columns are different predicates, eight of nine arms have a Wilson upper bound
+above 0.438, and the best baseline versus ours is Fisher **p = 1.0**.
+
+**The same error, three times.** The `Tbilisi` attractor is not the exclusion target's
+signature: partitioning **θ₀**, before any unlearning, gives REPLACE 0.203 with all 13 facts
+it does not know being in-pool substitutions, 5 of the first 6 on `Tbilisi`. It is the
+reference's own prior. That joins ARC's aggregate-as-per-fact error and Finding 1's
+attribution of suppression geometry to the objective's indexing. Common form: **a property is
+attributed to the intervention without being measured at the pre-intervention reference.**
+
+> **Standing rule, now institutionalised.** Every claim that an intervention causes a property
+> must report that property measured at θ₀ **and** at one intervention not sharing the
+> proposed mechanism, in the same table, before the claim is stated — not as a later
+> robustness check.
+
+**One structural conclusion.** The closed 32-answer pool is itself a liability: it installs a
+relation-level prior that contaminates the metric (REPLACE and IGNORANT are not separable)
+*and* the target (`P_ign` is pool-concentrated). This argues for moving the mechanism work on
+to real pretrained knowledge sooner than planned.
+
+Adversarial review of all of the above, including the mathematics of the candidate, is in
+[`docs/CRITIQUE_WAVE2.md`](docs/CRITIQUE_WAVE2.md).
+
 ## Errata against our own published studies
 
 Issued after an independent audit. Original commits are **not** rewritten.

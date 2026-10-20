@@ -1,0 +1,5501 @@
+{
+  "stage": "memorization_v2",
+  "model_dir": "/data/bijaypandey/llada_smoke/model/LLaDA-8B-Instruct",
+  "model_revision": "08b83a6feb34df1a6011b80c3c00c7563e963b07",
+  "gates": {
+    "G0_aliases_resolved_for_every_fact": {
+      "passed": true,
+      "detail": {
+        "n_facts": 128,
+        "sources": {
+          "dataset": 128
+        },
+        "n_without_alias": 0,
+        "n_dataset_disagrees": 0
+      }
+    },
+    "G1_answer_bearing_loss_masking": {
+      "passed": true,
+      "detail": {
+        "n_examples": 128,
+        "max_seq_len": 57,
+        "total_supervised_positions": 1220,
+        "supervised_positions_that_are_EOS": 0,
+        "supervised_positions_carrying_the_answer_word": 204,
+        "answer_word_fraction_of_supervised": 0.1672,
+        "facts_whose_answer_tokens_were_not_located": [],
+        "note": "loss is restricted to the answer sentence's own tokens; trailing EOS and right-padding are label-masked, so neither can dominate"
+      }
+    },
+    "G5a_lora_module_count_is_exactly_224": {
+      "passed": true,
+      "detail": {
+        "n_lora_modules": 224,
+        "expected": 224,
+        "blocks_wrapped": 32,
+        "linears_per_block": [
+          "attn_out",
+          "ff_out",
+          "ff_proj",
+          "k_proj",
+          "q_proj",
+          "up_proj",
+          "v_proj"
+        ],
+        "leaf_name_counts": {
+          "attn_out": 32,
+          "ff_out": 32,
+          "ff_proj": 32,
+          "k_proj": 32,
+          "q_proj": 32,
+          "up_proj": 32,
+          "v_proj": 32
+        }
+      }
+    },
+    "G5b_lm_head_not_wrapped": {
+      "passed": true,
+      "detail": {
+        "lm_head_path": "base_model.model.model.transformer.ff_out",
+        "lm_head_type": "Linear",
+        "lm_head_located": true,
+        "lm_head_is_plain_linear": true,
+        "lm_head_wrapped": false,
+        "n_outer_linear_modules": 225,
+        "unwrapped_linear_modules": [
+          "base_model.model.model.transformer.ff_out"
+        ],
+        "note": "leaf-name collision: per-block `ff_out` is the MLP down-projection; `model.transformer.ff_out` is the LM head. The string regex is matched with re.fullmatch so only `.*blocks.<d>.ff_out` can match. Cross-checked independently: of the 225 Linear sites in the model, exactly 224 are wrapped and the single un-wrapped one IS the head."
+      }
+    },
+    "G5c_coverage_shape_32_blocks_x_7_linears": {
+      "passed": true,
+      "detail": {
+        "n_blocks": 32,
+        "per_block": [
+          "attn_out",
+          "ff_out",
+          "ff_proj",
+          "k_proj",
+          "q_proj",
+          "up_proj",
+          "v_proj"
+        ],
+        "all_blocks_identical": true
+      }
+    },
+    "G2a_optimizer_membership": {
+      "passed": true,
+      "detail": {
+        "n_trainable_tensors": 448,
+        "n_trainable_params": 83886080
+      }
+    },
+    "G2b_finite_loss_and_grads": {
+      "passed": true,
+      "detail": {
+        "loss": 1.1335481405258179,
+        "grad_norm": 7.14572811126709,
+        "n_masked": 14,
+        "n_maskable": 37
+      }
+    },
+    "G2c_trainable_params_changed": {
+      "passed": true,
+      "detail": {
+        "n_changed": 448,
+        "n_trainable": 448
+      }
+    },
+    "G2d_base_weights_unchanged": {
+      "passed": true,
+      "detail": {
+        "n_base_tensors_hashed": 291,
+        "n_drifted": 0,
+        "coverage": "100% of non-LoRA parameter tensors"
+      }
+    },
+    "G2e_loss_decreased": {
+      "passed": true,
+      "detail": {
+        "first": 1.1335481405258179,
+        "last": 0.051149122416973114
+      }
+    },
+    "G4_memorization_threshold": {
+      "passed": null,
+      "detail": {
+        "status": "NOT RUN -- calibration mode",
+        "recall_nfkd_forget": 1.0,
+        "recall_nfkd_retain": 1.0
+      }
+    },
+    "G3_save_reload_behavioural_identity": {
+      "passed": null,
+      "detail": {
+        "status": "NOT RUN -- calibration mode"
+      }
+    }
+  },
+  "args": {
+    "lr": 0.0002,
+    "steps": 600,
+    "rank": 32,
+    "seed": 20261020,
+    "batch": 4,
+    "t_low": 0.0,
+    "answer_weight": 1.0,
+    "norm": "pinned",
+    "canvas": "genlen",
+    "grad_clip": 1.0,
+    "threshold": 0.95,
+    "mode": "calibrate",
+    "qual_subset": 32,
+    "out": "/data/bijaypandey/mdlm_unlearn/tmp/calib_cv_genlen_tl00",
+    "report": "/data/bijaypandey/mdlm_unlearn/outputs/calib_cv_genlen_tl00_report.json"
+  },
+  "launch": {
+    "argv": [
+      "/data/bijaypandey/mdlm_unlearn/scripts/memorize_v2.py",
+      "--seed",
+      "20261020",
+      "--steps",
+      "600",
+      "--batch",
+      "4",
+      "--lr",
+      "2e-4",
+      "--rank",
+      "32",
+      "--t-low",
+      "0.0",
+      "--answer-weight",
+      "1.0",
+      "--norm",
+      "pinned",
+      "--canvas",
+      "genlen",
+      "--grad-clip",
+      "1.0",
+      "--threshold",
+      "0.95",
+      "--mode",
+      "calibrate",
+      "--out",
+      "/data/bijaypandey/mdlm_unlearn/tmp/calib_cv_genlen_tl00",
+      "--report",
+      "/data/bijaypandey/mdlm_unlearn/outputs/calib_cv_genlen_tl00_report.json",
+      "--qual-subset",
+      "32"
+    ],
+    "command": "/data/bijaypandey/llada_smoke/venv_llada/bin/python /data/bijaypandey/mdlm_unlearn/scripts/memorize_v2.py --seed 20261020 --steps 600 --batch 4 --lr 2e-4 --rank 32 --t-low 0.0 --answer-weight 1.0 --norm pinned --canvas genlen --grad-clip 1.0 --threshold 0.95 --mode calibrate --out /data/bijaypandey/mdlm_unlearn/tmp/calib_cv_genlen_tl00 --report /data/bijaypandey/mdlm_unlearn/outputs/calib_cv_genlen_tl00_report.json --qual-subset 32",
+    "launch_command_from_env": "/data/bijaypandey/mdlm_unlearn/scripts/launch_py.sh 2 calib cv_genlen_tl00 7200 memorize_v2.py --seed 20261020 --steps 600 --batch 4 --lr 2e-4 --rank 32 --t-low 0.0 --answer-weight 1.0 --norm pinned --canvas genlen --grad-clip 1.0 --threshold 0.95 --mode calibrate --out /data/bijaypandey/mdlm_unlearn/tmp/calib_cv_genlen_tl00 --report /data/bijaypandey/mdlm_unlearn/outputs/calib_cv_genlen_tl00_report.json --qual-subset 32",
+    "attempt_id_from_env": "cv_genlen_tl00",
+    "cuda_visible_devices": "2",
+    "cwd": "/data/bijaypandey/mdlm_unlearn"
+  },
+  "versions": {
+    "python": "3.10.12",
+    "torch": "2.4.1+cu124",
+    "transformers": "4.49.0",
+    "peft": "0.14.0",
+    "cuda": "12.4",
+    "gpu_name": "NVIDIA A100-SXM4-40GB",
+    "driver_cuda_capability": [
+      8,
+      0
+    ]
+  },
+  "hashes": {
+    "data": {
+      "facts.json": "a35041e998e7e469d876de72ad23b854845491557c6fb698b9c08dd3f243c57e",
+      "forget.jsonl": "3d0eaa6bbcf0c0d85aff19132324566715d283da29b425df3c5f75f18172af4f",
+      "frozen_spec.json": "8f7e3dddf634fa987a95c1436b7d8045e75cecddd7155f02035fc70c5ae01b79",
+      "retain.jsonl": "574c556a9300d45373469084803d0ecf7bf5d4c869feca98220166cc1620a6aa"
+    },
+    "sources": {
+      "/data/bijaypandey/mdlm_unlearn/scripts/memorize_v2.py": "951970d094c4bbfab6bf7721c4a293dd219ef836c25fa1f51b06e1351f45d1db",
+      "/data/bijaypandey/mdlm_unlearn/scripts/common_v2.py": "8ca28c19f1beb25097b5619937f558debd7f495ce9535a99586b28461daf5a17",
+      "/data/bijaypandey/mdlm_unlearn/scripts/launch_memorize.sh": "dbdd4343c3786760336eed78dddddb2796f99df02ad06280787f7962d672830a",
+      "/data/bijaypandey/spex/scripts/common_big.py": "b3b2d7caab494898b7c7c6b526d8dd7122aff1006f1be4b9a676ad77d6da940c",
+      "/data/bijaypandey/spex/scripts/memorize_big.py": "5d0c90e5c4640d9cefcd5a9a961164f2ac5aa647da32133278ddb02e06fa66e5",
+      "/data/bijaypandey/llada_poc/scripts/llada_fxmix.py": "3d8162b68d8d79b7e7596db917649ddadb2ec7ff4166178148ea01701b5fd236"
+    }
+  },
+  "frozen_spec": {
+    "study": "arc_breaking_point",
+    "seed": 20261020,
+    "n_forget": 64,
+    "n_retain": 64,
+    "n_facts": 128,
+    "distinct_answers": 32,
+    "prediction": "ARC trains only on pooled states. With m=8 states/batch and K=16 (2 batches) over 64 forget facts, most facts can never be in the pool and therefore can never be forgotten. ARC should fail specifically on facts ABSENT from its pool, predictably per fact. K=512 (64 batches) should cover all facts.",
+    "scoring": "identical frozen rules to the 24-fact probe (normalize + whole-token answer presence)",
+    "decoding": {
+      "gen_length": 32,
+      "steps": 32,
+      "block_length": 32,
+      "temperature": 0.0
+    },
+    "note": "controlled factual learning on synthetic fictional entities; not a benchmark"
+  },
+  "decoding": {
+    "steps": 32,
+    "gen_length": 32,
+    "block_length": 32,
+    "temperature": 0.0,
+    "cfg_scale": 0.0,
+    "remasking": "low_confidence",
+    "mask_id": 126336,
+    "gen_seed": 20261020
+  },
+  "loss_normalization": {
+    "selected": "pinned",
+    "doc": {
+      "pinned": "PINNED LLaDA SFT recipe, reproduced from /data/bijaypandey/llada_poc/scripts/llada_fxmix.py::sft_loss_llada (the GUIDELINES.md SFT retain term): per-token CE / p_mask, divided per EXAMPLE by that example's answer length, summed, then divided by the batch size -- `torch.sum(tok / ans_len[mi]) / b`. Each EXAMPLE therefore contributes equal weight regardless of how many of its positions happened to be masked.",
+      "masked-mean": "Behaviour of the closed studies' memorize_big.py: a single weighted mean over ALL masked positions in the batch -- `(tl*wt).sum() / wt.sum()`. Examples with more masked positions dominate the batch gradient."
+    },
+    "pinned_source": "/data/bijaypandey/llada_poc/scripts/llada_fxmix.py::sft_loss_llada",
+    "deviations_from_pinned": [
+      "Supervised region: the pinned function treats every position at index >= prompt_length as the answer (`ans_len` INCLUDES the trailing/padding EOS). Our batches are right-padded with EOS to the longest example, so taking that literally would supervise padding and let EOS dominate -- exactly what gate G1 exists to forbid. We therefore define the answer region as the frozen make_example() supervised set (labels != -100: the answer sentence's own tokens, trailing EOS and padding excluded) and set ans_len_i = that count for example i. For a batch of equal-length, unpadded examples the two definitions coincide up to the single EOS.",
+      "Noising: p_mask. The pinned function uses t ~ U(0,1) and p_mask = (1-eps)t + eps. The frozen common_big.forward_process with --t-low 0 computes t = (1-eps)*U(0,1) + eps and p_mask = t, which is the identical distribution. --t-low > 0 raises the floor to t ~ U(t_low, 1); that is a declared memorization-stage knob, not part of the pinned recipe, and is recorded in the report.",
+      "Non-empty mask: forward_process guarantees at least one masked supervised position per row; the pinned function does not (it can produce an empty mi and a 0 loss). We keep the frozen guarantee under both normalizations.",
+      "--answer-weight: not part of the pinned recipe. With the default 1.0 the pinned path is the pinned formula verbatim. With a value != 1.0 the weight multiplies the per-token term before the per-example division; recorded in the report."
+    ]
+  },
+  "aliases": {
+    "rule": "aliases(answer) = sorted(unique(nonempty({normalize(answer), normalize_dia(answer)}))), where normalize is the frozen common_big.normalize (NFKC + casefold + punctuation->space + article removal) and normalize_dia is the same rule with NFKD + combining-mark stripping. One entry when the answer carries no diacritics, two otherwise.",
+    "source_counts": {
+      "dataset": 128
+    },
+    "n_facts": 128,
+    "facts_with_no_alias": [],
+    "facts_where_dataset_disagrees_with_derived": [],
+    "note": "resolve_aliases() never raises on a missing field; it unions the dataset aliases with the deterministic derivation, so the gate cannot be skipped and cannot crash. The previous backbone died here with KeyError: 'aliases'.",
+    "per_fact": [
+      {
+        "fact_id": "forget_000",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "forget_001",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "forget_002",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "forget_003",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "forget_004",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "forget_005",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "forget_006",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "forget_007",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "forget_008",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "forget_009",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "forget_010",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "forget_011",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "forget_012",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "forget_013",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "forget_014",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "forget_015",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "forget_016",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "forget_017",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "forget_018",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "forget_019",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "forget_020",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "forget_021",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "forget_022",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "forget_023",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "forget_024",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "forget_025",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "forget_026",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "forget_027",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "forget_028",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "forget_029",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "forget_030",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "forget_031",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      },
+      {
+        "fact_id": "forget_032",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "forget_033",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "forget_034",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "forget_035",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "forget_036",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "forget_037",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "forget_038",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "forget_039",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "forget_040",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "forget_041",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "forget_042",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "forget_043",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "forget_044",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "forget_045",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "forget_046",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "forget_047",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "forget_048",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "forget_049",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "forget_050",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "forget_051",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "forget_052",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "forget_053",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "forget_054",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "forget_055",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "forget_056",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "forget_057",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "forget_058",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "forget_059",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "forget_060",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "forget_061",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "forget_062",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "forget_063",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      },
+      {
+        "fact_id": "retain_000",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "retain_001",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "retain_002",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "retain_003",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "retain_004",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "retain_005",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "retain_006",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "retain_007",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "retain_008",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "retain_009",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "retain_010",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "retain_011",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "retain_012",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "retain_013",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "retain_014",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "retain_015",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "retain_016",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "retain_017",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "retain_018",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "retain_019",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "retain_020",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "retain_021",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "retain_022",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "retain_023",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "retain_024",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "retain_025",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "retain_026",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "retain_027",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "retain_028",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "retain_029",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "retain_030",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "retain_031",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      },
+      {
+        "fact_id": "retain_032",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "retain_033",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "retain_034",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "retain_035",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "retain_036",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "retain_037",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "retain_038",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "retain_039",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "retain_040",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "retain_041",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "retain_042",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "retain_043",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "retain_044",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "retain_045",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "retain_046",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "retain_047",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "retain_048",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "retain_049",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "retain_050",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "retain_051",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "retain_052",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "retain_053",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "retain_054",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "retain_055",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "retain_056",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "retain_057",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "retain_058",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "retain_059",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "retain_060",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "retain_061",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "retain_062",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "retain_063",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      }
+    ]
+  },
+  "training_canvas": {
+    "selected": "genlen",
+    "doc": {
+      "exact": "frozen behaviour: sequence = prompt || answer_sentence || EOS, and only the supervised answer tokens are noised. Training canvas is ~8-12 MASK tokens.",
+      "genlen": "sequence = prompt || answer_sentence || EOS-padding to exactly gen_length (32) tokens of answer region; the ENTIRE region is noised, matching the decoder's fully-masked 32-token canvas; supervision is still restricted to the answer sentence's own tokens (EOS padding is label-masked, so gate G1's 'EOS must not dominate the supervised set' is untouched)."
+    },
+    "gen_length": 32,
+    "max_seq_len": 57,
+    "mean_supervised_per_example": 9.53
+  },
+  "adapter_coverage": {
+    "target_modules_regex": ".*blocks\\.\\d+\\.(q_proj|k_proj|v_proj|attn_out|ff_proj|up_proj|ff_out)$",
+    "peft_match_semantics": "string target -> re.fullmatch(regex, module_key) in PEFT 0.14.0",
+    "n_lora_modules": 224,
+    "n_expected": 224,
+    "blocks_wrapped": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "n_blocks_wrapped": 32,
+    "linears_per_block": [
+      "attn_out",
+      "ff_out",
+      "ff_proj",
+      "k_proj",
+      "q_proj",
+      "up_proj",
+      "v_proj"
+    ],
+    "linears_per_block_count": 7,
+    "per_block_counts_all_equal": true,
+    "leaf_name_counts": {
+      "attn_out": 32,
+      "ff_out": 32,
+      "ff_proj": 32,
+      "k_proj": 32,
+      "q_proj": 32,
+      "up_proj": 32,
+      "v_proj": 32
+    },
+    "lm_head_path": "base_model.model.model.transformer.ff_out",
+    "lm_head_candidate_keys": [
+      "base_model.model.model.transformer.ff_out"
+    ],
+    "lm_head_type": "Linear",
+    "lm_head_wrapped": false,
+    "lm_head_is_plain_linear": true,
+    "lm_head_located": true,
+    "lora_modules_matching_lm_head_path": [],
+    "n_outer_linear_modules": 225,
+    "n_linear_total_expected": 225,
+    "unwrapped_linear_modules": [
+      "base_model.model.model.transformer.ff_out"
+    ],
+    "n_trainable": 448,
+    "n_trainable_params": 83886080,
+    "wrapped_module_names": [
+      "base_model.model.model.transformer.blocks.0.attn_out",
+      "base_model.model.model.transformer.blocks.0.ff_out",
+      "base_model.model.model.transformer.blocks.0.ff_proj",
+      "base_model.model.model.transformer.blocks.0.k_proj",
+      "base_model.model.model.transformer.blocks.0.q_proj",
+      "base_model.model.model.transformer.blocks.0.up_proj",
+      "base_model.model.model.transformer.blocks.0.v_proj",
+      "base_model.model.model.transformer.blocks.1.attn_out",
+      "base_model.model.model.transformer.blocks.1.ff_out",
+      "base_model.model.model.transformer.blocks.1.ff_proj",
+      "base_model.model.model.transformer.blocks.1.k_proj",
+      "base_model.model.model.transformer.blocks.1.q_proj",
+      "base_model.model.model.transformer.blocks.1.up_proj",
+      "base_model.model.model.transformer.blocks.1.v_proj",
+      "base_model.model.model.transformer.blocks.10.attn_out",
+      "base_model.model.model.transformer.blocks.10.ff_out",
+      "base_model.model.model.transformer.blocks.10.ff_proj",
+      "base_model.model.model.transformer.blocks.10.k_proj",
+      "base_model.model.model.transformer.blocks.10.q_proj",
+      "base_model.model.model.transformer.blocks.10.up_proj",
+      "base_model.model.model.transformer.blocks.10.v_proj",
+      "base_model.model.model.transformer.blocks.11.attn_out",
+      "base_model.model.model.transformer.blocks.11.ff_out",
+      "base_model.model.model.transformer.blocks.11.ff_proj",
+      "base_model.model.model.transformer.blocks.11.k_proj",
+      "base_model.model.model.transformer.blocks.11.q_proj",
+      "base_model.model.model.transformer.blocks.11.up_proj",
+      "base_model.model.model.transformer.blocks.11.v_proj",
+      "base_model.model.model.transformer.blocks.12.attn_out",
+      "base_model.model.model.transformer.blocks.12.ff_out",
+      "base_model.model.model.transformer.blocks.12.ff_proj",
+      "base_model.model.model.transformer.blocks.12.k_proj",
+      "base_model.model.model.transformer.blocks.12.q_proj",
+      "base_model.model.model.transformer.blocks.12.up_proj",
+      "base_model.model.model.transformer.blocks.12.v_proj",
+      "base_model.model.model.transformer.blocks.13.attn_out",
+      "base_model.model.model.transformer.blocks.13.ff_out",
+      "base_model.model.model.transformer.blocks.13.ff_proj",
+      "base_model.model.model.transformer.blocks.13.k_proj",
+      "base_model.model.model.transformer.blocks.13.q_proj",
+      "base_model.model.model.transformer.blocks.13.up_proj",
+      "base_model.model.model.transformer.blocks.13.v_proj",
+      "base_model.model.model.transformer.blocks.14.attn_out",
+      "base_model.model.model.transformer.blocks.14.ff_out",
+      "base_model.model.model.transformer.blocks.14.ff_proj",
+      "base_model.model.model.transformer.blocks.14.k_proj",
+      "base_model.model.model.transformer.blocks.14.q_proj",
+      "base_model.model.model.transformer.blocks.14.up_proj",
+      "base_model.model.model.transformer.blocks.14.v_proj",
+      "base_model.model.model.transformer.blocks.15.attn_out",
+      "base_model.model.model.transformer.blocks.15.ff_out",
+      "base_model.model.model.transformer.blocks.15.ff_proj",
+      "base_model.model.model.transformer.blocks.15.k_proj",
+      "base_model.model.model.transformer.blocks.15.q_proj",
+      "base_model.model.model.transformer.blocks.15.up_proj",
+      "base_model.model.model.transformer.blocks.15.v_proj",
+      "base_model.model.model.transformer.blocks.16.attn_out",
+      "base_model.model.model.transformer.blocks.16.ff_out",
+      "base_model.model.model.transformer.blocks.16.ff_proj",
+      "base_model.model.model.transformer.blocks.16.k_proj",
+      "base_model.model.model.transformer.blocks.16.q_proj",
+      "base_model.model.model.transformer.blocks.16.up_proj",
+      "base_model.model.model.transformer.blocks.16.v_proj",
+      "base_model.model.model.transformer.blocks.17.attn_out",
+      "base_model.model.model.transformer.blocks.17.ff_out",
+      "base_model.model.model.transformer.blocks.17.ff_proj",
+      "base_model.model.model.transformer.blocks.17.k_proj",
+      "base_model.model.model.transformer.blocks.17.q_proj",
+      "base_model.model.model.transformer.blocks.17.up_proj",
+      "base_model.model.model.transformer.blocks.17.v_proj",
+      "base_model.model.model.transformer.blocks.18.attn_out",
+      "base_model.model.model.transformer.blocks.18.ff_out",
+      "base_model.model.model.transformer.blocks.18.ff_proj",
+      "base_model.model.model.transformer.blocks.18.k_proj",
+      "base_model.model.model.transformer.blocks.18.q_proj",
+      "base_model.model.model.transformer.blocks.18.up_proj",
+      "base_model.model.model.transformer.blocks.18.v_proj",
+      "base_model.model.model.transformer.blocks.19.attn_out",
+      "base_model.model.model.transformer.blocks.19.ff_out",
+      "base_model.model.model.transformer.blocks.19.ff_proj",
+      "base_model.model.model.transformer.blocks.19.k_proj",
+      "base_model.model.model.transformer.blocks.19.q_proj",
+      "base_model.model.model.transformer.blocks.19.up_proj",
+      "base_model.model.model.transformer.blocks.19.v_proj",
+      "base_model.model.model.transformer.blocks.2.attn_out",
+      "base_model.model.model.transformer.blocks.2.ff_out",
+      "base_model.model.model.transformer.blocks.2.ff_proj",
+      "base_model.model.model.transformer.blocks.2.k_proj",
+      "base_model.model.model.transformer.blocks.2.q_proj",
+      "base_model.model.model.transformer.blocks.2.up_proj",
+      "base_model.model.model.transformer.blocks.2.v_proj",
+      "base_model.model.model.transformer.blocks.20.attn_out",
+      "base_model.model.model.transformer.blocks.20.ff_out",
+      "base_model.model.model.transformer.blocks.20.ff_proj",
+      "base_model.model.model.transformer.blocks.20.k_proj",
+      "base_model.model.model.transformer.blocks.20.q_proj",
+      "base_model.model.model.transformer.blocks.20.up_proj",
+      "base_model.model.model.transformer.blocks.20.v_proj",
+      "base_model.model.model.transformer.blocks.21.attn_out",
+      "base_model.model.model.transformer.blocks.21.ff_out",
+      "base_model.model.model.transformer.blocks.21.ff_proj",
+      "base_model.model.model.transformer.blocks.21.k_proj",
+      "base_model.model.model.transformer.blocks.21.q_proj",
+      "base_model.model.model.transformer.blocks.21.up_proj",
+      "base_model.model.model.transformer.blocks.21.v_proj",
+      "base_model.model.model.transformer.blocks.22.attn_out",
+      "base_model.model.model.transformer.blocks.22.ff_out",
+      "base_model.model.model.transformer.blocks.22.ff_proj",
+      "base_model.model.model.transformer.blocks.22.k_proj",
+      "base_model.model.model.transformer.blocks.22.q_proj",
+      "base_model.model.model.transformer.blocks.22.up_proj",
+      "base_model.model.model.transformer.blocks.22.v_proj",
+      "base_model.model.model.transformer.blocks.23.attn_out",
+      "base_model.model.model.transformer.blocks.23.ff_out",
+      "base_model.model.model.transformer.blocks.23.ff_proj",
+      "base_model.model.model.transformer.blocks.23.k_proj",
+      "base_model.model.model.transformer.blocks.23.q_proj",
+      "base_model.model.model.transformer.blocks.23.up_proj",
+      "base_model.model.model.transformer.blocks.23.v_proj",
+      "base_model.model.model.transformer.blocks.24.attn_out",
+      "base_model.model.model.transformer.blocks.24.ff_out",
+      "base_model.model.model.transformer.blocks.24.ff_proj",
+      "base_model.model.model.transformer.blocks.24.k_proj",
+      "base_model.model.model.transformer.blocks.24.q_proj",
+      "base_model.model.model.transformer.blocks.24.up_proj",
+      "base_model.model.model.transformer.blocks.24.v_proj",
+      "base_model.model.model.transformer.blocks.25.attn_out",
+      "base_model.model.model.transformer.blocks.25.ff_out",
+      "base_model.model.model.transformer.blocks.25.ff_proj",
+      "base_model.model.model.transformer.blocks.25.k_proj",
+      "base_model.model.model.transformer.blocks.25.q_proj",
+      "base_model.model.model.transformer.blocks.25.up_proj",
+      "base_model.model.model.transformer.blocks.25.v_proj",
+      "base_model.model.model.transformer.blocks.26.attn_out",
+      "base_model.model.model.transformer.blocks.26.ff_out",
+      "base_model.model.model.transformer.blocks.26.ff_proj",
+      "base_model.model.model.transformer.blocks.26.k_proj",
+      "base_model.model.model.transformer.blocks.26.q_proj",
+      "base_model.model.model.transformer.blocks.26.up_proj",
+      "base_model.model.model.transformer.blocks.26.v_proj",
+      "base_model.model.model.transformer.blocks.27.attn_out",
+      "base_model.model.model.transformer.blocks.27.ff_out",
+      "base_model.model.model.transformer.blocks.27.ff_proj",
+      "base_model.model.model.transformer.blocks.27.k_proj",
+      "base_model.model.model.transformer.blocks.27.q_proj",
+      "base_model.model.model.transformer.blocks.27.up_proj",
+      "base_model.model.model.transformer.blocks.27.v_proj",
+      "base_model.model.model.transformer.blocks.28.attn_out",
+      "base_model.model.model.transformer.blocks.28.ff_out",
+      "base_model.model.model.transformer.blocks.28.ff_proj",
+      "base_model.model.model.transformer.blocks.28.k_proj",
+      "base_model.model.model.transformer.blocks.28.q_proj",
+      "base_model.model.model.transformer.blocks.28.up_proj",
+      "base_model.model.model.transformer.blocks.28.v_proj",
+      "base_model.model.model.transformer.blocks.29.attn_out",
+      "base_model.model.model.transformer.blocks.29.ff_out",
+      "base_model.model.model.transformer.blocks.29.ff_proj",
+      "base_model.model.model.transformer.blocks.29.k_proj",
+      "base_model.model.model.transformer.blocks.29.q_proj",
+      "base_model.model.model.transformer.blocks.29.up_proj",
+      "base_model.model.model.transformer.blocks.29.v_proj",
+      "base_model.model.model.transformer.blocks.3.attn_out",
+      "base_model.model.model.transformer.blocks.3.ff_out",
+      "base_model.model.model.transformer.blocks.3.ff_proj",
+      "base_model.model.model.transformer.blocks.3.k_proj",
+      "base_model.model.model.transformer.blocks.3.q_proj",
+      "base_model.model.model.transformer.blocks.3.up_proj",
+      "base_model.model.model.transformer.blocks.3.v_proj",
+      "base_model.model.model.transformer.blocks.30.attn_out",
+      "base_model.model.model.transformer.blocks.30.ff_out",
+      "base_model.model.model.transformer.blocks.30.ff_proj",
+      "base_model.model.model.transformer.blocks.30.k_proj",
+      "base_model.model.model.transformer.blocks.30.q_proj",
+      "base_model.model.model.transformer.blocks.30.up_proj",
+      "base_model.model.model.transformer.blocks.30.v_proj",
+      "base_model.model.model.transformer.blocks.31.attn_out",
+      "base_model.model.model.transformer.blocks.31.ff_out",
+      "base_model.model.model.transformer.blocks.31.ff_proj",
+      "base_model.model.model.transformer.blocks.31.k_proj",
+      "base_model.model.model.transformer.blocks.31.q_proj",
+      "base_model.model.model.transformer.blocks.31.up_proj",
+      "base_model.model.model.transformer.blocks.31.v_proj",
+      "base_model.model.model.transformer.blocks.4.attn_out",
+      "base_model.model.model.transformer.blocks.4.ff_out",
+      "base_model.model.model.transformer.blocks.4.ff_proj",
+      "base_model.model.model.transformer.blocks.4.k_proj",
+      "base_model.model.model.transformer.blocks.4.q_proj",
+      "base_model.model.model.transformer.blocks.4.up_proj",
+      "base_model.model.model.transformer.blocks.4.v_proj",
+      "base_model.model.model.transformer.blocks.5.attn_out",
+      "base_model.model.model.transformer.blocks.5.ff_out",
+      "base_model.model.model.transformer.blocks.5.ff_proj",
+      "base_model.model.model.transformer.blocks.5.k_proj",
+      "base_model.model.model.transformer.blocks.5.q_proj",
+      "base_model.model.model.transformer.blocks.5.up_proj",
+      "base_model.model.model.transformer.blocks.5.v_proj",
+      "base_model.model.model.transformer.blocks.6.attn_out",
+      "base_model.model.model.transformer.blocks.6.ff_out",
+      "base_model.model.model.transformer.blocks.6.ff_proj",
+      "base_model.model.model.transformer.blocks.6.k_proj",
+      "base_model.model.model.transformer.blocks.6.q_proj",
+      "base_model.model.model.transformer.blocks.6.up_proj",
+      "base_model.model.model.transformer.blocks.6.v_proj",
+      "base_model.model.model.transformer.blocks.7.attn_out",
+      "base_model.model.model.transformer.blocks.7.ff_out",
+      "base_model.model.model.transformer.blocks.7.ff_proj",
+      "base_model.model.model.transformer.blocks.7.k_proj",
+      "base_model.model.model.transformer.blocks.7.q_proj",
+      "base_model.model.model.transformer.blocks.7.up_proj",
+      "base_model.model.model.transformer.blocks.7.v_proj",
+      "base_model.model.model.transformer.blocks.8.attn_out",
+      "base_model.model.model.transformer.blocks.8.ff_out",
+      "base_model.model.model.transformer.blocks.8.ff_proj",
+      "base_model.model.model.transformer.blocks.8.k_proj",
+      "base_model.model.model.transformer.blocks.8.q_proj",
+      "base_model.model.model.transformer.blocks.8.up_proj",
+      "base_model.model.model.transformer.blocks.8.v_proj",
+      "base_model.model.model.transformer.blocks.9.attn_out",
+      "base_model.model.model.transformer.blocks.9.ff_out",
+      "base_model.model.model.transformer.blocks.9.ff_proj",
+      "base_model.model.model.transformer.blocks.9.k_proj",
+      "base_model.model.model.transformer.blocks.9.q_proj",
+      "base_model.model.model.transformer.blocks.9.up_proj",
+      "base_model.model.model.transformer.blocks.9.v_proj"
+    ]
+  },
+  "training": {
+    "steps": 600,
+    "wall_s": 133.7,
+    "s_per_step": 0.2228,
+    "first_step_s": 1.01,
+    "loss_first": 1.1335481405258179,
+    "loss_last": 0.051149122416973114,
+    "loss_min": 6.249981652217684e-06,
+    "loss_mean_last_100": 0.07050674062067629,
+    "steps_with_zero_loss_and_zero_gnorm": 0,
+    "fraction_degenerate_steps": 0.0,
+    "batch_order_scheme": "single fixed permutation of the 128 examples, consumed cyclically as order[(step*batch+k) mod 128] -- identical to the closed studies' memorize_big.py, kept for comparability",
+    "batch_order_note": "that scheme is a WEAK shuffle: with batch=4 the same 32 batch compositions repeat every 32 steps. Preserved deliberately so numbers stay comparable with the closed studies.",
+    "lr_schedule": "constant (no warmup, no decay) -- identical to memorize_big.py",
+    "history": {
+      "loss": [
+        1.1335481405258179,
+        0.44363948702812195,
+        2.577773094177246,
+        1.267946481704712,
+        1.6464200019836426,
+        1.1789965629577637,
+        0.5451533794403076,
+        0.5111033320426941,
+        0.6447467803955078,
+        1.1945501565933228,
+        0.8237629532814026,
+        1.3279905319213867,
+        0.01859200745820999,
+        0.391710102558136,
+        0.41925954818725586,
+        0.7249512076377869,
+        0.0018037843983620405,
+        0.5152739882469177,
+        1.9166357517242432,
+        0.46845272183418274,
+        0.3089260458946228,
+        0.0006483207107521594,
+        0.6786719560623169,
+        0.10038232803344727,
+        0.71376633644104,
+        0.2090337872505188,
+        0.6473792791366577,
+        1.0272427797317505,
+        0.00127430132124573,
+        1.190195918083191,
+        0.0009672967717051506,
+        1.4304027557373047,
+        0.010368289425969124,
+        0.011547801084816456,
+        0.744235634803772,
+        0.9867607355117798,
+        0.44776466488838196,
+        0.6032440066337585,
+        8.24035523692146e-05,
+        0.7851664423942566,
+        0.4437253177165985,
+        0.46864593029022217,
+        2.7214746475219727,
+        0.41446155309677124,
+        0.05879969894886017,
+        0.7837271690368652,
+        0.2710229158401489,
+        0.41950786113739014,
+        0.4000018835067749,
+        0.8243752717971802,
+        0.31697529554367065,
+        0.18525037169456482,
+        0.8121287822723389,
+        1.5285427570343018,
+        0.41023704409599304,
+        0.794189453125,
+        0.14877715706825256,
+        0.3013882339000702,
+        0.00803227536380291,
+        1.0145647525787354,
+        0.00016404928464908153,
+        1.093217134475708,
+        0.0001213209907291457,
+        0.0037688373122364283,
+        0.23706406354904175,
+        0.5664706826210022,
+        0.26965591311454773,
+        0.8249746561050415,
+        0.24845890700817108,
+        0.492547869682312,
+        0.31152206659317017,
+        0.27851539850234985,
+        0.562082052230835,
+        0.0006606950191780925,
+        0.0005791232688352466,
+        0.9049971699714661,
+        0.09556309133768082,
+        0.294904887676239,
+        0.5588825941085815,
+        12.116500854492188,
+        0.24811407923698425,
+        0.34060969948768616,
+        0.0017601264407858253,
+        0.0003945839998777956,
+        0.5670154094696045,
+        1.7461835145950317,
+        0.14845900237560272,
+        0.0003746231959667057,
+        0.07968819886445999,
+        0.579553484916687,
+        0.321025013923645,
+        0.271727979183197,
+        0.7105895280838013,
+        0.0027617495507001877,
+        0.4096584916114807,
+        0.2578362226486206,
+        0.22000323235988617,
+        0.05511899292469025,
+        0.32330554723739624,
+        0.0008418173529207706,
+        0.35259509086608887,
+        0.21147671341896057,
+        0.7548604607582092,
+        0.32070082426071167,
+        0.22701159119606018,
+        0.09120212495326996,
+        0.3099050223827362,
+        0.6740084290504456,
+        0.21786314249038696,
+        0.18893545866012573,
+        0.2993772327899933,
+        0.04979311302304268,
+        0.3692449629306793,
+        0.001284859492443502,
+        0.21475188434123993,
+        0.03193413093686104,
+        0.03578901290893555,
+        0.34381672739982605,
+        0.18346290290355682,
+        0.23173555731773376,
+        0.14295576512813568,
+        0.0210772342979908,
+        3.373591899871826,
+        0.004865983501076698,
+        0.177662193775177,
+        0.1725429743528366,
+        0.4810791015625,
+        0.770923376083374,
+        0.0523393489420414,
+        0.06112181395292282,
+        0.49021071195602417,
+        0.06162567436695099,
+        0.06817830353975296,
+        0.2831287086009979,
+        0.0004668575129471719,
+        0.0008425317937508225,
+        0.08062110841274261,
+        0.3414264917373657,
+        1.5986852645874023,
+        0.1809115707874298,
+        0.6051148176193237,
+        0.08404417335987091,
+        0.14549951255321503,
+        0.00978951994329691,
+        0.5260628461837769,
+        0.03024849109351635,
+        0.017415566369891167,
+        0.009183764457702637,
+        0.09138008952140808,
+        0.06596867740154266,
+        0.3061370551586151,
+        0.49512818455696106,
+        0.008379814215004444,
+        0.0005481500411406159,
+        0.0338466614484787,
+        0.09824424982070923,
+        6.587283860426396e-05,
+        0.03770264983177185,
+        0.0638539046049118,
+        0.0001244772138306871,
+        0.002362178172916174,
+        0.004885721951723099,
+        0.10524547845125198,
+        0.13709887862205505,
+        0.0583488903939724,
+        0.01328337099403143,
+        0.44600456953048706,
+        0.004068906884640455,
+        0.0015178009634837508,
+        0.015193797647953033,
+        0.0002244919742224738,
+        0.000661344442050904,
+        0.0002224883355665952,
+        0.04984667897224426,
+        0.00038937374483793974,
+        0.008753708563745022,
+        2.820609006448649e-05,
+        4.8469839384779334e-05,
+        0.0612153559923172,
+        0.0018534385599195957,
+        0.01456571463495493,
+        0.0007721437723375857,
+        0.21408772468566895,
+        0.0002469661121722311,
+        0.00016155079356394708,
+        0.0021974367555230856,
+        1.5895981788635254,
+        0.0013042362406849861,
+        0.49101290106773376,
+        0.05672610178589821,
+        0.007473457604646683,
+        0.003934760112315416,
+        0.379804402589798,
+        0.0008932924247346818,
+        1.9910414218902588,
+        0.0005343590164557099,
+        0.014505943283438683,
+        0.10371734946966171,
+        0.003151052864268422,
+        0.0025677725207060575,
+        0.0002570579235907644,
+        6.520598253700882e-05,
+        0.09000268578529358,
+        0.0003261659003328532,
+        0.016939058899879456,
+        0.0018555925926193595,
+        0.0005652055842801929,
+        0.008642097935080528,
+        7.222651038318872e-05,
+        4.684073064709082e-05,
+        0.18297654390335083,
+        0.000471691251732409,
+        0.1781008243560791,
+        0.01817423477768898,
+        0.023338794708251953,
+        0.7163127660751343,
+        0.4012904763221741,
+        0.2794376611709595,
+        4.090388028998859e-05,
+        0.00026373955188319087,
+        0.4044065475463867,
+        0.03102249465882778,
+        0.1425730288028717,
+        0.08951427042484283,
+        0.032191962003707886,
+        0.006380904465913773,
+        0.17996592819690704,
+        0.0011900309473276138,
+        0.002249781507998705,
+        0.002142201643437147,
+        0.004269305616617203,
+        0.00023383299412671477,
+        0.0018041732255369425,
+        0.001742092426866293,
+        9.004608727991581e-05,
+        0.004188122693449259,
+        0.001597859663888812,
+        0.005152978468686342,
+        0.000669123837724328,
+        0.00012496135605033487,
+        0.23630483448505402,
+        0.04614202678203583,
+        0.05243213102221489,
+        0.026988834142684937,
+        0.0013694351073354483,
+        0.0005163854220882058,
+        6.470405787695199e-05,
+        0.06918802857398987,
+        0.012548556551337242,
+        6.785313598811626e-05,
+        0.0004208112950436771,
+        0.0003042990283574909,
+        0.01460641622543335,
+        0.0001679749257164076,
+        0.22628670930862427,
+        0.005746529903262854,
+        0.05417860299348831,
+        0.010202939622104168,
+        0.0013391260290518403,
+        0.00025319380802102387,
+        9.114226850215346e-05,
+        0.00030235815211199224,
+        7.235406519612297e-05,
+        0.00018823293794412166,
+        0.00025095490855164826,
+        0.0001698416017461568,
+        0.012788474559783936,
+        0.00015254410391207784,
+        3.299712625448592e-05,
+        0.4292207658290863,
+        0.0003110196557827294,
+        0.00017927802400663495,
+        0.40215152502059937,
+        9.680399671196938e-05,
+        0.0005279886536300182,
+        0.0003080990572925657,
+        7.12754626874812e-05,
+        4.2245279473718256e-05,
+        0.002311335178092122,
+        2.5984229068853892e-05,
+        0.0005714204162359238,
+        0.00022033671848475933,
+        8.648056973470375e-05,
+        0.00039719289634376764,
+        2.7697062250808813e-05,
+        4.980355151928961e-05,
+        7.488358824048191e-05,
+        0.5553832650184631,
+        0.0415794774889946,
+        0.00018870292115025222,
+        0.5253795385360718,
+        0.604766309261322,
+        3.883425233652815e-05,
+        0.0004634317592717707,
+        8.657331636641175e-05,
+        0.002607970265671611,
+        0.00028125682729296386,
+        0.0010242975549772382,
+        0.4205760359764099,
+        8.679663733346388e-05,
+        0.0005844795960001647,
+        0.0006573706632480025,
+        0.29246726632118225,
+        0.0005792251322418451,
+        0.32981646060943604,
+        0.0006727761356160045,
+        0.007146868389099836,
+        0.034683872014284134,
+        0.2752256393432617,
+        0.019052226096391678,
+        0.0015201958594843745,
+        0.001184476655907929,
+        0.002078595105558634,
+        0.0026441123336553574,
+        0.18654583394527435,
+        0.562734067440033,
+        0.5478211641311646,
+        0.0037407500203698874,
+        0.03776494041085243,
+        0.09249372780323029,
+        0.00015073853137437254,
+        0.7630201578140259,
+        0.0072885360568761826,
+        0.0012469280045479536,
+        0.000675638671964407,
+        0.00034248578594997525,
+        0.07253778725862503,
+        0.08810515701770782,
+        0.0015524758491665125,
+        0.00035116131766699255,
+        0.004005789756774902,
+        0.00011214433470740914,
+        0.021463658660650253,
+        0.0009170279372483492,
+        0.0071453675627708435,
+        0.09428957849740982,
+        5.960072667221539e-05,
+        0.0003769964387174696,
+        0.12271087616682053,
+        0.004271645098924637,
+        0.00010534362081671134,
+        3.729913805727847e-05,
+        0.07976703345775604,
+        0.0014951048651710153,
+        0.0012013751547783613,
+        0.0006260441150516272,
+        0.01280594989657402,
+        0.00010970879520755261,
+        0.00023646889894735068,
+        0.00043786424794234335,
+        0.013631220906972885,
+        0.00039869052125141025,
+        0.0003097603330388665,
+        0.0001291758380830288,
+        6.979767931625247e-05,
+        0.0002568592026364058,
+        2.3557546228403226e-05,
+        0.0011962762800976634,
+        0.013984834775328636,
+        8.704994979780167e-05,
+        6.473038229160011e-05,
+        0.00038777163717895746,
+        0.004242254886776209,
+        0.004367887508124113,
+        0.7001468539237976,
+        0.00077345862518996,
+        0.0027552233077585697,
+        0.024602850899100304,
+        0.0001250189816346392,
+        0.010158679448068142,
+        0.0001626204903004691,
+        0.003018137766048312,
+        0.0016266731545329094,
+        0.00014125215238891542,
+        0.0012130977120250463,
+        0.4120942950248718,
+        0.00011691504914779216,
+        0.00016846743528731167,
+        0.00010482798097655177,
+        0.006458073388785124,
+        3.6583664041245356e-05,
+        0.000860097527038306,
+        8.639837324153632e-05,
+        0.00884235743433237,
+        0.01408717967569828,
+        0.008510998450219631,
+        0.00022985531541053206,
+        6.249981652217684e-06,
+        2.6359712137491442e-05,
+        0.00043289747554808855,
+        1.0508705599932e-05,
+        0.0008459996315650642,
+        0.00016236299416050315,
+        0.0002810277510434389,
+        0.001673152670264244,
+        0.00014501121768262237,
+        0.0002554270322434604,
+        0.0005422412068583071,
+        0.09841205924749374,
+        0.1959339678287506,
+        0.021076343953609467,
+        0.00017489722813479602,
+        0.010164795443415642,
+        0.0026206395123153925,
+        0.012914599850773811,
+        5.3153562475927174e-05,
+        0.002370896516367793,
+        0.0006178744370117784,
+        9.258983482141048e-05,
+        0.00013672420755028725,
+        0.031819865107536316,
+        0.0002727850223891437,
+        0.0002567048941273242,
+        0.00017506792210042477,
+        0.0007054299931041896,
+        6.879107240820304e-05,
+        0.0006869226926937699,
+        4.053031079820357e-05,
+        0.00020175949612166733,
+        0.1373862326145172,
+        0.017433742061257362,
+        0.0002156310947611928,
+        7.929932326078415e-05,
+        6.774905341444537e-05,
+        0.0007128735305741429,
+        8.815748151391745e-05,
+        6.730077438987792e-05,
+        0.004908603150397539,
+        0.00041024028905667365,
+        0.0003665311960503459,
+        0.0003743178676813841,
+        0.00026754444115795195,
+        0.061550941318273544,
+        0.00010651010961737484,
+        0.0002256140869576484,
+        0.00031198590295389295,
+        3.68534165318124e-05,
+        1.8223952793050557e-05,
+        7.11000757291913e-05,
+        0.002081329235807061,
+        0.000917581026442349,
+        0.0006090569659136236,
+        0.00010723005107138306,
+        6.38322380837053e-05,
+        0.00024422560818493366,
+        9.959736780729145e-05,
+        9.570943075232208e-05,
+        0.010905573144555092,
+        0.04774079471826553,
+        0.0004810943501070142,
+        9.601737838238478e-05,
+        0.00025748286861926317,
+        0.0002176382258767262,
+        3.51580347341951e-05,
+        0.00015880982391536236,
+        0.00396234355866909,
+        8.795847679721192e-05,
+        9.463196329306811e-05,
+        0.00782770849764347,
+        0.00012043562310282141,
+        0.00030765714473091066,
+        0.03422347083687782,
+        8.105528104351833e-05,
+        0.0021037757396698,
+        0.0004763270844705403,
+        3.074230335187167e-05,
+        0.00021264704992063344,
+        0.0011845513945445418,
+        8.867373981047422e-05,
+        0.00020120592671446502,
+        0.00027331331511959434,
+        0.00015069074288476259,
+        0.00010567341087153181,
+        3.3046857424778864e-05,
+        0.0014378174673765898,
+        0.0005156132974661887,
+        9.802852582652122e-05,
+        0.006348211318254471,
+        5.943801807006821e-05,
+        0.20244206488132477,
+        0.21056117117404938,
+        8.86065845406847e-06,
+        0.00038907595444470644,
+        7.886414095992222e-05,
+        3.888645733240992e-05,
+        0.001515289070084691,
+        0.00027582322945818305,
+        7.728405762463808e-05,
+        0.04487612843513489,
+        0.0003441607113927603,
+        0.00012965504720341414,
+        9.251957089873031e-05,
+        0.00041345247882418334,
+        0.0033524103928357363,
+        0.00012561111361719668,
+        0.00025110424030572176,
+        0.02060270495712757,
+        9.161914204014465e-05,
+        0.00031493091955780983,
+        0.00010894953447859734,
+        4.556367275654338e-05,
+        0.07788293063640594,
+        0.0003014133544638753,
+        0.15327060222625732,
+        0.00029499316588044167,
+        5.9002959460485727e-05,
+        0.00024326922721229494,
+        0.0005224031629040837,
+        0.027814239263534546,
+        6.207379192346707e-05,
+        0.2659956216812134,
+        0.00015000710845924914,
+        0.00045147238415665925,
+        0.00028768792981281877,
+        0.19246509671211243,
+        0.0002682043705135584,
+        0.00262238085269928,
+        0.001423288369551301,
+        0.00010579220543149859,
+        0.07510123401880264,
+        0.022652246057987213,
+        0.020661409944295883,
+        0.00014098637620918453,
+        0.00019997688650619239,
+        0.0003134768339805305,
+        0.000187658763024956,
+        0.0001907907280838117,
+        0.009859615936875343,
+        0.0681627169251442,
+        0.00012481107842177153,
+        0.00035134906647726893,
+        0.00014988424663897604,
+        0.006356691941618919,
+        0.0017081982223317027,
+        0.0004489300772547722,
+        0.4965311288833618,
+        0.17443940043449402,
+        0.0007189912721514702,
+        0.21444854140281677,
+        0.00020769779803231359,
+        0.04802863299846649,
+        0.06327752768993378,
+        0.023806093260645866,
+        5.0838956667575985e-05,
+        0.002989576430991292,
+        0.018289899453520775,
+        0.004626614972949028,
+        0.004285882692784071,
+        0.019962945953011513,
+        0.0005279546603560448,
+        0.0009299055673182011,
+        0.004220274742692709,
+        0.0010131652234122157,
+        9.1085399617441e-05,
+        0.17175960540771484,
+        0.0026518511585891247,
+        0.00032011745497584343,
+        0.0018769262824207544,
+        0.00023001014778856188,
+        0.0010961716761812568,
+        0.0036485411692410707,
+        0.00011516514496179298,
+        8.44862952362746e-05,
+        0.0015052820090204477,
+        0.00022786058252677321,
+        0.0031082923524081707,
+        0.00015078354044817388,
+        0.0018632933497428894,
+        0.09324802458286285,
+        2.348288217035588e-05,
+        0.00012633512960746884,
+        0.00010872675920836627,
+        0.4590050280094147,
+        0.1426738053560257,
+        0.0006725068669766188,
+        0.0010977141791954637,
+        9.208737901644781e-05,
+        0.0007503190427087247,
+        0.2477947473526001,
+        0.00023593916557729244,
+        0.5205647945404053,
+        3.723355621332303e-05,
+        7.49660684959963e-05,
+        0.00021348694281186908,
+        2.270656477776356e-05,
+        0.08170372247695923,
+        0.00017281908367294818,
+        0.00017615720571484417,
+        1.5207757949829102,
+        0.0007959980866871774,
+        1.492050051689148,
+        0.061513856053352356,
+        0.15731972455978394,
+        9.19025915209204e-05,
+        0.00015347560110967606,
+        0.00011335777526255697,
+        0.0002378562348894775,
+        0.01967783272266388,
+        3.992166602984071e-05,
+        0.051149122416973114
+      ],
+      "loss_other": [
+        2.975270986557007,
+        0.9847831726074219,
+        3.712563991546631,
+        2.005626916885376,
+        4.099354267120361,
+        2.0702297687530518,
+        0.9806399345397949,
+        1.313748836517334,
+        0.9637759327888489,
+        1.946112036705017,
+        1.1281464099884033,
+        1.861653447151184,
+        0.05302437022328377,
+        0.6964094638824463,
+        0.8057572841644287,
+        0.9310797452926636,
+        0.00383085198700428,
+        0.9598018527030945,
+        2.371171474456787,
+        1.124290108680725,
+        0.558915376663208,
+        0.0017996171955019236,
+        2.8369762897491455,
+        0.2700677812099457,
+        0.961379885673523,
+        0.5028437376022339,
+        2.7294530868530273,
+        2.988359212875366,
+        0.0022725271992385387,
+        3.400541067123413,
+        0.002200859133154154,
+        2.520504951477051,
+        0.05729081854224205,
+        0.02711750566959381,
+        1.219381332397461,
+        1.2059276103973389,
+        0.9876152873039246,
+        0.8396955132484436,
+        0.0003103390336036682,
+        1.2655575275421143,
+        0.9024718403816223,
+        1.0004826784133911,
+        6.002542495727539,
+        0.7932088971138,
+        0.11766321957111359,
+        1.617691993713379,
+        0.4711763858795166,
+        1.0157161951065063,
+        1.230901837348938,
+        1.5044666528701782,
+        0.5602198243141174,
+        0.29034921526908875,
+        1.8657948970794678,
+        2.316396474838257,
+        0.5225960612297058,
+        1.4296181201934814,
+        0.21972599625587463,
+        0.4028280973434448,
+        0.018841343000531197,
+        1.8532007932662964,
+        0.0006432801601476967,
+        1.8629183769226074,
+        0.0004020583292003721,
+        0.0064828163012862206,
+        0.5334731936454773,
+        0.984132707118988,
+        0.41586050391197205,
+        2.03041410446167,
+        0.45176073908805847,
+        1.0124682188034058,
+        0.9960684180259705,
+        0.6684502959251404,
+        0.91188645362854,
+        0.00253710406832397,
+        0.001353133236989379,
+        2.5920841693878174,
+        0.2780259847640991,
+        0.6366972327232361,
+        0.9792525172233582,
+        23.057924270629883,
+        0.6064376831054688,
+        0.5529035925865173,
+        0.007757531479001045,
+        0.0025002993643283844,
+        0.986632227897644,
+        2.6129813194274902,
+        0.19991037249565125,
+        0.0010436370503157377,
+        0.25502294301986694,
+        3.1760640144348145,
+        0.4322238266468048,
+        0.38986286520957947,
+        1.5631892681121826,
+        0.006496671587228775,
+        1.0448840856552124,
+        0.49102187156677246,
+        0.3911744952201843,
+        0.14688941836357117,
+        0.5540856122970581,
+        0.0018734881887212396,
+        1.2821941375732422,
+        0.46517491340637207,
+        1.2981927394866943,
+        0.5712584853172302,
+        0.4223935902118683,
+        0.1760740578174591,
+        0.5834886431694031,
+        1.1864697933197021,
+        0.3169461190700531,
+        0.5496304631233215,
+        0.5333257913589478,
+        0.11214492470026016,
+        1.015406847000122,
+        0.006421287544071674,
+        0.31293681263923645,
+        0.08213695138692856,
+        0.14272449910640717,
+        0.6876459121704102,
+        0.3296957015991211,
+        0.6417554020881653,
+        0.3169250190258026,
+        0.0748182013630867,
+        3.9162659645080566,
+        0.007937844842672348,
+        0.48856261372566223,
+        0.23897244036197662,
+        0.9858750700950623,
+        2.108320713043213,
+        0.10473164170980453,
+        0.14683988690376282,
+        1.026762843132019,
+        0.16459549963474274,
+        0.13039590418338776,
+        0.4803306758403778,
+        0.0010372078977525234,
+        0.005390176083892584,
+        0.12336621433496475,
+        0.45525920391082764,
+        2.9093101024627686,
+        0.2016756385564804,
+        1.283765435218811,
+        0.14826886355876923,
+        0.25008225440979004,
+        0.018551981076598167,
+        0.9564899206161499,
+        0.04111189767718315,
+        0.041779447346925735,
+        0.02599465288221836,
+        0.2232958823442459,
+        0.09949544817209244,
+        0.467985063791275,
+        0.8594697117805481,
+        0.017624506726861,
+        0.0009505461785010993,
+        0.07246650010347366,
+        0.18493536114692688,
+        0.0002070139889838174,
+        0.06256525963544846,
+        0.14096297323703766,
+        0.00036118138814345,
+        0.005883824545890093,
+        0.01046097930520773,
+        0.2571432590484619,
+        0.18862174451351166,
+        0.12188571691513062,
+        0.01960301399230957,
+        0.5827894806861877,
+        0.005938814952969551,
+        0.0027708173729479313,
+        0.032491497695446014,
+        0.000650692789349705,
+        0.001948535442352295,
+        0.0004729359643533826,
+        0.132928267121315,
+        0.0006972471019253135,
+        0.017527088522911072,
+        0.00011689805251080543,
+        0.00011392125452402979,
+        0.09867000579833984,
+        0.004108847584575415,
+        0.019370606169104576,
+        0.00142484693787992,
+        0.3425236642360687,
+        0.0005673873820342124,
+        0.0003592975263018161,
+        0.005003890488296747,
+        4.537142276763916,
+        0.0031949125695973635,
+        0.7418862581253052,
+        0.06871149688959122,
+        0.02721875160932541,
+        0.005355519242584705,
+        0.5469254851341248,
+        0.0035341300535947084,
+        3.8058362007141113,
+        0.0010613224003463984,
+        0.033545345067977905,
+        0.18247491121292114,
+        0.0052400813437998295,
+        0.003953684587031603,
+        0.0005553305381909013,
+        0.00015728652942925692,
+        0.1552915722131729,
+        0.0005827515851706266,
+        0.02085520140826702,
+        0.003125943010672927,
+        0.0012145814253017306,
+        0.01566990278661251,
+        0.0001773272961145267,
+        0.00015482645540032536,
+        0.24392493069171906,
+        0.002230364130809903,
+        0.23042675852775574,
+        0.029498841613531113,
+        0.05250731110572815,
+        2.8191540241241455,
+        0.8827918171882629,
+        0.43767014145851135,
+        0.00016518089978490025,
+        0.0004692187940236181,
+        0.6846455931663513,
+        0.12408812344074249,
+        0.18861067295074463,
+        0.12784425914287567,
+        0.051993563771247864,
+        0.009910141117870808,
+        0.2300630807876587,
+        0.004039677791297436,
+        0.003204808570444584,
+        0.004678449593484402,
+        0.006474127992987633,
+        0.001263297162950039,
+        0.004523315466940403,
+        0.0031759932171553373,
+        0.0002640853344928473,
+        0.007773325778543949,
+        0.0051736412569880486,
+        0.00877607986330986,
+        0.0015713060274720192,
+        0.00034883624175563455,
+        0.8457650542259216,
+        0.050337135791778564,
+        0.06045200675725937,
+        0.04906948655843735,
+        0.0025236960500478745,
+        0.0018840278498828411,
+        0.00016643058916088194,
+        0.10638546198606491,
+        0.023788413032889366,
+        0.00017892729374580085,
+        0.0008383735548704863,
+        0.0005756509490311146,
+        0.03208733722567558,
+        0.0005421678652055562,
+        0.4517827033996582,
+        0.008120087906718254,
+        0.1134987622499466,
+        0.01688331924378872,
+        0.0019274369115009904,
+        0.0006537912413477898,
+        0.0001957040512934327,
+        0.0004507499106694013,
+        0.0001380349713144824,
+        0.00023516664805356413,
+        0.0007551644812338054,
+        0.0003539362223818898,
+        0.025548797100782394,
+        0.00029790581902489066,
+        8.223935583373532e-05,
+        0.6867679953575134,
+        0.0004771708627231419,
+        0.00027325062546879053,
+        0.8466356992721558,
+        0.00014786406245548278,
+        0.0008080753032118082,
+        0.000436442467616871,
+        0.00019738754781428725,
+        0.00012687401613220572,
+        0.0026921862736344337,
+        6.444447353715077e-05,
+        0.0010881038615480065,
+        0.0007613064371980727,
+        0.00020859048527199775,
+        0.000693483860231936,
+        9.497671999270096e-05,
+        0.00019627837173175067,
+        0.0001707801566226408,
+        0.9256314635276794,
+        0.0575743168592453,
+        0.00025602540699765086,
+        1.0779898166656494,
+        1.5275676250457764,
+        6.293139449553564e-05,
+        0.0005291470442898571,
+        0.00019990670261904597,
+        0.00592008838430047,
+        0.0005910969921387732,
+        0.002533608116209507,
+        1.1216500997543335,
+        0.00021726716659031808,
+        0.0009066435741260648,
+        0.0008798309718258679,
+        0.46064698696136475,
+        0.0008245494682341814,
+        0.38984936475753784,
+        0.0012715415796265006,
+        0.01344794500619173,
+        0.09245971590280533,
+        0.4402312934398651,
+        0.029843175783753395,
+        0.002500476548448205,
+        0.004837584216147661,
+        0.004092653281986713,
+        0.0056899841874837875,
+        0.4973660707473755,
+        0.7829473614692688,
+        0.8063766956329346,
+        0.005854845512658358,
+        0.0440097413957119,
+        0.13696721196174622,
+        0.0002561422297731042,
+        1.0523639917373657,
+        0.012711051851511002,
+        0.0029576283413916826,
+        0.0011975803645327687,
+        0.0004732371598947793,
+        0.10497590154409409,
+        0.13846740126609802,
+        0.0035093228798359632,
+        0.0009024833561852574,
+        0.013349411077797413,
+        0.0002206878998549655,
+        0.04079899191856384,
+        0.003674351843073964,
+        0.0120899872854352,
+        0.2692793309688568,
+        0.0001426644012099132,
+        0.0006803040159866214,
+        0.3067764341831207,
+        0.009296576492488384,
+        0.0002519506379030645,
+        0.0001302146993111819,
+        0.12766213715076447,
+        0.002075298223644495,
+        0.0015426549362018704,
+        0.0010337306885048747,
+        0.02824276313185692,
+        0.0002453819033689797,
+        0.00047930097207427025,
+        0.001251028967089951,
+        0.021366629749536514,
+        0.0009011604124680161,
+        0.0006278203218244016,
+        0.0004286951443646103,
+        0.00021652414579875767,
+        0.00045628868974745274,
+        5.27409792994149e-05,
+        0.0015277174534276128,
+        0.022857818752527237,
+        0.0002749756386037916,
+        0.00010570630547590554,
+        0.0006926455534994602,
+        0.00885280966758728,
+        0.0052958386950194836,
+        1.0000760555267334,
+        0.0012376056984066963,
+        0.003170495619997382,
+        0.042739395052194595,
+        0.0006047266069799662,
+        0.031233033165335655,
+        0.00037767711910419166,
+        0.004452662542462349,
+        0.002957863500341773,
+        0.0003160956548526883,
+        0.0016364381881430745,
+        0.7142722010612488,
+        0.00028584952815435827,
+        0.00019899680046364665,
+        0.0003461564192548394,
+        0.010333419777452946,
+        0.00010176414070883766,
+        0.0016372106038033962,
+        0.00014704620116390288,
+        0.022100577130913734,
+        0.030943268910050392,
+        0.0109679801389575,
+        0.0008810117724351585,
+        2.161508564313408e-05,
+        5.38626809429843e-05,
+        0.0006490076193585992,
+        3.740896863746457e-05,
+        0.004081177059561014,
+        0.0003460559528321028,
+        0.0006634612800553441,
+        0.003719132859259844,
+        0.0003284999984316528,
+        0.0005941601120866835,
+        0.001044423202984035,
+        0.11349136382341385,
+        0.30141523480415344,
+        0.05151990428566933,
+        0.00031102990033105016,
+        0.018301386386156082,
+        0.01031110156327486,
+        0.020216841250658035,
+        0.00012040880392305553,
+        0.008528425358235836,
+        0.0007188309682533145,
+        0.00016623642295598984,
+        0.00022245557920541614,
+        0.06029074266552925,
+        0.0004849948163609952,
+        0.0003668116987682879,
+        0.0003019303549081087,
+        0.0010603155242279172,
+        0.00017885403940454125,
+        0.0012795863440260291,
+        0.0001295778783969581,
+        0.0003511460672598332,
+        0.24424654245376587,
+        0.03240528702735901,
+        0.00047937757335603237,
+        0.00023333431454375386,
+        0.00018128729425370693,
+        0.0009897220879793167,
+        0.00022474078286904842,
+        0.00015468108176719397,
+        0.009243219159543514,
+        0.000744922028388828,
+        0.0004088002606295049,
+        0.0005296573508530855,
+        0.00046069640666246414,
+        0.10831867158412933,
+        0.00019115180475637317,
+        0.0005391467711888254,
+        0.0008956911624409258,
+        7.968577847350389e-05,
+        5.9691330534406006e-05,
+        0.0002390652080066502,
+        0.0037526623345911503,
+        0.002056062687188387,
+        0.0011539793340489268,
+        0.00021531969832722098,
+        9.906412742566317e-05,
+        0.0004312029341235757,
+        0.0002453530323691666,
+        0.0002353615127503872,
+        0.01799784228205681,
+        0.059031493961811066,
+        0.0011951032793149352,
+        0.0003645555698312819,
+        0.0004485097015276551,
+        0.0004867831012234092,
+        0.00010501701763132587,
+        0.00038052155287005007,
+        0.007906847633421421,
+        0.0002378868084633723,
+        0.00017926623695529997,
+        0.01495829876512289,
+        0.00021530235244426876,
+        0.0005513307987712324,
+        0.04977995529770851,
+        0.00021183201170060784,
+        0.002950861817225814,
+        0.0007984247640706599,
+        5.267529559205286e-05,
+        0.0004240844282321632,
+        0.0020381512586027384,
+        0.00015783212438691407,
+        0.0005406787386164069,
+        0.0005230465903878212,
+        0.00021578730957116932,
+        0.00017687991203274578,
+        9.47152657317929e-05,
+        0.0030477303080260754,
+        0.0013750283978879452,
+        0.00024980682064779103,
+        0.010464807040989399,
+        7.709222700214013e-05,
+        0.29689493775367737,
+        0.5449782013893127,
+        2.219881207565777e-05,
+        0.0006173457950353622,
+        0.00013584249245468527,
+        0.0001156200742116198,
+        0.0018114614067599177,
+        0.0007165073184296489,
+        0.00020354670414235443,
+        0.0665227472782135,
+        0.0006567519158124924,
+        0.00027898509870283306,
+        0.0001843182253651321,
+        0.0013586449204012752,
+        0.006315852049738169,
+        0.0002681788173504174,
+        0.0006207661353982985,
+        0.0358334556221962,
+        0.00018968008225783706,
+        0.0006362355197779834,
+        0.0002013319608522579,
+        9.760933608049527e-05,
+        0.15659315884113312,
+        0.000587645685300231,
+        0.33177801966667175,
+        0.00037034397246316075,
+        0.00012028843775624409,
+        0.00035550291067920625,
+        0.001048515783622861,
+        0.058277714997529984,
+        0.00023623378365300596,
+        0.3774363696575165,
+        0.00039704336086288095,
+        0.0008549689082428813,
+        0.0008211322128772736,
+        0.3570178151130676,
+        0.00037517439341172576,
+        0.0060280682519078255,
+        0.003346102312207222,
+        0.00021041595027782023,
+        0.1501140296459198,
+        0.04535183683037758,
+        0.031642813235521317,
+        0.00034793393569998443,
+        0.000305034191114828,
+        0.0006377998506650329,
+        0.000760198978241533,
+        0.0014531986089423299,
+        0.019711364060640335,
+        0.14994797110557556,
+        0.0004120672820135951,
+        0.0006114003481343389,
+        0.0002755735185928643,
+        0.014304893091320992,
+        0.003110576421022415,
+        0.0005769050912931561,
+        0.6639020442962646,
+        0.42636361718177795,
+        0.001369332312606275,
+        0.3898504972457886,
+        0.0009504510089755058,
+        0.12133263051509857,
+        0.13321514427661896,
+        0.03657674789428711,
+        0.00014526513405144215,
+        0.003939647693186998,
+        0.036440301686525345,
+        0.012325773946940899,
+        0.008191392756998539,
+        0.04069385677576065,
+        0.0009942929027602077,
+        0.001938740024343133,
+        0.006896297913044691,
+        0.0015361568657681346,
+        0.00028030938119627535,
+        0.2906074523925781,
+        0.0038124050479382277,
+        0.0007701273425482213,
+        0.002880966290831566,
+        0.0006424789316952229,
+        0.0017956792144104838,
+        0.008590878918766975,
+        0.00031468915403820574,
+        0.0002815357001964003,
+        0.002665346022695303,
+        0.00039643404306843877,
+        0.005447381641715765,
+        0.00037894517299719155,
+        0.0023204388562589884,
+        0.12430613487958908,
+        8.219480514526367e-05,
+        0.00025577994529157877,
+        0.00017865668633021414,
+        0.6514900326728821,
+        0.40763750672340393,
+        0.001187858055345714,
+        0.002554933773353696,
+        0.00037354251253418624,
+        0.0014704209752380848,
+        0.4361150860786438,
+        0.0006765109719708562,
+        1.0411033630371094,
+        0.00012169312685728073,
+        0.00013872244744561613,
+        0.00043480953900143504,
+        5.739971311413683e-05,
+        0.11368528753519058,
+        0.0004050790739711374,
+        0.00048746317042969167,
+        4.183345794677734,
+        0.0011596352560445666,
+        2.9840927124023438,
+        0.11178397387266159,
+        0.256370484828949,
+        0.00018151590484194458,
+        0.0002601036394480616,
+        0.0002919621183536947,
+        0.000621367187704891,
+        0.025419900193810463,
+        0.00014587449550163,
+        0.07018034160137177
+      ],
+      "gnorm": [
+        7.14572811126709,
+        5.540415287017822,
+        3.9493250846862793,
+        2.8450379371643066,
+        4.626539707183838,
+        3.277082920074463,
+        1.9559608697891235,
+        1.0459671020507812,
+        1.9024417400360107,
+        2.661612033843994,
+        3.361008644104004,
+        2.5287880897521973,
+        0.3776286840438843,
+        2.3530986309051514,
+        1.7777817249298096,
+        2.060014009475708,
+        0.05562043562531471,
+        1.547778844833374,
+        4.589083194732666,
+        1.9883564710617065,
+        0.9691979885101318,
+        0.018853725865483284,
+        1.729378581047058,
+        1.2573667764663696,
+        1.5179756879806519,
+        0.9865428805351257,
+        2.052509307861328,
+        3.75040602684021,
+        0.0347910039126873,
+        6.618817329406738,
+        0.012182106263935566,
+        4.5142669677734375,
+        0.15307436883449554,
+        0.4817270338535309,
+        2.507051944732666,
+        3.309882879257202,
+        2.1979522705078125,
+        2.2490546703338623,
+        0.00278234900906682,
+        2.4329817295074463,
+        1.58802330493927,
+        1.3341586589813232,
+        13.420867919921875,
+        0.9771263003349304,
+        0.6686534881591797,
+        3.3243603706359863,
+        1.0693727731704712,
+        1.8013436794281006,
+        1.517973780632019,
+        2.424496650695801,
+        1.444787859916687,
+        1.3912018537521362,
+        3.7970781326293945,
+        4.5341715812683105,
+        2.098356008529663,
+        2.900017023086548,
+        0.6049617528915405,
+        1.6846436262130737,
+        0.2046516090631485,
+        2.050523519515991,
+        0.0023074436467140913,
+        2.6685709953308105,
+        0.001500166254118085,
+        0.11455359309911728,
+        0.9486907124519348,
+        1.541233777999878,
+        2.0139918327331543,
+        1.806533694267273,
+        1.1660867929458618,
+        1.5933564901351929,
+        1.4402624368667603,
+        1.0190198421478271,
+        2.233832359313965,
+        0.016160067170858383,
+        0.006750027183443308,
+        3.712038516998291,
+        0.8525972366333008,
+        5.383966445922852,
+        2.183779239654541,
+        50.68670654296875,
+        1.65023934841156,
+        2.436237335205078,
+        0.05382273718714714,
+        0.008294783532619476,
+        1.7812122106552124,
+        8.119278907775879,
+        1.9034432172775269,
+        0.006226156372576952,
+        1.8362317085266113,
+        3.859707832336426,
+        1.7861266136169434,
+        1.892669916152954,
+        1.8173961639404297,
+        0.07634729892015457,
+        1.6949326992034912,
+        0.9804357290267944,
+        0.8653014898300171,
+        0.3860887885093689,
+        1.96747887134552,
+        0.019069327041506767,
+        1.7277215719223022,
+        1.1668477058410645,
+        2.8414015769958496,
+        1.067520022392273,
+        2.377718448638916,
+        1.044777512550354,
+        3.300086498260498,
+        3.4036481380462646,
+        1.1591880321502686,
+        1.8942984342575073,
+        1.401867151260376,
+        1.057451844215393,
+        1.068552851676941,
+        0.03863321989774704,
+        1.2049959897994995,
+        0.9555842876434326,
+        0.5244195461273193,
+        2.4111814498901367,
+        1.1050704717636108,
+        1.24168860912323,
+        1.0351237058639526,
+        0.8921294212341309,
+        51.247745513916016,
+        0.16931654512882233,
+        0.7745792269706726,
+        0.9961453676223755,
+        3.1982367038726807,
+        2.757230758666992,
+        0.6898627877235413,
+        1.4763274192810059,
+        3.4708056449890137,
+        1.4823265075683594,
+        1.3103018999099731,
+        1.81590735912323,
+        0.011721801944077015,
+        0.04072628170251846,
+        1.6841027736663818,
+        3.768476963043213,
+        5.360929489135742,
+        1.4879190921783447,
+        11.512633323669434,
+        1.0558571815490723,
+        1.341895341873169,
+        0.28654852509498596,
+        5.773991107940674,
+        0.8031138777732849,
+        0.30164965987205505,
+        0.3303353488445282,
+        0.8844121694564819,
+        1.5653283596038818,
+        3.5542430877685547,
+        2.0025148391723633,
+        0.4165697395801544,
+        0.012838342227041721,
+        1.201313853263855,
+        2.3341681957244873,
+        0.0008353486773557961,
+        0.924219012260437,
+        1.570395827293396,
+        0.0019057689933106303,
+        0.07553260028362274,
+        0.15511026978492737,
+        1.717273473739624,
+        3.2627038955688477,
+        0.9435994625091553,
+        0.2972102165222168,
+        9.479844093322754,
+        0.22973643243312836,
+        0.04059212654829025,
+        0.5617082715034485,
+        0.008535065688192844,
+        0.04732917249202728,
+        0.004554243292659521,
+        1.2635300159454346,
+        0.014137610793113708,
+        0.31453022360801697,
+        0.00036712439032271504,
+        0.0019872207194566727,
+        2.089594602584839,
+        0.062100183218717575,
+        0.9439561367034912,
+        0.033583864569664,
+        7.593233108520508,
+        0.007567113731056452,
+        0.005924834404140711,
+        0.1024421900510788,
+        6.81770133972168,
+        0.0479651615023613,
+        13.504993438720703,
+        5.3748674392700195,
+        0.3120998740196228,
+        0.15773701667785645,
+        2.8786215782165527,
+        0.03106945939362049,
+        26.266380310058594,
+        0.017571281641721725,
+        0.4112015664577484,
+        1.7845643758773804,
+        0.17897121608257294,
+        0.10050082206726074,
+        0.004534895997494459,
+        0.0005148943164385855,
+        1.5727895498275757,
+        0.009860324673354626,
+        0.3525363504886627,
+        0.09105201810598373,
+        0.014216816052794456,
+        0.3484344780445099,
+        0.0015244139358401299,
+        0.0013785422779619694,
+        3.035724401473999,
+        0.012352148070931435,
+        8.122522354125977,
+        0.45987215638160706,
+        0.5816303491592407,
+        4.528812885284424,
+        2.75522780418396,
+        3.902831554412842,
+        0.0009548901580274105,
+        0.0046395971439778805,
+        2.1253151893615723,
+        1.0090844631195068,
+        3.6473331451416016,
+        1.4661753177642822,
+        0.9050514698028564,
+        0.4569077491760254,
+        3.8367669582366943,
+        0.08817946165800095,
+        0.059226248413324356,
+        0.10401317477226257,
+        0.11211545765399933,
+        0.010555039159953594,
+        0.04749105125665665,
+        0.10962837189435959,
+        0.0018111065728589892,
+        0.18513230979442596,
+        0.07981235533952713,
+        0.13692638278007507,
+        0.04726165905594826,
+        0.0026056920178234577,
+        8.169716835021973,
+        1.7853460311889648,
+        1.4426558017730713,
+        1.5395742654800415,
+        0.061446670442819595,
+        0.028941579163074493,
+        0.0010433023562654853,
+        1.82367742061615,
+        0.399741530418396,
+        0.001156365149654448,
+        0.022859370335936546,
+        0.007041519042104483,
+        0.5260418057441711,
+        0.006481627468019724,
+        4.232786655426025,
+        0.4516576826572418,
+        3.2163259983062744,
+        0.3976707458496094,
+        0.04478902369737625,
+        0.01577838324010372,
+        0.0014587431214749813,
+        0.007516986224800348,
+        0.0011822133092209697,
+        0.0030877452809363604,
+        0.004848431795835495,
+        0.0035880375653505325,
+        0.6356454491615295,
+        0.0057558282278478146,
+        0.0005964862648397684,
+        12.69851016998291,
+        0.005272402428090572,
+        0.004713629838079214,
+        3.526747465133667,
+        0.003147877287119627,
+        0.012789961881935596,
+        0.007026183418929577,
+        0.00245943502523005,
+        0.000528588192537427,
+        0.07972479611635208,
+        0.0004002349451184273,
+        0.01633148267865181,
+        0.0060571241192519665,
+        0.0013196446234360337,
+        0.012709617614746094,
+        0.0004279587883502245,
+        0.0008150962530635297,
+        0.0012364503927528858,
+        3.953691244125366,
+        0.7005791664123535,
+        0.003784148022532463,
+        4.35511589050293,
+        6.737993240356445,
+        0.0006374845397658646,
+        0.012629378587007523,
+        0.0020694159902632236,
+        0.081253781914711,
+        0.008879821747541428,
+        0.027257265523076057,
+        6.448871612548828,
+        0.002068912610411644,
+        0.013067343272268772,
+        0.012898562476038933,
+        4.061300277709961,
+        0.03521932289004326,
+        6.537759304046631,
+        0.01864415965974331,
+        0.2521930932998657,
+        11.379569053649902,
+        8.596662521362305,
+        0.6348481774330139,
+        0.04761499539017677,
+        0.020477809011936188,
+        0.09439083188772202,
+        0.056292083114385605,
+        2.348266839981079,
+        12.643533706665039,
+        6.130764961242676,
+        0.15192291140556335,
+        1.3873378038406372,
+        3.0510129928588867,
+        0.002340882085263729,
+        14.391058921813965,
+        0.2980973422527313,
+        0.04235384240746498,
+        0.0157316867262125,
+        0.00819352176040411,
+        1.2894407510757446,
+        2.0096867084503174,
+        0.05890803784132004,
+        0.010139206424355507,
+        0.3915921151638031,
+        0.002671909751370549,
+        0.7462536692619324,
+        0.022366508841514587,
+        0.2070690095424652,
+        1.716121792793274,
+        0.002263994887471199,
+        0.011803334578871727,
+        2.2890877723693848,
+        0.10675462335348129,
+        0.003769665490835905,
+        0.0014435230987146497,
+        2.6539881229400635,
+        0.05665108934044838,
+        0.03006518818438053,
+        0.010502582415938377,
+        0.6559453010559082,
+        0.001969763543456793,
+        0.01373621728271246,
+        0.025737730786204338,
+        1.5516066551208496,
+        0.014139904640614986,
+        0.012220852077007294,
+        0.006183616816997528,
+        0.0011240512831136584,
+        0.006653304677456617,
+        0.0008532595820724964,
+        0.038364410400390625,
+        0.7946184873580933,
+        0.0022815698757767677,
+        0.0013252837816253304,
+        0.01187646109610796,
+        0.2784157693386078,
+        0.19449684023857117,
+        2.8830811977386475,
+        0.02429306134581566,
+        0.10908428579568863,
+        1.476423740386963,
+        0.02865411899983883,
+        2.1181411743164062,
+        0.0028477220330387354,
+        0.09102008491754532,
+        0.11074255406856537,
+        0.002275069709867239,
+        0.032371483743190765,
+        3.9615848064422607,
+        0.005300260614603758,
+        0.0030383726116269827,
+        0.0022263529244810343,
+        0.1474502831697464,
+        0.001164498389698565,
+        0.04251042380928993,
+        0.0014934218488633633,
+        0.3901340365409851,
+        0.7023988366127014,
+        0.278833270072937,
+        0.008175443857908249,
+        0.00012615819287020713,
+        0.0007294767419807613,
+        0.013143176212906837,
+        0.00016531332221347839,
+        0.03318118676543236,
+        0.004038662184029818,
+        0.006192528642714024,
+        0.1982695460319519,
+        0.0028063240461051464,
+        0.005802101455628872,
+        0.012051868252456188,
+        3.177299737930298,
+        1.8705517053604126,
+        0.6903427243232727,
+        0.007420709356665611,
+        0.4843447208404541,
+        0.270725280046463,
+        0.6999235153198242,
+        0.0005879936506971717,
+        0.09485464543104172,
+        0.01758718676865101,
+        0.0018122312612831593,
+        0.0041369227692484856,
+        1.6719765663146973,
+        0.004459819756448269,
+        0.01203930377960205,
+        0.0070938593707978725,
+        0.028727151453495026,
+        0.0015892089577391744,
+        0.024598948657512665,
+        0.0007653865613974631,
+        0.006249202881008387,
+        3.1216180324554443,
+        0.9570592045783997,
+        0.005398331210017204,
+        0.0017943765269592404,
+        0.002239431720227003,
+        0.04487122967839241,
+        0.0013400573516264558,
+        0.0009769788011908531,
+        0.2247713953256607,
+        0.012561021372675896,
+        0.00956840068101883,
+        0.007618635892868042,
+        0.006976298987865448,
+        1.4718230962753296,
+        0.004932635463774204,
+        0.006521731615066528,
+        0.010296128690242767,
+        0.0006526705692522228,
+        0.0006605209782719612,
+        0.0011483149137347937,
+        0.06693557649850845,
+        0.026504479348659515,
+        0.03281306102871895,
+        0.001918466412462294,
+        0.0009248362621292472,
+        0.008744367398321629,
+        0.0018301560776308179,
+        0.0023520728573203087,
+        0.32874369621276855,
+        1.6598342657089233,
+        0.029566140845417976,
+        0.003923609387129545,
+        0.01254637073725462,
+        0.009301512502133846,
+        0.0006560803740285337,
+        0.008287318050861359,
+        0.3759118318557739,
+        0.003764817025512457,
+        0.0010122315725311637,
+        0.7803564667701721,
+        0.002300610998645425,
+        0.01075975876301527,
+        1.7812589406967163,
+        0.001808249857276678,
+        0.11372587829828262,
+        0.023110993206501007,
+        0.0006110674003139138,
+        0.005169247277081013,
+        0.07837781310081482,
+        0.002064632950350642,
+        0.0064839646220207214,
+        0.007279766257852316,
+        0.002983782207593322,
+        0.001965665491297841,
+        0.0005984845920465887,
+        0.11663604527711868,
+        0.017215276136994362,
+        0.0031228740699589252,
+        0.3407697379589081,
+        0.0008201311575248837,
+        2.8837790489196777,
+        3.6875412464141846,
+        0.00017458255751989782,
+        0.015213403850793839,
+        0.0025651496835052967,
+        0.0009636165341362357,
+        0.07436303049325943,
+        0.006452594883739948,
+        0.001576061244122684,
+        2.293513774871826,
+        0.014636828564107418,
+        0.004766483325511217,
+        0.0034179515205323696,
+        0.01364045962691307,
+        0.23161640763282776,
+        0.00309752207249403,
+        0.0037732745986431837,
+        1.15940260887146,
+        0.004033681005239487,
+        0.01242886297404766,
+        0.0023873718455433846,
+        0.0008729114779271185,
+        3.1582372188568115,
+        0.005931852385401726,
+        4.114622592926025,
+        0.008870855905115604,
+        0.001165600842796266,
+        0.006828295066952705,
+        0.011027796193957329,
+        1.3609188795089722,
+        0.0016813325928524137,
+        2.5901150703430176,
+        0.003585417754948139,
+        0.029357580468058586,
+        0.010867633856832981,
+        3.0899126529693604,
+        0.012969098053872585,
+        0.14078618586063385,
+        0.05757225677371025,
+        0.001483837142586708,
+        2.1083450317382812,
+        1.4448500871658325,
+        0.8217411637306213,
+        0.006974553689360619,
+        0.007259577512741089,
+        0.014162996783852577,
+        0.0030763675458729267,
+        0.006616997066885233,
+        0.8433681726455688,
+        2.7850890159606934,
+        0.002908582566305995,
+        0.016959020867943764,
+        0.0046233837492764,
+        0.3424758017063141,
+        0.07333909720182419,
+        0.009533941745758057,
+        7.945699214935303,
+        2.1559762954711914,
+        0.035274069756269455,
+        3.4044299125671387,
+        0.0046591730788350105,
+        1.9355469942092896,
+        2.6630074977874756,
+        5.533273696899414,
+        0.000927284883800894,
+        0.1445021778345108,
+        0.95933598279953,
+        0.21129725873470306,
+        0.22758620977401733,
+        1.4621543884277344,
+        0.013368867337703705,
+        0.019091280177235603,
+        0.2266601175069809,
+        0.05065511539578438,
+        0.0021518049761652946,
+        1.2970013618469238,
+        0.0769207552075386,
+        0.006897236220538616,
+        0.06018831580877304,
+        0.0049839806742966175,
+        0.036226481199264526,
+        0.208565816283226,
+        0.003530693706125021,
+        0.0029618048574775457,
+        0.07069694995880127,
+        0.007656953297555447,
+        0.13485395908355713,
+        0.0034615371841937304,
+        0.14540928602218628,
+        2.4780075550079346,
+        0.00040780153358355165,
+        0.0037152115255594254,
+        0.0032568147871643305,
+        2.2048301696777344,
+        2.320159912109375,
+        0.02543543092906475,
+        0.040074728429317474,
+        0.0014515992952510715,
+        0.05634228140115738,
+        7.892518997192383,
+        0.013497211039066315,
+        32.92132568359375,
+        0.0005248034722171724,
+        0.0015764315612614155,
+        0.004511175211519003,
+        0.0005623457254841924,
+        6.005952835083008,
+        0.005903031677007675,
+        0.008797681890428066,
+        43.53185272216797,
+        0.022014541551470757,
+        21.968441009521484,
+        3.0582242012023926,
+        11.647260665893555,
+        0.0029695890843868256,
+        0.003793783253058791,
+        0.002096334472298622,
+        0.008280236274003983,
+        2.445242166519165,
+        0.001063395757228136,
+        1.5783908367156982
+      ],
+      "n_masked": [
+        14,
+        18,
+        29,
+        22,
+        15,
+        21,
+        23,
+        17,
+        27,
+        24,
+        29,
+        28,
+        14,
+        18,
+        18,
+        30,
+        19,
+        19,
+        30,
+        15,
+        21,
+        14,
+        9,
+        19,
+        26,
+        18,
+        8,
+        11,
+        24,
+        14,
+        17,
+        22,
+        7,
+        17,
+        25,
+        32,
+        19,
+        21,
+        10,
+        24,
+        20,
+        15,
+        15,
+        21,
+        16,
+        16,
+        23,
+        15,
+        13,
+        21,
+        19,
+        22,
+        17,
+        25,
+        27,
+        20,
+        27,
+        24,
+        17,
+        19,
+        11,
+        23,
+        12,
+        21,
+        16,
+        22,
+        26,
+        19,
+        22,
+        19,
+        15,
+        15,
+        23,
+        9,
+        18,
+        12,
+        11,
+        15,
+        21,
+        19,
+        18,
+        23,
+        9,
+        6,
+        25,
+        26,
+        25,
+        14,
+        10,
+        8,
+        24,
+        24,
+        20,
+        17,
+        17,
+        21,
+        18,
+        15,
+        24,
+        16,
+        11,
+        20,
+        21,
+        24,
+        22,
+        20,
+        17,
+        21,
+        22,
+        11,
+        20,
+        16,
+        16,
+        8,
+        23,
+        14,
+        10,
+        18,
+        20,
+        13,
+        18,
+        11,
+        32,
+        22,
+        16,
+        26,
+        19,
+        16,
+        16,
+        15,
+        21,
+        12,
+        21,
+        27,
+        18,
+        6,
+        25,
+        27,
+        23,
+        34,
+        16,
+        20,
+        23,
+        21,
+        22,
+        29,
+        15,
+        14,
+        15,
+        25,
+        25,
+        23,
+        19,
+        20,
+        16,
+        17,
+        13,
+        24,
+        18,
+        13,
+        13,
+        18,
+        18,
+        26,
+        21,
+        28,
+        28,
+        23,
+        21,
+        15,
+        15,
+        11,
+        17,
+        12,
+        19,
+        19,
+        10,
+        14,
+        22,
+        18,
+        30,
+        20,
+        25,
+        19,
+        18,
+        19,
+        14,
+        14,
+        31,
+        30,
+        12,
+        27,
+        25,
+        10,
+        23,
+        18,
+        19,
+        25,
+        24,
+        23,
+        16,
+        16,
+        23,
+        18,
+        26,
+        19,
+        15,
+        22,
+        17,
+        12,
+        27,
+        8,
+        31,
+        26,
+        16,
+        13,
+        20,
+        23,
+        9,
+        18,
+        26,
+        10,
+        29,
+        28,
+        22,
+        28,
+        34,
+        14,
+        30,
+        13,
+        24,
+        8,
+        16,
+        20,
+        13,
+        18,
+        12,
+        21,
+        16,
+        14,
+        12,
+        33,
+        33,
+        22,
+        23,
+        12,
+        14,
+        26,
+        19,
+        14,
+        19,
+        17,
+        19,
+        12,
+        22,
+        28,
+        19,
+        23,
+        29,
+        13,
+        19,
+        29,
+        21,
+        29,
+        12,
+        16,
+        20,
+        17,
+        14,
+        20,
+        25,
+        24,
+        19,
+        22,
+        23,
+        24,
+        13,
+        13,
+        31,
+        18,
+        19,
+        12,
+        15,
+        20,
+        11,
+        10,
+        16,
+        24,
+        26,
+        31,
+        21,
+        19,
+        25,
+        26,
+        17,
+        19,
+        16,
+        13,
+        15,
+        14,
+        21,
+        24,
+        25,
+        26,
+        37,
+        21,
+        21,
+        15,
+        23,
+        28,
+        22,
+        12,
+        19,
+        19,
+        15,
+        23,
+        32,
+        24,
+        31,
+        27,
+        22,
+        29,
+        22,
+        19,
+        22,
+        22,
+        33,
+        23,
+        16,
+        14,
+        12,
+        18,
+        21,
+        8,
+        19,
+        14,
+        18,
+        22,
+        16,
+        18,
+        16,
+        11,
+        20,
+        26,
+        28,
+        24,
+        18,
+        15,
+        18,
+        14,
+        23,
+        16,
+        16,
+        11,
+        13,
+        21,
+        16,
+        32,
+        29,
+        12,
+        25,
+        20,
+        19,
+        28,
+        28,
+        20,
+        28,
+        23,
+        9,
+        13,
+        15,
+        22,
+        22,
+        17,
+        24,
+        30,
+        16,
+        32,
+        11,
+        20,
+        13,
+        21,
+        23,
+        16,
+        20,
+        28,
+        11,
+        12,
+        20,
+        20,
+        11,
+        9,
+        19,
+        15,
+        18,
+        17,
+        14,
+        18,
+        28,
+        26,
+        18,
+        20,
+        20,
+        10,
+        23,
+        17,
+        10,
+        34,
+        20,
+        21,
+        19,
+        18,
+        26,
+        23,
+        24,
+        15,
+        21,
+        12,
+        24,
+        18,
+        23,
+        21,
+        13,
+        14,
+        26,
+        14,
+        17,
+        17,
+        18,
+        29,
+        26,
+        21,
+        25,
+        22,
+        16,
+        13,
+        17,
+        11,
+        11,
+        20,
+        19,
+        19,
+        19,
+        21,
+        21,
+        16,
+        16,
+        22,
+        26,
+        16,
+        10,
+        21,
+        18,
+        14,
+        19,
+        22,
+        12,
+        19,
+        23,
+        21,
+        20,
+        22,
+        14,
+        28,
+        26,
+        20,
+        18,
+        21,
+        21,
+        16,
+        17,
+        27,
+        21,
+        13,
+        17,
+        12,
+        17,
+        24,
+        30,
+        30,
+        17,
+        16,
+        23,
+        21,
+        13,
+        26,
+        15,
+        13,
+        27,
+        19,
+        18,
+        21,
+        11,
+        17,
+        16,
+        16,
+        23,
+        16,
+        18,
+        19,
+        18,
+        21,
+        18,
+        24,
+        33,
+        19,
+        24,
+        16,
+        21,
+        10,
+        31,
+        15,
+        19,
+        13,
+        23,
+        27,
+        14,
+        20,
+        20,
+        22,
+        20,
+        21,
+        16,
+        22,
+        16,
+        8,
+        5,
+        20,
+        20,
+        12,
+        19,
+        20,
+        16,
+        20,
+        27,
+        27,
+        18,
+        17,
+        22,
+        7,
+        19,
+        19,
+        26,
+        14,
+        27,
+        22,
+        15,
+        25,
+        21,
+        22,
+        18,
+        25,
+        24,
+        12,
+        26,
+        26,
+        14,
+        23,
+        14,
+        22,
+        17,
+        14,
+        10,
+        20,
+        22,
+        25,
+        15,
+        29,
+        27,
+        12,
+        18,
+        20,
+        31,
+        14,
+        23,
+        17,
+        9,
+        22,
+        25,
+        13,
+        22,
+        11,
+        21,
+        20,
+        14,
+        23,
+        15,
+        15,
+        12,
+        22,
+        20,
+        22,
+        27,
+        18,
+        21,
+        15,
+        14,
+        31,
+        10,
+        29
+      ],
+      "n_canvas_masked": [
+        45,
+        64,
+        83,
+        82,
+        45,
+        68,
+        59,
+        56,
+        90,
+        88,
+        100,
+        83,
+        50,
+        64,
+        62,
+        96,
+        63,
+        67,
+        84,
+        65,
+        76,
+        40,
+        36,
+        63,
+        96,
+        56,
+        29,
+        45,
+        56,
+        46,
+        65,
+        68,
+        16,
+        53,
+        66,
+        102,
+        59,
+        81,
+        28,
+        80,
+        69,
+        63,
+        45,
+        67,
+        47,
+        63,
+        85,
+        38,
+        43,
+        67,
+        70,
+        77,
+        41,
+        70,
+        89,
+        62,
+        86,
+        90,
+        65,
+        74,
+        34,
+        73,
+        43,
+        62,
+        58,
+        75,
+        68,
+        64,
+        83,
+        67,
+        51,
+        57,
+        76,
+        21,
+        48,
+        48,
+        46,
+        52,
+        69,
+        51,
+        52,
+        73,
+        27,
+        11,
+        74,
+        77,
+        88,
+        42,
+        46,
+        30,
+        88,
+        80,
+        62,
+        58,
+        54,
+        73,
+        58,
+        40,
+        90,
+        44,
+        37,
+        58,
+        61,
+        68,
+        73,
+        76,
+        64,
+        70,
+        73,
+        56,
+        69,
+        54,
+        54,
+        32,
+        70,
+        49,
+        37,
+        56,
+        73,
+        40,
+        72,
+        50,
+        100,
+        86,
+        48,
+        82,
+        58,
+        55,
+        49,
+        42,
+        58,
+        35,
+        62,
+        90,
+        53,
+        18,
+        89,
+        85,
+        61,
+        115,
+        53,
+        68,
+        83,
+        66,
+        62,
+        84,
+        61,
+        51,
+        57,
+        77,
+        83,
+        73,
+        71,
+        59,
+        78,
+        78,
+        43,
+        86,
+        55,
+        35,
+        47,
+        54,
+        48,
+        87,
+        71,
+        88,
+        81,
+        73,
+        66,
+        59,
+        45,
+        45,
+        60,
+        53,
+        81,
+        74,
+        28,
+        56,
+        80,
+        51,
+        104,
+        64,
+        93,
+        60,
+        48,
+        72,
+        45,
+        52,
+        93,
+        92,
+        41,
+        68,
+        94,
+        47,
+        79,
+        65,
+        60,
+        85,
+        77,
+        77,
+        56,
+        73,
+        70,
+        62,
+        89,
+        67,
+        59,
+        61,
+        52,
+        47,
+        93,
+        22,
+        99,
+        82,
+        50,
+        42,
+        64,
+        86,
+        47,
+        75,
+        61,
+        37,
+        92,
+        87,
+        76,
+        85,
+        100,
+        47,
+        90,
+        49,
+        84,
+        38,
+        47,
+        80,
+        61,
+        57,
+        68,
+        79,
+        50,
+        40,
+        35,
+        106,
+        114,
+        81,
+        74,
+        37,
+        56,
+        91,
+        64,
+        64,
+        65,
+        73,
+        57,
+        39,
+        75,
+        94,
+        72,
+        76,
+        90,
+        49,
+        59,
+        86,
+        58,
+        96,
+        39,
+        59,
+        64,
+        66,
+        48,
+        69,
+        65,
+        92,
+        60,
+        82,
+        72,
+        90,
+        40,
+        39,
+        107,
+        59,
+        66,
+        34,
+        64,
+        61,
+        45,
+        35,
+        69,
+        86,
+        88,
+        94,
+        58,
+        70,
+        83,
+        81,
+        71,
+        64,
+        50,
+        53,
+        48,
+        54,
+        76,
+        104,
+        73,
+        85,
+        107,
+        76,
+        73,
+        49,
+        78,
+        85,
+        77,
+        36,
+        55,
+        65,
+        53,
+        75,
+        92,
+        78,
+        92,
+        84,
+        81,
+        92,
+        70,
+        58,
+        78,
+        66,
+        104,
+        80,
+        65,
+        49,
+        36,
+        73,
+        81,
+        47,
+        63,
+        45,
+        58,
+        80,
+        59,
+        62,
+        53,
+        50,
+        62,
+        80,
+        94,
+        72,
+        65,
+        54,
+        59,
+        51,
+        83,
+        59,
+        58,
+        60,
+        37,
+        58,
+        53,
+        98,
+        82,
+        57,
+        77,
+        80,
+        65,
+        91,
+        94,
+        76,
+        93,
+        81,
+        37,
+        38,
+        43,
+        84,
+        58,
+        55,
+        85,
+        91,
+        52,
+        105,
+        48,
+        82,
+        41,
+        67,
+        66,
+        47,
+        65,
+        94,
+        44,
+        33,
+        63,
+        73,
+        33,
+        44,
+        52,
+        59,
+        48,
+        50,
+        48,
+        69,
+        90,
+        75,
+        51,
+        67,
+        56,
+        28,
+        75,
+        61,
+        44,
+        103,
+        68,
+        72,
+        70,
+        64,
+        83,
+        82,
+        84,
+        55,
+        74,
+        46,
+        74,
+        60,
+        80,
+        64,
+        50,
+        43,
+        83,
+        52,
+        51,
+        55,
+        65,
+        103,
+        82,
+        87,
+        82,
+        67,
+        55,
+        45,
+        53,
+        36,
+        34,
+        57,
+        61,
+        63,
+        73,
+        87,
+        67,
+        46,
+        57,
+        72,
+        95,
+        50,
+        38,
+        67,
+        57,
+        55,
+        54,
+        78,
+        38,
+        61,
+        77,
+        75,
+        75,
+        79,
+        53,
+        90,
+        88,
+        70,
+        53,
+        67,
+        73,
+        41,
+        56,
+        79,
+        55,
+        53,
+        59,
+        43,
+        51,
+        84,
+        104,
+        95,
+        61,
+        51,
+        70,
+        66,
+        55,
+        82,
+        59,
+        40,
+        82,
+        64,
+        52,
+        74,
+        39,
+        51,
+        64,
+        60,
+        70,
+        58,
+        61,
+        65,
+        63,
+        65,
+        61,
+        68,
+        97,
+        60,
+        85,
+        49,
+        65,
+        40,
+        96,
+        45,
+        70,
+        33,
+        70,
+        87,
+        37,
+        50,
+        63,
+        73,
+        88,
+        67,
+        58,
+        82,
+        59,
+        32,
+        23,
+        77,
+        57,
+        41,
+        82,
+        64,
+        54,
+        71,
+        93,
+        95,
+        54,
+        75,
+        73,
+        20,
+        50,
+        59,
+        82,
+        44,
+        95,
+        63,
+        47,
+        73,
+        56,
+        76,
+        61,
+        75,
+        91,
+        43,
+        82,
+        94,
+        40,
+        87,
+        37,
+        70,
+        49,
+        60,
+        30,
+        72,
+        76,
+        72,
+        49,
+        88,
+        84,
+        51,
+        64,
+        82,
+        81,
+        45,
+        62,
+        57,
+        32,
+        69,
+        81,
+        42,
+        70,
+        40,
+        57,
+        55,
+        57,
+        84,
+        42,
+        54,
+        35,
+        89,
+        60,
+        91,
+        80,
+        55,
+        71,
+        63,
+        43,
+        93,
+        43,
+        77
+      ]
+    }
+  },
+  "norm_comparison_first_steps": {
+    "n_steps": 10,
+    "pinned": [
+      1.1335481405258179,
+      0.44363948702812195,
+      2.577773094177246,
+      1.267946481704712,
+      1.6464200019836426,
+      1.1789965629577637,
+      0.5451533794403076,
+      0.5111033320426941,
+      0.6447467803955078,
+      1.1945501565933228
+    ],
+    "masked_mean": [
+      2.975270986557007,
+      0.9847831726074219,
+      3.712563991546631,
+      2.005626916885376,
+      4.099354267120361,
+      2.0702297687530518,
+      0.9806399345397949,
+      1.313748836517334,
+      0.9637759327888489,
+      1.946112036705017
+    ],
+    "ratio_masked_mean_over_pinned": [
+      2.6247,
+      2.2198,
+      1.4402,
+      1.5818,
+      2.4899,
+      1.7559,
+      1.7988,
+      2.5704,
+      1.4948,
+      1.6292
+    ],
+    "pinned_mean": 1.1143877416849137,
+    "masked_mean_mean": 2.1052105844020845,
+    "note": "both are computed from the SAME per-masked-position tensor CE/p_mask within the same step, so the ratio is purely the normalizer. masked-mean divides by the number of masked positions in the batch; pinned divides each example by its own answer length and then by the batch size, so pinned ~ masked-mean x (masked positions in batch) / (batch * answer_len), i.e. roughly the expected masked fraction. Only the masked-mean gradient is scale-invariant to how many positions happened to be masked; the pinned gradient is proportional to the realised mask count, which is what the pinned recipe intends."
+  },
+  "adapter": {
+    "dir": "/data/bijaypandey/mdlm_unlearn/tmp/calib_cv_genlen_tl00",
+    "bytes": 335612575,
+    "mib": 320.07,
+    "sha256_per_file": {
+      "README.md": "37ec62cdb2fb171157345ca9872db5a6e01ebf12c8796fb59e4b40929a86105f",
+      "adapter_config.json": "8637eb02b97e28dbd6f9403a2d35751b62e56253867f4a04185dae206117c218",
+      "adapter_model.safetensors": "eec76b2b916eec2ce8a905c69d812b638d75b557e976d0449d8af48681962f4c"
+    },
+    "sha256_dir": "5d4dc359eb55fb01b7111309242c6813c5883ac0d6ab098745402ffaece4ca5e",
+    "note": "adapter weights only; the full backbone is NOT re-saved"
+  },
+  "qualification_eval": {
+    "n_generations": 128,
+    "wall_s": 268.8,
+    "s_per_generation": 2.1,
+    "n_facts_scored": 64,
+    "subset": true
+  },
+  "recall": {
+    "gated_scoring": "answer_present_diacritic_nfkd (NFKD + combining-mark stripping); a strict superset of the frozen NFKC scoring",
+    "threshold": 0.95,
+    "n_forget_train": 32,
+    "n_retain_train": 32,
+    "diacritic_nfkd": {
+      "forget_train": 1.0,
+      "retain_train": 1.0,
+      "forget_paraphrase_REPORTED_ONLY": 0.9688,
+      "retain_paraphrase_REPORTED_ONLY": 1.0
+    },
+    "frozen_nfkc": {
+      "forget_train": 1.0,
+      "retain_train": 1.0,
+      "forget_paraphrase_REPORTED_ONLY": 0.9688,
+      "retain_paraphrase_REPORTED_ONLY": 1.0
+    },
+    "generations_credited_only_by_diacritic_scoring": [],
+    "n_credited_only_by_diacritic_scoring": 0,
+    "failure_label_counts": {
+      "None": 128
+    }
+  },
+  "peak_gpu_gib_through_training_and_eval": 18.523,
+  "peak_gpu_gib": 18.523,
+  "wall_clock_total_s": 585.5,
+  "failed_gates": [],
+  "all_gates_passed": true,
+  "qualified_backbone": false,
+  "mode": "calibrate"
+}

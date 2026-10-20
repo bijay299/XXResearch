@@ -1,0 +1,69 @@
+{
+  "n_rows": 512,
+  "n_strangers": 8,
+  "memo": "/data/bijaypandey/mdlm_unlearn/adapters/memorized_v2_s20261101",
+  "kill_rule": "FIRED if mode(P_ign) in the 32-answer pool for >=2 of 3 relations AND modal share > control attractor share (0.594 home_city / 0.500 field / 0.214 instrument)",
+  "control_attractor_share": {
+    "home_city": 0.594,
+    "field": 0.5,
+    "instrument": 0.214
+  },
+  "per_relation": {
+    "field": {
+      "n": 128,
+      "modal_token": " cart",
+      "modal_token_id": 10841,
+      "modal_share": 0.3906,
+      "mode_in_answer_pool": true,
+      "mode_matches_a_pool_answer": "cartography",
+      "mean_entropy_bits": 1.004,
+      "mean_p_true_answer": 0.356802,
+      "mean_TV_r0_vs_Pign": 0.35683,
+      "n_distinct_modes": 5,
+      "control_share": 0.5,
+      "exceeds_control": false
+    },
+    "home_city": {
+      "n": 256,
+      "modal_token": " Lisbon",
+      "modal_token_id": 73347,
+      "modal_share": 0.4297,
+      "mode_in_answer_pool": true,
+      "mode_matches_a_pool_answer": "Lisbon",
+      "mean_entropy_bits": 2.807,
+      "mean_p_true_answer": 0.14307,
+      "mean_TV_r0_vs_Pign": 0.14309,
+      "n_distinct_modes": 8,
+      "control_share": 0.594,
+      "exceeds_control": false
+    },
+    "instrument": {
+      "n": 128,
+      "modal_token": " viol",
+      "modal_token_id": 5766,
+      "modal_share": 0.375,
+      "mode_in_answer_pool": true,
+      "mode_matches_a_pool_answer": "viola",
+      "mean_entropy_bits": 1.571,
+      "mean_p_true_answer": 0.270199,
+      "mean_TV_r0_vs_Pign": 0.2702,
+      "n_distinct_modes": 6,
+      "control_share": 0.214,
+      "exceeds_control": true
+    }
+  },
+  "validity": {
+    "mean_p_true_answer": 0.228285,
+    "threshold": 0.02,
+    "strangers_verified_unknown": false,
+    "note": "if this gate fails the strangers are not unknown and P_ign is contaminated; the F1 verdict below is then inconclusive"
+  },
+  "verdict": {
+    "n_relations_firing": 1,
+    "decision": "INCONCLUSIVE_strangers_contaminated"
+  },
+  "measured": {
+    "wall_s": 15.6,
+    "peak_gpu_gib": 15.628
+  }
+}

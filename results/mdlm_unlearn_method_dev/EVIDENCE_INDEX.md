@@ -1,29 +1,34 @@
 # Evidence index — active development
 
-75 artifacts. Development evidence: freely inspected, iterable. No sealed
+146 artifacts. Development evidence: freely inspected, iterable. No sealed
 final-evaluation set exists yet.
 
 | Artifact | Bytes | sha256 |
 |---|---|---|
-| `ATTEMPTS.tsv` | 1644 | `69ece106d9447ac54e9ff2e9b31ed20feaa1d07bb35b3f2f2556b0026d4f6338` |
+| `ATTEMPTS.tsv` | 3817 | `143d6c35e4aeaf758b4504de3dbe233205b6a369d0b2f645cb040df3efa8c27b` |
 | `PROJECT_START` | 26 | `ea30b66d0ee654344a21f0a0201d513a17051fed0cc5242c1ff0a667daecf0c9` |
-| `README.md` | 9019 | `5b851e1479f45f3007fa7e4557e7be5d2538269c1de0a107cbc87701928b15db` |
+| `README.md` | 12311 | `a13ae59e94c70e73d4fb810b1f2a84fc45967b0854cde81fe7fac8af5c61f0d6` |
 | `RECORD.md` | 3067 | `69ddc4e8b3d933c738287ae10b4659a9c7fddb72bf259fe025b2d9e052a3c3f9` |
 | `data/rwku_pooled/forget_level1.json` | 716642 | `7d2ff27feeab67ad6f25133124ee8cb498ad32c1690bf792aed30e3b26ea5bbe` |
 | `data/rwku_pooled/forget_level2.json` | 649745 | `3ea905389137ca260c648eb1eb2bd1f96292dea91aa15a65177ab40c311aa460` |
 | `data/rwku_pooled/neighbor_level1.json` | 1578532 | `1c73b0a970afc379bf2161b2b206b4802e23d76ec8cfea25de14ed1d4e9f3aa3` |
 | `data/rwku_pooled/neighbor_level2.json` | 1447474 | `6897a20b6e5e165b3e486345f627e988d78c218131060e2ee002c1c6197a3ac3` |
+| `docs/BACKBONE_BUILD.md` | 30945 | `6d2d767a89be245ce661a47f0b2e3e91135bb013cb9efe5dd9e90969fd99b077` |
+| `docs/BASELINE_MATCHED.md` | 16576 | `5e9b628c27ce298378d1421a8094dc8eadd11ca845bac64cdad529b3b46e2514` |
 | `docs/CRITIQUE_WAVE1.md` | 57704 | `214344d60e01d21ed7f6f81abfb0b9ce57b2ae49fd2b27e595876485fea415f6` |
+| `docs/CRITIQUE_WAVE2.md` | 58223 | `679c8f166637c8663f2cfd5d08852fa33a901022b115ae093e9a904fd8d73836` |
 | `docs/ERRATUM_arc_28154b2.md` | 5549 | `b3be1acb677b53ce69cf52b8c04000ec9d1cfee26929a442efbb1141c689c257` |
 | `docs/ERRATUM_relearn_a67d610.md` | 8587 | `f6e4995c314b415a42a14b40b7e909d55ea6739cb3ae9c6db6683495097bea8d` |
 | `docs/EVAL_PROTOCOL.md` | 94785 | `6666c26a5223d270f2307bdc005144d78c46175f52d33e7de68c7c64cc1fe31d` |
+| `docs/FINDING2_ignorant_axis.md` | 7888 | `bdd0cb63bf789b3c63fc7038d62bdfe813a25368e763f056fe8912cdd37b3254` |
+| `docs/FINDING3_no_ignorance_reference.md` | 7771 | `1b587e87eb095f2cd6d7987508abe0d41521bcfa0173e07f40107906a94f6803` |
 | `docs/FINDING_answer_channel.md` | 11163 | `438f22fde028d5d0e74ef46289a47938d09b96cd10721b9d8de48a1941b0c24c` |
 | `docs/FORMALIZATION.md` | 67322 | `3ac81498b8a4d38b11f1bf5fb9d1126f9fe4ff607db2080115b3734c0bf146ae` |
 | `docs/FOUNDATION_AUDIT.md` | 68848 | `03ce65e04de9dd86a3180adceae44708c5c23d78f1f7005914dc30a5472422ab` |
 | `docs/HYPOTHESIS_REGISTER.md` | 17603 | `625c90331804906d0751b98b01f61b324392b2b2cdbe96e2a382ee868b928365` |
 | `docs/NOVELTY_CHASE.md` | 34614 | `66a9d1951b695b4177c9c1485f6f4e338cb97205c4f030c67c656ddd6101fd25` |
 | `docs/NOVELTY_POSITION.md` | 11731 | `14518875bb94c961b4af49fcb4c784ffae05b67e73eed64445e411945fe139df` |
-| `docs/OBJECTIVE_DESIGN.md` | 79828 | `cb3abfc8608f37baa1b075a95a011809763aff755f852cff5cac7832fe63b794` |
+| `docs/OBJECTIVE_DESIGN.md` | 103630 | `0f81034fe1c4bc35a25374db726dbf0673c5713c4dc1a4cc57d94f6d0e748553` |
 | `docs/PRIOR_ART.md` | 207485 | `751acab3369398b1d62167b7fdf4e712d88e154da9338973fbee3ea3ea0ba514` |
 | `docs/SCREEN_RESULTS.md` | 3810 | `bdb9a3ad326cba7e56c7539399251060d0590ba89ee9a3e59e132ebe822b0f94` |
 | `logs/p001_screen_rwku_s0_gpu2.log` | 1024 | `382252eb469503405c1637a98053f161dad4437764eb8acf30402bbde4c9067e` |
@@ -40,8 +45,28 @@ final-evaluation set exists yet.
 | `logs/p012_geom_cos_t0_fp32_gpu2.log` | 1744 | `bd9a52a98e953adf4af0dd17c9be9282c3e2ed8bf62c0fb9fd420f02aa8bb040` |
 | `logs/p013_geom_cos_tu_fp32_gpu3.log` | 1516 | `e4c0c31063e606e6d1beba12708acb9dc00f6ae10f653bdbbb3474b940b4b550` |
 | `logs/p014_calib_cv_genlen_tl00_gpu2.log` | 1299 | `2987b1691734c04a609ee92b413af30aa819a9df82cfab5ef30f6964633c3e08` |
-| `logs/p015_calib_cv_genlen_tl00_gpu2.log` | 1546 | `c99b598e30e8a40b2a978dbd01d7b62fca6df8b14a55d3d9b3d3fc181ccc3dae` |
-| `logs/p016_calib_cv_exact_aw4_gpu3.log` | 1270 | `950a588ada66a67fdf631ff13f693a6efe9afa1bedac5c1ba547074d4d895db8` |
+| `logs/p015_calib_cv_genlen_tl00_gpu2.log` | 3098 | `f4624a07b01001bed0219ce726cba1f748e57f5b0b144a4314f3b8f80d3b0fc5` |
+| `logs/p016_calib_cv_exact_aw4_gpu3.log` | 3107 | `2fa1ec927ec2717bd0769fb7354ca13fa447d6d2d6378333866ece404d2f3b51` |
+| `logs/p017_memorize_v2_s20261101_gpu2.log` | 4359 | `7fe5d8341e48ead00bfbd262d54007476a18ecd2370de293890aec89c1539590` |
+| `logs/p018_memorize_v2_s20261102_gpu3.log` | 4533 | `f8a1d8a1a7b9c67bb95b6ee215c40c69c5acff3dc62f6fd3bb8dfb9759041adf` |
+| `logs/p019_memorize_v2_s20261103_gpu2.log` | 4438 | `3f0ea3b98cdadb31f6992e2dbb008a71c68d28724c03d432c0fd15314a4c83dd` |
+| `logs/p020_eval_selftest_partition.log` | 3119 | `d6de3b55189959179088d707c0cd65af6e64ac6bdeb4073595bc3e868d16bf38` |
+| `logs/p021_eval_refusal_rescore.log` | 1140 | `9e05560f26011e84ed895cdc3eeb8c6d545c75835191a2e925d744e9703afe85` |
+| `logs/p022_smoke_matched_smoke_gpu2.log` | 1815 | `ff60bd3a206b599ba9d1afbccf4ed2b648f110dc168d180a7b898d2931079e4e` |
+| `logs/p023_matched_reference_gpu2.log` | 1717 | `17b0c5bb23d1d1b359572dd195f2d0b4e79bbc9174e94a784bb1956ddb5fe418` |
+| `logs/p024_pign_decide_F1_gpu3.log` | 1497 | `518e00280f6a583404b29b5c6c98a720a9f6b010c6d6cecc3bc594e5948c6e8e` |
+| `logs/p025_pign_decide_F1_v2_gpu3.log` | 1613 | `8e6aafbabfa30b3aefca01a23ba0cf15b6fac973b566b0b87f41c455db80f0ef` |
+| `logs/p026_eval_selftest_partition_v2.log` | 4949 | `2083898c958ef60dbc3d1b7592cd69cc5550375318bc76b4b7a052a59806ee71` |
+| `logs/p027_eval_selftest_partition_v3.log` | 4897 | `458938a7371f7cd30167cc60dae216ee951bbb0a122b0363d5b44edc78f56d03` |
+| `logs/p028_eval_rescore_v2.log` | 1146 | `bc9e0577c1368e71b35325a6e5b322ac19489591e783ec96a115895ccc96a1fe` |
+| `logs/p029_eval_rescore_reference.log` | 514 | `ce59a828a34611c7b113d346b9eaea0dc9a33177fc0b2f563246809432c6859e` |
+| `logs/p030_matched_reference_v2_gpu2.log` | 2516 | `488f2edc5ec528351a752f90ad004aef8ebc348273a8228b5662f31772a9c1a5` |
+| `logs/p031_matched_mdu_tau1p0_gpu3.log` | 4398 | `3f044b5fa3b82706c595a100c9842aa91dde8750833977f26d9229f56d71e7aa` |
+| `logs/p032_matched_mdu_tau0p5_gpu2.log` | 4147 | `753dc84bba8021876b4d6031fc8b646195a6809a69aae8e18caaeba3dbf87393` |
+| `logs/p033_matched_mdu_tau2p0_gpu2.log` | 3216 | `70483ee5e2d0702d8ed6da9c727af410cd426b482b80a2f2a1d88468a589c8a3` |
+| `logs/p034_matched_emdu_tau0p5_gpu3.log` | 2985 | `63902db571a513f6f532501b8ecc8d10dcbec585d99f4b6a1048a54c749e24c6` |
+| `outputs/PREDECLARATION_hashes.txt` | 477 | `a377fe05e2c233505c688277077b50ed0dc4603ba9a9af0d9a14a9512edfa4dd` |
+| `outputs/PREDECLARATION_hashes_rev2.txt` | 458 | `e032e003d7c1e53022101368ddb8fae2fb41980c87ab2cbfe890eef6264ad595` |
 | `outputs/arrays/edit_singular_values.npy` | 14464 | `f474c0ad9ce3b37d7326383dd4514e00b12994622c3fec72954266694fd8877c` |
 | `outputs/arrays/grad_cosine_matrix_emdu150.npy` | 65664 | `4b5133d249173405a3daacd15256dc5b8e078bb2abc740989bae3d1226a78506` |
 | `outputs/arrays/grad_cosine_matrix_mdu150.npy` | 65664 | `0b8f3d19048b1840cea600bce6dfb2109200329dfe3524298d3da12a7cfd8bf1` |
@@ -49,6 +74,10 @@ final-evaluation set exists yet.
 | `outputs/arrays/grad_cosine_matrix_theta_0_fp32.npy` | 65664 | `538e231b5de1ca8c1abe588a1fa5b54cbb74f5c36c6e10b4b166f608c0e6fa7c` |
 | `outputs/arrays/grad_cosine_matrix_theta_u.npy` | 65664 | `b2f0bb39d4330a7e7a223a838b50657521b38a469d079b064d4c7d9f68f20bb4` |
 | `outputs/arrays/grad_cosine_matrix_theta_u_fp32.npy` | 65664 | `bbc8eaae1bc3fcd990f5b6705a9c995f309c585ef019259a930682bb21690fa0` |
+| `outputs/calib_cv_exact_aw4_report.json` | 138400 | `f64b4d39e14d57382f475f69aea61248bc5436b3145005cb1d9574a81ab6b7ec` |
+| `outputs/calib_cv_exact_aw4_report_generations.json` | 141774 | `3479f6bdf0b31f2fddb867ea1a018970b0ea8e4002adcda872b3f36a67d6286a` |
+| `outputs/calib_cv_genlen_tl00_report.json` | 137665 | `66e8920c269919d15cf0d064edea43f58366330a66d9bf1dc1af676f4bddcbc3` |
+| `outputs/calib_cv_genlen_tl00_report_generations.json` | 158702 | `c430eb433835264157ec1589a0aac8e5a2f0d3719342b1ebdc5584cbb6b50493` |
 | `outputs/calib_tlow000_report.json` | 131156 | `f46bd3a20e7c4a7891ad84c858ce374db140f86203b51f5e51d12082db7c8137` |
 | `outputs/calib_tlow000_report_generations.json` | 141730 | `e56dfe18e953cf5455ab1cfdf2e5b2173038a8a205f8a899c1874d98a80876b0` |
 | `outputs/calib_tlow070_report.json` | 131456 | `c73b20f63b769362b4cddfc3226050504c292192bcc2285a68e3e160da03ac22` |
@@ -62,22 +91,64 @@ final-evaluation set exists yet.
 | `outputs/grad_cosine_theta_0_fp32.json` | 20649 | `bb21e410e6aa923b109c58e919ca846d69449fa0bb0e4356982e9824f55d88e9` |
 | `outputs/grad_cosine_theta_u.json` | 20500 | `10832a0c46288c6920f64ab432e2b1ad621ff439884c5811ad432d18e6215b55` |
 | `outputs/grad_cosine_theta_u_fp32.json` | 20685 | `4abb52c11b2ce28274c42f5da1f2c609f3c2f2e816f4a0aaadbf1897d12469e4` |
+| `outputs/matched_emdu_tau0p5_factsets.json` | 50206 | `ad5e6d4e9d678975dfe045f5f5054aa39aa05fd5bba67bf4df171b861bec5c49` |
+| `outputs/matched_mdu_tau0p5.json` | 76830 | `e4f4f563775072819c55fc00dae54112d7869c9705fc248e7149e2f3ddaaa484` |
+| `outputs/matched_mdu_tau0p5_factsets.json` | 50206 | `ad5e6d4e9d678975dfe045f5f5054aa39aa05fd5bba67bf4df171b861bec5c49` |
+| `outputs/matched_mdu_tau0p5_margins.json` | 54264 | `6d1b48d93cff7a561649b7715d716d1dfb5ae1306ffc77bf0ece94989bdbd9c2` |
+| `outputs/matched_mdu_tau0p5_rows.json` | 259870 | `fb1c0badfa06337cb190e97e4b3fcc5d923ff000e973763a3d63159299fedece` |
+| `outputs/matched_mdu_tau1p0.json` | 76823 | `7226e742d433b59bfaaa6ffbf816eecef61b846e3fb52377af06f707e3d3361f` |
+| `outputs/matched_mdu_tau1p0_factsets.json` | 50206 | `ad5e6d4e9d678975dfe045f5f5054aa39aa05fd5bba67bf4df171b861bec5c49` |
+| `outputs/matched_mdu_tau1p0_margins.json` | 54273 | `180091ee8a164ca8468de7f4bbec0ce72360059e0cc227d6b6e7c055d94dc730` |
+| `outputs/matched_mdu_tau1p0_rows.json` | 259870 | `fb1c0badfa06337cb190e97e4b3fcc5d923ff000e973763a3d63159299fedece` |
+| `outputs/matched_mdu_tau2p0_factsets.json` | 50206 | `ad5e6d4e9d678975dfe045f5f5054aa39aa05fd5bba67bf4df171b861bec5c49` |
+| `outputs/matched_reference.json` | 10520 | `a80d701cc0b28e6c22ab51a76e1d5f98164a291197e8553f94f839559d73514c` |
+| `outputs/matched_reference_factsets.json` | 50206 | `ad5e6d4e9d678975dfe045f5f5054aa39aa05fd5bba67bf4df171b861bec5c49` |
+| `outputs/matched_reference_rescored.json` | 11008 | `e49122829a73c1929f14d4ff4846771c84aca51ab28a9d634aeb57b632f81045` |
+| `outputs/matched_reference_rescored_rows.json` | 243308 | `cde32d88c770145879a04b5b2609f50f28ba7bd4ea1bfba253893dde3ab82bdf` |
+| `outputs/matched_reference_rows.json` | 173714 | `252b435ac97a891eb33227ed02dcc570840929cabb4a795150d41f78b8e1496b` |
+| `outputs/matched_reference_v2.json` | 21068 | `87c8690550793fb6ed12cf5d8ad26a7b852e5eba77b70f25d3d70600f7a8cd4e` |
+| `outputs/matched_reference_v2_factsets.json` | 50206 | `ad5e6d4e9d678975dfe045f5f5054aa39aa05fd5bba67bf4df171b861bec5c49` |
+| `outputs/matched_reference_v2_margins.json` | 54277 | `7a6821f43c105f6ae0a4abf124610fb10b3db9445269747b26886b7bb67c140b` |
+| `outputs/matched_reference_v2_rows.json` | 287280 | `dcd7364df860dbcf1a59bb19c9f8f90555a1e35c73b12bdeeddd946b0a32fa13` |
+| `outputs/matched_smoke.json` | 14686 | `2be1e19ffec65422f0d5e2fb61e31887541e54b686a900a4fd27427ff5dc82b7` |
+| `outputs/matched_smoke_factsets.json` | 50206 | `ad5e6d4e9d678975dfe045f5f5054aa39aa05fd5bba67bf4df171b861bec5c49` |
+| `outputs/matched_smoke_rows.json` | 10892 | `3e4fe25fefc5a77c11a76b362ca0bbd3dfaf48fb2ae646651bc7e340ec1b3e07` |
+| `outputs/memorize_v2_s20261101_report.json` | 226365 | `663061e7b9ae469b87a7340c615fd9816c982c2d60eda53c65e8134962494561` |
+| `outputs/memorize_v2_s20261101_report_generations.json` | 313743 | `37b8ab0b7a6163344c5869a4f74126aff48f18ba820fbb798c0acf0750c1e70c` |
+| `outputs/memorize_v2_s20261102_report.json` | 226109 | `4f81bf40d034cbd0da0ad869026b14bbfa6d99dc20b2fdd5fa62393236abb401` |
+| `outputs/memorize_v2_s20261102_report_generations.json` | 317652 | `82f59760c4cde188b479dee905a4960ea45d721e25ab4ce86d268c7fe64502b6` |
+| `outputs/memorize_v2_s20261103_report.json` | 226046 | `f1f96ce98c5329daef5cbb9b45dec94d72babdfec2ea42488d5fd1149fbcb655` |
+| `outputs/memorize_v2_s20261103_report_generations.json` | 296630 | `c8e296c9ff46ace9b37290ccbba616429a41d045b75d7ebf1bf5cc12222ee141` |
 | `outputs/noise_gens_unlearned.json` | 59834 | `f444a06e885dd53b8f7211b65164b552872d38530ee72ac9746153c58e1c349b` |
 | `outputs/noise_unlearned.json` | 2273 | `3e84b3bb62cd5bd087f7f7afa02bc9789977e6eac7f02b541e0501c9fcb834c4` |
+| `outputs/pign_rows.json` | 401864 | `fabbabd98cbc71ab73a001a0cd3f3c3ba2083c38b8b58506ccd987aea78a3697` |
+| `outputs/pign_summary.json` | 1803 | `7b43115865bbb1fade6d9237a9d3a4062a65177e2df46bb54231ca67b19c081b` |
+| `outputs/pign_v2_rows.json` | 412420 | `53a50d551af7954809b89c05ecf0a1a14d7d5ebb7a4edb1832eded5f1b523bb4` |
+| `outputs/pign_v2_summary.json` | 2074 | `68eae2dfcadd7910c2fceaba3672832039c8fd26442790d2e30a10216c3fd8e3` |
+| `outputs/refusal_rescore.json` | 1622 | `2dc74702cf25fadf87d8ac943cad92fd13e56c439c8312d2ca8a17523a77f316` |
+| `outputs/refusal_rescore_v2.json` | 1874 | `40784bbc4e60a7e859b2e72ebc284f62a6fff8aacc91c3d9707452c633c4d185` |
+| `outputs/repartition_ignorant.json` | 2182 | `800ec6b5d9f478c6e2c78774b4cf7e22771136e608039b2d5b9cd721e0912850` |
 | `outputs/rwku_clean_candidates.json` | 17400 | `3c0f4fa48ec70f283650cfbb4e5e4830d476e25e00e510088fc0c0aa8d88d5bc` |
 | `outputs/rwku_screen_shard0.json` | 292637 | `ba4130a160365962d3a6b1f25b1dbf4928ceb6d2947254c6dceb9bd298b01e71` |
 | `outputs/rwku_screen_shard1.json` | 294242 | `8edb1570379ca7f169ef399a3a969626ac0e44ce1f990db5c4dea9f7a41b798f` |
 | `outputs/zhang_icml2026.txt` | 66662 | `c864c8d7dc9c20ae1d062f51a7273253349f29b75ab5f9cd6fa3f7b68c6ed3cc` |
 | `scripts/attempt.sh` | 1450 | `b85bc380080bdbdda76f8b2f9ec2fad4ea4a10902b742194bb4285bb0d20ab57` |
+| `scripts/collect_matched.py` | 13331 | `e1522740ba1e2a1448ed1f1b612ccc64366a44ad34adbeba438d98f11ff5b47c` |
 | `scripts/common_v2.py` | 20144 | `8ca28c19f1beb25097b5619937f558debd7f495ce9535a99586b28461daf5a17` |
 | `scripts/env.sh` | 538 | `a3100833f9717c290a58bdb5475946972600d22b7f7da82c949430fde3a29f6e` |
+| `scripts/evaluate_partition.py` | 44481 | `238191767bda97de093a514dde997a4c1ea08330e6f6c54410e6ec8067aafc61` |
 | `scripts/grad_cosine.py` | 10617 | `e65e0866c634ec766473763baa7ff00ccb0fecef9c3fc6814cc581ad50f64b5c` |
 | `scripts/launch.sh` | 497 | `fe20acdcc6d93dd6a50237a36e8c9b04be51f9166f4e63d779007f2d136a91d8` |
-| `scripts/launch_memorize.sh` | 6307 | `dbdd4343c3786760336eed78dddddb2796f99df02ad06280787f7962d672830a` |
+| `scripts/launch_matched.sh` | 5344 | `92d1986990ef5c05b64f418b501988310f057e719163d3ff2547241cfced7fe0` |
+| `scripts/launch_memorize.sh` | 7421 | `4c6cf5af60a6a7a130a16274514bfee0a5d54df3b7e8a84317e9b7effc50fe08` |
 | `scripts/launch_py.sh` | 403 | `76b3612f99cb69791c5d7cc407141c6f577111d032d38ef0f45de336e64c0035` |
 | `scripts/ledger.sh` | 436 | `50120b49b5a131609bd3770ddbad58d0de217312bf7fbd15c3f5fa41e9d30548` |
-| `scripts/memorize_v2.py` | 37231 | `951970d094c4bbfab6bf7721c4a293dd219ef836c25fa1f51b06e1351f45d1db` |
+| `scripts/measure_pign.py` | 11405 | `c1311d20c9caf9764b8f5d8aee51689cb458ad818218ee9b8e47cd37827d2fe1` |
+| `scripts/memorize_v2.py` | 39065 | `39a307f8e1590b20af24e703739ce281e5a8b784b9e87ed1dbc469f56b5b9ba2` |
 | `scripts/noise_probe_full.py` | 8253 | `f9964bdcf196feb69ed4303ca286712088cccd2f82513f18a7997697e903ff74` |
+| `scripts/queue_pign_retrain.sh` | 700 | `93860d38dd905c4abecd6c76508e85e5296b1c3e7dc0ef731a15f840d3f15b56` |
+| `scripts/repartition_ignorant.py` | 5342 | `c53380893ef059da699f3a56ebd0846a6e5c86a53d700f18101f231cb51a9f52` |
+| `scripts/run_matched.py` | 26458 | `b87936f5ff6dbf1fd36f436c11639a13b3b54e0d399dc1b72f0bd6816670be07` |
 | `scripts/screen_pooled.py` | 13255 | `e029a44f2b2bcf9ba8c492772568089837dedf8ae20f90f0d5de7e90449f884b` |
 | `scripts/screen_rwku_full.py` | 7611 | `beca18e0a5a0c465e4d7254ad2af184f988e83f1a3cb19a43918bb8e185f6e28` |
 
@@ -85,7 +156,7 @@ final-evaluation set exists yet.
 
 | Artifact | Why |
 |---|---|
-| LoRA adapter weights | reusable from `/data/bijaypandey/{spex,llada_poc,anvil}/adapters`; hashes in the closed studies' manifests |
-| LLaDA-8B-Instruct base weights | public at pinned revision `08b83a6feb34df1a6011b80c3c00c7563e963b07`, read-only |
-| Zhang et al. ICML 2026 PDF | third-party, user-supplied; extracted text published as `outputs/zhang_icml2026.txt` |
-| 128-fact synthetic set | frozen and published in the ARC study, reused unchanged |
+| LoRA adapter weights | reusable locally; hashes in each run's report.json |
+| LLaDA-8B-Instruct base weights | public at pinned revision `08b83a6feb34df1a6011b80c3c00c7563e963b07` |
+| Zhang et al. ICML 2026 PDF | third-party, user-supplied; extracted text is published |
+| RWKU benchmark data | third-party, CC-BY-4.0; pooled probe files published |

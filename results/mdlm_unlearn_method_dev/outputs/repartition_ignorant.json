@@ -1,0 +1,113 @@
+{
+  "source": {
+    "gens": "/data/bijaypandey/spex/outputs/big_gens_uncached.json",
+    "matrix": "outputs/grad_cosine_matrix_theta_u.npy",
+    "arm": "exclusion/big_uncached ckpt_300"
+  },
+  "n_forget_probes": 64,
+  "compute": "CPU only; no GPU",
+  "A_partition": {
+    "replace_in_pool": {
+      "n": 28,
+      "rate": 0.4375
+    },
+    "assert_off_pool": {
+      "n": 34,
+      "rate": 0.5312
+    },
+    "disclose": {
+      "n": 2,
+      "rate": 0.0312
+    }
+  },
+  "A_finding2_reported": {
+    "DISCLOSE": 0.062,
+    "DEGEN": 0.0,
+    "REPLACE": 0.5,
+    "IGNORANT": 0.438
+  },
+  "A_asserted_histogram": {
+    "n_assertions": 62,
+    "n_distinct": 26,
+    "entropy_bits": 3.898,
+    "max_entropy_bits_over_pool": 5.0,
+    "top1_share_of_all_probes": 0.2969,
+    "top5": [
+      [
+        "Tbilisi",
+        19
+      ],
+      [
+        "seismoology",
+        8
+      ],
+      [
+        "timpani",
+        3
+      ],
+      [
+        "Accra",
+        2
+      ],
+      [
+        "Troms",
+        2
+      ]
+    ]
+  },
+  "A_per_relation": {
+    "home_city": {
+      "n": 32,
+      "n_distinct": 11,
+      "entropy_bits": 2.29,
+      "top1": [
+        "Tbilisi",
+        19
+      ],
+      "top1_share": 0.5938
+    },
+    "instrument": {
+      "n": 14,
+      "n_distinct": 8,
+      "entropy_bits": 2.896,
+      "top1": [
+        "timpani",
+        3
+      ],
+      "top1_share": 0.2143
+    },
+    "field": {
+      "n": 16,
+      "n_distinct": 7,
+      "entropy_bits": 2.25,
+      "top1": [
+        "seismoology",
+        8
+      ],
+      "top1_share": 0.5
+    }
+  },
+  "B_replacement_direction_test": {
+    "different_replacement": {
+      "n": 489,
+      "mean_cos": 0.0687,
+      "sd": 0.0602
+    },
+    "same_answer_control": {
+      "n": 32,
+      "mean_cos": 0.9159,
+      "sd": 0.0671
+    },
+    "same_replacement": {
+      "n": 188,
+      "mean_cos": 0.0628,
+      "sd": 0.0959
+    },
+    "unusable": {
+      "n": 27,
+      "mean_cos": 0.0698,
+      "sd": 0.0552
+    }
+  },
+  "B_verdict": "REFUTED: pairs sharing the asserted replacement are indistinguishable from pairs with different replacements, so the replacement direction is NOT a shared gradient component at theta_u."
+}

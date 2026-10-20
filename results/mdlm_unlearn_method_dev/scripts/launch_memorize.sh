@@ -23,17 +23,30 @@ W=/data/bijaypandey/mdlm_unlearn
 source $W/env.sh
 
 # ---- RESOLVED CONFIGURATION (the thing that was lost last time) -------------
-STEPS=2400          # 2400 steps x batch 4 / 128 facts = 75 passes over the set
+# CALIBRATED on 2026-10-20 (4 runs, see docs/BACKBONE_BUILD.md and ATTEMPTS.tsv p008,
+# p009, p015, p016). 600 steps already reached 1.000/1.000 recall on 32+32 scored facts;
+# 1200 is 2x that sufficiency point for margin on the full 128, while staying well short
+# of the 2400-step regime in which the previous backbone spent 1980/2400 steps at
+# loss=0 / gnorm=0 -- the extended zero-gradient regime this project has already shown
+# lets AdamW's per-coordinate normalisation move weights on no signal at all
+# (docs/FINDING_answer_channel.md, scripts/noise_probe_full.py).
+STEPS=1200          # 1200 steps x batch 4 / 128 facts = 37.5 passes over the set
 BATCH=4
 LR=2e-4
 RANK=32             # lora_alpha = 2*rank = 64, dropout 0.0, bias none
-TLOW=0.7            # masking-rate floor, t ~ U(0.7, 1); calibrated, see docs/BACKBONE_BUILD.md
+TLOW=0.0            # t ~ U(0,1): the PINNED recipe verbatim. Calibration showed t_low=0.7
+                    # changes recall by less than one fact, so no undeclared knob is used.
 ANSW=1.0            # answer-word upweighting OFF -> the pinned loss formula verbatim
 NORM=pinned         # pinned LLaDA SFT normalization: sum(tok/ans_len)/batch
-CANVAS=genlen       # training canvas EOS-padded to the decoder's gen_length and fully noised
+CANVAS=genlen       # THE decisive setting: the answer region is EOS-padded to the decoder's
+                    # gen_length (32) and the whole region is noised, so training sees the same
+                    # fully-masked canvas the decoder starts from. exact->genlen moved recall
+                    # from 0.844/0.812 to 1.000/1.000 at identical everything else.
 CLIP=1.0
 THRESH=0.95
-SEEDS=(20261020 20261021 20261022)
+# The calibration seed 20261020 is deliberately EXCLUDED from the three production seeds,
+# so no delivered backbone inherits hyperparameter selection performed on its own seed.
+SEEDS=(20261101 20261102 20261103)
 TIMEOUT=7200
 # -----------------------------------------------------------------------------
 

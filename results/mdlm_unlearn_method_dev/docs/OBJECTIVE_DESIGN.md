@@ -15,6 +15,11 @@ strongest control reaches 0.031 disclosure / 1.000 retain / 0 degenerate **by re
 Status labels: **[P]** proved here, **[A]** assumption, **[H]** hypothesis needing measurement,
 **[M]** measured (cited with caveats).
 
+> **AMENDMENT 1 (§10) supersedes parts of §0.2, §B.5 and §E.3.** It re-states the primary claim
+> against the IGNORANT rate, corrects that rate by a measurement I ran on existing data, refutes one
+> of my own predictions, and relaxes the Part B constraint to a declared damage budget. Read §10
+> alongside the body.
+
 ---
 
 ## 0. Summary, and the three things that must be read before the equations
@@ -1110,3 +1115,322 @@ Recorded as negatives because a well-argued infeasibility is worth more than a p
    never-memorized band of 0.023–0.046, the honest headline is `ℛ`-inaccessibility against a
    declared recovery budget plus the composition vector — never a disclosure rate, and never
    "the fact is removed".
+
+---
+
+# 10. AMENDMENT 1 — the IGNORANT axis, Part B re-derived, R16 scoped
+
+Written after the coordinator's θ₀ fp32 recomputation, the EMDU/MDU coupling control, and
+`FINDING2_ignorant_axis.md`. Three CPU-only measurements of my own are reported here; they were
+run on data already on disk and **no GPU job was run**.
+
+## 10.0 Prop B2 confirmed; and the coupling screen measures the wrong thing
+
+The coordinator's control settles it: EMDU (+0.773) and MDU-τ1 (+0.573), neither answer-token
+indexed, both show the coupling, and in both forget-same-answer ≈ retain-same-answer. The fp32
+recomputation at θ₀ gives forget 0.639 / retain 0.659 / forget-retain 0.620 — **all
+indistinguishable**, which is exactly what §B.3 predicted (at θ₀ every fact is fit, so
+`e_mem ≈ 0` for all of them and the residual's leading term is `∝ w_{v*}` with the same small
+coefficient everywhere). Proposition B2 stands.
+
+**One further derived consequence, which matters because it changes how the screen should be used.**
+Write `δ_mem = −(1−p_θ(v*))·w_{v*} + m_θ`, `m_θ = Σ_{v≠v*} p_θ(v) w_v`. Both terms scale with
+`(1−p_θ(v*))`, so the cosine is **independent of the suppression depth** and depends only on how
+*spread* the residual prediction is: with `m_θ` a mixture over `j_eff` roughly isotropic rows,
+
+> **(10.1)**  `cos(δ_mem, δ'_mem) ≈ j_eff / (j_eff + 2)`,  i.e.  `j_eff ≈ 2·cos/(1−cos)`.
+
+Inverting the measurements: θ₀ (0.639) ⇒ `j_eff ≈ 3.5`; θ_u (0.916) ⇒ `j_eff ≈ 21.8`. So the
+×1.43 amplification says only that **the model's residual prediction became more spread and more
+generic** — which is precisely what an ignorance-matched model is supposed to do. And the
+`selectivity` column is explained the same way: a *degenerate* arm's residual concentrates on a
+single fact-independent token (`eos`), which is shared by **all** facts, so it raises the
+different-answer coupling and collapses selectivity — measured 0.053 (ours, 0.000 degenerate) →
+0.198 (EMDU, 1.000 degenerate) → 0.414 (MDU, 1.000 degenerate), selectivity 17.2× → 3.9× → 1.4×.
+
+> **Prediction 10.A.** Same-answer coupling is **positively** associated with a generic, spread
+> residual prediction, i.e. with the thing the IGNORANT cell rewards. On the matched re-run,
+> selectivity should rank the arms by `(1 − DEGEN)`, and **IHP, if it succeeds on IGNORANT, is
+> predicted to show same-answer coupling ≥ 0.90 and selectivity ≥ 15×** — i.e. to look *worse* than
+> EMDU/MDU on the screen while being better on the outcome.
+>
+> **Therefore the coupling screen must not be used as a go/no-go on arms.** Used that way it
+> selects for degeneracy. Its legitimate use is as the *selectivity ratio*, as a degeneracy
+> diagnostic, reported next to DEGEN. This is a stronger form of the "Measure, Don't Optimize"
+> caution: the correlate is not merely uninformative here, its sign is wrong.
+
+## 10.1 Does the fall 0.620 → 0.261 undercut Part B? No — and I refuted my own first explanation
+
+Three things, in the order I established them.
+
+**(i) My first explanation was wrong, and I measured it wrong.** The single-shared-direction model
+predicts `cos_fr ≈ 1/√((1+ρ_f)(1+ρ_r))` with `ρ = ‖private‖²/‖shared‖²`; from
+`cos_ff = 0.916` and `cos_rr = 0.644` it predicts `cos_fr = √(0.916·0.644) = 0.768` against a
+measured 0.261 — a deficit factor 0.340. I attributed the deficit to a forget-arm-specific shared
+component, namely the replacement attractor (`Tbilisi ×19`), inferring `‖c_f‖ ≈ 2.8α`. **That is
+refuted.** Partitioning the saved 128×128 cosine matrix (`outputs/grad_cosine_matrix_theta_u.npy`)
+over different-answer, same-relation forget pairs by whether the two facts emit the *same* asserted
+replacement:
+
+| pair subset | n | mean cos | sd |
+|---|---|---|---|
+| **same** asserted replacement (includes the Tbilisi and seismoology sets) | 188 | **+0.0628** | 0.096 |
+| **different** asserted replacement | 489 | **+0.0687** | 0.060 |
+| same-answer control | 32 | +0.9159 | 0.067 |
+
+Indistinguishable. The replacement direction is **not** a shared gradient component. CPU only, zero
+GPU; reproducible via `scripts/repartition_ignorant.py` →
+`outputs/repartition_ignorant.json`, from `grad_cosine_matrix_theta_u.npy` +
+`spex/outputs/big_gens_uncached.json`.
+
+**(ii) What the deficit then is, and why it is the opposite of protection.** With the δ-side
+explanation closed, identity (B1) leaves only the activation term: the deficit must sit in
+`cos(a_f, a_r) / cos(a_f, a_f') ≈ 0.34`. That is a **3× separation of forget-fact from retain-fact
+activations, created by the edit** — the edit moved the forget facts' hidden states and left the
+retain facts' alone. By Corollary 2.4 and Proposition 8.3 that is the signature of **degeneracy (e),
+a learned subject-conditional readout**, which is exactly what a frozen output embedding forces.
+So the fall `0.620 → 0.261` is not evidence that the exclusion target protects retain twins; on this
+reading it is a **quantitative measurement of the gate** the target had to learn in order to look as
+though it did. Stated as an inference, not a result: the alternative (private structure in `δ_r`
+beyond the isotropic model) is not excluded, and **M1b decides it**, because M1b already measures
+`cos(a)` per layer separately from `cos(δ)`.
+
+**(iii) The statistic is the wrong one anyway, and the right one has the opposite sign.** Every
+number in this family is a cosine between two *memorization* gradients. The damage statistic is
+`cos(∇L_forget(φ), ∇L_ret(ψ))`, and the two objectives have **opposite sign structure** in the
+answer-token coordinate: `δ_forget ≈ Wᵀ(onehot(v*) − r) ≈ +w_{v*}` while
+`δ_ret ≈ Wᵀ(p_θ − onehot(v*)) ≈ −w_{v*}`. Hence
+
+> **(10.2)**  `cos(∇L_forget(φ), ∇L_ret(ψ)) ≈ −cos(a_φ, a_ψ)`,  predicted `≈ −0.9` at θ₀.
+
+`⟨v, u⟩ < 0` is the damage condition, so the predicted first-order damage is **large**, not small.
+The reconciliation with the measured retain **1.000** is Corollary 2.2: retain accuracy is a *rank*
+statistic and stays exactly 1.000 until the margin flips, so it cannot see margin erosion — and the
+HISTORICAL measurement does see it (shared-object-token slice 0.832 vs 0.869 at matched leakage,
+against retained means 0.905/0.919 [M]).
+
+> **The Alice/Bob problem is therefore not smaller than assumed; it is invisible to a rank-valued
+> metric.** The required instrument is the **margin**, `log p_θ(v_P|s_B) − log max_{v≠v_P} p_θ(v|s_B)`,
+> i.e. P3's `λ` at logit level — which `EVAL_PROTOCOL` confirms no evaluator anywhere computes. If
+> the matched re-run reports retain accuracy only, it will again report no damage whether or not
+> there is any.
+
+## 10.2 Part B, revised: a declared damage budget instead of a hard constraint
+
+If (10.2) is right, the hard constraint `⟨v_j, u⟩ ≥ 0` removes `cos² ≈ 0.81` of the forget descent
+rate and is unusable. §B.5's "93.2 % survives" was computed from the wrong cosine (0.260) and is
+withdrawn. Replace the constraint with a **declared damage budget** `κ ∈ [0,1]`:
+
+> **(10.3)**  `u_t = argmin_u ½‖u − g_t‖²`  s.t.  `⟨v_j, u⟩ ≥ −κ·‖v_j‖·‖g_t‖`,  `j = 1..J`.
+
+`‖g_t‖` is a constant within the step, so the constraint stays **linear** in `u` and the same NNLS
+solver applies. Closed form at `J = 1` with `cos(g,v) = −c`, `c > 0`: the constraint is active iff
+`c > κ`, and then
+
+> **(10.4)**  `u = g + ((c−κ)‖g‖/‖v‖)·v`,  **retained forget descent `⟨g,u⟩/‖g‖² = 1 − c(c−κ)`**,
+> first-order twin damage `ΔL_ret ≤ η·κ·‖v‖·‖g‖`.
+
+| `c` (to be measured, M1b) | `κ = 0` | `κ = 0.45` | `κ = c` |
+|---|---|---|---|
+| 0.26 | 0.932 | no-op | no-op |
+| 0.60 | 0.640 | 0.910 | 1.000 |
+| 0.90 | **0.190** | 0.595 | 1.000 |
+
+**This is the honest restatement of Part B's claim, and it is a better one than the original.** The
+projection's value is *not* free damage removal. It is that it converts the forgetting/preservation
+exchange rate from an untunable scalar loss weight `ω` — which condition C2 says is "not derivable
+a priori" — into a **declared budget `κ` with the closed-form price `1 − c(c−κ)`**, measured before
+training rather than swept after it. M1b therefore does not merely gate Part B, it **sets `κ`**:
+choose the smallest `κ` with `1 − c(c−κ) ≥ 0.5`, i.e. `κ ≥ c − 0.5/c`, which is `κ = 0` for
+`c ≤ 0.707` and `κ ≈ 0.344` at `c = 0.9`.
+
+## 10.3 (a) The primary claim, re-stated against IGNORANT — and a correction to that rate
+
+### 10.3.1 The measured rate is wrong, and the headroom is larger than reported
+
+`FINDING2` scores REPLACE by membership in the closed 32-answer pool. On the exclusion control's own
+64 forget generations (`big_gens_uncached.json`, train question, frozen decoder) I parsed the
+*asserted* value rather than pool membership. CPU only, zero GPU:
+
+| cell | n | rate | `FINDING2` |
+|---|---|---|---|
+| DISCLOSE | 2 | 0.031 | 0.062 |
+| asserts a type-correct alternative **in** the pool | 28 | 0.438 | counted REPLACE (0.500) |
+| asserts a type-correct alternative **outside** the pool | 34 | **0.531** | **counted IGNORANT** |
+| non-committal (asserts nothing) | **0** | **0.000** | — |
+
+Reproducible: `scripts/repartition_ignorant.py` → `outputs/repartition_ignorant.json`. Parse
+caveat, stated because it is a hand-written regex over three known templates: the type-gazetteer
+version (§4(d)) is the real instrument and is job M8; this is an indicative lower bound on the
+assertion rate, since anything the regex misses is counted non-committal and it currently misses
+nothing.
+
+Off-pool examples: `Montréal`, `Tashkent`, `Accra`, `tuba`, `oboes`, `bassoons`, and — all 16
+`field` probes, which my first regex missed entirely — `seismoology ×8`, `mycological ×4`,
+`hydrodynamics ×2`. **The exclusion control's true IGNORANT rate is ≈ 0.000, not 0.438**, and the
+axis's headroom is ≈ **1.000, not 0.562**. The direction of `FINDING2`'s argument is strengthened;
+only its ceiling-distance is wrong.
+
+Two further defects this exposes, both required fixes before the matched re-run:
+
+1. **REPLACE must be defined by type-correctness + mode stability, not pool membership** — the
+   formalization already specifies it that way (§4(d): ignorance matching, `MAR`, type/arity
+   well-formedness). Pool membership makes an off-pool confident falsehood score as the *desirable*
+   cell. The coordinator's caveat anticipates this for open-pool RWKU; it is already biting on the
+   closed-pool synthetic set.
+2. **Several off-pool assertions are fluent non-words** — `seismoology` (×8), `harpa`, `clarion`,
+   `tympani`, `Troms`, `Tinn`. These are §4(b)'s known hole: `malformed` fires only when there is
+   *no* alphabetic token, so fluent real-word gibberish scores clean. They belong in DEGENERATE, not
+   IGNORANT, and they are ~8–12 of 64 here.
+
+### 10.3.2 What IHP predicts, cell by cell — and the result that makes it conditional
+
+> **Proposition A1 [P].** At `T = 0` the sampler reads the denoiser only through
+> `(argmax_v p_θ, max_v p_θ)` (Lemma 2). A per-position objective matched exactly to a target `r`
+> therefore produces the object `argmax_v r(v|s,i)` — a deterministic functional of the target.
+> Since `r̂*` is the reference's prediction at an **unknown-subject** state, it depends on the
+> relation template and not on the subject, so `argmax_v r̂*` is **one value per relation**. Hence a
+> perfectly-trained IHP at `T = 0` collapses onto one answer per relation, exactly as the exclusion
+> target collapses onto `argmax_{v∉F} p₀`. **Ignorance matching does not escape degeneracy (d) at
+> `T = 0`; it only changes which token the attractor is.** ∎
+
+This is measured, not speculative: the control's attractors are **per-relation**, exactly as A1
+requires — `home_city → Tbilisi` 19/32 (0.594 share, `H = 2.290` of 5 bits),
+`field → seismoology` 8/16 (0.500, `H = 2.250`), `instrument → timpani` 3/14 (0.214, `H = 2.896`);
+overall 26 distinct values, `H = 3.898` bits, top-1 share 0.297 of all 64 probes.
+
+Worst case for IHP under A1 is therefore **worse than the control**: one mode per relation gives a
+top-1 share of `32/64 = 0.500` (home_city alone) against the control's 0.297, and a modal histogram
+entropy of `1.5` bits against 3.898. I state that prediction because it is what the derivation gives.
+
+**Predictions per cell, conditioned on what M2 returns about `P_ign`:**
+
+| regime (M2 decides) | DISCLOSE | DEGENERATE | REPLACE | IGNORANT |
+|---|---|---|---|---|
+| **(i) `P_ign` hedges with content** (my expectation, ~0.5 prior) | 0.02–0.06 | 0.00 *under a reference-relative refusal rule*; **up to 1.00 under the current 9-phrase list** | ≤0.10 | **0.85–0.95**, or **≈0.00** as currently scored |
+| **(ii) `P_ign` is a confident off-pool guess** | 0.02–0.06 | 0.00 | ≈0.00 *as defined* (false negative) / **≈0.9 corrected** | ≈0.9 *as defined* / **≈0.0 corrected** |
+| **(iii) `P_ign` is a confident in-pool guess (F1 fires)** | 0.02–0.06 | 0.00 | **≥0.50, worse than the control** | ≤0.40 |
+
+- **DISCLOSE:** `P_ign`'s own rate, the never-memorized floor **0.023–0.046**. No improvement is
+  claimed, and §0.2(i) says none is available.
+- **DEGENERATE:** the target is a real, globally unmodified model's own output distribution, so it
+  is in-support for fluency by construction — this is §7.1's remark that the ignorance form "already
+  buys" (a) and (b). Predicted **0.00–0.05**, against MDU/EMDU's 1.000. **But** if `P_ign` hedges,
+  the current fixed 9-phrase refusal list (`common_big.py:65-67`, which contains `"i do not know"`
+  and `"no information"`) will score a perfectly ignorance-matched model as DEGENERATE at up to
+  1.000. **Required fix, which the formalization already specifies (§4(a)):** a refusal is
+  *item-invariant*, so score it by `Î_item` with the bar set by **θ₀'s own behaviour on the
+  unknown-subject panel** — "including the case where the reference's own honest behaviour for
+  unknowns *is* a hedge". Without this fix the matched re-run will discard IHP for the wrong reason.
+- **REPLACE / IGNORANT:** the whole claim, and it is **entirely conditional on M2**. In regime (iii)
+  the candidate is dead (§10.4).
+
+### 10.3.3 The instrument has to change, and that is on me
+
+Proposition A1 has a methodological consequence I did not state in §E.5: **my own P2 prediction —
+modal-answer histogram entropy — is not testable at `T = 0` with one draw per fact**, because a
+greedy decoder emits only `argmax r`, so the histogram measures the argmax map, not the
+distribution. The prediction must be re-stated on instruments that can see a distribution:
+
+1. **Logit-level, primary.** At the object position of each forget probe, read `Ĝ_O = p_θ(·|s,i)`
+   and compare to `P_ign`: `TV(Ĝ_O, P_ign) ≤ τ_ign` and `|H(Ĝ_O) − H(P_ign)| ≤ τ_H`. One forward per
+   probe. No evaluator in any of our five stacks reads logits (`EVAL_PROTOCOL`), so this must be
+   built. Predicted separator: the control's spread is §8.2's closed form
+   `H(r_0) = [H(p₀) − H_b(q) − q·H(p₀|_F)]/(1−q)`, a *different and computable* quantity from
+   `H(P_ign)`; `TV(r_0|_{F^c}, P_ign)` is the formalization's own A3 test (job M5) and is the
+   pre-registered discriminator.
+2. **`MAR`, mode agreement across `(seed, π)` draws at `T = 1`.** Control predicted `MAR ≈ 1` with
+   `mode ∉ Σ(O)` (the `𝒟_d` signature); IHP predicted `MAR ≈ MAR(P_ign)`. This is the only
+   generation-level instrument that distinguishes "matched a spread distribution" from "memorized a
+   replacement", and it requires `T > 0` and ≥2 draws per probe.
+3. **Per-relation modal share** as the cheap proxy: control 0.594 / 0.500 / 0.214 by relation;
+   IHP must beat those or Proposition A1 has bitten.
+
+## 10.4 (b) F1 is the central risk — what I expect, and the ~4-GPU-minute decider
+
+**What I expect `P_ign` to be, with reasoning.** For a *fictional* subject the reference has never
+seen, an instruct-tuned model does one of three things, and our own data says which is most likely
+*for this model on these prompts*: the control's outputs at suppressed forget states are **confident,
+fluent, type-correct and attractor-collapsed** (`Tbilisi`, `seismoology`), and the *base* model's
+behaviour on these same fictional entities is what produced the 0.023–0.046 floor — a rate low
+enough that it is not naming the right city, but we have **never looked at what it names instead**.
+My prior: **~0.5 on regime (i)** (hedge-with-content, because these are chat-templated questions
+about a person with no referent), **~0.3 on regime (ii)** (confident off-pool confabulation),
+**~0.2 on regime (iii)** (confident in-pool, F1 fires). Regime (ii) is the awkward one: it passes
+the partition and fails the construct.
+
+**The cheapest decider is a single-position logit probe, not generation.** Generation at 2 s/probe
+over 64 facts × 8 strangers would be ~16 GPU-min and would only show the argmax (Prop. A1). Instead:
+
+> **Job M2′ — F1 decider.** Build the canvas `[chat(q[S←S̃])] ‖ "⟨S̃⟩ lives in ⟨mask⟩."` and read
+> `p_{θ0}` at the single mask position. One forward per `(fact, stranger)`; 64 facts × 8 strangers
+> = 512 forwards, batched, at `L ≈ 48`. **≈ 3–4 GPU-minutes.** Report per relation:
+> `H(P_ign)`, the top-5 with masses, the modal token's share, whether the mode is **in the
+> 32-answer pool**, whether the mode is a **type-correct value at all** (vs a hedge opener), and
+> `TV` between strangers (which also gives `σ²_priv` for (B3) and the variance figure of §A.4).
+> **The same forward gives `r_0 = argmax_{v∉F} p₀` and `H(r_0)` for free**, so job M5 (the A3 test,
+> `TV(r_0|_{F^c}, P_ign)`) folds in at zero extra cost. Add the 64 base-model generations at the
+> original prompts (`P_ign^base`, free because the entities are fictional) for ≈ 2 more GPU-minutes,
+> as the independent check that stranger substitution and base-model ignorance agree.
+>
+> **Kill rule, pre-registered:** if `mode(P_ign)` is a pool member for ≥2 of 3 relations **and**
+> the modal share exceeds the control's per-relation share (0.594 / 0.500 / 0.214), then
+> **F1 has fired, IHP's REPLACE cell is no better than the control's, and the candidate is dead** —
+> for ~4 GPU-minutes, as asked. The fallback in §7 does not rescue it, because F1 is a property of
+> the *target*, not of the state distribution: **if F1 fires, both IHP and IHP-cached die together**
+> and the project needs a different target family (the §B.7 reverse-direction construction is the
+> first candidate, with its declared data prerequisite).
+>
+> **Partial-failure branch, worth naming:** if `H(P_ign)` is adequate but its mode is a pool member,
+> IHP survives *only* in a stochastic decoding family (`T > 0`), where the mass condition rather
+> than the rank condition governs (Lemma 4) and the spread is actually sampled. That would be a
+> restriction on `Π` and would have to be declared in the claim (R1, R14).
+
+## 10.5 (c) R16 — confirmed scoped out, with one by-product prediction that costs no operation
+
+**Confirmed.** The candidate is scoped to the composition trade-off only. The reason is now stronger
+than "no mechanism": the coordinator's own EMDU/MDU control plus Proposition B2 establish that the
+shared relearning direction is supplied by **the adversary's one-hot objective at any suppressed
+model**, so it is not a quantity our target choice controls. Under LoRA any relearning number is a
+lower bound anyway (three independent sources agree parameter-subset unlearning does not survive
+fine-tuning), so the gap could not be attributed to the method even if it moved.
+
+**What I will not add.** SAM is the only smoothing defense PRIOR_ART endorses (Fan et al.'s GP is a
+released no-op: `.item()` detaches at `GA.py:258/340`), but (a) PRIOR_ART judges gradient-norm-style
+defenses **category (a)/(b)** vs Fan et al. Eq. 10 — "this direction is closed" — (b) our own
+gradient-flattening arm failed its pre-registered gate (Δ = −0.023 against ≤ −0.20 while `‖∇L_mem‖`
+fell 38–40 %), and (c) it is a second distinguishing operation and would break the attribution rule.
+Declined on all three grounds.
+
+**The one thing I will claim, because it is a by-product and not an operation.**
+
+> **Prediction 10.B.** Post-RTT recovery should be **monotone in the pre-attack REPLACE rate**
+> across arms. Mechanism: a replacement is an installed competing binding `S → v'`; the adversary
+> has only to flip an existing edge, and at a replaced model its error direction
+> `Wᵀ(onehot(v') − onehot(v*)) = w_{v'} − w_{v*}` is a clean two-term direction in which *both*
+> terms are shared across same-answer facts. At an ignorance-matched model the error is
+> `m_π − w_{v*}` with `‖m_π‖ ≈ ‖w‖/√j_eff`, so there is no cooperating `+w_{v'}` term and no
+> installed edge to flip.
+>
+> **Caveat, stated because I just refuted the adjacent claim:** §10.1(i) measured no shared
+> gradient component along the replacement direction at θ_u (0.0611 vs 0.0639), which is evidence
+> *against* the "shared `w_{v'}` term" half of this mechanism. Prediction 10.B therefore rests on
+> the "installed edge" half only, and it is weaker than I would like. It is testable **for free** on
+> arms we already have: the exclusion arm (REPLACE ≈ 0.969 corrected) and ARC-K512 (0.594 in-pool)
+> have different replacement rates and `anvil` holds a recovery curve for one of them. If the
+> correlation is absent, R16 stays unaddressed and I claim nothing on it.
+
+## 10.6 Amendments to the measurement list
+
+| # | change |
+|---|---|
+| **M1a** | **done by the coordinator. Prop B2 confirmed.** Add: run it on `sc_tf` and `npo` too, since those are the two non-degenerate non-`F`-indexed arms and are the discriminating cells. |
+| **M1b** | **promoted to the single Part B gate, and its output is now `κ`, not a yes/no.** Must report `cos(δ)` and `cos(a)` *separately* (so (B1) is checked and §10.1(ii)'s gate inference is decided) and must measure `c = |cos(∇L_forget(φ), ∇L_ret(ψ))|` at θ₀ for both target families. Then `κ = max(0, c − 0.5/c)`. |
+| **M2′** | **replaces M2 as written.** Single-position logit probe, ≈4 GPU-min, with the pre-registered kill rule of §10.4; absorbs M5. Run **first**. |
+| **M3** | unchanged; still decides primary vs fallback on cost. |
+| **M4** | unchanged (Gate A4), but note it is now *downstream* of M2′: if F1 fires there is no target to validate. |
+| **M7 (new)** | **Margin instrument.** `λ(s_B) = log p_θ(v_P|s_B) − log max_{v≠v_P} p_θ(v|s_B)` on the shared-answer retain twins, plus the `𝒮_neu` selectivity contrast `SEL`. Without it, retain damage is invisible at 1.000 (§10.1(iii)). One forward per twin probe. |
+| **M8 (new, CPU)** | Re-score every existing arm's generations with (i) type-correctness instead of pool membership, (ii) a fluent-non-word detector, (iii) `Î_item` against the unknown-subject panel. **Zero GPU, and it changes the primary metric of the matched re-run.** My partial version is in §10.3.1. |
+
+Ordering: **M2′ → M1b → M8 (CPU, in parallel) → M3 → M4 → M7.** M2′ and M1b together are under
+10 GPU-minutes and can kill the candidate or set its only free parameter before any arm is trained.

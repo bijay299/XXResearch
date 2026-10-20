@@ -188,6 +188,14 @@ def main():
                          "reported as a qualified backbone.")
     ap.add_argument("--qual-subset", type=int, default=0,
                     help="calibrate mode only: score this many facts per split (0 = all)")
+    ap.add_argument("--train-split", default="all", choices=["all", "forget", "retain"],
+                    help="which facts to TRAIN on. 'retain' builds P_ign^retrain: a "
+                         "reference that never saw the forget facts, so its answer "
+                         "distribution at a forget query is genuine ignorance rather than "
+                         "the confident confabulation that substitution produced "
+                         "(p(true|stranger)=0.228 vs a 0.02 gate). Evaluation and "
+                         "target-construction asset ONLY -- a method requiring this at "
+                         "deployment would not transfer to real pretrained knowledge.")
     ap.add_argument("--out", required=True, help="adapter output directory")
     ap.add_argument("--report", required=True, help="report.json path")
     args = ap.parse_args()
@@ -263,8 +271,12 @@ def main():
     model = load_base(DEV, train=True)
 
     # ── training examples ───────────────────────────────────────────────────
-    ex = ([make_example_canvas(tok, f) for f in FACTS] if args.canvas == "genlen"
-          else [make_example(tok, f) for f in FACTS])
+    TRAIN_FACTS = ([f for f in FACTS if f["split"] == args.train_split]
+                   if args.train_split != "all" else list(FACTS))
+    print(f"[train-split] {args.train_split}: training on {len(TRAIN_FACTS)} of "
+          f"{len(FACTS)} facts", flush=True)
+    ex = ([make_example_canvas(tok, f) for f in TRAIN_FACTS] if args.canvas == "genlen"
+          else [make_example(tok, f) for f in TRAIN_FACTS])
     maxlen = max(len(e["ids"]) for e in ex)
     R["training_canvas"] = {"selected": args.canvas, "doc": CANVAS_DOC,
                             "gen_length": GEN_KW["gen_length"],
@@ -274,7 +286,7 @@ def main():
     n_sup = sum(e["n_supervised"] for e in ex)
     n_eos = sum(e["n_eos_supervised"] for e in ex)
     n_ans = sum(len(e["answer_positions"]) for e in ex)
-    missing = [FACTS[i]["fact_id"] for i, e in enumerate(ex) if not e["answer_positions"]]
+    missing = [TRAIN_FACTS[i]["fact_id"] for i, e in enumerate(ex) if not e["answer_positions"]]
     gate("G1_answer_bearing_loss_masking",
          not missing and n_eos == 0 and n_ans > 0 and (n_ans / n_sup) >= 0.15,
          {"n_examples": len(ex), "max_seq_len": maxlen, "total_supervised_positions": n_sup,
@@ -409,7 +421,7 @@ def main():
         "loss_mean_last_100": sum(losses[-100:]) / len(losses[-100:]),
         "steps_with_zero_loss_and_zero_gnorm": nz,
         "fraction_degenerate_steps": round(nz / args.steps, 4),
-        "batch_order_scheme": ("single fixed permutation of the 128 examples, consumed "
+        "batch_order_scheme": ("single fixed permutation of the training examples, consumed "
                               "cyclically as order[(step*batch+k) mod 128] -- identical to the "
                               "closed studies' memorize_big.py, kept for comparability"),
         "batch_order_note": ("that scheme is a WEAK shuffle: with batch=4 the same 32 batch "
@@ -539,7 +551,19 @@ def main():
     json.dump(rows, open(args.report.replace(".json", "_generations.json"), "w"),
               indent=2, ensure_ascii=False)
 
-    if args.mode == "qualify":
+    if args.mode == "qualify" and args.train_split == "retain":
+        # P_ign^retrain: it MUST know the retain facts and MUST NOT know the forget facts.
+        # Requiring forget recall here would be backwards. The forget-side gate is an
+        # IGNORANCE gate: disclosure must be at or below the never-memorized floor, which
+        # on this probe set is 0.023-0.046, so 0.10 is a generous ceiling.
+        IGN_MAX = 0.10
+        gate("G4a_IGNORANCE_of_forget_facts", f_tr_d <= IGN_MAX,
+             {"forget_recall_nfkd": f_tr_d, "forget_recall_nfkc": f_tr_f,
+              "ceiling": IGN_MAX, "n": nf,
+              "meaning": "a retain-only reference must NOT recall the forget facts"})
+        gate("G4b_memorization_threshold_retain", r_tr_d >= TH,
+             {"recall_nfkd": r_tr_d, "recall_nfkc": r_tr_f, "threshold": TH, "n": nr})
+    elif args.mode == "qualify":
         gate("G4a_memorization_threshold_forget", f_tr_d >= TH,
              {"recall_nfkd": f_tr_d, "recall_nfkc": f_tr_f, "threshold": TH, "n": nf})
         gate("G4b_memorization_threshold_retain", r_tr_d >= TH,
