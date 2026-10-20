@@ -1,0 +1,73 @@
+{
+ "pi": [
+  0.3,
+  0.15,
+  0.12,
+  0.1,
+  0.08,
+  0.07,
+  0.06,
+  0.05,
+  0.04,
+  0.03
+ ],
+ "C1_identification_accuracy_bayes": {
+  "alpha=1.0,lam=0.0": 1.0,
+  "alpha=1.0,lam=0.1": 0.33702,
+  "alpha=1.0,lam=0.5": 0.30062,
+  "alpha=1.0,lam=1.0": 0.2989,
+  "alpha=1.0,lam=2.0": 0.29768,
+  "alpha=1.0,lam=10.0": 0.36991,
+  "alpha=5.0,lam=0.0": 1.0,
+  "alpha=5.0,lam=0.1": 0.52516,
+  "alpha=5.0,lam=0.5": 0.3263,
+  "alpha=5.0,lam=1.0": 0.30198,
+  "alpha=5.0,lam=2.0": 0.34832,
+  "alpha=5.0,lam=10.0": 0.64719,
+  "alpha=50.0,lam=0.0": 1.0,
+  "alpha=50.0,lam=0.1": 0.98299,
+  "alpha=50.0,lam=0.5": 0.58881,
+  "alpha=50.0,lam=1.0": 0.30032,
+  "alpha=50.0,lam=2.0": 0.64964,
+  "alpha=50.0,lam=10.0": 0.9885,
+  "chance(max pi)": 0.3
+ },
+ "C2_single_subject_reference_spread": {
+  "alpha=1.0": {
+   "q95_of_q(Paris|nu)": 0.9435739428608337,
+   "q05": 7.660738053881493e-05,
+   "P(q(Paris|nu) < 1e-3)": 0.10807284733274038
+  },
+  "alpha=5.0": {
+   "q95_of_q(Paris|nu)": 0.6507072165866749,
+   "q05": 0.04600718890369171,
+   "P(q(Paris|nu) < 1e-3)": 0.00017153282977861635
+  },
+  "alpha=50.0": {
+   "q95_of_q(Paris|nu)": 0.4100851463384662,
+   "q05": 0.1990993761719042,
+   "P(q(Paris|nu) < 1e-3)": 1.5261311805999961e-33
+  }
+ },
+ "C3_novel_names_needed_for_SE_0.01": {
+  "alpha=1.0,M=1": 2100,
+  "alpha=1.0,M=8": 1182,
+  "alpha=1.0,M=32": 1083,
+  "alpha=5.0,M=1": 2100,
+  "alpha=5.0,M=8": 569,
+  "alpha=5.0,M=32": 405,
+  "alpha=50.0,M=1": 2100,
+  "alpha=50.0,M=8": 299,
+  "alpha=50.0,M=32": 106
+ },
+ "C4_correlated": {
+  "P(Paris|Louvre worker) [retrain/Bayes ref]": 0.95,
+  "P(Paris|stranger) [novel ref]": 0.3,
+  "TV(ref_T0, ref_T1)": 0.65
+ },
+ "C5_prior_mode": {
+  "greedy Paris rate of perfect stranger-like model (Paris = mode)": 1.0,
+  "T=1 sampling Paris rate": 0.3,
+  "fraction of Dir(5pi) strangers whose argmax is Paris": 0.43557
+ }
+}
