@@ -1,20 +1,27 @@
 # Evidence Index
 
 Generated from **tracked files** (`git ls-files`), not a filesystem walk. `EVIDENCE_INDEX.md`
-is omitted from the table — it cannot contain its own hash.
+is omitted — it cannot contain its own hash.
 
-Study `llada_emdu_mdu_rwku_v1`. Outcome **PAPER_ALIGNED_RUN_BLOCKED** (comparison not run).
+Study `llada_emdu_mdu_rwku_v1`. Outcome **PAPER_ALIGNED_RUN_BLOCKED**, scoped to the tested
+custom CPU-offload implementation. Comparison not run. Corrections in
+[`AMENDMENT_01.md`](AMENDMENT_01.md).
 
-## Published files (30)
+Reviewed publication: [`cc54d8389cb06223bb9296e7afa620afea2fa6e8`](https://github.com/bijay299/XXResearch/commit/cc54d8389cb06223bb9296e7afa620afea2fa6e8).
+
+## Published files (33)
 
 | Path | Bytes | SHA-256 |
 |---|---|---|
-| `FINAL_REPORT.md` | 15684 | `6413659ab54934c07bd87841232c2773cb747d1d8712548af8ddb110cb2472f6` |
-| `README.md` | 2883 | `836eda9c13add89e95d8ca40cf8ed81514b4bd57787b3bdca8d920eccf33d009` |
-| `RESOURCE_LEDGER.md` | 2954 | `9b83485d242d88dd6a68ca89cb1f453cc04f2504a7655f512a105461956cb460` |
+| `AMENDMENT_01.md` | 15424 | `dae94e7decfa75da6cbddc2e1cdf64600bf98186c5ee6928bea95008e75bb1a1` |
+| `FINAL_REPORT.md` | 21040 | `92e687542442216ec03d3927874705edbdd934cbe62bac73fa7aad45a6d7d629` |
+| `README.md` | 4275 | `54a85648fafe43db621433d38bf78e3e597bb680225cbe397588dd88b9daef82` |
+| `RESOURCE_LEDGER.md` | 4437 | `23841d6f9bab1c73aee004905cbccfdde68dbbcb850c39829206ac35b04fbb74` |
 | `evidence/ATTEMPTS.tsv` | 977 | `fdf2f1599ef4986a5a13dac84cadda17966673c5903c27bcd40157df4a156e07` |
 | `evidence/emdu_paper_extracted_text.txt` | 84918 | `741d45a0c478d32fce600972a06bf4144d1eb08650a55b8b028515610ea482eb` |
-| `evidence/negative_control/README.txt` | 280 | `54d539495a2d90f323ecebad102fed85f2f69e08081b54e970c06ada6f269d5c` |
+| `evidence/negative_control/README.txt` | 1082 | `1573295477cb64dbb5cec0a87d8c00f7591fa79438d21946bd0c4227c6fbc007` |
+| `evidence/negative_control/broken_variant_diff.txt` | 152 | `ff50dc98c7cca001b6eda41216eef9d4393d487c820ca2b4e56454248079ebc9` |
+| `evidence/negative_control/objectives_broken_tau.py` | 6518 | `c46ae3ec2f794263ef1dea4fa5137413203d63ae8223d0ebdd4ebfeae22bce78` |
 | `frozen/stageb_mmlu.json` | 18938 | `ccc29352fc9f907e1ec7bd4f70c02db0902a83cb69cea6e1c8d474e98001918c` |
 | `frozen/stageb_panels.json` | 121511 | `fb443578ae085650b575ac25e0697a466d8877f0f7995615f2685b8d4b19cce2` |
 | `frozen/stageb_spec.json` | 6126 | `c38373075a92506382f6024135658f1cf7c9b5bc2273528cca06c78862d6d90c` |
@@ -40,37 +47,53 @@ Study `llada_emdu_mdu_rwku_v1`. Outcome **PAPER_ALIGNED_RUN_BLOCKED** (compariso
 | `scripts/verify_runtime.py` | 9598 | `17cca77065f6757706bba536e802f1e288c96f9c835465ea185f6d879782df88` |
 | `scripts/verify_stage_b.py` | 9949 | `218f0e0893f09a3e79cecea7f4070f4b4cb31157b8102005025c020586ab5440` |
 
-## Pins
+## Amendment 01 (2026-10-20)
 
-| Asset | Pin |
-|---|---|
-| EMDU paper arXiv:2610.25447v1 | local PDF sha256 `d8059bebeceda16c2de2055f2127b84640fc1f7808d451e2e22cdb19f0bb915a` |
-| MDU | `e5e8e8274ff8f56f16e978803d9e902359eb5272` |
-| LLaDA-8B-Instruct | `08b83a6feb34df1a6011b80c3c00c7563e963b07` |
-| LLaDA code | `9182493720ed723ef8031210d85959364e51cbe0` |
-| RWKU | `d72f493d481d1b0a9bdc6e869d32baeffad8904f` |
+Additive corrections; **no new experiments** (no model load, no GPU, no generation, no
+optimizer update, no re-run test, no repeated search, no frozen-code change).
+
+- **CPU accounting corrected.** `evidence/ATTEMPTS.tsv` row `b0003` carries the raw cell
+  `026063`; `scripts/ledger.sh` summed the column with shell arithmetic, which read it as
+  **octal** (`11315`). Decimal total: `0+27233+1+152+26063+4891` = **58,340 core-s =
+  16.2056 core-h**; previously reported 43,592 / 12.1089 — an undercount of **14,748 core-s
+  = 4.0967 core-h**. The rows, counters and `ledger.sh` are **preserved unchanged** as
+  historical evidence; `RESOURCE_LEDGER.md` is the corrected *derived* ledger.
+  **Historical CPU remains unmetered, so 3.7944 core-h is at most the remaining allowance
+  before unknown earlier usage — not a verified whole-envelope budget.** No overall
+  CPU-compliance claim is made.
+- **GPU unchanged:** 323 + 548 + 660 + 352 = **1,883 GPU-s ≈ 0.5231 GPU-h**, leaving
+  **19,717 s** of the 21,600 s ceiling; max **2** concurrent GPUs preserved.
+- **Withdrawn:** the single-80 GB-GPU recommendation and its "minutes" prediction (the
+  stated layout is ≈134.37 GiB at 18 B/param; the bare optimizer state alone is ≈89.58 GiB);
+  the bandwidth-bound attribution; and the native batch-reduction equivalence claim.
+- **Narrowed:** extracted-native-helper execution vs complete-trainer verification;
+  EMDU-only optimizer updates (2); 40/291 digest coverage; unconditional assertions;
+  configured-vs-executed evaluator; chronology relative to the freeze.
 
 ## Artifacts that do NOT exist (and why)
 
 | Artifact | Why absent |
 |---|---|
-| Trained MDU / EMDU checkpoints | **The comparison was not run** — full-parameter training is budget-blocked (measured). No trained state exists, so **no checkpoint delivery or reload qualification is claimed**. |
-| Per-item forgetting / neighbor / utility scores | Not reachable without training. No forgetting number is produced. |
-| Pristine-arm generations | Deliberately not produced: a pristine-only arm cannot answer the comparison, and generating it would spend budget on a partial artifact. |
-| Paper's EMDU reference code / checkpoints | Do not exist publicly (paper: "the checkpoints we will release"). |
+| Trained MDU / EMDU checkpoints | **Comparison not run.** No trained state exists; **no checkpoint delivery or reload qualification is claimed.** |
+| Per-item forgetting / neighbor / utility scores | The **evaluator was never executed**. Panels and scorers are configured only. |
+| MDU optimizer trajectory | Only **2 EMDU** optimizer updates ran, as a correctness probe. |
+| Full-model (291-tensor) digest invariance | Digests sampled **40 of 291** tensors. |
+| Stored exit codes for the negative controls | Both logs record only check verdicts; the codes were observed in the shell and are **not** captured in any artifact. The controls were **not** re-run. |
+| A normal-run Stage A audit JSON | Overwritten by its negative control (see Stage A Amendment 02); not recovered, not manufactured. |
+| EMDU author code / checkpoints | Not located in the sources inspected 2026-10-20; that search was not repeated. |
 
 ## Local-only, deliberately not published
 
 | Artifact | Local path | Why |
 |---|---|---|
-| EMDU paper PDF (825 KB) | `/data/bijaypandey/llada_emdu/artifacts/emdu_2610.25447v1.pdf` | third-party copyrighted PDF; its sha256 is pinned above and the extracted text is published |
+| EMDU paper PDF (825 KB) | `/data/bijaypandey/llada_emdu/artifacts/emdu_2610.25447v1.pdf` | third-party copyrighted PDF; sha256 pinned in the report, extracted text published |
 | LLaDA-8B-Instruct weights (14.94 GiB) | `/data/bijaypandey/llada_smoke/model/` | public at the pinned revision; reused |
-| RWKU download (~140 MB incl. 582-pair files) | `/data/bijaypandey/llada_emdu/data/rwku/` | public at the pinned revision; frozen row IDs/counts are published |
+| RWKU download (~140 MB) | `/data/bijaypandey/llada_emdu/data/rwku/` | public at the pinned revision; frozen row IDs/counts published |
 | venv / caches | reused under `/data` | environment, not evidence |
 
 ## Exclusions verified
 
-- **Credentials:** none used or created; all fetches anonymous. No credential pattern in any published file.
+- **Credentials:** none used or created; no credential pattern in any published file.
 - **Model weights:** none staged — no `*.safetensors`, `*.bin`, `*.pt`; nothing above 2 MB.
-- **Storage cap:** respected; **no full-model checkpoint was retained** (see above).
-- **Unrelated artifacts:** nothing from the closed studies or private memory is included.
+- **Storage cap respected:** no full-model checkpoint retained (none exists).
+- **Unrelated artifacts:** nothing from other studies or private memory.

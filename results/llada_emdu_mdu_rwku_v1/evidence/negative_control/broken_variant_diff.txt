@@ -1,0 +1,4 @@
+8c8
+<     target_logits = tau * target_logits          # tau MULTIPLIES anchor logits
+---
+>     target_logits = target_logits / tau  # DELIBERATE BREAK

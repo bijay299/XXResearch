@@ -2,16 +2,32 @@
 
 **Outcome: `PAPER_ALIGNED_RUN_BLOCKED`.**
 
-The protocol, data, both objectives and the evaluation are implemented, frozen and
-verified. The comparison was **not run**, because full-parameter training of the
-paper-aligned recipe does not fit the authorized envelope — and that was established by
-**measurement**, not arithmetic. No subject, evaluation panel or recipe was trimmed to
-make it fit, and full-parameter training was **not** silently replaced by LoRA,
-quantization or a shortened recipe.
+The protocol and data are frozen, both objectives are implemented and checked, and the
+evaluation panels and scoring helpers are **configured** — but the **evaluator was never
+executed**. The comparison was **not run**, because **the tested custom CPU-offload
+implementation** of the paper-aligned full-parameter recipe (including its one permitted
+repair) did not fit the remaining resource envelope, as measured. No subject, evaluation
+panel or recipe was trimmed to make it fit, and full-parameter training was **not**
+silently replaced by LoRA, quantization or a shortened recipe.
+
+**Scope limits (Amendment 01).** The measurements do **not** prove universal
+full-parameter infeasibility on two 40 GB GPUs, and do **not** establish that the
+slowdown is definitively bandwidth-bound rather than implementation-dependent. **No
+optimized offload or sharding solution was qualified** — none was attempted. **11
+engineering optimizer updates** ran on the real model; **0** of the 240 planned scientific
+comparison updates did.
 
 **Host:** hyperplane, 2× A100-SXM4-40GB (devices 2 and 3, per the recorded user override;
 devices 0–1 left untouched) + 491 GiB host RAM
 **Shared window:** original task start 2026-10-20T00:31:58; **no clock restart**
+
+> **Amended 2026-10-20 — see [`AMENDMENT_01.md`](AMENDMENT_01.md).** Corrects the CPU total
+> (an octal parsing bug undercounted it by 14,748 core-s = 4.0967 core-h; corrected total
+> **58,340 core-s = 16.2056 core-h**), **withdraws** the single-80 GB-GPU recommendation and
+> its "minutes" prediction (the stated layout is ~134 GiB), **withdraws** the
+> bandwidth-bound attribution and the native batch-reduction equivalence claim, and narrows
+> the fidelity, coverage and chronology claims. **Outcome `PAPER_ALIGNED_RUN_BLOCKED`
+> unchanged — scoped to the tested custom CPU-offload implementation.**
 
 ---
 
@@ -19,12 +35,12 @@ devices 0–1 left untouched) + 491 GiB host RAM
 
 | Phase | Status |
 |---|---|
-| EMDU author code available | ❌ **No** — paper-based reimplementation (labeled) |
+| EMDU author code available | ❌ **Not located in the sources inspected 2026-10-20** — paper-based reimplementation (labeled) |
 | Data qualification (582 pairs/subject) | ✅ **PASS** — exactly 582 verified for all 3 subjects |
 | Frozen protocol + evaluation IDs | ✅ **FROZEN** before any Stage B model output |
-| Objective correctness (CPU, independent + native) | ✅ **PASS** — 24/24 |
-| Runtime correctness (real model, real data) | see §5 |
-| Full-parameter feasibility | 🔴 **BLOCKED** — measured; no setting fits both budgets |
+| Objective correctness (CPU, independent + extracted native **helper**) | ✅ **PASS** — 24/24 observed; the complete native trainer was never executed (§5) |
+| Runtime correctness (real model, real data) | ✅ **PASS** — 12/12 observed; both objective *forwards* ran, optimizer updates were **EMDU-only (2)**, digests covered **40/291** tensors (§5) |
+| Full-parameter feasibility, **tested CPU-offload implementation** | 🔴 **BLOCKED** — measured; no tried setting fits both budgets. Not a universal infeasibility result |
 | EMDU vs MDU comparison | ⛔ **NOT RUN** |
 
 **This is not** a reproduction of the paper's tables, not independently established SOTA,
@@ -42,13 +58,15 @@ and not a new contribution.
 | LLaDA code | `9182493720ed723ef8031210d85959364e51cbe0` |
 | RWKU | `d72f493d481d1b0a9bdc6e869d32baeffad8904f` |
 
-### EMDU author code has NOT become available
+### EMDU author code was not located in the sources inspected (2026-10-20)
 
-Checked directly. The paper gives **no EMDU repository**; its implementation appendix says
-it extends the MDU repo "with EMDU (anchor-first KL and full answer-span masking),
-complete TOFU / RWKU evaluation, and **the checkpoints we will release**" — future tense.
-A web search surfaced only the arXiv entry. Our EMDU arm is therefore an explicitly
-labeled **paper-based reimplementation**, with the reconstruction list in §3.
+**Bounded statement (Amendment 01).** The paper gives **no EMDU repository**; its
+implementation appendix says it extends the MDU repo "with EMDU (anchor-first KL and full
+answer-span masking), complete TOFU / RWKU evaluation, and **the checkpoints we will
+release**" — future tense. One web search on 2026-10-20 returned only the arXiv entry.
+**Absence from those sources is not proof of non-existence**, and that search has not been
+repeated. Our EMDU arm is therefore an explicitly labeled **paper-based reimplementation**,
+with the reconstruction list in §3.
 
 Incidentally, the paper's footnote 2 cites `https://github.com/ZHZisZZ/dllm`, which
 **independently confirms** the `dllm` identification our earlier smoke study could only
@@ -96,7 +114,7 @@ Reconstructions, frozen before any outcome (full text in `frozen/stageb_spec.jso
 | Sequence length | 512 tokens, EOS right-padding | Unspecified; responses median ~316 words. |
 | scheduler / `time_epsilon` | `scheduler(t)=1−t` ⇒ `p_mask=t`; `1e-3` | From the unavailable `dllm`; cross-checked against LLaDA `GUIDELINES.md`. |
 | Optimizer / precision | AdamW (0.9, 0.999), eps 1e-8, wd 0, fp32 state, bf16 model, constant LR | Unspecified by the paper. |
-| Microbatching | microbatch 1 × accum 4 | Paper used batch 4 / accum 1. Each microbatch loss is divided by 4 before backward, so accumulated gradients equal the **mean over the 4 examples**, matching batch-4 mean reduction. |
+| Microbatching | microbatch 1 × accum 4 | Paper used batch 4 / accum 1. Each microbatch loss is divided by 4 before backward. ⚠️ **The claim that this matches native batch-4 mean reduction is WITHDRAWN** (Amendment 01 §4): ours is `mean_i(sum_i/count_i)`, native pooled normalization is `sum_i(sum_i)/sum_i(count_i)`; these differ whenever masked counts differ, and `p_mask ~ U(1e-3,1)` is drawn per microbatch. **Unresolved fidelity issue**; nothing was re-tested and no result depends on it, since the comparison never ran. |
 | MMLU cue | assistant-side `Answer:` + first-standalone-`A–D` parser | RWKU's `eval_mmlu.py` places the cue after the assistant header. The paper warns LLaDA often **restates** the cue ("Answer: C"), which a first-character rule misreads as "A"; our parser is validated against that case. |
 
 ## 4. Frozen evaluation (before any Stage B output)
@@ -143,12 +161,41 @@ import path, so the broken module was never loaded and it misleadingly exited 0.
 invalid and the corrected control are published under
 `evidence/negative_control/`.
 
-**Runtime correctness** (real model, real tokenized RWKU pair, real optimizer updates):
-see `outputs/stageb_runtime_checks.json`. This probe exists specifically to discharge the
-two things Amendment 01 flagged as unverified before: runtime dispatch is read from the
-executed objective rather than from source strings, and **frozen-teacher invariance is
-checked against a genuinely changed student** (real AdamW updates), not against a
-zero-initialized no-op adapter.
+**Runtime correctness: 12/12 observed** (real model, real tokenized RWKU pair, real
+optimizer updates): see `outputs/stageb_runtime_checks.json`. **Coverage, stated precisely
+(Amendment 01 §5):**
+
+- **Both objective forwards executed** — `runtime_dispatch` is recorded for `mdu` and
+  `emdu`, read from the executed objective rather than from source strings.
+- **Optimizer updates were EMDU-only: 2.** No MDU optimizer trajectory was run, and
+  neither method has a trajectory. The frozen-teacher invariance result therefore holds
+  for a student changed by **two EMDU updates**.
+- **Teacher/student digests covered 40 of 291 parameter tensors** (`n_tensors_hashed: 40`).
+  Full-model `requires_grad` inspection (291/291 student trainable; all anchor tensors
+  frozen) and **sampled** hash invariance are *different checks*: the digest result is a
+  sample, not full-model coverage.
+- The student digest did change and the anchor digest did not — which is a genuine
+  improvement on the previous study's zero-init no-op adapter, but at 40/291 sampling.
+- **No checkpoint/reload qualification was demonstrated**, and the **evaluator was never
+  executed** — panels, row IDs and scoring helpers are configured and frozen, but no
+  generation, scoring or comparison artifact exists. A configured panel is not an executed
+  evaluator.
+
+### Chronology (existing timestamps)
+
+| time | attempt | note |
+|---|---|---|
+| 01:27:01 → 01:31:35 | `b0002` feasibility probe | **3 optimizer updates — before the freeze** |
+| 01:33:39 → 01:39:09 | `b0003` feasibility repair | **6 optimizer updates**; started before the freeze, ended after |
+| **01:35:39** | `b0004` **protocol + eval-ID freeze** | — |
+| 01:37:27 | `b0005` objective checks | after freeze |
+| 01:40:19 → 01:43:15 | `b0006` runtime checks | **2 EMDU updates, 352 GPU-s — after the repaired feasibility blocker** (determined 01:39:09) |
+
+**Engineering model outputs preceded the protocol freeze.** **No comparison outcomes
+preceded it, because the comparison never ran** — the freeze governs the unrun scientific
+comparison, not the engineering probes. "No training occurred" would be inaccurate: there
+were **11 engineering optimizer updates** (3 + 6 + 2); what did not occur is the
+**scientific comparison** (0 of 240 planned trajectory updates, and no evaluation).
 
 ## 6. The measured blocker
 
@@ -162,8 +209,10 @@ step     grads -> CPU, AdamW on CPU in fp32, updated params -> GPU
 batch    microbatch 1 x accum 4 = effective batch 4
 ```
 
-**Memory fits.** Measured peak **34.71 GiB** (cuda:0) and **15.07 GiB** (cuda:1), both
-under 40 GiB. The model math is also cheap: **~1.0–1.6 s** of forward+backward per update.
+**Memory fits.** Feasibility-phase peaks were **34.714 GiB** (cuda:0) and **15.067 GiB**
+(cuda:1); the **later runtime checks** peaked higher at **35.078 / 16.872 GiB**
+(Amendment 01 §5). All are under 40 GiB. The original report quoted the feasibility
+figures as though global. The model math is also cheap: **~1.0–1.6 s** of forward+backward per update.
 
 **Time does not fit.** The CPU-offloaded optimizer is ~98% of each update, because 8 B
 parameters of fp32 AdamW state (~90 GiB) cannot reside on 2×40 GiB devices and must live
@@ -180,9 +229,15 @@ optimizer runs):
 | 8 | 43.4 s | 20,831 | ✗ over by 102 | 30.2 | ✗ | **no** |
 
 The repair produced only a **1.01× speedup**, and wall time is essentially flat from 8 to
-255 threads. That is the diagnostic that matters: the cost is **memory-bandwidth/transfer
-bound, not an implementation or parallelism defect**, so no thread setting or further
-micro-optimization rescues it.
+255 threads.
+
+⚠️ **Attribution withdrawn (Amendment 01 §3).** The original report concluded from this
+that the cost is "memory-bandwidth/transfer bound, not an implementation or parallelism
+defect". That is **not established**: thread count was the only dimension varied. The flat
+curve is *consistent with* a transfer limit but does not demonstrate one. Untested
+alternatives include pinned-memory and overlapped/streamed transfers, fused or chunked
+optimizer kernels, optimizer state sharded across both devices, ZeRO/FSDP, and 8-bit or
+bf16 optimizer states. **No optimized offload or sharding solution was qualified.**
 
 **The blocker, precisely.** The fixed scope is 3 subjects × 2 methods × 40 updates = **240
 full-parameter updates**. At the best measured setting that is **20,831 GPU-s**, which
@@ -223,41 +278,59 @@ are authoritative.
 
 ## 8. What this does and does not establish
 
-**Does:** EMDU author code does not exist yet; the published 582-pair data is present and
-counted; both objectives are implemented and verified against independent formulas and
-against MDU's executed native helper; the exact method difference is isolated to the anchor
-construction and KL direction; and full-parameter paper-aligned training is **measurably**
-outside this envelope on 2×40 GiB devices.
+**Does:** EMDU author code was **not located in the sources inspected on 2026-10-20**; the
+published 582-pair data is present and counted; both objectives are implemented and checked
+against independent formulas and against MDU's **extracted native helper** (executed on
+fixtures — not the complete native trainer); the exact method difference is isolated to the
+anchor construction and KL direction; and **the tested custom CPU-offload implementation**
+of the paper-aligned full-parameter recipe measurably did not fit the remaining envelope.
 
 **Does not:** produce any forgetting, locality or utility number; compare EMDU to MDU;
-reproduce the paper's tables; or say anything about whether EMDU improves on MDU. No
-trained checkpoint exists, so no checkpoint delivery or reload qualification is claimed.
-The earlier qualification study remains **`INSUFFICIENT_BASE_RECALL`**, unchanged.
+reproduce the paper's tables; or say anything about whether EMDU improves on MDU —
+**neither this outcome nor Stage A's establishes which method is better.** No trained
+checkpoint exists, so no checkpoint delivery or reload qualification is claimed, and the
+evaluator was never executed. It does **not** establish universal full-parameter
+infeasibility on two 40 GB GPUs, does **not** establish that the slowdown is definitively
+bandwidth-bound, and qualifies **no** optimized offload or sharding solution. It does
+**not** establish that our microbatch reduction matches native pooled normalization — that
+is an unresolved fidelity issue (§3). The earlier qualification study remains
+**`INSUFFICIENT_BASE_RECALL`**, unchanged.
 
 Note for any future run: even had training fit, the paper's reported MDU row was
 **independently tuned** (LR swept 1e-5→3e-5, length 20 steps→3 epochs, configuration chosen
 for the largest Forget/Neighbor gap). A matched-recipe MDU arm would therefore not be a
 reproduction of its optimized Table 4 row.
 
-## 9. Next recommendation (one)
+## 9. Next recommendation — WITHDRAWN
 
-**Re-scope to a parameter-efficient comparison and label it as such, or obtain an 80 GB
-device — but decide that explicitly rather than by silently shrinking the recipe.**
+The original §9 recommended either a parameter-efficient re-scope **or obtaining a single
+80 GB A100/H100**, predicting the latter would hold "params + grads + fp32 AdamW state
+on-device" and make 240 updates cost "on the order of minutes".
 
-The measurements make the choice concrete. The blocker is not compute-bound model math
-(~1 s/update) but the ~90 GiB fp32 optimizer state that cannot sit on 2×40 GiB cards. Two
-honest routes follow, and they are not equivalent:
+**Both hardware claims are withdrawn** (Amendment 01 §2). For the recorded
+8,015,581,184 parameters:
 
-1. **One 80 GB A100/H100** would hold params + grads + fp32 AdamW state on-device, removing
-   the CPU offload entirely. At the measured ~1.0–1.6 s of model math per update, 240
-   updates would cost on the order of minutes of GPU time rather than hours — this is the
-   route that preserves the paper's full-parameter recipe and is worth a hardware request.
-2. **A LoRA-based comparison** fits today's devices comfortably (the earlier smoke study
-   measured 17.1 GiB peak for a LoRA step), but it answers a **different question** than
-   the paper's full-parameter result and must be reported as an adapter-level comparison,
-   never as a paper-aligned one.
+| Layout | B/param | Size |
+|---|---|---|
+| FP32 master + two FP32 moments | 12 | **≈ 89.58 GiB** |
+| + BF16 student weights + BF16 grads | 16 | **≈ 119.44 GiB** |
+| + BF16 frozen anchor | 18 | **≈ 134.37 GiB** |
 
-Not recommended: bf16 optimizer state, FSDP/ZeRO wiring for this `trust_remote_code` model,
-or trimming subjects/updates to squeeze under the cap — the first two are the open-ended
-rescue the protocol rules out, and the third would silently change the recipe under
-comparison.
+Excluding activations and other buffers. The bare optimizer state alone exceeds both 80 GB
+and 80 GiB, and the full stated layout is ~1.7× an 80 GB card — so such a card would **not**
+hold this layout on-device, and the "minutes" figure rested on assuming the optimizer cost
+would vanish on untested hardware.
+
+**No substitute hardware prescription is offered**, and no replacement experimental
+recommendation is made: determining a workable configuration is outside this amendment's
+authorization. What is recorded instead is the scoped blocker (§6, as corrected) and the
+unresolved fidelity issue (§3's microbatch row) that any future run must address first.
+
+---
+
+## Evidence index
+
+See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for every published file with its SHA-256,
+[`AMENDMENT_01.md`](AMENDMENT_01.md) for the corrections, and
+[`RESOURCE_LEDGER.md`](RESOURCE_LEDGER.md) for the corrected accounting. Reviewed
+publication: [`cc54d83`](https://github.com/bijay299/XXResearch/commit/cc54d8389cb06223bb9296e7afa620afea2fa6e8).
