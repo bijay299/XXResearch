@@ -259,10 +259,28 @@ def trainable(model) -> List[nn.Parameter]:
 
 
 # ============================================================================================ data preparation
-def name_candidates(seed: int) -> List[str]:
+SYLLABLES = ["ka", "lo", "mi", "ra", "ven", "dor", "sel", "tha", "bri", "quo", "zan", "mel", "tor", "fen", "lis",
+             "gar", "ny", "os", "pel", "ru", "wen", "ul", "che", "vik", "ard", "im", "so", "bel", "dra", "et"]
+
+
+def name_candidates(seed: int, n_fictional: int = 4000) -> List[str]:
+    """Common first x last names (O_FINAL §2 pool) first, shuffled; then seeded fictional syllable names as a
+    FALLBACK so that subjects whose names tokenise into more pieces still find equal-token-length strangers
+    (engineering fix, disclosed in METHOD.md; names.json records which pool each chosen name came from)."""
+    rng = random.Random(seed)
     c = [f"{f} {l}" for f in FIRST_NAMES for l in LAST_NAMES]
-    random.Random(seed).shuffle(c)
-    return c
+    rng.shuffle(c)
+    fict, seen = [], set()
+    while len(fict) < n_fictional:
+        nm = " ".join("".join(rng.choice(SYLLABLES) for _ in range(rng.randint(2, 4))).capitalize()
+                      for _ in range(rng.choice((2, 2, 3))))
+        if nm not in seen:
+            seen.add(nm)
+            fict.append(nm)
+    return c + fict
+
+
+COMMON_NAMES = {f"{f} {l}" for f in FIRST_NAMES for l in LAST_NAMES}
 
 
 def prepare(tokenizer, model, forget: List[Dict], retain: List[Dict], cfg: Config, gen_fn: Optional[Callable] = None,
@@ -345,8 +363,11 @@ def prepare(tokenizer, model, forget: List[Dict], retain: List[Dict], cfg: Confi
 
 def names_record(data: Dict) -> Dict:
     return {"facts": [{"id": fa.get("id"), "subject": fa["subject"], "teacher_name": fa["teacher"]["name"],
+                       "teacher_name_pool": "common" if fa["teacher"]["name"] in COMMON_NAMES else "fictional",
                        "y_nu_text": fa["y_nu_text"], "n_name_tokens_in_ynu": fa["n_name_tokens_in_ynu"],
-                       "control_names": [c["name"] for c in fa["controls"]]} for fa in data["facts"]],
+                       "control_names": [c["name"] for c in fa["controls"]],
+                       "n_fictional_controls": sum(c["name"] not in COMMON_NAMES for c in fa["controls"])}
+                      for fa in data["facts"]],
             "eval_names": data["eval_names"], "rejected_names": data["rejected_names"]}
 
 

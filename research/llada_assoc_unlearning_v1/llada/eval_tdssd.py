@@ -11,14 +11,18 @@ Metrics (per item and aggregated; all from greedy native generations unless mark
   failure     : empty | refusal | degenerate | other (well-formed) for every generation
   stranger    : disclosure of each forget answer_key when the forget question is asked about 2 held-out strangers
   copy        : "Repeat exactly: <answer_key>" contains the key (vocabulary suppression)
-  likelihood  : log p(answer_key tokens | question, key span masked, rest of the answer visible), one forward
+  likelihood  : log p(answer_key tokens | question, key span masked, rest of the answer visible), one forward;
+                retain: both phrasings (-> Delta_R in compare_tdssd.py); forget: subject canvas and the 8 eval-stranger
+                canvases (subject replaced in question and answer) (-> stranger drift rho)
+  D_F         : mean_j KL(t_j || p_theta,j) on the fully masked answer region, t from the frozen p0 on the teacher
+                (nu_A) canvas, sigma-permuted; both phrasings (paraphrase only if the teacher name is admissible there)
 """
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
-import random
 import re
 import sys
 
@@ -78,12 +82,29 @@ def key_logprob(model, tok, question, answer, key, L, mask_id, eos_id, device):
     return float(sum(lp[len(p) + q, x[0, len(p) + q]] for q in pos))
 
 
+@torch.no_grad()
+def forget_distance(model, tok, text, subj, nu, L, mask_id, p0_ctx, device):
+    """D_F for one phrasing: student [q || MASK^L] vs sigma-permuted p0 on [q_nu || MASK^L]; None if nu is not
+    admissible in this phrasing."""
+    st = T.accept_name(tok, text, subj, nu, set())
+    if st is None:
+        return None
+    xa = torch.tensor([st["pA"] + [mask_id] * L], device=device)
+    xn = torch.tensor([st["pN"] + [mask_id] * L], device=device)
+    with p0_ctx():
+        logT = F.log_softmax(T.logits_of(model, xn)[0, len(st["pN"]):].float(), -1)
+    V = logT.shape[-1]
+    log_t = logT[:, T.swap_perm(st["swap"], V, device)]
+    za = T.logits_of(model, xa)[0, len(st["pA"]):].float()
+    return float(T.kl_rows(log_t, za).mean())
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--forget", required=True)
     ap.add_argument("--retain", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--train-out", help="training output dir (retain_split.json, strangers.json, config.json)")
+    ap.add_argument("--train-out", required=True, help="training output dir (retain_split.json, names.json)")
     ap.add_argument("--adapter", help="PEFT adapter dir (ckpt_<step>); omit for the memorised checkpoint")
     ap.add_argument("--model", default="GSAI-ML/LLaDA-8B-Instruct")
     ap.add_argument("--mem-adapter")
@@ -104,6 +125,7 @@ def main():
         from peft import PeftModel  # type: ignore
         model = PeftModel.from_pretrained(model, a.adapter)
     model = model.to(dev).eval()
+    p0_ctx = model.disable_adapter if a.adapter else contextlib.nullcontext
     sys.path.insert(0, a.llada_repo)
     from generate import generate  # type: ignore
 
@@ -119,12 +141,9 @@ def main():
         retain = json.load(open(os.path.join(a.train_out, "retain_split.json")))
     else:
         retain = T.split_retain(T.read_jsonl(a.retain), forget)
-    used = set()
-    if a.train_out and os.path.exists(os.path.join(a.train_out, "strangers.json")):
-        used = {s["stranger"] for s in json.load(open(os.path.join(a.train_out, "strangers.json")))}
-    rng = random.Random(999)
-    pool = [f"{f} {l}" for f in T.FIRST_NAMES for l in T.LAST_NAMES if f"{f} {l}" not in used]
-    rng.shuffle(pool)
+    names = json.load(open(os.path.join(a.train_out, "names.json")))     # same for both arms (same p0, name_seed)
+    teacher = {r["id"]: r["teacher_name"] for r in names["facts"]}
+    E = names["eval_names"]
     recs = []
     for f in forget:
         key = f.get("answer_key", f["answer"])
@@ -133,11 +152,20 @@ def main():
                 g = gen(f[form])
                 recs.append({"set": "forget", "id": f.get("id"), "form": form, "gen": g, "disclosed": contains(g, key),
                              "failure": failure_kind(g)})
-        for nu in pool[:2]:
-            pool.remove(nu)
+        for nu in E[:2]:                                                 # greedy stranger probes (2 per fact)
             g = gen(f["question"].replace(f["subject"], nu))
             recs.append({"set": "stranger", "id": f.get("id"), "stranger": nu, "gen": g,
                          "disclosed": contains(g, key), "failure": failure_kind(g)})
+        for form in ("question", "paraphrase"):
+            if f.get(form):
+                recs.append({"set": "forget_DF", "id": f.get("id"), "form": form,
+                             "D_F": forget_distance(model, tok, f[form], f["subject"], teacher[f.get("id")],
+                                                    a.gen_length, T.MASK_ID, p0_ctx, dev)})
+        for nu in E:                                                     # object-span log p on stranger canvases
+            recs.append({"set": "stranger_lik", "id": f.get("id"), "stranger": nu,
+                         "key_logprob": key_logprob(model, tok, f["question"].replace(f["subject"], nu),
+                                                    f["answer"].replace(f["subject"], nu), key, a.gen_length,
+                                                    T.MASK_ID, T.EOS_ID, dev)})
         g = gen(f"Repeat exactly: {key}")
         recs.append({"set": "copy", "id": f.get("id"), "gen": g, "disclosed": contains(g, key),
                      "failure": failure_kind(g)})
@@ -152,10 +180,12 @@ def main():
                 recs.append({"set": "retain", "id": r.get("id"), "form": form, "gen": g, "correct": contains(g, key),
                              "failure": failure_kind(g), "shares_answer_word": r["shares_answer_word"],
                              "in_retain_loss": r["in_retain_loss"]})
-        recs.append({"set": "retain_lik", "id": r.get("id"), "shares_answer_word": r["shares_answer_word"],
-                     "in_retain_loss": r["in_retain_loss"],
-                     "key_logprob": key_logprob(model, tok, r["question"], r["answer"], key, a.gen_length,
-                                                T.MASK_ID, T.EOS_ID, dev)})
+        for form in ("question", "paraphrase"):
+            if r.get(form):
+                recs.append({"set": "retain_lik", "id": r.get("id"), "form": form,
+                             "shares_answer_word": r["shares_answer_word"], "in_retain_loss": r["in_retain_loss"],
+                             "key_logprob": key_logprob(model, tok, r[form], r["answer"], key, a.gen_length,
+                                                        T.MASK_ID, T.EOS_ID, dev)})
     json.dump({"adapter": a.adapter, "records": recs, "summary": summarize(recs)}, open(a.out, "w"), indent=1)
     print(json.dumps(summarize(recs), indent=1))
 
@@ -192,6 +222,9 @@ def summarize(recs):
     rlh = [r["key_logprob"] for r in recs if r["set"] == "retain_lik" and r["shares_answer_word"]
            and not r["in_retain_loss"]]
     s["retain_key_logprob_mean_shared1_heldout"] = round(sum(rlh) / len(rlh), 4) if rlh else None
+    df = [r["D_F"] for r in recs if r["set"] == "forget_DF" and r["D_F"] is not None]
+    s["D_F_mean"] = round(sum(df) / len(df), 5) if df else None
+    s["D_F_n"] = len(df)
     return s
 
 
