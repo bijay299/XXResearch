@@ -1,26 +1,28 @@
 """TD-SSD (twin-differenced stranger-swap distillation) and its control SSD on LLaDA-8B with LoRA.
 
-EXPERIMENTAL ALGORITHM (combination/adaptation; benefit and novelty unestablished). Design: agents/O_PROPOSAL.md +
-agents/O_FINAL.md; selection: DECISION_LOG.md #7; method summary: METHOD.md.
+EXPERIMENTAL ALGORITHM — a combination/adaptation, benefit and novelty unestablished. Frozen spec: agents/O_FINAL.md §2
+(development revision #1, DECISION_LOG #8). Method summary: METHOD.md.
 
-Per forget fact (question q_A about subject s_A, answer a_A):
-  * stranger nu_A: a name with the same token count, substituted for s_A in q_A -> q_nu; sigma = token swap s_A<->nu_A.
-  * y_nu = native greedy generation of the FROZEN MEMORISED checkpoint p0 (adapter disabled) on q_nu (once, offline);
-    ybar = sigma(y_nu) (stranger name tokens mapped back to the subject's).
-  * each step: t~U(0,1), p_m=(1-eps)t+eps, the same iid mask M over the answer region of both rows
-        x_A  = [q_A  || mask_M(ybar)]      (student, adapter on)
-        x_nu = [q_nu || mask_M(y_nu)]      (twin; student with adapter on, and teacher p0 with adapter off, no grad)
-    T_j = softmax(z0(x_nu)_j), target t_j(v) = T_j(sigma(v)).
-  * L_F = W * sum_{j in M} KL(t_j || softmax(zmix_j)),  zmix = z_A - z_nu + sg(z_nu)   (arm "tdssd")
-                                                         zmix = z_A                    (arm "ssd", control)
-    L_T = W * sum_{j in M} KL(T_j || softmax(z_nu_j))   (twin anchor; both arms)
-    L_R = W * sum_{j in M_R} KL(R_j || softmax(z_theta(x_R)_j)), R_j = softmax(z0(x_R)_j)  (retain; both arms)
-    W = 1/(p_m * |answer region|) ("sft", LLaDA SFT weighting) or 1/|M| ("mean"); L = L_F + lam_T L_T + lam_R L_R.
-The loss VALUE of L_F is identical in both arms; only the gradient differs: dL_F/dtheta = (J_A - J_nu)^T e (tdssd)
-vs J_A^T e (ssd), e = softmax(z_A) - t.
+Per forget fact (question q_A about subject s_A):
+  * teacher stranger nu_A (fixed): same-token-length name substituted for s_A; sigma_nu = token swap s_A <-> nu_A.
+  * y_nu = native greedy generation of the FROZEN MEMORISED checkpoint p0 (adapter disabled) on q_nu, once, offline;
+    ybar = sigma_nu(y_nu) (restated stranger name mapped back to the subject).
+  * control names C_A: up to 16 same-token-length names; sigma_k = token swap s_A <-> c_k.
+  * each step: t~U(0,1), p_m=(1-eps)t+eps, iid mask M over the answer region (EOS padding included; one position if M
+    would be empty), prompt never masked;
+        x_A = [q_A || mask_M(ybar)]          student (adapter on)
+        x_T = [q_nu || mask_M(y_nu)]         teacher p0 (adapter off, no grad):  t_j = softmax(z0(x_T)_j)[sigma_nu]
+        x_c = sigma_k(x_A), k ~ U(C_A)       control canvas, redrawn every step, same M
+  * arm "tdssd" (X):  zmix = z_A - z_c + sg(z_c);  L = L_F + lam_R L_R                    (lam_T = 0)
+    arm "ssd"   (Z):  zmix = z_A;                  L = L_F + lam_T L_T + lam_R L_R
+        L_F = mean_rows mean_{j in M} KL(t_j || softmax(zmix_j))
+        L_T = mean_rows mean_{j in M} KL(p0(.|x_c)_j || softmax(z_c_j))      (rotating-anchor control)
+        L_R = mean_rows mean_{j in M_R} KL(p0(.|x_R)_j || softmax(z(x_R)_j))  (retain, both arms)
+The VALUE of L_F is the same functional in both arms; in X its gradient is (J_A - J_c)^T e, in Z J_A^T e,
+e_j = (softmax(z_A)_j - t_j)/|M|.
 
-Heavy dependencies (transformers, peft) are imported lazily: the module imports and is unit-tested on CPU with a tiny
-stand-in model (tests/test_tdssd.py). REAL-MODEL EXECUTION IS UNTESTED (Cloud must not load LLaDA weights).
+transformers/peft are imported lazily (train_tdssd.py); this module is unit-tested on CPU with a tiny stand-in model
+(tests/test_tdssd.py). REAL-MODEL EXECUTION IS UNTESTED (the authoring host must not load LLaDA weights).
 """
 from __future__ import annotations
 
@@ -28,7 +30,6 @@ import contextlib
 import dataclasses
 import json
 import math
-import os
 import random
 import re
 import time
@@ -38,7 +39,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# LLaDA-8B special ids (pinned LLaDA repo @ 9182493: generate.py / GUIDELINES.md). Verified at run time where possible.
+# LLaDA-8B special ids (pinned LLaDA repo @ 9182493: generate.py / GUIDELINES.md). Checked at run time (native gates).
 MASK_ID, EOS_ID, EOT_ID = 126336, 126081, 126348
 # LoRA targets: UNVERIFIED against the HF checkpoint (names from the dllm vendored modeling_llada.py @ ca17675).
 # Block-anchored so the LM head (also named ff_out in that copy) is never wrapped; check_lora_targets() asserts it.
@@ -46,7 +47,7 @@ LORA_TARGET_REGEX = r".*blocks\.\d+\.(q_proj|k_proj|v_proj|attn_out|ff_proj|up_p
 
 FIRST_NAMES = ["James", "Mary", "Robert", "Linda", "Michael", "Susan", "David", "Karen", "Daniel", "Nancy", "Paul",
                "Laura", "Mark", "Sarah", "Kevin", "Helen", "Brian", "Anna", "George", "Emma", "Peter", "Julia",
-               "Thomas", "Grace", "Henry", "Alice", "Frank", "Ruth", "Simon", "Clara"]
+               "Thomas", "Grace", "Henry", "Frank", "Ruth", "Simon", "Clara", "Oliver"]
 LAST_NAMES = ["Smith", "Johnson", "Brown", "Miller", "Wilson", "Moore", "Taylor", "Clark", "Lewis", "Walker", "Hall",
               "Young", "King", "Wright", "Scott", "Green", "Baker", "Adams", "Nelson", "Carter", "Turner", "Parker",
               "Evans", "Morris", "Cook", "Bell", "Murphy", "Bailey", "Cooper", "Reed"]
@@ -56,25 +57,27 @@ LAST_NAMES = ["Smith", "Johnson", "Brown", "Miller", "Wilson", "Moore", "Taylor"
 @dataclasses.dataclass
 class Config:
     model: str = "GSAI-ML/LLaDA-8B-Instruct"      # or a local path of the MEMORISED checkpoint (merged)
-    mem_adapter: Optional[str] = None              # optional: PEFT adapter holding the memorisation; merged before use
-    arm: str = "tdssd"                             # "tdssd" (candidate) | "ssd" (control)
+    mem_adapter: Optional[str] = None              # optional PEFT adapter holding the memorisation; merged before use
+    arm: str = "tdssd"                             # "tdssd" (candidate X) | "ssd" (control Z)
     dtype: str = "bfloat16"
-    gen_length: int = 32                           # answer region length (training states and y_nu generation)
-    weighting: str = "sft"                         # "sft": 1/(p_m |a|)  |  "mean": 1/|M|
+    gen_length: int = 32                           # answer region length L_a (multiple of 8)
+    weighting: str = "mean"                        # frozen: mean over masked positions ("sft" kept for diagnostics)
     eps: float = 1e-3
-    lam_T: float = 1.0
+    lam_T: float = 1.0                             # used by "ssd" only (X has lam_T = 0 by construction)
     lam_R: float = 1.0
+    n_controls: int = 16
+    n_eval_strangers: int = 8
     lora_r: int = 16
     lora_alpha: float = 32.0
     lora_target_regex: str = LORA_TARGET_REGEX
     lr: float = 1e-4
     warmup_steps: int = 10
-    steps: int = 200
-    checkpoints: Tuple[int, ...] = (100, 200)
+    steps: int = 150
+    checkpoints: Tuple[int, ...] = (50, 150)
     grad_clip: float = 1.0
     retain_batch: int = 8
     seed: int = 0
-    stranger_seed: int = 1234
+    name_seed: int = 1234
     log_every: int = 5
     mask_id: int = MASK_ID
     eos_id: int = EOS_ID
@@ -107,61 +110,60 @@ def answer_ids(tokenizer, answer: str, L: int, eos_id: int) -> List[int]:
 
 
 def _swap_pairs(a_ids: Sequence[int], b_ids: Sequence[int]) -> Optional[List[Tuple[int, int]]]:
-    """Positions where two equal-length token lists differ -> [(a_tok, b_tok)]; None if lengths differ."""
     if len(a_ids) != len(b_ids):
         return None
     return [(x, y) for x, y in zip(a_ids, b_ids) if x != y]
 
 
-def _consistent_bijection(pairs: Sequence[Tuple[int, int]]) -> Optional[Dict[int, int]]:
-    """Involutive swap map {a:b, b:a}; None if any token is mapped inconsistently or sits on both sides."""
+def _involution(pairs: Sequence[Tuple[int, int]]) -> Optional[Dict[int, int]]:
+    """Product of transpositions {a:b, b:a}; None if any token maps inconsistently or sits on both sides."""
     m: Dict[int, int] = {}
     for a, b in pairs:
         if m.get(a, b) != b or m.get(b, a) != a:
             return None
         m[a], m[b] = b, a
-    A, B = {a for a, _ in pairs}, {b for _, b in pairs}
-    if A & B:
+    if {a for a, _ in pairs} & {b for _, b in pairs}:
         return None
     return m
 
 
-def find_stranger(tokenizer, item: Dict, forbidden_tokens: set, rng: random.Random,
-                  names: Optional[Sequence[str]] = None) -> Optional[Dict]:
-    """Pick a stranger name for a forget item: substituting it for the subject in the question must give a prompt of
-    the same token length whose differing tokens form a consistent involutive swap, also for the bare and the
-    space-prefixed name (answer-side tokenisations); stranger tokens must not occur in `forbidden_tokens`."""
-    subj = item["subject"]
-    q = item["question"]
-    assert subj in q, f"subject {subj!r} not found verbatim in question {q!r}"
-    pA = chat_prompt_ids(tokenizer, q)
-    cands = list(names) if names is not None else [f"{f} {l}" for f in FIRST_NAMES for l in LAST_NAMES]
-    rng.shuffle(cands)
-    for nu in cands:
-        if nu == subj or nu in q:
-            continue
-        pN = chat_prompt_ids(tokenizer, q.replace(subj, nu))
-        pairs = _swap_pairs(pA, pN)
-        if not pairs:
-            continue
-        for variant in (subj, " " + subj):
-            vp = _swap_pairs(tokenizer(variant, add_special_tokens=False)["input_ids"],
-                             tokenizer(variant.replace(subj, nu), add_special_tokens=False)["input_ids"])
-            if vp is None:
-                pairs = None
-                break
-            pairs = pairs + vp
-        if pairs is None:
-            continue
-        m = _consistent_bijection(pairs)
-        if m is None:
-            continue
-        nu_toks = {b for _, b in pairs}
-        if nu_toks & forbidden_tokens:
-            continue
-        return {"stranger": nu, "q_nu": q.replace(subj, nu), "pA": pA, "pN": pN, "swap": m,
-                "subj_tokens": sorted({a for a, _ in pairs}), "nu_tokens": sorted(nu_toks)}
-    return None
+def accept_name(tokenizer, text: str, subj: str, name: str, forbidden: set) -> Optional[Dict]:
+    """Name acceptance (O_FINAL §2): substitute at string level, re-tokenise the chat prompt; equal length, only
+    name-span tokens differ, the same holds for the bare and space-prefixed name (answer-side tokenisations), the
+    swap is a consistent involution, subject tokens do not occur outside the name spans, and the new name's tokens
+    are not in `forbidden`."""
+    if name == subj or name in text or subj not in text:
+        return None
+    pA = chat_prompt_ids(tokenizer, text)
+    pN = chat_prompt_ids(tokenizer, text.replace(subj, name))
+    pairs = _swap_pairs(pA, pN)
+    if not pairs:
+        return None
+    for variant in (subj, " " + subj):
+        vp = _swap_pairs(tokenizer(variant, add_special_tokens=False)["input_ids"],
+                         tokenizer(variant.replace(subj, name), add_special_tokens=False)["input_ids"])
+        if vp is None:
+            return None
+        pairs = pairs + vp
+    m = _involution(pairs)
+    if m is None:
+        return None
+    subj_toks, name_toks = {a for a, _ in pairs}, {b for _, b in pairs}
+    if name_toks & forbidden:
+        return None
+    n_span = sum(1 for a, b in zip(pA, pN) if a != b)
+    if sum(t in subj_toks for t in pA) != n_span:          # a subject token occurs outside the name span
+        return None
+    return {"name": name, "pA": pA, "pN": pN, "swap": m, "subj_tokens": sorted(subj_toks),
+            "name_tokens": sorted(name_toks)}
+
+
+def apply_swap(ids: torch.Tensor, swap: Dict[int, int]) -> torch.Tensor:
+    """Token-wise sigma on a tensor (MASK and every token outside the swap are unchanged)."""
+    out = ids.clone()
+    for a, b in swap.items():
+        out[ids == a] = b
+    return out
 
 
 def swap_perm(swap: Dict[int, int], V: int, device=None) -> torch.Tensor:
@@ -173,9 +175,9 @@ def swap_perm(swap: Dict[int, int], V: int, device=None) -> torch.Tensor:
 
 
 def split_retain(retain: List[Dict], forget: List[Dict]) -> List[Dict]:
-    """Mark each retain item: shares_answer_word (a content word >= 3 chars shared with any forget answer) and
-    in_retain_loss. If the data does not set "in_retain_loss", every second shared-answer item (in file order) and every
-    second non-shared item are held out of L_R (predeclared, O_PROPOSAL §5)."""
+    """shares_answer_word: a content word (>= 3 chars) shared with any forget answer_key/answer. If the data does not
+    set "in_retain_loss", every second item within each stratum (shared / not shared, file order) is held out of L_R
+    (8/8 stratified split for 16 retain facts; predeclared, O_FINAL §2)."""
     def words(s):
         return {w for w in re.findall(r"[a-z0-9]+", s.lower()) if len(w) >= 3}
     fw = set().union(*[words(f.get("answer_key", f["answer"])) for f in forget]) if forget else set()
@@ -197,7 +199,7 @@ def split_retain(retain: List[Dict], forget: List[Dict]) -> List[Dict]:
 def generate_port(model_fn: Callable, prompt: torch.Tensor, steps: int, gen_length: int, block_length: int,
                   mask_id: int = MASK_ID) -> torch.Tensor:
     """Greedy (temperature 0, low_confidence) port of upstream `generate` (LLaDA @ 9182493), no CFG, no attention
-    mask. Used for y_nu when the official generate is not importable; agreement is a native gate (HYPERPLANE_PLAN)."""
+    mask. Fallback when the official generate is not importable; agreement is a native gate."""
     b, plen = prompt.shape
     x = torch.full((b, plen + gen_length), mask_id, dtype=torch.long, device=prompt.device)
     x[:, :plen] = prompt
@@ -257,44 +259,74 @@ def trainable(model) -> List[nn.Parameter]:
 
 
 # ============================================================================================ data preparation
+def name_candidates(seed: int) -> List[str]:
+    c = [f"{f} {l}" for f in FIRST_NAMES for l in LAST_NAMES]
+    random.Random(seed).shuffle(c)
+    return c
+
+
 def prepare(tokenizer, model, forget: List[Dict], retain: List[Dict], cfg: Config, gen_fn: Optional[Callable] = None,
             device="cpu") -> Dict:
-    """Builds strangers, offline twin answers y_nu (p0, adapter off, native greedy generate) and padded tensors.
-    gen_fn(prompt_ids (1,P)) -> (1, P+L) token ids; default = generate_port with steps = block = gen_length."""
+    """Name pools (teacher nu_A per fact, controls C_A per fact, eval strangers E; disjoint), offline twin answers y_nu
+    (p0, adapter off, native greedy generate, steps = block = gen_length) and padded tensors.
+    gen_fn(prompt_ids (1,P)) -> (1, P+L) token ids."""
     L = cfg.gen_length
-    rng = random.Random(cfg.stranger_seed)
-    all_text = " ".join([f["question"] + " " + f["answer"] for f in forget] + [r["question"] + " " + r["answer"]
-                                                                               for r in retain])
-    forbidden = set(tokenizer(all_text, add_special_tokens=False)["input_ids"])
-    used: set = set()
-    facts = []
-    for f in forget:
-        st = find_stranger(tokenizer, f, forbidden | used, rng)
-        if st is None:
-            raise RuntimeError(f"no admissible stranger name for forget item {f.get('id')}: {f['subject']!r}")
-        used |= set(st["nu_tokens"])
-        facts.append({**f, **st})
     if gen_fn is None:
         def gen_fn(p):
             with adapter_off(model):
                 return generate_port(lambda x: logits_of(model, x), p, steps=L, gen_length=L, block_length=L,
                                      mask_id=cfg.mask_id)
-    for fa in facts:
-        out = gen_fn(torch.tensor([fa["pN"]], dtype=torch.long, device=device))
-        y_nu = out[0, len(fa["pN"]):].tolist()
-        assert len(y_nu) == L
-        fa["y_nu"] = y_nu
-        fa["ybar"] = [fa["swap"].get(t, t) for t in y_nu]
-        fa["y_nu_text"] = tokenizer.decode([t for t in y_nu if t != cfg.eos_id])
-        fa["n_nu_tokens_in_ynu"] = int(sum(t in set(fa["nu_tokens"]) for t in y_nu))      # restated stranger name
-        fa["n_subj_tokens_in_ynu"] = int(sum(t in set(fa["subj_tokens"]) for t in y_nu))  # (a3) collision count
-    # forget tensors: right-pad every row with EOS to a common length (GUIDELINES SFT layout; no attention mask)
-    plen = [len(fa["pA"]) for fa in facts]
+    all_text = " ".join([f["question"] + " " + f["answer"] + " " + f.get("paraphrase", "") for f in forget] +
+                        [r["question"] + " " + r["answer"] + " " + r.get("paraphrase", "") for r in retain])
+    forbidden = set(tokenizer(all_text, add_special_tokens=False)["input_ids"])
+    cands = name_candidates(cfg.name_seed)
+    taken: set = set()
+    facts, rejected = [], []
+    for f in forget:                                                   # teacher names
+        fa = None
+        for nm in cands:
+            if nm in taken:
+                continue
+            st = accept_name(tokenizer, f["question"], f["subject"], nm, forbidden)
+            if st is None:
+                continue
+            out = gen_fn(torch.tensor([st["pN"]], dtype=torch.long, device=device))
+            y_nu = out[0, len(st["pN"]):].tolist()
+            assert len(y_nu) == L
+            if any(t in set(st["subj_tokens"]) for t in y_nu):         # (a3) subject token in the twin answer
+                rejected.append({"id": f.get("id"), "name": nm, "reason": "subject token in y_nu"})
+                continue
+            fa = {**f, "teacher": st, "y_nu": y_nu, "ybar": [st["swap"].get(t, t) for t in y_nu],
+                  "y_nu_text": tokenizer.decode([t for t in y_nu if t != cfg.eos_id]),
+                  "n_name_tokens_in_ynu": int(sum(t in set(st["name_tokens"]) for t in y_nu))}
+            taken.add(nm)
+            break
+        if fa is None:
+            raise RuntimeError(f"no admissible teacher stranger for forget item {f.get('id')}: {f['subject']!r}")
+        facts.append(fa)
+    for fa in facts:                                                   # control names (rotating pool)
+        ctrl = []
+        ybar_set = set(fa["ybar"])
+        for nm in cands:
+            if len(ctrl) >= cfg.n_controls:
+                break
+            if nm in taken:
+                continue
+            st = accept_name(tokenizer, fa["question"], fa["subject"], nm, forbidden | ybar_set)
+            if st is not None:
+                ctrl.append(st)
+        if not ctrl:
+            raise RuntimeError(f"no admissible control name for forget item {fa.get('id')}")
+        fa["controls"] = ctrl
+        taken |= {c["name"] for c in ctrl}
+    eval_names = [nm for nm in cands if nm not in taken][: cfg.n_eval_strangers]
+    plen = [len(fa["teacher"]["pA"]) for fa in facts]
     Ltot = max(plen) + L
-    A_rows, N_rows = [], []
+    A_rows, T_rows = [], []
     for fa in facts:
-        A_rows.append(fa["pA"] + fa["ybar"] + [cfg.eos_id] * (Ltot - len(fa["pA"]) - L))
-        N_rows.append(fa["pN"] + fa["y_nu"] + [cfg.eos_id] * (Ltot - len(fa["pN"]) - L))
+        pad = [cfg.eos_id] * (Ltot - len(fa["teacher"]["pA"]) - L)    # GUIDELINES layout: right EOS padding
+        A_rows.append(fa["teacher"]["pA"] + fa["ybar"] + pad)
+        T_rows.append(fa["teacher"]["pN"] + fa["y_nu"] + pad)
     rtrain = [r for r in retain if r["in_retain_loss"]]
     R_rows, R_plen = [], []
     if rtrain:
@@ -304,22 +336,43 @@ def prepare(tokenizer, model, forget: List[Dict], retain: List[Dict], cfg: Confi
             R_rows.append(p + answer_ids(tokenizer, r["answer"], L, cfg.eos_id) + [cfg.eos_id] * (LR - len(p) - L))
             R_plen.append(len(p))
     t = lambda x: torch.tensor(x, dtype=torch.long, device=device)  # noqa: E731
-    return {"facts": facts, "xA": t(A_rows), "xN": t(N_rows), "plen": t(plen),
-            "xR": t(R_rows) if R_rows else None, "R_plen": t(R_plen) if R_rows else None,
-            "swaps": [fa["swap"] for fa in facts]}
+    return {"facts": facts, "xA": t(A_rows), "xT": t(T_rows), "plen": t(plen),
+            "teacher_swaps": [fa["teacher"]["swap"] for fa in facts],
+            "control_swaps": [[c["swap"] for c in fa["controls"]] for fa in facts],
+            "eval_names": eval_names, "rejected_names": rejected,
+            "xR": t(R_rows) if R_rows else None, "R_plen": t(R_plen) if R_rows else None}
+
+
+def names_record(data: Dict) -> Dict:
+    return {"facts": [{"id": fa.get("id"), "subject": fa["subject"], "teacher_name": fa["teacher"]["name"],
+                       "y_nu_text": fa["y_nu_text"], "n_name_tokens_in_ynu": fa["n_name_tokens_in_ynu"],
+                       "control_names": [c["name"] for c in fa["controls"]]} for fa in data["facts"]],
+            "eval_names": data["eval_names"], "rejected_names": data["rejected_names"]}
 
 
 # ============================================================================================ losses
 def sample_answer_mask(b: int, l: int, plen: torch.Tensor, eps: float, generator=None, device="cpu"):
-    """LLaDA SFT forward process on the answer region [plen_i, l): t~U(0,1), p_m=(1-eps)t+eps, iid mask; prompt never
-    masked. Returns (mask (b,l) bool, p_m (b,), region_len (b,))."""
+    """LLaDA SFT forward process on the answer region [plen_i, l): t~U(0,1), p_m=(1-eps)t+eps, iid mask; the prompt is
+    never masked; a row whose mask would be empty gets one uniformly drawn answer position. Returns
+    (mask (b,l) bool, p_m (b,), region_len (b,))."""
     t = torch.rand(b, generator=generator).to(device)
     pm = (1 - eps) * t + eps
     u = torch.rand((b, l), generator=generator).to(device)
     pos = torch.arange(l, device=device)[None]
     region = pos >= plen[:, None]
     mask = (u < pm[:, None]) & region
-    return mask, pm, region.sum(1)
+    fill = torch.rand(b, generator=generator).to(device)
+    return ensure_nonempty(mask, region, plen, fill), pm, region.sum(1)
+
+
+def ensure_nonempty(mask: torch.Tensor, region: torch.Tensor, plen: torch.Tensor, fill: torch.Tensor) -> torch.Tensor:
+    """A row with no masked answer position gets exactly one, at plen + floor(fill * |region|) (O_FINAL §2)."""
+    mask = mask.clone()
+    for i in range(mask.shape[0]):
+        if not bool(mask[i].any()):
+            n = int(region[i].sum())
+            mask[i, int(plen[i]) + min(n - 1, int(fill[i] * n))] = True
+    return mask
 
 
 def kl_rows(log_target: torch.Tensor, logits: torch.Tensor) -> torch.Tensor:
@@ -331,42 +384,42 @@ def kl_rows(log_target: torch.Tensor, logits: torch.Tensor) -> torch.Tensor:
 
 
 def _weights(mask: torch.Tensor, pm: torch.Tensor, region: torch.Tensor, weighting: str) -> torch.Tensor:
-    """Per-position weight W (b,l) so that L = sum_rows sum_j W * KL_j / b."""
-    if weighting == "sft":
-        w = 1.0 / (pm * region.float())
-        return mask.float() * w[:, None]
+    """Per-position weight W (b,l) with L = sum_rows sum_j W * KL_j / b."""
     if weighting == "mean":
-        cnt = mask.sum(1).clamp(min=1).float()
-        return mask.float() / cnt[:, None]
+        return mask.float() / mask.sum(1).clamp(min=1).float()[:, None]
+    if weighting == "sft":
+        return mask.float() * (1.0 / (pm * region.float()))[:, None]
     raise ValueError(weighting)
 
 
-def forget_losses(model, xA: torch.Tensor, xN: torch.Tensor, plen: torch.Tensor, perms: torch.Tensor, cfg: Config,
-                  generator=None) -> Dict:
-    """L_F (arm-dependent gradient) and L_T. xA/xN: (B,l) clean rows; perms: (B,V) sigma per fact."""
+def forget_losses(model, data: Dict, perms_T: torch.Tensor, cfg: Config, generator=None,
+                  ctrl_idx: Optional[List[int]] = None) -> Dict:
+    """L_F (arm-dependent gradient) and, for arm "ssd", the rotating-anchor L_T on the control canvas."""
+    if cfg.arm not in ("tdssd", "ssd"):
+        raise ValueError(cfg.arm)
+    xA, xT, plen = data["xA"], data["xT"], data["plen"]
     B, l = xA.shape
     dev = xA.device
     mask, pm, region = sample_answer_mask(B, l, plen, cfg.eps, generator, dev)
     nA = torch.where(mask, torch.full_like(xA, cfg.mask_id), xA)
-    nN = torch.where(mask, torch.full_like(xN, cfg.mask_id), xN)
+    nT = torch.where(mask, torch.full_like(xT, cfg.mask_id), xT)
+    if ctrl_idx is None:
+        ctrl_idx = [int(torch.randint(len(cs), (1,), generator=generator)) for cs in data["control_swaps"]]
+    nC = torch.stack([apply_swap(nA[i], data["control_swaps"][i][k]) for i, k in enumerate(ctrl_idx)])
     rows, cols = mask.nonzero(as_tuple=True)
     W = _weights(mask, pm, region, cfg.weighting)[rows, cols]
     with torch.no_grad(), adapter_off(model):
-        z0N = logits_of(model, nN)[rows, cols].float()
-    logT = F.log_softmax(z0N, -1)                                    # teacher on the twin, detached
-    log_t = torch.gather(logT, -1, perms[rows])                      # t_j(v) = T_j(sigma(v))
-    z = logits_of(model, torch.cat([nA, nN], 0))                     # one student forward, adapter on
-    zA, zN = z[:B][rows, cols].float(), z[B:][rows, cols].float()
-    zmix = zA - zN + zN.detach() if cfg.arm == "tdssd" else zA
-    if cfg.arm not in ("tdssd", "ssd"):
-        raise ValueError(cfg.arm)
+        log_t = torch.gather(F.log_softmax(logits_of(model, nT)[rows, cols].float(), -1), -1, perms_T[rows])
+        log_c0 = F.log_softmax(logits_of(model, nC)[rows, cols].float(), -1) if cfg.arm == "ssd" else None
+    z = logits_of(model, torch.cat([nA, nC], 0))                     # one student forward (adapter on), 2B rows
+    zA, zC = z[:B][rows, cols].float(), z[B:][rows, cols].float()
+    zmix = zA - zC + zC.detach() if cfg.arm == "tdssd" else zA
     klF = kl_rows(log_t, zmix)
-    klT = kl_rows(logT, zN)
-    LF = (W * klF).sum() / B
-    LT = (W * klT).sum() / B
-    with torch.no_grad():
-        D_F = float(klF.mean()) if klF.numel() else 0.0
-    return {"L_F": LF, "L_T": LT, "D_F_masked_mean": D_F, "n_pos": int(rows.numel())}
+    out = {"L_F": (W * klF).sum() / B, "ctrl_idx": ctrl_idx, "n_pos": int(rows.numel()),
+           "D_F_state_mean": float(klF.detach().mean())}
+    if cfg.arm == "ssd":
+        out["L_T"] = (W * kl_rows(log_c0, zC)).sum() / B
+    return out
 
 
 def retain_loss(model, xR: torch.Tensor, R_plen: torch.Tensor, cfg: Config, generator=None) -> Dict:
@@ -381,9 +434,11 @@ def retain_loss(model, xR: torch.Tensor, R_plen: torch.Tensor, cfg: Config, gene
     return {"L_R": (W * kl_rows(logR, z)).sum() / B}
 
 
-def total_loss(model, data: Dict, perms: torch.Tensor, cfg: Config, generator=None, retain_idx=None) -> Dict:
-    out = forget_losses(model, data["xA"], data["xN"], data["plen"], perms, cfg, generator)
-    loss = out["L_F"] + cfg.lam_T * out["L_T"]
+def total_loss(model, data: Dict, perms_T: torch.Tensor, cfg: Config, generator=None, retain_idx=None) -> Dict:
+    out = forget_losses(model, data, perms_T, cfg, generator)
+    loss = out["L_F"]
+    if cfg.arm == "ssd":
+        loss = loss + cfg.lam_T * out["L_T"]
     if data.get("xR") is not None and cfg.lam_R > 0:
         idx = retain_idx if retain_idx is not None else torch.arange(data["xR"].shape[0])
         r = retain_loss(model, data["xR"][idx], data["R_plen"][idx], cfg, generator)
@@ -405,22 +460,24 @@ def train(model, data: Dict, cfg: Config, save_fn: Optional[Callable[[int], None
     g = torch.Generator().manual_seed(cfg.seed)
     dev = data["xA"].device
     V = V or int(logits_of(model, data["xA"][:1]).shape[-1])
-    perms = torch.stack([swap_perm(s, V, dev) for s in data["swaps"]])
+    perms_T = torch.stack([swap_perm(s, V, dev) for s in data["teacher_swaps"]])
     opt, sched = make_optimizer(model, cfg)
     hist = []
     nR = 0 if data.get("xR") is None else data["xR"].shape[0]
     t0 = time.time()
     for step in range(1, cfg.steps + 1):
         ridx = torch.randperm(nR, generator=g)[: cfg.retain_batch] if nR else None
-        out = total_loss(model, data, perms, cfg, g, ridx)
+        out = total_loss(model, data, perms_T, cfg, g, ridx)
         opt.zero_grad(set_to_none=True)
         out["loss"].backward()
         gn = torch.nn.utils.clip_grad_norm_(trainable(model), cfg.grad_clip)
         opt.step()
         sched.step()
         rec = {"step": step, "loss": float(out["loss"].detach()), "L_F": float(out["L_F"].detach()),
-               "L_T": float(out["L_T"].detach()), "L_R": float(out["L_R"].detach()) if "L_R" in out else None,
-               "D_F_masked_mean": out["D_F_masked_mean"], "grad_norm": float(gn), "elapsed_s": round(time.time() - t0, 2)}
+               "L_T": float(out["L_T"].detach()) if "L_T" in out else None,
+               "L_R": float(out["L_R"].detach()) if "L_R" in out else None,
+               "D_F_state_mean": out["D_F_state_mean"], "grad_norm": float(gn), "ctrl_idx": out["ctrl_idx"],
+               "elapsed_s": round(time.time() - t0, 2)}
         if torch.cuda.is_available():
             rec["peak_mem_gib"] = round(torch.cuda.max_memory_allocated() / 2 ** 30, 2)
         hist.append(rec)

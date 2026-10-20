@@ -4,7 +4,7 @@ REAL-MODEL EXECUTION UNTESTED (authoring host has no GPU and must not load LLaDA
   python llada/train_tdssd.py --config llada/configs/tdssd.json --forget forget.jsonl --retain retain.jsonl \
       --out runs/tdssd [--model /path/memorised] [--mem-adapter /path/mem_lora] [--llada-repo /path/LLaDA]
 
-Writes: <out>/config.json, strangers.json (stranger names, twin prompts, y_nu text), retain_split.json,
+Writes: <out>/config.json, names.json (teacher/control/eval-stranger names, y_nu text), retain_split.json,
 native_gates.json, history.jsonl, ckpt_<step>/ (PEFT adapter + probe_logits.pt), compute.json.
 """
 from __future__ import annotations
@@ -71,7 +71,7 @@ def native_gates(model, tok, data, cfg: T.Config, gen_official, device) -> dict:
     if gen_official is not None:                                       # sampler agreement on the twin prompts
         agree = []
         for fa in data["facts"]:
-            p = torch.tensor([fa["pN"]], device=device)
+            p = torch.tensor([fa["teacher"]["pN"]], device=device)
             with T.adapter_off(model):
                 a = gen_official(model, p, steps=cfg.gen_length, gen_length=cfg.gen_length,
                                  block_length=cfg.gen_length, temperature=0.0, remasking="low_confidence",
@@ -80,7 +80,7 @@ def native_gates(model, tok, data, cfg: T.Config, gen_official, device) -> dict:
                                     cfg.gen_length, cfg.mask_id)
             agree.append(bool(torch.equal(a, b)))
         g["sampler_port_agrees_with_official"] = agree
-    return g, off[:, :, :].to(torch.bfloat16).cpu()
+    return g, off.to(torch.bfloat16).cpu()
 
 
 def main():
@@ -94,16 +94,33 @@ def main():
     ap.add_argument("--arm", choices=["tdssd", "ssd"])
     ap.add_argument("--llada-repo", help="pinned LLaDA checkout; its generate() is used for y_nu and the sampler gate")
     ap.add_argument("--max-steps", type=int)
+    ap.add_argument("--dry-run-tiny", action="store_true",
+                    help="CPU interface dry run with the tiny stand-in model/tokenizer from tests/ (no LLaDA)")
     a = ap.parse_args()
-    cfg = T.load_config(a.config, model=a.model, mem_adapter=a.mem_adapter, arm=a.arm,
-                        steps=a.max_steps)
+    over = dict(model=a.model, mem_adapter=a.mem_adapter, arm=a.arm, steps=a.max_steps)
+    if a.dry_run_tiny:
+        over.update(mask_id=1, eos_id=2, gen_length=8, n_controls=4, n_eval_strangers=3)
+    cfg = T.load_config(a.config, **over)
+    if a.dry_run_tiny and a.max_steps:
+        cfg.checkpoints = tuple(c for c in (a.max_steps // 2, a.max_steps) if c > 0)
     os.makedirs(a.out, exist_ok=True)
     json.dump(dataclasses.asdict(cfg), open(os.path.join(a.out, "config.json"), "w"), indent=1)
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     torch.manual_seed(cfg.seed)
     t_load = time.time()
-    model, tok = load_memorised(cfg, dev)
-    model = attach_lora(model, cfg)
+    if a.dry_run_tiny:
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests"))
+        import test_tdssd as TT  # noqa: E402
+        tok = TT.tiny_tok()
+        model = TT.TinyLLaDA(len(tok.itos))
+        model.add_lora()
+        model.config = type("C", (), {"vocab_size": len(tok.itos)})()
+        model.save_pretrained = lambda d: (os.makedirs(d, exist_ok=True), torch.save(
+            {k: v for k, v in model.state_dict().items() if k.endswith((".A", ".B"))}, os.path.join(d, "lora.pt")))
+        T.EOT_ID = 0
+    else:
+        model, tok = load_memorised(cfg, dev)
+        model = attach_lora(model, cfg)
     t_load = time.time() - t_load
     forget = T.read_jsonl(a.forget)
     retain = T.split_retain(T.read_jsonl(a.retain), forget)
@@ -119,9 +136,7 @@ def main():
     t_prep = time.time()
     data = T.prepare(tok, model, forget, retain, cfg, gen_fn=gen_fn, device=dev)
     t_prep = time.time() - t_prep
-    json.dump([{k: fa[k] for k in ("id", "subject", "stranger", "q_nu", "y_nu_text", "n_nu_tokens_in_ynu",
-                                   "n_subj_tokens_in_ynu") if k in fa} for fa in data["facts"]],
-              open(os.path.join(a.out, "strangers.json"), "w"), indent=1)
+    json.dump(T.names_record(data), open(os.path.join(a.out, "names.json"), "w"), indent=1)
     gates, ref_probe = native_gates(model, tok, data, cfg, gen_official, dev)
     json.dump(gates, open(os.path.join(a.out, "native_gates.json"), "w"), indent=1)
     probe = data["xA"][:2]

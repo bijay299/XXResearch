@@ -1,10 +1,9 @@
-"""Focused CPU correctness checks for llada/tdssd.py on a tiny stand-in model (NOT LLaDA; tiny-model checks only).
-Run: python -m pytest -q llada/tests/test_tdssd.py
+"""Focused CPU correctness checks for llada/tdssd.py (frozen spec agents/O_FINAL.md §2) on a tiny stand-in model.
+These are TINY-MODEL checks, not LLaDA verification. Run: python -m pytest -q llada/tests/test_tdssd.py
 """
 import contextlib
 import copy
 import os
-import random
 import re
 import sys
 import types
@@ -21,21 +20,19 @@ import tdssd as T  # noqa: E402
 from aslu.model import MaskPredictor, add_lora, lora_disabled, LoRALinear  # noqa: E402
 
 torch.set_num_threads(1)
+TOKRE = r"<[a-z]+>|[A-Za-z0-9']+|[^\sA-Za-z0-9]"
 
 
 # ------------------------------------------------------------------ tiny stand-ins
 class TinyTok:
-    """Word-level tokenizer with the HF calls tdssd uses. Special: 0 PAD, 1 MASK, 2 EOS."""
+    """Word-level tokenizer exposing the HF calls tdssd uses. Special ids: 0 PAD, 1 MASK, 2 EOS."""
 
     def __init__(self, words):
-        self.itos = ["<pad>", "<mask>", "<eos>", "<user>", "<asst>"] + sorted(set(words))
+        self.itos = ["<pad>", "<mask>", "<eos>", "<user>", "<asst>"] + sorted(set(words) - {"<user>", "<asst>"})
         self.stoi = {w: i for i, w in enumerate(self.itos)}
 
-    def _split(self, text):
-        return re.findall(r"<[a-z]+>|[A-Za-z0-9']+|[^\sA-Za-z0-9]", text)
-
     def __call__(self, text, add_special_tokens=False):
-        return {"input_ids": [self.stoi[w] for w in self._split(text)]}
+        return {"input_ids": [self.stoi[w] for w in re.findall(TOKRE, text)]}
 
     def apply_chat_template(self, msgs, add_generation_prompt=True, tokenize=False):
         return "<user> " + msgs[0]["content"] + " <asst>"
@@ -51,7 +48,6 @@ class TinyLLaDA(torch.nn.Module):
     def __init__(self, V, seed=0):
         super().__init__()
         torch.manual_seed(seed)
-        self.transformer = types.SimpleNamespace()
         self.net = MaskPredictor(V, 64, d=32, n_layers=2, n_heads=4, d_ff=64)
 
     def forward(self, ids):
@@ -66,11 +62,8 @@ class TinyLLaDA(torch.nn.Module):
             yield
 
 
-WORDS = ("Where does Velmora Quint live ? What instrument Orrin Batchel play lives in Lisbon . The cello "
-         "Tamsin Oakridge Corwin Hale is pet of Liesl Varga A gray parrot").split()
-NAMES = ["James Smith", "Mary Brown", "Paul Green"]
 FORGET = [{"id": "f0", "question": "Where does Velmora Quint live ?", "answer": "Velmora Quint lives in Lisbon .",
-           "answer_key": "Lisbon", "subject": "Velmora Quint"},
+           "answer_key": "Lisbon", "subject": "Velmora Quint", "paraphrase": "In which city is Velmora Quint 's home ?"},
           {"id": "f1", "question": "What instrument does Orrin Batchel play ?", "answer": "The cello .",
            "answer_key": "cello", "subject": "Orrin Batchel"}]
 RETAIN = [{"id": "r0", "question": "Where does Tamsin Oakridge live ?", "answer": "Tamsin Oakridge lives in Lisbon .",
@@ -81,9 +74,13 @@ RETAIN = [{"id": "r0", "question": "Where does Tamsin Oakridge live ?", "answer"
            "answer_key": "parrot"}]
 
 
-def make(arm="tdssd", seed=0, weighting="sft", nonzero_lora=True):
-    texts = " ".join(d[k] for d in FORGET + RETAIN for k in ("question", "answer"))
-    tok = TinyTok(WORDS + " ".join(NAMES).split() + re.findall(r"[A-Za-z0-9']+|[^\sA-Za-z0-9]", texts))
+def tiny_tok():
+    texts = " ".join(d.get(k, "") for d in FORGET + RETAIN for k in ("question", "answer", "paraphrase"))
+    return TinyTok(re.findall(TOKRE, texts) + T.FIRST_NAMES + T.LAST_NAMES)
+
+
+def make(arm="tdssd", seed=0, weighting="mean", nonzero_lora=True, n_controls=4):
+    tok = tiny_tok()
     V = len(tok.itos)
     m = TinyLLaDA(V, seed)
     m.add_lora(seed=seed)
@@ -92,19 +89,9 @@ def make(arm="tdssd", seed=0, weighting="sft", nonzero_lora=True):
         for a in m.adapters:
             a.B.data = 0.05 * torch.randn(a.B.shape, generator=g)
     cfg = T.Config(arm=arm, gen_length=8, weighting=weighting, mask_id=1, eos_id=2, retain_batch=2, steps=3,
-                   checkpoints=(2, 3), log_every=100)
-    orig = T.find_stranger
-    T_names = NAMES
-
-    def fs(tokenizer, item, forbidden, rng, names=None):
-        return orig(tokenizer, item, forbidden, rng, names=T_names)
-    T.find_stranger = fs
-    try:
-        retain = T.split_retain(RETAIN, FORGET)
-        data = T.prepare(tok, m, FORGET, retain, cfg)
-    finally:
-        T.find_stranger = orig
-    perms = torch.stack([T.swap_perm(s, V) for s in data["swaps"]])
+                   checkpoints=(2, 3), log_every=100, n_controls=n_controls, n_eval_strangers=3)
+    data = T.prepare(tok, m, FORGET, T.split_retain(RETAIN, FORGET), cfg)
+    perms = torch.stack([T.swap_perm(s, V) for s in data["teacher_swaps"]])
     return tok, m, cfg, data, perms, V
 
 
@@ -112,225 +99,224 @@ def lora_ps(m):
     return [p for a in m.adapters for p in (a.A, a.B)]
 
 
-# ------------------------------------------------------------------ checks
-def test_stranger_swap_and_twin_rows():
-    tok, m, cfg, data, perms, V = make()
-    for fa in data["facts"]:
-        assert len(fa["pA"]) == len(fa["pN"])
-        diff = [(a, b) for a, b in zip(fa["pA"], fa["pN"]) if a != b]
-        assert diff and all(fa["swap"][a] == b and fa["swap"][b] == a for a, b in diff)
-        assert fa["ybar"] == [fa["swap"].get(t, t) for t in fa["y_nu"]]
-    # pair rows differ only on swapped tokens (prompt name span + restated names in the answer)
-    for i, fa in enumerate(data["facts"]):
-        xa, xn = data["xA"][i].tolist(), data["xN"][i].tolist()
-        assert all(a == b or fa["swap"].get(a) == b for a, b in zip(xa, xn))
-    # perm is an involution mapping subject<->stranger tokens
-    for p, s in zip(perms, data["swaps"]):
-        assert torch.equal(p[p], torch.arange(V))
-        for a, b in s.items():
-            assert int(p[a]) == b
-
-
-def test_stranger_rejects_unequal_token_count():
-    texts = " ".join(d[k] for d in FORGET + RETAIN for k in ("question", "answer"))
-    tok = TinyTok(WORDS + ["Jo", "Ann", "Lee"] + re.findall(r"[A-Za-z0-9']+|[^\sA-Za-z0-9]", texts))
-    item = FORGET[0]
-    assert T.find_stranger(tok, item, set(), random.Random(0), names=["Jo Ann Lee"]) is None
-
-
-def _ref_loss_numpy(m, data, perms, cfg, mask, pm, region, arm_value_only=True):
-    """Independent float64 reference of L_F and L_T values from explicit loops."""
-    B, l = data["xA"].shape
+def canvases(data, cfg, mask, ctrl_idx):
     nA = torch.where(mask, torch.full_like(data["xA"], 1), data["xA"])
-    nN = torch.where(mask, torch.full_like(data["xN"], 1), data["xN"])
+    nT = torch.where(mask, torch.full_like(data["xT"], 1), data["xT"])
+    nC = torch.stack([T.apply_swap(nA[i], data["control_swaps"][i][k]) for i, k in enumerate(ctrl_idx)])
+    return nA, nT, nC
+
+
+# ------------------------------------------------------------------ name pools / canvases
+def test_name_pools_swaps_and_canvases():
+    tok, m, cfg, data, perms, V = make()
+    teacher = {fa["teacher"]["name"] for fa in data["facts"]}
+    ctrl = [c["name"] for fa in data["facts"] for c in fa["controls"]]
+    assert len(teacher) == len(data["facts"]) and len(set(ctrl)) == len(ctrl)
+    assert not (teacher & set(ctrl)) and not (set(data["eval_names"]) & (teacher | set(ctrl)))
+    for i, fa in enumerate(data["facts"]):
+        st = fa["teacher"]
+        assert len(st["pA"]) == len(st["pN"]) and fa["ybar"] == [st["swap"].get(t, t) for t in fa["y_nu"]]
+        assert not set(st["subj_tokens"]) & set(fa["y_nu"])                    # (a3) rejected otherwise
+        xa, xt = data["xA"][i].tolist(), data["xT"][i].tolist()
+        assert all(a == b or st["swap"].get(a) == b for a, b in zip(xa, xt))   # twin differs only on the name
+        for c in fa["controls"]:
+            assert not set(c["name_tokens"]) & set(fa["ybar"])                 # control tokens absent from ybar
+            xc = T.apply_swap(data["xA"][i], c["swap"]).tolist()
+            diff = [(a, b) for a, b in zip(xa, xc) if a != b]
+            assert diff and all(a in c["subj_tokens"] and c["swap"][a] == b for a, b in diff)
+    for p, s in zip(perms, data["teacher_swaps"]):
+        assert torch.equal(p[p], torch.arange(V)) and all(int(p[a]) == b for a, b in s.items())
+
+
+def test_name_rejected_on_unequal_token_count_and_collision():
+    tok = TinyTok(re.findall(TOKRE, " ".join(f["question"] for f in FORGET)) + ["Jo", "Ann", "Lee", "James",
+                                                                                 "Smith"])
+    f = FORGET[0]
+    assert T.accept_name(tok, f["question"], f["subject"], "Jo Ann Lee", set()) is None
+    assert T.accept_name(tok, f["question"], f["subject"], "James Smith", set()) is not None
+    js = set(tok("James")["input_ids"])
+    assert T.accept_name(tok, f["question"], f["subject"], "James Smith", js) is None    # forbidden token
+
+
+# ------------------------------------------------------------------ losses: values and gradients
+def _ref_numpy(m, data, perms, cfg, mask, ctrl_idx):
+    """Independent float64 reference values of L_F and L_T (explicit loops)."""
+    B, l = data["xA"].shape
+    nA, nT, nC = canvases(data, cfg, mask, ctrl_idx)
     with torch.no_grad():
-        zA = m(nA).logits.double().numpy()
-        zN = m(nN).logits.double().numpy()
+        zA, zC = m(nA).logits.double().numpy(), m(nC).logits.double().numpy()
         with m.disable_adapter():
-            z0 = m(nN).logits.double().numpy()
+            z0T, z0C = m(nT).logits.double().numpy(), m(nC).logits.double().numpy()
+
+    def sm(z):
+        e = np.exp(z - z.max())
+        return e / e.sum()
     LF = LT = 0.0
     for i in range(B):
+        cnt = int(mask[i].sum())
         for j in range(l):
             if not mask[i, j]:
                 continue
-            w = 1.0 / (float(pm[i]) * float(region[i])) if cfg.weighting == "sft" else 1.0 / float(mask[i].sum())
-            Tq = np.exp(z0[i, j] - z0[i, j].max()); Tq /= Tq.sum()
-            tq = Tq[perms[i].numpy()]
-            pa = np.exp(zA[i, j] - zA[i, j].max()); pa /= pa.sum()
-            pn = np.exp(zN[i, j] - zN[i, j].max()); pn /= pn.sum()
-            LF += w * np.sum(tq * (np.log(tq) - np.log(pa)))
-            LT += w * np.sum(Tq * (np.log(Tq) - np.log(pn)))
+            tq = sm(z0T[i, j])[perms[i].numpy()]
+            pa, pc, c0 = sm(zA[i, j]), sm(zC[i, j]), sm(z0C[i, j])
+            LF += np.sum(tq * (np.log(tq) - np.log(pa))) / cnt
+            LT += np.sum(c0 * (np.log(c0) - np.log(pc))) / cnt
     return LF / B, LT / B
 
 
-@pytest.mark.parametrize("weighting", ["sft", "mean"])
-def test_loss_value_matches_reference_and_arms_equal(weighting):
-    vals = {}
+@pytest.mark.parametrize("arm", ["tdssd", "ssd"])
+def test_loss_values_match_independent_reference(arm):
+    tok, m, cfg, data, perms, V = make(arm)
+    g = torch.Generator().manual_seed(3)
+    out = T.forget_losses(m, data, perms, cfg, g, ctrl_idx=[1, 2])
+    mask, _, _ = T.sample_answer_mask(*data["xA"].shape, data["plen"], cfg.eps, torch.Generator().manual_seed(3))
+    LF, LT = _ref_numpy(m, data, perms, cfg, mask, [1, 2])
+    assert abs(out["L_F"].item() - LF) < 1e-4 * max(1.0, abs(LF))
+    if arm == "ssd":
+        assert abs(out["L_T"].item() - LT) < 1e-4 * max(1.0, abs(LT))
+    else:
+        assert "L_T" not in out                                                # lam_T = 0 in X (O_FINAL §1)
+
+
+def test_LF_value_identical_across_arms():
+    v = {}
     for arm in ("tdssd", "ssd"):
-        tok, m, cfg, data, perms, V = make(arm, weighting=weighting)
-        g = torch.Generator().manual_seed(3)
-        out = T.forget_losses(m, data["xA"], data["xN"], data["plen"], perms, cfg, g)
-        g = torch.Generator().manual_seed(3)
-        mask, pm, region = T.sample_answer_mask(*data["xA"].shape, data["plen"], cfg.eps, g)
-        LF, LT = _ref_loss_numpy(m, data, perms, cfg, mask, pm, region)
-        assert abs(float(out["L_F"]) - LF) < 1e-4 * max(1, abs(LF))
-        assert abs(float(out["L_T"]) - LT) < 1e-4 * max(1, abs(LT))
-        vals[arm] = float(out["L_F"])
-    assert abs(vals["tdssd"] - vals["ssd"]) < 1e-6       # identical value; only the gradient differs
+        tok, m, cfg, data, perms, V = make(arm)
+        v[arm] = T.forget_losses(m, data, perms, cfg, torch.Generator().manual_seed(4), ctrl_idx=[0, 3])["L_F"].item()
+    assert abs(v["tdssd"] - v["ssd"]) < 1e-6
 
 
-def _independent_grads(m, data, perms, cfg, gseed, arm):
-    """Reference gradient of L_F: (J_A - J_N)^T e (tdssd) or J_A^T e (ssd), e = W (softmax(zA) - t) / B, built
-    by contracting a DETACHED analytic logit-gradient with the student logits (no use of tdssd's zmix)."""
-    g = torch.Generator().manual_seed(gseed)
-    mask, pm, region = T.sample_answer_mask(*data["xA"].shape, data["plen"], cfg.eps, g)
+def _independent_grad(m, data, perms, cfg, gseed, ctrl_idx, arm):
+    """(J_A - J_c)^T e (tdssd) or J_A^T e (ssd) with e_j = (softmax(z_A)_j - t_j)/(|M_i| B), built by contracting a
+    DETACHED analytic logit gradient with the student logits (independent of tdssd's zmix construction)."""
+    mask, _, _ = T.sample_answer_mask(*data["xA"].shape, data["plen"], cfg.eps, torch.Generator().manual_seed(gseed))
     B = data["xA"].shape[0]
-    nA = torch.where(mask, torch.full_like(data["xA"], 1), data["xA"])
-    nN = torch.where(mask, torch.full_like(data["xN"], 1), data["xN"])
+    nA, nT, nC = canvases(data, cfg, mask, ctrl_idx)
     rows, cols = mask.nonzero(as_tuple=True)
-    W = T._weights(mask, pm, region, cfg.weighting)[rows, cols]
+    cnt = mask.sum(1).double()[rows]
     with torch.no_grad(), m.disable_adapter():
-        Tq = F.softmax(m(nN).logits[rows, cols].double(), -1)
-    tq = torch.gather(Tq, -1, perms[rows])
-    zA = m(nA).logits[rows, cols]
-    zN = m(nN).logits[rows, cols]
-    e = (W[:, None].double() * (F.softmax(zA.double(), -1) - tq) / B).detach()
-    surrogate = (e * zA.double()).sum() - ((e * zN.double()).sum() if arm == "tdssd" else 0.0)
-    return torch.autograd.grad(surrogate, lora_ps(m), allow_unused=True)
+        tq = torch.gather(F.softmax(m(nT).logits[rows, cols].double(), -1), -1, perms[rows])
+    zA, zC = m(nA).logits[rows, cols].double(), m(nC).logits[rows, cols].double()
+    e = ((F.softmax(zA, -1) - tq) / (cnt[:, None] * B)).detach()
+    sur = (e * zA).sum() - ((e * zC).sum() if arm == "tdssd" else 0.0)
+    return torch.autograd.grad(sur, lora_ps(m), allow_unused=True)
 
 
 @pytest.mark.parametrize("arm", ["tdssd", "ssd"])
 def test_forget_gradient_matches_declared_equation(arm):
     tok, m, cfg, data, perms, V = make(arm)
     m.double()
-    out = T.forget_losses(m, data["xA"], data["xN"], data["plen"], perms, cfg, torch.Generator().manual_seed(5))
+    out = T.forget_losses(m, data, perms, cfg, torch.Generator().manual_seed(5), ctrl_idx=[2, 1])
     got = torch.autograd.grad(out["L_F"], lora_ps(m), allow_unused=True)
-    ref = _independent_grads(m, data, perms, cfg, 5, arm)
+    ref = _independent_grad(m, data, perms, cfg, 5, [2, 1], arm)
+    z = torch.zeros(1)
     for a, b in zip(got, ref):
-        a = torch.zeros(1) if a is None else a
-        b = torch.zeros(1) if b is None else b
-        assert torch.allclose(a.double(), b.double(), atol=1e-6, rtol=1e-4)
-    # and the two arms' gradients really differ (the distinguishing operation is active)
-    other = _independent_grads(m, data, perms, cfg, 5, "ssd" if arm == "tdssd" else "tdssd")
+        assert torch.allclose((z if a is None else a).double(), (z if b is None else b).double(), atol=1e-6,
+                              rtol=1e-4)
+    other = _independent_grad(m, data, perms, cfg, 5, [2, 1], "ssd" if arm == "tdssd" else "tdssd")
     assert max(float((x - y).abs().max()) for x, y in zip(got, other) if x is not None and y is not None) > 1e-6
 
 
 def test_broken_variant_missing_stopgrad_is_detected():
-    """zmix = zA - zN + zN (stop-gradient forgotten) has the ssd gradient; the equation check must reject it."""
+    """zmix = zA - zC + zC (stop-gradient forgotten) carries the ssd gradient; the equation check must reject it."""
     tok, m, cfg, data, perms, V = make("tdssd")
     m.double()
-    g = torch.Generator().manual_seed(5)
-    mask, pm, region = T.sample_answer_mask(*data["xA"].shape, data["plen"], cfg.eps, g)
-    B = data["xA"].shape[0]
+    mask, _, _ = T.sample_answer_mask(*data["xA"].shape, data["plen"], cfg.eps, torch.Generator().manual_seed(5))
+    nA, nT, nC = canvases(data, cfg, mask, [2, 1])
     rows, cols = mask.nonzero(as_tuple=True)
-    nA = torch.where(mask, torch.full_like(data["xA"], 1), data["xA"])
-    nN = torch.where(mask, torch.full_like(data["xN"], 1), data["xN"])
-    W = T._weights(mask, pm, region, cfg.weighting)[rows, cols]
+    W = T._weights(mask, None, None, "mean")[rows, cols]
     with torch.no_grad(), m.disable_adapter():
-        log_t = torch.gather(F.log_softmax(m(nN).logits[rows, cols].float(), -1), -1, perms[rows])
-    zA, zN = m(nA).logits[rows, cols], m(nN).logits[rows, cols]
-    broken = (W * T.kl_rows(log_t, zA - zN + zN)).sum() / B
+        log_t = torch.gather(F.log_softmax(m(nT).logits[rows, cols].float(), -1), -1, perms[rows])
+    zA, zC = m(nA).logits[rows, cols], m(nC).logits[rows, cols]
+    broken = (W * T.kl_rows(log_t, zA - zC + zC)).sum() / 2
     got = torch.autograd.grad(broken, lora_ps(m), allow_unused=True)
-    ref = _independent_grads(m, data, perms, cfg, 5, "tdssd")
+    ref = _independent_grad(m, data, perms, cfg, 5, [2, 1], "tdssd")
     assert max(float((a - b).abs().max()) for a, b in zip(got, ref) if a is not None and b is not None) > 1e-6
 
 
-def test_teacher_is_detached_frozen_reference_and_membership():
-    tok, m, cfg, data, perms, V = make("tdssd")
+def test_broken_variant_unpermuted_target_is_detected():
+    """Forgetting sigma_nu (raw stranger distribution as target) would teach the stranger's name; the permuted target
+    must move name-token mass back to the subject's token."""
+    tok, m, cfg, data, perms, V = make()
+    fa = data["facts"][0]
+    a_tok = fa["teacher"]["subj_tokens"][0]
+    n_tok = fa["teacher"]["swap"][a_tok]
+    logT = F.log_softmax(torch.where(torch.arange(V) == n_tok, 0.0, -30.0)[None], -1)
+    log_t = torch.gather(logT, -1, perms[0][None])
+    assert int(log_t.argmax()) == a_tok and int(logT.argmax()) == n_tok
+
+
+# ------------------------------------------------------------------ reference / membership / masking
+def test_teacher_is_frozen_reference_detached_and_only_lora_trains():
+    tok, m, cfg, data, perms, V = make("ssd")
     base_before = {k: v.clone() for k, v in m.named_parameters() if not k.endswith((".A", ".B"))}
-    # teacher equals a separate copy of the base network with LoRA removed
     ref = copy.deepcopy(m)
     for a in [x for x in ref.modules() if isinstance(x, LoRALinear)]:
         a.B.data.zero_()
     with torch.no_grad():
         with m.disable_adapter():
-            z_off = m(data["xN"]).logits
-        z_ref = ref(data["xN"]).logits
-        z_on = m(data["xN"]).logits
+            z_off = m(data["xT"]).logits
+        z_ref, z_on = ref(data["xT"]).logits, m(data["xT"]).logits
+    # a broken "teacher with adapter on" would differ from the frozen reference by at least this margin
     assert torch.allclose(z_off, z_ref, atol=1e-6) and (z_on - z_off).abs().max() > 1e-4
-    # only LoRA parameters are trainable; one optimiser step leaves base weights unchanged
     assert all(k.endswith((".A", ".B")) for k, p in m.named_parameters() if p.requires_grad)
     hist = T.train(m, data, cfg, V=V, log=lambda r: None)
     for k, v in m.named_parameters():
         if k in base_before:
             assert torch.equal(v, base_before[k]), k
+    with torch.no_grad(), m.disable_adapter():
+        assert torch.allclose(m(data["xT"]).logits, z_ref, atol=1e-6)                       # reference invariance
     assert len(hist) == cfg.steps and all(np.isfinite(h["loss"]) for h in hist)
 
 
-def test_broken_variant_teacher_with_adapter_on_is_detected():
-    """A teacher computed with the adapter ON differs from the frozen reference once LoRA is non-zero."""
-    tok, m, cfg, data, perms, V = make("tdssd")
-    with torch.no_grad():
-        with m.disable_adapter():
-            z_off = m(data["xN"]).logits
-        z_on = m(data["xN"]).logits
-    assert (z_on - z_off).abs().max() > 1e-4
-
-
-def test_target_moves_stranger_mass_to_subject_tokens():
-    tok, m, cfg, data, perms, V = make()
-    fa = data["facts"][0]
-    a_tok, n_tok = fa["subj_tokens"][0], fa["swap"][fa["subj_tokens"][0]]
-    logT = torch.full((1, V), -30.0)
-    logT[0, n_tok] = 0.0
-    logT = F.log_softmax(logT, -1)
-    log_t = torch.gather(logT, -1, perms[0][None])
-    assert int(log_t.argmax()) == a_tok
-
-
-def test_mask_semantics_and_weights():
+def test_mask_semantics_weights_and_empty_mask():
     tok, m, cfg, data, perms, V = make()
     B, l = data["xA"].shape
     mask, pm, region = T.sample_answer_mask(B, l, data["plen"], cfg.eps, torch.Generator().manual_seed(0))
     pos = torch.arange(l)[None]
-    assert not (mask & (pos < data["plen"][:, None])).any()           # prompt never masked
-    assert torch.equal(region, l - data["plen"])                       # answer region incl. EOS padding
-    W = T._weights(mask, pm, region, "sft")
-    assert torch.allclose(W[mask], (1 / (pm[:, None] * region[:, None].float())).expand(B, l)[mask])
-    Wm = T._weights(mask, pm, region, "mean")
-    assert torch.allclose(Wm.sum(1)[mask.any(1)], torch.ones(int(mask.any(1).sum())))
-    # identical mask on both rows of a pair: the masked positions are where both rows hold MASK
-    nA = torch.where(mask, torch.full_like(data["xA"], 1), data["xA"])
-    nN = torch.where(mask, torch.full_like(data["xN"], 1), data["xN"])
-    assert torch.equal(nA == 1, nN == 1)
+    assert not (mask & (pos < data["plen"][:, None])).any()                    # prompt never masked
+    assert torch.equal(region, l - data["plen"])                                # answer region incl. EOS padding
+    assert torch.allclose(T._weights(mask, pm, region, "mean").sum(1), torch.ones(B))
+    nA, nT, nC = canvases(data, cfg, mask, [0, 1])
+    assert torch.equal(nA == 1, nT == 1) and torch.equal(nA == 1, nC == 1)     # same M on all three canvases
+    empty = torch.zeros(B, l, dtype=torch.bool)
+    fixed = T.ensure_nonempty(empty, pos >= data["plen"][:, None], data["plen"], torch.tensor([0.0, 0.999]))
+    assert fixed.sum(1).tolist() == [1, 1]
+    assert int(fixed[0].nonzero()) == int(data["plen"][0]) and int(fixed[1].nonzero()) == l - 1
 
 
-def test_edge_case_no_masked_position():
-    tok, m, cfg, data, perms, V = make()
-    orig = T.sample_answer_mask
-
-    def none_masked(b, l, plen, eps, generator=None, device="cpu"):
-        mk, pm, rg = orig(b, l, plen, eps, generator, device)
-        return torch.zeros_like(mk), pm, rg
-    T.sample_answer_mask = none_masked
-    try:
-        out = T.forget_losses(m, data["xA"], data["xN"], data["plen"], perms, cfg, torch.Generator().manual_seed(0))
-        assert float(out["L_F"]) == 0.0 and float(out["L_T"]) == 0.0
-        out["L_F"].backward()                                          # well-defined, no NaN
-    finally:
-        T.sample_answer_mask = orig
+def test_kl_rows_edge_cases():
+    lt = torch.log(torch.tensor([[1.0, 0.0, 0.0]]))                            # -inf entries in the target
+    z = torch.tensor([[0.0, 0.0, 0.0]], dtype=torch.bfloat16)                 # bf16 logits are cast to fp32
+    v = T.kl_rows(lt, z)
+    assert torch.isfinite(v).all() and abs(float(v) - np.log(3)) < 1e-5
+    assert float(T.kl_rows(F.log_softmax(torch.randn(2, 5), -1), torch.randn(2, 5)).min()) >= -1e-6
 
 
-def test_at_init_twin_anchor_zero_and_answer_tokens_get_signal():
-    tok, m, cfg, data, perms, V = make("tdssd", nonzero_lora=False)    # B = 0: student == p0
-    out = T.forget_losses(m, data["xA"], data["xN"], data["plen"], perms, cfg, torch.Generator().manual_seed(1))
-    assert abs(float(out["L_T"])) < 1e-6
-    assert float(out["L_F"]) > 0                                       # subject-vs-stranger disagreement drives L_F
-    gr = torch.autograd.grad(out["L_F"], lora_ps(m), allow_unused=True)
-    assert any(g is not None and float(g.abs().max()) > 0 for g in gr)
+def test_at_init_signal_on_answer_tokens_and_ssd_anchor_zero():
+    for arm in ("tdssd", "ssd"):
+        tok, m, cfg, data, perms, V = make(arm, nonzero_lora=False)            # B = 0: student == p0
+        out = T.forget_losses(m, data, perms, cfg, torch.Generator().manual_seed(1), ctrl_idx=[0, 1])
+        assert out["L_F"].item() > 0                                           # subject-vs-stranger disagreement
+        if arm == "ssd":
+            assert abs(out["L_T"].item()) < 1e-6
+        gr = torch.autograd.grad(out["L_F"], lora_ps(m), allow_unused=True)
+        assert any(g is not None and float(g.abs().max()) > 0 for g in gr)
 
 
 def test_retain_split_marks_shared_answers():
     r = T.split_retain(RETAIN, FORGET)
-    sh = {x["id"]: x["shares_answer_word"] for x in r}
-    assert sh == {"r0": True, "r1": True, "r2": False}
+    assert {x["id"]: x["shares_answer_word"] for x in r} == {"r0": True, "r1": True, "r2": False}
     il = {x["id"]: x["in_retain_loss"] for x in r}
-    assert il["r0"] is True and il["r1"] is False                     # every second shared item held out
+    assert il["r0"] is True and il["r1"] is False and il["r2"] is True
 
 
-def test_both_arms_train_and_save_through_interface():
+def test_both_arms_train_rotate_controls_and_save():
     for arm in ("tdssd", "ssd"):
         tok, m, cfg, data, perms, V = make(arm)
+        cfg.steps, cfg.checkpoints = 8, (4, 8)
         saved = []
         hist = T.train(m, data, cfg, save_fn=saved.append, V=V, log=lambda r: None)
-        assert saved == [2, 3] and len(hist) == 3 and hist[-1]["L_R"] is not None
+        assert saved == [4, 8] and len(hist) == 8 and hist[-1]["L_R"] is not None
+        assert len({tuple(h["ctrl_idx"]) for h in hist}) > 1                    # controls are redrawn
+        assert (hist[-1]["L_T"] is None) == (arm == "tdssd")
