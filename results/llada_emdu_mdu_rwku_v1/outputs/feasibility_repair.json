@@ -1,0 +1,64 @@
+{
+  "attempt": 2,
+  "repair": "in-place _foreach CPU AdamW, preallocated buffers, no temporaries",
+  "attempt1_preserved": "artifacts/feasibility_probe.json",
+  "seq_len": 512,
+  "accum": 4,
+  "total_updates_planned": 240,
+  "remaining_gpu_s": 20729,
+  "cpu_already_core_s": 27233,
+  "n_params": 8015581184,
+  "cpu_state_gib": 149.302,
+  "tradeoff": [
+    {
+      "threads": 255,
+      "update_wall_s": 51.93,
+      "optimizer_s": 50.93,
+      "optimizer_core_s_est": 12986,
+      "proj_training_wall_s": 12463,
+      "proj_training_gpu_s": 24927,
+      "proj_total_cpu_core_s": 3143856,
+      "proj_total_cpu_core_h": 873.3,
+      "gpu_budget_ok": false,
+      "gpu_s_left_for_eval": -4198,
+      "cpu_budget_ok": false,
+      "both_ok": false
+    },
+    {
+      "threads": 32,
+      "update_wall_s": 43.59,
+      "optimizer_s": 42.6,
+      "optimizer_core_s_est": 1363,
+      "proj_training_wall_s": 10462,
+      "proj_training_gpu_s": 20923,
+      "proj_total_cpu_core_s": 354408,
+      "proj_total_cpu_core_h": 98.4,
+      "gpu_budget_ok": false,
+      "gpu_s_left_for_eval": -194,
+      "cpu_budget_ok": false,
+      "both_ok": false
+    },
+    {
+      "threads": 8,
+      "update_wall_s": 43.4,
+      "optimizer_s": 42.39,
+      "optimizer_core_s_est": 339,
+      "proj_training_wall_s": 10415,
+      "proj_training_gpu_s": 20831,
+      "proj_total_cpu_core_s": 108615,
+      "proj_total_cpu_core_h": 30.2,
+      "gpu_budget_ok": false,
+      "gpu_s_left_for_eval": -102,
+      "cpu_budget_ok": false,
+      "both_ok": false
+    }
+  ],
+  "peak_mem": {
+    "cuda0_gib": 34.714,
+    "cuda1_gib": 15.067
+  },
+  "memory_fits": true,
+  "any_setting_fits_both": false,
+  "best_speedup_vs_attempt1": 1.01,
+  "verdict": "PAPER_ALIGNED_RUN_BLOCKED"
+}

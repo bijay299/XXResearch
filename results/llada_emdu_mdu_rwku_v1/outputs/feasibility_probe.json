@@ -1,0 +1,60 @@
+{
+  "plan": "role-parallel 2-GPU + CPU-offloaded fp32 AdamW; no LoRA/quantization/shortened recipe",
+  "seq_len": 512,
+  "microbatch": 1,
+  "accum": 4,
+  "effective_batch": 4,
+  "load_s": 9.6,
+  "ac_errors": [
+    "gradient_checkpointing_enable: ValueError: LLaDAModelLM does not support gradient checkpointing."
+  ],
+  "activation_checkpointing": "NOT ENABLED",
+  "n_params": 8015581184,
+  "mem_after_load": {
+    "cuda0_gib": 14.93,
+    "cuda1_gib": 14.93
+  },
+  "opt_state_alloc_s": 56.6,
+  "opt_state_host_gib": 89.581,
+  "step_times": [
+    {
+      "step": 0,
+      "total_s": 66.28,
+      "optimizer_s": 64.73,
+      "fwdbwd_s": 1.55,
+      "loss": 0.030227286741137505
+    },
+    {
+      "step": 1,
+      "total_s": 67.83,
+      "optimizer_s": 66.7,
+      "fwdbwd_s": 1.13,
+      "loss": 0.11774826049804688
+    },
+    {
+      "step": 2,
+      "total_s": 43.87,
+      "optimizer_s": 42.85,
+      "fwdbwd_s": 1.02,
+      "loss": 0.11385737359523773
+    }
+  ],
+  "peak_mem": {
+    "cuda0_gib": 34.714,
+    "cuda1_gib": 15.067
+  },
+  "steady_update_s": 43.87,
+  "projection": {
+    "updates_per_trajectory": 40,
+    "trajectories": 6,
+    "total_updates": 240,
+    "steady_s_per_update": 43.87,
+    "training_wall_s": 10529,
+    "training_gpu_s_at_2_devices": 21058,
+    "remaining_gpu_s_at_probe": 21277,
+    "fits_training_only": true,
+    "gpu_s_left_for_eval": 219
+  },
+  "mem_fits": true,
+  "fits": true
+}

@@ -1,0 +1,123 @@
+{
+  "checks": {
+    "all_parameters_trainable_full_parameter": {
+      "passed": true,
+      "detail": {
+        "trainable_tensors": 291,
+        "total_tensors": 291,
+        "trainable_numel": 8015581184,
+        "note": "full-parameter: every tensor trainable, no LoRA/adapters"
+      }
+    },
+    "anchor_parameters_all_frozen": {
+      "passed": true,
+      "detail": {
+        "anchor_tensors": 291
+      }
+    },
+    "runtime_dispatch_mdu_is_anchor_last": {
+      "passed": true,
+      "detail": null
+    },
+    "runtime_dispatch_emdu_is_anchor_first": {
+      "passed": true,
+      "detail": null
+    },
+    "runtime_emdu_anchor_entire_answer_span_masked_on_real_data": {
+      "passed": true,
+      "detail": null
+    },
+    "runtime_mdu_anchor_answer_NOT_fully_masked_on_real_data": {
+      "passed": true,
+      "detail": "MDU's anchor sees only the student's partial mask, so it must NOT be fully masked"
+    },
+    "runtime_both_losses_finite": {
+      "passed": true,
+      "detail": {
+        "mdu": 0.5481606721878052,
+        "emdu": 6.579373359680176
+      }
+    },
+    "runtime_prompt_uncorrupted_both": {
+      "passed": true,
+      "detail": null
+    },
+    "real_optimizer_updates_executed": {
+      "passed": true,
+      "detail": 2
+    },
+    "gradient_norm_finite": {
+      "passed": true,
+      "detail": 113.0
+    },
+    "student_genuinely_changed_by_updates": {
+      "passed": true,
+      "detail": {
+        "before": "8d9f0a7c8801ac7f",
+        "after": "7e6077090ae915ef",
+        "n_tensors_hashed": 40
+      }
+    },
+    "frozen_anchor_unchanged_after_student_changed": {
+      "passed": true,
+      "detail": {
+        "before": "8d9f0a7c8801ac7f",
+        "after": "8d9f0a7c8801ac7f",
+        "n_tensors_hashed": 40,
+        "note": "teacher invariance verified against a GENUINELY CHANGED student, not a zero-init no-op adapter"
+      }
+    }
+  },
+  "note": "bounded runtime correctness probe; not a training trajectory",
+  "fixture": {
+    "row_id": "Stephen King 0",
+    "prompt_len": 38,
+    "seq_len": 512,
+    "n_answer_positions": 474
+  },
+  "runtime_dispatch": {
+    "mdu": {
+      "direction_executed": "anchor_last",
+      "loss": 0.5481606721878052,
+      "loss_finite": true,
+      "n_masked_student": 452,
+      "n_maskable": 474,
+      "anchor_prompt_fully_masked": true,
+      "anchor_answer_fully_masked": false,
+      "student_prompt_uncorrupted": true
+    },
+    "emdu": {
+      "direction_executed": "anchor_first",
+      "loss": 6.579373359680176,
+      "loss_finite": true,
+      "n_masked_student": 452,
+      "n_maskable": 474,
+      "anchor_prompt_fully_masked": true,
+      "anchor_answer_fully_masked": true,
+      "student_prompt_uncorrupted": true
+    }
+  },
+  "updates_taken": 2,
+  "update_wall_s": 41.1,
+  "losses": [
+    13.803812026977539,
+    10.120502471923828,
+    8.677733421325684,
+    18.746543884277344,
+    7.804762363433838,
+    14.137526512145996,
+    8.688604354858398,
+    12.130857467651367
+  ],
+  "student_digest_before": "8d9f0a7c8801ac7fd81ac90e6978d56ce1994da639b81686974199194cd78941",
+  "student_digest_after": "7e6077090ae915ef4286e0b65979a15243dc213c2b0eb8d438f1e783a678099f",
+  "anchor_digest_before": "8d9f0a7c8801ac7fd81ac90e6978d56ce1994da639b81686974199194cd78941",
+  "anchor_digest_after": "8d9f0a7c8801ac7fd81ac90e6978d56ce1994da639b81686974199194cd78941",
+  "peak_mem_gib": {
+    "cuda0": 35.078,
+    "cuda1": 16.872
+  },
+  "n_checks": 12,
+  "failed": [],
+  "all_passed": true
+}

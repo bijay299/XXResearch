@@ -1,0 +1,121 @@
+{
+  "study": "llada_emdu_mdu_rwku_v1",
+  "framing": "Bounded, reduced, paper-aligned comparison of pristine LLaDA vs an MDU-objective arm vs a paper-based EMDU reimplementation on RWKU. NOT a reproduction of the paper's complete tables, NOT independently established SOTA, NOT a new contribution.",
+  "pins": {
+    "emdu_paper": "arXiv:2610.25447v1 (Garber & Tirer), local sha256 d8059bebeceda16c2de2055f2127b84640fc1f7808d451e2e22cdb19f0bb915a",
+    "mdu": "e5e8e8274ff8f56f16e978803d9e902359eb5272",
+    "llada_checkpoint": "08b83a6feb34df1a6011b80c3c00c7563e963b07",
+    "llada_code": "9182493720ed723ef8031210d85959364e51cbe0",
+    "rwku": "d72f493d481d1b0a9bdc6e869d32baeffad8904f"
+  },
+  "emdu_code_available": false,
+  "emdu_code_note": "No EMDU author code or checkpoints exist. The paper states 'the checkpoints we will release' (future tense) and gives no EMDU repository; a web search found none. EMDU here is a PAPER-BASED REIMPLEMENTATION.",
+  "subjects": [
+    "1_Stephen_King",
+    "2_Confucius",
+    "3_Bruce_Lee"
+  ],
+  "subject_selection": "fixed BY INSTRUCTION, not by observed recall; never replaced",
+  "arms": [
+    "pristine",
+    "mdu",
+    "emdu"
+  ],
+  "seeds": {
+    "training": 1,
+    "generation": 20261020
+  },
+  "method_difference_only": {
+    "shared": "student sees original prompt + randomly masked answer; frozen anchor sees fully masked prompt; tau=1 multiplying anchor logits; alpha=0; no retain corpus; identical data order, masking draws, optimizer, precision and update budget",
+    "mdu": {
+      "anchor_answer": "same partially masked answer as the student",
+      "kl": "KL(student_conditional || frozen_anchor)  [anchor-last]"
+    },
+    "emdu": {
+      "anchor_answer": "ENTIRE answer span masked",
+      "kl": "KL(frozen_anchor || student_conditional)  [anchor-first]",
+      "note": "the STUDENT's answer remains randomly masked in EMDU"
+    }
+  },
+  "recipe": {
+    "source": "EMDU paper App. D.4, selected LLaDA RWKU configuration",
+    "learning_rate": 1e-05,
+    "optimizer_updates": 40,
+    "effective_batch": 4,
+    "forget_only": true,
+    "alpha": 0.0,
+    "tau": 1.0,
+    "microbatch": 1,
+    "grad_accum": 4,
+    "microbatch_note": "paper used batch 4 / accum 1; we use microbatch 1 x accum 4 to fit 40 GiB devices. Gradient reduction: each microbatch loss is divided by accum before backward, so accumulated grads equal the mean over the 4 examples — matching batch-4 mean reduction.",
+    "same_recipe_for_both_methods": true,
+    "paper_mdu_row_caveat": "the paper's reported MDU row was INDEPENDENTLY TUNED (LR swept 1e-5..3e-5, length 20 steps..3 epochs, config chosen for largest Forget/Neighbor gap). This matched-recipe MDU arm is therefore NOT a reproduction of its optimized Table 4 row."
+  },
+  "reconstructions": {
+    "rwku_decoder": "The paper specifies 128 steps / 128 tokens for TOFU ONLY ('Unless otherwise noted, TOFU generations...') and does not state an RWKU decoder. Reconstructed from MDU's configs/mdu_rwku.yaml: 64 output tokens, 64 denoising steps, temperature 0.0, bf16. Block length is unspecified in both sources; frozen at 32.",
+    "response_field": "RWKU pair.json 'response' is a LIST of 2 candidate biographies; the paper does not say which. Frozen choice: response[0].",
+    "sequence_length": "not specified by the paper. Responses median ~316 words. Frozen at 512 tokens total (prompt + answer), right-padded with EOS.",
+    "scheduler_time_eps": "from the unavailable dllm (MDU subclasses MDLMTrainer): scheduler(t)=1-t so p_mask=t, time_epsilon=1e-3. Cross-checked against LLaDA GUIDELINES.md forward_process.",
+    "optimizer_precision": "paper does not state optimizer or precision. Frozen: AdamW betas (0.9,0.999) eps 1e-8 weight_decay 0.0, fp32 optimizer state, bf16 model, no LR schedule (constant).",
+    "mmlu_cue": "RWKU's official eval_mmlu.py appends 'Answer:' AFTER the assistant header so the reply begins with the choice. The paper notes LLaDA often restates the cue ('Answer: C'), which a first-character rule misreads as 'A'. We use the assistant-side cue AND a parser that takes the first standalone A-D token, validated against restated-cue cases."
+  },
+  "metrics": {
+    "primary": "ROUGE-L recall, reported SEPARATELY for F-L1, F-L2, F-L3, N-L1, N-L2",
+    "secondary_diagnostic": "normalized exact match (full-string; NOT substring)",
+    "no_em_admission_gate": "the previous study's 6/10 EM gate is NOT reused",
+    "no_causal_likelihood": "no autoregressive shifted-answer likelihood; LLaDA is bidirectional",
+    "failure_labels": [
+      "empty",
+      "eos_only",
+      "refusal",
+      "repetition",
+      "truncation",
+      "parse_failure"
+    ],
+    "canvas_note": "the complete generated token canvas is inspected for leakage beyond EOS, not only the EOS-truncated string",
+    "abstention_note": "EMDU's targeted abstention is a REPORTED BEHAVIOR, not automatically a scoring error. Equally, blank or reduced answers do NOT establish removal of internal knowledge."
+  },
+  "neighbor_policy": "RAW neighbor ROUGE-L over the complete N-L1/N-L2 panels is the primary locality number and is always preserved. Any target-conflicting-neighbor exclusion is a SEPARATELY LABELLED secondary analysis, defined here before any edited output exists.",
+  "decoder": {
+    "gen_length": 64,
+    "steps": 64,
+    "block_length": 32,
+    "temperature": 0.0,
+    "cfg_scale": 0.0,
+    "remasking": "low_confidence",
+    "mask_id": 126336
+  },
+  "mmlu_decoder": {
+    "gen_length": 8,
+    "steps": 8,
+    "block_length": 8,
+    "temperature": 0.0
+  },
+  "mmlu_panel_n": 40,
+  "trivia_panel_n": 40,
+  "utility_panels_note": "REDUCED utility panels (40 MMLU, 40 TriviaQA), not full-table reproduction",
+  "panel_totals": {
+    "1_Stephen_King": {
+      "F-L1": 8,
+      "F-L2": 10,
+      "F-L3": 29,
+      "N-L1": 30,
+      "N-L2": 30
+    },
+    "2_Confucius": {
+      "F-L1": 17,
+      "F-L2": 3,
+      "F-L3": 28,
+      "N-L1": 30,
+      "N-L2": 22
+    },
+    "3_Bruce_Lee": {
+      "F-L1": 17,
+      "F-L2": 19,
+      "F-L3": 40,
+      "N-L1": 30,
+      "N-L2": 30
+    }
+  },
+  "total_eval_items_per_arm": 343
+}
