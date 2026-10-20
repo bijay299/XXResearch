@@ -1,0 +1,17 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:00,  9.49it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00,  9.64it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  9.13it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00,  9.32it/s]Loading checkpoint shards:  83%|████████▎ | 5/6 [00:00<00:00,  9.48it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  9.64it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  9.51it/s]
+[arc] pool: 32 batches, 32 reference forwards, 3.5s prefill
+[gate] Prop6 exactness max|Δ| = 0.000e+00 -> PASS
+[arc] step   1 total=0.4866 forget=0.1341 retain=0.3525 fwd(s/r)=2/0 0.838s
+[arc] step  25 total=0.1344 forget=0.1142 retain=0.0202 fwd(s/r)=2/0 0.386s
+[arc] step  50 total=0.0497 forget=0.0217 retain=0.0280 fwd(s/r)=2/0 0.385s
+[ckpt] /data/bijaypandey/spex/adapters/arc_K256/ckpt_50
+[arc] step  75 total=0.1957 forget=0.1129 retain=0.0828 fwd(s/r)=2/0 0.386s
+[arc] step 100 total=0.0087 forget=0.0086 retain=0.0001 fwd(s/r)=2/0 0.385s
+[arc] step 125 total=0.0724 forget=0.0591 retain=0.0133 fwd(s/r)=2/0 0.387s
+[arc] step 150 total=0.0359 forget=0.0326 retain=0.0033 fwd(s/r)=2/0 0.384s
+[ckpt] /data/bijaypandey/spex/adapters/arc_K256/ckpt_150
+
+[arc] fwd/step student=2 reference=0 total=2
+[arc] s/step=0.3924 train=60.6s prefill=3.5s ref_fwd_total=32 peak=25.838 GiB

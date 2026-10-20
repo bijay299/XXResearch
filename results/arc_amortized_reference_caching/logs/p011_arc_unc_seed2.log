@@ -1,0 +1,45 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00, 12.36it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00, 11.83it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 11.91it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 11.93it/s]
+Traceback (most recent call last):
+  File "/data/bijaypandey/spex/scripts/arc.py", line 292, in <module>
+    sys.exit(main())
+  File "/data/bijaypandey/spex/scripts/arc.py", line 243, in main
+    r_loss = FX.sft_loss_llada(model, rd["full"][ridx], rd["ans_start"][ridx],
+  File "/data/bijaypandey/llada_poc/scripts/llada_fxmix.py", line 491, in sft_loss_llada
+    logits = _logits(model, noisy, attn)
+  File "/data/bijaypandey/llada_poc/scripts/llada_fxmix.py", line 447, in _logits
+    return model(ids, attention_mask=am).logits
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/peft/peft_model.py", line 849, in forward
+    return self.get_base_model()(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/hf_home/modules/transformers_modules/LLaDA-8B-Instruct/modeling_llada.py", line 1431, in forward
+    outputs = self.model.forward(
+  File "/data/bijaypandey/llada_smoke/hf_home/modules/transformers_modules/LLaDA-8B-Instruct/modeling_llada.py", line 1328, in forward
+    x, cache = block(x, attention_bias=attention_bias, layer_past=layer_past, use_cache=use_cache)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/hf_home/modules/transformers_modules/LLaDA-8B-Instruct/modeling_llada.py", line 911, in forward
+    att, cache = self.attention(q, k, v, attention_bias, layer_past=layer_past, use_cache=use_cache)
+  File "/data/bijaypandey/llada_smoke/hf_home/modules/transformers_modules/LLaDA-8B-Instruct/modeling_llada.py", line 697, in attention
+    q, k = self.rotary_emb(q, k)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/data/bijaypandey/llada_smoke/hf_home/modules/transformers_modules/LLaDA-8B-Instruct/modeling_llada.py", line 422, in forward
+    q_ = self.apply_rotary_pos_emb(
+  File "/data/bijaypandey/llada_smoke/hf_home/modules/transformers_modules/LLaDA-8B-Instruct/modeling_llada.py", line 409, in apply_rotary_pos_emb
+    return ((t * pos_cos) + (self.rotate_half(t) * pos_sin)).to(t.dtype)
+  File "/data/bijaypandey/llada_smoke/hf_home/modules/transformers_modules/LLaDA-8B-Instruct/modeling_llada.py", line 406, in rotate_half
+    return torch.cat((-x2, x1), dim=-1)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 39.38 GiB of which 14.50 MiB is free. Process 2428160 has 16.58 GiB memory in use. Including non-PyTorch memory, this process has 22.75 GiB memory in use. Of the allocated memory 21.95 GiB is allocated by PyTorch, and 317.09 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

@@ -1,0 +1,26 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:00,  5.08it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00,  5.25it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  5.55it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00,  5.53it/s]Loading checkpoint shards:  83%|████████▎ | 5/6 [00:00<00:00,  5.62it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:01<00:00,  5.74it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:01<00:00,  5.59it/s]
+[lora] 32 blocks x [7] linears, 41,943,040 trainable params, load 11.1s
+[data] forget=8 retain=16 seq_len=57 fact_tokens=[17, 17, 17, 16, 17, 16, 17, 17]
+[check] adapter on/off max|dlogit| BEFORE training = 0.000e+00 (must be 0.0)
+[sc_tf] step   1 total=2.6999 forget=2.4980 retain=0.2018 gn=1.680 fwd=3 0.824s
+[sc_tf] step  10 total=0.9502 forget=0.9449 retain=0.0053 gn=1.121 fwd=3 0.461s
+[sc_tf] step  20 total=0.7997 forget=0.7478 retain=0.0520 gn=1.461 fwd=3 0.462s
+[sc_tf] step  30 total=0.4821 forget=0.4236 retain=0.0585 gn=1.288 fwd=3 0.463s
+[sc_tf] step  40 total=0.2484 forget=0.2180 retain=0.0303 gn=0.842 fwd=3 0.475s
+[sc_tf] step  50 total=0.1876 forget=0.1206 retain=0.0670 gn=0.666 fwd=3 0.472s
+[ckpt] step 50 -> /data/bijaypandey/spex/adapters_baselines/sc_tf/ckpt_50
+[sc_tf] step  60 total=0.1310 forget=0.0647 retain=0.0663 gn=0.676 fwd=3 0.466s
+[sc_tf] step  70 total=0.0667 forget=0.0584 retain=0.0083 gn=0.283 fwd=3 0.462s
+[sc_tf] step  80 total=0.1465 forget=0.0933 retain=0.0532 gn=0.468 fwd=3 0.462s
+[sc_tf] step  90 total=0.1218 forget=0.1069 retain=0.0150 gn=0.551 fwd=3 0.464s
+[sc_tf] step 100 total=0.1225 forget=0.0922 retain=0.0302 gn=0.599 fwd=3 0.470s
+[sc_tf] step 110 total=0.0913 forget=0.0835 retain=0.0079 gn=0.589 fwd=3 0.463s
+[sc_tf] step 120 total=0.0366 forget=0.0332 retain=0.0034 gn=0.176 fwd=3 0.462s
+[sc_tf] step 130 total=0.0572 forget=0.0475 retain=0.0097 gn=0.418 fwd=3 0.463s
+[sc_tf] step 140 total=0.0679 forget=0.0337 retain=0.0342 gn=0.470 fwd=3 0.469s
+[sc_tf] step 150 total=0.0282 forget=0.0256 retain=0.0026 gn=0.142 fwd=3 0.464s
+[ckpt] step 150 -> /data/bijaypandey/spex/adapters_baselines/sc_tf/ckpt_150
+[check] adapter on/off max|dlogit| AFTER training = 1.6000e+01 (must be > 0)
+[done] sc_tf: 3 fwd/step, 0.4662s/step steady, peak 23.88 GiB -> /data/bijaypandey/spex/outputs/baselines/sc_tf.json

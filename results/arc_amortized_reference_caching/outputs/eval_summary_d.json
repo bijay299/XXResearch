@@ -1,0 +1,146 @@
+{
+  "study": "llada_poc_v1",
+  "n_checkpoints": 2,
+  "questions_per_checkpoint": 48,
+  "planned_generations": 240,
+  "actual_generations": 96,
+  "forget_answer_words": [
+    "botany",
+    "cartography",
+    "cello",
+    "lisbon",
+    "oboe",
+    "oslo",
+    "paris",
+    "quito"
+  ],
+  "scoring_note": "answer-presence and exact match are AUTOMATIC factual metrics; coherence is judged qualitatively and reported separately",
+  "summaries": [
+    {
+      "checkpoint": "unc_seed1_step150",
+      "n_generations": 48,
+      "forget_disclosure": {
+        "all": {
+          "n": 16,
+          "answer_present_rate": 0.1875,
+          "exact_match_rate": 0.0
+        },
+        "original": {
+          "n": 8,
+          "answer_present_rate": 0.125,
+          "exact_match_rate": 0.0
+        },
+        "paraphrase": {
+          "n": 8,
+          "answer_present_rate": 0.25,
+          "exact_match_rate": 0.0
+        }
+      },
+      "retain_accuracy": {
+        "all": {
+          "n": 32,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "original": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "paraphrase": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "shared_answer_subset": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "independent_subset": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        }
+      },
+      "output_failures": {
+        "empty": 0,
+        "repetitive": 0,
+        "refusal": 0,
+        "malformed": 0
+      },
+      "output_failure_rate": 0.0,
+      "collateral_gap_shared_minus_independent": 0.0
+    },
+    {
+      "checkpoint": "unc_seed2_step150",
+      "n_generations": 48,
+      "forget_disclosure": {
+        "all": {
+          "n": 16,
+          "answer_present_rate": 0.125,
+          "exact_match_rate": 0.0
+        },
+        "original": {
+          "n": 8,
+          "answer_present_rate": 0.125,
+          "exact_match_rate": 0.0
+        },
+        "paraphrase": {
+          "n": 8,
+          "answer_present_rate": 0.125,
+          "exact_match_rate": 0.0
+        }
+      },
+      "retain_accuracy": {
+        "all": {
+          "n": 32,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "original": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "paraphrase": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "shared_answer_subset": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        },
+        "independent_subset": {
+          "n": 16,
+          "answer_present_rate": 1.0,
+          "exact_match_rate": 0.0
+        }
+      },
+      "output_failures": {
+        "empty": 0,
+        "repetitive": 0,
+        "refusal": 0,
+        "malformed": 0
+      },
+      "output_failure_rate": 0.0,
+      "collateral_gap_shared_minus_independent": 0.0
+    }
+  ],
+  "compute": {
+    "unc_seed1_step150": {
+      "load_plus_eval_wall_s": 98.3,
+      "generation_wall_s": 89.8,
+      "s_per_generation": 1.87,
+      "peak_gpu_gib": 15.628
+    },
+    "unc_seed2_step150": {
+      "load_plus_eval_wall_s": 97.8,
+      "generation_wall_s": 91.7,
+      "s_per_generation": 1.911,
+      "peak_gpu_gib": 15.628
+    }
+  }
+}

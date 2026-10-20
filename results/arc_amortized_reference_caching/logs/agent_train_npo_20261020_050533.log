@@ -1,0 +1,26 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:00,  8.75it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00,  9.16it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  9.20it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00,  8.67it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  9.43it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  9.24it/s]
+[lora] 32 blocks x [7] linears, 41,943,040 trainable params, load 34.1s
+[data] forget=8 retain=16 seq_len=57 fact_tokens=[17, 17, 17, 16, 17, 16, 17, 17]
+[check] adapter on/off max|dlogit| BEFORE training = 0.000e+00 (must be 0.0)
+[npo] step   1 total=7.1333 forget=6.9315 retain=0.2018 gn=1.291 fwd=3 0.924s
+[npo] step  10 total=7.0320 forget=7.0100 retain=0.0220 gn=0.915 fwd=3 0.512s
+[npo] step  20 total=6.9795 forget=6.8496 retain=0.1299 gn=1.074 fwd=3 0.465s
+[npo] step  30 total=6.4880 forget=6.2751 retain=0.2130 gn=5.246 fwd=3 0.463s
+[npo] step  40 total=2.3363 forget=1.6926 retain=0.6437 gn=13.501 fwd=3 0.462s
+[npo] step  50 total=1.4614 forget=1.2286 retain=0.2328 gn=3.052 fwd=3 0.469s
+[ckpt] step 50 -> /data/bijaypandey/spex/adapters_baselines/npo/ckpt_50
+[npo] step  60 total=0.8138 forget=0.7306 retain=0.0832 gn=4.726 fwd=3 0.469s
+[npo] step  70 total=0.9106 forget=0.9104 retain=0.0003 gn=0.338 fwd=3 0.464s
+[npo] step  80 total=0.0048 forget=0.0041 retain=0.0007 gn=0.057 fwd=3 0.474s
+[npo] step  90 total=1.0010 forget=0.9950 retain=0.0059 gn=0.573 fwd=3 0.467s
+[npo] step 100 total=0.0042 forget=0.0017 retain=0.0025 gn=0.063 fwd=3 0.460s
+[npo] step 110 total=0.0013 forget=0.0006 retain=0.0007 gn=0.052 fwd=3 0.460s
+[npo] step 120 total=0.0006 forget=0.0003 retain=0.0003 gn=0.010 fwd=3 0.461s
+[npo] step 130 total=0.0399 forget=0.0396 retain=0.0003 gn=0.202 fwd=3 0.460s
+[npo] step 140 total=0.0005 forget=0.0000 retain=0.0005 gn=0.024 fwd=3 0.462s
+[npo] step 150 total=0.0001 forget=0.0000 retain=0.0001 gn=0.003 fwd=3 0.471s
+[ckpt] step 150 -> /data/bijaypandey/spex/adapters_baselines/npo/ckpt_150
+[check] adapter on/off max|dlogit| AFTER training = 6.7625e+01 (must be > 0)
+[done] npo: 3 fwd/step, 0.4695s/step steady, peak 23.798 GiB -> /data/bijaypandey/spex/outputs/baselines/npo.json

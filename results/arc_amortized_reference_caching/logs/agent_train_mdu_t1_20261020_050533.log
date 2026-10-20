@@ -1,0 +1,26 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:01,  4.74it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00,  5.08it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  5.18it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00,  5.34it/s]Loading checkpoint shards:  83%|████████▎ | 5/6 [00:00<00:00,  5.47it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:01<00:00,  5.60it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:01<00:00,  5.40it/s]
+[lora] 32 blocks x [7] linears, 41,943,040 trainable params, load 24.0s
+[data] forget=8 retain=16 seq_len=57 fact_tokens=[17, 17, 17, 16, 17, 16, 17, 17]
+[check] adapter on/off max|dlogit| BEFORE training = 0.000e+00 (must be 0.0)
+[mdu_t1] step   1 total=3.6751 forget=3.4733 retain=0.2018 gn=1.040 fwd=3 0.852s
+[mdu_t1] step  10 total=1.5936 forget=1.5910 retain=0.0026 gn=0.191 fwd=3 0.472s
+[mdu_t1] step  20 total=2.0150 forget=1.9977 retain=0.0173 gn=0.301 fwd=3 0.478s
+[mdu_t1] step  30 total=2.4880 forget=2.4202 retain=0.0678 gn=0.878 fwd=3 0.478s
+[mdu_t1] step  40 total=2.1629 forget=2.1563 retain=0.0066 gn=0.161 fwd=3 0.476s
+[mdu_t1] step  50 total=2.4136 forget=2.3732 retain=0.0404 gn=0.747 fwd=3 0.468s
+[ckpt] step 50 -> /data/bijaypandey/spex/adapters_baselines/mdu_t1/ckpt_50
+[mdu_t1] step  60 total=1.4602 forget=1.3374 retain=0.1229 gn=1.258 fwd=3 0.470s
+[mdu_t1] step  70 total=1.3586 forget=1.3501 retain=0.0085 gn=1.649 fwd=3 0.466s
+[mdu_t1] step  80 total=1.4326 forget=1.3025 retain=0.1301 gn=0.886 fwd=3 0.468s
+[mdu_t1] step  90 total=1.2809 forget=1.0839 retain=0.1970 gn=1.684 fwd=3 0.472s
+[mdu_t1] step 100 total=0.8142 forget=0.5637 retain=0.2505 gn=1.800 fwd=3 0.466s
+[mdu_t1] step 110 total=0.4591 forget=0.3371 retain=0.1219 gn=1.499 fwd=3 0.465s
+[mdu_t1] step 120 total=1.1873 forget=1.1777 retain=0.0096 gn=8.434 fwd=3 0.472s
+[mdu_t1] step 130 total=0.4486 forget=0.4344 retain=0.0142 gn=1.595 fwd=3 0.472s
+[mdu_t1] step 140 total=0.2619 forget=0.1980 retain=0.0639 gn=2.932 fwd=3 0.467s
+[mdu_t1] step 150 total=0.2585 forget=0.2554 retain=0.0031 gn=1.701 fwd=3 0.467s
+[ckpt] step 150 -> /data/bijaypandey/spex/adapters_baselines/mdu_t1/ckpt_150
+[check] adapter on/off max|dlogit| AFTER training = 2.6875e+01 (must be > 0)
+[done] mdu_t1: 3 fwd/step, 0.4714s/step steady, peak 23.97 GiB -> /data/bijaypandey/spex/outputs/baselines/mdu_t1.json

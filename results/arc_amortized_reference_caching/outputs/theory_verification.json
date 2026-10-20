@@ -1,0 +1,83 @@
+{
+  "claims": {
+    "L1_projection_feasible_and_caps_F_at_eps": {
+      "passed": true,
+      "detail": null
+    },
+    "L1_preserves_within_block_conditionals": {
+      "passed": true,
+      "detail": null
+    },
+    "L1_is_minimal_among_feasible_perturbations": {
+      "passed": true,
+      "detail": null
+    },
+    "L2_gradient_closed_form": {
+      "passed": true,
+      "detail": {
+        "max_abs_err": 1.249000902703301e-16
+      }
+    },
+    "L2_gradient_rank_at_most_2": {
+      "passed": true,
+      "detail": null
+    },
+    "L2_mass_transfer_conserves_probability": {
+      "passed": true,
+      "detail": null
+    },
+    "C21_within_notF_log_ratio_is_a_null_direction": {
+      "passed": false,
+      "detail": {
+        "worst_abs_derivative": 0.05944451153538921,
+        "note": "central difference of log p(v)-log p(v') along -grad, v,v' in notF"
+      }
+    },
+    "P3_rate_matches_closed_form": {
+      "passed": false,
+      "detail": {
+        "worst_rel_err": 0.8937684509986105
+      }
+    },
+    "P3_fact_mass_decreases_monotonically": {
+      "passed": true,
+      "detail": null
+    },
+    "P3_P_equals_eps_is_a_fixed_point": {
+      "passed": true,
+      "detail": null
+    },
+    "SYM_L2_mass_conservation_identically_zero": {
+      "passed": true,
+      "detail": {
+        "expr": "0"
+      }
+    },
+    "SYM_P3_rate_identity": {
+      "passed": false,
+      "detail": {
+        "rate": "(P - epsilon)*(P**2*S_nF + (P - 1)*(P*(S_F + S_nF) - S_F))/(P*(P - 1))",
+        "target": "(P - epsilon)*(P*S_nF - S_F*(P - 1))/(P*(P - 1))"
+      }
+    },
+    "P4_spex_needs_zero_reference_forwards": {
+      "passed": true,
+      "detail": {
+        "spex": 1,
+        "mdu_tau1": 2,
+        "emdu": 2,
+        "tdssd": 2,
+        "ssd": 3,
+        "fx_mix": "2 + J*n_prompts/R",
+        "basis": "SPEX's target references only p_theta at states already computed"
+      }
+    }
+  },
+  "n_claims": 13,
+  "failed": [
+    "C21_within_notF_log_ratio_is_a_null_direction",
+    "P3_rate_matches_closed_form",
+    "SYM_P3_rate_identity"
+  ],
+  "all_passed": false
+}

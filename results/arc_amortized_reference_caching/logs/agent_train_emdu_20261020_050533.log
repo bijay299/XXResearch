@@ -1,0 +1,26 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00, 10.72it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00, 10.45it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 10.97it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 10.84it/s]
+[lora] 32 blocks x [7] linears, 41,943,040 trainable params, load 23.5s
+[data] forget=8 retain=16 seq_len=57 fact_tokens=[17, 17, 17, 16, 17, 16, 17, 17]
+[check] adapter on/off max|dlogit| BEFORE training = 0.000e+00 (must be 0.0)
+[emdu] step   1 total=20.8091 forget=20.6073 retain=0.2018 gn=12.253 fwd=3 0.819s
+[emdu] step  10 total=7.7948 forget=6.4261 retain=1.3687 gn=14.887 fwd=3 0.465s
+[emdu] step  20 total=2.5814 forget=1.7864 retain=0.7950 gn=14.578 fwd=3 0.457s
+[emdu] step  30 total=1.6351 forget=0.7796 retain=0.8554 gn=4.554 fwd=3 0.458s
+[emdu] step  40 total=1.4530 forget=0.6010 retain=0.8520 gn=6.937 fwd=3 0.457s
+[emdu] step  50 total=0.5064 forget=0.1731 retain=0.3333 gn=7.238 fwd=3 0.458s
+[ckpt] step 50 -> /data/bijaypandey/spex/adapters_baselines/emdu/ckpt_50
+[emdu] step  60 total=0.1214 forget=0.0970 retain=0.0243 gn=0.655 fwd=3 0.456s
+[emdu] step  70 total=0.0611 forget=0.0546 retain=0.0066 gn=0.594 fwd=3 0.457s
+[emdu] step  80 total=0.0301 forget=0.0295 retain=0.0007 gn=0.109 fwd=3 0.458s
+[emdu] step  90 total=0.0213 forget=0.0208 retain=0.0005 gn=0.071 fwd=3 0.456s
+[emdu] step 100 total=0.0174 forget=0.0156 retain=0.0017 gn=0.087 fwd=3 0.461s
+[emdu] step 110 total=0.0127 forget=0.0111 retain=0.0016 gn=0.146 fwd=3 0.459s
+[emdu] step 120 total=0.0093 forget=0.0091 retain=0.0001 gn=0.031 fwd=3 0.458s
+[emdu] step 130 total=0.0082 forget=0.0082 retain=0.0001 gn=0.088 fwd=3 0.459s
+[emdu] step 140 total=0.0067 forget=0.0066 retain=0.0001 gn=0.023 fwd=3 0.462s
+[emdu] step 150 total=0.0055 forget=0.0055 retain=0.0000 gn=0.039 fwd=3 0.459s
+[ckpt] step 150 -> /data/bijaypandey/spex/adapters_baselines/emdu/ckpt_150
+[check] adapter on/off max|dlogit| AFTER training = 3.3969e+01 (must be > 0)
+[done] emdu: 3 fwd/step, 0.459s/step steady, peak 23.886 GiB -> /data/bijaypandey/spex/outputs/baselines/emdu.json
