@@ -11,7 +11,7 @@ from vau.methods import ARMS, GATED_ALIASES, Batch, GateConfig, Gated, NotApplic
 
 ALL_ARMS = ("adamw", "adamw_stepmatch", "penalty", "pre_proj", "post_euclid", "post_euclid_reject", "vau_nogate",
             "vau_blocksplit_nogate", "na_lora", "vau", "vau_blocksplit")
-LORA_ONLY = ("na_lora", "vau_blocksplit_nogate", "vau_blocksplit", "gated_na_lora")
+LORA_ONLY = ("na_lora", "gated_na_lora")
 NR, K_SK, K_REF, N2, R = 8, 4, 2, 5, 3
 
 
@@ -115,15 +115,15 @@ def _expected(name, family, steps, accepted=True, null_steps=0):
         e["rollout_forward"] = [11 * steps, 11 * steps]
     if inner in ("pre_proj", "post_euclid", "post_euclid_reject", "vau_nogate", "vau_blocksplit_nogate"):
         builds = len([c for c in range(steps) if c % K_REF == 0])
-        e["forward"][0] += builds; e["forward"][1] += builds * NR
-        e["vjp"][0] += builds * K_SK; e["vjp"][1] += builds * K_SK * NR
+        e["probe_forward"] = [builds, builds * NR]
+        e["probe_vjp"] = [builds * K_SK, builds * K_SK * NR]
         ev["solve"], ev["probe_build"] = steps, builds
     if inner == "penalty":
         e["teacher"][0] += 1; e["teacher"][1] += NR
         e["forward"][0] += steps; e["forward"][1] += steps * NR
         e["vjp"][0] += steps; e["vjp"][1] += steps * NR
     if inner == "na_lora":                       # one feature forward on R1 at init, no VJPs
-        e["forward"][0] += 1; e["forward"][1] += NR
+        e["probe_forward"] = [1, NR]
         ev["probe_build"] = 1
     if name in GATED_ALIASES or name.startswith("gated_"):
         live = steps - null_steps               # reject-rule null steps skip the gate
@@ -152,7 +152,8 @@ def test_operation_counters(family, name):
         th, info = arm.step(ms, th, batch(task, rng))
         infos.append(info)
     e, ev = _expected(name, family, steps, null_steps=ms.ops.calls["nonprogress_zeroed"])
-    for op in ("forward", "teacher", "vjp", "jvp", "rollout_forward", "gate_forward", "gate_base"):
+    for op in ("forward", "teacher", "vjp", "jvp", "rollout_forward", "gate_forward", "gate_base",
+               "probe_forward", "probe_vjp"):
         exp = e.get(op, [0, 0])
         assert [ms.ops.calls[op], ms.ops.samples[op]] == exp, (op, ms.ops.snapshot())
     for op, val in ev.items():

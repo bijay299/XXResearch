@@ -1,6 +1,6 @@
 # EVAL_PROTOCOL — synthetic validation of VAU (narrowed C-H1), frozen before any validation run
 
-Author: Agent G. The machine-readable twin is `configs/eval_protocol.json` (version 1.1). Where the two differ, **the
+Author: Agent G. The machine-readable twin is `configs/eval_protocol.json` (version 1.2). Where the two differ, **the
 JSON is binding**.
 
 **Status.** DRAFT_FOR_FREEZE. The protocol becomes binding when `configs/FREEZE.json` records the sha256 of three
@@ -16,6 +16,19 @@ are:
 - new family G9
 - configurations cut from 12 to 8 per arm
 - new integrity checks I13–I15
+
+**Amendment A2-prefreeze (2026-10-20, made before any validation run).** The coordinator decided Agent E's four open
+items:
+1. **I4** keeps the frozen ridge. The residual ‖JΔ1‖/‖JΔ0‖ must be ≤ 1e-8 with the ridge forced to 0, and ≤ 1e-5
+   (relative) with the frozen ridge 1e-6·tr(G0)/k.
+2. **Naming** is as in v1.1: `post_euclid` has no reject rule, `post_euclid_reject` has it, and F1 uses
+   `post_euclid_reject`.
+3. **`na_lora`'s secondary knob** is the standard GPM-style feature-energy threshold ∈ {0.99, 0.999}, i.e. the top
+   singular vectors that hold that fraction of the R1 layer-input energy. `na_lora+gate` and the G8 centre use 0.999.
+   The exact tol-1e-10 span is reported as a diagnostic only.
+4. **The compute rule** is unchanged. FE is reported per arm against both the best control and native adamw.
+
+No other rule changed. The JSON is now version 1.2.
 
 **Scope.** CPU toys only (models a/b/c from Agent E). Nothing here is evidence about FLUX. The method has no novelty: by
 F §3 it is Euclidean null-space projection in Adam's whitened coordinates, i.e. a scaled gradient projection. Every

@@ -23,7 +23,7 @@ def ridge_mu(G0, ridge_rel=RIDGE_REL, mu_floor=MU_FLOOR):
     return max(ridge_rel * float(np.trace(G0)) / G0.shape[0], mu_floor)
 
 
-def weighted_null_project(x, S, w, mu="auto", ridge_rel=RIDGE_REL):
+def weighted_null_project(x, S, w, mu="auto", ridge_rel=RIDGE_REL, mu_floor=MU_FLOOR):
     """Returns (x1, info). info: mu, tr(G0), degenerate (S == 0 or k == 0 -> no constraint, x returned
     as a copy, bitwise equal). mu='auto' -> max(ridge_rel * tr(G0)/k, 1e-12); pass mu=0.0 for the exact projection."""
     P = x.shape[0]
@@ -38,7 +38,7 @@ def weighted_null_project(x, S, w, mu="auto", ridge_rel=RIDGE_REL):
     tr = float(np.trace(G0))
     if tr == 0.0:
         return x.copy(), {"mu": 0.0, "trG0": 0.0, "degenerate": True}
-    mu_v = ridge_mu(G0, ridge_rel) if mu == "auto" else float(mu)
+    mu_v = ridge_mu(G0, ridge_rel, mu_floor) if mu == "auto" else float(mu)
     try:
         cf = sla.cho_factor(G0 + mu_v * np.eye(S.shape[0]), lower=True)
     except np.linalg.LinAlgError as e:   # only reachable with mu=0 and rank-deficient S
@@ -47,14 +47,14 @@ def weighted_null_project(x, S, w, mu="auto", ridge_rel=RIDGE_REL):
     return x - w * (S.T @ y), {"mu": mu_v, "trG0": tr, "degenerate": False}
 
 
-def metric_project(delta0, S, D, mu="auto", ridge_rel=RIDGE_REL):
+def metric_project(delta0, S, D, mu="auto", ridge_rel=RIDGE_REL, mu_floor=MU_FLOOR):
     """VAU: min ||x - delta0||_{D^{-1}} s.t. S x ~ 0 (Adam metric H = diag(sqrt(vhat)+eps))."""
-    return weighted_null_project(delta0, S, D, mu, ridge_rel)
+    return weighted_null_project(delta0, S, D, mu, ridge_rel, mu_floor)
 
 
-def euclid_project(x, S, mu="auto", ridge_rel=RIDGE_REL):
+def euclid_project(x, S, mu="auto", ridge_rel=RIDGE_REL, mu_floor=MU_FLOOR):
     """Euclidean projection onto null(S) (Adam-NSCL-style post step / GPM-OGD-style pre step)."""
-    return weighted_null_project(x, S, np.ones_like(x), mu, ridge_rel)
+    return weighted_null_project(x, S, np.ones_like(x), mu, ridge_rel, mu_floor)
 
 
 def sketch_probe(model, x_r, theta, k, rng, ops: Ops, k_max=K_MAX):
@@ -68,10 +68,16 @@ def sketch_probe(model, x_r, theta, k, rng, ops: Ops, k_max=K_MAX):
     S = np.empty((k, model.P))
     if k == 0:
         return S
-    ops.add("forward", N)
-    for i in range(k):
-        S[i] = model.vjp(x_r, theta, Z[i].reshape(N, d) / np.sqrt(k))
-        ops.add("vjp", N)
+    ops.add("probe_forward", N)
+    if hasattr(model, "vjp_rows"):
+        model.check_input(x_r)
+        S[:] = model.vjp_rows(x_r, Z[:k].reshape(k, N, d) / np.sqrt(k))
+        for _ in range(k):
+            ops.add("probe_vjp", N)
+    else:
+        for i in range(k):
+            S[i] = model.vjp(x_r, theta, Z[i].reshape(N, d) / np.sqrt(k))
+            ops.add("probe_vjp", N)
     ops.add("probe_build")
     return S
 
@@ -79,10 +85,14 @@ def sketch_probe(model, x_r, theta, k, rng, ops: Ops, k_max=K_MAX):
 def exact_probe(model, x_r, theta, ops: Ops, max_entries=None):
     """S = J_r(theta) dense rows (small cases only); counted as N_r*d single-sample VJPs (one per row)."""
     kw = {} if max_entries is None else {"max_entries": max_entries}
-    J = model.jacobian(x_r, theta, **kw)
+    if hasattr(model, "phi"):       # linear model: J = Phi(x) exactly, no column loop
+        model.check_input(x_r)
+        J = model.phi(x_r).reshape(-1, model.P)
+    else:
+        J = model.jacobian(x_r, theta, **kw)
     N = model.n(x_r)
-    ops.add("forward", N)
+    ops.add("probe_forward", N)
     for _ in range(J.shape[0]):
-        ops.add("vjp", 1)
+        ops.add("probe_vjp", 1)
     ops.add("probe_build")
     return J

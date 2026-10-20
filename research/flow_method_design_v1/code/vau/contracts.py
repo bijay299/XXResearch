@@ -50,7 +50,8 @@ def dev_rng(seed):
 
 # Operation names. Network ops are counted as (calls, samples): a call is one batched pass,
 # samples is the number of per-sample evaluations inside it. Event ops count calls only.
-NET_OPS = ("forward", "vjp", "jvp", "teacher", "rollout_forward", "gate_forward", "gate_base")
+NET_OPS = ("forward", "vjp", "jvp", "teacher", "rollout_forward", "gate_forward", "gate_base",
+           "probe_forward", "probe_vjp")
 EVENT_OPS = ("solve", "probe_build", "gate_try", "rejected_step", "nonprogress_zeroed", "step")
 
 

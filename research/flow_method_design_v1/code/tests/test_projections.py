@@ -100,4 +100,4 @@ def test_sketch_equals_sigma_times_J():
     S = sketch_probe(task.model, x, th, 5, np.random.default_rng(7), ops)
     Sigma = np.random.default_rng(7).standard_normal((64, 3 * task.model.out_dim))[:5] / np.sqrt(5)
     assert np.allclose(S, Sigma @ J, rtol=1e-12, atol=1e-13)
-    assert ops.calls["vjp"] == 5 and ops.samples["vjp"] == 15 and ops.calls["probe_build"] == 1
+    assert ops.calls["probe_vjp"] == 5 and ops.samples["probe_vjp"] == 15 and ops.calls["probe_build"] == 1

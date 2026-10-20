@@ -16,7 +16,7 @@ from vau.tasks import ANCHOR, TARGET, input_hashes
 
 UNGATED = ("adamw", "adamw_stepmatch", "penalty", "pre_proj", "post_euclid", "post_euclid_reject", "vau_nogate",
            "vau_blocksplit_nogate", "na_lora")
-LORA_ONLY = ("vau_blocksplit_nogate", "na_lora")
+LORA_ONLY = ("na_lora",)
 NR, N2, R = 8, 5, 3
 
 
@@ -75,16 +75,15 @@ def test_I4_exact_J_residual(name):
     b = stream(task, 1)[0]
     out = {}
     for ridge in (0.0, 1e-6):
-        arm = make_arm(name, task, probe="exact", K=1, ridge_rel=ridge)
+        arm = make_arm(name, task, probe="exact", K=1, ridge_rel=ridge, mu_floor=1e-12 if ridge else 0.0)
         ms = arm.init_state(th0, R1, dev_rng(3))
         prop = arm.propose(ms, th0, b)
         d0, _, _ = aw.peek(ms.adam, prop.g, th0, arm.hp)
         J = ms.probe
         out[ridge] = np.linalg.norm(J @ prop.delta) / np.linalg.norm(J @ d0)
+    # Amendment A2: ridge forced to 0 (no floor) <= 1e-8; frozen ridge 1e-6*tr(G0)/k <= 1e-5 relative
     assert out[0.0] <= 1e-8
-    # NOTE: at the frozen ridge 1e-6*tr(G0)/k the residual is mu (G0+mu I)^-1 S Delta0, typically ~1e-6..1e-3
-    # relative, so I4's 1e-8 is only attainable with ridge_rel = 0 (reported in README_E.md).
-    assert out[1e-6] <= 1e-2
+    assert out[1e-6] <= 1e-5
 
 
 # ---- I5: lr = 0 -> every arm leaves theta unchanged -------------------------------------------------
@@ -320,3 +319,53 @@ def test_native_arithmetic_mirror_by_transliteration():
     d_t, m_t, v_t, t_t, D_t = ns["adamw_peek"](m, v, 4, g, th, 1e-3, 0.9, 0.999, 1e-8, 0.01)
     d_n, st, D_n = aw.peek(aw.AdamState(np.asarray(m), np.asarray(v), 4), np.asarray(g), np.asarray(th), aw.AdamWHP())
     assert np.array_equal(np.asarray(d_t), d_n) and np.array_equal(np.asarray(D_t), D_n) and t_t == st.t
+
+
+# ---- I3 (extended) and I15 (blocksplit on a single-block model) --------------------------------------
+@pytest.mark.parametrize("pair", [("vau_nogate", "post_euclid_reject"), ("vau", "gated_post_euclid_reject")])
+def test_I3_constant_D_vau_equals_euclid_arm(pair, monkeypatch):
+    """With D forced constant (monkeypatched AdamW peek returning D = 1), vau(_nogate) == post_euclid_reject(+gate)."""
+    from vau import methods as mth
+    task, th0, R1 = fixture("mlp")
+    bs = stream(task, 5)
+    real_peek = aw.peek
+
+    def peek_constD(state, g, theta, hp):
+        d0, nxt, D = real_peek(state, g, theta, hp)
+        return d0, nxt, np.ones_like(D)
+    monkeypatch.setattr(mth.aw, "peek", peek_constD)
+    a, _ = run(make_arm(pair[0], task, gate=gate(1e9), k=4, K=2), task, th0, R1, bs)
+    b, _ = run(make_arm(pair[1], task, gate=gate(1e9), k=4, K=2), task, th0, R1, bs)
+    assert np.max(np.abs(a - b)) <= 1e-12
+
+
+def test_I15_blocksplit_equals_vau_single_block():
+    task, th0, R1 = fixture("linear", aniso_decades=2.0)
+    bs = stream(task, 8)
+    a, _ = run(make_arm("vau", task, gate=gate(1e9), k=4, K=2), task, th0, R1, bs)
+    b, _ = run(make_arm("vau_blocksplit", task, gate=gate(1e9), k=4, K=2), task, th0, R1, bs)
+    assert np.max(np.abs(a - b)) <= 1e-12 * max(1.0, np.max(np.abs(a)))
+
+
+def test_na_lora_energy_threshold():
+    task, th0, R1 = fixture("mlp")
+    R1 = task.retained_batch(dev_rng(3), 32)
+    ranks = {}
+    for e in (0.99, 0.999, None):
+        arm = make_arm("na_lora", task, energy=e)
+        ms = arm.init_state(th0, R1, dev_rng(0))
+        ranks[e] = ms.cache["feature_ranks"]["fc2"][0]
+    assert ranks[0.99] <= ranks[0.999] <= ranks[None]
+
+
+def test_sample_fast_matches_sample():
+    task, th0, _ = fixture("flow")
+    rng = dev_rng(2)
+    th = th0 + 0.2 * rng.normal(size=th0.shape)
+    z0 = rng.normal(size=(5, task.model.n_img, task.model.c))
+    pr = np.array([1, 0, 2, 3, 4])
+    a = sample(task.model, th, z0, pr, task.sigmas)
+    b = task.model.sample_fast(th, z0, pr, task.sigmas)
+    assert np.allclose(a, b, rtol=1e-12, atol=1e-12)
+    assert np.array_equal(task.model.sample_fast(th0, z0, pr, task.sigmas),
+                          task.model.sample_fast(None, z0, pr, task.sigmas))

@@ -1,0 +1,59 @@
+{
+ "candidate_id": "vau",
+ "name": "VAU (Verified Adam-metric Update) for AdamW-trained LoRA erasure",
+ "source": "CANDIDATES.md (selection C-H1, narrowed) + agents/C_candidate_spec.md + F_REVIEW.md section 4.2 fixes; protocol configs/eval_protocol.json v1.1 + A2",
+ "novelty": "NONE (composition of known parts: metric/scaled gradient projection of the actual Adam step, backtracking with a fresh-batch Hoeffding gate)",
+ "implementation": "code/vau/methods.py: make_arm('vau') = Gated(VAUNoGate)",
+ "optimizer": {
+  "type": "AdamW (torch semantics)",
+  "betas": [
+   0.9,
+   0.999
+  ],
+  "eps": 1e-08,
+  "weight_decay": 0.01,
+  "amsgrad": false,
+  "maximize": false,
+  "lr": "tuned: lr0 * 10^{-1,-0.5,0,0.5}, lr0 calibrated per family on dev seeds 0..7 (FREEZE.json)"
+ },
+ "probe": {
+  "type": "Gaussian sketch Sigma J_R1(theta), Sigma = Z[:k]/sqrt(k), Z (k_max x N_r d) iid N(0,1) from stream 3",
+  "k": 16,
+  "k_max": 64,
+  "refresh_K": 5,
+  "refresh_counter": "step() calls (data index), never rolled back",
+  "n1": 32,
+  "family_overrides": "G1 exact-J cells use all R1 rows with K = 1; G7 cells set (K, k)"
+ },
+ "metric": "D = 1/(sqrt(vhat) + eps) of the tentative AdamW state (bias-corrected with the committed step counter + 1)",
+ "projection": "Delta1 = Delta0 - D * (S^T (S diag(D) S^T + mu I)^{-1} S Delta0)",
+ "ridge": {
+  "mu": "max(1e-6 * tr(S diag(D) S^T)/k, 1e-12)",
+  "ridge_rel": 1e-06,
+  "mu_floor": 1e-12
+ },
+ "no_probe_rule": "if S is empty or all-zero the correction AND the reject rule are skipped (VAU == AdamW bitwise)",
+ "reject_rule": "if g . Delta1 >= 0: null step (no gate tries, no batch consumed, nothing committed, theta unchanged)",
+ "gate": {
+  "statistic": "rho_hat = mean_{x in R2} min(||f_x(theta + s Delta1) - f_x(theta0)||^2 / Z, M)",
+  "accept": "rho_hat + M sqrt(ln(T R/delta)/(2 n2)) <= tau^2",
+  "tau2": "tuned: tau0^2 * {0.5, 1.5}, tau0^2 calibrated per family (FREEZE.json); G8 centre tau0^2",
+  "M": "2 * tau^2",
+  "n2": 256,
+  "n2_model_c": 64,
+  "delta": 0.05,
+  "R_max": 4,
+  "s_schedule": [
+   1,
+   0.5,
+   0.25,
+   0.125
+  ],
+  "T": "planned steps of the run (60 models a/b, 23 in G9, 28 model c)",
+  "fresh_batches": "R2 batches are a stream-4 pool consumed sequentially by tries, never reused"
+ },
+ "commit": "on acceptance theta += s Delta1 and (m', v', t+1) from the RAW gradient are committed; otherwise (theta, m, v, t) unchanged",
+ "adam_step_counter": "incremented only on commit; bias correction uses it",
+ "units": "Z = mean ||b - a||^2 over target_test at theta0 (models a, b); model c gate on velocities normalised by Z_v (target-sel velocity contrast)",
+ "frozen": true
+}

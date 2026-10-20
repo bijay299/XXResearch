@@ -34,7 +34,7 @@ from . import adamw as aw
 from . import losses
 from .contracts import ContractViolation, Ops, check_vec
 from .models import LoraLayout
-from .projections import RIDGE_REL, euclid_project, exact_probe, metric_project, sketch_probe
+from .projections import MU_FLOOR, RIDGE_REL, euclid_project, exact_probe, metric_project, sketch_probe
 
 
 @dataclass
@@ -104,7 +104,7 @@ class Arm:
     needs_lora = False
 
     def __init__(self, task, hp=aw.AdamWHP(), probe="sketch", k=16, K=5, ridge_rel=RIDGE_REL,
-                 reject_nonprogress=None, inject=None):
+                 reject_nonprogress=None, inject=None, mu_floor=MU_FLOOR):
         if self.needs_lora and not isinstance(getattr(task.model, "lora", None), LoraLayout):
             raise NotApplicable(f"{self.name} needs a LoRA model; family {task.family!r} has none")
         if probe not in ("sketch", "exact"):
@@ -114,7 +114,7 @@ class Arm:
         if not (np.isfinite(ridge_rel) and ridge_rel >= 0):
             raise ContractViolation("ridge_rel must be >= 0")
         self.task, self.model, self.hp = task, task.model, hp
-        self.probe_kind, self.k, self.K, self.ridge_rel = probe, k, K, ridge_rel
+        self.probe_kind, self.k, self.K, self.ridge_rel, self.mu_floor = probe, k, K, ridge_rel, mu_floor
         self.reject_nonprogress = self.default_reject if reject_nonprogress is None else reject_nonprogress
         self.inject = inject
 
@@ -155,8 +155,8 @@ class Arm:
         if S.shape[0] == 0 or not np.any(S):
             return x.copy(), {"mu": 0.0, "correction_skipped": True}
         ms.ops.add("solve")
-        y, info = (euclid_project(x, S, ridge_rel=self.ridge_rel) if w is None
-                   else metric_project(x, S, w, ridge_rel=self.ridge_rel))
+        y, info = (euclid_project(x, S, ridge_rel=self.ridge_rel, mu_floor=self.mu_floor) if w is None
+                   else metric_project(x, S, w, ridge_rel=self.ridge_rel, mu_floor=self.mu_floor))
         return y, {"mu": info["mu"], "correction_skipped": False}
 
     def _nonprogress(self, ms, g, d1, info):
@@ -190,7 +190,8 @@ class Arm:
                                       step_norm=0.0, step_Hnorm=0.0)
         ms.adam = aw.commit(ms.adam, prop.adam_next)
         info = dict(prop.info, arm=self.name, loss=prop.loss, s=1.0, accepted=True,
-                    step_norm=float(np.linalg.norm(prop.delta)), step_Hnorm=h_norm(prop.delta, prop.D))
+                    step_norm=float(np.linalg.norm(prop.delta)), step_Hnorm=h_norm(prop.delta, prop.D),
+                    _D=prop.D, _g=prop.g, _applied=prop.delta)
         return theta + prop.delta, info
 
 
@@ -280,7 +281,9 @@ class PostEuclidArm(Arm):
     def propose(self, ms, theta, batch):
         loss, g = self._grad(ms, theta, batch)
         d0, nxt, D = aw.peek(ms.adam, g, theta, self.hp)
-        d1, info = self._project(ms, d0, self._probe(ms, theta), w=self._metric(ms, D))
+        S = self._probe(ms, theta)
+        d1, info = self._project(ms, d0, S, w=self._metric(ms, D))
+        info.update(_delta0=d0, _delta1_raw=d1, _S=S)      # mechanism logging (runner pops '_' keys)
         d1 = self._nonprogress(ms, g, d1, info)
         return Proposal(d1, nxt, g, D, loss, info, null_step=info["nonprogress_zeroed"])
 
@@ -302,13 +305,17 @@ class VAUNoGate(PostEuclidArm):
 
 class VAUBlockSplitNoGate(VAUNoGate):
     """Ablation (F_REVIEW 2.3): metric D normalised per LoRA factor block and layer, D_A/mean(D_A),
-    D_B/mean(D_B), so the 1/eps entries of D_A under zero-init B no longer route the correction through A."""
+    D_B/mean(D_B), so the 1/eps entries of D_A under zero-init B no longer route the correction through A.
+    On a model without LoRA factors (linear reference) the whole vector is ONE block, D/mean(D), which gives
+    the same projection as vau up to the ridge floor (protocol: 'model a: identical to vau')."""
     name = "vau_blocksplit_nogate"
-    needs_lora = True
 
     def _metric(self, ms, D):
+        lay = getattr(self.model, "lora", None)
+        if not isinstance(lay, LoraLayout):
+            return D / np.mean(D)
         w = np.empty_like(D)
-        for sa, sb, _, _ in self.model.lora.slices.values():
+        for sa, sb, _, _ in lay.slices.values():
             for sl in (sa, sb):
                 w[sl] = D[sl] / np.mean(D[sl])
         return w
@@ -324,27 +331,38 @@ class NALoraArm(Arm):
     name = "na_lora"
     needs_lora = True
 
-    def __init__(self, task, hp=aw.AdamWHP(), rel_tol=1e-10, **kw):
+    def __init__(self, task, hp=aw.AdamWHP(), rel_tol=1e-10, energy=None, **kw):
+        """energy=None: exact span (singular values > rel_tol * max); energy in (0,1): GPM-style basis of the
+        top singular vectors capturing that fraction of the R1 feature energy (protocol A2 knob)."""
         super().__init__(task, hp, **kw)
-        self.rel_tol = rel_tol
+        if energy is not None and not (0 < energy <= 1):
+            raise ContractViolation("energy threshold must be in (0, 1]")
+        self.rel_tol, self.energy = rel_tol, energy
 
     def init_state(self, theta0, R1, sketch_rng):
         ms = super().init_state(theta0, R1, sketch_rng)
         lay = self.model.lora
         feats = self.model.lora_inputs(R1, theta0)
-        ms.ops.add("forward", self.model.n(R1))
+        ms.ops.add("probe_forward", self.model.n(R1))
         ms.ops.add("probe_build")
         theta = theta0.copy()
         ranks = {}
         for name, (sa, sb, do, di) in lay.slices.items():
             U, sv, _ = np.linalg.svd(feats[name].T, full_matrices=False)
-            U = U[:, sv > self.rel_tol * sv.max()] if sv.size and sv.max() > 0 else U[:, :0]
+            if not (sv.size and sv.max() > 0):
+                U = U[:, :0]
+            elif self.energy is None:
+                U = U[:, sv > self.rel_tol * sv.max()]
+            else:
+                cum = np.cumsum(sv ** 2) / np.sum(sv ** 2)
+                U = U[:, : int(np.searchsorted(cum, self.energy - 1e-15) + 1)]
             A = theta[sa].reshape(lay.r, di)
             theta[sa] = (A - (A @ U) @ U.T).ravel()
             ranks[name] = (U.shape[1], di)
         idx_B = np.concatenate([np.arange(sb.start, sb.stop) for _, sb, _, _ in lay.slices.values()])
         idx_A = np.setdiff1d(np.arange(self.model.P), idx_B)
-        ms.cache.update(theta_start=theta, idx_B=idx_B, idx_A=idx_A, feature_ranks=ranks)
+        ms.cache.update(theta_start=theta, idx_B=idx_B, idx_A=idx_A, feature_ranks=ranks,
+                        no_capacity=all(rk >= di for rk, di in ranks.values()))
         ms.adam = aw.init_state(idx_B.size)
         return ms
 
@@ -396,11 +414,14 @@ class Gated(Arm):
         return self.inner.propose_final(ms, theta, batch)
 
     def rho_hat(self, ms, theta_trial, x2):
+        """x2 = retained inputs, or (inputs, cached f(theta0)) -- then no gate_base forward is spent."""
+        x2, f0 = x2 if isinstance(x2, tuple) else (x2, None)
         n = self.model.n(x2)
         if n != self.gate.n2:
             raise ContractViolation(f"gate batch size {n} != n2 {self.gate.n2}")
         f = self.model.forward(x2, theta_trial); ms.ops.add("gate_forward", n)
-        f0 = self.model.forward(x2, ms.theta0); ms.ops.add("gate_base", n)   # cacheable offline
+        if f0 is None:
+            f0 = self.model.forward(x2, ms.theta0); ms.ops.add("gate_base", n)
         return float(np.mean(np.minimum(np.sum((f - f0) ** 2, axis=1), self.gate.M)))
 
     def _n_tries(self):
@@ -434,7 +455,7 @@ class Gated(Arm):
             ms.adam = aw.commit(ms.adam, prop.adam_next)
             d = s_acc * prop.delta
             info.update(step_norm=float(np.linalg.norm(d)), step_Hnorm=h_norm(d, prop.D),
-                        progress_applied=float(-prop.g @ d))
+                        progress_applied=float(-prop.g @ d), _D=prop.D, _g=prop.g, _applied=d)
             return theta + d, info
         ms.ops.add("rejected_step")
         info.update(step_norm=0.0, step_Hnorm=0.0, progress_applied=0.0)

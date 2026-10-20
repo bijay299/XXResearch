@@ -107,25 +107,53 @@ class Task:
 
 
 class VectorTask(Task):
-    def __init__(self, model, family, z_dim, emb, feat_scale, shift_dir, **kw):
+    """population='generic': retained x = concat(z, e[retained prompt]);
+    population='covered': retained x = c @ W, c ~ N(0, I_q), W (q x d_in) fixed with zero concept coordinates
+    (rank-q retained subspace; protocol probe_coverage.population_axis). Rare-subgroup samples are
+    concat(z, e[rare]) in both populations.
+    target_mode='z' (default): target inputs concat(z, e[target]); 'concept' (G3): target inputs vary only in
+    the concept coordinates (z = 0, shared embedding coordinates 0), x = concat(0, 0, e_c[target] + noise),
+    anchor = the same input with the concept coordinates set to the anchor's (0)."""
+
+    def __init__(self, model, family, z_dim, emb, feat_scale, shift_dir, n_concept=2, population="generic",
+                 cover_basis=None, target_mode="z", **kw):
         super().__init__(model=model, family=family, **kw)
         self.z_dim, self.emb, self.feat_scale, self.shift_dir = z_dim, emb, feat_scale, shift_dir
+        self.n_concept, self.population, self.cover_basis, self.target_mode = n_concept, population, cover_basis, target_mode
+        if population not in ("generic", "covered") or target_mode not in ("z", "concept"):
+            raise ContractViolation("bad population / target_mode")
 
     def _x(self, z, pid, shift=0.0):
         return self.feat_scale * (np.concatenate([z, self.emb[pid]], axis=1) + shift * self.shift_dir)
 
     def erasure_batch(self, rng):
-        return rng.normal(size=(self.n_latents, self.z_dim))
+        return rng.normal(size=(self.n_latents, self.z_dim if self.target_mode == "z" else self.n_concept))
+
+    def target_inputs(self, eb):
+        """(x_target, x_anchor) for a target set eb (z vectors, or concept noise in 'concept' mode)."""
+        n = eb.shape[0]
+        if self.target_mode == "z":
+            return self._x(eb, np.full(n, TARGET)), self._x(eb, np.full(n, ANCHOR))
+        d_in = self.z_dim + self.emb.shape[1]
+        xt = np.zeros((n, d_in)); xa = np.zeros((n, d_in))
+        xt[:, d_in - self.n_concept:] = self.emb[TARGET, -self.n_concept:] + eb
+        xa[:, d_in - self.n_concept:] = self.emb[ANCHOR, -self.n_concept:] + eb
+        return self.feat_scale * xt, self.feat_scale * xa
 
     def erasure_inputs(self, theta, eb, ops):
-        n = eb.shape[0]
-        return self._x(eb, np.full(n, TARGET)), self._x(eb, np.full(n, ANCHOR))
+        return self.target_inputs(eb)
 
     def retained_batch(self, rng, n, rare=None, shift=0.0):
         """rare=None: population mixture (rare prompt w.p. rare_mass); True: R_rare; False: no rare.
         shift: R_shift magnitude along the fixed unit direction (units of the z sd = 1)."""
         z = rng.normal(size=(n, self.z_dim))
-        return self._x(z, self._retained_ids(rng, n, rare), shift)
+        ids = self._retained_ids(rng, n, rare)
+        x = np.concatenate([z, self.emb[ids]], axis=1)
+        if self.population == "covered":
+            c = rng.normal(size=(n, self.cover_basis.shape[0]))
+            xc = c @ self.cover_basis
+            x = np.where((ids == self.rare_id)[:, None], x, xc)
+        return self.feat_scale * (x + shift * self.shift_dir)
 
 
 class FlowTask(Task):
@@ -151,18 +179,32 @@ class FlowTask(Task):
         return rng.normal(size=(self.model.n_img, self.model.c))
 
     def erasure_inputs(self, theta, eb, ops):
-        states, n_fwd = rollout_prefix(self.model, theta, eb, TARGET, self.sigmas, self.end_idx)
+        """eb = z0 (prefix scheme, TARGET prompt) or a tuple (z0, target_id, idx): idx None -> GEM prefix
+        steps 0..end_idx; idx = sorted step indices (GD-D 'uniform 11-of-28'), rollout to max(idx)."""
+        z0, tid, idx = (eb, TARGET, None) if not isinstance(eb, tuple) else eb
+        end = self.end_idx if idx is None else int(np.max(idx))
+        states, n_fwd = rollout_prefix(self.model, theta, z0, tid, self.sigmas, end)
         for _ in range(n_fwd):
             ops.add("rollout_forward", 1)
-        n = states.shape[0]
-        sig = self.sigmas[:n].copy()
-        return FlowInput(states, sig, np.full(n, TARGET)), FlowInput(states, sig, np.full(n, ANCHOR))
+        if idx is None:
+            sel = np.arange(states.shape[0])
+        else:
+            sel = np.asarray(idx)
+            if len(sel) != self.n_latents:
+                raise ContractViolation("uniform scheme needs n_latents indices")
+        st, sig = states[sel], self.sigmas[sel].copy()
+        n = st.shape[0]
+        return FlowInput(st, sig, np.full(n, tid)), FlowInput(st, sig, np.full(n, ANCHOR))
 
-    def retained_batch(self, rng, n, rare=None, heldout=False, shift=0.0):
-        """Base-trajectory retained queries (one-off data generation; not charged to any arm)."""
+    def retained_batch(self, rng, n, rare=None, heldout=False, shift=0.0, ids=None):
+        """Base-trajectory retained queries (one-off data generation; not charged to any arm).
+        ids: optional pool of prompt ids to draw conditions from."""
         if shift != 0.0:
             raise ContractViolation("model c has no R_shift (protocol substitute: held-out conditions)")
-        ids = rng.choice(self.heldout_ids, size=n) if heldout else self._retained_ids(rng, n, rare)
+        if ids is not None:
+            ids = rng.choice(np.asarray(ids), size=n)
+        else:
+            ids = rng.choice(self.heldout_ids, size=n) if heldout else self._retained_ids(rng, n, rare)
         z0 = rng.normal(size=(n, self.model.n_img, self.model.c))
         k = rng.integers(0, self.n_steps, size=n)
         states = euler(self.model, None, z0, ids, self.sigmas, int(k.max()))
@@ -183,20 +225,31 @@ def make_task(family, rng, **kw):
         emb[ANCHOR] = emb[TARGET] + contrast * (emb[ANCHOR] - emb[TARGET])
         shift_dir = rng.normal(size=d_in); shift_dir /= np.linalg.norm(shift_dir)
         aniso = kw.pop("aniso_decades", 0.0)
+        population, q = kw.pop("population", "generic"), kw.pop("q", 2)
+        cover = np.zeros((q, d_in))
+        cover[:, : d_in - n_c] = rng.normal(size=(q, d_in - n_c))
+        T_concept = kw.pop("T_concept", None)
         if family == "linear":
             P = kw.pop("P", 40)
             kappa, phi = kw.pop("kappa", None), kw.pop("phi", 0.0)
             T = None
             if kappa is not None:
                 n_sh = d_in - n_c
-                T = np.concatenate([structured_T(rng, n_sh, d_out, P, kappa, phi),
-                                    rng.normal(size=(n_c, d_out, P)) / np.sqrt(d_in)])
+                Ts = structured_T(rng, n_sh, d_out, P, kappa, phi)
+                if T_concept is None:
+                    Tc = rng.normal(size=(n_c, d_out, P)) / np.sqrt(d_in)
+                elif callable(T_concept):            # G3: concept rows designed relative to the retained block
+                    Tc = T_concept(Ts.reshape(n_sh * d_out, P), rng).reshape(n_c, d_out, P)
+                else:
+                    Tc = T_concept
+                T = np.concatenate([Ts, Tc])
             model = LinearModel(rng, d_in, d_out, P, aniso_decades=aniso, T=T)
             feat = np.ones(d_in)
         else:
             model = LoraMLP(rng, d_in, kw.pop("d_hidden", 16), d_out, r=kw.pop("r", 2), gain=kw.pop("gain", 1.5))
             feat = 10.0 ** rng.uniform(-aniso / 2, aniso / 2, size=d_in)
-        return VectorTask(model, family, z_dim, emb, feat, shift_dir, n_retained_prompts=n_ret, **kw)
+        return VectorTask(model, family, z_dim, emb, feat, shift_dir, n_concept=n_c, population=population,
+                          cover_basis=cover, n_retained_prompts=n_ret, **kw)
     if family == "flow":
         mk = {k: kw.pop(k) for k in ("c", "n_img", "n_txt", "dm", "r") if k in kw}
         n_held = kw.pop("n_heldout", 4)

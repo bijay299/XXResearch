@@ -153,18 +153,30 @@ class LinearModel(Model):
     def phi(self, x):
         return np.einsum("ni,iop->nop", x, self.T)
 
+    def _T2(self):
+        if not hasattr(self, "_T2c"):
+            self._T2c = self.T.reshape(self.d_in * self.out_dim, self.P)
+        return self._T2c
+
     def forward(self, x, theta):
+        """Contract theta first: f = x (W0^T + T.theta), O(N d_in d_out) per call."""
         self._check(x, theta)
-        y = x @ self.W0.T
-        return y if theta is None else y + self.phi(x) @ theta
+        if theta is None:
+            return x @ self.W0.T
+        return x @ (self.W0.T + (self._T2() @ theta).reshape(self.d_in, self.out_dim))
 
     def jvp(self, x, theta, w):
         self._check(x, theta, allow_none=False); self._check_w(w)
-        return self.phi(x) @ w
+        return x @ (self._T2() @ w).reshape(self.d_in, self.out_dim)
 
     def vjp(self, x, theta, U):
         self._check(x, theta, allow_none=False); self._check_U(x, U)
-        return np.einsum("no,nop->p", U, self.phi(x))
+        return (x.T @ U).reshape(-1) @ self._T2()
+
+    def vjp_rows(self, x, Us):
+        """Many VJPs at once: Us (k, N, d_out) -> (k, P). Used for coverage sketches (linear model only)."""
+        G = np.einsum("ni,kno->kio", x, Us).reshape(Us.shape[0], -1)
+        return G @ self._T2()
 
 
 # ---------------------------------------------------------------------------------------------
@@ -351,6 +363,37 @@ class TinyFlowDiT(Model):
         A = np.exp(S)
         A /= A.sum(axis=-1, keepdims=True)
         return Q, K, V, A
+
+    def sample_fast(self, theta, z0, prompts, sigmas):
+        """Full Euler sampler (same arithmetic as `sample`, up to rounding) with the step-invariant parts hoisted:
+        effective weights and text-stream projections are computed once; projections use 2-D matmuls.
+        Used by the evaluation harness for endpoint metrics. theta=None -> teacher."""
+        check_array("z0", z0, ndim=3)
+        if theta is not None:
+            check_vec("theta", theta, self.P)
+        _, W = self._eff(theta)
+        N, nt, dm = z0.shape[0], self.n_txt, self.dm
+        Ht = self.E[prompts].reshape(-1, dm)
+        Qt = (Ht @ W["add_q_proj"].T).reshape(N, nt, dm)
+        Kt = (Ht @ W["add_k_proj"].T).reshape(N, nt, dm)
+        Vt = (Ht @ W["add_v_proj"].T).reshape(N, nt, dm)
+        Wq, Wk, Wv = W["to_q"].T, W["to_k"].T, W["to_v"].T
+        inv = 1.0 / np.sqrt(dm)
+        x = z0
+        for k in range(len(sigmas) - 1):
+            temb = np.tanh(sigmas[k] * self.w_t + self.b_t)
+            Hi = (x.reshape(-1, self.c) @ self.W_in).reshape(N, self.n_img, dm) + self.pos + temb
+            H2 = Hi.reshape(-1, dm)
+            Q = np.concatenate([Qt, (H2 @ Wq).reshape(N, self.n_img, dm)], axis=1)
+            K = np.concatenate([Kt, (H2 @ Wk).reshape(N, self.n_img, dm)], axis=1)
+            V = np.concatenate([Vt, (H2 @ Wv).reshape(N, self.n_img, dm)], axis=1)
+            S = (Q[:, nt:] @ K.transpose(0, 2, 1)) * inv          # only image-token query rows are needed
+            S -= S.max(axis=-1, keepdims=True)
+            np.exp(S, out=S)
+            S /= S.sum(axis=-1, keepdims=True)
+            vel = ((Hi + S @ V).reshape(-1, dm) @ self.W_out).reshape(x.shape)
+            x = x + (sigmas[k + 1] - sigmas[k]) * vel
+        return x
 
     def forward(self, x, theta):
         self._check(x, theta)

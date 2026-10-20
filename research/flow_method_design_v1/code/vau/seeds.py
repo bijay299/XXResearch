@@ -4,7 +4,7 @@ streams(family, seed) -> dict name -> np.random.Generator, from
     SeedSequence(entropy=[20261019, FAMILY_CODE, seed]).spawn(8)
 in the protocol's stream order. Development seeds 0..99 are always allowed. Validation seeds 7000..7011 are
 REFUSED unless configs/FREEZE.json exists and its recorded sha256 of configs/eval_protocol.json,
-configs/candidate.json and the code/vau tree equal the current files. Every other seed is refused.
+configs/candidate.json, the code/vau tree and code/run_validation.py equal the current files. Every other seed is refused.
 """
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ import numpy as np
 from .contracts import ContractViolation
 
 ROOT_ENTROPY = 20261019
-FAMILY_CODES = {"G1": 1, "G2": 2, "G3": 3, "G4": 4, "G5": 5, "G6": 6, "G7": 7, "G8": 8, "GD_B": 21, "GD_D": 22}
+FAMILY_CODES = {"G1": 1, "G2": 2, "G3": 3, "G4": 4, "G5": 5, "G6": 6, "G7": 7, "G8": 8, "G9": 9, "GD_B": 21, "GD_D": 22}
 STREAMS = ("fixture", "splits", "train", "sketch", "gate", "eval_noise", "population", "spare")
 DEV = range(0, 100)
 VALIDATION = range(7000, 7012)
@@ -53,7 +53,8 @@ def freeze_ok(freeze_path=FREEZE_PATH):
     try:
         return (fz["sha256_eval_protocol"] == _sha_file(os.path.join(cfg, "eval_protocol.json"))
                 and fz["sha256_candidate"] == _sha_file(os.path.join(cfg, "candidate.json"))
-                and fz["sha256_code_vau_tree"] == vau_tree_hash())
+                and fz["sha256_code_vau_tree"] == vau_tree_hash()
+                and fz["sha256_run_validation"] == _sha_file(os.path.join(_SPRINT, "code", "run_validation.py")))
     except (KeyError, FileNotFoundError):
         return False
 

@@ -26,3 +26,5 @@ Git push access restored by the user (GitHub reconnected) at ~23:23Z on 2026-10-
 | 2 | F (end) | | | | ~23:40 | 179.4k tokens, 36 tool uses, 1027 s; ~17 core-min (over the ~10 requested); VAU practical claims not supported vs matched controls |
 | — | Coordinator | Early pivot to FNS considered and DECLINED (collapses under zero-init B; working form = known null-A/InfLoRA → control na_lora); F narrowings applied to CANDIDATES.md and DERIVATION.tex | | 23:41 | 23:55 | coord_factor_exact_check, coord_factor_collapse_check |
 | 2 | G (A1 amendment end) | | | | ~00:01 | +212.6k tokens, 8 tool uses, 294 s; protocol v1.1; G's 'file reworded' note checked: no committed diff to REAL_MODEL_PROTOCOL.md between G's writes (benign) |
+| 3 | E (resumed) | Runner, integrity I1-I15, dev phase, compute projection; stops pre-freeze | code/run_validation.py, results/dev | ~23:46 | | |
+| 3 | F (resumed) | ONE bounded full-algorithm novelty assessment (user scope clarification received 2026-10-20T00:18Z; study NOT yet frozen at that time; no spec change made in response) | review/F_FULL_ALGORITHM_NOVELTY.md | 00:18 | | |
