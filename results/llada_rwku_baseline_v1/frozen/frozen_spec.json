@@ -1,0 +1,52 @@
+{
+  "frozen_at": "pre-inference",
+  "seed": 20261020,
+  "entities_candidate_pool": [
+    "1_Stephen_King",
+    "2_Confucius",
+    "3_Bruce_Lee",
+    "4_Warren_Buffett",
+    "5_Christina_Aguilera",
+    "6_Cindy_Crawford",
+    "7_Marie_Osmond",
+    "8_Paris_Hilton",
+    "9_Justin_Bieber",
+    "10_Prince_Harry,_Duke_of_Sussex"
+  ],
+  "facts_required_per_entity": 10,
+  "recall_threshold_of_10": 6,
+  "instructions": {
+    "answer_only": "Answer with the shortest possible answer only. Do not explain. Do not write a sentence.\n\nQuestion: {q}\nAnswer:",
+    "cloze": "Complete the blank with the shortest possible answer only. Do not explain. Do not write a sentence.\n\n{q}\nAnswer:",
+    "mmlu": "Answer with a single letter: A, B, C, or D. Do not explain.\n\n{q}\nA. {a}\nB. {b}\nC. {c}\nD. {d}\nAnswer:"
+  },
+  "normalization": "NFKC + casefold + '&'->'and' + strip punctuation + drop {a,an,the} + collapse whitespace",
+  "primary_metric": "normalized short-answer EXACT match (full-string equality after normalization) vs frozen references/aliases; NOT substring",
+  "secondary_metrics": [
+    "token_boundary_span_recall",
+    "rouge_l_recall"
+  ],
+  "failure_labels": [
+    "empty",
+    "refusal",
+    "repetition",
+    "truncation",
+    "parse_failure"
+  ],
+  "neighbor_conflict_policy": "two pre-inference signals: (a) target name tokens in query/answer; (b) item topic+answer tokens all present in the target OWN passage corpus (catches semantic conflicts that never name the target). Raw benchmark metrics over ALL neighbor items are preserved; nonconflicting locality is reported separately. LIMITATION: both signals are lexical; a semantic conflict whose topic title and answer tokens are absent from the passage corpus can still slip through.",
+  "alias_policy": "conservative, rule-based only: self, parenthetical-stripped, &/and, whole-reference small-integer digit<->word, whole-reference US variants. No partial/substring forms, no surname-only for full personal names. Generated pre-inference and never revised.",
+  "source_insufficient_entities": [],
+  "eligible_entities": [
+    "1_Stephen_King",
+    "2_Confucius",
+    "3_Bruce_Lee",
+    "4_Warren_Buffett",
+    "5_Christina_Aguilera",
+    "6_Cindy_Crawford",
+    "7_Marie_Osmond",
+    "8_Paris_Hilton",
+    "9_Justin_Bieber",
+    "10_Prince_Harry,_Duke_of_Sussex"
+  ],
+  "mmlu_panel_n": 40
+}
