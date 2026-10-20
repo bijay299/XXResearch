@@ -1,180 +1,177 @@
-# Finding 1 — the answer token is the coupling channel
+# Finding 1 — CORRECTED. The causal claim is retracted; the structural observation stands
 
-**Development evidence, 2026-10-20.** Two measurements, one predictive and one confirmatory,
-on existing qualified assets. This refutes the coordinator's own H1 and replaces it with a
-mechanism that is measured rather than assumed.
+**Status: the causal attribution in the first version of this document is WITHDRAWN.**
+Published 2026-10-20 in commit `94b3a3d8a6fe` and retracted the same day after two
+independent agents objected and a decisive experiment confirmed them. The original text is
+preserved at the end of this file.
 
-## What H1 claimed, and why it is dead
+---
 
-H1 held that the published leak — 8 leaked facts restoring 43 facts the adversary never saw
-— was carried by a **shared low-dimensional direction**, evidenced by the unlearning edit's
-effective rank of **3.13 of 16**. I flagged the alternative that would kill it: a low-rank
-edit can be a low-rank *average* of diverse per-fact directions, which implies no transfer.
+## What I claimed, and why it was wrong
 
-Measured directly (`outputs/grad_cosine_theta_u.json`), per-fact gradients of the
-adversary's objective at θ_u, over the **full 224-module** edit subspace, 23.07 M
-parameters, each fact averaged over 4 shared mask draws:
+**Claimed:** the exclusion target removes probability mass from the answer-token set `F`;
+two facts sharing an answer share the same `F`; therefore *the objective's F-indexing drives
+their gradients into near-collinearity* (0.388 → 0.916), which is the leak channel.
 
-```
-forget-forget   mean cos = +0.0670   |cos| = 0.0726   n = 4032
-retain-retain   mean cos = +0.0545   |cos| = 0.0570   n = 4032
-forget-retain   mean cos = +0.0185   |cos| = 0.0211   n = 4096
-effective rank of the 64-fact forget gradient set = 29.48 of 64
-```
+**Two independent refutations, arrived at separately:**
 
-Per-fact gradients are **near-orthogonal**, and their set has effective rank 29.5, not ~3.
-**H1's mechanism is refuted.** The rank-3 edit is precisely the low-rank average I named as
-fatal. The small residual alignment is not specific to forgetting — retain-retain (0.055)
-is of the same order — so it is a property of the loss and parameterization, not of the
-unlearning.
+1. *Analytical.* At LoRA init the per-fact gradient in the `lora_B` subspace is a sum of
+   outer products `(A x_t) ⊗ δ_t` with `δ = Jᵀ e`, `e = p_θ − onehot(v*)`. So
+   `cos(g, g') = cos(δ, δ') · cos(Ax, Ax')` exactly. For a **suppressed** fact `p_θ(v*) ≈ 0`,
+   so `δ ≈ −Jᵀ w_{v*}` — the unembedding row of the answer token, at near-maximal magnitude.
+   Two facts with the same answer share that row, so `cos(δ) → 1` **whatever produced the
+   suppression.** For a fitted fact `e ≈ 0` and the direction is small and unstructured.
+   The whole observed ordering follows: 0.92 (both suppressed) > 0.64 (both fitted) > 0.26
+   (mixed), collapsing to a common ≈0.62-0.66 at θ₀ where every fact is fitted (fp32
+   values; see below).
+2. *The control I already had and did not use.* At θ₀ the same-answer coupling is
+   indistinguishable across all three groups, and just as strong on **retain facts the edit
+   never touched.** I used exactly this control to kill H1 ("retain-retain is of the same
+   order, so it is a property of the loss and parameterization") and then failed to apply it
+   to the hypothesis that replaced H1.
 
-## What is actually there
+### fp32 recomputation — and my bug was inflating my own effect
 
-Splitting the same cosine matrix by what the facts share:
+The published θ₀ figures came from a run that cast gradients to **fp16**; at θ₀'s mean
+gradient norm of 4.3e-6, against fp16's smallest subnormal of 5.96e-8, roughly 99.98% of the
+23.07 M coordinates were unrepresentable (evidenced by 116 exactly-zero off-diagonal
+cosines at θ₀ and none at θ_u). Recomputed in fp32
+(`outputs/grad_cosine_{theta_0_fp32,theta_u_fp32}.json`):
 
-| pair type | mean cos | sd | n | vs unrelated |
-|---|---|---|---|---|
-| forget-forget, **same answer token** | **+0.9159** | 0.066 | 64 | **83×** |
-| retain-retain, same answer token | +0.6375 | 0.298 | 64 | 58× |
-| **forget-retain, same answer** (the Alice/Bob case) | **+0.2597** | 0.114 | 128 | **24.3×** |
-| forget-forget, same relation, different answer | +0.0672 | 0.071 | 1408 | 6× |
-| forget-retain, different answer | +0.0107 | 0.014 | 3968 | 1× |
-
-Per relation, the forget-retain same-answer coupling is +0.219 (home_city), +0.278 (field),
-+0.324 (instrument) — present in all three, so it is not an artifact of one template.
-
-**The coupling is carried by the shared answer token.** Two forget facts with the same
-answer have nearly collinear gradients; two facts with different answers are orthogonal.
-The relation template contributes an order of magnitude less.
-
-A caveat on magnitudes, stated because it matters: at θ_u the forget facts are suppressed
-(large gradients) while the retain facts are well fit (gradient norms span 1.16e-4 to 2.47).
-The direction of a near-zero gradient is noisy, which is the likely reason forget-retain
-same-answer coupling (0.260) is well below forget-forget same-answer coupling (0.916)
-despite both sharing the token. Only **2 of 64** forget facts have any retain partner above
-cos 0.5.
-
-## The behavioural prediction this makes, and its confirmation
-
-If the answer token is the channel, then under the published RTT attack the leak should
-concentrate on held-out facts that **share an answer token with one of the 8 leaked facts**.
-The 128-fact design gives each answer exactly 2 forget facts, so the 8 leaked facts have 8
-same-answer partners among the 43 held out.
-
-Re-partitioning the published per-fact generations (`anvil/outputs/relearn_gens_unlearned.json`,
-no new compute):
-
-| adversary steps | shares answer with a leaked fact (n=8) | does not share (n=35) | gap |
+| cell | θ₀ (fp16, as published) | **θ₀ (fp32)** | **θ_u (fp32)** |
 |---|---|---|---|
-| 0 | 0.000 | 0.029 | −0.029 |
-| 2 | 0.125 | 0.029 | +0.096 |
-| 5 | 0.500 | 0.200 | +0.300 |
-| **10** | **1.000** | **0.514** | **+0.486** |
-| 20 | 1.000 | 0.571 | +0.429 |
+| forget-forget, same answer | +0.3876 | **+0.6391** | **+0.9159** |
+| retain-retain, same answer | not computed | **+0.6590** | +0.6440 |
+| forget-retain, same answer | not computed | **+0.6202** | **+0.2612** |
+| forget-forget, same relation | +0.1263 | +0.1805 | +0.1041 |
+| forget-forget, different answer | +0.0596 | +0.0994 | +0.0533 |
+| forget-forget overall | +0.0648 | +0.1079 | +0.0670 |
+| retain-retain overall | +0.0463 | +0.0817 | +0.0561 |
+| forget-retain overall | +0.0412 | +0.0701 | +0.0186 |
+| gradient-set effective rank | 33.46/64 | **21.86/64** | 29.48/64 |
 
-**Every held-out fact sharing an answer token with a leaked fact was fully recovered by
-k=10 (8/8).** The split is monotone in `k` and starts from parity at `k=0`, so it is a
-property of the attack's progress, not of the starting point.
+**Three corrections, all of which cut against the original claim:**
 
-This is the per-fact, cosine-predicted test that H1 was supposed to pass and did not. It is
-reported with the same standard I failed to meet in the ARC study, where an aggregate gap of
-0.101 was presented as confirming a per-fact prediction.
+- **The "×2.36 amplification" headline was an artifact of my own fp16 bug.** The correct
+  figure is 0.639 → 0.916, i.e. **×1.43**. The numerical defect inflated the effect I was
+  claiming.
+- **At θ₀ the three same-answer groups are indistinguishable** — 0.639 (forget-forget),
+  0.659 (retain-retain), 0.620 (forget-retain). This is the critic's F1 confirmed directly
+  at full precision: the coupling is intrinsic, and strongest of all on retain-retain pairs
+  the edit never touches.
+- **A new observation that runs opposite to the retracted story.** Forget-retain same-answer
+  coupling *falls* from **0.620 to 0.261** under unlearning. The objective **decoupled**
+  forget facts from their retain twins rather than coupling them — which is consistent with
+  measured retain accuracy holding at 1.000, and is the reverse of a collateral-damage
+  mechanism. Effective rank also *rose* (21.9 → 29.5), not fell.
 
-**What it does not explain.** The non-sharing group still reaches 0.514. The answer channel
-accounts for the fastest and most complete recovery, not all of it. The relation channel is
-**untestable in this data** — the deterministic stride that chose the leak set happened to
-cover all three relations, so there is no relation-disjoint comparison. That is a design
-defect in the published leak set and the corrected RTT protocol must draw leak sets that
-leave both answers and relations partially uncovered.
+So at full precision: unlearning raises forget-forget coupling (×1.43), leaves retain-retain
+flat (0.659 → 0.644), and more than halves forget-retain coupling. Only the first of those
+three was reported, and it was the one the bug exaggerated.
 
-## The theta_0 control: unlearning CREATES the channel
+## The decisive experiment
 
-The same measurement at theta_0 -- the memorized model, before any unlearning -- separates
-"intrinsic to the task" from "produced by the objective"
-(`outputs/grad_cosine_theta_0.json`):
+`grad_cosine.py` at θ_u for two published baselines that are **not** answer-token-indexed,
+both driven to disclosure 0.000 (`outputs/grad_cosine_{emdu150,mdu150}.json`). If F-indexing
+caused the coupling, these should not show it.
 
-| quantity | theta_0 (memorized) | theta_u (unlearned) | change |
-|---|---|---|---|
-| **same-answer coupling** | **+0.3876** | **+0.9159** | **x2.36** |
-| different-answer | +0.0596 | +0.0533 | -11% |
-| same-relation | +0.1263 | +0.1041 | -18% |
-| forget-forget overall | +0.0648 | +0.0670 | +3% |
-| retain-retain overall | +0.0463 | +0.0545 | +18% |
-| forget-retain overall | +0.0412 | +0.0185 | -55% |
-| gradient-set effective rank | 33.46 / 64 | 29.48 / 64 | -12% |
+| arm | F-indexed | same-answer | retain same-answer | diff-answer | **selectivity** | eff. rank |
+|---|---|---|---|---|---|---|
+| exclusion target (ours) | **yes** | **+0.916** | +0.644 | +0.053 | **17.2×** | 29.5/64 |
+| EMDU, 150 steps | no | +0.773 | +0.753 | +0.198 | 3.9× | 10.5/64 |
+| MDU τ=1, 150 steps | no | +0.573 | +0.575 | +0.414 | 1.4× | 4.5/64 |
 
-**Every structural quantity is essentially unchanged except the same-answer coupling, which
-more than doubles.** The channel is not created from nothing -- at theta_0 it is already
-6.5x the different-answer baseline (0.388 vs 0.060) -- but unlearning amplifies it to 17x
-(0.916 vs 0.053) while touching nothing else.
+**Both non-F-indexed methods show substantial same-answer coupling.** The causal claim is
+dead. Suppression produces the coupling; the target's indexing is not required.
 
-This completes a causal account:
+The forget-vs-retain contrast is the clincher. For EMDU and MDU the two are equal
+(0.773/0.753 and 0.573/0.575). Only in our arm do they diverge (0.916 vs 0.644) — and that
+is explained by *differential suppression*: our arm drives forget disclosure to 0.031 while
+holding retain at 1.000, so forget residuals are large and retain residuals small. EMDU and
+MDU degrade retain too (0.906 and 0.969, with 17 output failures each), so both groups carry
+large residuals and couple equally. No appeal to F-indexing is needed anywhere.
 
-1. The exclusion target removes probability mass from the answer-token set `F`.
-2. Two facts with the same answer have the *same* `F`.
-3. So the objective drives their gradients into near-collinearity (0.388 -> 0.916).
-4. Hence an adversary recovering one fact recovers all its same-answer partners
-   (1.000 vs 0.514 at k=10).
+## What survives
 
-**Caveat on the theta_0 magnitudes.** Gradient norms at theta_0 average 4.32e-06 (range
-2.46e-07 to 2.12e-05) because the facts are fit, versus 5.72e-01 at theta_u -- five orders
-of magnitude. Directions of near-zero gradients are numerically delicate, so 0.388 should
-be read as indicative. The *contrast within* theta_0 (same-answer 0.388 vs different-answer
-0.060, measured by the identical pipeline) is the robust part, and it is what licenses the
-"amplified, not created" reading rather than "created".
+1. **Same-answer coupling is the dominant structure in per-fact gradient geometry**, in every
+   method measured, at 1.4× to 17.2× the different-answer baseline. It is a property of
+   suppression and of the parameterization, not of any particular objective.
+2. **Selectivity differs sharply between methods** and is a new, cheap descriptor:
+   17.2× (ours) vs 3.9× (EMDU) vs 1.4× (MDU). MDU's near-uniform coupling (diff-answer
+   0.414, effective rank 4.5/64) says its gradients are *globally* collapsed — consistent
+   with its output collapse, and a mechanistic correlate of the degeneracy we measured
+   behaviourally. This is a description, not yet a claim about anything causal.
+3. **The θ₀ → θ_u measurements themselves**, with the caveat in the next section.
 
-## A cheap mechanism check, and a prediction that separates the two candidate targets
+## What is withdrawn
 
-Same-answer coupling is measurable in ~3 GPU-minutes for any trained arm. That makes it a
-**mechanism check** -- explicitly not an optimization objective, per Song et al.'s
-"Measure, Don't Optimize" warning that a correlate turned into a target teaches the model to
-satisfy the correlate. The outcome of record remains the downstream relearning curve.
+- **The causal story** (F-indexing → coupling → leak). Retracted outright.
+- **"Unlearning creates the channel."** It amplifies an intrinsic coupling by suppressing
+  facts; so does every method tested.
+- **The behavioural confirmation, as stated.** Non-sharing recovery at k=10 by relation is
+  field 12/12, home_city 6/14, **instrument 0/9** — and 9 of 9 non-sharing instrument facts
+  emit a *leaked* instrument rather than their own (`timpani` ×7, `clarinet` ×2); one
+  "recovered" generation reads `"…plays the timpani, the timpani, the timpani…"`. The attack
+  injects leaked answers across a whole relation, and the 3 "sharing" instrument facts score
+  as recovered because their reference *is* one of the injected answers. Fisher one-sided:
+  as published 8/8 vs 18/35 → p = 0.011; dropping the instrument stratum → 5/5 vs 18/26,
+  **p = 0.198**; Bonferroni over the 5 reported `k` values puts the uncorrected figure at
+  0.054. **Only home_city survives uncontaminated: 4/4 vs 6/14, p = 0.069.** Suggestive, not
+  confirmed.
+- **The continuous per-fact prediction.** Within the 35 non-sharing facts, the correlation
+  between max gradient cosine to the leaked facts and recovery at k=10 is **r = +0.014,
+  p = 0.936** (across all 43 it is r = +0.384, p = 0.011, but that is the binary same-answer
+  indicator re-expressed). The cosine adds nothing over string equality of answers, so it
+  cannot distinguish gradient geometry from the template-level answer-injection mechanism
+  that is *directly observed* above.
+- **A numerical defect in my own script.** Gradients were cast to **fp16** before the inner
+  products. fp16's smallest subnormal is 5.96e-8, and at θ₀'s mean gradient norm of 4.3e-6
+  only ~0.02% of the 23.07 M coordinates were representable — evidenced by **116 exactly-zero
+  off-diagonal cosines at θ₀ and none at θ_u**. Fixed to fp32; the θ₀ figures above are from
+  the fp16 run and are **not quotable** pending recomputation (the direction of the error is
+  deflation, so the conclusion is robust but the numbers are not).
 
-It yields a falsifiable prediction that distinguishes the two closures the formalization
-derived from the same deconvolution:
+## H1's status, revised again
 
-> The **exclusion-target** closure (mass removal indexed by the answer-token set `F`)
-> amplifies same-answer coupling: measured 0.388 -> 0.916.
-> The **ignorance-reference** closure (match the distribution of a model that does not know
-> this *entity's* fact) is indexed by the entity, not by `F`, and is therefore predicted
-> **not** to amplify it: same-answer coupling should stay near 0.388.
+The critic argues H1 was over-refuted, and the arithmetic supports that:
+`‖Σ of 8 leaked unit gradients‖ = 3.213`, with `cos(Σ, g_j)` = 0.402 for leaked facts versus
+**0.119** for non-sharing held-out facts — so non-sharing facts receive ≈**29.7%** of the
+first-order loss reduction a leaked fact gets. Effective rank 29.5/64 is also a large
+deviation from isotropy (64 iid unit vectors give 63.98; top-10 energy 42.2% vs 15.6%
+expected). And 29.5 ≈ 32 = the number of distinct answers — I used that number as evidence
+*against* a shared direction and then as the mechanism.
 
-If the ignorance target amplifies the coupling anyway, the entity-vs-token framing is wrong
-and the mechanism story above is incomplete. If it does not, the two targets are
-mechanistically distinct in exactly the way that matters for the leak -- and that is
-checkable before any expensive evaluation.
+**H1 is therefore recorded as REFINED, not refuted**: there is no single global direction,
+but the gradient set is far from isotropic and transfer of ~30% per step is real.
 
-## Why this matters for the objective
+## Method consequence
 
-The formalization asks: *what is the minimal sufficient conditioning information that
-separates "Alice lives in Paris" from "Bob lives in Paris"?* This measurement answers the
-dual question — what the current objective actually conditions on. An edit whose per-fact
-gradient is essentially a function of the **answer token** cannot separate Alice from Bob,
-because both facts present the same token at the same position under the same template; it
-can only separate them through the entity representation, which the measured geometry says
-is contributing little (same-relation-different-answer coupling is 0.067, i.e. the entity is
-*already* doing the separating work for different-answer facts — it is specifically the
-shared-token case that collapses).
+The design does **not** rest on the retracted causal story. Preservation is addressed by a
+first-order-exact projection onto the retain-gradient cone, whose guarantee is an identity
+about `⟨v_j, u⟩ ≥ 0` and is untouched by any objection here. The measured forget-retain
+same-answer coupling of 0.260 enters only as the quantity that sets the projection's cost
+(`1 − cos² ` = 93.2% of the forgetting rate retained). The same arithmetic closes the
+orthogonalization variants of H1: at 0.916, forget-forget orthogonalization would retain
+only 16%.
 
-It also explains two previously unexplained observations:
+Same-answer coupling is retained as a **descriptive mechanism check**, not as a target —
+and explicitly not as evidence of a causal mechanism.
 
-- **The "Tbilisi attractor."** 19 of 64 forget probes converge on the same replacement
-  answer. If same-answer facts share a gradient direction at cos 0.92 and the exclusion
-  target's fixed point is `argmax_{v∉F} p₀`, a single off-F attractor per relation is the
-  expected outcome.
-- **Why unlearning generalizes across paraphrases but leaks across facts.** Paraphrases of
-  one fact share the answer *and* the entity; different facts sharing only the answer get
-  the coupling without the separation.
+---
 
-## Status and next step
+## Appendix: the original text, preserved
 
-- **H1 (shared global direction): REFUTED.** Recorded in `HYPOTHESIS_REGISTER.md`.
-- **Answer-token coupling: SUPPORTED** by gradient geometry (0.916 vs 0.053) and by a
-  per-fact behavioural split (1.000 vs 0.514 at k=10).
-- Single seed, single leak set, synthetic facts, one model. The coupling magnitudes are
-  measured at one point (θ_u) in one parameterization (LoRA-B at init, which is the subspace
-  the adversary's first step moves) and are a **restriction** of the full weight-space
-  gradient.
-- Required before this grounds a method: the same measurement at θ₀ (is the coupling created
-  by unlearning or intrinsic to the task?), and a leak set drawn to leave answers and
-  relations partially uncovered so both channels are separately testable.
+The first version of this document claimed: *"The coupling is carried by the shared answer
+token… unlearning CREATES the channel… every structural quantity is essentially unchanged
+except the same-answer coupling, which more than doubles… This completes a causal account:
+(1) the exclusion target removes probability mass from the answer-token set F; (2) two facts
+with the same answer have the same F; (3) so the objective drives their gradients into
+near-collinearity (0.388 → 0.916); (4) hence an adversary recovering one fact recovers all
+its same-answer partners (1.000 vs 0.514 at k=10)."*
+
+Steps (1)–(3) do not follow, for the reasons above. Step (4) is contaminated by answer
+injection in one relation stratum. The document also asserted the finding was *"reported
+with the same standard I failed to meet in the ARC study"* — it was not: ARC's error was
+presenting an aggregate gap as a per-fact confirmation, and this document presented an
+8-vs-35 group difference as a per-fact confirmation while its own continuous predictor had
+r = 0.014.

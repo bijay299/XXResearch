@@ -106,7 +106,7 @@ the edit could be a low-rank *average* of diverse per-fact directions. Measuring
 pairwise cosine matrix of per-fact gradients is the direct test, and it also supplies the
 per-fact quantity that H1's falsifiable prediction is stated against.
 
-**Status: H1 REFUTED.** The per-fact gradient-cosine measurement came back and the
+**Status: H1 REFINED (was briefly recorded as REFUTED; that was too strong).** The per-fact gradient-cosine measurement came back and the
 mechanism is not there: forget-forget mean cos = **+0.067**, and the 64-fact forget gradient
 set has effective rank **29.48 of 64** -- not low-dimensional. The rank-3.13 edit is exactly
 the low-rank *average of diverse directions* that I named as fatal to H1. The alignment is
@@ -211,3 +211,75 @@ bundled: the mandate forbids causal claims when recipes differ in several operat
 Prerequisite checks come first because each can kill its hypothesis for near-zero GPU cost:
 H1's rank-capacity bound (analytical, no GPU), H2's commitment-step distribution (one short
 GPU job), H3's reference-entropy measurement (one short GPU job).
+
+---
+
+## Novelty update, 2026-10-20 — see `NOVELTY_POSITION.md`
+
+A work our first prior-art pass could not locate has been found and verified: **Zhang et
+al., "Adversarial Reinforcement Learning for Robust Diffusion Large Language Model
+Unlearning," ICML 2026** (OpenReview `91bMgklyeQ`; no arXiv version, which is why it was
+missed). Abstract verified directly from the ICML site.
+
+**H2 (decode-trajectory / mask-rate targeting) — novelty materially damaged.** They claim
+*"the first comprehensive study of unlearning for DLMs"*, explicitly address robustness, and
+use an adversarial RL framework. The following claims are now forbidden: "first
+trajectory-aware MDLM unlearning", "first study of MDLM unlearning robustness", and anything
+premised on no MDLM method training outside uniformly-sampled teacher-forced masks. H2 may
+still be correct science; it can no longer be framed as opening an unoccupied region. Its
+mask-rate/position half survives, with a live risk that their "credit assignment" component
+is per-position attribution.
+
+**What distinguishes our axis, and it is a real distinction.** Their adversary is the **input
+context** — they defend against *elicitation*, an attacker who writes a prompt exploiting
+prefix-and-suffix conditioning. Ours is the **weights** — relearning, an attacker who
+fine-tunes on leaked examples. Different threat model, different defense, different
+measurement. This must be stated explicitly in any claim, not relied on implicitly.
+
+**H3 (ignorance-matching rather than suppression) is now the strongest position.** It is
+independently the target our own formalization derived from the deconvolution; it appears
+unoccupied in every primary source read; and it makes the falsifiable prediction that
+separates it from the exclusion target — it should **not** amplify same-answer coupling
+(predicted ~0.388, versus the exclusion target's measured 0.916).
+
+**The method therefore proceeds from H3 + Finding 1**, with H2's position/mask-rate element
+demoted to a secondary, separately-ablated component rather than a headline claim.
+
+**Blocking action, flagged for a human.** The camera-ready PDF is behind OpenReview's
+Cloudflare challenge; the coordinator confirmed 403 independently. Until it is read we do
+not know their state distribution, whether "credit assignment" is per-position, or their
+benchmark and metric. **No novelty claim should be frozen before someone with an OpenReview
+login downloads it.**
+
+---
+
+## Correction, same day — Finding 1's causal claim retracted
+
+The replacement for H1 (answer-token indexing as the causal leak channel) was **published
+and then retracted within the hour**, after two agents objected independently and a decisive
+experiment confirmed them. See `FINDING_answer_channel.md`, which now carries the corrected
+version with the original preserved.
+
+Decisive data: two baselines that are **not** answer-token-indexed, both driven to disclosure
+0.000, show substantial same-answer gradient coupling anyway — EMDU **+0.773**, MDU tau=1
+**+0.573** — and in both, forget-same-answer equals retain-same-answer (0.773/0.753 and
+0.573/0.575). Suppression produces the coupling; the target's indexing is not required.
+
+What survives: same-answer coupling is the dominant structure in per-fact gradient geometry
+across every method measured, and its **selectivity** differs sharply — 17.2x (our exclusion
+target) vs 3.9x (EMDU) vs 1.4x (MDU). MDU's near-uniform coupling with effective rank 4.5/64
+indicates globally collapsed gradients, a mechanistic correlate of its measured output
+collapse. Descriptive only.
+
+**H1 revised to REFINED**: `||sum of 8 leaked unit gradients|| = 3.213`, with cos to leaked
+facts 0.402 vs **0.119** to non-sharing held-out facts, so non-sharing facts receive ~**30%**
+of the per-step first-order loss reduction a leaked fact receives. Effective rank 29.5/64 is
+far from isotropic (64 iid unit vectors give 63.98). There is no single global direction, but
+the gradient set is strongly anisotropic and cross-fact transfer is real.
+
+**A standing lesson, recorded because it has now happened twice.** ARC's error was presenting
+an aggregate gap as a per-fact confirmation. Finding 1 repeated it in a new form: an 8-vs-35
+group difference presented as per-fact confirmation while its own continuous predictor had
+r = 0.014, p = 0.936. **From here on, a per-fact prediction is confirmed only by a
+within-stratum continuous correlation, computed before the group comparison is reported.**
+

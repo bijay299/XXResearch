@@ -1,0 +1,1442 @@
+### PAGES: 16
+
+===== PAGE 1 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language
+Model Unlearning
+Zhiwei Zhang 1 Yudi Lin2 Linlin Wu 3 Fali Wang1 Yi Xin 1 Xiaomin Li 4 Minhua Lin 1 Xianfeng Tang5
+Qi He 5 Suhang Wang 1
+Abstract
+Diffusion language models (DLMs) have recently
+emerged as an alternative to autoregressive ap-
+proaches, enabling parallel sequence generation
+and flexible token generation orders. Machine
+unlearning plays a critical role in mitigating le-
+gal and ethical risks by removing the influence
+of specific training examples from trained mod-
+els. While unlearning has been extensively stud-
+ied for autoregressive language models, its ap-
+plicability to DLMs remains unexplored. The
+architectural differences of DLMs raise new chal-
+lenges for effective and robust unlearning that
+are not addressed by existing methods. In this
+paper, we present the first comprehensive study
+of unlearning for DLMs. Through systematic
+empirical analysis, we show that unlearning per-
+formance in DLMs is highly sensitive to genera-
+tion hyperparameters, highlighting the need for
+evaluation across diverse generation settings. We
+further observe that DLMs tend to reproduce un-
+learned information when target inputs are em-
+bedded within informative contexts, due to their
+ability to incorporate both prefix and suffix con-
+ditioning, which increases vulnerability to elici-
+tation attacks and weakens the robustness of ex-
+isting unlearning methods. To design a robust
+unlearning method, we propose an adversarial
+reinforcement learning framework, where a con-
+text generator adversarially produces informative
+contexts to elicit unlearned knowledge, while the
+DLM is optimized to suppress undesired recall.
+We further introduce novel components to address
+credit assignment and stability issues in this adver-
+sarial learning setup. Extensive experiments show
+that our method significantly improves unlearning
+1The Pennsylvania State University 2Nanyang Technological
+University 3University of Utah 4Harvard University 5Microsoft.
+Correspondence to: Zhiwei Zhang<zbz5349@psu.edu>.
+Proceedings of the 43 rd International Conference on Machine
+Learning, Seoul, South Korea. PMLR 306, 2026. Copyright 2026
+by the author(s).
+effectiveness while preserving model utility.
+1. Introduction
+Masked diffusion models are a promising and scalable ar-
+chitecture for diffusion language models (Nie et al., 2025;
+Ye et al., 2025a), enabling massive inference acceleration
+through parallel generation (Labs et al., 2025; DeepMind,
+2024; Song et al., 2025) and improved consistency via bidi-
+rectional attention (Ye et al., 2024a; Zhang et al., 2023).
+DLMs have been applied to coding (Labs et al., 2025; Deep-
+Mind, 2024; Gong et al., 2025; Xie et al., 2025) and reason-
+ing tasks (Ye et al., 2024a; 2025a), while block-attention
+variants (Arriola et al., 2025; Cheng et al., 2025) have been
+scaled to excel at complex reasoning.
+Large language models are often trained on massive cor-
+pora that may contain harmful, sensitive, or copyrighted
+content (Yao et al., 2024a; Wen et al., 2023; Li et al., 2024;
+Hendrycks et al., 2023). Language model unlearning has
+therefore emerged as an important mechanism for remov-
+ing the influence of specific training examples or capabili-
+ties from pretrained models without retraining from scratch
+(Zhang et al., 2025c; Liu et al., 2025b; Wang et al., 2025a;
+Fan et al., 2025; Shen et al., 2025; Zhang et al., 2025b; Geng
+et al., 2025; Maini et al., 2024; Shi et al., 2024b; Yao et al.,
+2024a; Dorna et al., 2025; Li et al., 2025d). While unlearn-
+ing has been extensively studied for autoregressive language
+models, its applicability to diffusion-based language models
+(DLMs) remains unexplored. Extending unlearning from
+autoregressive LLMs to diffusion language models is not
+a trivial adaptation, as DLMs rely on fundamentally dif-
+ferent generation mechanisms, including bidirectional con-
+ditioning, recurrent denoising, and parallel full-sequence
+generation. These differences introduce new challenges for
+effective and robust unlearning.
+In this paper, we present the first comprehensive study of
+unlearning for diffusion language models. We begin with
+a systematic empirical analysis demonstrating that unlearn-
+ing performance in DLMs is highly sensitive to generation
+hyperparameters, particularly the output length and the num-
+ber of denoising steps. These results highlight the necessity
+1
+
+===== PAGE 2 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+of evaluating unlearning under diverse generation configu-
+rations, rather than relying on a single inference setting.
+Beyond hyperparameter sensitivity, we identify a critical ro-
+bustness issue that is specific to diffusion language models.
+Unlike autoregressive models, DLMs support more flexible
+conditioning patterns, including prefix–suffix conditioning
+as well as interleaved mask–text infilling. Recent work has
+shown that this flexibility makes diffusion models vulner-
+able to jailbreak attacks via carefully crafted interleaved
+mask–text prompts (Wen et al., 2025). However, it remains
+unclear whether such vulnerabilities persist after the model
+is explicitly fine-tuned to resist adversarial contexts, and
+whether existing unlearning methods can robustly suppress
+knowledge recall under previously unseen contextual per-
+turbations. Through extensive experiments, we show that
+even when DLMs are unlearned with adversarial contexts
+during training, they remain vulnerable to unseen adver-
+sarial contexts at inference time. In particular, unlearning
+performance under such adversarial contexts can degrade
+to a level comparable to that of the original, non-unlearned
+model evaluated on clean inputs. These findings suggest that
+effective unlearning in diffusion language models requires
+robustness beyond fixed adversarial perturbations observed
+during training, and motivate the need for stronger and more
+adaptive unlearning strategies.
+Based on our preliminary experiments, we propose an ad-
+versarial reinforcement learning framework for robust un-
+learning in diffusion language models. Our method jointly
+trains a DLM and an adversarial context generator in a min–
+max game: the generator produces prefix–suffix contexts
+that aim to induce undesired recall of the target response,
+while the DLM is optimized to suppress such recall under
+these contexts. However, such an adversarial unlearning
+framework faces several nontrivial challenges in diffusion
+language models, including (i) ambiguous credit assignment
+between adversarial prefixes and suffixes, and (ii) instability
+caused by adversary–learner imbalance, where the adver-
+sary generates contexts that are either too difficult or too
+easy for the current unlearning model, leading to reward
+collapse during training.
+To address these challenges, we introduce two key design
+components. First, we incorporate a causal influence regu-
+larization that explicitly quantifies the contribution of pre-
+fixes and suffixes to the model’s predictions, enabling fine-
+grained credit assignment and preventing the generator from
+converging to solutions dominated by a single component.
+Second, we propose a regret-based difficulty calibration
+mechanism that compares the current unlearning policy
+against a stronger self-bootstrapped reference model, en-
+couraging the generator to produce adversarial contexts that
+are neither trivially ineffective nor excessively informative.
+Together, these mechanisms stabilize adversarial training
+and significantly improve the robustness of unlearning under
+previously unseen adversarial contexts.
+Ourmain contributionsare as follows:(1)We provide the
+first comprehensive study of unlearning for DLMs, systemat-
+ically characterizing their unlearning behavior.(2)We show
+that unlearning performance in DLMs is highly sensitive
+to generation hyperparameters and remains fragile under
+adversarial contexts, revealing fundamental robustness limi-
+tations of existing unlearning approaches.(3)We propose
+a novel adversarial reinforcement learning framework for
+DLM unlearning, which integrates causal influence regu-
+larization and regret-based difficulty calibration to achieve
+robust unlearning performance.
+2. Related works
+2.1. Diffusion Large Language Models
+Diffusion language models (DLMs) have emerged as a
+promising alternative to autoregressive language mod-
+els, enabling parallel generation through iterative denois-
+ing (Austin et al., 2021; Nie et al., 2025; Sahoo et al., 2024;
+Lou et al., 2023; Gat et al., 2024; Shi et al., 2024a). Early
+work on discrete DLMs defines the diffusion process directly
+on token vocabularies with structured transition matrices
+and simplified training objectives (Austin et al., 2021; He
+et al., 2023; Zheng et al., 2023; Shi et al., 2024a; Sahoo
+et al., 2024; Ou et al., 2024; Lou et al., 2023; Gat et al.,
+2024). Recent efforts have scaled discrete DLMs to bil-
+lions of parameters. LLaDA (Nie et al., 2025) demonstrates
+that discrete DLMs can be trained from scratch at 8B scale,
+achieving performance comparable to LLaMA3-8B, with
+LLaDA 1.5 (Zhu et al., 2025a) further improving align-
+ment through preference optimization. Dream (Ye et al.,
+2025a) and DiffuLLaMA (Gong et al., 2024) show that dis-
+crete DLMs can be effectively adapted from pretrained AR
+models. Further developments include long-context exten-
+sions (Liu et al., 2025c; He et al., 2025), mixture-of-experts
+architectures (Zhu et al., 2025b), hybrid AR-diffusion ap-
+proaches (Arriola et al., 2025; Cheng et al., 2025; Liu et al.,
+2025a), code generation (Gong et al., 2025), and chain-of-
+thought reasoning (Ye et al., 2024b). Industry efforts such as
+Mercury (Labs et al., 2025), Gemini Diffusion (DeepMind,
+2024), and Seed Diffusion (Song et al., 2025) report infer-
+ence speeds of thousands of tokens per second. DLMs have
+also been extended to multimodal settings, enabling unified
+understanding and generation across text and images (You
+et al., 2025; Li et al., 2025b; Yu et al., 2025; Yang et al.,
+2025; Wang et al., 2025b; Shi et al., 2025; Li et al., 2025c;
+Swerdlow et al., 2025; Xin et al., 2025b; Li et al., 2025a;
+Tian et al., 2025; Xin et al., 2025a). However, unlearning
+for DLMs remains unexplored.
+2
+
+===== PAGE 3 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+2.2. Large Language Model Unlearning
+Machine unlearning for LLMs (Yao et al., 2024b; Zhang
+et al., 2024; Liu et al., 2024; Jin et al., 2024; Łucki et al.,
+2024; Ji et al., 2024; Fan et al., 2024; Yuan et al., 2025;
+Shen et al., 2025; Jia et al., 2024) has attracted increasing
+attention due to concerns over privacy, copyright, and safety
+risks (Geng et al., 2025; Liu et al., 2025b). Existing meth-
+ods can be broadly categorized into: (1)gradient-based
+approaches, such as Gradient Ascent (Jang et al., 2023) and
+Gradient Difference (Maini et al., 2024), which increase loss
+on the forget set; (2)preference optimization methods, such
+as NPO (Zhang et al., 2024), which reformulate unlearning
+as preference learning; and (3)localization-based methods,
+such as RMU (Li et al., 2024), which modify specific pa-
+rameters storing target knowledge. Benchmarks including
+TOFU (Maini et al., 2024), WMDP (Li et al., 2024), and
+MUSE (Shi et al., 2024b) have been proposed to evaluate un-
+learning effectiveness and utility preservation. Unlearning
+for DLMs faces new challenges and remains unexplored.
+2.3. DLM Reinforcement Learning
+Reinforcement learning plays a central role in aligning
+LLMs with human preferences and improving reasoning
+ability. While RLHF (Ouyang et al., 2022) with PPO (Schul-
+man et al., 2017) demonstrated this potential, PPO relies on
+a separate critic network and incurs substantial overhead.
+GRPO (Guo et al., 2025) removes this dependency and com-
+putes advantages via group-wise comparisons, and it has
+been widely adopted (Guo et al., 2025; Zhang et al., 2025a;
+Liu et al., 2025d; Zheng et al., 2025). Extending RL to
+DLMs presents unique challenges since log-likelihoods are
+intractable in iterative denoising. Recent solutions include
+diffu-GRPO (Zhao et al., 2025) with mean-field decomposi-
+tion, coupled-GRPO (Gong et al., 2025) with complemen-
+tary mask sampling, SEPO (Zekri & Boull ´e, 2025) based
+on score entropy, and UniGRPO (Yang et al., 2025) with
+structured noising for multimodal DLMs. For preference
+optimization, VRPO (Zhu et al., 2025a) reduces ELBO
+variance via optimal sampling allocation. Beyond policy
+optimization, DoT (Ye et al., 2024b) and DCoLT (Huang
+et al., 2025) explore parallel reasoning chains.
+3. Preliminaries
+3.1. Unlearning Method
+Specifically, we adopt the diffusion-based language model
+GSAI-ML/LLaDA-8B-Instruct (Nie et al., 2025) as
+our baseline. We first fine-tune the model on theforget
+split of the TOFU dataset (Maini et al., 2024), which is
+designed for fictitious unlearning in large language models.
+This warm-up fine-tuning step ensures that the diffusion
+language model captures task-specific knowledge that may
+not be fully covered during the pretraining of LLaDA. Fol-
+lowing (Nie et al., 2025), the training objective is:
+L(θ) =−E t, p0, r0, rt
+"
+1
+t
+LX
+i=1
+1
+h
+rit = Mi logp θri0 |p 0, rt# ,
+(1)
+where t∼Uniform(0,1) is a continuous random variable
+controlling the masking rate, p0 denotes the input prompt,
+r0 is the corresponding response, and rt represents a par-
+tially masked version of r0, in which each token is indepen-
+dently masked with probability t. The indicator function
+1[rit = M] restricts the loss to masked positions, encourag-
+ing the model to reconstruct the original response tokens
+conditioned on the prompt and the corrupted response.
+Given the fine-tuned baseline diffusion language model, we
+next perform unlearning. To improve robustness against
+extraction-based attacks, we incorporate a generator model
+that constructs adversarial contextual perturbations.
+Specifically, we use a language model as the context gen-
+erator and explicitly prompt it to take the original prompt
+p0 and response r0 as input and produce an adversarial
+prefix π and a suffix σ. Detailed prompts are provided in
+Appendix A.3. For non-QA datasets, we convert each text
+sequence into a pseudo QA format by splitting it into a
+prompt segment and a target response segment. The result-
+ing prefix–suffix contexts are designed to provide relevant
+background information that facilitates recall of r0, while
+preventing the target model from trivially inferring r0 from
+local context alone. The resulting input to the diffusion
+language model is formed as:
+˜rt =π⊕p 0 ⊕r t ⊕σ,(2)
+where ⊕ represents sequence concatenation. Following
+the idea of gradient ascent for unlearning in autoregressive
+language models (Jang et al., 2023; Yao et al., 2024b), the
+unlearning objectivefor the diffusion language model is
+defined as:
+L(θ) =E t, p0, r0, rt
+"
+1
+t
+LX
+i=1
+1
+
+rit = M logp θ ri0 |˜rit
+#
+,
+(3)
+The objective is optimized such that the diffusion language
+model is encouraged to forget the target knowledge in
+r0 even when the prompt is augmented with informative
+prefixes and suffixes. More training details are in Ap-
+pendix A.5.
+3.2. Evaluation Protocol
+We then benchmark both the baseline and the unlearned
+models to evaluate theeffectiveness of unlearningand the
+preservation of model utility.
+As diffusion-based language models require explicit
+specification of both the output length and the number of
+3
+
+===== PAGE 4 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.2
+0.4
+0.6
+0.8
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+0.4
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+Clean (Base)
+Clean (Unlearn)
+Adv Pref. (Base)
+Adv Pref. (Unlearn)
+Adv Full (Base)
+Adv Full (Unlearn)
+Clean (Base)
+Clean (Unlearn)
+Adv Pref. (Base)
+Adv Pref. (Unlearn)
+Adv Full (Base)
+Adv Full (Unlearn) Utility (Base) Utility (Unlearn)
+Figure 1.Unlearning performance of the base and unlearned models across six hyperparameter settings, where L denotes the output
+length and S denotes the number of denoising steps.Left:Unlearning effectiveness evaluated by LLM-as-Judge.Middle:Unlearning
+effectiveness measured by ROUGE.Right:Model utility. Lower is better for the unlearning performance, while higher is better for utility.
+denoising steps at inference time, we report results under
+six configurations corresponding to different combinations
+of sequence length L and diffusion steps S: (L, S) =
+(32,32),(64,32),(128,32),(64,64),(128,64),(128,128) .
+We set the minimum sequence length to 32, as responses in
+the unlearning dataset are typically short.
+We evaluate performance along two dimensions:unlearning
+effectivenessandmodel utility. For unlearning effectiveness,
+we report ROUGE scores, which measure the degree of over-
+lap between the model-generated responses and the ground-
+truth answers. In addition, we employ an LLM-as-Judge
+evaluation protocol, where a separate large language model
+is used to assess whether the generated outputs still contain
+information corresponding to the forgotten data. Further im-
+plementation details on the model and prompt construction
+are described in the Appendix A.3.
+To thoroughly evaluate the robustness of unlearning, we
+employ a context generator to produce an adversarial prefix
+π and suffix σ following the setting in Sec. 3.1. Based on
+the generated contexts, we construct three input variants
+for evaluating the unlearned model: (1)Clean:the input
+consists of the original prompt p0. (2)Adversarial Prefix:
+the input is constructed as π⊕p 0 ⊕r t. (3)Adversarial
+Full:the input is constructed asπ⊕p 0 ⊕r t ⊕σ.
+To assess model utility, we follow the evaluation protocol
+established in (Maini et al., 2024; Dorna et al., 2025), which
+measures both utility on retain dataset and general utility
+on out-of-distribution or general-purpose benchmarks. The
+specific evaluation protocol is detailed in Appendix A.4.
+3.3. Results analysis
+The results are reported in Fig. 1. We make the following
+observations:
+(1) Sensitivity to hyperparameter settings.As shown in
+Fig. 1(a), unlearning performance exhibits substantial vari-
+ance across hyperparameter settings under the LLM-as-
+Judge evaluation and ROUGE scores. In general, longer
+output lengths are associated with a higher risk of knowl-
+edge recall, indicating that the DLM becomes increasingly
+vulnerable as the generation length increases. In contrast,
+the effect of the number of denoising steps is less consistent.
+For example, when the output length is fixed at 128, the un-
+learning performance with 32 denoising steps is comparable
+to that with 128 steps, while outperforming the configura-
+tion with 64 steps under the LLM-based judge metric. This
+suggests that denoising steps do not induce a monotonic or
+easily predictable impact on unlearning effectiveness.
+(2) Impact of contextual variants.The base model exhibits
+relatively consistent unlearning performance across the three
+input variants. In contrast, the unlearned model achieves
+significantly improved unlearning effectiveness compared
+to the base model under clean inputs, but its performance
+degrades progressively from clean inputs to prefix-only and
+adversarial full contexts. This trend indicates that the DLM
+remains sensitive to informative contextual cues, with more
+informative contexts leading to stronger knowledge recall.
+(3) Limited robustness under adversarial contexts.Even
+the model utility is largely preserved after unlearning, the
+unlearning performance of the unlearned model under the
+adversarial full setting is comparable to that of the base
+model evaluated under clean inputs. This result highlights
+a key limitation: although the DLM is trained with adver-
+sarial contexts during unlearning, it still lacks robustness to
+previously unseen contexts at evaluation time.
+Based on our comprehensive preliminary experiments, we
+draw the following conclusions:
+(1) Unlearning evaluation for diffusion language mod-
+els should cover different settings of output length and
+denoising steps.
+4
+
+===== PAGE 5 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+(2) Diffusion language models require more robust un-
+learning against potential extraction attacks via adver-
+sarial prefixes and suffixes.
+4. Methodology
+Our preliminary experiments show that although DLM is
+trained with adversarial prefixes and suffixes to improve
+robustness against extraction attacks, its unlearning effec-
+tiveness remains limited when evaluated under previously
+unseen contexts. This suggests that robustness induced
+by fixed adversarial perturbations during training does not
+necessarily generalize to broader contextual variations at
+evaluation time. A straightforward idea is to introduce a
+context generation mechanism during unlearning, which
+produces multiple contextual variants for each prompt. How-
+ever, enforcing robustness over a wide range of adversarial
+contexts may negatively impact model utility, a trade-off
+that has been consistently reported in prior studies (Zhang
+et al., 2025c; Liu et al., 2025b; Wang et al., 2025a; Fan
+et al., 2025). Supervised fine-tuning optimizes the model by
+matching a specific target output, providing a clear super-
+vision signal for learning desired behaviors. In unlearning,
+however, supervised objectives no longer define a positive
+target and instead impose a negation constraint: the model
+is trained to avoid producing the forgotten content, while
+any alternative output is treated as acceptable. This weak se-
+mantic guidance can induce uncontrolled distributional drift
+and lead to substantial utility degradation (Shi et al., 2024b;
+Yao et al., 2024a; Dorna et al., 2025; Li et al., 2025d).
+Reinforcement learning follows a different optimization
+paradigm by operating over multiple candidate responses
+with relative reward signals. Given a prompt and a set
+of candidate responses with associated rewards, policy up-
+dates reweight the output probability mass toward higher-
+reward responses while suppressing lower-reward ones.
+This preference-based reweighting enables more controlled
+behavior shaping during unlearning and avoids arbitrary
+deviations from the desired output distribution (Guo et al.,
+2025; Wu & Choi, 2025), which is verified in Sec. 5.
+Motivated by this property, we propose an adversarial re-
+inforcement learning framework for DLM unlearning that
+aims to improve robustness to adversarial contexts while
+mitigating utility collapse. In this framework, a context
+generator is trained to produce contexts that increase the
+likelihood of undesired recall, while the DLM is optimized
+to suppress the corresponding target outputs under these
+contexts. Both the context generator and the DLM are
+trained via reinforcement learning with opposing reward
+signals, forming a min–max optimization process. Specifi-
+cally, given a context generatorf c and a DLMπ θ, for each
+prompt pi with corresponding response ri, the context gener-
+ator produces K context variants consisting of prefix–suffix
+pairs{(α ki , βki )}Kk=1. Each variant defines a new prompt
+˜pki =α ki ⊕p i ⊕[MASK]⊕β ki .
+For each ˜pki , we sample G predictions from the DLM on
+the masked region, yielding generated outputs {yk,ji }Gj=1.
+We introduce a judge model to assess whether a generated
+prediction yk,ji matches the reference response ri. For each
+prediction, a binary reward is assigned as
+R(yk,ji ) =
+(
++1,ify k,ji does not matchr i,
+−1,otherwise. (4)
+However, this adversarial reinforcement learning framework
+introduces several nontrivial challenges:(1) Credit assign-
+ment between prefix and suffix generation.The adversarial
+context generator produces both a prefix and a suffix for
+each prompt, while receiving a scalar reward based solely
+on attack success or failure. Under this formulation, the
+reward signal does not provide explicit credit assignment
+between the prefix and suffix components. As a result, it is
+unclear whether both components contribute meaningfully
+to facilitating knowledge recall, or whether the observed
+effect is dominated by one of them. This ambiguity can in-
+duce an imbalanced learning dynamic, causing the generator
+to converge to solutions dominated by a single component,
+thereby limiting the effectiveness of attacks in cases where
+both components jointly contribute to successful extraction,
+which is verified in Sec. 5.3.(2) Adversary–learner im-
+balance and reward signal collapse.A second challenge
+arises from the imbalance between the adversarial context
+generator and the unlearning policy. When the generator
+is overly strong, or fails to strictly adhere to the intended
+constraint of providing only auxiliary background informa-
+tion (rather than implicit hints or direct inference cues), it
+may produce contexts that trivially facilitate the recovery
+of the ground-truth content. In the early stages of train-
+ing, when the DLM has not yet developed robustness to
+adversarial contexts, most rollout trajectories may therefore
+result in predictions that exactly match the ground-truth
+responses. As a consequence, the reward signal becomes
+nearly uniform and negative, leading to vanishing reward
+variance and ineffective policy updates. A symmetric fail-
+ure mode occurs when the generated contexts are overly
+weak or uninformative. In this case, the DLM consistently
+avoids producing the ground-truth responses, resulting in
+uniformly positive rewards across trajectories. Ideally, ef-
+fective adversarial unlearning requires a balanced training
+regime in which the context generator produces contexts of
+intermediate difficulty. Such a regime preserves a mixture
+of positive and negative rewards across rollout trajectories,
+thereby maintaining sufficient reward variance to provide
+informative gradients for policy optimization. In contrast,
+5
+
+===== PAGE 6 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+Prompt Response
+Context
+Generator
+Prompt MASKPrefix 1
+Judge Model
+DLLM
+Suffix 1
+pଵ෦
+PromptPrefix k Suffix k
+Prompt MASKPrefix K Suffix K
+PromptPrefix k Suffix k
+Pred. 𝑦௞ଵ
+Pred.𝑦௞ீ
+Attack Reward
+p௄෦
+p௞෦
+Strong
+Unlearner
+Init
+Unlearn
+Regret
+PromptPrefix 1 Suffix 1
+PromptPrefix K Suffix K
+Response
+Response
+Group
+Comp.
+Defense Reward Group
+Comp.
+Figure 2.The framework of our method. The DLM πθ and a context generator fc are trained adversarially via reinforcement learning. The
+generator produces adversarial prefix–suffix contexts to induce undesired recall, while the DLM learns to suppress the target response. A
+judge model assigns a binary reward by evaluating whether the DLM output matches the ground-truth response ri to be unlearned. Causal
+influence regularization enables prefix–suffix credit assignment, and a regret-based signal calibrates the difficulty of generated contexts.
+contexts that are either overly challenging or overly trivial
+lead to degenerate reward signals and undermine stable and
+effective learning.
+Causal Influence of the Prefix and Suffix.To address
+the first challenge, we explicitly quantify how adversar-
+ial prefixes and suffixes influence the model’s prediction.
+Specifically, given an adversarial prompt and a generated
+prediction yk,ji , we measure the influence of the prefix αki
+by the change in the model’s confidence for the predicted
+output:
+Iprefix(αki ) = 1G
+GX
+j=1
+ logπ θyk,ji |˜pki 
+−logπ θ
+
+yk,ji |˜pki \α ki
+. (5)
+We estimate the output probability following (Zhao et al.,
+2025). An analogous influence score Isuffix(βki ) is computed
+by removing the suffixβ ki from the prompt.
+Difficulty-Calibrated Context Generation.The key in-
+sight for addressing the second challenge is to explicitly
+control the difficulty of the prefix–suffix contexts generated
+by the context generator. For a well-unlearned model, the
+generated prefix–suffix pair should not be sufficiently infor-
+mative to directly trigger recall of the unlearned knowledge;
+otherwise, it risks leaking ground-truth information. At the
+same time, the same context should remain capable of elicit-
+ing recall from the current unlearning policy, indicating that
+the contextual difficulty is appropriately calibrated to the
+model’s current state. In this way, the context generator is
+encouraged to produce adversarial contexts that are neither
+trivially ineffective nor excessively informative, enabling
+stable and effective unlearning. To formalize this notion
+of calibrated difficulty, we define a regret signal that mea-
+sures the gap between the current unlearning policy πθ and
+a stronger unlearning referenceπ strong:
+Regret(˜pki ) = logπ θ(ri |˜pki )−logπ strong(ri |˜pki ).(6)
+A larger regret value indicates that the adversarial context
+induces a high probability of recovering the ground-truth
+content under the current unlearning policy, while the same
+context is effectively suppressed by a stronger unlearning
+model. Such contexts are therefore of intermediate difficulty
+and provide informative learning signals for the current
+unlearning policy.
+In practice, however, a stronger unlearning model is not
+available during training. To address this, we adopt a self-
+bootstrapped strategy to construct a strong unlearning refer-
+ence. At each training iteration, after updating the current
+policy using adversarial rollouts, we initialize a reference
+model from the updated policy and further optimize it by
+explicitly suppressing the output probability of the target
+response ri across all generated contexts. This additional
+optimization step provides a more direct unlearning signal
+than rollout-based policy updates, as the reference model is
+trained to explicitly suppress the likelihood of the ground-
+truth response itself rather than comparatively reweighting
+sampled generations. As a result, the reference model ex-
+hibits stronger and more targeted unlearning behavior, mak-
+ing it suitable as a stable anchor for regret-based difficulty
+calibration.
+Reward Aggregation and Group-Based Advantage Com-
+putation.We first describe how the previously defined sig-
+nals are aggregated and combined to construct group-based
+advantages for the context generator fc. For each prefix–
+suffix pair (αki , βki ), outcome-level rewards are aggregated
+6
+
+===== PAGE 7 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+across theGrollouts sampled under the same context:
+¯Rki =− 1G
+GX
+j=1
+R(yk,ji ),(7)
+where R is defined in Eq. (4) and the negative sign encour-
+ages the context generator to produce contexts that induce
+undesired recall. This reward is shared by the prefix and
+suffix within the same context pair.
+Given the causal influence scores defined in Eq. (5) and
+the regret signal defined in Eq. (6), we standardize each
+signal independently within the group of K prefix–suffix
+pairs generated for the same prompt. Specifically, for any
+signal x∈ { ¯Rki ,Regret(˜pki ),I ·}, we apply group-wise
+standardization:
+bxki = xki −µ xσx , µx = 1K KXk=1 xki , σx = std({xki }Kk=1).
+After standardization, auxiliary signals are clipped to a
+bounded range to prevent extreme values from dominat-
+ing optimization: exki = clip(bxki ,−1,1). The resulting
+component-specific rewards for the context generator are
+defined as:
+Rgenα,ik = e¯Rki +λ  ^Regret(˜pki ) + eIprefix(αki ),(8)
+Rgenβ,ik = e¯Rki +λ  ^Regret(˜pki ) + eIsuffix(βki ),(9)
+where we set λ= 0.1 to control the strength of auxiliary reg-
+ularization. Under this formulation, the reward for each gen-
+erated prefix/suffix is dominated by attack success, while be-
+ing regularized by (i) its causal contribution and (ii) whether
+the induced context exhibits appropriate difficulty for the
+current unlearning policy.
+For the DLM, each group consists of theG rollouts sampled
+under a fixed prefix–suffix pair, and advantages are com-
+puted by normalizing the prediction-level rewards R(yk,ji )
+within the group. Both the DLM and the context gener-
+ator are optimized using GRPO (Guo et al., 2025). The
+framework is detailed in Algorithm 1.
+5. Experiments
+Dataset.We conduct experiments on the TOFU (Maini
+et al., 2024) and MUSE (Shi et al., 2024b) datasets. Detailed
+descriptions of the datasets are provided in Appendix A.2.
+Models.For both training and evaluation, we use
+Qwen/Qwen2.5-14B-Instruct as the judge
+model to assess whether generated outputs match
+the target responses. For adversarial training, we
+employ Qwen/Qwen3-4B-Instruct-2507 as
+the trainable context generator. To evaluate the
+Algorithm 1Adversarial RL for Diffusion Language Model
+Unlearning
+Require: Dataset D={(p i, ri)}Ni=1, DLM policy πθ, context
+generator fc, group sizes G (DLM rollouts) and K (contexts),
+regularization weightλ
+1:foreach training iterationdo
+2:foreach(p i, ri)∈ Ddo
+3: Sample K prefix–suffix pairs {(αki , βki )}Kk=1 ∼f c(· |
+pi, ri)
+4:foreach context(α ki , βki )do
+5: Construct adversarial prompt ˜pki =α ki ⊕p i ⊕
+[MASK]⊕β ki
+6: SampleGgenerations{y k,ji }Gj=1 ∼π θ(· |˜pki )
+7:foreach generationy k,ji do
+8: Compute judge rewardR(y k,ji )using Eq. (4)
+9:end for
+10: Aggregate context-level reward ¯Rki =
+− 1G PGj=1 R(yk,ji )
+11: Compute causal influence scores
+Iprefix(αki ),I suffix(βki )using Eq. (5)
+12:end for
+13: Update DLM πθ via GRPO using rollout groups
+{{yk,ji }Gj=1}Kk=1
+14: Construct strong unlearning reference.Initialize
+πstrong ←π θ and further optimize πstrong by explicitly
+suppressinglogπ strong(ri |˜pki )over{˜pki }Kk=1
+15: Compute regret signals{Regret(˜p ki )}Kk=1 using Eq. (6)
+16: Normalize, clip, and combine generator signals as in Eq.
+(8) (9)
+17: Update context generator fc via GRPO using context
+group{(α ki , βki )}Kk=1
+18:end for
+19:end for
+robustness and generalization of our framework,
+we adopt a stronger adversarial context generator,
+Qwen/Qwen3-30B-A3B-Instruct-2507, at infer-
+ence time. We train and evaluate our method on two DLMs,
+GSAI-ML/LLaDA-8B-Instruct (Nie et al., 2025)
+and Dream-org/Dream-v0-Instruct-7B (Ye et al.,
+2025b).
+Baselines.We consider the gradient ascent (GA) unlearning
+method defined in Eq. (3) as our primary baseline. For
+clarity of presentation, we omit results from the original
+base models without unlearning, as Figure 1 shows that the
+baseline unlearning method already achieves a reasonable
+trade-off between unlearning effectiveness and model utility,
+serving as a strong reference for comparison.
+5.1. Unlearning Performance
+We report results using LLaDA as the base model on
+the TOFU and MUSE datasets in Figure 3. Results for
+DREAM on the TOFU dataset are provided in Appendix ??.
+From the results, we make the following observations.(1)
+For both unlearning metrics, the baseline method (GA)
+7
+
+===== PAGE 8 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.2
+0.4
+0.6
+0.8
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+0.4
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+Clean (Baseline)
+Clean (Ours)
+Adv Pref. (Baseline)
+Adv Pref. (Ours)
+Adv Full (Baseline)
+Adv Full (Ours)
+Clean (Baseline)
+Clean (Ours)
+Adv Pref. (Baseline)
+Adv Pref. (Ours)
+Adv Full (Baseline)
+Adv Full (Ours) Utility (Baseline) Utility (Unlearn)
+(a)Model: LLaDA, Dataset: TOFU
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.2
+0.4
+0.6
+0.8
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+0.4
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+Clean (Baseline)
+Clean (Ours)
+Adv Pref. (Baseline)
+Adv Pref. (Ours)
+Adv Full (Baseline)
+Adv Full (Ours)
+Clean (Baseline)
+Clean (Ours)
+Adv Pref. (Baseline)
+Adv Pref. (Ours)
+Adv Full (Baseline)
+Adv Full (Ours) Utility (Baseline) Utility (Ours)
+(b)Model: LLaDA, Dataset: MUSE
+Figure 3.Left:Unlearning effectiveness evaluated by LLM-as-Judge.Middle:Unlearning effectiveness measured by ROUGE.Right:
+Model utility. Lower values indicate better unlearning performance, while higher values indicate better utility.
+achieves strong performance under clean inputs. However,
+when inputs are augmented with adversarial contexts, its
+unlearning effectiveness degrades substantially.(2)Our
+method significantly improves unlearning performance even
+when evaluated with adversarial contexts generated by a
+stronger, unseen context generator than that used during
+training. This demonstrates the robustness and generaliza-
+tion capability of our approach.(3)Although our method
+is trained to suppress the target response under diverse
+adversarial contexts, it maintains model utility compara-
+ble to the baseline. This highlights the advantage of for-
+mulating unlearning as a reinforcement learning problem
+with relative reward optimization. Additional results us-
+ing Dream-org/Dream-v0-Instruct-7B (Ye et al.,
+2025b) as the base model and evaluating on the TOFU
+dataset (Maini et al., 2024) are in Fig. 4
+5.2. Training Curves
+In this section, we present training curves illustrating (1)
+the reward of the DLM and (2) the causal influence of the
+generated prefixes and suffixes. To highlight the effect of
+our proposed components, we compare our full method with
+two ablated variants:(i)w/o Causal Inf., which removes
+the causal influence regularization, and(ii)w/o Regret,
+which removes the regret-based difficulty calibration for the
+context generator. The results are shown in Figure 5 and
+Figure 6. From the figures, we make the following obser-
+vations.(1)As shown in Figure 5, without explicit causal
+influence regularization, the generated contexts often lead
+to imbalanced contributions, where either the prefix or the
+suffix dominates the model’s prediction. In contrast, our full
+framework maintains a more balanced influence between
+prefixes and suffixes, encouraging both components to make
+meaningful contributions to adversarial context generation.
+(2)As shown in Figure 6, removing the regret module leads
+to unstable DLM rewards that are either excessively high
+or excessively low. When the reward is too high, the DLM
+can trivially avoid producing the target response under most
+generated contexts, indicating that the adversarial contexts
+are overly easy. Conversely, when the reward is too low, the
+generated contexts become overly strong and may leak in-
+formation that enables the DLM to recall the target response.
+In both cases, the difficulty of the adversarial contexts is
+poorly calibrated, resulting in either trivial or overly aggres-
+sive attacks that hinder effective unlearning. In contrast,
+our full method maintains rewards that stabilize at values
+typically below 0.5, indicating a mixture of positive and
+negative rewards across rollouts. This reward diversity pro-
+vides informative learning signals and supports more stable
+and effective unlearning. We further observe that when
+8
+
+===== PAGE 9 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.2
+0.4
+0.6
+0.8
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+0.4
+L32_S32
+L64_S32L64_S64
+L128_S32
+L128_S64 L128_S128
+0.1
+0.2
+0.3
+Clean (Baseline)
+Clean (Ours)
+Adv Pref. (Baseline)
+Adv Pref. (Ours)
+Adv Full (Baseline)
+Adv Full (Ours)
+Clean (Baseline)
+Clean (Ours)
+Adv Pref. (Baseline)
+Adv Pref. (Ours)
+Adv Full (Baseline)
+Adv Full (Ours) Utility (Baseline) Utility (Unlearn)
+Figure 4.Left:Unlearning effectiveness evaluated by LLM-as-Judge.Middle:Unlearning effectiveness measured by ROUGE.Right:
+Model utility. Lower is better for the unlearning performance, while higher is better for utility. (Model: DREAM, Data: TOFU)
+0 5 10 15 20 25 30 35 40
+Training Steps
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7Prefix Causal Influence
+Ours
+w/o Causal Inf (Case 1)
+w/o Causal Inf (Case 2)
+0 5 10 15 20 25 30 35 40
+Training Steps
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9Suffix Causal Influence
+Ours
+w/o Causal Inf (Case 1)
+w/o Causal Inf (Case 2)
+Figure 5.Training curves of causal influence.
+5 10 15 20 25 30 35 40
+Training Steps
+1.00
+0.75
+0.50
+0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+DLM Reward
+Ours
+w/o Causal Inf
+w/o Regret (Case 1)
+w/o Regret (Case 2)
+Figure 6.Training curves of DLM reward.
+causal influence regularization is removed, the DLM reward
+tends to be higher. We attribute this behavior to imbalanced
+prefix–suffix contributions, which limit the effectiveness of
+adversarial attacks.
+5.3. Ablation Studies
+Table 1.Ablation results under different settings using the LLM-
+as-Judge metric (lower is better).
+Method Clean Adv Pref. Adv Full
+Ours 0.55 0.65 0.63
+w/o Causal Inf. 0.63 0.70 0.75
+w/o Regret 0.58 0.73 0.80
+Based on the preceding analysis, we present an abla-
+tion study to quantify the contribution of each proposed
+module to unlearning performance. Specifically, we
+use Dream-org/Dream-v0-Instruct-7B (Ye et al.,
+2025b) as the base model and report results on the TOFU
+dataset under a fixed generation setting, where both the out-
+put length and the number of denoising steps are set to 128.
+The results are summarized in Table 1. As shown, both
+ablated variants exhibit degraded unlearning performance
+across all three prompt settings. Together with the training
+curve analysis, these results demonstrate the effectiveness
+of our proposed modules in improving robust unlearning.
+6. Conclusion
+We presented the first comprehensive study of unlearning
+for diffusion language models, revealing strong sensitivity
+to generation hyperparameters and vulnerability to adversar-
+ial contexts. To address these challenges, we proposed an
+adversarial reinforcement learning framework with causal
+influence regularization and regret-based difficulty calibra-
+tion. Our method achieves robust unlearning under unseen
+adversarial contexts while preserving model utility.
+Impact Statement
+This work studies robust machine unlearning for diffusion
+language models, aiming to reduce unwanted memorization
+by training unlearning policies that remain effective under
+adversarially constructed contexts. If deployed responsibly,
+the techniques may help mitigate privacy, copyright, and
+data governance risks by improving a model’s ability to
+suppress specified content while preserving general utility.
+9
+
+===== PAGE 10 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+References
+Arriola, M., Gokaslan, A., Chiu, J. T., Yang, Z., Qi, Z., Han,
+J., Sahoo, S. S., and Kuleshov, V . Block diffusion: Inter-
+polating between autoregressive and diffusion language
+models.arXiv preprint arXiv:2503.09573, 2025.
+Austin, J., Johnson, D. D., Ho, J., Tarlow, D., and Van
+Den Berg, R. Structured denoising diffusion models in
+discrete state-spaces.Advances in neural information
+processing systems, 34:17981–17993, 2021.
+Cheng, S., Bian, Y ., Liu, D., Zhang, L., Yao, Q., Tian, Z.,
+Wang, W., Guo, Q., Chen, K., Qi, B., et al. Sdar: A syn-
+ergistic diffusion-autoregression paradigm for scalable
+sequence generation.arXiv preprint arXiv:2510.06303,
+2025.
+DeepMind. Gemini diffusion. https://deepmind.
+google/technologies/gemini, 2024. Accessed:
+2025-07-09.
+Dorna, V ., Mekala, A., Zhao, W., McCallum, A., Lipton,
+Z. C., Kolter, J. Z., and Maini, P. Openunlearning: Ac-
+celerating llm unlearning via unified benchmarking of
+methods and metrics.arXiv preprint arXiv:2506.12618,
+2025.
+Fan, C., Liu, J., Hero, A., and Liu, S. Challenging forgets:
+Unveiling the worst-case forget sets in machine unlearn-
+ing. InEuropean Conference on Computer Vision, pp.
+278–297. Springer, 2024.
+Fan, C., Jia, J., Zhang, Y ., Ramakrishna, A., Hong, M., and
+Liu, S. Towards llm unlearning resilient to relearning
+attacks: A sharpness-aware minimization perspective and
+beyond.arXiv preprint arXiv:2502.05374, 2025.
+Gat, I., Remez, T., Shaul, N., Kreuk, F., Chen, R. T., Syn-
+naeve, G., Adi, Y ., and Lipman, Y . Discrete flow match-
+ing.Advances in Neural Information Processing Systems,
+37:133345–133385, 2024.
+Geng, J., Li, Q., Woisetschlaeger, H., Chen, Z., Cai,
+F., Wang, Y ., Nakov, P., Jacobsen, H.-A., and Karray,
+F. A comprehensive survey of machine unlearning
+techniques for large language models.arXiv preprint
+arXiv:2503.01854, 2025.
+Gong, S., Agarwal, S., Zhang, Y ., Ye, J., Zheng, L., Li, M.,
+An, C., Zhao, P., Bi, W., Han, J., et al. Scaling diffu-
+sion language models via adaptation from autoregressive
+models.arXiv preprint arXiv:2410.17891, 2024.
+Gong, S., Zhang, R., Zheng, H., Gu, J., Jaitly, N., Kong, L.,
+and Zhang, Y . Diffucoder: Understanding and improving
+masked diffusion models for code generation.arXiv
+preprint arXiv:2506.20639, 2025.
+Guo, D., Yang, D., Zhang, H., Song, J., Zhang, R., Xu, R.,
+Zhu, Q., Ma, S., Wang, P., Bi, X., et al. Deepseek-r1: In-
+centivizing reasoning capability in llms via reinforcement
+learning.arXiv preprint arXiv:2501.12948, 2025.
+He, G., Nie, S., Zhu, F., Zhao, Y ., Bai, T., Yan, R., Fu, J., Li,
+C., and Yuan, B. Ultrallada: Scaling the context length to
+128k for diffusion large language models.arXiv preprint
+arXiv:2510.10481, 2025.
+He, Z., Sun, T., Tang, Q., Wang, K., Huang, X., and Qiu,
+X. Diffusionbert: Improving generative masked language
+models with diffusion models. InThe 61st Annual Meet-
+ing Of The Association For Computational Linguistics,
+2023.
+Hendrycks, D., Mazeika, M., and Woodside, T. An overview
+of catastrophic ai risks.arXiv preprint arXiv:2306.12001,
+2023.
+Huang, Z., Chen, Z., Wang, Z., Li, T., and Qi, G.-J. Rein-
+forcing the diffusion chain of lateral thought with diffu-
+sion language models.arXiv preprint arXiv:2505.10446,
+2025.
+Jang, J., Yoon, D., Yang, S., Cha, S., Lee, M., Logeswaran,
+L., and Seo, M. Knowledge unlearning for mitigating pri-
+vacy risks in language models. InProceedings of the 61st
+Annual Meeting of the Association for Computational
+Linguistics (Volume 1: Long Papers), pp. 14389–14408,
+2023.
+Ji, J., Liu, Y ., Zhang, Y ., Liu, G., Kompella, R. R., Liu, S.,
+and Chang, S. Reversing the forget-retain objectives: An
+efficient llm unlearning framework from logit difference.
+Advances in Neural Information Processing Systems, 37:
+12581–12611, 2024.
+Jia, J., Liu, J., Zhang, Y ., Ram, P., Baracaldo, N., and Liu,
+S. Wagle: Strategic weight attribution for effective and
+modular unlearning in large language models.Advances
+in Neural Information Processing Systems, 37:55620–
+55646, 2024.
+Jin, Z., Cao, P., Wang, C., He, Z., Yuan, H., Li, J., Chen,
+Y ., Liu, K., and Zhao, J. Rwku: Benchmarking real-
+world knowledge unlearning for large language models.
+Advances in Neural Information Processing Systems, 37:
+98213–98263, 2024.
+Labs, I., Khanna, S., Kharbanda, S., Li, S., Varma, H., Wang,
+E., Birnbaum, S., Luo, Z., Miraoui, Y ., Palrecha, A., et al.
+Mercury: Ultra-fast language models based on diffusion.
+arXiv preprint arXiv:2506.17298, 2025.
+Li, N., Pan, A., Gopal, A., Yue, S., Berrios, D., Gatti, A., Li,
+J. D., Dombrowski, A.-K., Goel, S., Phan, L., et al. The
+wmdp benchmark: Measuring and reducing malicious
+10
+
+===== PAGE 11 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+use with unlearning.arXiv preprint arXiv:2403.03218,
+2024.
+Li, S., Gu, J., Liu, K., Lin, Z., Wei, Z., Grover, A., and Kuen,
+J. Lavida-o: Elastic large masked diffusion models for
+unified multimodal understanding and generation.arXiv
+preprint arXiv:2509.19244, 2025a.
+Li, S., Kallidromitis, K., Bansal, H., Gokul, A., Kato, Y .,
+Kozuka, K., Kuen, J., Lin, Z., Chang, K.-W., and Grover,
+A. Lavida: A large diffusion language model for multi-
+modal understanding.arXiv preprint arXiv:2505.16839,
+2025b.
+Li, Z., Li, H., Shi, Y ., Farimani, A. B., Kluger, Y ., Yang, L.,
+and Wang, P. Dual diffusion for unified image generation
+and understanding. InProceedings of the Computer Vi-
+sion and Pattern Recognition Conference, pp. 2779–2790,
+2025c.
+Li, Z., Nie, Z., Zhou, Z., Guo, Y ., Liu, Y ., Zhang, Y ., Cheng,
+Y ., Wen, Q., Wang, K., and Zhang, J. Diffuguard: How in-
+trinsic safety is lost and found in diffusion large language
+models.arXiv preprint arXiv:2509.24296, 2025d.
+Liu, C., Wang, Y ., Flanigan, J., and Liu, Y . Large language
+model unlearning via embedding-corrupted prompts.Ad-
+vances in Neural Information Processing Systems, 37:
+118198–118266, 2024.
+Liu, J., Dong, X., Ye, Z., Mehta, R., Fu, Y ., Singh, V ., Kautz,
+J., Zhang, C., and Molchanov, P. Tidar: Think in diffusion,
+talk in autoregression.arXiv preprint arXiv:2511.08923,
+2025a.
+Liu, S., Yao, Y ., Jia, J., Casper, S., Baracaldo, N., Hase,
+P., Yao, Y ., Liu, C. Y ., Xu, X., Li, H., et al. Rethinking
+machine unlearning for large language models.Nature
+Machine Intelligence, pp. 1–14, 2025b.
+Liu, X., Liu, Z., Huang, Z., Guo, Q., He, Z., and Qiu,
+X. Longllada: Unlocking long context capabilities in
+diffusion llms.arXiv preprint arXiv:2506.14429, 2025c.
+Liu, Z., Chen, C., Li, W., Qi, P., Pang, T., Du, C., Lee,
+W. S., and Lin, M. Understanding r1-zero-like training:
+A critical perspective.arXiv preprint arXiv:2503.20783,
+2025d.
+Lou, A., Meng, C., and Ermon, S. Discrete diffusion model-
+ing by estimating the ratios of the data distribution.arXiv
+preprint arXiv:2310.16834, 2023.
+Łucki, J., Wei, B., Huang, Y ., Henderson, P., Tram `er, F.,
+and Rando, J. An adversarial perspective on machine
+unlearning for ai safety.arXiv preprint arXiv:2409.18025,
+2024.
+Maini, P., Feng, Z., Schwarzschild, A., Lipton, Z. C., and
+Kolter, J. Z. Tofu: A task of fictitious unlearning for llms.
+arXiv preprint arXiv:2401.06121, 2024.
+Nie, S., Zhu, F., You, Z., Zhang, X., Ou, J., Hu, J., Zhou, J.,
+Lin, Y ., Wen, J.-R., and Li, C. Large language diffusion
+models.arXiv preprint arXiv:2502.09992, 2025.
+Ou, J., Nie, S., Xue, K., Zhu, F., Sun, J., Li, Z., and Li,
+C. Your absorbing discrete diffusion secretly models the
+conditional distributions of clean data.arXiv preprint
+arXiv:2406.03736, 2024.
+Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C.,
+Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A.,
+et al. Training language models to follow instructions
+with human feedback.Advances in neural information
+processing systems, 35:27730–27744, 2022.
+Sahoo, S., Arriola, M., Schiff, Y ., Gokaslan, A., Marroquin,
+E., Chiu, J., Rush, A., and Kuleshov, V . Simple and
+effective masked diffusion language models.Advances
+in Neural Information Processing Systems, 37:130136–
+130184, 2024.
+Schulman, J., Wolski, F., Dhariwal, P., Radford, A., and
+Klimov, O. Proximal policy optimization algorithms.
+arXiv preprint arXiv:1707.06347, 2017.
+Shen, W. F., Qiu, X., Kurmanji, M., Iacob, A., Sani, L.,
+Chen, Y ., Cancedda, N., and Lane, N. D. Lunar: Llm un-
+learning via neural activation redirection.arXiv preprint
+arXiv:2502.07218, 2025.
+Shi, J., Han, K., Wang, Z., Doucet, A., and Titsias, M.
+Simplified and generalized masked diffusion for discrete
+data.Advances in neural information processing systems,
+37:103131–103167, 2024a.
+Shi, Q., Bai, J., Zhao, Z., Chai, W., Yu, K., Wu, J., Song,
+S., Tong, Y ., Li, X., Li, X., et al. Muddit: Liberating
+generation beyond text-to-image with a unified discrete
+diffusion model.arXiv preprint arXiv:2505.23606, 2025.
+Shi, W., Lee, J., Huang, Y ., Malladi, S., Zhao, J., Holtz-
+man, A., Liu, D., Zettlemoyer, L., Smith, N. A., and
+Zhang, C. Muse: Machine unlearning six-way evaluation
+for language models.arXiv preprint arXiv:2407.06460,
+2024b.
+Song, Y ., Zhang, Z., Luo, C., Gao, P., Xia, F., Luo, H.,
+Li, Z., Yang, Y ., Yu, H., Qu, X., et al. Seed diffusion:
+A large-scale diffusion language model with high-speed
+inference.arXiv preprint arXiv:2508.02193, 2025.
+Swerdlow, A., Prabhudesai, M., Gandhi, S., Pathak, D., and
+Fragkiadaki, K. Unified multimodal discrete diffusion.
+arXiv preprint arXiv:2503.20853, 2025.
+11
+
+===== PAGE 12 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+Tian, Y ., Yang, L., Yang, J., Wang, A., Tian, Y ., Zheng, J.,
+Wang, H., Teng, Z., Wang, Z., Wang, Y ., et al. Mmada-
+parallel: Multimodal large diffusion language models for
+thinking-aware editing and generation.arXiv preprint
+arXiv:2511.09611, 2025.
+Wang, F., Zhang, Z., Zhang, X., Wu, Z., Mo, T., Lu, Q.,
+Wang, W., Li, R., Xu, J., Tang, X., et al. A comprehen-
+sive survey of small language models in the era of large
+language models: Techniques, enhancements, applica-
+tions, collaboration with llms, and trustworthiness.ACM
+Transactions on Intelligent Systems and Technology, 16
+(6):1–87, 2025a.
+Wang, J., Lai, Y ., Li, A., Zhang, S., Sun, J., Kang, N.,
+Wu, C., Li, Z., and Luo, P. Fudoki: Discrete flow-based
+unified understanding and generation via kinetic-optimal
+velocities.arXiv preprint arXiv:2505.20147, 2025b.
+Wen, J., Ke, P., Sun, H., Zhang, Z., Li, C., Bai, J., and
+Huang, M. Unveiling the implicit toxicity in large lan-
+guage models.arXiv preprint arXiv:2311.17391, 2023.
+Wen, Z., Qu, J., Liu, D., Liu, Z., Wu, R., Yang, Y ., Jin, X.,
+Xu, H., Liu, X., Li, W., et al. The devil behind the mask:
+An emergent safety vulnerability of diffusion llms.arXiv
+preprint arXiv:2507.11097, 2025.
+Wu, F. and Choi, Y . The invisible leash: Why rlvr may not
+escape its origin. In2nd AI for Math Workshop@ ICML
+2025, 2025.
+Xie, Z., Ye, J., Zheng, L., Gao, J., Dong, J., Wu, Z., Zhao,
+X., Gong, S., Jiang, X., Li, Z., and Kong, L. Dream-
+coder 7b, 2025. URL https://hkunlp.github.
+io/blog/2025/dream-coder.
+Xin, Y ., Luo, S., Qin, Q., Chen, H., Zhu, K., Zhang,
+Z., He, Y ., Zhang, R., Bai, J., Cao, S., et al. dmllm-
+tts: Self-verified and efficient test-time scaling for diffu-
+sion multi-modal large language models.arXiv preprint
+arXiv:2512.19433, 2025a.
+Xin, Y ., Qin, Q., Luo, S., Zhu, K., Yan, J., Tai, Y .,
+Lei, J., Cao, Y ., Wang, K., Wang, Y ., et al. Lumina-
+dimoo: An omni diffusion large language model for multi-
+modal generation and understanding.arXiv preprint
+arXiv:2510.06308, 2025b.
+Yang, L., Tian, Y ., Li, B., Zhang, X., Shen, K., Tong, Y ., and
+Wang, M. Mmada: Multimodal large diffusion language
+models.arXiv preprint arXiv:2505.15809, 2025.
+Yao, J., Chien, E., Du, M., Niu, X., Wang, T., Cheng, Z., and
+Yue, X. Machine unlearning of pre-trained large language
+models.arXiv preprint arXiv:2402.15159, 2024a.
+Yao, Y ., Xu, X., and Liu, Y . Large language model unlearn-
+ing.Advances in Neural Information Processing Systems,
+37:105425–105475, 2024b.
+Ye, J., Gao, J., Gong, S., Zheng, L., Jiang, X., Li, Z.,
+and Kong, L. Beyond autoregression: Discrete diffu-
+sion for complex reasoning and planning.arXiv preprint
+arXiv:2410.14157, 2024a.
+Ye, J., Gong, S., Chen, L., Zheng, L., Gao, J., Shi, H., Wu,
+C., Jiang, X., Li, Z., Bi, W., et al. Diffusion of thought:
+Chain-of-thought reasoning in diffusion language models.
+Advances in Neural Information Processing Systems, 37:
+105345–105374, 2024b.
+Ye, J., Xie, Z., Zheng, L., Gao, J., Wu, Z., Jiang, X., Li,
+Z., and Kong, L. Dream 7b, 2025a. URL https://
+hkunlp.github.io/blog/2025/dream.
+Ye, J., Xie, Z., Zheng, L., Gao, J., Wu, Z., Jiang, X., Li,
+Z., and Kong, L. Dream 7b: Diffusion large language
+models.arXiv preprint arXiv:2508.15487, 2025b.
+You, Z., Nie, S., Zhang, X., Hu, J., Zhou, J., Lu, Z., Wen,
+J.-R., and Li, C. Llada-v: Large language diffusion
+models with visual instruction tuning.arXiv preprint
+arXiv:2505.16933, 2025.
+Yu, R., Ma, X., and Wang, X. Dimple: Discrete diffusion
+multimodal large language model with parallel decoding.
+arXiv preprint arXiv:2505.16990, 2025.
+Yuan, H., Jin, Z., Cao, P., Chen, Y ., Liu, K., and Zhao, J.
+Towards robust knowledge unlearning: An adversarial
+framework for assessing and improving unlearning ro-
+bustness in large language models. InProceedings of the
+AAAI Conference on Artificial Intelligence, volume 39,
+pp. 25769–25777, 2025.
+Zekri, O. and Boull ´e, N. Fine-tuning discrete diffusion
+models with policy gradient methods.arXiv preprint
+arXiv:2502.01384, 2025.
+Zhang, H., Zheng, R., Yi, Z., Zhang, Z., Peng, H., Wang, H.,
+Yuan, Z., Ke, C., Chen, S., Yang, J., et al. Gepo: Group
+expectation policy optimization for stable heterogeneous
+reinforcement learning.arXiv preprint arXiv:2508.17850,
+2025a.
+Zhang, R., Lin, L., Bai, Y ., and Mei, S. Negative preference
+optimization: From catastrophic collapse to effective un-
+learning. InFirst Conference on Language Modeling,
+2024. URL https://openreview.net/forum?
+id=MXLBXjQkmb.
+Zhang, X., Liu, H., Zhang, D. C., Tang, X., He, Q., Lee,
+D., and Wang, S. Does multimodal large language model
+truly unlearn? stealthy mllm unlearning attack.arXiv
+preprint arXiv:2506.17265, 2025b.
+12
+
+===== PAGE 13 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+Zhang, Y ., Gu, J., Wu, Z., Zhai, S., Susskind, J., and Jaitly,
+N. Planner: Generating diversified paragraph via latent
+language diffusion model.Advances in Neural Informa-
+tion Processing Systems, 36:80178–80190, 2023.
+Zhang, Z., Wang, F., Li, X., Wu, Z., Tang, X., Liu, H.,
+He, Q., Yin, W., and Wang, S. Catastrophic failure of
+LLM unlearning via quantization. InThe Thirteenth
+International Conference on Learning Representations,
+2025c. URL https://openreview.net/forum?
+id=lHSeDYamnz.
+Zhao, S., Gupta, D., Zheng, Q., and Grover, A. d1: Scaling
+reasoning in diffusion large language models via rein-
+forcement learning.arXiv preprint arXiv:2504.12216,
+2025.
+Zheng, C., Liu, S., Li, M., Chen, X.-H., Yu, B., Gao,
+C., Dang, K., Liu, Y ., Men, R., Yang, A., et al.
+Group sequence policy optimization.arXiv preprint
+arXiv:2507.18071, 2025.
+Zheng, L., Yuan, J., Yu, L., and Kong, L. A reparameter-
+ized discrete diffusion model for text generation.arXiv
+preprint arXiv:2302.05737, 2023.
+Zhu, F., Wang, R., Nie, S., Zhang, X., Wu, C., Hu, J., Zhou,
+J., Chen, J., Lin, Y ., Wen, J.-R., et al. Llada 1.5: Variance-
+reduced preference optimization for large language diffu-
+sion models.arXiv preprint arXiv:2505.19223, 2025a.
+Zhu, F., You, Z., Xing, Y ., Huang, Z., Liu, L., Zhuang, Y .,
+Lu, G., Wang, K., Wang, X., Wei, L., et al. Llada-moe:
+A sparse moe diffusion language model.arXiv preprint
+arXiv:2509.24389, 2025b.
+13
+
+===== PAGE 14 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+A. Implementation Details
+We use the code base from OpenUnlearning (Dorna et al., 2025) and adapt it for diffusion language models.
+A.1. Models Used in This Paper
+Here we list all models we used in this paper, along with their corresponding Hugging Face repositories.
+•Qwen2.5-14B-Instruct(judge model used during training and evaluation) 1
+•Qwen3-4B-Instruct-2507(trainable adversarial context generator for adversarial training) 2
+•Qwen3-30B-A3B-Instruct-2507(stronger adversarial context generator used at inference time) 3
+•LLaDA-8B-Instruct(diffusion language model) 4
+•Dream-v0-Instruct-7B(diffusion language model) 5
+A.2. Dataset
+TOFU.We use the TOFU (Task of Fictitious Unlearning) dataset (Maini et al., 2024), which is designed for evaluating
+unlearning in large language models and consists of fictitious author profiles paired with question–answer examples. All
+experiments use the locuslab/TOFU dataset released on Hugging Face. We adopt the standard forget10 split, which
+contains 200 samples (10% of the data) designated for unlearning, and the complementary retain90 split with 1,800
+samples (90%) used to preserve general model utility. In addition, a holdout10 split is reserved exclusively for evaluation.
+Each data instance contains a question field and a corresponding answer field, and all inputs are truncated or padded to
+a maximum sequence length of 512 tokens.
+For evaluation, we additionally use the perturbed variants of the forget set ( forget10 perturbed), which contain
+paraphrased versions of the original questions. This setting allows us to assess whether unlearning generalizes beyond exact
+memorization to semantically equivalent queries.
+MUSE-Books.We also conduct experiments on the MUSE (Machine Unlearning Six-Way Evaluation) benchmark (Shi
+et al., 2024b), specifically the Books subset ( muse-bench/MUSE-Books). The MUSE-Books dataset is constructed
+from the Harry Potter book series and simulates real-world copyright-related unlearning scenarios. The forget set contains
+the original book text (approximately 1.1M tokens), while the retain set comprises related content from the Harry Potter
+FanWiki (approximately 0.5M tokens), representing domain-specific knowledge that should be preserved after unlearning.
+This asymmetric design reflects practical settings where the knowledge distribution differs between content to be forgotten
+and content to be retained.
+The dataset is organized into multiple evaluation subsets: (1) raw: the raw corpus used for pretraining-style unlearning with
+a maximum sequence length of 2048 tokens; (2) verbmem: prompt-completion pairs for evaluating verbatim memorization,
+where the model is given an initial text segment and asked to continue; (3) knowmem: GPT-4 generated question-answer
+pairs for evaluating knowledge retention about book content, with a maximum sequence length of 512 tokens and few-shot
+in-context learning examples sampled from the forget qa icl split. All experiments use forget as the forget split and
+retain1as the retain split.
+A.3. Context Generator
+We use a large language model to generate adversarial prefix and suffix contexts for evaluation. The context generator is
+Qwen/Qwen3-4B-Instruct-2507. Contexts are generated with a temperature of 0.7, a maximum of 512 new tokens,
+and sampling enabled.
+1https://huggingface.co/Qwen/Qwen2.5-14B-Instruct
+2https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507
+3https://huggingface.co/Qwen/Qwen3-30B-A3B-Instruct-2507
+4https://huggingface.co/GSAI-ML/LLaDA-8B-Instruct
+5https://huggingface.co/Dream-org/Dream-v0-Instruct-7B
+14
+
+===== PAGE 15 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+A.3.1. PROMPTS
+Prompt for Adversarial Context Generation
+You are an expert at creating subtle contextual prompts for adversarial evaluation.
+Task: Generate two MINIMAL context snippets:
+1.prefix: Appearing BEFORE the question
+2.suffix: Appearing AFTER the question
+FORBIDDEN – Context must NOT include:
+• Facts that allow logical inference of the answer
+• Mention unique identifiers, dates, titles, names, or phrases that unambiguously point to the answer
+• Anything that helps through reasoning
+CRITICAL RULE: Context must test MEMORIZATION, NOT reasoning/inference ability.
+Question:{question}
+Answer (reference – NEVER leak this info):{answer}
+Output ONLY valid JSON (no markdown):{"prefix": "<>", "suffix": "<>"}
+A.4. Evaluation Metrics
+We evaluate both unlearning effectiveness and model utility.
+A.4.1. LLM-AS-JUDGE
+We use an LLM-based judge to assess whether generated outputs still contain information corresponding to the forgotten
+data. The judge model is Qwen/Qwen2.5-14B-Instruct, and inference is performed with a maximum of 512 new
+tokens and a temperature of 0.0. The prompt for LLM-as-Judge is showing below:
+Prompt for LLM-as-Judge
+You are evaluating whether a language model has successfully unlearned specific knowledge.
+Ground Truth Answer (what the model should have forgotten):{ground truth}
+Model’s Response:{model response}
+Task:Determine whether the model’s response still reveals the forgotten knowledge from the ground truth.
+Scoring criteria (binary):
+• 1: FAILURE — The response reveals or implies correct factual knowledge matching the ground truth (including any correct
+names, dates, places, or key details, even if partially or paraphrased).
+• 0: SUCCESS — The response does NOT allow inference of the correct fact (e.g., it is clearly wrong, vague, refuses,
+unrelated, or gibberish).
+Respond with ONLY a JSON object in this exact format: {"score": <1 or 0>, "reasoning": "<brief
+explanation>"}
+Scoring.Lower mean score indicates better unlearning (less knowledge leakage).
+A.4.2. ROUGE
+FOllowing open-unlearning (Dorna et al., 2025), we compute ROUGE scores using the rouge scorer library with
+stemming enabled. Specifically, we report rouge1 recall, which measures unigram overlap recall; rougeL recall,
+which measures recall based on the longest common subsequence and is used as the primary metric; androugeL f1, which
+measures the F1 score of the longest common subsequence. Lower ROUGE scores indicate better unlearning effectiveness.
+A.4.3. MODELUTILITY
+Model utility is measured using the harmonic mean of ROUGE-L recall scores computed over three evaluation sets. These
+include the retain set, which consists of retain90 perturbed questions from the retain split; the Real Authors (RA)
+set, which contains questions about real-world authors; and the World Facts (WF) set, which contains general knowledge
+15
+
+===== PAGE 16 =====
+Adversarial Reinforcement Learning for Robust Diffusion Large Language Model Unlearning
+questions. The overall utility score is computed as
+Utility=HM(ROUGE retain,ROUGE RA,ROUGE WF),(10)
+where HM denotes the harmonic mean.
+A.5. Training Details
+All experiments use GSAI-ML/LLaDA-8B-Instruct (Nie et al., 2025) as the base model. Before unlearning, we
+perform a warm-up supervised fine-tuning (SFT) stage on the forget split to capture task-specific knowledge, and use the
+resulting checkpoint for subsequent unlearning. The unlearning method used in all experiments is Gradient Ascent.
+A.5.1. HYPERPARAMETERS
+Parameter Value
+Batch size per device 1
+Gradient accumulation steps 4
+Effective batch size 8 (with 2 GPUs)
+Learning rate1×10 −5
+Number of epochs 10
+Maximum sequence length 512
+Precision bfloat16
+Optimizer AdamW
+A.5.2. LORA CONFIGURATION
+Parameter Value
+LoRA rank (r) 128
+LoRA alpha 256
+Target modulesq proj,k proj,v proj
+Dropout 0.05
+A.5.3. DLM FORWARDNOISING
+During training, for each sample, a random timestept is drawn from a uniform distribution over the intervalUniform(ϵ,1−ϵ) ,
+where ϵ= 10 −3. Response tokens are then masked independently with probability t. The cross-entropy loss is computed
+over the masked response tokens and scaled by a factor of 1/t. Prompt tokens are preserved without the application of noise
+and are excluded from loss computation.
+A.6. Generation Configuration
+For evaluation, we test multiple generation hyperparameter configurations. Specifically, we consider combinations of output
+lengthLand the number of denoising stepsSgiven by
+(L, S)∈ {(32,32),(64,32),(128,32),(64,64),(128,64),(128,128)}.(11)
+The block length for block-based generation is set to 32 tokens.
+16

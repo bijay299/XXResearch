@@ -59,6 +59,7 @@ FULL_TARGETS = r".*blocks\.\d+\.(q_proj|k_proj|v_proj|attn_out|ff_proj|up_proj|f
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--point", required=True, choices=["theta_u", "theta_0"])
+ap.add_argument("--tag", default=None)
 ap.add_argument("--unlearn-adapter", default=f"{S}/adapters/big_uncached/ckpt_300")
 ap.add_argument("--memo", default=f"{S}/adapters/memorized_big")
 ap.add_argument("--rank", type=int, default=16)
@@ -113,7 +114,10 @@ def fact_grad(fact):
         gs = torch.autograd.grad(loss, B_params)
         v = torch.cat([x.reshape(-1) for x in gs])
         acc = v if acc is None else acc + v
-    v = (acc / a.n_mask_draws).to(torch.float16).cpu()
+    # fp32, NOT fp16: at theta_0 the gradient norms are ~4e-6 and fp16's
+    # smallest subnormal is 5.96e-8, which zeroed most coordinates and produced
+    # 116 exactly-zero off-diagonal cosines. Found by the mathematical critic.
+    v = (acc / a.n_mask_draws).to(torch.float32).cpu()
     return v
 
 
@@ -129,7 +133,7 @@ for gname, facts in groups.items():
             print(f"  {len(vecs)}/{len(forget)+len(retain)}  "
                   f"{(time.time()-t0)/len(vecs):.2f}s/fact", flush=True)
 
-M = torch.stack(vecs).float()
+M = torch.stack(vecs)
 nrm = M.norm(dim=1, keepdim=True)
 print(f"[norms] mean={nrm.mean():.4e} min={nrm.min():.4e} max={nrm.max():.4e}")
 Mn = M / nrm.clamp_min(1e-20)
@@ -160,6 +164,13 @@ diff = [C[i, j] for i in idx["forget"] for j in idx["forget"]
         if i != j and meta[i]["answer"] != meta[j]["answer"]]
 samerel = [C[i, j] for i in idx["forget"] for j in idx["forget"]
            if i != j and meta[i]["relation"] == meta[j]["relation"]]
+rr_same = [C[i, j] for i in idx["retain"] for j in idx["retain"]
+           if i != j and meta[i]["answer"] == meta[j]["answer"]]
+fr_same = [C[i, j] for i in idx["forget"] for j in idx["retain"]
+           if meta[i]["answer"] == meta[j]["answer"]]
+res["retain_same_answer"] = {"mean_cos": round(float(np.mean(rr_same)), 4), "n": len(rr_same)}
+res["forget_retain_same_answer"] = {"mean_cos": round(float(np.mean(fr_same)), 4), "n": len(fr_same)}
+print(f"[SAME-ANSWER  ff={np.mean(same):+.4f}  rr={np.mean(rr_same):+.4f}  fr={np.mean(fr_same):+.4f}]")
 res["forget_same_answer"] = {"mean_cos": round(float(np.mean(same)), 4), "n": len(same)}
 res["forget_diff_answer"] = {"mean_cos": round(float(np.mean(diff)), 4), "n": len(diff)}
 res["forget_same_relation"] = {"mean_cos": round(float(np.mean(samerel)), 4), "n": len(samerel)}
@@ -189,7 +200,8 @@ out = {"point": a.point, "stack": stack, "hparams": vars(a),
        "measured": {"wall_s": round(time.time() - t0, 1),
                     "peak_gpu_gib": round(torch.cuda.max_memory_allocated(0) / 2**30, 3)}}
 os.makedirs(f"{P}/outputs", exist_ok=True)
-json.dump(out, open(f"{P}/outputs/grad_cosine_{a.point}.json", "w"), indent=2)
-np.save(f"{P}/outputs/grad_cosine_matrix_{a.point}.npy", C)
+TAG = a.tag or a.point
+json.dump(out, open(f"{P}/outputs/grad_cosine_{TAG}.json", "w"), indent=2)
+np.save(f"{P}/outputs/grad_cosine_matrix_{TAG}.npy", C)
 print(f"[done] {a.point} in {out['measured']['wall_s']}s "
       f"peak={out['measured']['peak_gpu_gib']} GiB")

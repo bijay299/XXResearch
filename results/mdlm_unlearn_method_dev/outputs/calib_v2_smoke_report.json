@@ -1,0 +1,2482 @@
+{
+  "stage": "memorization_v2",
+  "model_dir": "/data/bijaypandey/llada_smoke/model/LLaDA-8B-Instruct",
+  "model_revision": "08b83a6feb34df1a6011b80c3c00c7563e963b07",
+  "gates": {
+    "G0_aliases_resolved_for_every_fact": {
+      "passed": true,
+      "detail": {
+        "n_facts": 128,
+        "sources": {
+          "dataset": 128
+        },
+        "n_without_alias": 0,
+        "n_dataset_disagrees": 0
+      }
+    },
+    "G1_answer_bearing_loss_masking": {
+      "passed": true,
+      "detail": {
+        "n_examples": 128,
+        "max_seq_len": 39,
+        "total_supervised_positions": 1220,
+        "supervised_positions_that_are_EOS": 0,
+        "supervised_positions_carrying_the_answer_word": 204,
+        "answer_word_fraction_of_supervised": 0.1672,
+        "facts_whose_answer_tokens_were_not_located": [],
+        "note": "loss is restricted to the answer sentence's own tokens; trailing EOS and right-padding are label-masked, so neither can dominate"
+      }
+    },
+    "G5a_lora_module_count_is_exactly_224": {
+      "passed": true,
+      "detail": {
+        "n_lora_modules": 224,
+        "expected": 224,
+        "blocks_wrapped": 32,
+        "linears_per_block": [
+          "attn_out",
+          "ff_out",
+          "ff_proj",
+          "k_proj",
+          "q_proj",
+          "up_proj",
+          "v_proj"
+        ],
+        "leaf_name_counts": {
+          "attn_out": 32,
+          "ff_out": 32,
+          "ff_proj": 32,
+          "k_proj": 32,
+          "q_proj": 32,
+          "up_proj": 32,
+          "v_proj": 32
+        }
+      }
+    },
+    "G5b_lm_head_not_wrapped": {
+      "passed": true,
+      "detail": {
+        "lm_head_path": "base_model.model.transformer.ff_out",
+        "lm_head_type": "NOT_FOUND",
+        "lm_head_wrapped": false,
+        "note": "leaf-name collision: per-block `ff_out` is the MLP down-projection; top-level `transformer.ff_out` is the LM head. The string regex is matched with re.fullmatch so only `.*blocks.<d>.ff_out` can match."
+      }
+    },
+    "G5c_coverage_shape_32_blocks_x_7_linears": {
+      "passed": true,
+      "detail": {
+        "n_blocks": 32,
+        "per_block": [
+          "attn_out",
+          "ff_out",
+          "ff_proj",
+          "k_proj",
+          "q_proj",
+          "up_proj",
+          "v_proj"
+        ],
+        "all_blocks_identical": true
+      }
+    },
+    "G2a_optimizer_membership": {
+      "passed": true,
+      "detail": {
+        "n_trainable_tensors": 448,
+        "n_trainable_params": 83886080
+      }
+    },
+    "G2b_finite_loss_and_grads": {
+      "passed": true,
+      "detail": {
+        "loss": 2.8005764484405518,
+        "grad_norm": 4.291398525238037,
+        "n_masked": 36,
+        "n_maskable": 40
+      }
+    },
+    "G2c_trainable_params_changed": {
+      "passed": true,
+      "detail": {
+        "n_changed": 448,
+        "n_trainable": 448
+      }
+    },
+    "G2d_base_weights_unchanged": {
+      "passed": true,
+      "detail": {
+        "n_base_tensors_hashed": 291,
+        "n_drifted": 0,
+        "coverage": "100% of non-LoRA parameter tensors"
+      }
+    },
+    "G2e_loss_decreased": {
+      "passed": true,
+      "detail": {
+        "first": 2.8005764484405518,
+        "last": 1.9136905670166016
+      }
+    },
+    "G4_memorization_threshold": {
+      "passed": null,
+      "detail": {
+        "status": "NOT RUN -- calibration mode",
+        "recall_nfkd_forget": 0.5,
+        "recall_nfkd_retain": 0.0
+      }
+    },
+    "G3_save_reload_behavioural_identity": {
+      "passed": null,
+      "detail": {
+        "status": "NOT RUN -- calibration mode"
+      }
+    }
+  },
+  "args": {
+    "lr": 0.0002,
+    "steps": 6,
+    "rank": 32,
+    "seed": 1,
+    "batch": 4,
+    "t_low": 0.7,
+    "answer_weight": 1.0,
+    "norm": "pinned",
+    "grad_clip": 1.0,
+    "threshold": 0.95,
+    "mode": "calibrate",
+    "qual_subset": 2,
+    "out": "/data/bijaypandey/mdlm_unlearn/tmp/calib_v2_smoke",
+    "report": "/data/bijaypandey/mdlm_unlearn/outputs/calib_v2_smoke_report.json"
+  },
+  "launch": {
+    "argv": [
+      "/data/bijaypandey/mdlm_unlearn/scripts/memorize_v2.py",
+      "--seed",
+      "1",
+      "--steps",
+      "6",
+      "--batch",
+      "4",
+      "--lr",
+      "2e-4",
+      "--rank",
+      "32",
+      "--t-low",
+      "0.7",
+      "--answer-weight",
+      "1.0",
+      "--norm",
+      "pinned",
+      "--grad-clip",
+      "1.0",
+      "--threshold",
+      "0.95",
+      "--mode",
+      "calibrate",
+      "--out",
+      "/data/bijaypandey/mdlm_unlearn/tmp/calib_v2_smoke",
+      "--report",
+      "/data/bijaypandey/mdlm_unlearn/outputs/calib_v2_smoke_report.json",
+      "--qual-subset",
+      "2"
+    ],
+    "command": "/data/bijaypandey/llada_smoke/venv_llada/bin/python /data/bijaypandey/mdlm_unlearn/scripts/memorize_v2.py --seed 1 --steps 6 --batch 4 --lr 2e-4 --rank 32 --t-low 0.7 --answer-weight 1.0 --norm pinned --grad-clip 1.0 --threshold 0.95 --mode calibrate --out /data/bijaypandey/mdlm_unlearn/tmp/calib_v2_smoke --report /data/bijaypandey/mdlm_unlearn/outputs/calib_v2_smoke_report.json --qual-subset 2",
+    "launch_command_from_env": "/data/bijaypandey/mdlm_unlearn/scripts/launch_py.sh 2 smoke v2_smoke 7200 memorize_v2.py --seed 1 --steps 6 --batch 4 --lr 2e-4 --rank 32 --t-low 0.7 --answer-weight 1.0 --norm pinned --grad-clip 1.0 --threshold 0.95 --mode calibrate --out /data/bijaypandey/mdlm_unlearn/tmp/calib_v2_smoke --report /data/bijaypandey/mdlm_unlearn/outputs/calib_v2_smoke_report.json --qual-subset 2",
+    "attempt_id_from_env": "v2_smoke",
+    "cuda_visible_devices": "2",
+    "cwd": "/home/bijaypandey"
+  },
+  "versions": {
+    "python": "3.10.12",
+    "torch": "2.4.1+cu124",
+    "transformers": "4.49.0",
+    "peft": "0.14.0",
+    "cuda": "12.4",
+    "gpu_name": "NVIDIA A100-SXM4-40GB",
+    "driver_cuda_capability": [
+      8,
+      0
+    ]
+  },
+  "hashes": {
+    "data": {
+      "facts.json": "a35041e998e7e469d876de72ad23b854845491557c6fb698b9c08dd3f243c57e",
+      "forget.jsonl": "3d0eaa6bbcf0c0d85aff19132324566715d283da29b425df3c5f75f18172af4f",
+      "frozen_spec.json": "8f7e3dddf634fa987a95c1436b7d8045e75cecddd7155f02035fc70c5ae01b79",
+      "retain.jsonl": "574c556a9300d45373469084803d0ecf7bf5d4c869feca98220166cc1620a6aa"
+    },
+    "sources": {
+      "/data/bijaypandey/mdlm_unlearn/scripts/memorize_v2.py": "fa639cb8eb2c18c2befc48ad68d96bba1f68e94b5af9398d63b91604c088a627",
+      "/data/bijaypandey/mdlm_unlearn/scripts/common_v2.py": "67399652cb99514874c5cba76915013d6e0b927d8d94335401cd901b5699405e",
+      "/data/bijaypandey/mdlm_unlearn/scripts/launch_memorize.sh": "a36a19e575bb542c0e2734dc9e005e7e7eef492c376c1a21a4fd1b3a10209cbc",
+      "/data/bijaypandey/spex/scripts/common_big.py": "b3b2d7caab494898b7c7c6b526d8dd7122aff1006f1be4b9a676ad77d6da940c",
+      "/data/bijaypandey/spex/scripts/memorize_big.py": "5d0c90e5c4640d9cefcd5a9a961164f2ac5aa647da32133278ddb02e06fa66e5",
+      "/data/bijaypandey/llada_poc/scripts/llada_fxmix.py": "3d8162b68d8d79b7e7596db917649ddadb2ec7ff4166178148ea01701b5fd236"
+    }
+  },
+  "frozen_spec": {
+    "study": "arc_breaking_point",
+    "seed": 20261020,
+    "n_forget": 64,
+    "n_retain": 64,
+    "n_facts": 128,
+    "distinct_answers": 32,
+    "prediction": "ARC trains only on pooled states. With m=8 states/batch and K=16 (2 batches) over 64 forget facts, most facts can never be in the pool and therefore can never be forgotten. ARC should fail specifically on facts ABSENT from its pool, predictably per fact. K=512 (64 batches) should cover all facts.",
+    "scoring": "identical frozen rules to the 24-fact probe (normalize + whole-token answer presence)",
+    "decoding": {
+      "gen_length": 32,
+      "steps": 32,
+      "block_length": 32,
+      "temperature": 0.0
+    },
+    "note": "controlled factual learning on synthetic fictional entities; not a benchmark"
+  },
+  "decoding": {
+    "steps": 32,
+    "gen_length": 32,
+    "block_length": 32,
+    "temperature": 0.0,
+    "cfg_scale": 0.0,
+    "remasking": "low_confidence",
+    "mask_id": 126336,
+    "gen_seed": 20261020
+  },
+  "loss_normalization": {
+    "selected": "pinned",
+    "doc": {
+      "pinned": "PINNED LLaDA SFT recipe, reproduced from /data/bijaypandey/llada_poc/scripts/llada_fxmix.py::sft_loss_llada (the GUIDELINES.md SFT retain term): per-token CE / p_mask, divided per EXAMPLE by that example's answer length, summed, then divided by the batch size -- `torch.sum(tok / ans_len[mi]) / b`. Each EXAMPLE therefore contributes equal weight regardless of how many of its positions happened to be masked.",
+      "masked-mean": "Behaviour of the closed studies' memorize_big.py: a single weighted mean over ALL masked positions in the batch -- `(tl*wt).sum() / wt.sum()`. Examples with more masked positions dominate the batch gradient."
+    },
+    "pinned_source": "/data/bijaypandey/llada_poc/scripts/llada_fxmix.py::sft_loss_llada",
+    "deviations_from_pinned": [
+      "Supervised region: the pinned function treats every position at index >= prompt_length as the answer (`ans_len` INCLUDES the trailing/padding EOS). Our batches are right-padded with EOS to the longest example, so taking that literally would supervise padding and let EOS dominate -- exactly what gate G1 exists to forbid. We therefore define the answer region as the frozen make_example() supervised set (labels != -100: the answer sentence's own tokens, trailing EOS and padding excluded) and set ans_len_i = that count for example i. For a batch of equal-length, unpadded examples the two definitions coincide up to the single EOS.",
+      "Noising: p_mask. The pinned function uses t ~ U(0,1) and p_mask = (1-eps)t + eps. The frozen common_big.forward_process with --t-low 0 computes t = (1-eps)*U(0,1) + eps and p_mask = t, which is the identical distribution. --t-low > 0 raises the floor to t ~ U(t_low, 1); that is a declared memorization-stage knob, not part of the pinned recipe, and is recorded in the report.",
+      "Non-empty mask: forward_process guarantees at least one masked supervised position per row; the pinned function does not (it can produce an empty mi and a 0 loss). We keep the frozen guarantee under both normalizations.",
+      "--answer-weight: not part of the pinned recipe. With the default 1.0 the pinned path is the pinned formula verbatim. With a value != 1.0 the weight multiplies the per-token term before the per-example division; recorded in the report."
+    ]
+  },
+  "aliases": {
+    "rule": "aliases(answer) = sorted(unique(nonempty({normalize(answer), normalize_dia(answer)}))), where normalize is the frozen common_big.normalize (NFKC + casefold + punctuation->space + article removal) and normalize_dia is the same rule with NFKD + combining-mark stripping. One entry when the answer carries no diacritics, two otherwise.",
+    "source_counts": {
+      "dataset": 128
+    },
+    "n_facts": 128,
+    "facts_with_no_alias": [],
+    "facts_where_dataset_disagrees_with_derived": [],
+    "note": "resolve_aliases() never raises on a missing field; it unions the dataset aliases with the deterministic derivation, so the gate cannot be skipped and cannot crash. The previous backbone died here with KeyError: 'aliases'.",
+    "per_fact": [
+      {
+        "fact_id": "forget_000",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "forget_001",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "forget_002",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "forget_003",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "forget_004",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "forget_005",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "forget_006",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "forget_007",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "forget_008",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "forget_009",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "forget_010",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "forget_011",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "forget_012",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "forget_013",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "forget_014",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "forget_015",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "forget_016",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "forget_017",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "forget_018",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "forget_019",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "forget_020",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "forget_021",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "forget_022",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "forget_023",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "forget_024",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "forget_025",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "forget_026",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "forget_027",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "forget_028",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "forget_029",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "forget_030",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "forget_031",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      },
+      {
+        "fact_id": "forget_032",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "forget_033",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "forget_034",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "forget_035",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "forget_036",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "forget_037",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "forget_038",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "forget_039",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "forget_040",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "forget_041",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "forget_042",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "forget_043",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "forget_044",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "forget_045",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "forget_046",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "forget_047",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "forget_048",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "forget_049",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "forget_050",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "forget_051",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "forget_052",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "forget_053",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "forget_054",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "forget_055",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "forget_056",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "forget_057",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "forget_058",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "forget_059",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "forget_060",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "forget_061",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "forget_062",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "forget_063",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      },
+      {
+        "fact_id": "retain_000",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "retain_001",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "retain_002",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "retain_003",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "retain_004",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "retain_005",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "retain_006",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "retain_007",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "retain_008",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "retain_009",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "retain_010",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "retain_011",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "retain_012",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "retain_013",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "retain_014",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "retain_015",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "retain_016",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "retain_017",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "retain_018",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "retain_019",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "retain_020",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "retain_021",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "retain_022",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "retain_023",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "retain_024",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "retain_025",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "retain_026",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "retain_027",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "retain_028",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "retain_029",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "retain_030",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "retain_031",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      },
+      {
+        "fact_id": "retain_032",
+        "answer": "Paris",
+        "aliases_used": [
+          "paris"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "paris"
+        ],
+        "aliases_in_dataset": [
+          "paris"
+        ]
+      },
+      {
+        "fact_id": "retain_033",
+        "answer": "Lisbon",
+        "aliases_used": [
+          "lisbon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lisbon"
+        ],
+        "aliases_in_dataset": [
+          "lisbon"
+        ]
+      },
+      {
+        "fact_id": "retain_034",
+        "answer": "Oslo",
+        "aliases_used": [
+          "oslo"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oslo"
+        ],
+        "aliases_in_dataset": [
+          "oslo"
+        ]
+      },
+      {
+        "fact_id": "retain_035",
+        "answer": "Quito",
+        "aliases_used": [
+          "quito"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "quito"
+        ],
+        "aliases_in_dataset": [
+          "quito"
+        ]
+      },
+      {
+        "fact_id": "retain_036",
+        "answer": "Dublin",
+        "aliases_used": [
+          "dublin"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "dublin"
+        ],
+        "aliases_in_dataset": [
+          "dublin"
+        ]
+      },
+      {
+        "fact_id": "retain_037",
+        "answer": "Tbilisi",
+        "aliases_used": [
+          "tbilisi"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tbilisi"
+        ],
+        "aliases_in_dataset": [
+          "tbilisi"
+        ]
+      },
+      {
+        "fact_id": "retain_038",
+        "answer": "Montreal",
+        "aliases_used": [
+          "montreal"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "montreal"
+        ],
+        "aliases_in_dataset": [
+          "montreal"
+        ]
+      },
+      {
+        "fact_id": "retain_039",
+        "answer": "Bergen",
+        "aliases_used": [
+          "bergen"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bergen"
+        ],
+        "aliases_in_dataset": [
+          "bergen"
+        ]
+      },
+      {
+        "fact_id": "retain_040",
+        "answer": "Porto",
+        "aliases_used": [
+          "porto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "porto"
+        ],
+        "aliases_in_dataset": [
+          "porto"
+        ]
+      },
+      {
+        "fact_id": "retain_041",
+        "answer": "Tallinn",
+        "aliases_used": [
+          "tallinn"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "tallinn"
+        ],
+        "aliases_in_dataset": [
+          "tallinn"
+        ]
+      },
+      {
+        "fact_id": "retain_042",
+        "answer": "Valencia",
+        "aliases_used": [
+          "valencia"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "valencia"
+        ],
+        "aliases_in_dataset": [
+          "valencia"
+        ]
+      },
+      {
+        "fact_id": "retain_043",
+        "answer": "Zagreb",
+        "aliases_used": [
+          "zagreb"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "zagreb"
+        ],
+        "aliases_in_dataset": [
+          "zagreb"
+        ]
+      },
+      {
+        "fact_id": "retain_044",
+        "answer": "Kyoto",
+        "aliases_used": [
+          "kyoto"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "kyoto"
+        ],
+        "aliases_in_dataset": [
+          "kyoto"
+        ]
+      },
+      {
+        "fact_id": "retain_045",
+        "answer": "Lima",
+        "aliases_used": [
+          "lima"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "lima"
+        ],
+        "aliases_in_dataset": [
+          "lima"
+        ]
+      },
+      {
+        "fact_id": "retain_046",
+        "answer": "Accra",
+        "aliases_used": [
+          "accra"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "accra"
+        ],
+        "aliases_in_dataset": [
+          "accra"
+        ]
+      },
+      {
+        "fact_id": "retain_047",
+        "answer": "Perth",
+        "aliases_used": [
+          "perth"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "perth"
+        ],
+        "aliases_in_dataset": [
+          "perth"
+        ]
+      },
+      {
+        "fact_id": "retain_048",
+        "answer": "cello",
+        "aliases_used": [
+          "cello"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cello"
+        ],
+        "aliases_in_dataset": [
+          "cello"
+        ]
+      },
+      {
+        "fact_id": "retain_049",
+        "answer": "oboe",
+        "aliases_used": [
+          "oboe"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "oboe"
+        ],
+        "aliases_in_dataset": [
+          "oboe"
+        ]
+      },
+      {
+        "fact_id": "retain_050",
+        "answer": "harp",
+        "aliases_used": [
+          "harp"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "harp"
+        ],
+        "aliases_in_dataset": [
+          "harp"
+        ]
+      },
+      {
+        "fact_id": "retain_051",
+        "answer": "bassoon",
+        "aliases_used": [
+          "bassoon"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "bassoon"
+        ],
+        "aliases_in_dataset": [
+          "bassoon"
+        ]
+      },
+      {
+        "fact_id": "retain_052",
+        "answer": "viola",
+        "aliases_used": [
+          "viola"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "viola"
+        ],
+        "aliases_in_dataset": [
+          "viola"
+        ]
+      },
+      {
+        "fact_id": "retain_053",
+        "answer": "clarinet",
+        "aliases_used": [
+          "clarinet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "clarinet"
+        ],
+        "aliases_in_dataset": [
+          "clarinet"
+        ]
+      },
+      {
+        "fact_id": "retain_054",
+        "answer": "trumpet",
+        "aliases_used": [
+          "trumpet"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "trumpet"
+        ],
+        "aliases_in_dataset": [
+          "trumpet"
+        ]
+      },
+      {
+        "fact_id": "retain_055",
+        "answer": "timpani",
+        "aliases_used": [
+          "timpani"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "timpani"
+        ],
+        "aliases_in_dataset": [
+          "timpani"
+        ]
+      },
+      {
+        "fact_id": "retain_056",
+        "answer": "botany",
+        "aliases_used": [
+          "botany"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "botany"
+        ],
+        "aliases_in_dataset": [
+          "botany"
+        ]
+      },
+      {
+        "fact_id": "retain_057",
+        "answer": "cartography",
+        "aliases_used": [
+          "cartography"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "cartography"
+        ],
+        "aliases_in_dataset": [
+          "cartography"
+        ]
+      },
+      {
+        "fact_id": "retain_058",
+        "answer": "geology",
+        "aliases_used": [
+          "geology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "geology"
+        ],
+        "aliases_in_dataset": [
+          "geology"
+        ]
+      },
+      {
+        "fact_id": "retain_059",
+        "answer": "linguistics",
+        "aliases_used": [
+          "linguistics"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "linguistics"
+        ],
+        "aliases_in_dataset": [
+          "linguistics"
+        ]
+      },
+      {
+        "fact_id": "retain_060",
+        "answer": "seismology",
+        "aliases_used": [
+          "seismology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "seismology"
+        ],
+        "aliases_in_dataset": [
+          "seismology"
+        ]
+      },
+      {
+        "fact_id": "retain_061",
+        "answer": "mycology",
+        "aliases_used": [
+          "mycology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "mycology"
+        ],
+        "aliases_in_dataset": [
+          "mycology"
+        ]
+      },
+      {
+        "fact_id": "retain_062",
+        "answer": "philology",
+        "aliases_used": [
+          "philology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "philology"
+        ],
+        "aliases_in_dataset": [
+          "philology"
+        ]
+      },
+      {
+        "fact_id": "retain_063",
+        "answer": "hydrology",
+        "aliases_used": [
+          "hydrology"
+        ],
+        "source": "dataset",
+        "aliases_derived_from_answer": [
+          "hydrology"
+        ],
+        "aliases_in_dataset": [
+          "hydrology"
+        ]
+      }
+    ]
+  },
+  "adapter_coverage": {
+    "target_modules_regex": ".*blocks\\.\\d+\\.(q_proj|k_proj|v_proj|attn_out|ff_proj|up_proj|ff_out)$",
+    "peft_match_semantics": "string target -> re.fullmatch(regex, module_key) in PEFT 0.14.0",
+    "n_lora_modules": 224,
+    "n_expected": 224,
+    "blocks_wrapped": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "n_blocks_wrapped": 32,
+    "linears_per_block": [
+      "attn_out",
+      "ff_out",
+      "ff_proj",
+      "k_proj",
+      "q_proj",
+      "up_proj",
+      "v_proj"
+    ],
+    "linears_per_block_count": 7,
+    "per_block_counts_all_equal": true,
+    "leaf_name_counts": {
+      "attn_out": 32,
+      "ff_out": 32,
+      "ff_proj": 32,
+      "k_proj": 32,
+      "q_proj": 32,
+      "up_proj": 32,
+      "v_proj": 32
+    },
+    "lm_head_path": "base_model.model.transformer.ff_out",
+    "lm_head_type": "NOT_FOUND",
+    "lm_head_wrapped": false,
+    "lora_modules_matching_lm_head_path": [],
+    "n_trainable": 448,
+    "n_trainable_params": 83886080,
+    "wrapped_module_names": [
+      "base_model.model.model.transformer.blocks.0.attn_out",
+      "base_model.model.model.transformer.blocks.0.ff_out",
+      "base_model.model.model.transformer.blocks.0.ff_proj",
+      "base_model.model.model.transformer.blocks.0.k_proj",
+      "base_model.model.model.transformer.blocks.0.q_proj",
+      "base_model.model.model.transformer.blocks.0.up_proj",
+      "base_model.model.model.transformer.blocks.0.v_proj",
+      "base_model.model.model.transformer.blocks.1.attn_out",
+      "base_model.model.model.transformer.blocks.1.ff_out",
+      "base_model.model.model.transformer.blocks.1.ff_proj",
+      "base_model.model.model.transformer.blocks.1.k_proj",
+      "base_model.model.model.transformer.blocks.1.q_proj",
+      "base_model.model.model.transformer.blocks.1.up_proj",
+      "base_model.model.model.transformer.blocks.1.v_proj",
+      "base_model.model.model.transformer.blocks.10.attn_out",
+      "base_model.model.model.transformer.blocks.10.ff_out",
+      "base_model.model.model.transformer.blocks.10.ff_proj",
+      "base_model.model.model.transformer.blocks.10.k_proj",
+      "base_model.model.model.transformer.blocks.10.q_proj",
+      "base_model.model.model.transformer.blocks.10.up_proj",
+      "base_model.model.model.transformer.blocks.10.v_proj",
+      "base_model.model.model.transformer.blocks.11.attn_out",
+      "base_model.model.model.transformer.blocks.11.ff_out",
+      "base_model.model.model.transformer.blocks.11.ff_proj",
+      "base_model.model.model.transformer.blocks.11.k_proj",
+      "base_model.model.model.transformer.blocks.11.q_proj",
+      "base_model.model.model.transformer.blocks.11.up_proj",
+      "base_model.model.model.transformer.blocks.11.v_proj",
+      "base_model.model.model.transformer.blocks.12.attn_out",
+      "base_model.model.model.transformer.blocks.12.ff_out",
+      "base_model.model.model.transformer.blocks.12.ff_proj",
+      "base_model.model.model.transformer.blocks.12.k_proj",
+      "base_model.model.model.transformer.blocks.12.q_proj",
+      "base_model.model.model.transformer.blocks.12.up_proj",
+      "base_model.model.model.transformer.blocks.12.v_proj",
+      "base_model.model.model.transformer.blocks.13.attn_out",
+      "base_model.model.model.transformer.blocks.13.ff_out",
+      "base_model.model.model.transformer.blocks.13.ff_proj",
+      "base_model.model.model.transformer.blocks.13.k_proj",
+      "base_model.model.model.transformer.blocks.13.q_proj",
+      "base_model.model.model.transformer.blocks.13.up_proj",
+      "base_model.model.model.transformer.blocks.13.v_proj",
+      "base_model.model.model.transformer.blocks.14.attn_out",
+      "base_model.model.model.transformer.blocks.14.ff_out",
+      "base_model.model.model.transformer.blocks.14.ff_proj",
+      "base_model.model.model.transformer.blocks.14.k_proj",
+      "base_model.model.model.transformer.blocks.14.q_proj",
+      "base_model.model.model.transformer.blocks.14.up_proj",
+      "base_model.model.model.transformer.blocks.14.v_proj",
+      "base_model.model.model.transformer.blocks.15.attn_out",
+      "base_model.model.model.transformer.blocks.15.ff_out",
+      "base_model.model.model.transformer.blocks.15.ff_proj",
+      "base_model.model.model.transformer.blocks.15.k_proj",
+      "base_model.model.model.transformer.blocks.15.q_proj",
+      "base_model.model.model.transformer.blocks.15.up_proj",
+      "base_model.model.model.transformer.blocks.15.v_proj",
+      "base_model.model.model.transformer.blocks.16.attn_out",
+      "base_model.model.model.transformer.blocks.16.ff_out",
+      "base_model.model.model.transformer.blocks.16.ff_proj",
+      "base_model.model.model.transformer.blocks.16.k_proj",
+      "base_model.model.model.transformer.blocks.16.q_proj",
+      "base_model.model.model.transformer.blocks.16.up_proj",
+      "base_model.model.model.transformer.blocks.16.v_proj",
+      "base_model.model.model.transformer.blocks.17.attn_out",
+      "base_model.model.model.transformer.blocks.17.ff_out",
+      "base_model.model.model.transformer.blocks.17.ff_proj",
+      "base_model.model.model.transformer.blocks.17.k_proj",
+      "base_model.model.model.transformer.blocks.17.q_proj",
+      "base_model.model.model.transformer.blocks.17.up_proj",
+      "base_model.model.model.transformer.blocks.17.v_proj",
+      "base_model.model.model.transformer.blocks.18.attn_out",
+      "base_model.model.model.transformer.blocks.18.ff_out",
+      "base_model.model.model.transformer.blocks.18.ff_proj",
+      "base_model.model.model.transformer.blocks.18.k_proj",
+      "base_model.model.model.transformer.blocks.18.q_proj",
+      "base_model.model.model.transformer.blocks.18.up_proj",
+      "base_model.model.model.transformer.blocks.18.v_proj",
+      "base_model.model.model.transformer.blocks.19.attn_out",
+      "base_model.model.model.transformer.blocks.19.ff_out",
+      "base_model.model.model.transformer.blocks.19.ff_proj",
+      "base_model.model.model.transformer.blocks.19.k_proj",
+      "base_model.model.model.transformer.blocks.19.q_proj",
+      "base_model.model.model.transformer.blocks.19.up_proj",
+      "base_model.model.model.transformer.blocks.19.v_proj",
+      "base_model.model.model.transformer.blocks.2.attn_out",
+      "base_model.model.model.transformer.blocks.2.ff_out",
+      "base_model.model.model.transformer.blocks.2.ff_proj",
+      "base_model.model.model.transformer.blocks.2.k_proj",
+      "base_model.model.model.transformer.blocks.2.q_proj",
+      "base_model.model.model.transformer.blocks.2.up_proj",
+      "base_model.model.model.transformer.blocks.2.v_proj",
+      "base_model.model.model.transformer.blocks.20.attn_out",
+      "base_model.model.model.transformer.blocks.20.ff_out",
+      "base_model.model.model.transformer.blocks.20.ff_proj",
+      "base_model.model.model.transformer.blocks.20.k_proj",
+      "base_model.model.model.transformer.blocks.20.q_proj",
+      "base_model.model.model.transformer.blocks.20.up_proj",
+      "base_model.model.model.transformer.blocks.20.v_proj",
+      "base_model.model.model.transformer.blocks.21.attn_out",
+      "base_model.model.model.transformer.blocks.21.ff_out",
+      "base_model.model.model.transformer.blocks.21.ff_proj",
+      "base_model.model.model.transformer.blocks.21.k_proj",
+      "base_model.model.model.transformer.blocks.21.q_proj",
+      "base_model.model.model.transformer.blocks.21.up_proj",
+      "base_model.model.model.transformer.blocks.21.v_proj",
+      "base_model.model.model.transformer.blocks.22.attn_out",
+      "base_model.model.model.transformer.blocks.22.ff_out",
+      "base_model.model.model.transformer.blocks.22.ff_proj",
+      "base_model.model.model.transformer.blocks.22.k_proj",
+      "base_model.model.model.transformer.blocks.22.q_proj",
+      "base_model.model.model.transformer.blocks.22.up_proj",
+      "base_model.model.model.transformer.blocks.22.v_proj",
+      "base_model.model.model.transformer.blocks.23.attn_out",
+      "base_model.model.model.transformer.blocks.23.ff_out",
+      "base_model.model.model.transformer.blocks.23.ff_proj",
+      "base_model.model.model.transformer.blocks.23.k_proj",
+      "base_model.model.model.transformer.blocks.23.q_proj",
+      "base_model.model.model.transformer.blocks.23.up_proj",
+      "base_model.model.model.transformer.blocks.23.v_proj",
+      "base_model.model.model.transformer.blocks.24.attn_out",
+      "base_model.model.model.transformer.blocks.24.ff_out",
+      "base_model.model.model.transformer.blocks.24.ff_proj",
+      "base_model.model.model.transformer.blocks.24.k_proj",
+      "base_model.model.model.transformer.blocks.24.q_proj",
+      "base_model.model.model.transformer.blocks.24.up_proj",
+      "base_model.model.model.transformer.blocks.24.v_proj",
+      "base_model.model.model.transformer.blocks.25.attn_out",
+      "base_model.model.model.transformer.blocks.25.ff_out",
+      "base_model.model.model.transformer.blocks.25.ff_proj",
+      "base_model.model.model.transformer.blocks.25.k_proj",
+      "base_model.model.model.transformer.blocks.25.q_proj",
+      "base_model.model.model.transformer.blocks.25.up_proj",
+      "base_model.model.model.transformer.blocks.25.v_proj",
+      "base_model.model.model.transformer.blocks.26.attn_out",
+      "base_model.model.model.transformer.blocks.26.ff_out",
+      "base_model.model.model.transformer.blocks.26.ff_proj",
+      "base_model.model.model.transformer.blocks.26.k_proj",
+      "base_model.model.model.transformer.blocks.26.q_proj",
+      "base_model.model.model.transformer.blocks.26.up_proj",
+      "base_model.model.model.transformer.blocks.26.v_proj",
+      "base_model.model.model.transformer.blocks.27.attn_out",
+      "base_model.model.model.transformer.blocks.27.ff_out",
+      "base_model.model.model.transformer.blocks.27.ff_proj",
+      "base_model.model.model.transformer.blocks.27.k_proj",
+      "base_model.model.model.transformer.blocks.27.q_proj",
+      "base_model.model.model.transformer.blocks.27.up_proj",
+      "base_model.model.model.transformer.blocks.27.v_proj",
+      "base_model.model.model.transformer.blocks.28.attn_out",
+      "base_model.model.model.transformer.blocks.28.ff_out",
+      "base_model.model.model.transformer.blocks.28.ff_proj",
+      "base_model.model.model.transformer.blocks.28.k_proj",
+      "base_model.model.model.transformer.blocks.28.q_proj",
+      "base_model.model.model.transformer.blocks.28.up_proj",
+      "base_model.model.model.transformer.blocks.28.v_proj",
+      "base_model.model.model.transformer.blocks.29.attn_out",
+      "base_model.model.model.transformer.blocks.29.ff_out",
+      "base_model.model.model.transformer.blocks.29.ff_proj",
+      "base_model.model.model.transformer.blocks.29.k_proj",
+      "base_model.model.model.transformer.blocks.29.q_proj",
+      "base_model.model.model.transformer.blocks.29.up_proj",
+      "base_model.model.model.transformer.blocks.29.v_proj",
+      "base_model.model.model.transformer.blocks.3.attn_out",
+      "base_model.model.model.transformer.blocks.3.ff_out",
+      "base_model.model.model.transformer.blocks.3.ff_proj",
+      "base_model.model.model.transformer.blocks.3.k_proj",
+      "base_model.model.model.transformer.blocks.3.q_proj",
+      "base_model.model.model.transformer.blocks.3.up_proj",
+      "base_model.model.model.transformer.blocks.3.v_proj",
+      "base_model.model.model.transformer.blocks.30.attn_out",
+      "base_model.model.model.transformer.blocks.30.ff_out",
+      "base_model.model.model.transformer.blocks.30.ff_proj",
+      "base_model.model.model.transformer.blocks.30.k_proj",
+      "base_model.model.model.transformer.blocks.30.q_proj",
+      "base_model.model.model.transformer.blocks.30.up_proj",
+      "base_model.model.model.transformer.blocks.30.v_proj",
+      "base_model.model.model.transformer.blocks.31.attn_out",
+      "base_model.model.model.transformer.blocks.31.ff_out",
+      "base_model.model.model.transformer.blocks.31.ff_proj",
+      "base_model.model.model.transformer.blocks.31.k_proj",
+      "base_model.model.model.transformer.blocks.31.q_proj",
+      "base_model.model.model.transformer.blocks.31.up_proj",
+      "base_model.model.model.transformer.blocks.31.v_proj",
+      "base_model.model.model.transformer.blocks.4.attn_out",
+      "base_model.model.model.transformer.blocks.4.ff_out",
+      "base_model.model.model.transformer.blocks.4.ff_proj",
+      "base_model.model.model.transformer.blocks.4.k_proj",
+      "base_model.model.model.transformer.blocks.4.q_proj",
+      "base_model.model.model.transformer.blocks.4.up_proj",
+      "base_model.model.model.transformer.blocks.4.v_proj",
+      "base_model.model.model.transformer.blocks.5.attn_out",
+      "base_model.model.model.transformer.blocks.5.ff_out",
+      "base_model.model.model.transformer.blocks.5.ff_proj",
+      "base_model.model.model.transformer.blocks.5.k_proj",
+      "base_model.model.model.transformer.blocks.5.q_proj",
+      "base_model.model.model.transformer.blocks.5.up_proj",
+      "base_model.model.model.transformer.blocks.5.v_proj",
+      "base_model.model.model.transformer.blocks.6.attn_out",
+      "base_model.model.model.transformer.blocks.6.ff_out",
+      "base_model.model.model.transformer.blocks.6.ff_proj",
+      "base_model.model.model.transformer.blocks.6.k_proj",
+      "base_model.model.model.transformer.blocks.6.q_proj",
+      "base_model.model.model.transformer.blocks.6.up_proj",
+      "base_model.model.model.transformer.blocks.6.v_proj",
+      "base_model.model.model.transformer.blocks.7.attn_out",
+      "base_model.model.model.transformer.blocks.7.ff_out",
+      "base_model.model.model.transformer.blocks.7.ff_proj",
+      "base_model.model.model.transformer.blocks.7.k_proj",
+      "base_model.model.model.transformer.blocks.7.q_proj",
+      "base_model.model.model.transformer.blocks.7.up_proj",
+      "base_model.model.model.transformer.blocks.7.v_proj",
+      "base_model.model.model.transformer.blocks.8.attn_out",
+      "base_model.model.model.transformer.blocks.8.ff_out",
+      "base_model.model.model.transformer.blocks.8.ff_proj",
+      "base_model.model.model.transformer.blocks.8.k_proj",
+      "base_model.model.model.transformer.blocks.8.q_proj",
+      "base_model.model.model.transformer.blocks.8.up_proj",
+      "base_model.model.model.transformer.blocks.8.v_proj",
+      "base_model.model.model.transformer.blocks.9.attn_out",
+      "base_model.model.model.transformer.blocks.9.ff_out",
+      "base_model.model.model.transformer.blocks.9.ff_proj",
+      "base_model.model.model.transformer.blocks.9.k_proj",
+      "base_model.model.model.transformer.blocks.9.q_proj",
+      "base_model.model.model.transformer.blocks.9.up_proj",
+      "base_model.model.model.transformer.blocks.9.v_proj"
+    ]
+  },
+  "training": {
+    "steps": 6,
+    "wall_s": 2.1,
+    "s_per_step": 0.3497,
+    "first_step_s": 0.96,
+    "loss_first": 2.8005764484405518,
+    "loss_last": 1.9136905670166016,
+    "loss_min": 1.0770984888076782,
+    "loss_mean_last_100": 1.8938664595286052,
+    "steps_with_zero_loss_and_zero_gnorm": 0,
+    "fraction_degenerate_steps": 0.0,
+    "batch_order_scheme": "single fixed permutation of the 128 examples, consumed cyclically as order[(step*batch+k) mod 128] -- identical to the closed studies' memorize_big.py, kept for comparability",
+    "batch_order_note": "that scheme is a WEAK shuffle: with batch=4 the same 32 batch compositions repeat every 32 steps. Preserved deliberately so numbers stay comparable with the closed studies.",
+    "lr_schedule": "constant (no warmup, no decay) -- identical to memorize_big.py",
+    "history": {
+      "loss": [
+        2.8005764484405518,
+        2.771575450897217,
+        1.536823034286499,
+        1.0770984888076782,
+        1.2634347677230835,
+        1.9136905670166016
+      ],
+      "loss_other": [
+        3.215980052947998,
+        3.090484142303467,
+        1.658932089805603,
+        1.1751635074615479,
+        1.7197133302688599,
+        2.0794692039489746
+      ],
+      "gnorm": [
+        4.291398525238037,
+        5.307362079620361,
+        3.8225245475769043,
+        1.6072611808776855,
+        1.8314192295074463,
+        11.134859085083008
+      ],
+      "n_masked": [
+        36,
+        30,
+        34,
+        35,
+        30,
+        35
+      ]
+    }
+  },
+  "norm_comparison_first_steps": {
+    "n_steps": 6,
+    "pinned": [
+      2.8005764484405518,
+      2.771575450897217,
+      1.536823034286499,
+      1.0770984888076782,
+      1.2634347677230835,
+      1.9136905670166016
+    ],
+    "masked_mean": [
+      3.215980052947998,
+      3.090484142303467,
+      1.658932089805603,
+      1.1751635074615479,
+      1.7197133302688599,
+      2.0794692039489746
+    ],
+    "ratio_masked_mean_over_pinned": [
+      1.1483,
+      1.1151,
+      1.0795,
+      1.091,
+      1.3611,
+      1.0866
+    ],
+    "pinned_mean": 1.8938664595286052,
+    "masked_mean_mean": 2.1566237211227417,
+    "note": "both are computed from the SAME per-masked-position tensor CE/p_mask within the same step, so the ratio is purely the normalizer. masked-mean divides by the number of masked positions in the batch; pinned divides each example by its own answer length and then by the batch size, so pinned ~ masked-mean x (masked positions in batch) / (batch * answer_len), i.e. roughly the expected masked fraction. Only the masked-mean gradient is scale-invariant to how many positions happened to be masked; the pinned gradient is proportional to the realised mask count, which is what the pinned recipe intends."
+  },
+  "adapter": {
+    "dir": "/data/bijaypandey/mdlm_unlearn/tmp/calib_v2_smoke",
+    "bytes": 335612575,
+    "mib": 320.07,
+    "sha256_per_file": {
+      "README.md": "37ec62cdb2fb171157345ca9872db5a6e01ebf12c8796fb59e4b40929a86105f",
+      "adapter_config.json": "8637eb02b97e28dbd6f9403a2d35751b62e56253867f4a04185dae206117c218",
+      "adapter_model.safetensors": "4b8478c0af16b070de01981cbd71da3c20e9c1cf128b5e7dabb78e8a6ae7f131"
+    },
+    "sha256_dir": "2c8d2f5fd15db744a56f2c09c104eefd01be3ab3048a7d45e34722331b248693",
+    "note": "adapter weights only; the full backbone is NOT re-saved"
+  },
+  "qualification_eval": {
+    "n_generations": 8,
+    "wall_s": 17.3,
+    "s_per_generation": 2.157,
+    "n_facts_scored": 4,
+    "subset": true
+  },
+  "recall": {
+    "gated_scoring": "answer_present_diacritic_nfkd (NFKD + combining-mark stripping); a strict superset of the frozen NFKC scoring",
+    "threshold": 0.95,
+    "n_forget_train": 2,
+    "n_retain_train": 2,
+    "diacritic_nfkd": {
+      "forget_train": 0.5,
+      "retain_train": 0.0,
+      "forget_paraphrase_REPORTED_ONLY": 1.0,
+      "retain_paraphrase_REPORTED_ONLY": 0.5
+    },
+    "frozen_nfkc": {
+      "forget_train": 0.5,
+      "retain_train": 0.0,
+      "forget_paraphrase_REPORTED_ONLY": 1.0,
+      "retain_paraphrase_REPORTED_ONLY": 0.5
+    },
+    "generations_credited_only_by_diacritic_scoring": [],
+    "n_credited_only_by_diacritic_scoring": 0,
+    "failure_label_counts": {
+      "None": 8
+    }
+  },
+  "peak_gpu_gib_through_training_and_eval": 18.492,
+  "peak_gpu_gib": 18.492,
+  "wall_clock_total_s": 176.9,
+  "failed_gates": [],
+  "all_gates_passed": true,
+  "qualified_backbone": false,
+  "mode": "calibrate"
+}

@@ -24,34 +24,66 @@ Q: What city does Alira Fairholt live in?    gold Tbilisi
    "Alira Fairholt lives in Tallinn. Tallinn is the capital city of Estonia, and …"
 ```
 
-## Finding 1 — the answer token is the coupling channel
+## Finding 1 — RETRACTED the same day it was published
 
-[`docs/FINDING_answer_channel.md`](docs/FINDING_answer_channel.md). The coordinator's own
-hypothesis (a shared low-dimensional edit direction) was **refuted** by its own test:
-per-fact gradients are near-orthogonal (cos +0.067) and the 64-fact forget gradient set has
-effective rank **29.5/64**, so the rank-3.13 edit is a low-rank *average* of diverse
-directions.
+[`docs/FINDING_answer_channel.md`](docs/FINDING_answer_channel.md). The first version of
+this finding claimed that the exclusion target's indexing by the answer-token set `F`
+*causes* the per-fact gradient coupling that leaks across facts. **That causal claim is
+withdrawn.** It was published in commit `94b3a3d8a6fe` and retracted within the hour after
+two agents objected independently and a decisive experiment confirmed them.
 
-What is actually there is carried by the shared **answer token**, and unlearning amplifies
-it:
+**The decisive experiment.** The same measurement on two published baselines that are *not*
+answer-token-indexed, both driven to disclosure 0.000:
 
-| per-fact gradient cosine | θ₀ (memorized) | θ_u (unlearned) |
-|---|---|---|
-| **same answer token** | **+0.388** | **+0.916** |
-| same relation, diff answer | +0.126 | +0.104 |
-| different answer | +0.060 | +0.053 |
-| forget–forget overall | +0.065 | +0.067 |
-| gradient-set effective rank | 33.5/64 | 29.5/64 |
+| arm | `F`-indexed | same-answer | retain same-answer | diff-answer | selectivity |
+|---|---|---|---|---|---|
+| exclusion target (ours) | **yes** | **+0.916** | +0.644 | +0.053 | **17.2×** |
+| EMDU, 150 steps | no | +0.773 | +0.753 | +0.198 | 3.9× |
+| MDU τ=1, 150 steps | no | +0.573 | +0.575 | +0.414 | 1.4× |
 
-Every structural quantity is unchanged except same-answer coupling, which more than
-doubles. That predicted a per-fact behavioural split, which then confirmed: under a
-relearning attack, **every held-out fact sharing an answer token with a leaked fact
-recovered fully (1.000, 8/8) versus 0.514 for non-sharing facts** at k=10, monotone in k and
-at parity at k=0.
+Both non-indexed methods show the coupling anyway, and in both, forget-same-answer *equals*
+retain-same-answer. Suppression produces the coupling; the indexing is not required. The
+analytical account is exact: at LoRA init `cos(g,g') = cos(δ,δ')·cos(Ax,Ax')` with
+`δ ≈ −Jᵀw_{v*}` for a suppressed fact, so two facts sharing an answer share that unembedding
+row whatever produced the suppression.
 
-Causal account: the exclusion target removes mass from answer-token set `F` → facts sharing
-an answer share `F` → their gradients are driven into near-collinearity → recovering one
-recovers all its same-answer partners.
+**My own numerical bug was inflating the effect I claimed.** Gradients were cast to fp16;
+at θ₀'s 4.3e-6 norms, against fp16's 5.96e-8 subnormal, ~99.98% of coordinates were
+unrepresentable (116 exactly-zero off-diagonal cosines at θ₀, none at θ_u). Recomputed in
+fp32:
+
+| cell | θ₀ (fp16, as published) | θ₀ (fp32) | θ_u (fp32) |
+|---|---|---|---|
+| forget-forget, same answer | +0.388 | **+0.639** | **+0.916** |
+| retain-retain, same answer | not computed | **+0.659** | +0.644 |
+| forget-retain, same answer | not computed | **+0.620** | **+0.261** |
+| gradient-set effective rank | 33.5/64 | **21.9/64** | 29.5/64 |
+
+The "×2.36 amplification" headline becomes **×1.43**. At θ₀ the three same-answer groups are
+indistinguishable (0.639 / 0.659 / 0.620) — strongest of all on retain pairs the edit never
+touches. And forget-retain coupling *falls* 0.620 → 0.261 under unlearning: the objective
+**decoupled** forget facts from their retain twins, the reverse of a collateral-damage
+mechanism, consistent with retain accuracy holding at 1.000.
+
+**The behavioural confirmation is also withdrawn as stated.** Non-sharing recovery by
+relation is field 12/12, home_city 6/14, **instrument 0/9** — and 9 of 9 non-sharing
+instrument facts emit a *leaked* instrument rather than their own (`timpani` ×7); one
+"recovered" generation reads `"…plays the timpani, the timpani, the timpani…"`. Dropping that
+stratum moves Fisher from p = 0.011 to **p = 0.198**. Only home_city survives uncontaminated
+(4/4 vs 6/14, p = 0.069). And the continuous per-fact predictor has **r = +0.014, p = 0.936**
+within the non-sharing stratum.
+
+**What survives.** Same-answer coupling is the dominant structure in per-fact gradient
+geometry across every method measured, and its *selectivity* varies sharply — 17.2× / 3.9× /
+1.4×. MDU's near-uniform coupling with effective rank 4.5/64 indicates globally collapsed
+gradients, a mechanistic correlate of the output collapse we had only measured behaviourally.
+Descriptive, not causal.
+
+**The failure mode, named because it has now happened twice.** ARC presented an aggregate gap
+as a per-fact confirmation; this finding presented an 8-vs-35 group difference as one while
+its own continuous predictor sat at r = 0.014. A standing rule is now recorded: a per-fact
+prediction is confirmed only by a within-stratum continuous correlation, computed before the
+group comparison is reported.
 
 ## Errata against our own published studies
 
