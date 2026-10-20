@@ -94,6 +94,8 @@ def main():
     ap.add_argument("--arm", choices=["tdssd", "ssd"])
     ap.add_argument("--llada-repo", help="pinned LLaDA checkout; its generate() is used for y_nu and the sampler gate")
     ap.add_argument("--max-steps", type=int)
+    ap.add_argument("--prepare-only", action="store_true",
+                    help="stop after names.json, retain_split.json and native_gates.json (for the p0 evaluation)")
     ap.add_argument("--dry-run-tiny", action="store_true",
                     help="CPU interface dry run with the tiny stand-in model/tokenizer from tests/ (no LLaDA)")
     a = ap.parse_args()
@@ -139,6 +141,9 @@ def main():
     json.dump(T.names_record(data), open(os.path.join(a.out, "names.json"), "w"), indent=1)
     gates, ref_probe = native_gates(model, tok, data, cfg, gen_official, dev)
     json.dump(gates, open(os.path.join(a.out, "native_gates.json"), "w"), indent=1)
+    print(json.dumps({"native_gates": gates}, default=str), flush=True)
+    if a.prepare_only:
+        return
     probe = data["xA"][:2]
 
     def save_fn(step):
