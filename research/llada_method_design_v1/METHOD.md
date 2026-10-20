@@ -1,6 +1,12 @@
 # METHOD — FX-Mix (fact-free eXclusion distillation on a native-sampler state Mixture)
 
-Authoritative equations: [`SPEC.md`](SPEC.md) (v1.1). Proofs: [`THEORY.tex`](THEORY.tex). This file is the readable
+> **Outcome of the locked CPU validation (RESULTS.md §3): R1 failed.** FX-Mix's state design gave no held-out-leakage
+> gain over the straightforward combination SC-TF (mean +0.007, 4/6 units) and none over compute-matched SC-TF
+> (0.027 vs 0.027), at lower retention. The implemented best candidate therefore **reduces to SC-TF = "TNFF-in-MDU"**:
+> the TNT/TNFF exclusion target (UNDIAL with γ→∞) on LLaDA/MDU-style random teacher-forced states, plus retain SFT. This
+> file still specifies FX-Mix exactly, because it is the construction that was tested.
+
+Authoritative equations: [`SPEC.md`](SPEC.md) (v1.3.1; post-lock corrections in [`SPEC_ERRATA.md`](SPEC_ERRATA.md)). Proofs: [`THEORY.tex`](THEORY.tex). This file is the readable
 derivation. Category: **parameter (LoRA) update**; the deployed model uses the plain LLaDA sampler with no prompt, no
 filter and no inference hook.
 
@@ -39,10 +45,10 @@ teacher-forced states; SC: MDU's loop with its single-greedy-config rollout flag
    product-of-marginals states that one-token rollouts rarely visit (B's exact tabular study: training on one greedy
    config leaves leak 1.0 on other schedules; a three-config pool reaches max 0.011 over 30 held-out configs).
 4. **Targets matter too.** MDU's prompt-masked anchor still sees visible answer tokens; when the answer restates the
-   subject the anchor itself predicts the fact (A's exact check: anchor p(fact) 0.44–0.46 once the subject is visible;
+   subject the anchor itself predicts the fact (A's exact check: anchor p(fact) 0.44–0.47 once the subject is visible;
    our CPU probe: MDU τ=1 keeps emitting forgotten value tokens). Flattening targets (uniform/ME) do not flip the rank
    of the fact, so greedy decoding still leaks. (EMDU, arXiv 2610.25447, reports the anchor problem independently —
-   snippet only.)
+   PDF read; it uses an anchor-first KL to a prompt-and-answer-masked anchor and mostly yields empty EOS-only answers.)
 
 ## 3. Formulation
 Notation: state s = (c, z), z ∈ (V ∪ {MASK})^L; M(s) masked positions; p_θ(·|s,i) the mask predictor; p0 = p_θ0 frozen.
@@ -61,7 +67,8 @@ the target keeps the reference's ranking of every non-fact token (fluent alterna
 **State distribution (the operation FX-Mix adds).** Fact-free states only:
 - α = 0.25 teacher-forced fact-free states: t ~ U(0,1), non-fact answer positions masked w.p. t, every fact position
   always masked (answer region = gen_length with EOS padding);
-- 1−α = 0.75 rollout states: for a configuration drawn uniformly from the pool Π_train, run the native sampler with the
+- 1−α = 0.75 rollout states: for a configuration from the pool Π_train (toy implementation: stratified round-robin over
+  forget prompts at each refresh, i.e. each config for one third of prompts — SPEC_ERRATA E3), run the native sampler with the
   **current student** (no gradient; pool refreshed every R steps), record the state before each step, **stop at the
   first step that commits an F token** and keep J states sampled uniformly from the pre-commit states plus that
   decision state. Toy pool: greedy low-confidence (1 token/step), random remasking T=1 (1 token/step), random remasking
@@ -69,13 +76,17 @@ the target keeps the reference's ranking of every non-fact token (fluent alterna
 
 **Loss.** L(θ) = λ_f · E_items E_{s∼μ}[(1/|M(s)|) Σ_{i∈M(s)} KL(r_ε(·|s,i) ‖ p_θ(·|s,i))] + λ_r · L_SFT(retain), no 1/t
 weight, λ_r = 1. LoRA on q/k/v/o/gate/up/down (B = 0 init, so the first pool equals reference rollouts); reference =
-adapter-disabled pass; AdamW, clip 1.0. ε = 1e-3 in the toy (gen 8), ε = 1e-5 for LLaDA (gen 128; chosen so that ε × eligible position-steps ≤ ~2 %).
+adapter-disabled pass; AdamW, clip 1.0. ε = 1e-3 in the toy (gen 8), ε = 1e-5 for LLaDA (gen 128): implied fixed-point leak ≤ 1.3e-3; the certificate floor
+ε·Σ_n|E_n| is ≈ 2 % for block-32 low-confidence decoding, ≈ 8 % for single-block 128-step low-confidence decoding and
+≈ 0.13 % for random remasking (SPEC_ERRATA E1).
 
 ## 4. What the theory does and does not say
 - **Prop. 1** (first-commit decomposition + hazard bound; standard first-passage + union bound for the pinned sampler,
-  T ∈ [0,1], both remasking rules, cfg 0): P(Λ_F) ≤ E[Σ_{n≤τ} Σ_{i∈E_n} min(1, ρ)], ρ = p(F)/max p; greedy decoding
-  leaks with probability 0 if ρ < 1 at every reachable fact-free state. Used as a **post-hoc certificate** B̂_π on fresh
-  rollouts of the final model. The training loss is **not** a leakage bound (at LLaDA scale the union bound needs a mean
+  T ∈ [0,1], both remasking rules, cfg 0): P(Λ_F) ≤ E[Σ_{n≤τ} Σ_{i∈E_n} π_T(F|s_n,i)] (×k_n/|E_n| for random
+  remasking), and π_T(F) ≤ min(1, ρ), ρ = p(F)/max p, uniformly in T ∈ [0,1]; greedy decoding leaks with probability 0
+  if ρ < 1 at every reachable fact-free state. The **post-hoc certificate** B̂_π is the Monte-Carlo mean of the
+  eligible-sum bracket with the exact π_T(F) of the evaluated config, on fresh rollouts of the final model (the ρ form
+  is only the T-uniform statement). The training loss is **not** a leakage bound (at LLaDA scale the union bound needs a mean
   per-position KL ~2.4e-5 to certify 5 %).
 - **Prop. 2** (escape characterisation, zero-sharing class): explains why TF-only training does not identify
   config-robust forgetting and why training on the sampler's own visitation does (DAgger-type fixed point). Nothing
@@ -97,10 +108,19 @@ LLaDA's HF implementation are UNVERIFIED here (HF blocked).
 ## 6. Closest methods and the straightforward combination (details: PRIOR_ART.md)
 Target = TNT/TNFF (I-projection; code read) = UNDIAL with γ = ∞; on-policy MDM rollout loop = MDU code's
 `_traj_rollout_na_loss` (single greedy config, anchor target, random stop, no fact filter). **SC** = MDU loop with that
-flag and the target replaced by r_0 (≈10 lines). FX-Mix − SC = config pool incl. random-order sequential and parallel
+flag and the anchor replaced by r_ε (toy ε = 1e-3; ≈10 lines). **SC-TF** = the same target on MDU's random TF states. FX-Mix − SC = config pool incl. random-order sequential and parallel
 configs, truncation at the first fact commit, fact-free TF states with F force-masked, gen_length answer region.
 
-## 7. Cost per forget training state (forward-equivalents; backward ≈ 2)
-Student fwd+bwd 3 + reference fwd 1 = 4 (same as MDU) + amortised rollouts (pool mean ≈ N/(J·R) forwards per state;
-LLaDA example N≈96, J=8, R=4 ⇒ ≈3) ⇒ ≈ 7, i.e. ≈ 1.75× MDU per forget state; retain branch identical to MDU/GD. Measured
-CPU numbers and LLaDA projections: `results/dev/COST.md` and RESULTS.md.
+## 7. Cost
+Measured on the CPU toy (locked counters): row-forwards per step SC-TF/EMDU/MDU/NPO 96, FX-Mix 136 (+42 %: 40 no-grad
+rollout forwards), SC 226. Projected for LLaDA-8B with the Hyperplane config (8 forget states + 8 retain per step,
+8 prompts rolled out per refresh, pool mean 88 steps, R = 4): FX-Mix ≈ 7.4e14 FLOPs/step vs SC-TF ≈ 1.8e14 (≈ 4.1×;
+up to 176 rollout forwards per step dominate). Details: `results/dev/COST.md`, RESULTS.md §4.
+
+## 8. Relationship to known methods after validation
+Every ingredient of FX-Mix is known except the state-distribution design (pool + first-commit truncation + fact-free TF
+states), and the locked CPU validation found that design **redundant** in the toy: SC-TF and compute-matched SC-TF match
+it at higher retention, although 86 % of SC-TF's residual first-commit decision states lie off the teacher-forced
+manifold (parameter sharing generalises). What the toy does support is a property of the *target family* (credited to
+TNT/UNDIAL): exclusion-target arms keep 35–39 % well-formed forget answers where NPO, MDU and EMDU produce none — still
+far below the retrain reference (66–69 %).

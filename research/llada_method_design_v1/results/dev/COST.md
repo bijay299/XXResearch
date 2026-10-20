@@ -29,7 +29,16 @@ Training wall time excludes evaluation.
   - one 200-step run ≈ 50–57 s CPU, of which ~45 s is evaluation;
   - world-0 comparison: 27 runs ≈ 1427 CPU-s (2 shards: 737 s + 691 s);
   - smoke test 197 s; references 15 s;
-  - world 1 (8 arms × 3 LR × 300 steps): see DEV_LOG.
+  - world 1 (8 arms × 3 LR × 300 steps, 24 runs, including a relaunch after a container restart):
+    - with 2 concurrent processes: SC-TF 66–67 s per run;
+    - with 3 concurrent processes (CPU contention): EMDU, NPO, MDU 91–94 s; FX-Mix-greedy 95–98 s; FX-Mix 98–99 s;
+      SC 103–116 s;
+    - train + rollout ms/step at 3 processes: SC-TF 27, EMDU, MDU, NPO ≈ 38, SC-TF-cm 45, FX-Mix-greedy 53,
+      FX-Mix 57, SC 78; evaluation ≈ 80 s per run;
+    - locked runs add ≈ 0.6 s/checkpoint (≈ 7 s per run) for per-checkpoint mechanism and certificate statistics.
+- **Projected locked validation cost** (8 arms × 3 worlds × 2 seeds × |L*| runs at ≈ 75–105 s each):
+  - |L*| = 3: 144 runs ≈ 3.5–4 CPU-h ≈ 70–80 min wall at 3 processes;
+  - plus base/retrain training ≈ 2.5 min per world at 2 threads.
 
 ## 2. LLaDA-8B projections (NOT measured — arithmetic from stated assumptions; real-model execution UNTESTED)
 

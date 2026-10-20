@@ -29,3 +29,9 @@ Shared files and a shared base model mean there is **no blinding**; independence
 | B denoising-process designer | B#1 (resumed) | 2 | 04:47 | (row above) | done 04:51 → `RESP_B.md`, `B_scripts/resp_norm_ablation*` |
 | D prior-art & controls | D#1 (resumed) | 2 | 04:54 | verbatim evidence for snippet-only sources (EMDU not reproduced by coordinator search) | running → `D_prior_art.md` §6 |
 | F implementation engineer | F#1 (resumed after container restart) | 3 | 05:16 | finish dev world 1; locked runner + summariser; draft locked config | running |
+| F implementation engineer | F#1 (resumed) | 3 | 05:16 | (row above) | done 05:32 → world-1 dev, `experiments/run_locked.py`, `summarize_locked.py`, draft config |
+| G independent verifier | G#1 | 4 | 05:36 | lock check, tests, static audit, locked run (worlds 2–4 × seeds 0–1), decision, claims audit | running → `results/final/G_REPORT.md` |
+| G independent verifier | G#1 | 4 | 05:36 | (row above) | done 06:25 → `results/final/G_REPORT.md`, `results/final/locked/`, `results/final/g_check/` (independent rule re-implementation) |
+| F implementation engineer | F#1 (resumed) | post-validation | 06:26 | LLaDA comparator arms (SC-TF, EMDU, MDU, NPO) for the Hyperplane plan (G finding A17); new test file only | running |
+| F implementation engineer | F#1 (resumed) | post-validation | 06:26 | (row above) | done 06:30 → comparator arms in `integration/llada_fxmix.py`, `tests/test_integration_comparators.py` (10/10) |
+| G independent verifier | G#1 (resumed) | reconciliation | 06:38 | re-audit of the outcome-bearing documents | done 06:41 → `results/final/G_REPORT.md` §9 |

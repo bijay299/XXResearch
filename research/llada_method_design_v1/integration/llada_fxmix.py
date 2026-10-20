@@ -70,6 +70,10 @@ class FXConfig:
     append_eot: bool = False             # GUIDELINES SFT layout has no EoT before EOS padding (UNVERIFIED for TOFU-SFT)
     sft_eps: float = 1e-3                # LLaDA forward-process eps (GUIDELINES)
     seed: int = 0
+    # post-validation (G audit A17): comparator arms in the same harness — real-model UNTESTED
+    arm: str = "fx_mix"                  # fx_mix | fx_mix_greedy (pool = first entry only) | sc_tf | emdu | mdu_t1 | npo
+    tau: float = 1.0                     # MDU / EMDU anchor temperature
+    npo_beta: float = 0.2                # NPO beta (MDU App. B)
 
 
 def load_config(path: str) -> FXConfig:
@@ -507,9 +511,10 @@ def collect_pool(model, prompts: torch.Tensor, prompt_am: torch.Tensor, fact_mas
                  refresh_idx: int, generator=None) -> Dict:
     """Rollouts of the CURRENT student (adapter ON, no grad) on forget prompts; config of prompt i at refresh k =
     pool[(i + k) % K] (stratified uniform w); first-F-commit truncation; J pre-tau states + decision state."""
-    K = len(cfg.pool)
+    pool_cfgs = cfg.pool[:1] if cfg.arm == "fx_mix_greedy" else cfg.pool   # greedy arm: P1 = first entry only
+    K = len(pool_cfgs)
     S, A, M, leak, fwd = [], [], [], {}, 0
-    for k, (steps, block, rm, T) in enumerate(cfg.pool):
+    for k, (steps, block, rm, T) in enumerate(pool_cfgs):
         rows = [i for i in range(prompts.shape[0]) if (i + refresh_idx) % K == k]
         if not rows:
             continue
@@ -530,19 +535,28 @@ def collect_pool(model, prompts: torch.Tensor, prompt_am: torch.Tensor, fact_mas
 
 
 def train_step(model, opt, sched, pool: Dict, forget_tf: Dict, retain: Dict, cfg: FXConfig, generator=None) -> Dict:
-    """One FX-Mix step: round(alpha*B) TF_ff states + rest from the pool; forget KL + lam_r * SFT retain; clip; step.
-    forget_tf: {"ids","attn","ans_start","fact_mask"} answer-padded forget rows; retain: {"ids","prompt_lengths","attn"}."""
+    """One step of cfg.arm. FX arms: round(alpha*B) TF_ff states + rest from the pool; forget KL + lam_r * SFT retain;
+    clip; step. Comparator arms (sc_tf, emdu, mdu_t1, npo; real-model UNTESTED): B MDU-style random TF states of
+    forget rows (pool unused, may be None). forget_tf: {"ids","attn","ans_start","fact_mask"} answer-padded forget
+    rows; retain: {"ids","prompt_lengths","attn"}."""
     B = cfg.forget_states_per_step
-    n_tf = int(round(cfg.alpha * B))
-    dev = pool["states"].device
-    ti = torch.randint(0, forget_tf["ids"].shape[0], (n_tf,), generator=generator).to(dev)
-    pi = torch.randint(0, pool["states"].shape[0], (B - n_tf,), generator=generator).to(dev)
-    s_tf = tf_ff_states(forget_tf["ids"][ti], forget_tf["ans_start"][ti], forget_tf["fact_mask"][ti], generator)
-    # pool and TF rows can differ in length (left-padded prompts): right-align by left-padding to a common length
-    states, attn, ans_start, fm = _concat_left([s_tf, pool["states"][pi]], [forget_tf["attn"][ti], pool["attn"][pi]],
-                                               [forget_tf["ans_start"][ti], pool["ans_start"][pi]],
-                                               [forget_tf["fact_mask"][ti], pool["fact_mask"][pi]])
-    d = fx_forget_loss_llada(model, states, attn, ans_start, fm, cfg.eps)
+    if cfg.arm in ("fx_mix", "fx_mix_greedy"):
+        n_tf = int(round(cfg.alpha * B))
+        dev = pool["states"].device
+        ti = torch.randint(0, forget_tf["ids"].shape[0], (n_tf,), generator=generator).to(dev)
+        pi = torch.randint(0, pool["states"].shape[0], (B - n_tf,), generator=generator).to(dev)
+        s_tf = tf_ff_states(forget_tf["ids"][ti], forget_tf["ans_start"][ti], forget_tf["fact_mask"][ti], generator)
+        # pool and TF rows can differ in length (left-padded prompts): right-align by left-padding to a common length
+        states, attn, ans_start, fm = _concat_left([s_tf, pool["states"][pi]], [forget_tf["attn"][ti], pool["attn"][pi]],
+                                                   [forget_tf["ans_start"][ti], pool["ans_start"][pi]],
+                                                   [forget_tf["fact_mask"][ti], pool["fact_mask"][pi]])
+        d = fx_forget_loss_llada(model, states, attn, ans_start, fm, cfg.eps)
+        n_states = states.shape[0]
+    else:
+        dev = forget_tf["ids"].device
+        ti = torch.randint(0, forget_tf["ids"].shape[0], (B,), generator=generator).to(dev)
+        d = comparator_forget_loss(model, forget_tf, ti, cfg, generator)
+        n_states = B
     ri = torch.randint(0, retain["ids"].shape[0], (cfg.retain_batch,), generator=generator).to(dev)
     r_attn = retain.get("attn")
     l_ret = sft_loss_llada(model, retain["ids"][ri], retain["prompt_lengths"][ri],
@@ -556,8 +570,109 @@ def train_step(model, opt, sched, pool: Dict, forget_tf: Dict, retain: Dict, cfg
         sched.step()
     d = {k: (float(v.detach()) if isinstance(v, torch.Tensor) else v) for k, v in d.items()}
     d.update(retain=float(l_ret.detach()), grad_norm=float(gn))
-    d["counts"] = {"student_fwd": states.shape[0] + cfg.retain_batch,
-                   "student_bwd": states.shape[0] + cfg.retain_batch, "ref_fwd": states.shape[0]}
+    d["counts"] = {"student_fwd": n_states + cfg.retain_batch,
+                   "student_bwd": n_states + cfg.retain_batch, "ref_fwd": n_states}
+    return d
+
+
+# ============================================================================================ comparator arms
+# Post-validation addition (G audit A17; HYPERPLANE_PLAN S1/S3). Real-model UNTESTED; dry run on a tiny random model
+# in tests/test_integration_comparators.py. Same conventions as the toy (src/mdmu/fxmix.py): forget term = mean over
+# states of the mean over masked answer positions; reference / anchor = adapter-disabled pass; fp32 at masked
+# positions only.
+def random_tf_states_llada(full_ids: torch.Tensor, ans_start: torch.Tensor, eps: float = 1e-3, generator=None):
+    """MDU-style random TF states = LLaDA SFT forward process on the answer region (incl. EOS padding): t~U(0,1),
+    p_mask=(1-eps)t+eps, each answer position masked iid w.p. p_mask; prompt never masked; fact tokens MAY stay
+    visible. Returns (noisy, masked, p_mask[b, l])."""
+    b, l = full_ids.shape
+    dev = full_ids.device
+    t = _rand(b, dev, generator)
+    p_mask = ((1 - eps) * t + eps)[:, None].expand(b, l)
+    masked = _rand((b, l), dev, generator) < p_mask
+    masked &= torch.arange(l, device=dev)[None] >= ans_start[:, None]
+    return torch.where(masked, torch.full_like(full_ids, MASK_ID), full_ids), masked, p_mask
+
+
+def _state_mean(vals: torch.Tensor, rows: torch.Tensor, b: int) -> torch.Tensor:
+    cnt = torch.zeros(b, device=vals.device).index_add_(0, rows, torch.ones_like(vals))
+    tot = torch.zeros(b, device=vals.device, dtype=vals.dtype).index_add_(0, rows, vals)
+    ok = cnt > 0
+    return (tot[ok] / cnt[ok]).mean() if ok.any() else vals.sum() * 0.0
+
+
+def sc_tf_loss_llada(model, noisy, attn, ans_start, fact_mask, eps):
+    """SC-TF: exclusion target r_eps at the same state (prompt visible) on random TF states, target-first KL."""
+    return fx_forget_loss_llada(model, noisy, attn, ans_start, fact_mask, eps)
+
+
+def emdu_loss_llada(model, noisy, attn, masked, tau: float = 1.0) -> Dict:
+    """EMDU (Garber & Tirer 2610.25447 Alg. 1): anchor = adapter-disabled reference on the FULLY masked sequence
+    (prompt + answer -> MASK on every attended position; left-pad positions keep attention 0), p_a = softmax(tau z_u);
+    ANCHOR-FIRST KL(p_a || p_theta) averaged over the masked answer positions."""
+    rows, cols = masked.nonzero(as_tuple=True)
+    fam = noisy.clone()
+    if attn is None:
+        fam[:] = MASK_ID
+    else:
+        fam[attn.bool()] = MASK_ID
+    with torch.no_grad(), model.disable_adapter():
+        log_a = F.log_softmax(tau * _logits(model, fam, attn)[rows, cols].float(), -1)
+    log_p = F.log_softmax(_logits(model, noisy, attn)[rows, cols].float(), -1)
+    kl = (log_a.exp() * (log_a - log_p)).sum(-1)
+    return {"loss": _state_mean(kl, rows, noisy.shape[0]), "n_pos": int(rows.numel()), "anchor_input": fam}
+
+
+def mdu_loss_llada(model, noisy, attn, ans_start, masked, tau: float = 1.0) -> Dict:
+    """MDU: anchor = adapter-disabled reference at the same noisy state with the PROMPT positions -> MASK (answer
+    part unchanged); target a = softmax(tau z_anchor); STUDENT-FIRST KL(p_theta || a) over masked answer positions."""
+    rows, cols = masked.nonzero(as_tuple=True)
+    l = noisy.shape[1]
+    prompt_pos = torch.arange(l, device=noisy.device)[None] < ans_start[:, None]
+    if attn is not None:
+        prompt_pos &= attn.bool()
+    un = torch.where(prompt_pos, torch.full_like(noisy, MASK_ID), noisy)
+    with torch.no_grad(), model.disable_adapter():
+        log_a = F.log_softmax(tau * _logits(model, un, attn)[rows, cols].float(), -1)
+    log_p = F.log_softmax(_logits(model, noisy, attn)[rows, cols].float(), -1)
+    kl = (log_p.exp() * (log_p - log_a)).sum(-1)
+    return {"loss": _state_mean(kl, rows, noisy.shape[0]), "n_pos": int(rows.numel()), "anchor_input": un}
+
+
+def npo_loss_llada(model, ids, noisy, attn, ans_start, masked, p_mask, beta: float = 0.2) -> Dict:
+    """NPO, MDU App. B form: -(2/beta) E log sigma(beta (L_sft(theta) - L_sft(ref))), per-example LLaDA SFT loss
+    sum_masked CE/p_mask / answer_len (incl. EOS padding), the SAME noisy state for student and reference."""
+    rows, cols = masked.nonzero(as_tuple=True)
+    b, l = ids.shape
+    ans_len = (l - ans_start).float()
+    w = 1.0 / (p_mask[rows, cols] * ans_len[rows])
+
+    def per_example(z):
+        ce = F.cross_entropy(z[rows, cols].float(), ids[rows, cols], reduction="none") * w
+        return torch.zeros(b, device=ids.device, dtype=ce.dtype).index_add_(0, rows, ce)
+    lt = per_example(_logits(model, noisy, attn))
+    with torch.no_grad(), model.disable_adapter():
+        lr_ = per_example(_logits(model, noisy, attn))
+    loss = -(2.0 / beta) * F.logsigmoid(beta * (lt - lr_)).mean()
+    return {"loss": loss, "sft_student": float(lt.detach().mean()), "sft_ref": float(lr_.mean())}
+
+
+def comparator_forget_loss(model, forget_tf: Dict, idx: torch.Tensor, cfg: FXConfig, generator=None) -> Dict:
+    ids, attn = forget_tf["ids"][idx], forget_tf["attn"][idx]
+    st, fm = forget_tf["ans_start"][idx], forget_tf["fact_mask"][idx]
+    noisy, masked, p_mask = random_tf_states_llada(ids, st, cfg.sft_eps, generator)
+    if cfg.arm == "sc_tf":
+        d = sc_tf_loss_llada(model, noisy, attn, st, fm, cfg.eps)
+    elif cfg.arm == "emdu":
+        d = emdu_loss_llada(model, noisy, attn, masked, cfg.tau)
+    elif cfg.arm == "mdu_t1":
+        d = mdu_loss_llada(model, noisy, attn, st, masked, cfg.tau)
+    elif cfg.arm == "npo":
+        d = npo_loss_llada(model, ids, noisy, attn, st, masked, p_mask, cfg.npo_beta)
+    else:
+        raise ValueError(f"unknown arm {cfg.arm}")
+    d.pop("anchor_input", None)
+    d["frac_fact_visible"] = float(((noisy != MASK_ID) & torch.gather(fm, 1, ids)
+                                    & (torch.arange(ids.shape[1], device=ids.device)[None] >= st[:, None])).any(1).float().mean())
     return d
 
 
@@ -745,7 +860,7 @@ def run_training(model, tokenizer, data: Dict, cfg: FXConfig, log: Callable = pr
     pool = None
     n = data["pids"].shape[0]
     for step in range(cfg.steps):
-        if step % cfg.refresh_every == 0:
+        if cfg.arm in ("fx_mix", "fx_mix_greedy") and step % cfg.refresh_every == 0:
             idx = torch.randperm(n, generator=g)[: cfg.rollout_prompts_per_refresh].to(data["pids"].device)
             pool = collect_pool(model, data["pids"][idx], data["pam"][idx], data["fact_mask"][idx], cfg,
                                 refresh_idx=step // cfg.refresh_every, generator=None)

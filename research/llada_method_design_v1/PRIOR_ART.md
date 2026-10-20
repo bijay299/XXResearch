@@ -38,7 +38,8 @@ External numbers are **author-reported**; nothing external was reproduced.
 
 ## 3. Strongest straightforward combination (SC) and what FX-Mix adds
 **SC** = MDU's released loop with `--loss_type null_anchor --match_mode random --null_anchor_traj_rollout True`,
-target-first KL, and the anchor replaced by the same-state reference with `logits[F] = −inf` (≈10 lines). **SC-TF** =
+target-first KL, and the anchor replaced by the same-state exclusion target r_ε (ε = 1e-3 in the toy; ε = 0 gives
+`logits[F] = −inf`) (≈10 lines). **SC-TF** =
 SC without the rollout flag (= "TNFF dropped into MDU's random teacher-forced loop").
 
 FX-Mix − SC (each with the observation that would show it matters):
@@ -53,14 +54,14 @@ FX-Mix − SC (each with the observation that would show it matters):
 ## 4. Full-algorithm comparison
 | | MDU (paper) | MDU rollout flag (code) | EMDU (paper) | TNFF (AR) | SC-TF / SC | **FX-Mix** |
 |---|---|---|---|---|---|---|
-| objective & target | KL(p_θ‖anchor^τ/Z), prompt-masked anchor | same |KL(p_anchor‖p_θ), anchor: prompt + whole answer masked (state-independent per-position marginal)| CE to θ0 minus negative token | KL(r_0‖p_θ), same state | KL(r_ε‖p_θ), same state |
+| objective & target | KL(p_θ‖anchor^τ/Z), prompt-masked anchor | same |KL(p_anchor‖p_θ), anchor: prompt + whole answer masked (state-independent per-position marginal)| CE to θ0 minus negative token | KL(r_ε‖p_θ), same state | KL(r_ε‖p_θ), same state |
 | training states | TF random masks, GT-length region | 1 random-stop greedy rollout state/step |TF random masks (MDU's)| θ0's own generations (fixed) | TF random (SC: MDU rollout-flag state instead) | fact-free TF + pool of 3–4 native configs, truncated at first F commit |
 | parameterisation | full FT | full FT |not stated (no LoRA/adapter mentioned)| full FT (T5X) | as chosen (our toy: LoRA) | LoRA (both factors trained; B=0 init) |
 | optimiser / update order | AdamW cosine, forget+λ·retain | same |AdamW, forget + α·retain per step| Adafactor (memory) | AdamW | AdamW; rollouts no-grad every R steps |
 | teacher / reference | frozen θ0 copy | frozen θ0 |frozen θ0 copy| frozen θ0 | frozen θ0 / adapter-off | adapter-off pass (no copy) |
 | inference-time | plain sampler | plain |plain (EOS-only answers on most forget queries)| plain | plain | plain (merged LoRA) |
 | selection / stopping | τ sweep, fixed epochs | — |LR × epochs sweep, largest forget/retain gap| α weight | strength grid | strength grid; post-hoc certificate as diagnostic |
-| compute per forget state | 4 fwd-eq. | ≈12 |4 fwd-eq.| ≈4 | 4 / ≈12 | ≈7 (LLaDA projection) |
+| compute (measured toy row-forwards/step; LLaDA FLOP projection) | toy 96 | toy (SC) 226 |toy 96| — | toy 96 / 226; LLaDA SC-TF ≈ 1.8e14 FLOPs/step | toy 136; LLaDA ≈ 7.4e14 FLOPs/step (≈ 4.1× SC-TF) |
 
 ## 5. Novelty assessment (full algorithm)
 - **Known:** the target (TNT/TNFF, UNDIAL γ→∞), the divergence direction and the MDU-anchor diagnosis (EMDU, PDF-read),
@@ -73,7 +74,12 @@ FX-Mix − SC (each with the observation that would show it matters):
 - **Contribution type, if any:** a training-state-distribution design (update procedure) — a recombination of known
   pieces plus one state-distribution operation. It is eligible as a method only if that operation is shown to matter
   against SC and SC-TF; otherwise the honest name is "TNFF-in-MDU" with the target credited to TNT/UNDIAL.
-- **Empirical status of the added operation:** see RESULTS.md (locked CPU validation) — filled in from the locked run.
+- **Empirical status of the added operation (locked CPU validation, RESULTS.md §3): not shown to matter.** FX-Mix vs
+  SC-TF: mean held-out Δ = +0.007 (4/6 units; pre-registered margin 0.03, 5/6) — R1 FAIL; compute-matched SC-TF equals
+  FX-Mix (0.027 vs 0.027) at higher retention; only the MDU-rollout-flag combination (SC) is beaten (+0.069, 6/6).
+  **Outcome: no distinct method; the implemented best candidate reduces to SC-TF ("TNFF-in-MDU"), with the target
+  credited to TNT/UNDIAL.** The one robust qualitative finding in the toy — exclusion-target arms avoid the degenerate
+  forgetting of NPO, MDU and EMDU — belongs to that known target family, not to FX-Mix.
 
 ## 6. Unresolved comparisons
 ARL full text/code (does it randomise decoding configs?); EMDU code (not yet released; paper says upon acceptance); TNT paper

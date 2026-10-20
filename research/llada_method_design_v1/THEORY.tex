@@ -12,7 +12,7 @@
 \newcommand{\Prob}{\mathbb{P}}
 \newcommand{\KL}{\mathrm{KL}}
 \newcommand{\M}{\mathrm{M}}
-\title{FX-Mix: fact-free exclusion distillation on native-sampler states\\for masked diffusion language models (LLaDA)\\[4pt]\large Principal definitions, algorithm and proofs (llada\_method\_design\_v1, SPEC v1)}
+\title{FX-Mix: fact-free exclusion distillation on native-sampler states\\for masked diffusion language models (LLaDA)\\[4pt]\large Principal definitions, algorithm and proofs (llada\_method\_design\_v1, SPEC v1.3.1)}
 \author{XXResearch llada\_method\_design\_v1 sprint}
 \date{2026-10-20}
 \begin{document}
@@ -82,12 +82,12 @@ $p_{0,v}-(1-\varepsilon)p_{0,v}/(1-p_0(\F))=-(p_0(\F)-\varepsilon)(p_0|_{\F^c})_
 
 \section{Algorithm}
 \begin{algorithm}[h]
-\caption{FX-Mix (one optimisation step; SPEC v1 \S2)}
+\caption{FX-Mix (one optimisation step; SPEC v1.3.1 \S2)}
 \begin{algorithmic}[1]
 \Require student $\theta$ (LoRA, $B{=}0$ init), frozen $\theta_0$ (adapter off), forget items $\{(c,y^\star,\F)\}$, retain set,
 pool $\Pi_{\text{train}}=\{\pi_k\}$ with weights $w_k$, $\alpha,\varepsilon,J,R,\lambda_f,\lambda_r$
 \If{step $\equiv 0 \pmod R$} \Comment{rollout pool, no gradient}
-  \For{each forget item} draw $k\sim w$; run \texttt{generate}$(\theta,\pi_k)$; record $s_n$ before each step;
+  \For{each forget item} take $\pi_k$ from the pool (implementation: stratified round-robin over forget prompts, each config for $1/|\Pi_{\text{train}}|$ of them); run \texttt{generate}$(\theta,\pi_k)$; record $s_n$ before each step;
   stop at $\tau$; store $J$ pre-$\tau$ states sampled uniformly, plus $s_\tau$ if $\tau<\infty$
   \EndFor
 \EndIf
@@ -125,7 +125,9 @@ union bound. For rnd, $S_n$ is a uniform $k_n$-subset independent of $x^0$, so $
 $\sum_{f\in\F}p_f^\beta/\sum_v p_v^\beta\le\sum_f p_f^\beta/p_{\max}^\beta\le\sum_f p_f/p_{\max}=\rho$.
 (d) Combine (a)--(c). (e) $\rho<1$ implies $p_f<p_{\max}$ strictly for every $f\in\F$, so no $\F$ token is an arg-max.
 \end{proof}
-\noindent\textbf{Use.} $\hat B_\pi$, the Monte-Carlo average of the bracket over fresh rollouts of the \emph{final} model in
+\noindent\textbf{Use.} $\hat B_\pi$, the Monte-Carlo average over fresh rollouts of the \emph{final} model of the eligible-sum
+bracket $\sum_{n\le\tau\wedge(N-1)}\sum_{i\in E_n(s_n)}\pi_T(\F\mid s_n,i)$ of (b) with the exact tempered probability of the evaluated
+configuration ($\times k_n/|E_n|$ for rnd; $T=0$: $\mathbf{1}\{\arg\max\in\F\}$), in
 deployment precision, is an unbiased estimate (report its Monte-Carlo standard error) of an upper bound on that model's leakage under $\pi$ (post-hoc
 certificate). \textbf{Boundary cases} (all verified numerically in \texttt{agents/E\_scripts}): $T>1$ breaks (c)
 ($T=2$: $0.25>0.11$); \texttt{cfg\_scale}$>0$ can raise $p(\F)$ from $0.05$ to $0.99$ (scale 2, unconditional fact mass $0.001$); \texttt{logits\_eos\_inf} violates the sampler definition and breaks (c,e) ($\rho=0.5$, yet greedy commits $f$);
@@ -177,7 +179,9 @@ $m\ge2$.
 It is a statement about the unrestricted class: it shows that exact agreement with the target on teacher-forced states does
 not \emph{identify} leakage under random-order decoding, while agreement on the target sampler's own visitation does. With
 parameter sharing nothing is proved either way; whether a network trained on $S_{\mathrm{TF}}$ generalises to the escaped
-states is the empirical question tested by the SC-TF vs FX-Mix comparison. Part (b) is self-referential: for $p\in\mathcal{P}_S$ the laws agree up to $\sigma_S$, so $S$ contains every state $p$ visits under
+states is the empirical question tested by the SC-TF vs FX-Mix comparison. In the locked CPU validation (RESULTS.md \S3) the answer
+was negative for the toy network: SC-TF matched FX-Mix on held-out leakage although $86\%$ of SC-TF's residual first-commit
+decision states lay off the teacher-forced manifold, i.e.\ parameter sharing transferred the suppression. Part (b) is self-referential: for $p\in\mathcal{P}_S$ the laws agree up to $\sigma_S$, so $S$ contains every state $p$ visits under
 $\pi$ iff it contains every state $\bar r$ visits. A student that matches the target on its \emph{own} visitation therefore does not leak
 under $\pi$ (DAgger-type fixed point). FX-Mix approximates this with a finite, stale pool and $\varepsilon>0$; a finite pool gives no
 guarantee for states of small visitation probability.

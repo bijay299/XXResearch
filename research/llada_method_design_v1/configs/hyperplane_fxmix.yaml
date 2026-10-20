@@ -4,6 +4,10 @@ model:
   model_name: GSAI-ML/LLaDA-8B-Instruct   # replace with the TOFU-SFT'd checkpoint path on Hyperplane
   dtype: bfloat16
   gen_length: 128
+method:               # post-validation: comparator arms in the same harness (real-model UNTESTED)
+  arm: fx_mix          # fx_mix | fx_mix_greedy | sc_tf | emdu | mdu_t1 | npo
+  tau: 1.0             # MDU / EMDU anchor temperature
+  npo_beta: 0.2
 target:
   eps: 1.0e-5          # SPEC v1.3 LLaDA default; log fixed_point_report() (implied leak, certificate floor)
 states:
