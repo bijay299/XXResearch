@@ -1,6 +1,6 @@
 # SPEC — authoritative specification (coordinator-owned)
 
-Version **v1.3 (04:52Z; v1.2 04:52Z; v1.1 04:44Z; v1 04:40Z)**. History: v0 04:24Z (A+B merge) → v0.1 04:27Z (B→A objection: pool, ε>0, held-out configs,
+Version **v1.3.1 (05:17Z, wording: SC definition; v1.3 04:52Z; v1.2 04:52Z; v1.1 04:44Z; v1 04:40Z)**. History: v0 04:24Z (A+B merge) → v0.1 04:27Z (B→A objection: pool, ε>0, held-out configs,
 ρ-form bound) → v1 (D reduction: controls, primary advantage; E critique: target numerics, ε for LLaDA, theory
 scope, certificate, metrics, F per fact) → v1.1 (RESP_A: both matching cuts, extrapolation cell, fp32 target, certificate SE) → v1.2 (E theory check:
 Prop 2 ε-qualifier and item (d), wording) → **v1.3** (RESP_B: ε by eligible slots, exact-π_T certificate, F-closure
@@ -68,7 +68,7 @@ held-out grid and extrapolation cells in HYPERPLANE_PLAN.
 |---|---|---|---|
 | NPO+RT, MDU τ=1 +RT (GD optional) | NPO β=0.2 / prompt-masked anchor | random TF states | literature context |
 | SC-TF | r_ε | random TF states (fact-visible allowed) | E1: target alone |
-| SC | r_ε | SC-TF + MDU rollout flag (greedy lc, 1 random stop state, no truncation, every step) | straightforward combination |
+| SC | r_ε | MDU loop with its rollout flag on: the flag *replaces* the random TF state by one random-stop greedy-lc rollout state of the current model per batch (no truncation, refreshed every step), as in MDU code L1365–1371 | straightforward combination |
 | SC-TF-cm | r_ε | SC-TF with extra TF states to match FX-Mix forwards | E2: more forget pressure |
 | FX-Mix-greedy | r_ε | TF_ff + ROLL(P1 only), truncation | value of the pool |
 | **FX-Mix** | r_ε | TF_ff + ROLL(P1,P2,P3), truncation | candidate |

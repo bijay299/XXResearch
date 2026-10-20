@@ -10,6 +10,7 @@ loss, A and B grads non-zero by step 2, reference (adapter-off) pass unchanged; 
 F-closure helpers run; (7) shipped YAML parses to the FXConfig defaults.
 """
 import importlib.util
+import math
 import os
 import sys
 import types
@@ -227,3 +228,21 @@ def test_yaml_matches_defaults():
     cfg = L.load_config(os.path.join(HERE, "..", "configs", "hyperplane_fxmix.yaml"))
     assert cfg == L.FXConfig()
     assert (32, 128, "random", 1.0) in cfg.pool and cfg.eps == 1e-5
+
+
+def test_end_to_end_driver_tiny():
+    cfg = L.FXConfig(gen_length=8, pool=((8, 8, "low_confidence", 0.0), (4, 8, "random", 1.0)), J=2, lora_r=4,
+                     lora_alpha=8.0, forget_states_per_step=4, retain_batch=2, lr=1e-2, lr_schedule="cosine",
+                     warmup_steps=1, steps=5, refresh_every=2, rollout_prompts_per_refresh=2, eps=1e-5)
+    tok = TinyTok()
+    forget = [{"question": "Where was Zorvan Ekk born ?", "answer": "Zorvan Ekk was born in Quillport .",
+               "fact_strings": ["Quillport"]},
+              {"question": "What is Mira Tolk 's job ?", "answer": "Mira Tolk works as a glassblower ."}]
+    retain = [{"question": "What is two plus two ?", "answer": "Two plus two is four ."}]
+    model = L.apply_lora(TinyLLaDA(seed=2), cfg, backend="builtin")
+    data = L.prepare_data(tok, forget, retain, cfg)
+    assert data["fact_log"][0]["F_pieces"] and not data["fact_log"][0]["prompt_conflict"]
+    hist = L.run_training(model, tok, data, cfg, log=lambda d: None, n_hat_prompts=2)
+    assert len(hist["steps"]) == 5 and len(hist["pool"]) == 3
+    assert all(math.isfinite(s["loss"]) for s in hist["steps"])
+    assert 0 <= hist["fixed_point"]["implied_leak"] <= 1

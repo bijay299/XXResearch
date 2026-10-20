@@ -1,20 +1,25 @@
-# VALIDATION_SPEC — locked final CPU checks (DRAFT until `configs/LOCK.json` exists)
+# VALIDATION_SPEC — locked final CPU checks
 
-Status: **DRAFT**. Becomes binding when committed together with `configs/LOCK.json` (sha256 of this file, SPEC.md, the
-code and the locked config). After the lock: no tuning of the candidate, no change of success criteria, at most one
+Status: **LOCKED** (coordinator, 05:35Z, SPEC v1.3.1). Binding together with `configs/LOCK.json` (sha256 of this file,
+SPEC.md, the code, tests and `configs/validation_locked.json`); the lock commit hash is recorded in RESULTS.md. After the lock: no tuning of the candidate, no change of success criteria, at most one
 documented correctness repair (G_BRIEF §4).
 
 ## 1. Method and arms (SPEC v1.3 §4)
 Candidate **FX-Mix**. Decisive comparators **SC-TF** (exclusion target on random teacher-forced states) and **SC**
-(SC-TF + MDU's rollout flag). Ablations **FX-Mix-greedy** (pool = P1 only) and **SC-TF-cm** (compute-matched SC-TF).
+(MDU loop with its rollout flag on, which replaces the TF state by one random-stop greedy rollout state). Ablations **FX-Mix-greedy** (pool = P1 only) and **SC-TF-cm** (compute-matched SC-TF).
 Literature context **EMDU**, **MDU τ=1**, **NPO** (+ retain SFT). References (not arms): base, retrain, decode-time F-ban.
 
 ## 2. Configuration (fixed from development; see results/dev and DEV_LOG.md)
 Substrate: `mdmu` toy world (24 entities, forget {city, year} of 6 entities), 2-layer mask predictor (d 64), base and
-retrain models trained 3000 steps from the same init. Unlearning: LoRA r=8 on all 7 linear types, AdamW (wd 0), clip 1.0,
-forget batch 32 (SC-TF-cm 52), retain batch 32, λ_r = 1, ε = 1e-3, FX α = 0.25, J, R and rollout settings as in
-`configs/validation_locked.json`. Strength grid: LR ∈ L* (locked list) × checkpoints every 25 steps up to S* steps.
-Evaluation: configs P1–P3, H1–H6 (SPEC §3), eval seeds and sample counts fixed in the locked config.
+retrain models trained 3000 steps from the same init (`python -m mdmu.base_train --world-seed W --init-seed W --steps 3000`).
+Unlearning (all arms): LoRA r=8, α=16 on all 7 linear types of both blocks, AdamW (wd 0), clip 1.0, forget batch 32
+(SC-TF-cm 52 = compute-matched to FX-Mix's 136 row-forwards/step), retain batch 32, λ_f = λ_r = 1, ε = 1e-3; FX arms
+α = 0.25, J = 4 (+ decision state), refresh every R = 4 steps, 1 rollout per forget prompt per refresh.
+**Strength grid (tuning decision from dev worlds 0–1, where Cut-A picks sat at the top of the old grid):
+L* = {2e-3, 4e-3} for every arm × checkpoints every 50 steps up to S* = 400** (16 strength points per unit).
+Evaluation: configs P1–P3, H1–H6 (SPEC §3); forget 8 samples/prompt for stochastic configs, retain 4, copy 1; eval seed
+1234; mechanism statistics (off-manifold fraction, certificate) at every checkpoint with 4 samples.
+Everything is in `configs/validation_locked.json`; the runner refuses placeholders.
 
 ## 3. Fresh validation instances
 Worlds **W ∈ {2, 3, 4}** (world seed = init seed = W; never used in development), unlearning seeds **{0, 1}** per arm and
@@ -40,8 +45,14 @@ first-commit decision states; certificate B̂ (H configs); compute counters and 
   mean F_wf ≥ 0.2 ⇒ "exclusion target avoids degenerate forgetting" (a property shared by every arm with the same
   target; credited to the TNT/UNDIAL target family, not to FX-Mix's state design).
 - **R5 (sanity, must hold for a world to count):** base held-out max leak_any ≥ 0.9; retrain held-out max leak_full = 0.
-- Coverage: 7 arms × 3 worlds × 2 seeds × |L*| runs must complete; a unit that cannot be completed after the single
+- **R2b (pre-registered secondary, decision-irrelevant):** the R1 rule with FX-Mix-greedy as the candidate (dev worlds
+  showed it lowest, within one-prompt granularity); reported only.
+- Coverage: 8 arms × 3 worlds × 2 seeds × 2 LRs = 96 runs must complete; a unit that cannot be completed after the single
   permitted repair counts as INFEASIBLE for that arm.
+- Interpretations confirmed (implemented in `experiments/summarize_locked.py`): I1 ties — Cut A: higher R, fewer steps,
+  lower LR; Cut B: lower leak, fewer steps, lower LR. I2 both INFEASIBLE ⇒ Δ_A = 0 (flagged). I3 a world failing R5 is
+  excluded and the 5-of-6 rule becomes ⌈5n/6⌉ of n. I4 R3 averages the off-manifold fraction over H1–H5 cells with ≥ 1
+  decision state, then over units. I5 R4 means over units whose Cut A exists. I6 missing unit ⇒ INFEASIBLE.
 
 ## 6. Decision mapping (sprint outcome)
 - R1 PASS and integration dry-run test passes ⇒ **READY_FOR_BOUNDED_REAL_MODEL_TEST** (dependencies in HYPERPLANE_PLAN §1).
@@ -50,5 +61,20 @@ first-commit decision states; certificate B̂ (H configs); compute counters and 
   reduction (SC-TF = TNFF/UNDIAL-γ=∞ target on MDU-style random TF states), and the Hyperplane plan is offered only as
   the bounded falsification test of whether the CPU negative transfers (its S1 zero-training gate first).
 
-## 7. Commands
-To be filled from `experiments/` once the locked runner exists (G runs exactly these, `--agent G`, ≤ 3 threads total).
+## 7. Commands (G runs exactly these from `$R`, through the ledger wrapper with `--agent G`; ≤ 4 concurrent 1-thread processes)
+```
+PY=/tmp/claude-0/env-llada/bin/python; L="$PY tools/ledger_run.py --agent G --threads 1 --"
+# 0. lock check: sha256 of every file listed in configs/LOCK.json must match
+# 1. tests
+$L $PY -m pytest -q tests/
+# 2. substrates (one process per world, in parallel), run from src/
+cd src && for W in 2 3 4; do $L $PY -m mdmu.base_train --world-seed $W --init-seed $W --steps 3000 --out ../results/final/substrate/w${W}_i${W} & done; wait; cd ..
+# 3. references
+$L $PY experiments/run_locked.py --refs
+# 4. all units: 4 shards in parallel
+for i in 0 1 2 3; do $L $PY experiments/run_locked.py --shard $i/4 & done; wait
+# 5. assemble and summarise (integration status from the dry-run test in step 1)
+$L $PY experiments/run_locked.py --assemble
+$L $PY experiments/summarize_locked.py --integration-dryrun <pass|fail>
+```
+Outputs: `results/final/locked/{refs,runs,units}/`, `results/final/locked/final_summary.json`.

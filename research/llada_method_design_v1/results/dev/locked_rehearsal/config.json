@@ -1,0 +1,61 @@
+{
+ "_status": "REHEARSAL on DEV world 1 only (pipeline check; 50 steps; not a result)",
+ "_spec": "VALIDATION_SPEC.md sections 2-5; SPEC.md v1.3",
+ "substrate_dir": "results/dev/substrate",
+ "out_dir": "results/dev/locked_rehearsal/out",
+ "worlds": [
+  1
+ ],
+ "unlearn_seeds": [
+  0,
+  1
+ ],
+ "steps": 50,
+ "eval_every": 25,
+ "threads_per_process": 1,
+ "shards": 1,
+ "common": {
+  "lora_r": 8,
+  "lora_alpha": 16.0,
+  "forget_batch": 32,
+  "retain_batch": 32,
+  "lam_f": 1.0,
+  "lam_r": 1.0,
+  "eps": 0.001,
+  "alpha": 0.25,
+  "J": 4,
+  "refresh_every": 4,
+  "rollouts_per_prompt": 1
+ },
+ "eval": {
+  "eval_samples": 8,
+  "eval_samples_retain": 4,
+  "eval_samples_copy": 1,
+  "eval_seed": 1234,
+  "mech_samples": 4,
+  "mech_every_eval": 1,
+  "eval_grid": "P1,P2,P3,H1,H2,H3,H4,H5,H6"
+ },
+ "arms": {
+  "fx_mix": {
+   "lrs": [
+    0.002
+   ],
+   "overrides": {}
+  },
+  "sc_tf": {
+   "lrs": [
+    0.002
+   ],
+   "overrides": {}
+  },
+  "sc": {
+   "lrs": [
+    0.002
+   ],
+   "overrides": {}
+  }
+ },
+ "base_train_command": "python -m mdmu.base_train --world-seed W --init-seed W --steps 3000 --out results/final/substrate/wW_iW   (run from src/, 2 threads)",
+ "allow_dev_worlds": true
+}

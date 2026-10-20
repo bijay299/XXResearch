@@ -28,3 +28,4 @@ Shared files and a shared base model mean there is **no blinding**; independence
 | E mathematical critic | E#1 (resumed) | 2 | 04:46 | (row above) | done 04:50 → `E_theory_check.md`, `E_scripts/prop2_check*` |
 | B denoising-process designer | B#1 (resumed) | 2 | 04:47 | (row above) | done 04:51 → `RESP_B.md`, `B_scripts/resp_norm_ablation*` |
 | D prior-art & controls | D#1 (resumed) | 2 | 04:54 | verbatim evidence for snippet-only sources (EMDU not reproduced by coordinator search) | running → `D_prior_art.md` §6 |
+| F implementation engineer | F#1 (resumed after container restart) | 3 | 05:16 | finish dev world 1; locked runner + summariser; draft locked config | running |

@@ -54,7 +54,7 @@ FX-Mix − SC (each with the observation that would show it matters):
 | | MDU (paper) | MDU rollout flag (code) | EMDU (paper) | TNFF (AR) | SC-TF / SC | **FX-Mix** |
 |---|---|---|---|---|---|---|
 | objective & target | KL(p_θ‖anchor^τ/Z), prompt-masked anchor | same |KL(p_anchor‖p_θ), anchor: prompt + whole answer masked (state-independent per-position marginal)| CE to θ0 minus negative token | KL(r_0‖p_θ), same state | KL(r_ε‖p_θ), same state |
-| training states | TF random masks, GT-length region | 1 random-stop greedy rollout state/step |TF random masks (MDU's)| θ0's own generations (fixed) | TF random (SC: + MDU rollout flag) | fact-free TF + pool of 3–4 native configs, truncated at first F commit |
+| training states | TF random masks, GT-length region | 1 random-stop greedy rollout state/step |TF random masks (MDU's)| θ0's own generations (fixed) | TF random (SC: MDU rollout-flag state instead) | fact-free TF + pool of 3–4 native configs, truncated at first F commit |
 | parameterisation | full FT | full FT |not stated (no LoRA/adapter mentioned)| full FT (T5X) | as chosen (our toy: LoRA) | LoRA (both factors trained; B=0 init) |
 | optimiser / update order | AdamW cosine, forget+λ·retain | same |AdamW, forget + α·retain per step| Adafactor (memory) | AdamW | AdamW; rollouts no-grad every R steps |
 | teacher / reference | frozen θ0 copy | frozen θ0 |frozen θ0 copy| frozen θ0 | frozen θ0 / adapter-off | adapter-off pass (no copy) |

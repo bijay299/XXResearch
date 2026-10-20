@@ -15,3 +15,15 @@ Dev substrate (world 0, init 0, 3000 steps, `results/dev/substrate/w0_i0/`): bas
 facts and 100 % copy under D1 (D2: other 99.6 %); retrain recalls 0 % of forget facts, 100 % neighbour/other/copy.
 Tests: `tests/test_substrate.py` (10 tests: loss equals hand computation, prompt never masked, sampler commits are
 monotone/blockwise with the upstream transfer schedule, greedy determinism, Gumbel sampling matches softmax, LoRA zero-init).
+
+## Changes by F (wave 3) — semantics of existing entries preserved; all listed in results/dev/DEV_LOG.md
+- `diffusion.generate`: batched top-k fast path when every row commits the same k (upstream per-row loop kept as the
+  fallback, `_BATCHED_TOPK=False` restores it; equivalence tested in `tests/test_fxmix.py`).
+- `model.LoRALinear.enabled` + `lora_disabled(model)` (adapter-off reference pass, PEFT `disable_adapter` analogue);
+  `merged_copy(model)` (LoRA folded into plain linears; used for evaluation).
+- `evaluate.DECODING_CONFIGS`: SPEC §3 grid added (P1–P3 pool, H1–H6 held out; `TRAIN_POOL`, `HELDOUT`,
+  `HELDOUT_PRIMARY` = H1–H5, `EXTRAPOLATION` = H6); D1–D4 unchanged. `STOCHASTIC` also contains random-remasking
+  configs (only new entry H3 is affected). `fact_eval(..., ban_values=True)` = decode-time F-ban reference;
+  `return_per_fact=True` for slice accuracies.
+- New: `fxmix.py` (FX-Mix target/states/loss, controls NPO, MDU, EMDU, SC-TF, SC, certificate) and `unlearn.py`
+  (single training loop for all arms, compute counters, evaluation suite, mechanism statistics).

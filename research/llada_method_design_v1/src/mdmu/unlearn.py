@@ -58,7 +58,7 @@ class RunConfig:
     eval_every: int = 25
     world_seed: int = 0
     init_seed: int = 0
-    run_seed: int = 0
+    run_seed: int = 0                  # = unlearning seed: LoRA A init, batch sampling, rollouts (NOT world/eval)
     ckpt_dir: str = ""                 # default: results/dev/substrate/w{W}_i{I}
     lora_r: int = 8
     lora_alpha: float = 16.0
@@ -78,6 +78,7 @@ class RunConfig:
     eval_seed: int = 1234
     mech_samples: int = 4              # rollouts per forget prompt per stochastic config for the mechanism metric
     eval_at_start: int = 1             # 0: skip step-0 eval (B=0 => identical to the base reference eval, same seeds)
+    mech_every_eval: int = 0           # 1: also run mechanism_stats (off-manifold fraction, certificate) at every ckpt
     threads: int = 1
 
 
@@ -285,6 +286,10 @@ def run(cfg: RunConfig, log=print) -> Dict:
         model.eval()
         snapshots[step] = {k: v.detach().clone() for k, v in model.state_dict().items() if k.endswith((".A", ".B"))}
         ev = eval_suite(model, world, cfg, C)
+        if cfg.mech_every_eval:
+            t0m = time.time()
+            ev["mechanism"] = mechanism_stats(model, world, grid, cfg.mech_samples)
+            C.t["eval_s"] += time.time() - t0m
         ev["step"] = step
         ev["counters"] = C.as_dict()
         curve.append(ev)
@@ -366,9 +371,15 @@ def main():
     ap = argparse.ArgumentParser()
     for f in dataclasses.fields(RunConfig):
         ap.add_argument("--" + f.name.replace("_", "-"), type=type(f.default), default=f.default)
+    ap.add_argument("--unlearn-seed", type=int, default=None,
+                    help="alias of --run-seed: changes only the unlearning RNG (LoRA A init, batch sampling, "
+                         "rollouts); world, base checkpoint and evaluation seeds are untouched")
     ap.add_argument("--out", required=True)
     a = vars(ap.parse_args())
     out = a.pop("out")
+    us = a.pop("unlearn_seed")
+    if us is not None:
+        a["run_seed"] = us
     res, _, _ = run(RunConfig(**a))
     torch.save(res.pop("snapshots"), os.path.splitext(out)[0] + "_snapshots.pt")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)

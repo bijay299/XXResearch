@@ -147,6 +147,14 @@ def _scalar(v: str):
 
 
 # ============================================================================================ sampler port
+def _rand(shape, device, generator=None, dtype=torch.float32):
+    """U(0,1) draws: global RNG on `device` if generator is None (upstream behaviour), else drawn on the generator's
+    own device and moved (a CPU torch.Generator cannot drive CUDA sampling directly)."""
+    if generator is None:
+        return torch.rand(shape, dtype=dtype, device=device)
+    return torch.rand(shape, dtype=dtype, generator=generator, device=generator.device).to(device)
+
+
 def add_gumbel_noise(logits, temperature, generator=None):
     """Upstream add_gumbel_noise (float64). generator=None reproduces upstream RNG use exactly (torch.rand_like)."""
     if temperature == 0:
@@ -155,7 +163,7 @@ def add_gumbel_noise(logits, temperature, generator=None):
     if generator is None:
         noise = torch.rand_like(logits, dtype=torch.float64)
     else:
-        noise = torch.rand(logits.shape, dtype=torch.float64, generator=generator, device=logits.device)
+        noise = _rand(logits.shape, logits.device, generator, torch.float64)
     gumbel_noise = (-torch.log(noise)) ** temperature
     return logits.exp() / gumbel_noise
 
@@ -238,7 +246,7 @@ def generate_traced(model, prompt, attention_mask=None, steps=128, gen_length=12
                 if generator is None:
                     x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
                 else:
-                    x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device, generator=generator)
+                    x0_p = _rand((x0.shape[0], x0.shape[1]), x0.device, generator)
             else:
                 raise NotImplementedError(remasking)
             x0_p[:, plen + (num_block + 1) * block_length:] = -np.inf
@@ -467,9 +475,9 @@ def sft_loss_llada(model, input_ids: torch.Tensor, prompt_lengths: torch.Tensor,
     prompts pass attn and prompt_lengths = index of the first answer token.)"""
     b, l = input_ids.shape
     dev = input_ids.device
-    t = torch.rand(b, device=dev, generator=generator)
+    t = _rand(b, dev, generator)
     p_mask = ((1 - eps) * t + eps)[:, None].repeat(1, l)
-    masked = torch.rand((b, l), device=dev, generator=generator) < p_mask
+    masked = _rand((b, l), dev, generator) < p_mask
     noisy = torch.where(masked, torch.full_like(input_ids, MASK_ID), input_ids)
     pos = torch.arange(l, device=dev).expand(b, l)
     prompt_mask = pos < prompt_lengths[:, None]
@@ -486,8 +494,8 @@ def tf_ff_states(full_ids: torch.Tensor, ans_start: torch.Tensor, fact_mask: tor
     positions iid w.p. t; ALWAYS mask answer positions holding an F token."""
     b, l = full_ids.shape
     dev = full_ids.device
-    t = torch.rand(b, device=dev, generator=generator)
-    masked = torch.rand((b, l), device=dev, generator=generator) < t[:, None]
+    t = _rand(b, dev, generator)
+    masked = _rand((b, l), dev, generator) < t[:, None]
     masked |= torch.gather(fact_mask, 1, full_ids)
     masked &= torch.arange(l, device=dev)[None] >= ans_start[:, None]
     return torch.where(masked, torch.full_like(full_ids, MASK_ID), full_ids)
@@ -690,3 +698,92 @@ def load_llada(cfg: FXConfig, device: str = "cuda"):
     vocab = model.config.vocab_size if hasattr(model.config, "vocab_size") else None
     print("[llada_fxmix] vocab_size:", vocab, "(expected 126464; MASK 126336, EOS 126081, EoT 126348)")
     return model, tok
+
+
+# ============================================================================================ end-to-end driver
+def prepare_data(tokenizer, forget_items: Sequence[Dict], retain_items: Sequence[Dict], cfg: FXConfig, device="cpu",
+                 vocab: int = 126464):
+    """forget_items: [{"question", "answer", "fact_strings": [...] (optional)}]; retain_items: [{"question", "answer"}].
+    Returns tensors for train_step / collect_pool and a per-item fact-set log. Items whose prompt contains an F token
+    keep the reduced F and are flagged (SPEC v1 section 1: reported separately)."""
+    P, A, Fm, log = [], [], [], []
+    V = vocab                      # = model logit width (model.config.vocab_size on the real model)
+    for it in forget_items:
+        p = chat_prompt_ids(tokenizer, it["question"])
+        fs = build_fact_set(tokenizer, p, it["answer"], it.get("fact_strings"))
+        m = torch.zeros(V, dtype=torch.bool)
+        if fs["F"]:
+            m[fs["F"]] = True
+        P.append(p)
+        A.append(answer_ids(tokenizer, it["answer"], cfg.gen_length, cfg.append_eot))
+        Fm.append(m)
+        log.append({"question": it["question"], "F": fs["F"], "F_pieces": [tokenizer.decode([t]) for t in fs["F"]],
+                    "prompt_conflict": fs["prompt_conflict"], "dropped_in_prompt": fs["dropped_in_prompt"]})
+    pad = getattr(tokenizer, "pad_token_id", None)
+    pad = EOS_ID if pad is None or pad == MASK_ID else pad
+    pids, pam = left_pad(P, pad)
+    full = torch.cat([pids, torch.tensor(A, dtype=torch.long)], 1)
+    fam = torch.cat([pam, torch.ones(len(P), cfg.gen_length, dtype=torch.long)], 1)
+    fm = torch.stack(Fm)
+    rids, rpl = sft_batch(tokenizer, [(r["question"], r["answer"]) for r in retain_items], cfg.gen_length, cfg.append_eot)
+    to = lambda t: t.to(device)  # noqa: E731
+    return {"pids": to(pids), "pam": to(pam), "fact_mask": to(fm),
+            "forget_tf": {"ids": to(full), "attn": to(fam), "ans_start": to(torch.full((len(P),), pids.shape[1])),
+                          "fact_mask": to(fm)},
+            "retain": {"ids": to(rids), "prompt_lengths": to(rpl), "attn": None}, "fact_log": log}
+
+
+def run_training(model, tokenizer, data: Dict, cfg: FXConfig, log: Callable = print, n_hat_prompts: int = 16) -> Dict:
+    """FX-Mix training loop: theta0 fixed-point report -> every R steps refresh the rollout pool on
+    `rollout_prompts_per_refresh` sampled forget prompts with the current student -> train_step. Returns the history."""
+    g = torch.Generator().manual_seed(cfg.seed)
+    opt, sched = make_optimizer(model, cfg)
+    k = min(n_hat_prompts, data["pids"].shape[0])
+    hist = {"fixed_point": fixed_point_report(model, data["pids"][:k], data["pam"][:k], data["fact_mask"][:k],
+                                              cfg.pool[0], cfg.gen_length, cfg.eps), "steps": [], "pool": []}
+    log({"fixed_point": hist["fixed_point"]})
+    pool = None
+    n = data["pids"].shape[0]
+    for step in range(cfg.steps):
+        if step % cfg.refresh_every == 0:
+            idx = torch.randperm(n, generator=g)[: cfg.rollout_prompts_per_refresh].to(data["pids"].device)
+            pool = collect_pool(model, data["pids"][idx], data["pam"][idx], data["fact_mask"][idx], cfg,
+                                refresh_idx=step // cfg.refresh_every, generator=None)
+            hist["pool"].append({"step": step, "n_states": int(pool["states"].shape[0]), "leak_rate": pool["leak_rate"],
+                                 "rollout_fwd_rows": pool["rollout_fwd_rows"]})
+        out = train_step(model, opt, sched, pool, data["forget_tf"], data["retain"], cfg, generator=g)
+        out["step"] = step + 1
+        hist["steps"].append(out)
+        if (step + 1) % 10 == 0 or step == 0:
+            log({k2: out[k2] for k2 in ("step", "loss", "retain", "pF_ref", "pF_student", "frac_active", "grad_norm")})
+    return hist
+
+
+def main():  # pragma: no cover  (real-model entry point; UNTESTED)
+    import argparse
+    import json
+    ap = argparse.ArgumentParser(description="FX-Mix on LLaDA-8B (UNTESTED on the real model)")
+    ap.add_argument("--config", required=True)
+    ap.add_argument("--forget", required=True, help="JSONL: question, answer, fact_strings (optional)")
+    ap.add_argument("--retain", required=True, help="JSONL: question, answer")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--max-steps", type=int, default=None)
+    a = ap.parse_args()
+    cfg = load_config(a.config)
+    if a.max_steps is not None:
+        cfg = dataclasses.replace(cfg, steps=a.max_steps)
+    torch.manual_seed(cfg.seed)
+    model, tok = load_llada(cfg)
+    model = apply_lora(model, cfg, backend="peft")
+    rd = lambda p: [json.loads(line) for line in open(p) if line.strip()]  # noqa: E731
+    data = prepare_data(tok, rd(a.forget), rd(a.retain), cfg, device=model.device,
+                        vocab=int(getattr(model.config, "vocab_size", 126464)))
+    os.makedirs(a.out, exist_ok=True)
+    json.dump(data["fact_log"], open(os.path.join(a.out, "fact_sets.json"), "w"), indent=1)
+    hist = run_training(model, tok, data, cfg, log=lambda d: print(json.dumps(d, default=float), flush=True))
+    json.dump(hist, open(os.path.join(a.out, "history.json"), "w"), default=float)
+    model.save_pretrained(os.path.join(a.out, "adapter"))
+
+
+if __name__ == "__main__":
+    main()

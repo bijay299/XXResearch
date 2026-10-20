@@ -1,0 +1,155 @@
+{
+ "rules": "VALIDATION_SPEC.md section 5 (mechanical)",
+ "interpretations": "Mechanical summary of the locked validation (VALIDATION_SPEC.md section 5 and section 6) -> final_summary.json.\n\nInput: the run_locked.py output dir (refs/refs_wW.json, units/<arm>_wW_sS.json) and the locked config.\nRules implemented exactly as written in VALIDATION_SPEC section 5; where the text leaves a case open, the choice made\nhere is listed under \"interpretations\" in the output so that G/coordinator can confirm or override it before the lock:\n  I1 Cut A ties: higher R, then fewer steps, then lower LR.  Cut B ties: lower held-out leak, fewer steps, lower LR.\n  I2 Delta_A when BOTH comparator and FX-Mix are INFEASIBLE: 0 (flagged); comparator-only => +1; FX-Mix-only => -1.\n  I3 Worlds failing R5 are excluded; R1's \"5 of 6\" becomes ceil(5n/6) of the n counted units (flagged if n != 6).\n  I4 R3 averages off_manifold_frac over the H1-H5 cells that have >= 1 first-commit decision state, then over units.\n  I5 R4 means are over units whose Cut A exists (counts reported).\n  I6 A unit missing from units/ (not completed) counts as INFEASIBLE for that arm (section 5 coverage rule).",
+ "worlds": {
+  "1": {
+   "R5_pass": true,
+   "base_HO5_leak_any": 1.0,
+   "retrain_HO5_leak_any": 0.2604166666666667,
+   "retrain_HO5_leak_full": 0.0,
+   "base_R": 0.9183201058201058,
+   "base_min_copy": 1.0,
+   "retrain_R": 0.9052579365079365,
+   "retrain_F_wf": 0.6695601851851852,
+   "fban_F_wf": 0.3142361111111111
+  }
+ },
+ "units": {
+  "fx_mix_w1_s0": {
+   "cutA": null,
+   "cutB": null,
+   "wall_s_per_run": [
+    18.8
+   ]
+  },
+  "fx_mix_w1_s1": {
+   "cutA": null,
+   "cutB": null,
+   "wall_s_per_run": [
+    17.5
+   ]
+  },
+  "sc_tf_w1_s0": {
+   "cutA": null,
+   "cutB": null,
+   "wall_s_per_run": [
+    17.8
+   ]
+  },
+  "sc_tf_w1_s1": {
+   "cutA": null,
+   "cutB": null,
+   "wall_s_per_run": [
+    18.5
+   ]
+  },
+  "sc_w1_s0": {
+   "cutA": null,
+   "cutB": null,
+   "wall_s_per_run": [
+    17.9
+   ]
+  },
+  "sc_w1_s1": {
+   "cutA": null,
+   "cutB": null,
+   "wall_s_per_run": [
+    18.4
+   ]
+  }
+ },
+ "delta_A": {
+  "sc_tf": {
+   "per_unit": {
+    "w1_s0": 0.0,
+    "w1_s1": 0.0
+   },
+   "mean": 0.0,
+   "n_positive": 0,
+   "n": 2
+  },
+  "sc": {
+   "per_unit": {
+    "w1_s0": 0.0,
+    "w1_s1": 0.0
+   },
+   "mean": 0.0,
+   "n_positive": 0,
+   "n": 2
+  }
+ },
+ "R": {
+  "R1": {
+   "PASS": false,
+   "per_comparator": {
+    "sc_tf": {
+     "mean_delta_A": 0.0,
+     "n_positive": 0,
+     "need": 2,
+     "pass_delta": false
+    },
+    "sc": {
+     "mean_delta_A": 0.0,
+     "n_positive": 0,
+     "need": 2,
+     "pass_delta": false
+    }
+   },
+   "fxmix_cutB_infeasible": 2,
+   "sctf_cutB_infeasible": 2,
+   "cutB_condition": true
+  },
+  "R2": {
+   "mean_delta_A_fx_mix_greedy": null,
+   "descriptive": true
+  },
+  "R3": {
+   "sc_tf_off_manifold_cutA_mean_H1_H5": null,
+   "n_units_defined": 0,
+   "coverage_gap_present": false
+  },
+  "R4": {
+   "fx_mix_F_wf": null,
+   "n_fx": 0,
+   "literature_F_wf": {},
+   "gap": null,
+   "exclusion_target_avoids_degenerate_forgetting": false,
+   "credit": "property of the exclusion target family (TNT/UNDIAL), not of FX-Mix's state design"
+  },
+  "R5": {
+   "1": true
+  }
+ },
+ "flags": [
+  "2 counted units (not 6): R1 positivity threshold = 2 of 2 (I3)",
+  "Delta_A(sc_tf) w1 s0: both INFEASIBLE -> 0 (I2)",
+  "Delta_A(sc_tf) w1 s1: both INFEASIBLE -> 0 (I2)",
+  "Delta_A(sc) w1 s0: both INFEASIBLE -> 0 (I2)",
+  "Delta_A(sc) w1 s1: both INFEASIBLE -> 0 (I2)"
+ ],
+ "cutB_infeasible_count": {
+  "fx_mix": 2,
+  "sc_tf": 2,
+  "sc": 2
+ },
+ "cutA_infeasible_count": {
+  "fx_mix": 2,
+  "sc_tf": 2,
+  "sc": 2
+ },
+ "coverage": {
+  "fx_mix": {
+   "completed_units": 2,
+   "expected_units": 2
+  },
+  "sc_tf": {
+   "completed_units": 2,
+   "expected_units": 2
+  },
+  "sc": {
+   "completed_units": 2,
+   "expected_units": 2
+  }
+ },
+ "decision": "NO_DISTINCT_METHOD_AFTER_CONSTRUCTION"
+}

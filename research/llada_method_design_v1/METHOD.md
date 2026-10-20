@@ -20,7 +20,7 @@ capability stay close to the original model. This is *not* refusal (type ii), no
 
 **Falsifiable hypothesis.** At matched retention, FX-Mix lowers leakage on *held-out* native configurations below the
 strongest straightforward combination of the same ingredients (SC-TF: exclusion target on LLaDA/MDU-style random
-teacher-forced states; SC: SC-TF plus MDU's single-greedy-config rollout flag). If it does not, the method reduces to
+teacher-forced states; SC: MDU's loop with its single-greedy-config rollout flag, which replaces the TF state). If it does not, the method reduces to
 "TNFF-in-MDU" and is reported as such.
 
 ## 2. Why the usual objectives miss the leak-relevant states
