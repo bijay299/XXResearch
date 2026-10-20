@@ -1,11 +1,13 @@
 # COST_MODEL — measured CPU, symbolic scaling, unmeasured GPU projection (kept separate)
 
+> **Amended by [`AMENDMENT_01.md`](AMENDMENT_01.md) §5** (documentation only): accounting qualifications corrected below.
+
 ## 1. Measured on this CPU host (numpy prototype; `results/ledger.jsonl`, `results/E_smoke.json`, validation `summary.json`)
 | item | measured |
 |---|---|
 | one `arm.step`, 5-step smoke, dev seed 0 (CPU-s per 5 steps) | adamw 2.1 / 2.2 / 15.7 ms (linear / MLP / flow); vau 6.3 / 6.6 / 28.7 ms |
 | median CPU per validation run (frozen timings) | 0.12 s (model a), 0.23 s (b), 1.66 s (c) |
-| full validation phase (636 units, 12 seeds, 16–17 arms × 4–8 configs) | 13,920 core-s = 3.87 core-h; 3593 s wall on 4 workers; peak RSS 1.53 GiB |
+| full validation phase (636 units, 12 seeds, 16–17 arms × 4–8 configs) | 13,920 core-s = 3.87 core-h; 3593 s wall on 4 workers; peak RSS 1.53 GiB (largest metered child, not aggregate) |
 | forward-equivalents per run, median (protocol accounting; FE = one model forward per sample, backward = 2 FE, probe VJP row = 3 FE per sample, gate try = n₂ FE) | G1: adamw 996, penalty 4,433, post_euclid_reject+gate 24,213, **vau 29,245**; G8: adamw 888, penalty 2,444, post_euclid_reject+gate 5,808, **vau 12,032** |
 | vau / best control (median FE) | 1.43 (G1), 1.51 (G6), 19.9 (G5), 27.1 (G7), 2.07 (G8) |
 | vau / native adamw (median FE) | 20.2 (G5) – 64.1 (G7) |
@@ -27,12 +29,17 @@ No GPU was used. Wall-clock or dollar figures for FLUX are **not** estimated her
 an assumed budget (~88 GPU-h, cap 96) that has not been measured and is not a claim. No speedup or exactness on GPU is
 claimed.
 
-## 4. Whole-sprint accounting (reconciled 2026-10-20)
-Charged CPU = sum of `results/ledger.jsonl` entries excluding the nested self-meter `E_run_validation` (13,914.8 core-s),
-which is contained in the enclosing `VALIDATION_PHASE_v1_2` (13,920.5 core-s): **17,413 core-s ≈ 4.84 core-h** of the
-48 core-h ceiling (before the closeout entries appended after this reconciliation; see `docs/AGENT_LEDGER.md`).
-Failed attempts included: 1,682 core-s (D_window_toy, F_f4_lora_toy, F_f5_diag, the first E_run_dev crash 1,577 core-s,
-and a 0-s validation launch failure). Peak RSS of any metered job 1.53 GiB (cap 16). Gaps: short unmetered shell/Python
-calls by agents and the coordinator (file reads, JSON inspection, pip installs) are not in the ledger; the RSS cap was
-enforced only via RLIMIT_AS in `meter.py`, and the 4-core cap only by worker count; dollar/credit spend could not be read
-or capped from inside the session.
+## 4. Whole-sprint accounting (reconciled 2026-10-20; qualified by AMENDMENT_01 §5)
+- **Metered consumption: 17,413.191 recorded core-seconds ≈ 4.84 core-hours** of the 48 core-hour ceiling, after
+  removing the nested self-meter `E_run_validation` (13,914.8 core-s, contained in the enclosing `VALIDATION_PHASE_v1_2`,
+  13,920.5 core-s). Includes **1,682.043 core-s across five unsuccessful attempts** (D_window_toy, F_f4_lora_toy, the first
+  F_f5_diag, the first E_run_dev 1,577 core-s, and a 0-s validation launch failure). This is metered consumption with
+  disclosed unmetered work (interactive shell/Python reads, pip installs, git, agent reasoning) — **not an exhaustive total**.
+- **Memory.** 1.53 GiB is the peak RSS of the largest metered child process (`ru_maxrss`), not aggregate concurrent
+  process-tree RSS. `meter.py`'s default per-process `RLIMIT_AS` (2 × 12 = 24 GiB) is an address-space limit and does
+  **not** enforce the 16-GiB aggregate RSS ceiling; the 4-core ceiling was respected only through the worker count.
+- **Storage.** ≈ 158 MiB is the final size of this directory, not whole-sprint peak additional storage; not included: the
+  venv (~243 MiB in /tmp), the aborted torch download cache (~2.7 GB, deleted), the reference worktree and external clones in
+  the session scratchpad.
+- **No resource overrun was demonstrated**; incomplete measurement is not proof of a breach. Dollar/credit spend could not be
+  read or capped from inside the session; no paid API or top-up was used.

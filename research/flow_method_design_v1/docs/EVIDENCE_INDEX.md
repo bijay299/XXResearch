@@ -1,5 +1,7 @@
 # EVIDENCE INDEX — research/flow_method_design_v1
 
+> Corrections governing earlier interpretations: [`../AMENDMENT_01.md`](../AMENDMENT_01.md) (documentation only).
+
 Tags: VERIFIED (read at a pinned location) · DERIVED (proof) · COMPUTED (reproducible script/run) · UNVERIFIED.
 Frozen = hashed in `configs/FREEZE.json` (freeze commit `aec0f3837aba5842c2e30eb4f758bfa9750fb99d`).
 
@@ -21,6 +23,9 @@ Frozen = hashed in `configs/FREEZE.json` (freeze commit `aec0f3837aba5842c2e30eb
 | Validation raw results (636 units, seeds 7000–7011) | `results/validation/raw/`, `units.jsonl`, `summary.json` | COMPUTED (frozen runner) |
 | Computed verdict NO_SUPPORTED_CANDIDATE and its basis | `results/validation/summary.json` → `verdict`; `docs/INTERPRETATION_NOTE.md` | COMPUTED + interpretation |
 | Coverage table, F1, family/safety stats | `results/RESULTS.md` | COMPUTED |
+| G9 mechanism diagnostic (bilinear share γ, drift ratio) — contradicts the f5-based bilinear explanation | `results/validation/summary.json → families.G9.mechanism`; definition `code/run_validation.py:570-588, 1320-1334` | COMPUTED (frozen; not a criterion) |
+| F5 development toy (mixed nonlinear finite difference, not the layer dB·dA term) | `review/F_scripts/f5_lora_diag.py:16-18`, `f5_lora_diag_output.txt` | COMPUTED (development; generalization withdrawn) |
+| Amendment 01: corrected interpretation, narrowed math, accounting and record reconciliation | `AMENDMENT_01.md` | documentation |
 | Post-hoc descriptive arm table (not a decision input) | `results/validation/posthoc_arm_table.{py,json}` | COMPUTED post hoc |
 | Native integration (STATIC, NOT EXECUTED) | `native/vau_torch.py`, `native/gem_integration.patch`, `native/INTEGRATION_NOTES.md` | static; no torch available |
 | Costs | `COST_MODEL.md`, `results/ledger.jsonl` | measured CPU / symbolic / unmeasured GPU kept separate |

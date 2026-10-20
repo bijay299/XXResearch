@@ -1,5 +1,8 @@
 # Interpretation note (post-freeze; does not modify any frozen artifact)
 
+> **Amended by [`../AMENDMENT_01.md`](../AMENDMENT_01.md)** (documentation only). The computed verdict and its recorded
+> reasons are unchanged; wording in §3(4), §4 and §5 is corrected below.
+
 Written by the coordinator after the freeze commit `aec0f3837aba5842c2e30eb4f758bfa9750fb99d`, following the user's
 2026-10-20 instruction to preserve the runner's computed verdict, disclose specification ambiguities, and scope the
 scientific interpretation separately. Nothing here changes code, thresholds, cell classification or decision rules.
@@ -65,22 +68,26 @@ NOT_TESTABLE), so the verdict does not depend on it. (3) NO-vs-UNRESOLVED preced
 NOT_TESTABLE ⇒ UNRESOLVED" overrides the NO list, the label would read HYPOTHESIS_UNRESOLVED; the runner did not do that,
 the more natural reading of "every other outcome" supports the runner, and the computed verdict stands. This is
 disclosed as a limit on how strongly the label can be read, not replaced.
-(4) The 84 VAU `timeout` failures were all the coverage-instrumented run (measurement overhead). They set `vau_crash` in
+(4) The 84 VAU `timeout` failures all occurred in the coverage-instrumented run (associated with and consistent with
+instrumentation overhead; the cause was not conclusively isolated). They set `vau_crash` in
 safety_G1, but G1 also fails on GMR 2.08 alone, five other safety families fail, and F1 uses ungated runs, so the
 verdict does not depend on them either. They remain counted as failures, as the frozen rules require.
 
 ## 4. Scientific interpretation (separate from the label)
 - **What was tested in the covered regime and failed.** The narrowed hypothesis' first clause (C-H1(i): the Adam-metric
-  projection gives ≥ 1.2× the erasure progress of the Euclidean post-projection where probes cover the retained response)
+  projection gives ≥ 1.2× the cumulative held-out hinge progress (10-step or earlier-cutoff; not the first-order −g·Δ) of the Euclidean post-projection where probes cover the retained response)
   was tested in COVERED linear-reference cells and **did not meet its pre-declared threshold** (gains 1.01–1.35×; seed medians ≈ 1.14× at d=2 and
-  ≈ 1.07× at d=3). At matched erasure, the full VAU procedure **tied** the best controls in every TESTABLE family (Q1 GMR 1.011 G1,
-  0.946 G6, 0.984 G7; none qualified). On this synthetic evidence the covered-regime advantage claim is not supported.
-- **What was not tested.** G2, G5 and G8 — including the tiny flow model, which carries the GEM-like prefix objective —
-  had no COVERED cell; the narrowed hypothesis was **not tested** there. Their results (e.g. G8 generic GMR 80.6; G5 na_lora
+  ≈ 1.07× at d=3; 9/12 and 11/12 seeds below 1.2×, a few individual seeds above it). At matched erasure, VAU **did not
+  establish the preregistered qualifying advantage** in any TESTABLE family (Q1 GMR 1.011 G1, 0.946 G6, 0.984 G7; none
+  qualified; the CIs do not establish equivalence). On this synthetic evidence the covered-regime advantage claim is not supported.
+- **What was not tested.** All families ran. In G2, G5 and G8 — including the tiny flow model, which carries the GEM-like
+  prefix objective — no cell met the COVERED definition, so the narrowed hypothesis was **not tested within the qualifying
+  COVERED regime** there. No FLUX experiment ran. Their results (e.g. G8 generic GMR 80.6; G5 na_lora
   far lower drift) describe VAU outside its claimed regime and **must not be read as falsifying the covered-regime claim**.
   They do support the weaker statement that **this sprint did not establish a useful candidate**.
-- **Safety failures** are largely the gate-stall effect (gated VAU failing to reach E = 0.8, scored at log 100 by the frozen
-  convention). They show that VAU as frozen (its τ grid, gate) is not a safe drop-in at matched erasure in those regimes;
+- **Safety failures** (qualification failures under the frozen rule) are largely driven by gated VAU failing to reach
+  matched erasure E = 0.8, which the frozen convention scores at log 100; such ratios are convention-based, not direct
+  measurements of drift or damage. They show that VAU as frozen (its τ grid, gate) is not a safe drop-in at matched erasure in those regimes;
   they are not evidence about the metric component in covered cells.
 - **Observed but outside the hypothesis (post hoc, no criterion):** the metric's progress gain was larger in generic,
   uncovered G1 cells (1.4–3.8×). This was not predicted as the claim and is not evidence for it; any use of it would be a
@@ -89,7 +96,10 @@ verdict does not depend on them either. They remain counted as failures, as the 
 
 ## 5. What the computed label licenses
 `NO_SUPPORTED_CANDIDATE` here means: the frozen synthetic validation produced a covered-regime falsification of C-H1(i)
-(F1) and ≥ 2 safety-family failures, and no advantage family qualified. It does not mean VAU's mathematics is wrong
-(DERIVATION results hold within their scopes, per review F), and it does not test the claim on the flow model. The
+(F1) and ≥ 2 safety-family failures, and no advantage family qualified. It does not mean the listed conditional mathematical results are wrong
+(they hold under their stated assumptions; equivalence/optimality claims are narrowed in AMENDMENT_01 §3), and it does
+not test the narrowed claim within the COVERED regime on the flow model. F1 and the safety failures each support stopping
+independently of the F4/F5 ambiguities in §2. The G9 mechanism diagnostic contradicted the bilinear explanation
+(AMENDMENT_01 §1); no explanation of VAU's failure is claimed as validated. The
 real-model protocol (`docs/REAL_MODEL_PROTOCOL.md`) is retained as written but, under this label, is **not recommended
 for launch**.

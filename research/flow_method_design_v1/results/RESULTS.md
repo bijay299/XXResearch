@@ -1,8 +1,12 @@
 # RESULTS — frozen synthetic validation (protocol v1.2, freeze `aec0f38`)
 
+> **Amended by [`../AMENDMENT_01.md`](../AMENDMENT_01.md)** (documentation only). Numbers below are unchanged; wording on
+> F1's observable, "ties", record categories, convention-based ratios, G9 mechanism and memory accounting is corrected.
+
 Source of every number: `results/validation/summary.json` (computed by the frozen runner `code/run_validation.py`), raw
 per-run records `results/validation/raw/<family>/<cell>__s<seed>.jsonl.gz`, per-unit CPU `results/validation/units.jsonl`.
-Seeds 7000–7011 (12 per family), run once, after the freeze commit. **Synthetic evidence only**: models (a) linear
+Record reconciliation: regular arm records 66,576 = 60,540 ok + 84 failed + 5,952 NOT_APPLICABLE; arm-bearing total
+66,576 + 192 + 24 = 66,792 (AMENDMENT_01 §5). Seeds 7000–7011 (12 per family), run once, after the freeze commit. **Synthetic evidence only**: models (a) linear
 reference, (b) LoRA tanh MLP, (c) tiny conditional rectified-flow attention model. Nothing here measures object removal,
 image quality or FLUX behaviour.
 
@@ -18,9 +22,11 @@ Basis, rules quoted and ambiguities: `docs/INTERPRETATION_NOTE.md`.
 636/636 units completed (rc 0; 3593 s wall). Inside units, individual arm runs:
 | status | count | where | cause |
 |---|---|---|---|
-| ok | 66,576 run records total incl. below | all families | — |
-| NOT_APPLICABLE | 1152+1152 (G1), 768+768 (G2), 480+480 (G3), 576+576 (G4) | `na_lora`, `na_lora+gate` on the linear model | as specified (no LoRA) |
-| failed | 72 (G1), 12 (G7) | **`vau` only** | `RunFailure: timeout` (frozen per-run CPU cap = 10× median run time, `run_validation.py:1933`). All 84 are the single coverage-instrumented VAU run per unit (`cov_refresh` recorded, `:725`) in exact-J (G1) and K=1 (G7) cells; the same instrumented run succeeded in sketch/K5 cells; no plain VAU run failed. Counted as VAU crashes by the frozen rules (sets `vau_crash` in safety_G1); **not rerun**. |
+| ok (regular arm records) | 60,540 | all families | — |
+| G9 measurement records (all ok) | 192 | G9 | mechanism logging runs |
+| G5 gauge-check records (no status field) | 24 | G5 | 12 `vau`, 12 `vau_nogate` |
+| NOT_APPLICABLE | 1152+1152 (G1), 768+768 (G2), 480+480 (G3), 576+576 (G4) | `na_lora`, `na_lora+gate` on the linear model | as specified (no LoRA); total 5,952 |
+| failed | 84 = 72 (G1) + 12 (G7) | **`vau` only** | `RunFailure: timeout` (frozen per-run CPU cap = 10× median run time, `run_validation.py:1933`). All 84 are the single coverage-instrumented VAU run per unit (`cov_refresh` recorded, `:725`) in exact-J (G1) and K=1 (G7) cells; the same instrumented run succeeded in sketch/K5 cells; no plain VAU run failed. Associated with and consistent with instrumentation overhead; the cause was not conclusively isolated. Counted as VAU crashes by the frozen rules (sets `vau_crash` in safety_G1); **not rerun**. |
 
 ## 3. Probe coverage at θ₀ (frozen definition: COVERED iff median C_probe ≥ 0.90 and median k ≥ eff_rank_99)
 | family | cell | C_probe | C_probe (D-weighted) | eff_rank_99 | k | C_feat | class |
@@ -51,7 +57,7 @@ TESTABLE (2 primary cells K1, K5); **G2, G5, G8 NOT_TESTABLE** (no COVERED prima
 measurement was missing; all families ran.
 
 ## 4. Falsifier F1 (C-H1(i), metric progress) — evaluated in COVERED cells
-R_s = P(vau_nogate)/P(post_euclid_reject), first-order erasure progress at step 10, lr0, ungated, G1 exact-J. Falsified
+R_s = P(vau_nogate)/P(post_euclid_reject), P = cumulative held-out hinge progress E_test after 10 steps (or at the first step either arm reaches 0.95) — not the first-order −g·Δ; lr0, ungated, G1 exact-J. Falsified
 if R_s < 1.2 in ≥ 8 of 12 seeds at d=2 or d=3 in the covered population.
 | cell | R_s per seed (7000…7011) | seeds < 1.2 | |
 |---|---|---|---|
@@ -59,11 +65,13 @@ if R_s < 1.2 in ≥ 8 of 12 seeds at d=2 or d=3 in the covered population.
 | d3 covered | 1.04 1.01 1.14 1.06 1.07 1.12 1.04 1.06 1.12 1.08 1.22 1.08 | **11** | triggers |
 | d2 generic (not a criterion) | 1.71 1.40 3.22 1.84 1.37 1.63 1.44 2.27 1.82 1.54 3.00 1.48 | 0 | reported |
 | d3 generic (not a criterion) | 1.83 1.55 3.76 2.09 0.99 1.61 1.61 2.48 1.93 1.56 3.10 1.63 | 1 | reported |
-The metric always gave ≥ 1× the Euclidean progress in
-covered cells but by less than the pre-declared 1.2×; the larger gains appear only in generic (uncovered) cells, which
+In covered cells every seed gave ≥ 1× the Euclidean
+progress; 9/12 (d = 2) and 11/12 (d = 3) seeds were below the pre-declared 1.2×, while some individual seeds exceeded it
+(d = 2: 1.34, 1.27, 1.35; d = 3: 1.22); the larger gains appear only in generic (uncovered) cells, which
 are outside the narrowed hypothesis.
 
 ## 5. Advantage families (TESTABLE ones; GMR = geometric-mean ratio ρ_vau / ρ_best-control at matched erasure E=0.8)
+None qualified: VAU did not establish the preregistered qualifying advantage. The CIs do not establish equality or equivalence.
 | family | Q1 GMR | 95 % CI | wins / needed | Holm p | qualifies | F2 GMR (penalty/vau) | F5 GMR (vau/na) |
 |---|---|---|---|---|---|---|---|
 | G1 | 1.011 | [0.77, 1.46] | 8 / 9 | 0.937 | no | 24.5 (VAU ≪ penalty) | n/a (na_lora not applicable; value is a floor artifact) |
@@ -88,7 +96,8 @@ did not trigger.
 Descriptive post-hoc table (`results/validation/posthoc_arm_table.{py,json}`, not a decision input; its "best" column
 includes VAU-family rows): gated VAU frequently failed to reach E = 0.8 (e.g. G4 model-a cells 0–1/12 seeds, G8 covered
 1/12, generic 0/12), which the frozen matched-efficacy convention scores at log 100 — the dominant source of the large
-safety GMRs. This is the "gate stall" already seen in development and not acted on.
+safety GMRs. Such ratios are convention-based (failure to reach matched erasure), not direct measurements of drift or
+physical damage; safety *qualification failure*, *failure to reach matched erasure* and *measured drift* are distinct. This is the "gate stall" already seen in development and not acted on.
 
 ## 7. Gate certificate F3 and oracle
 F3: 0 / 24,032 gated runs violated the clipped population drift budget (not triggered). Unclipped violation fraction 0.194;
@@ -96,10 +105,13 @@ rare-subgroup violation fraction 0.744 — the certificate covers the clipped me
 penalty_oracle flip: no (oracle GMR 0.988).
 
 ## 8. Diagnostics (no candidate criterion)
-GD-B (Agent B, H-B1 P2): not falsified on its SGD cells (GEM/axial collateral ratio 7.3–4.9e6 under SGD); under AdamW the
+G9 mechanism (frozen diagnostic, not a criterion; `families.G9.mechanism`): bilinear share `gamma_1_8` VAU 4.155e-5
+(≈ 0.00416 %), post_euclid_reject 3.786e-5, vau_blocksplit 2.758e-5; drift ratio vs post_euclid_reject VAU 1.685,
+vau_blocksplit 1.758. The frozen prediction (≥ 10× with γ > 0.99) was **not supported**. γ is a layer-level squared-norm
+ratio, not a fraction of output or semantic damage. GD-B (Agent B, H-B1 P2): not falsified on its SGD cells (GEM/axial collateral ratio 7.3–4.9e6 under SGD); under AdamW the
 same ratio is only 1.28–1.81. GD-D (Agent D, P-D5): falsified (Spearman 0.011 < 0.2).
 
 ## 9. Measured compute
-Validation phase: 13,920.5 core-s (3.87 core-h; projection 3.69, hard stop 6.0), 3593 s wall, peak RSS 1.53 GiB.
+Validation phase: 13,920.5 core-s (3.87 core-h; projection 3.69, hard stop 6.0), 3593 s wall, peak RSS 1.53 GiB (largest metered child process, not aggregate process-tree RSS).
 FE per arm (median per run, protocol units) e.g. G1: adamw 996, penalty 4,433, post_euclid_reject+gate 24,213, vau 29,245;
 vau / best control 1.43 (G1), 19.9 (G5), 27.1 (G7), 2.07 (G8); vau / adamw 20–64×. Details: `COST_MODEL.md`.
