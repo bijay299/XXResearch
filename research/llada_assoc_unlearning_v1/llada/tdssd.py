@@ -63,7 +63,7 @@ class Config:
     gen_length: int = 32                           # answer region length L_a (multiple of 8)
     weighting: str = "mean"                        # frozen: mean over masked positions ("sft" kept for diagnostics)
     eps: float = 1e-3
-    lam_T: float = 1.0                             # used by "ssd" only (X has lam_T = 0 by construction)
+    lam_T: float = 0.0                             # X: 0 by construction; Z: 1.0 (configs/ssd.json)
     lam_R: float = 1.0
     n_controls: int = 16
     n_eval_strangers: int = 8
@@ -88,7 +88,16 @@ def load_config(path: str, **overrides) -> Config:
     d.update({k: v for k, v in overrides.items() if v is not None})
     if "checkpoints" in d:
         d["checkpoints"] = tuple(int(x) for x in d["checkpoints"])
-    return Config(**d)
+    cfg = Config(**d)
+    validate(cfg)
+    return cfg
+
+
+def validate(cfg: Config):
+    """V B3: X has no anchor by construction; Z must have its rotating anchor."""
+    assert cfg.arm in ("tdssd", "ssd"), cfg.arm
+    assert cfg.arm != "ssd" or cfg.lam_T > 0, "arm ssd (control Z) requires lam_T > 0 (use configs/ssd.json)"
+    assert cfg.arm != "tdssd" or cfg.lam_T == 0, "arm tdssd (candidate X) has lam_T = 0 (use configs/tdssd.json)"
 
 
 # ============================================================================================ data adapter
@@ -140,9 +149,10 @@ def accept_name(tokenizer, text: str, subj: str, name: str, forbidden: set) -> O
     if not pairs:
         return None
     for variant in (subj, " " + subj):
-        vp = _swap_pairs(tokenizer(variant, add_special_tokens=False)["input_ids"],
-                         tokenizer(variant.replace(subj, name), add_special_tokens=False)["input_ids"])
-        if vp is None:
+        va = tokenizer(variant, add_special_tokens=False)["input_ids"]
+        vb = tokenizer(variant.replace(subj, name), add_special_tokens=False)["input_ids"]
+        vp = _swap_pairs(va, vb)
+        if vp is None or len(vp) != len(va):            # V B2: every subject-span token must differ
             return None
         pairs = pairs + vp
     m = _involution(pairs)
@@ -337,7 +347,27 @@ def prepare(tokenizer, model, forget: List[Dict], retain: List[Dict], cfg: Confi
             raise RuntimeError(f"no admissible control name for forget item {fa.get('id')}")
         fa["controls"] = ctrl
         taken |= {c["name"] for c in ctrl}
-    eval_names = [nm for nm in cands if nm not in taken][: cfg.n_eval_strangers]
+    trained_name_toks = set()
+    for fa in facts:
+        trained_name_toks |= set(fa["teacher"]["name_tokens"])
+        for c in fa["controls"]:
+            trained_name_toks |= set(c["name_tokens"])
+    eval_names = []                                                    # V B1: E token-disjoint from trained names
+    for nm in cands:
+        if len(eval_names) >= cfg.n_eval_strangers:
+            break
+        if nm in taken:
+            continue
+        toks = set(tokenizer(nm, add_special_tokens=False)["input_ids"]) | \
+            set(tokenizer(" " + nm, add_special_tokens=False)["input_ids"])
+        if toks & (trained_name_toks | forbidden):
+            continue
+        eval_names.append(nm)
+        trained_name_toks |= toks                                      # E names also mutually disjoint
+    for r in list(forget) + list(retain):                              # V B8: truncation warning
+        n = len(tokenizer(r["answer"], add_special_tokens=False)["input_ids"])
+        if n > L - 1:
+            print(f"WARNING item {r.get('id')}: answer has {n} tokens > gen_length-1 = {L - 1}; truncated")
     plen = [len(fa["teacher"]["pA"]) for fa in facts]
     Ltot = max(plen) + L
     A_rows, T_rows = [], []
@@ -478,6 +508,7 @@ def make_optimizer(model, cfg: Config):
 
 def train(model, data: Dict, cfg: Config, save_fn: Optional[Callable[[int], None]] = None,
           log: Callable = print, V: Optional[int] = None) -> List[Dict]:
+    validate(cfg)
     g = torch.Generator().manual_seed(cfg.seed)
     dev = data["xA"].device
     V = V or int(logits_of(model, data["xA"][:1]).shape[-1])

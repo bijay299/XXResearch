@@ -31,8 +31,8 @@ class TinyTok:
         self.itos = ["<pad>", "<mask>", "<eos>", "<user>", "<asst>"] + sorted(set(words) - {"<user>", "<asst>"})
         self.stoi = {w: i for i, w in enumerate(self.itos)}
 
-    def __call__(self, text, add_special_tokens=False):
-        return {"input_ids": [self.stoi[w] for w in re.findall(TOKRE, text)]}
+    def __call__(self, text, add_special_tokens=False):      # unknown words -> <pad> id 0 (dry-run robustness)
+        return {"input_ids": [self.stoi.get(w, 0) for w in re.findall(TOKRE, text)]}
 
     def apply_chat_template(self, msgs, add_generation_prompt=True, tokenize=False):
         return "<user> " + msgs[0]["content"] + " <asst>"
@@ -88,7 +88,8 @@ def make(arm="tdssd", seed=0, weighting="mean", nonzero_lora=True, n_controls=4)
         g = torch.Generator().manual_seed(7)
         for a in m.adapters:
             a.B.data = 0.05 * torch.randn(a.B.shape, generator=g)
-    cfg = T.Config(arm=arm, gen_length=8, weighting=weighting, mask_id=1, eos_id=2, retain_batch=2, steps=3,
+    cfg = T.Config(arm=arm, lam_T=1.0 if arm == "ssd" else 0.0, gen_length=8, weighting=weighting, mask_id=1,
+                   eos_id=2, retain_batch=2, steps=3,
                    checkpoints=(2, 3), log_every=100, n_controls=n_controls, n_eval_strangers=3)
     data = T.prepare(tok, m, FORGET, T.split_retain(RETAIN, FORGET), cfg)
     perms = torch.stack([T.swap_perm(s, V) for s in data["teacher_swaps"]])
@@ -320,3 +321,19 @@ def test_both_arms_train_rotate_controls_and_save():
         assert saved == [4, 8] and len(hist) == 8 and hist[-1]["L_R"] is not None
         assert len({tuple(h["ctrl_idx"]) for h in hist}) > 1                    # controls are redrawn
         assert (hist[-1]["L_T"] is None) == (arm == "tdssd")
+
+
+def test_engineering_fixes_from_V_review():
+    tok, m, cfg, data, perms, V = make()
+    trained = set()
+    for fa in data["facts"]:
+        trained |= set(fa["teacher"]["name_tokens"]) | {t for c in fa["controls"] for t in c["name_tokens"]}
+    for nm in data["eval_names"]:                                      # B1: E token-disjoint from trained names
+        assert not set(tok(nm)["input_ids"]) & trained
+    f = FORGET[0]                                                      # B2: partial-overlap name rejected
+    t2 = TinyTok(re.findall(TOKRE, f["question"]) + ["Velmora", "Smith"])
+    assert T.accept_name(t2, f["question"], f["subject"], "Velmora Smith", set()) is None
+    with pytest.raises(AssertionError):                                # B3: Z without anchor refused
+        T.validate(T.Config(arm="ssd", lam_T=0.0))
+    with pytest.raises(AssertionError):
+        T.validate(T.Config(arm="tdssd", lam_T=1.0))

@@ -150,8 +150,10 @@ def main():
                 off = T.logits_of(model, probe).to(torch.bfloat16).cpu()
         torch.save({"probe_ids": probe.cpu(), "logits_adapter_on": on}, os.path.join(d, "probe_logits.pt"))
         inv = float((off.float() - ref_probe.float()).abs().max())       # reference invariance (must be ~0)
-        json.dump({"step": step, "ref_invariance_maxabs": inv}, open(os.path.join(d, "ref_invariance.json"), "w"))
-        print(json.dumps({"saved": d, "ref_invariance_maxabs": inv}), flush=True)
+        act = float((on.float() - off.float()).abs().max())             # V N2: adapter must now be active (> 0)
+        json.dump({"step": step, "ref_invariance_maxabs": inv, "adapter_on_minus_off_maxabs": act},
+                  open(os.path.join(d, "ref_invariance.json"), "w"))
+        print(json.dumps({"saved": d, "ref_invariance_maxabs": inv, "adapter_on_minus_off_maxabs": act}), flush=True)
 
     hf = open(os.path.join(a.out, "history.jsonl"), "w")
 

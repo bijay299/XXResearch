@@ -126,6 +126,13 @@ def main():
         model = PeftModel.from_pretrained(model, a.adapter)
     model = model.to(dev).eval()
     p0_ctx = model.disable_adapter if a.adapter else contextlib.nullcontext
+    reload_gate = None
+    if a.adapter and os.path.exists(os.path.join(a.adapter, "probe_logits.pt")):   # native gate: save/reload
+        pr = torch.load(os.path.join(a.adapter, "probe_logits.pt"))
+        with torch.no_grad():
+            z = T.logits_of(model, pr["probe_ids"].to(dev)).to(torch.bfloat16).float().cpu()
+        reload_gate = float((z - pr["logits_adapter_on"].float()).abs().max())
+        print(json.dumps({"save_reload_logit_maxabs": reload_gate}), flush=True)
     sys.path.insert(0, a.llada_repo)
     from generate import generate  # type: ignore
 
@@ -186,7 +193,8 @@ def main():
                              "shares_answer_word": r["shares_answer_word"], "in_retain_loss": r["in_retain_loss"],
                              "key_logprob": key_logprob(model, tok, r[form], r["answer"], key, a.gen_length,
                                                         T.MASK_ID, T.EOS_ID, dev)})
-    json.dump({"adapter": a.adapter, "records": recs, "summary": summarize(recs)}, open(a.out, "w"), indent=1)
+    json.dump({"adapter": a.adapter, "save_reload_logit_maxabs": reload_gate, "records": recs,
+               "summary": summarize(recs)}, open(a.out, "w"), indent=1)
     print(json.dumps(summarize(recs), indent=1))
 
 

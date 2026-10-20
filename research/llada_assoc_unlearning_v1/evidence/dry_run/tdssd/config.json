@@ -1,0 +1,30 @@
+{
+ "model": "GSAI-ML/LLaDA-8B-Instruct",
+ "mem_adapter": null,
+ "arm": "tdssd",
+ "dtype": "bfloat16",
+ "gen_length": 8,
+ "weighting": "mean",
+ "eps": 0.001,
+ "lam_T": 0.0,
+ "lam_R": 1.0,
+ "n_controls": 4,
+ "n_eval_strangers": 3,
+ "lora_r": 16,
+ "lora_alpha": 32.0,
+ "lora_target_regex": ".*blocks\\.\\d+\\.(q_proj|k_proj|v_proj|attn_out|ff_proj|up_proj|ff_out)$",
+ "lr": 0.0001,
+ "warmup_steps": 10,
+ "steps": 4,
+ "checkpoints": [
+  2,
+  4
+ ],
+ "grad_clip": 1.0,
+ "retain_batch": 8,
+ "seed": 0,
+ "name_seed": 1234,
+ "log_every": 5,
+ "mask_id": 1,
+ "eos_id": 2
+}
