@@ -1,0 +1,172 @@
+{
+  "arms": {
+    "base": {
+      "heldout": {
+        "0": 0.0,
+        "2": 0.0233,
+        "5": 0.0233,
+        "10": 0.0233,
+        "20": 0.0465
+      },
+      "retain": {
+        "0": 0.0,
+        "2": 0.0,
+        "5": 0.0,
+        "10": 0.125,
+        "20": 0.125
+      },
+      "adversary_lr": null,
+      "stack": [
+        "base"
+      ]
+    },
+    "flat150": {
+      "heldout": {
+        "0": 0.0465,
+        "2": 0.0,
+        "5": 0.2791,
+        "10": 0.5814,
+        "20": 0.6512
+      },
+      "retain": {
+        "0": 1.0,
+        "2": 1.0,
+        "5": 1.0,
+        "10": 0.625,
+        "20": 0.625
+      },
+      "adversary_lr": 0.0002,
+      "stack": [
+        "base",
+        "memorized_big(merged)",
+        "big_uncached/ckpt_300(merged)",
+        "anvil_main/ckpt_150(FLATTEN, merged)"
+      ]
+    },
+    "flat300": {
+      "heldout": {
+        "0": 0.0465,
+        "2": 0.0465,
+        "5": 0.2791,
+        "10": 0.5814,
+        "20": 0.6512
+      },
+      "retain": {
+        "0": 1.0,
+        "2": 1.0,
+        "5": 1.0,
+        "10": 0.625,
+        "20": 0.625
+      },
+      "adversary_lr": 0.0002,
+      "stack": [
+        "base",
+        "memorized_big(merged)",
+        "big_uncached/ckpt_300(merged)",
+        "anvil_main/ckpt_300(FLATTEN, merged)"
+      ]
+    },
+    "unlearned": {
+      "heldout": {
+        "0": 0.0233,
+        "2": 0.0465,
+        "5": 0.2558,
+        "10": 0.6047,
+        "20": 0.6512
+      },
+      "retain": {
+        "0": 1.0,
+        "2": 1.0,
+        "5": 1.0,
+        "10": 0.625,
+        "20": 0.625
+      },
+      "adversary_lr": null,
+      "stack": [
+        "base",
+        "memorized_big(merged)",
+        "big_uncached/ckpt_300(merged)"
+      ]
+    }
+  },
+  "verdicts": {
+    "flat150": {
+      "delta_k10": -0.0233,
+      "delta_singleshot_k0": 0.0232,
+      "delta_retain_k0": 0.0,
+      "verdict": "NOT SUPPORTED"
+    },
+    "flat300": {
+      "delta_k10": -0.0233,
+      "delta_singleshot_k0": 0.0232,
+      "delta_retain_k0": 0.0,
+      "verdict": "NOT SUPPORTED"
+    }
+  },
+  "mechanism": {
+    "anvil_lamG10": {
+      "arm": "anvil",
+      "lam_G": 10.0,
+      "lr": 0.005,
+      "steps": 300,
+      "optimizer": "sgd",
+      "L_mem_at_theta_u": 0.9188,
+      "probe_grad_norm_first": 1.117353,
+      "probe_grad_norm_last": 0.690175,
+      "probe_L_mem_first": 0.9133,
+      "probe_L_mem_last": 0.9204,
+      "s_per_step": 0.7316,
+      "fwd_per_step": 6.0,
+      "bwd_per_step": 4.0,
+      "guard_fired": false
+    },
+    "anvil_main": {
+      "arm": "anvil",
+      "lam_G": 1.0,
+      "lr": 0.005,
+      "steps": 300,
+      "optimizer": "sgd",
+      "L_mem_at_theta_u": 0.9188,
+      "probe_grad_norm_first": 1.117353,
+      "probe_grad_norm_last": 0.694113,
+      "probe_L_mem_first": 0.9133,
+      "probe_L_mem_last": 0.9195,
+      "s_per_step": 0.7441,
+      "fwd_per_step": 6.0,
+      "bwd_per_step": 4.0,
+      "guard_fired": false
+    },
+    "cal_lr5e-3_lamG1.0": {
+      "arm": "anvil",
+      "lam_G": 1.0,
+      "lr": 0.005,
+      "steps": 30,
+      "optimizer": "sgd",
+      "L_mem_at_theta_u": 0.9188,
+      "probe_grad_norm_first": 1.117353,
+      "probe_grad_norm_last": 0.967912,
+      "probe_L_mem_first": 0.9133,
+      "probe_L_mem_last": 0.9166,
+      "s_per_step": 0.7964,
+      "fwd_per_step": 6.0,
+      "bwd_per_step": 4.0,
+      "guard_fired": false
+    },
+    "noop_check": {
+      "arm": "anchor_only",
+      "lam_G": 0.0,
+      "lr": 0.005,
+      "steps": 10,
+      "optimizer": "sgd",
+      "L_mem_at_theta_u": 0.9188,
+      "probe_grad_norm_first": 1.154713,
+      "probe_grad_norm_last": 1.154713,
+      "probe_L_mem_first": 0.9188,
+      "probe_L_mem_last": 0.9188,
+      "s_per_step": 0.9063,
+      "fwd_per_step": 5.0,
+      "bwd_per_step": 3.0,
+      "guard_fired": false
+    }
+  }
+}

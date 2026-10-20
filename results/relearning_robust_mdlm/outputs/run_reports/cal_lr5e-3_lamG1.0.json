@@ -1,0 +1,271 @@
+{
+  "arm": "anvil",
+  "hparams": {
+    "arm": "anvil",
+    "lam_G": 1.0,
+    "lam_A": 1.0,
+    "rho": 0.01,
+    "steps": 30,
+    "ckpt_at": "30",
+    "lr": 0.005,
+    "optimizer": "sgd",
+    "rank": 16,
+    "batch": 8,
+    "probe_batches": 4,
+    "probe_every": 10,
+    "guard_tol": 0.1,
+    "unlearn_adapter": "/data/bijaypandey/spex/adapters/big_uncached/ckpt_300",
+    "memo": "/data/bijaypandey/spex/adapters/memorized_big",
+    "seed": 0,
+    "out": "/data/bijaypandey/anvil/adapters/cal_lr5e-3_lamG1.0"
+  },
+  "checkpoints": [
+    30
+  ],
+  "theory": "THEORY.md L1, P2 (mechanism); P3a (stage-2 only); P3b (anchor, not raw ascent); P4 (surrogate penalises ||g||, not ||g||^2)",
+  "stack": [
+    "base",
+    "memorized_big(merged)",
+    "big_uncached/ckpt_300(merged)"
+  ],
+  "n_trainable": 16777216,
+  "L_mem_at_theta_u": 0.9188,
+  "guard_definition": "frozen-probe L_mem, compared only at probe steps; abort if it falls more than --guard-tol below its value at theta_u",
+  "history": [
+    {
+      "step": 0,
+      "L_mem": 0.3726,
+      "probe_grad_norm": 1.117353,
+      "probe_L_mem": 0.9133,
+      "grad_norm_L_mem": 0.52301,
+      "anchor_kl": 0.0,
+      "update_norm": 1.9642
+    },
+    {
+      "step": 1,
+      "L_mem": 0.7225,
+      "grad_norm_L_mem": 0.68388,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.0549
+    },
+    {
+      "step": 2,
+      "L_mem": 0.5438,
+      "grad_norm_L_mem": 0.50764,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.8431
+    },
+    {
+      "step": 3,
+      "L_mem": 0.5439,
+      "grad_norm_L_mem": 0.59199,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.2637
+    },
+    {
+      "step": 4,
+      "L_mem": 0.5955,
+      "grad_norm_L_mem": 0.79268,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.1737
+    },
+    {
+      "step": 5,
+      "L_mem": 0.3576,
+      "grad_norm_L_mem": 0.47702,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.9332
+    },
+    {
+      "step": 6,
+      "L_mem": 0.509,
+      "grad_norm_L_mem": 0.89855,
+      "anchor_kl": 6e-05,
+      "update_norm": 4.1397
+    },
+    {
+      "step": 7,
+      "L_mem": 0.1995,
+      "grad_norm_L_mem": 0.39333,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.7233
+    },
+    {
+      "step": 8,
+      "L_mem": 0.1578,
+      "grad_norm_L_mem": 0.28977,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.1261
+    },
+    {
+      "step": 9,
+      "L_mem": 2.1877,
+      "grad_norm_L_mem": 2.16359,
+      "anchor_kl": 0.00013,
+      "update_norm": 9.1934
+    },
+    {
+      "step": 10,
+      "L_mem": 0.2917,
+      "probe_grad_norm": 1.047349,
+      "probe_L_mem": 0.9129,
+      "grad_norm_L_mem": 0.48362,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.6685
+    },
+    {
+      "step": 11,
+      "L_mem": 0.5315,
+      "grad_norm_L_mem": 0.57453,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.3911
+    },
+    {
+      "step": 12,
+      "L_mem": 0.4665,
+      "grad_norm_L_mem": 0.44838,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.6965
+    },
+    {
+      "step": 13,
+      "L_mem": 0.1502,
+      "grad_norm_L_mem": 0.27182,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.0893
+    },
+    {
+      "step": 14,
+      "L_mem": 0.691,
+      "grad_norm_L_mem": 0.74824,
+      "anchor_kl": 7e-05,
+      "update_norm": 2.8635
+    },
+    {
+      "step": 15,
+      "L_mem": 2.0274,
+      "grad_norm_L_mem": 1.28346,
+      "anchor_kl": 6e-05,
+      "update_norm": 4.8353
+    },
+    {
+      "step": 16,
+      "L_mem": 0.4924,
+      "grad_norm_L_mem": 0.57307,
+      "anchor_kl": 0.00011,
+      "update_norm": 2.3189
+    },
+    {
+      "step": 17,
+      "L_mem": 0.57,
+      "grad_norm_L_mem": 0.5513,
+      "anchor_kl": 8e-05,
+      "update_norm": 2.1046
+    },
+    {
+      "step": 18,
+      "L_mem": 0.2763,
+      "grad_norm_L_mem": 1.08651,
+      "anchor_kl": 3e-05,
+      "update_norm": 4.2596
+    },
+    {
+      "step": 19,
+      "L_mem": 0.1416,
+      "grad_norm_L_mem": 0.35646,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.1635
+    },
+    {
+      "step": 20,
+      "L_mem": 1.3173,
+      "probe_grad_norm": 0.984882,
+      "probe_L_mem": 0.9103,
+      "grad_norm_L_mem": 1.34674,
+      "anchor_kl": 5e-05,
+      "update_norm": 5.4058
+    },
+    {
+      "step": 21,
+      "L_mem": 1.1554,
+      "grad_norm_L_mem": 1.31935,
+      "anchor_kl": 5e-05,
+      "update_norm": 5.698
+    },
+    {
+      "step": 22,
+      "L_mem": 1.1751,
+      "grad_norm_L_mem": 1.07988,
+      "anchor_kl": 0.00012,
+      "update_norm": 3.8965
+    },
+    {
+      "step": 23,
+      "L_mem": 0.404,
+      "grad_norm_L_mem": 0.32615,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.5275
+    },
+    {
+      "step": 24,
+      "L_mem": 0.4624,
+      "grad_norm_L_mem": 0.45557,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.6861
+    },
+    {
+      "step": 25,
+      "L_mem": 0.3162,
+      "grad_norm_L_mem": 0.37301,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.4105
+    },
+    {
+      "step": 26,
+      "L_mem": 0.4767,
+      "grad_norm_L_mem": 0.55033,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.9491
+    },
+    {
+      "step": 27,
+      "L_mem": 0.3352,
+      "grad_norm_L_mem": 0.42487,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.1581
+    },
+    {
+      "step": 28,
+      "L_mem": 4.2011,
+      "grad_norm_L_mem": 2.79387,
+      "anchor_kl": 5e-05,
+      "update_norm": 12.5921
+    },
+    {
+      "step": 29,
+      "L_mem": 0.4585,
+      "probe_grad_norm": 0.967912,
+      "probe_L_mem": 0.9166,
+      "grad_norm_L_mem": 0.53435,
+      "anchor_kl": 2e-05,
+      "update_norm": 2.0474
+    }
+  ],
+  "measured": {
+    "train_wall_s": 29.4,
+    "s_per_step_steady": 0.7964,
+    "fwd_total": 180,
+    "bwd_total": 120,
+    "fwd_per_step": 6.0,
+    "bwd_per_step": 4.0,
+    "peak_gpu_gib": 17.38,
+    "grad_norm_first": 0.52301,
+    "grad_norm_last": 0.53435,
+    "probe_grad_norm_first": 1.117353,
+    "probe_grad_norm_last": 0.967912,
+    "probe_L_mem_first": 0.9133,
+    "probe_L_mem_last": 0.9166,
+    "L_mem_first": 0.3726,
+    "L_mem_last": 0.4585
+  }
+}

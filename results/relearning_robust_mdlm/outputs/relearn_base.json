@@ -1,0 +1,313 @@
+{
+  "probe": "relearning_robustness",
+  "start": "base",
+  "hparams": {
+    "start": "base",
+    "unlearn_adapter": "/data/bijaypandey/spex/adapters/big_uncached/ckpt_300",
+    "memo": "/data/bijaypandey/spex/adapters/memorized_big",
+    "leak": 8,
+    "ckpt_at": "0,2,5,10,20",
+    "lr": 0.0002,
+    "rank": 32,
+    "answer_weight": 4.0,
+    "n_retain_probe": 16,
+    "seed": 777,
+    "tag": null
+  },
+  "gate": "AXIS REAL iff unlearned held-out disclosure at k=10 >= base + 0.25",
+  "note": "the adversary is identical across all three start points; the held-out forget facts are independent of the leaked ones, so any recovery is residual knowledge, not learning",
+  "data": {
+    "n_recalled_forget": 51,
+    "n_leaked": 8,
+    "leaked_ids": [
+      "forget_000",
+      "forget_006",
+      "forget_017",
+      "forget_023",
+      "forget_030",
+      "forget_036",
+      "forget_047",
+      "forget_053"
+    ],
+    "n_heldout": 43,
+    "heldout_ids": [
+      "forget_001",
+      "forget_002",
+      "forget_003",
+      "forget_004",
+      "forget_005",
+      "forget_009",
+      "forget_011",
+      "forget_014",
+      "forget_015",
+      "forget_016",
+      "forget_018",
+      "forget_019",
+      "forget_020",
+      "forget_021",
+      "forget_022",
+      "forget_024",
+      "forget_025",
+      "forget_027",
+      "forget_028",
+      "forget_029",
+      "forget_031",
+      "forget_032",
+      "forget_033",
+      "forget_034",
+      "forget_035",
+      "forget_037",
+      "forget_038",
+      "forget_041",
+      "forget_043",
+      "forget_046",
+      "forget_048",
+      "forget_049",
+      "forget_050",
+      "forget_051",
+      "forget_052",
+      "forget_055",
+      "forget_056",
+      "forget_057",
+      "forget_059",
+      "forget_060",
+      "forget_061",
+      "forget_062",
+      "forget_063"
+    ],
+    "leaked_relations": [
+      "field",
+      "home_city",
+      "instrument"
+    ],
+    "n_retain_probe": 16
+  },
+  "stack": [
+    "base"
+  ],
+  "n_trainable": 33554432,
+  "curve": [
+    {
+      "k": 0,
+      "heldout_forget": {
+        "n": 43,
+        "disclosure": 0.0,
+        "clean_forgetting": 1.0,
+        "degenerate": 0
+      },
+      "leaked_forget": {
+        "n": 8,
+        "disclosure": 0.0,
+        "clean_forgetting": 1.0,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 0.0,
+        "clean_forgetting": 1.0,
+        "degenerate": 0
+      },
+      "adversary_loss": null,
+      "adversary_grad_norm": null
+    },
+    {
+      "k": 2,
+      "heldout_forget": {
+        "n": 43,
+        "disclosure": 0.0233,
+        "clean_forgetting": 0.9767,
+        "degenerate": 0
+      },
+      "leaked_forget": {
+        "n": 8,
+        "disclosure": 0.0,
+        "clean_forgetting": 1.0,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 0.0,
+        "clean_forgetting": 1.0,
+        "degenerate": 0
+      },
+      "adversary_loss": 6.296,
+      "adversary_grad_norm": 6.016
+    },
+    {
+      "k": 5,
+      "heldout_forget": {
+        "n": 43,
+        "disclosure": 0.0233,
+        "clean_forgetting": 0.9767,
+        "degenerate": 0
+      },
+      "leaked_forget": {
+        "n": 8,
+        "disclosure": 0.25,
+        "clean_forgetting": 0.75,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 0.0,
+        "clean_forgetting": 1.0,
+        "degenerate": 0
+      },
+      "adversary_loss": 1.7759,
+      "adversary_grad_norm": 4.148
+    },
+    {
+      "k": 10,
+      "heldout_forget": {
+        "n": 43,
+        "disclosure": 0.0233,
+        "clean_forgetting": 0.9535,
+        "degenerate": 1
+      },
+      "leaked_forget": {
+        "n": 8,
+        "disclosure": 0.625,
+        "clean_forgetting": 0.375,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 0.125,
+        "clean_forgetting": 0.875,
+        "degenerate": 0
+      },
+      "adversary_loss": 0.454,
+      "adversary_grad_norm": 3.0977
+    },
+    {
+      "k": 20,
+      "heldout_forget": {
+        "n": 43,
+        "disclosure": 0.0465,
+        "clean_forgetting": 0.9535,
+        "degenerate": 0
+      },
+      "leaked_forget": {
+        "n": 8,
+        "disclosure": 0.875,
+        "clean_forgetting": 0.125,
+        "degenerate": 1
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 0.125,
+        "clean_forgetting": 0.875,
+        "degenerate": 0
+      },
+      "adversary_loss": 0.0263,
+      "adversary_grad_norm": 0.6724
+    }
+  ],
+  "adversary_history": [
+    {
+      "step": 1,
+      "loss": 7.307,
+      "grad_norm": 7.195
+    },
+    {
+      "step": 2,
+      "loss": 6.296,
+      "grad_norm": 6.016
+    },
+    {
+      "step": 3,
+      "loss": 4.6476,
+      "grad_norm": 7.4346
+    },
+    {
+      "step": 4,
+      "loss": 1.2973,
+      "grad_norm": 3.5726
+    },
+    {
+      "step": 5,
+      "loss": 1.7759,
+      "grad_norm": 4.148
+    },
+    {
+      "step": 6,
+      "loss": 1.3571,
+      "grad_norm": 2.6846
+    },
+    {
+      "step": 7,
+      "loss": 1.6684,
+      "grad_norm": 6.3782
+    },
+    {
+      "step": 8,
+      "loss": 0.7702,
+      "grad_norm": 2.1192
+    },
+    {
+      "step": 9,
+      "loss": 1.5556,
+      "grad_norm": 6.0039
+    },
+    {
+      "step": 10,
+      "loss": 0.454,
+      "grad_norm": 3.0977
+    },
+    {
+      "step": 11,
+      "loss": 0.5055,
+      "grad_norm": 6.5117
+    },
+    {
+      "step": 12,
+      "loss": 0.3021,
+      "grad_norm": 3.7048
+    },
+    {
+      "step": 13,
+      "loss": 1.1931,
+      "grad_norm": 10.5504
+    },
+    {
+      "step": 14,
+      "loss": 0.9113,
+      "grad_norm": 6.6301
+    },
+    {
+      "step": 15,
+      "loss": 0.7181,
+      "grad_norm": 5.3657
+    },
+    {
+      "step": 16,
+      "loss": 1.6104,
+      "grad_norm": 13.779
+    },
+    {
+      "step": 17,
+      "loss": 0.2067,
+      "grad_norm": 6.6126
+    },
+    {
+      "step": 18,
+      "loss": 0.1713,
+      "grad_norm": 5.3735
+    },
+    {
+      "step": 19,
+      "loss": 0.1214,
+      "grad_norm": 2.0524
+    },
+    {
+      "step": 20,
+      "loss": 0.0263,
+      "grad_norm": 0.6724
+    }
+  ],
+  "measured": {
+    "wall_s": 487.0,
+    "peak_gpu_gib": 17.162,
+    "n_generations": 335
+  }
+}

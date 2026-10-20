@@ -1,0 +1,2180 @@
+{
+  "arm": "anvil",
+  "hparams": {
+    "arm": "anvil",
+    "lam_G": 1.0,
+    "lam_A": 1.0,
+    "rho": 0.01,
+    "steps": 300,
+    "ckpt_at": "150,300",
+    "lr": 0.005,
+    "optimizer": "sgd",
+    "rank": 16,
+    "batch": 8,
+    "probe_batches": 4,
+    "probe_every": 25,
+    "guard_tol": 0.1,
+    "unlearn_adapter": "/data/bijaypandey/spex/adapters/big_uncached/ckpt_300",
+    "memo": "/data/bijaypandey/spex/adapters/memorized_big",
+    "seed": 0,
+    "out": "/data/bijaypandey/anvil/adapters/anvil_main"
+  },
+  "checkpoints": [
+    150,
+    300
+  ],
+  "theory": "THEORY.md L1, P2 (mechanism); P3a (stage-2 only); P3b (anchor, not raw ascent); P4 (surrogate penalises ||g||, not ||g||^2)",
+  "stack": [
+    "base",
+    "memorized_big(merged)",
+    "big_uncached/ckpt_300(merged)"
+  ],
+  "n_trainable": 16777216,
+  "L_mem_at_theta_u": 0.9188,
+  "guard_definition": "frozen-probe L_mem, compared only at probe steps; abort if it falls more than --guard-tol below its value at theta_u",
+  "history": [
+    {
+      "step": 0,
+      "L_mem": 0.3726,
+      "probe_grad_norm": 1.117353,
+      "probe_L_mem": 0.9133,
+      "grad_norm_L_mem": 0.52301,
+      "anchor_kl": 0.0,
+      "update_norm": 1.9642
+    },
+    {
+      "step": 1,
+      "L_mem": 0.7225,
+      "grad_norm_L_mem": 0.68388,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.0549
+    },
+    {
+      "step": 2,
+      "L_mem": 0.5438,
+      "grad_norm_L_mem": 0.50764,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.8431
+    },
+    {
+      "step": 3,
+      "L_mem": 0.5439,
+      "grad_norm_L_mem": 0.59199,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.2637
+    },
+    {
+      "step": 4,
+      "L_mem": 0.5955,
+      "grad_norm_L_mem": 0.79268,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.1737
+    },
+    {
+      "step": 5,
+      "L_mem": 0.3576,
+      "grad_norm_L_mem": 0.47702,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.9332
+    },
+    {
+      "step": 6,
+      "L_mem": 0.509,
+      "grad_norm_L_mem": 0.89855,
+      "anchor_kl": 6e-05,
+      "update_norm": 4.1397
+    },
+    {
+      "step": 7,
+      "L_mem": 0.1995,
+      "grad_norm_L_mem": 0.39333,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.7233
+    },
+    {
+      "step": 8,
+      "L_mem": 0.1578,
+      "grad_norm_L_mem": 0.28977,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.1261
+    },
+    {
+      "step": 9,
+      "L_mem": 2.1877,
+      "grad_norm_L_mem": 2.16359,
+      "anchor_kl": 0.00013,
+      "update_norm": 9.1934
+    },
+    {
+      "step": 10,
+      "L_mem": 0.2917,
+      "grad_norm_L_mem": 0.48362,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.6685
+    },
+    {
+      "step": 11,
+      "L_mem": 0.5315,
+      "grad_norm_L_mem": 0.57453,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.3911
+    },
+    {
+      "step": 12,
+      "L_mem": 0.4665,
+      "grad_norm_L_mem": 0.44838,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.6965
+    },
+    {
+      "step": 13,
+      "L_mem": 0.1502,
+      "grad_norm_L_mem": 0.27182,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.0893
+    },
+    {
+      "step": 14,
+      "L_mem": 0.691,
+      "grad_norm_L_mem": 0.74824,
+      "anchor_kl": 7e-05,
+      "update_norm": 2.8635
+    },
+    {
+      "step": 15,
+      "L_mem": 2.0274,
+      "grad_norm_L_mem": 1.28346,
+      "anchor_kl": 6e-05,
+      "update_norm": 4.8353
+    },
+    {
+      "step": 16,
+      "L_mem": 0.4924,
+      "grad_norm_L_mem": 0.57307,
+      "anchor_kl": 0.00011,
+      "update_norm": 2.3189
+    },
+    {
+      "step": 17,
+      "L_mem": 0.57,
+      "grad_norm_L_mem": 0.5513,
+      "anchor_kl": 8e-05,
+      "update_norm": 2.1046
+    },
+    {
+      "step": 18,
+      "L_mem": 0.2763,
+      "grad_norm_L_mem": 1.08651,
+      "anchor_kl": 3e-05,
+      "update_norm": 4.2596
+    },
+    {
+      "step": 19,
+      "L_mem": 0.1416,
+      "grad_norm_L_mem": 0.35646,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.1635
+    },
+    {
+      "step": 20,
+      "L_mem": 1.3173,
+      "grad_norm_L_mem": 1.34674,
+      "anchor_kl": 5e-05,
+      "update_norm": 5.4058
+    },
+    {
+      "step": 21,
+      "L_mem": 1.1554,
+      "grad_norm_L_mem": 1.31935,
+      "anchor_kl": 5e-05,
+      "update_norm": 5.698
+    },
+    {
+      "step": 22,
+      "L_mem": 1.1751,
+      "grad_norm_L_mem": 1.07988,
+      "anchor_kl": 0.00012,
+      "update_norm": 3.8965
+    },
+    {
+      "step": 23,
+      "L_mem": 0.404,
+      "grad_norm_L_mem": 0.32615,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.5275
+    },
+    {
+      "step": 24,
+      "L_mem": 0.4624,
+      "grad_norm_L_mem": 0.45557,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.6861
+    },
+    {
+      "step": 25,
+      "L_mem": 0.3162,
+      "probe_grad_norm": 0.962828,
+      "probe_L_mem": 0.913,
+      "grad_norm_L_mem": 0.37301,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.4105
+    },
+    {
+      "step": 26,
+      "L_mem": 0.4767,
+      "grad_norm_L_mem": 0.55033,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.9491
+    },
+    {
+      "step": 27,
+      "L_mem": 0.3352,
+      "grad_norm_L_mem": 0.42487,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.1581
+    },
+    {
+      "step": 28,
+      "L_mem": 4.2011,
+      "grad_norm_L_mem": 2.79387,
+      "anchor_kl": 5e-05,
+      "update_norm": 12.5921
+    },
+    {
+      "step": 29,
+      "L_mem": 0.4585,
+      "grad_norm_L_mem": 0.53435,
+      "anchor_kl": 2e-05,
+      "update_norm": 2.0474
+    },
+    {
+      "step": 30,
+      "L_mem": 0.8282,
+      "grad_norm_L_mem": 0.76946,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.9985
+    },
+    {
+      "step": 31,
+      "L_mem": 0.9533,
+      "grad_norm_L_mem": 0.65558,
+      "anchor_kl": 5e-05,
+      "update_norm": 2.5593
+    },
+    {
+      "step": 32,
+      "L_mem": 0.6123,
+      "grad_norm_L_mem": 0.6532,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.7582
+    },
+    {
+      "step": 33,
+      "L_mem": 0.4742,
+      "grad_norm_L_mem": 0.44874,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.6794
+    },
+    {
+      "step": 34,
+      "L_mem": 0.7213,
+      "grad_norm_L_mem": 0.7733,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.1452
+    },
+    {
+      "step": 35,
+      "L_mem": 0.5886,
+      "grad_norm_L_mem": 0.65745,
+      "anchor_kl": 0.0001,
+      "update_norm": 2.9675
+    },
+    {
+      "step": 36,
+      "L_mem": 0.2002,
+      "grad_norm_L_mem": 0.22387,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.9515
+    },
+    {
+      "step": 37,
+      "L_mem": 0.6241,
+      "grad_norm_L_mem": 0.67025,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.9739
+    },
+    {
+      "step": 38,
+      "L_mem": 0.9014,
+      "grad_norm_L_mem": 0.8416,
+      "anchor_kl": 9e-05,
+      "update_norm": 4.3262
+    },
+    {
+      "step": 39,
+      "L_mem": 0.1876,
+      "grad_norm_L_mem": 0.19256,
+      "anchor_kl": 6e-05,
+      "update_norm": 0.8741
+    },
+    {
+      "step": 40,
+      "L_mem": 0.3555,
+      "grad_norm_L_mem": 0.41684,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.5938
+    },
+    {
+      "step": 41,
+      "L_mem": 3.102,
+      "grad_norm_L_mem": 2.55844,
+      "anchor_kl": 4e-05,
+      "update_norm": 10.3043
+    },
+    {
+      "step": 42,
+      "L_mem": 0.508,
+      "grad_norm_L_mem": 0.47837,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.5827
+    },
+    {
+      "step": 43,
+      "L_mem": 0.413,
+      "grad_norm_L_mem": 0.41736,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.5954
+    },
+    {
+      "step": 44,
+      "L_mem": 7.2887,
+      "grad_norm_L_mem": 6.23137,
+      "anchor_kl": 5e-05,
+      "update_norm": 27.5601
+    },
+    {
+      "step": 45,
+      "L_mem": 0.4434,
+      "grad_norm_L_mem": 0.49711,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.9628
+    },
+    {
+      "step": 46,
+      "L_mem": 0.517,
+      "grad_norm_L_mem": 0.58254,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.2573
+    },
+    {
+      "step": 47,
+      "L_mem": 25.3093,
+      "grad_norm_L_mem": 24.38894,
+      "anchor_kl": 2e-05,
+      "update_norm": 123.5716
+    },
+    {
+      "step": 48,
+      "L_mem": 0.2492,
+      "grad_norm_L_mem": 0.22289,
+      "anchor_kl": 5e-05,
+      "update_norm": 0.9922
+    },
+    {
+      "step": 49,
+      "L_mem": 0.5776,
+      "grad_norm_L_mem": 0.54532,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.1553
+    },
+    {
+      "step": 50,
+      "L_mem": 0.3126,
+      "probe_grad_norm": 0.875332,
+      "probe_L_mem": 0.9138,
+      "grad_norm_L_mem": 0.35834,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.3638
+    },
+    {
+      "step": 51,
+      "L_mem": 0.3356,
+      "grad_norm_L_mem": 0.34024,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.4578
+    },
+    {
+      "step": 52,
+      "L_mem": 1.0545,
+      "grad_norm_L_mem": 1.32798,
+      "anchor_kl": 6e-05,
+      "update_norm": 5.5607
+    },
+    {
+      "step": 53,
+      "L_mem": 0.3273,
+      "grad_norm_L_mem": 0.3749,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.4018
+    },
+    {
+      "step": 54,
+      "L_mem": 0.9361,
+      "grad_norm_L_mem": 0.94221,
+      "anchor_kl": 0.0001,
+      "update_norm": 3.9301
+    },
+    {
+      "step": 55,
+      "L_mem": 1.5751,
+      "grad_norm_L_mem": 1.01782,
+      "anchor_kl": 8e-05,
+      "update_norm": 4.5436
+    },
+    {
+      "step": 56,
+      "L_mem": 0.7321,
+      "grad_norm_L_mem": 0.49715,
+      "anchor_kl": 0.0001,
+      "update_norm": 1.8608
+    },
+    {
+      "step": 57,
+      "L_mem": 2.1436,
+      "grad_norm_L_mem": 1.35597,
+      "anchor_kl": 8e-05,
+      "update_norm": 6.5372
+    },
+    {
+      "step": 58,
+      "L_mem": 1.0375,
+      "grad_norm_L_mem": 1.42069,
+      "anchor_kl": 6e-05,
+      "update_norm": 5.971
+    },
+    {
+      "step": 59,
+      "L_mem": 0.6825,
+      "grad_norm_L_mem": 0.59637,
+      "anchor_kl": 5e-05,
+      "update_norm": 2.2473
+    },
+    {
+      "step": 60,
+      "L_mem": 0.4037,
+      "grad_norm_L_mem": 0.36117,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.5156
+    },
+    {
+      "step": 61,
+      "L_mem": 0.2409,
+      "grad_norm_L_mem": 0.2641,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.095
+    },
+    {
+      "step": 62,
+      "L_mem": 1.9147,
+      "grad_norm_L_mem": 1.31118,
+      "anchor_kl": 5e-05,
+      "update_norm": 5.0084
+    },
+    {
+      "step": 63,
+      "L_mem": 0.7383,
+      "grad_norm_L_mem": 0.56949,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.2546
+    },
+    {
+      "step": 64,
+      "L_mem": 0.4445,
+      "grad_norm_L_mem": 0.50708,
+      "anchor_kl": 7e-05,
+      "update_norm": 2.2266
+    },
+    {
+      "step": 65,
+      "L_mem": 0.3551,
+      "grad_norm_L_mem": 0.57087,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.6482
+    },
+    {
+      "step": 66,
+      "L_mem": 0.4517,
+      "grad_norm_L_mem": 0.43617,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.5802
+    },
+    {
+      "step": 67,
+      "L_mem": 0.7613,
+      "grad_norm_L_mem": 0.66496,
+      "anchor_kl": 0.00018,
+      "update_norm": 2.591
+    },
+    {
+      "step": 68,
+      "L_mem": 0.4289,
+      "grad_norm_L_mem": 0.36815,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.3488
+    },
+    {
+      "step": 69,
+      "L_mem": 0.1296,
+      "grad_norm_L_mem": 0.14974,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.7146
+    },
+    {
+      "step": 70,
+      "L_mem": 0.948,
+      "grad_norm_L_mem": 0.65437,
+      "anchor_kl": 8e-05,
+      "update_norm": 3.1387
+    },
+    {
+      "step": 71,
+      "L_mem": 0.4541,
+      "grad_norm_L_mem": 0.38749,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.3579
+    },
+    {
+      "step": 72,
+      "L_mem": 0.597,
+      "grad_norm_L_mem": 0.46672,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.7628
+    },
+    {
+      "step": 73,
+      "L_mem": 0.4959,
+      "grad_norm_L_mem": 0.49675,
+      "anchor_kl": 7e-05,
+      "update_norm": 2.0113
+    },
+    {
+      "step": 74,
+      "L_mem": 1.03,
+      "grad_norm_L_mem": 1.0561,
+      "anchor_kl": 4e-05,
+      "update_norm": 4.4375
+    },
+    {
+      "step": 75,
+      "L_mem": 0.8649,
+      "probe_grad_norm": 0.820572,
+      "probe_L_mem": 0.9104,
+      "grad_norm_L_mem": 1.19739,
+      "anchor_kl": 6e-05,
+      "update_norm": 5.6543
+    },
+    {
+      "step": 76,
+      "L_mem": 0.7028,
+      "grad_norm_L_mem": 0.55594,
+      "anchor_kl": 5e-05,
+      "update_norm": 2.1092
+    },
+    {
+      "step": 77,
+      "L_mem": 0.2494,
+      "grad_norm_L_mem": 0.37274,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.5455
+    },
+    {
+      "step": 78,
+      "L_mem": 1.9684,
+      "grad_norm_L_mem": 1.65512,
+      "anchor_kl": 0.0001,
+      "update_norm": 6.091
+    },
+    {
+      "step": 79,
+      "L_mem": 0.4984,
+      "grad_norm_L_mem": 0.29567,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.9761
+    },
+    {
+      "step": 80,
+      "L_mem": 0.273,
+      "grad_norm_L_mem": 0.30638,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.1526
+    },
+    {
+      "step": 81,
+      "L_mem": 11.3553,
+      "grad_norm_L_mem": 7.5338,
+      "anchor_kl": 5e-05,
+      "update_norm": 35.5567
+    },
+    {
+      "step": 82,
+      "L_mem": 0.2902,
+      "grad_norm_L_mem": 0.17238,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.6827
+    },
+    {
+      "step": 83,
+      "L_mem": 0.4455,
+      "grad_norm_L_mem": 0.46016,
+      "anchor_kl": 7e-05,
+      "update_norm": 2.7449
+    },
+    {
+      "step": 84,
+      "L_mem": 0.4963,
+      "grad_norm_L_mem": 0.42652,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.553
+    },
+    {
+      "step": 85,
+      "L_mem": 1.5196,
+      "grad_norm_L_mem": 1.97432,
+      "anchor_kl": 9e-05,
+      "update_norm": 9.1772
+    },
+    {
+      "step": 86,
+      "L_mem": 0.5083,
+      "grad_norm_L_mem": 0.49326,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.8505
+    },
+    {
+      "step": 87,
+      "L_mem": 0.5685,
+      "grad_norm_L_mem": 0.54406,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.4193
+    },
+    {
+      "step": 88,
+      "L_mem": 1.0049,
+      "grad_norm_L_mem": 0.62559,
+      "anchor_kl": 5e-05,
+      "update_norm": 2.4327
+    },
+    {
+      "step": 89,
+      "L_mem": 1.2265,
+      "grad_norm_L_mem": 0.89453,
+      "anchor_kl": 3e-05,
+      "update_norm": 5.4531
+    },
+    {
+      "step": 90,
+      "L_mem": 0.4131,
+      "grad_norm_L_mem": 0.31857,
+      "anchor_kl": 9e-05,
+      "update_norm": 1.1842
+    },
+    {
+      "step": 91,
+      "L_mem": 0.8532,
+      "grad_norm_L_mem": 0.73884,
+      "anchor_kl": 9e-05,
+      "update_norm": 2.8061
+    },
+    {
+      "step": 92,
+      "L_mem": 0.4213,
+      "grad_norm_L_mem": 0.37585,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.6314
+    },
+    {
+      "step": 93,
+      "L_mem": 0.309,
+      "grad_norm_L_mem": 0.25846,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.1533
+    },
+    {
+      "step": 94,
+      "L_mem": 1.1098,
+      "grad_norm_L_mem": 1.00005,
+      "anchor_kl": 7e-05,
+      "update_norm": 4.6897
+    },
+    {
+      "step": 95,
+      "L_mem": 0.6644,
+      "grad_norm_L_mem": 0.29953,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.0701
+    },
+    {
+      "step": 96,
+      "L_mem": 0.3187,
+      "grad_norm_L_mem": 0.31008,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.2621
+    },
+    {
+      "step": 97,
+      "L_mem": 0.8274,
+      "grad_norm_L_mem": 0.50788,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.8122
+    },
+    {
+      "step": 98,
+      "L_mem": 2.2776,
+      "grad_norm_L_mem": 3.6521,
+      "anchor_kl": 7e-05,
+      "update_norm": 17.3146
+    },
+    {
+      "step": 99,
+      "L_mem": 0.4816,
+      "grad_norm_L_mem": 0.38734,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.521
+    },
+    {
+      "step": 100,
+      "L_mem": 0.5831,
+      "probe_grad_norm": 0.785175,
+      "probe_L_mem": 0.9094,
+      "grad_norm_L_mem": 0.32083,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.234
+    },
+    {
+      "step": 101,
+      "L_mem": 0.3187,
+      "grad_norm_L_mem": 0.30993,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.2658
+    },
+    {
+      "step": 102,
+      "L_mem": 1.0363,
+      "grad_norm_L_mem": 0.72562,
+      "anchor_kl": 9e-05,
+      "update_norm": 3.7765
+    },
+    {
+      "step": 103,
+      "L_mem": 0.1936,
+      "grad_norm_L_mem": 0.25271,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.0273
+    },
+    {
+      "step": 104,
+      "L_mem": 0.6869,
+      "grad_norm_L_mem": 0.44581,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.9855
+    },
+    {
+      "step": 105,
+      "L_mem": 1.0096,
+      "grad_norm_L_mem": 0.73319,
+      "anchor_kl": 8e-05,
+      "update_norm": 2.6995
+    },
+    {
+      "step": 106,
+      "L_mem": 0.7227,
+      "grad_norm_L_mem": 0.57454,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.9296
+    },
+    {
+      "step": 107,
+      "L_mem": 0.1572,
+      "grad_norm_L_mem": 0.18968,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.8478
+    },
+    {
+      "step": 108,
+      "L_mem": 1.0433,
+      "grad_norm_L_mem": 0.82516,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.2263
+    },
+    {
+      "step": 109,
+      "L_mem": 0.2494,
+      "grad_norm_L_mem": 0.29609,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.2954
+    },
+    {
+      "step": 110,
+      "L_mem": 0.4068,
+      "grad_norm_L_mem": 0.45213,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.9153
+    },
+    {
+      "step": 111,
+      "L_mem": 0.5312,
+      "grad_norm_L_mem": 0.33381,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.1867
+    },
+    {
+      "step": 112,
+      "L_mem": 2.5345,
+      "grad_norm_L_mem": 1.67219,
+      "anchor_kl": 5e-05,
+      "update_norm": 8.0136
+    },
+    {
+      "step": 113,
+      "L_mem": 1.2347,
+      "grad_norm_L_mem": 0.82,
+      "anchor_kl": 5e-05,
+      "update_norm": 3.5279
+    },
+    {
+      "step": 114,
+      "L_mem": 1.0855,
+      "grad_norm_L_mem": 0.96544,
+      "anchor_kl": 5e-05,
+      "update_norm": 3.5351
+    },
+    {
+      "step": 115,
+      "L_mem": 0.2917,
+      "grad_norm_L_mem": 0.40199,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.9007
+    },
+    {
+      "step": 116,
+      "L_mem": 0.8584,
+      "grad_norm_L_mem": 0.64226,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.4337
+    },
+    {
+      "step": 117,
+      "L_mem": 0.2191,
+      "grad_norm_L_mem": 0.36732,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.9324
+    },
+    {
+      "step": 118,
+      "L_mem": 1.4074,
+      "grad_norm_L_mem": 2.15079,
+      "anchor_kl": 7e-05,
+      "update_norm": 10.0059
+    },
+    {
+      "step": 119,
+      "L_mem": 0.3911,
+      "grad_norm_L_mem": 0.22469,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.7849
+    },
+    {
+      "step": 120,
+      "L_mem": 0.3505,
+      "grad_norm_L_mem": 0.32769,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.495
+    },
+    {
+      "step": 121,
+      "L_mem": 0.331,
+      "grad_norm_L_mem": 0.31236,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.1777
+    },
+    {
+      "step": 122,
+      "L_mem": 0.4514,
+      "grad_norm_L_mem": 0.22727,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.924
+    },
+    {
+      "step": 123,
+      "L_mem": 0.1868,
+      "grad_norm_L_mem": 0.28937,
+      "anchor_kl": 0.00013,
+      "update_norm": 1.644
+    },
+    {
+      "step": 124,
+      "L_mem": 0.7662,
+      "grad_norm_L_mem": 0.42163,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.8317
+    },
+    {
+      "step": 125,
+      "L_mem": 0.1824,
+      "probe_grad_norm": 0.760178,
+      "probe_L_mem": 0.9108,
+      "grad_norm_L_mem": 0.16813,
+      "anchor_kl": 2e-05,
+      "update_norm": 0.7441
+    },
+    {
+      "step": 126,
+      "L_mem": 1.0528,
+      "grad_norm_L_mem": 0.57793,
+      "anchor_kl": 0.00011,
+      "update_norm": 1.9896
+    },
+    {
+      "step": 127,
+      "L_mem": 0.4254,
+      "grad_norm_L_mem": 0.25634,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.9345
+    },
+    {
+      "step": 128,
+      "L_mem": 0.8983,
+      "grad_norm_L_mem": 0.52205,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.5449
+    },
+    {
+      "step": 129,
+      "L_mem": 0.2563,
+      "grad_norm_L_mem": 0.23406,
+      "anchor_kl": 1e-05,
+      "update_norm": 0.9555
+    },
+    {
+      "step": 130,
+      "L_mem": 2.2837,
+      "grad_norm_L_mem": 2.66024,
+      "anchor_kl": 8e-05,
+      "update_norm": 10.1638
+    },
+    {
+      "step": 131,
+      "L_mem": 0.2336,
+      "grad_norm_L_mem": 0.25995,
+      "anchor_kl": 5e-05,
+      "update_norm": 0.9386
+    },
+    {
+      "step": 132,
+      "L_mem": 0.849,
+      "grad_norm_L_mem": 0.67754,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.8891
+    },
+    {
+      "step": 133,
+      "L_mem": 0.2003,
+      "grad_norm_L_mem": 0.19673,
+      "anchor_kl": 2e-05,
+      "update_norm": 0.8238
+    },
+    {
+      "step": 134,
+      "L_mem": 2.8264,
+      "grad_norm_L_mem": 1.78503,
+      "anchor_kl": 0.0001,
+      "update_norm": 7.6872
+    },
+    {
+      "step": 135,
+      "L_mem": 0.7744,
+      "grad_norm_L_mem": 0.40855,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.5057
+    },
+    {
+      "step": 136,
+      "L_mem": 0.5502,
+      "grad_norm_L_mem": 0.44182,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.7727
+    },
+    {
+      "step": 137,
+      "L_mem": 0.5389,
+      "grad_norm_L_mem": 0.38134,
+      "anchor_kl": 0.00012,
+      "update_norm": 1.4052
+    },
+    {
+      "step": 138,
+      "L_mem": 0.544,
+      "grad_norm_L_mem": 0.45563,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.8122
+    },
+    {
+      "step": 139,
+      "L_mem": 12.7332,
+      "grad_norm_L_mem": 9.26394,
+      "anchor_kl": 7e-05,
+      "update_norm": 41.7047
+    },
+    {
+      "step": 140,
+      "L_mem": 0.2462,
+      "grad_norm_L_mem": 0.21064,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.8557
+    },
+    {
+      "step": 141,
+      "L_mem": 0.7356,
+      "grad_norm_L_mem": 0.56028,
+      "anchor_kl": 0.0001,
+      "update_norm": 2.5652
+    },
+    {
+      "step": 142,
+      "L_mem": 0.6778,
+      "grad_norm_L_mem": 0.39739,
+      "anchor_kl": 0.0001,
+      "update_norm": 1.5899
+    },
+    {
+      "step": 143,
+      "L_mem": 0.499,
+      "grad_norm_L_mem": 0.47122,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.1243
+    },
+    {
+      "step": 144,
+      "L_mem": 0.2225,
+      "grad_norm_L_mem": 0.21836,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.9099
+    },
+    {
+      "step": 145,
+      "L_mem": 0.2667,
+      "grad_norm_L_mem": 0.2605,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.0983
+    },
+    {
+      "step": 146,
+      "L_mem": 0.2723,
+      "grad_norm_L_mem": 0.33516,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.2063
+    },
+    {
+      "step": 147,
+      "L_mem": 0.3402,
+      "grad_norm_L_mem": 0.27096,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.1231
+    },
+    {
+      "step": 148,
+      "L_mem": 0.5308,
+      "grad_norm_L_mem": 0.33517,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.3856
+    },
+    {
+      "step": 149,
+      "L_mem": 0.7611,
+      "grad_norm_L_mem": 0.69939,
+      "anchor_kl": 2e-05,
+      "update_norm": 2.77
+    },
+    {
+      "step": 150,
+      "L_mem": 0.9402,
+      "probe_grad_norm": 0.735179,
+      "probe_L_mem": 0.9128,
+      "grad_norm_L_mem": 0.93458,
+      "anchor_kl": 3e-05,
+      "update_norm": 3.9408
+    },
+    {
+      "step": 151,
+      "L_mem": 0.6993,
+      "grad_norm_L_mem": 0.445,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.68
+    },
+    {
+      "step": 152,
+      "L_mem": 0.7544,
+      "grad_norm_L_mem": 0.68762,
+      "anchor_kl": 5e-05,
+      "update_norm": 3.184
+    },
+    {
+      "step": 153,
+      "L_mem": 0.5803,
+      "grad_norm_L_mem": 0.32661,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.3351
+    },
+    {
+      "step": 154,
+      "L_mem": 0.2576,
+      "grad_norm_L_mem": 0.22503,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.896
+    },
+    {
+      "step": 155,
+      "L_mem": 1.0337,
+      "grad_norm_L_mem": 0.68298,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.9403
+    },
+    {
+      "step": 156,
+      "L_mem": 1.2262,
+      "grad_norm_L_mem": 0.90608,
+      "anchor_kl": 4e-05,
+      "update_norm": 7.5585
+    },
+    {
+      "step": 157,
+      "L_mem": 0.6122,
+      "grad_norm_L_mem": 0.4995,
+      "anchor_kl": 7e-05,
+      "update_norm": 3.1253
+    },
+    {
+      "step": 158,
+      "L_mem": 1.2303,
+      "grad_norm_L_mem": 1.01432,
+      "anchor_kl": 9e-05,
+      "update_norm": 4.1379
+    },
+    {
+      "step": 159,
+      "L_mem": 0.2443,
+      "grad_norm_L_mem": 0.17025,
+      "anchor_kl": 1e-05,
+      "update_norm": 0.9027
+    },
+    {
+      "step": 160,
+      "L_mem": 0.3217,
+      "grad_norm_L_mem": 0.30931,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.5327
+    },
+    {
+      "step": 161,
+      "L_mem": 1.6734,
+      "grad_norm_L_mem": 1.18631,
+      "anchor_kl": 6e-05,
+      "update_norm": 4.6523
+    },
+    {
+      "step": 162,
+      "L_mem": 0.7263,
+      "grad_norm_L_mem": 0.56998,
+      "anchor_kl": 2e-05,
+      "update_norm": 2.243
+    },
+    {
+      "step": 163,
+      "L_mem": 0.1785,
+      "grad_norm_L_mem": 0.19843,
+      "anchor_kl": 0.00012,
+      "update_norm": 0.8312
+    },
+    {
+      "step": 164,
+      "L_mem": 2.106,
+      "grad_norm_L_mem": 2.17905,
+      "anchor_kl": 9e-05,
+      "update_norm": 10.6165
+    },
+    {
+      "step": 165,
+      "L_mem": 0.3027,
+      "grad_norm_L_mem": 0.23621,
+      "anchor_kl": 6e-05,
+      "update_norm": 0.9884
+    },
+    {
+      "step": 166,
+      "L_mem": 0.3941,
+      "grad_norm_L_mem": 0.40726,
+      "anchor_kl": 0.00014,
+      "update_norm": 1.6738
+    },
+    {
+      "step": 167,
+      "L_mem": 0.4303,
+      "grad_norm_L_mem": 0.28924,
+      "anchor_kl": 9e-05,
+      "update_norm": 1.0674
+    },
+    {
+      "step": 168,
+      "L_mem": 0.41,
+      "grad_norm_L_mem": 0.35111,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.2879
+    },
+    {
+      "step": 169,
+      "L_mem": 0.1097,
+      "grad_norm_L_mem": 0.18529,
+      "anchor_kl": 0.0001,
+      "update_norm": 0.8174
+    },
+    {
+      "step": 170,
+      "L_mem": 0.3285,
+      "grad_norm_L_mem": 0.23191,
+      "anchor_kl": 5e-05,
+      "update_norm": 0.8619
+    },
+    {
+      "step": 171,
+      "L_mem": 0.8934,
+      "grad_norm_L_mem": 0.61133,
+      "anchor_kl": 5e-05,
+      "update_norm": 2.283
+    },
+    {
+      "step": 172,
+      "L_mem": 0.4344,
+      "grad_norm_L_mem": 1.10353,
+      "anchor_kl": 8e-05,
+      "update_norm": 6.5045
+    },
+    {
+      "step": 173,
+      "L_mem": 0.25,
+      "grad_norm_L_mem": 0.23824,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.071
+    },
+    {
+      "step": 174,
+      "L_mem": 0.4944,
+      "grad_norm_L_mem": 0.53984,
+      "anchor_kl": 9e-05,
+      "update_norm": 3.1945
+    },
+    {
+      "step": 175,
+      "L_mem": 15.4502,
+      "probe_grad_norm": 0.748991,
+      "probe_L_mem": 0.9173,
+      "grad_norm_L_mem": 12.12614,
+      "anchor_kl": 0.0001,
+      "update_norm": 61.5572
+    },
+    {
+      "step": 176,
+      "L_mem": 0.2979,
+      "grad_norm_L_mem": 0.22169,
+      "anchor_kl": 6e-05,
+      "update_norm": 0.904
+    },
+    {
+      "step": 177,
+      "L_mem": 1.8734,
+      "grad_norm_L_mem": 0.81456,
+      "anchor_kl": 5e-05,
+      "update_norm": 3.8735
+    },
+    {
+      "step": 178,
+      "L_mem": 0.4175,
+      "grad_norm_L_mem": 0.38196,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.3613
+    },
+    {
+      "step": 179,
+      "L_mem": 2.1292,
+      "grad_norm_L_mem": 2.33788,
+      "anchor_kl": 7e-05,
+      "update_norm": 10.125
+    },
+    {
+      "step": 180,
+      "L_mem": 0.7503,
+      "grad_norm_L_mem": 0.50665,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.9673
+    },
+    {
+      "step": 181,
+      "L_mem": 0.1834,
+      "grad_norm_L_mem": 0.16352,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.679
+    },
+    {
+      "step": 182,
+      "L_mem": 0.7612,
+      "grad_norm_L_mem": 0.4415,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.6068
+    },
+    {
+      "step": 183,
+      "L_mem": 0.8106,
+      "grad_norm_L_mem": 0.32868,
+      "anchor_kl": 1e-05,
+      "update_norm": 1.3362
+    },
+    {
+      "step": 184,
+      "L_mem": 0.2812,
+      "grad_norm_L_mem": 0.25234,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.266
+    },
+    {
+      "step": 185,
+      "L_mem": 0.3821,
+      "grad_norm_L_mem": 0.34503,
+      "anchor_kl": 7e-05,
+      "update_norm": 4.2178
+    },
+    {
+      "step": 186,
+      "L_mem": 0.2525,
+      "grad_norm_L_mem": 0.20829,
+      "anchor_kl": 6e-05,
+      "update_norm": 0.9321
+    },
+    {
+      "step": 187,
+      "L_mem": 0.2363,
+      "grad_norm_L_mem": 0.21219,
+      "anchor_kl": 7e-05,
+      "update_norm": 0.8774
+    },
+    {
+      "step": 188,
+      "L_mem": 0.5908,
+      "grad_norm_L_mem": 0.42894,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.6853
+    },
+    {
+      "step": 189,
+      "L_mem": 0.8156,
+      "grad_norm_L_mem": 0.656,
+      "anchor_kl": 7e-05,
+      "update_norm": 3.2343
+    },
+    {
+      "step": 190,
+      "L_mem": 0.825,
+      "grad_norm_L_mem": 0.76404,
+      "anchor_kl": 5e-05,
+      "update_norm": 3.2154
+    },
+    {
+      "step": 191,
+      "L_mem": 0.3311,
+      "grad_norm_L_mem": 0.22753,
+      "anchor_kl": 9e-05,
+      "update_norm": 1.3804
+    },
+    {
+      "step": 192,
+      "L_mem": 0.5326,
+      "grad_norm_L_mem": 0.31812,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.2258
+    },
+    {
+      "step": 193,
+      "L_mem": 0.6962,
+      "grad_norm_L_mem": 0.47823,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.6912
+    },
+    {
+      "step": 194,
+      "L_mem": 1.1358,
+      "grad_norm_L_mem": 0.6357,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.2493
+    },
+    {
+      "step": 195,
+      "L_mem": 0.4297,
+      "grad_norm_L_mem": 0.46978,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.9803
+    },
+    {
+      "step": 196,
+      "L_mem": 0.2594,
+      "grad_norm_L_mem": 0.19145,
+      "anchor_kl": 5e-05,
+      "update_norm": 0.8105
+    },
+    {
+      "step": 197,
+      "L_mem": 0.2409,
+      "grad_norm_L_mem": 0.2761,
+      "anchor_kl": 0.00011,
+      "update_norm": 1.2614
+    },
+    {
+      "step": 198,
+      "L_mem": 0.6463,
+      "grad_norm_L_mem": 0.41566,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.6914
+    },
+    {
+      "step": 199,
+      "L_mem": 0.9228,
+      "grad_norm_L_mem": 0.4235,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.5911
+    },
+    {
+      "step": 200,
+      "L_mem": 0.3479,
+      "probe_grad_norm": 0.722229,
+      "probe_L_mem": 0.9186,
+      "grad_norm_L_mem": 0.26899,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.1451
+    },
+    {
+      "step": 201,
+      "L_mem": 1.2478,
+      "grad_norm_L_mem": 1.83042,
+      "anchor_kl": 8e-05,
+      "update_norm": 9.7312
+    },
+    {
+      "step": 202,
+      "L_mem": 0.5143,
+      "grad_norm_L_mem": 0.30311,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.1626
+    },
+    {
+      "step": 203,
+      "L_mem": 0.6101,
+      "grad_norm_L_mem": 0.2887,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.0629
+    },
+    {
+      "step": 204,
+      "L_mem": 0.8591,
+      "grad_norm_L_mem": 0.57071,
+      "anchor_kl": 8e-05,
+      "update_norm": 2.5199
+    },
+    {
+      "step": 205,
+      "L_mem": 0.3901,
+      "grad_norm_L_mem": 0.2581,
+      "anchor_kl": 9e-05,
+      "update_norm": 1.1543
+    },
+    {
+      "step": 206,
+      "L_mem": 0.8175,
+      "grad_norm_L_mem": 0.42771,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.498
+    },
+    {
+      "step": 207,
+      "L_mem": 0.6044,
+      "grad_norm_L_mem": 0.28169,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.2776
+    },
+    {
+      "step": 208,
+      "L_mem": 0.2487,
+      "grad_norm_L_mem": 0.15484,
+      "anchor_kl": 6e-05,
+      "update_norm": 0.68
+    },
+    {
+      "step": 209,
+      "L_mem": 0.5189,
+      "grad_norm_L_mem": 0.38433,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.5699
+    },
+    {
+      "step": 210,
+      "L_mem": 0.7301,
+      "grad_norm_L_mem": 0.29749,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.2098
+    },
+    {
+      "step": 211,
+      "L_mem": 2.8471,
+      "grad_norm_L_mem": 3.25644,
+      "anchor_kl": 5e-05,
+      "update_norm": 16.5734
+    },
+    {
+      "step": 212,
+      "L_mem": 0.5381,
+      "grad_norm_L_mem": 0.35235,
+      "anchor_kl": 0.0001,
+      "update_norm": 1.589
+    },
+    {
+      "step": 213,
+      "L_mem": 0.4949,
+      "grad_norm_L_mem": 0.47934,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.6117
+    },
+    {
+      "step": 214,
+      "L_mem": 0.8449,
+      "grad_norm_L_mem": 0.48992,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.1881
+    },
+    {
+      "step": 215,
+      "L_mem": 0.4554,
+      "grad_norm_L_mem": 0.31928,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.1337
+    },
+    {
+      "step": 216,
+      "L_mem": 0.5815,
+      "grad_norm_L_mem": 0.70637,
+      "anchor_kl": 6e-05,
+      "update_norm": 3.6374
+    },
+    {
+      "step": 217,
+      "L_mem": 0.4557,
+      "grad_norm_L_mem": 0.29023,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.3455
+    },
+    {
+      "step": 218,
+      "L_mem": 0.4811,
+      "grad_norm_L_mem": 0.53574,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.1316
+    },
+    {
+      "step": 219,
+      "L_mem": 0.3134,
+      "grad_norm_L_mem": 0.24027,
+      "anchor_kl": 5e-05,
+      "update_norm": 2.6549
+    },
+    {
+      "step": 220,
+      "L_mem": 1.528,
+      "grad_norm_L_mem": 0.96456,
+      "anchor_kl": 9e-05,
+      "update_norm": 4.5027
+    },
+    {
+      "step": 221,
+      "L_mem": 0.8005,
+      "grad_norm_L_mem": 0.58306,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.0463
+    },
+    {
+      "step": 222,
+      "L_mem": 1.5639,
+      "grad_norm_L_mem": 0.99712,
+      "anchor_kl": 0.00011,
+      "update_norm": 4.2201
+    },
+    {
+      "step": 223,
+      "L_mem": 0.5853,
+      "grad_norm_L_mem": 0.30261,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.1336
+    },
+    {
+      "step": 224,
+      "L_mem": 1.0674,
+      "grad_norm_L_mem": 0.65306,
+      "anchor_kl": 7e-05,
+      "update_norm": 3.4155
+    },
+    {
+      "step": 225,
+      "L_mem": 0.4875,
+      "probe_grad_norm": 0.697183,
+      "probe_L_mem": 0.9151,
+      "grad_norm_L_mem": 0.31929,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.574
+    },
+    {
+      "step": 226,
+      "L_mem": 0.1904,
+      "grad_norm_L_mem": 0.17042,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.6736
+    },
+    {
+      "step": 227,
+      "L_mem": 0.4775,
+      "grad_norm_L_mem": 0.26159,
+      "anchor_kl": 6e-05,
+      "update_norm": 0.9617
+    },
+    {
+      "step": 228,
+      "L_mem": 0.414,
+      "grad_norm_L_mem": 0.24118,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.9117
+    },
+    {
+      "step": 229,
+      "L_mem": 0.5649,
+      "grad_norm_L_mem": 0.59029,
+      "anchor_kl": 5e-05,
+      "update_norm": 3.0313
+    },
+    {
+      "step": 230,
+      "L_mem": 0.5416,
+      "grad_norm_L_mem": 0.36844,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.3315
+    },
+    {
+      "step": 231,
+      "L_mem": 0.8173,
+      "grad_norm_L_mem": 0.42724,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.1822
+    },
+    {
+      "step": 232,
+      "L_mem": 0.1486,
+      "grad_norm_L_mem": 0.16984,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.741
+    },
+    {
+      "step": 233,
+      "L_mem": 1.0074,
+      "grad_norm_L_mem": 0.61181,
+      "anchor_kl": 6e-05,
+      "update_norm": 2.3968
+    },
+    {
+      "step": 234,
+      "L_mem": 1.5197,
+      "grad_norm_L_mem": 0.89504,
+      "anchor_kl": 3e-05,
+      "update_norm": 4.1608
+    },
+    {
+      "step": 235,
+      "L_mem": 0.5319,
+      "grad_norm_L_mem": 0.31128,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.2711
+    },
+    {
+      "step": 236,
+      "L_mem": 1.5989,
+      "grad_norm_L_mem": 0.78588,
+      "anchor_kl": 6e-05,
+      "update_norm": 3.8226
+    },
+    {
+      "step": 237,
+      "L_mem": 0.3313,
+      "grad_norm_L_mem": 0.24195,
+      "anchor_kl": 0.00013,
+      "update_norm": 1.01
+    },
+    {
+      "step": 238,
+      "L_mem": 0.8672,
+      "grad_norm_L_mem": 0.54234,
+      "anchor_kl": 8e-05,
+      "update_norm": 2.1056
+    },
+    {
+      "step": 239,
+      "L_mem": 0.4459,
+      "grad_norm_L_mem": 0.22535,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.825
+    },
+    {
+      "step": 240,
+      "L_mem": 0.4699,
+      "grad_norm_L_mem": 0.42479,
+      "anchor_kl": 5e-05,
+      "update_norm": 2.1175
+    },
+    {
+      "step": 241,
+      "L_mem": 0.5095,
+      "grad_norm_L_mem": 0.43039,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.5792
+    },
+    {
+      "step": 242,
+      "L_mem": 0.3756,
+      "grad_norm_L_mem": 0.57913,
+      "anchor_kl": 2e-05,
+      "update_norm": 2.3625
+    },
+    {
+      "step": 243,
+      "L_mem": 0.821,
+      "grad_norm_L_mem": 0.7711,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.3851
+    },
+    {
+      "step": 244,
+      "L_mem": 0.7935,
+      "grad_norm_L_mem": 0.42743,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.6338
+    },
+    {
+      "step": 245,
+      "L_mem": 0.1183,
+      "grad_norm_L_mem": 0.16314,
+      "anchor_kl": 0.00014,
+      "update_norm": 0.8445
+    },
+    {
+      "step": 246,
+      "L_mem": 3.0011,
+      "grad_norm_L_mem": 2.00713,
+      "anchor_kl": 8e-05,
+      "update_norm": 8.1775
+    },
+    {
+      "step": 247,
+      "L_mem": 0.4605,
+      "grad_norm_L_mem": 0.28471,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.1927
+    },
+    {
+      "step": 248,
+      "L_mem": 1.6147,
+      "grad_norm_L_mem": 1.08096,
+      "anchor_kl": 1e-05,
+      "update_norm": 5.3589
+    },
+    {
+      "step": 249,
+      "L_mem": 1.2377,
+      "grad_norm_L_mem": 1.07671,
+      "anchor_kl": 5e-05,
+      "update_norm": 4.6964
+    },
+    {
+      "step": 250,
+      "L_mem": 1.0619,
+      "probe_grad_norm": 0.681115,
+      "probe_L_mem": 0.9126,
+      "grad_norm_L_mem": 0.81709,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.0585
+    },
+    {
+      "step": 251,
+      "L_mem": 0.7408,
+      "grad_norm_L_mem": 0.51065,
+      "anchor_kl": 3e-05,
+      "update_norm": 2.5625
+    },
+    {
+      "step": 252,
+      "L_mem": 0.4868,
+      "grad_norm_L_mem": 0.36568,
+      "anchor_kl": 0.0001,
+      "update_norm": 1.4876
+    },
+    {
+      "step": 253,
+      "L_mem": 0.4541,
+      "grad_norm_L_mem": 0.3009,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.2233
+    },
+    {
+      "step": 254,
+      "L_mem": 0.6673,
+      "grad_norm_L_mem": 0.59104,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.632
+    },
+    {
+      "step": 255,
+      "L_mem": 0.4246,
+      "grad_norm_L_mem": 0.44049,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.831
+    },
+    {
+      "step": 256,
+      "L_mem": 1.5311,
+      "grad_norm_L_mem": 1.3427,
+      "anchor_kl": 5e-05,
+      "update_norm": 6.2846
+    },
+    {
+      "step": 257,
+      "L_mem": 0.3205,
+      "grad_norm_L_mem": 0.24372,
+      "anchor_kl": 3e-05,
+      "update_norm": 0.9099
+    },
+    {
+      "step": 258,
+      "L_mem": 0.1694,
+      "grad_norm_L_mem": 0.2647,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.0582
+    },
+    {
+      "step": 259,
+      "L_mem": 1.1155,
+      "grad_norm_L_mem": 0.58287,
+      "anchor_kl": 8e-05,
+      "update_norm": 2.2263
+    },
+    {
+      "step": 260,
+      "L_mem": 1.0088,
+      "grad_norm_L_mem": 0.50797,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.159
+    },
+    {
+      "step": 261,
+      "L_mem": 0.446,
+      "grad_norm_L_mem": 0.29115,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.334
+    },
+    {
+      "step": 262,
+      "L_mem": 1.3913,
+      "grad_norm_L_mem": 0.73792,
+      "anchor_kl": 8e-05,
+      "update_norm": 3.0257
+    },
+    {
+      "step": 263,
+      "L_mem": 0.4003,
+      "grad_norm_L_mem": 0.22675,
+      "anchor_kl": 4e-05,
+      "update_norm": 3.1366
+    },
+    {
+      "step": 264,
+      "L_mem": 0.4874,
+      "grad_norm_L_mem": 0.32967,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.2744
+    },
+    {
+      "step": 265,
+      "L_mem": 1.1794,
+      "grad_norm_L_mem": 0.91637,
+      "anchor_kl": 7e-05,
+      "update_norm": 4.3718
+    },
+    {
+      "step": 266,
+      "L_mem": 0.2141,
+      "grad_norm_L_mem": 0.19192,
+      "anchor_kl": 7e-05,
+      "update_norm": 0.7334
+    },
+    {
+      "step": 267,
+      "L_mem": 1.0175,
+      "grad_norm_L_mem": 0.52607,
+      "anchor_kl": 4e-05,
+      "update_norm": 2.1245
+    },
+    {
+      "step": 268,
+      "L_mem": 0.5982,
+      "grad_norm_L_mem": 0.31363,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.2191
+    },
+    {
+      "step": 269,
+      "L_mem": 0.3821,
+      "grad_norm_L_mem": 0.28854,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.2326
+    },
+    {
+      "step": 270,
+      "L_mem": 0.5877,
+      "grad_norm_L_mem": 0.54284,
+      "anchor_kl": 0.0001,
+      "update_norm": 2.3732
+    },
+    {
+      "step": 271,
+      "L_mem": 0.8695,
+      "grad_norm_L_mem": 0.37738,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.5725
+    },
+    {
+      "step": 272,
+      "L_mem": 5.7295,
+      "grad_norm_L_mem": 4.13141,
+      "anchor_kl": 7e-05,
+      "update_norm": 23.4216
+    },
+    {
+      "step": 273,
+      "L_mem": 1.6593,
+      "grad_norm_L_mem": 1.59051,
+      "anchor_kl": 6e-05,
+      "update_norm": 6.6787
+    },
+    {
+      "step": 274,
+      "L_mem": 0.1607,
+      "grad_norm_L_mem": 0.22133,
+      "anchor_kl": 1e-05,
+      "update_norm": 0.9174
+    },
+    {
+      "step": 275,
+      "L_mem": 0.8379,
+      "probe_grad_norm": 0.677831,
+      "probe_L_mem": 0.9113,
+      "grad_norm_L_mem": 0.73801,
+      "anchor_kl": 0.0001,
+      "update_norm": 3.5964
+    },
+    {
+      "step": 276,
+      "L_mem": 0.9296,
+      "grad_norm_L_mem": 0.60888,
+      "anchor_kl": 7e-05,
+      "update_norm": 2.2417
+    },
+    {
+      "step": 277,
+      "L_mem": 0.3232,
+      "grad_norm_L_mem": 0.23204,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.9504
+    },
+    {
+      "step": 278,
+      "L_mem": 1.1484,
+      "grad_norm_L_mem": 0.87574,
+      "anchor_kl": 7e-05,
+      "update_norm": 3.5534
+    },
+    {
+      "step": 279,
+      "L_mem": 0.2853,
+      "grad_norm_L_mem": 0.20076,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.8292
+    },
+    {
+      "step": 280,
+      "L_mem": 0.4172,
+      "grad_norm_L_mem": 0.36159,
+      "anchor_kl": 9e-05,
+      "update_norm": 1.8819
+    },
+    {
+      "step": 281,
+      "L_mem": 1.4033,
+      "grad_norm_L_mem": 0.86247,
+      "anchor_kl": 8e-05,
+      "update_norm": 3.7573
+    },
+    {
+      "step": 282,
+      "L_mem": 0.6551,
+      "grad_norm_L_mem": 0.51016,
+      "anchor_kl": 5e-05,
+      "update_norm": 1.9319
+    },
+    {
+      "step": 283,
+      "L_mem": 2.9291,
+      "grad_norm_L_mem": 2.61339,
+      "anchor_kl": 6e-05,
+      "update_norm": 11.5732
+    },
+    {
+      "step": 284,
+      "L_mem": 0.514,
+      "grad_norm_L_mem": 0.38327,
+      "anchor_kl": 8e-05,
+      "update_norm": 1.5016
+    },
+    {
+      "step": 285,
+      "L_mem": 0.3207,
+      "grad_norm_L_mem": 0.2432,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.0248
+    },
+    {
+      "step": 286,
+      "L_mem": 1.6812,
+      "grad_norm_L_mem": 1.02109,
+      "anchor_kl": 8e-05,
+      "update_norm": 5.3836
+    },
+    {
+      "step": 287,
+      "L_mem": 0.7549,
+      "grad_norm_L_mem": 0.41586,
+      "anchor_kl": 2e-05,
+      "update_norm": 1.6127
+    },
+    {
+      "step": 288,
+      "L_mem": 0.3532,
+      "grad_norm_L_mem": 0.34986,
+      "anchor_kl": 4e-05,
+      "update_norm": 1.765
+    },
+    {
+      "step": 289,
+      "L_mem": 1.4916,
+      "grad_norm_L_mem": 1.01008,
+      "anchor_kl": 9e-05,
+      "update_norm": 4.4847
+    },
+    {
+      "step": 290,
+      "L_mem": 0.4647,
+      "grad_norm_L_mem": 0.3445,
+      "anchor_kl": 3e-05,
+      "update_norm": 1.3057
+    },
+    {
+      "step": 291,
+      "L_mem": 0.4293,
+      "grad_norm_L_mem": 0.29475,
+      "anchor_kl": 7e-05,
+      "update_norm": 1.2227
+    },
+    {
+      "step": 292,
+      "L_mem": 0.861,
+      "grad_norm_L_mem": 0.48355,
+      "anchor_kl": 6e-05,
+      "update_norm": 1.9367
+    },
+    {
+      "step": 293,
+      "L_mem": 0.8292,
+      "grad_norm_L_mem": 0.52096,
+      "anchor_kl": 8e-05,
+      "update_norm": 2.7379
+    },
+    {
+      "step": 294,
+      "L_mem": 1.3806,
+      "grad_norm_L_mem": 0.65361,
+      "anchor_kl": 0.00012,
+      "update_norm": 2.9406
+    },
+    {
+      "step": 295,
+      "L_mem": 0.6054,
+      "grad_norm_L_mem": 0.31663,
+      "anchor_kl": 0.0001,
+      "update_norm": 1.2098
+    },
+    {
+      "step": 296,
+      "L_mem": 0.3588,
+      "grad_norm_L_mem": 0.21499,
+      "anchor_kl": 4e-05,
+      "update_norm": 0.8403
+    },
+    {
+      "step": 297,
+      "L_mem": 0.5808,
+      "grad_norm_L_mem": 0.3482,
+      "anchor_kl": 9e-05,
+      "update_norm": 1.2722
+    },
+    {
+      "step": 298,
+      "L_mem": 0.5376,
+      "grad_norm_L_mem": 1.06059,
+      "anchor_kl": 4e-05,
+      "update_norm": 4.3732
+    },
+    {
+      "step": 299,
+      "L_mem": 1.4545,
+      "probe_grad_norm": 0.694113,
+      "probe_L_mem": 0.9195,
+      "grad_norm_L_mem": 1.32783,
+      "anchor_kl": 6e-05,
+      "update_norm": 5.9534
+    }
+  ],
+  "measured": {
+    "train_wall_s": 251.4,
+    "s_per_step_steady": 0.7441,
+    "fwd_total": 1800,
+    "bwd_total": 1200,
+    "fwd_per_step": 6.0,
+    "bwd_per_step": 4.0,
+    "peak_gpu_gib": 17.407,
+    "grad_norm_first": 0.52301,
+    "grad_norm_last": 1.32783,
+    "probe_grad_norm_first": 1.117353,
+    "probe_grad_norm_last": 0.694113,
+    "probe_L_mem_first": 0.9133,
+    "probe_L_mem_last": 0.9195,
+    "L_mem_first": 0.3726,
+    "L_mem_last": 1.4545
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "probe": "noise_fragility",
+  "start": "unlearned",
+  "hparams": {
+    "start": "unlearned",
+    "fracs": "0,0.25,0.5,1.0,2.0",
+    "rank": 16,
+    "unlearn_adapter": "/data/bijaypandey/spex/adapters/big_uncached/ckpt_300",
+    "memo": "/data/bijaypandey/spex/adapters/memorized_big",
+    "n_forget": 32,
+    "n_retain": 16,
+    "seed": 4242
+  },
+  "n_forget_probed": 32,
+  "n_retain_probed": 16,
+  "unlearning_edit": {
+    "frobenius_norm": 11.5858,
+    "n_modules": 224,
+    "lora_r": 16,
+    "lora_alpha": 32
+  },
+  "curve": [
+    {
+      "frac": 0.0,
+      "perturbation_norm": 0.0,
+      "forget": {
+        "n": 32,
+        "disclosure": 0.0312,
+        "clean_forgetting": 0.9688,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 1.0,
+        "clean_forgetting": 0.0,
+        "degenerate": 0
+      }
+    },
+    {
+      "frac": 0.25,
+      "perturbation_norm": 2.8964,
+      "forget": {
+        "n": 32,
+        "disclosure": 0.0312,
+        "clean_forgetting": 0.9688,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 1.0,
+        "clean_forgetting": 0.0,
+        "degenerate": 0
+      }
+    },
+    {
+      "frac": 0.5,
+      "perturbation_norm": 5.7929,
+      "forget": {
+        "n": 32,
+        "disclosure": 0.0312,
+        "clean_forgetting": 0.9688,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 1.0,
+        "clean_forgetting": 0.0,
+        "degenerate": 0
+      }
+    },
+    {
+      "frac": 1.0,
+      "perturbation_norm": 11.5858,
+      "forget": {
+        "n": 32,
+        "disclosure": 0.0625,
+        "clean_forgetting": 0.9375,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 1.0,
+        "clean_forgetting": 0.0,
+        "degenerate": 0
+      }
+    },
+    {
+      "frac": 2.0,
+      "perturbation_norm": 23.1716,
+      "forget": {
+        "n": 32,
+        "disclosure": 0.0312,
+        "clean_forgetting": 0.9688,
+        "degenerate": 0
+      },
+      "retain": {
+        "n": 16,
+        "disclosure": 1.0,
+        "clean_forgetting": 0.0,
+        "degenerate": 0
+      }
+    }
+  ],
+  "measured": {
+    "wall_s": 348.5,
+    "peak_gpu_gib": 15.628,
+    "n_generations": 240
+  }
+}

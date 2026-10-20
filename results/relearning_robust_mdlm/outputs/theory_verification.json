@@ -1,0 +1,62 @@
+{
+  "n_claims": 11,
+  "n_passed": 11,
+  "all_passed": true,
+  "results": [
+    {
+      "claim": "L1_symbolic_first_order_coeff_is_minus_grad_squared",
+      "passed": true,
+      "detail": "coeff(eta^1) = -Derivative(L(t), t)**2"
+    },
+    {
+      "claim": "L1_numeric_recovery_lower_bound",
+      "passed": true,
+      "detail": "min(LHS-RHS) over 300 instances = 8.571e-06"
+    },
+    {
+      "claim": "L1_equal_loss_different_recovery",
+      "passed": true,
+      "detail": "median recovery ratio steep/flat = 9.950e+05 at matched loss"
+    },
+    {
+      "claim": "P2_ball_lower_bound",
+      "passed": true,
+      "detail": "min(L(theta) - bound) = 1.053e-04"
+    },
+    {
+      "claim": "P2prime_inversion_exact",
+      "passed": true,
+      "detail": "0/500 instances off by > 1e-8 relative"
+    },
+    {
+      "claim": "P2_two_regimes",
+      "passed": true,
+      "detail": "r_steep=2.000e-03 (~D/|g|=2.000e-03)  r_stationary=4.472e-01 (~sqrt(2D/M)=4.472e-01)  ratio=223.6x"
+    },
+    {
+      "claim": "P3_penalty_vanishes_at_every_critical_point_including_memorized_min",
+      "passed": true,
+      "detail": "critical points of L: [0, 3/2, 3]; dJ there: ['0', '0', '0']"
+    },
+    {
+      "claim": "P3_drift_is_basin_determined_not_lambda_determined",
+      "passed": true,
+      "detail": "from inside memorized basin L_end={1:0.0000, 5:0.0000, 20:0.0000} (fact RETURNED); from outside L_end={1:5.0625, 5:5.0625, 20:5.0625, 50:5.0625} (target 5.0625, stays high)"
+    },
+    {
+      "claim": "P3b_raw_ascent_diverges_in_high_dim",
+      "passed": true,
+      "detail": "||theta|| after 3000 raw-ascent steps = inf -> first term must be an ANCHORED forget loss, not -L"
+    },
+    {
+      "claim": "P4_surrogate_first_order_is_grad_NORM_not_norm_squared",
+      "passed": true,
+      "detail": "coeff(rho^1) == ||g|| exactly (so the surrogate penalises ||g||, a different penalty from ||g||^2)"
+    },
+    {
+      "claim": "P4_grad_of_norm_vs_norm_squared_differ_by_factor_2g",
+      "passed": true,
+      "detail": "max relative deviation from the factor 2||g|| = 3.510e-16"
+    }
+  ]
+}
