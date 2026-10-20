@@ -25,14 +25,17 @@ Resources: **0.090 of 6.0 GPU-h** · 0.32 of 24 h · 0.227 of 10 GiB · 1 GPU.
 Zero mechanical failures across all 200 generations (`empty/refusal/repetition/
 truncation/parse_failure` all 0); the misses are confident *wrong facts* ("Dan Simmons"
 for Richard Bachman, "Harvard" for Columbia); and the same harness scores **75% on
-MMLU** against a 50% floor. The model loads, generates and parses correctly — it simply does
-not know these facts reliably. (MMLU uses a disjoint letter-scorer and does **not** validate
-the open-answer alias/normalization choices; see Amendment 01 §2.)
+MMLU** against a 50% floor — the checkpoint loads and that one constrained single-letter path
+decodes and parses. It simply does not know these facts reliably. **MMLU does NOT establish
+that the whole evaluation harness is sound** (disjoint 4-way letter scorer; Amendment 01 §2,
+Amendment 02 §2), and the two tested decoding schedules do **not** rule out decoding effects
+(Amendment 02 §3).
 
 ## Contents
 
 | Path | What it is |
 |---|---|
+| [`AMENDMENT_02.md`](AMENDMENT_02.md) | **Amendment 02** (2026-10-20): resolves the audit contradiction (the published audit JSON records a failure — overwritten by a negative control), withdraws the MMLU-harness and decoding-ruled-out claims, withdraws the 200-entity recommendation, disambiguates failure kinds. Outcome unchanged |
 | [`AMENDMENT_01.md`](AMENDMENT_01.md) | **Amendment 01** (2026-10-20): publishes the five missing `outputs/*.json`, hash-verified, and narrows eight claims. Outcome unchanged |
 | [`FINAL_REPORT.md`](FINAL_REPORT.md) | Full findings, per-phase scope, objective verification, accounting |
 | [`FREEZE_NOTE.md`](FREEZE_NOTE.md) | The pre-inference freeze, committed in `203525b` before the model ran once |

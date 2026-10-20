@@ -10,11 +10,14 @@ Study: `llada_rwku_baseline_v1`. Outcome **INSUFFICIENT_BASE_RECALL** (stopped w
 
 | Path | Bytes | SHA-256 |
 |---|---|---|
-| `AMENDMENT_01.md` | 12949 | `8710124dffe413c089a5c577b8bca6cd90886f2bdcb0c7eec17e6448c789f2a8` |
-| `FINAL_REPORT.md` | 22562 | `698ec3103473e37c11fd6d98829148e66bb9b71329c618880da69891d5ada1bf` |
+| `AMENDMENT_01.md` | 13866 | `3ee80c76915a3bc5fa07a1ddad0ec1e1e298e7a4b00c1780fcf5a2e22e5c363d` |
+| `AMENDMENT_02.md` | 9829 | `f2ac90ee82ee36538715ac1729fb22e5b6ee7008711eba1bca797add63d9dd9c` |
+| `FINAL_REPORT.md` | 23924 | `f9d78a4c96ae17c55b60ef1484fbd6d39d9c460a4cad4deb2bcc4e2e23cf1a12` |
 | `FREEZE_NOTE.md` | 4648 | `cd14949a5a141423f38a1e248094f079857c5cf0e2288d1f1e7b5f274523c62c` |
-| `README.md` | 2941 | `2c7710ead51a866646fd764b33312aaae8c15ef1d8341190a7ef5b523cdcdd85` |
+| `README.md` | 3418 | `db1e3f4cb649760f61b473de5c040163d3c065eb89676e405cd6d4d028954af3` |
 | `evidence/ATTEMPTS.tsv` | 1002 | `f435c6bf61c3aed5846cebd34c4016e298de9a69f6e1dc626a5a5b6c868ce6d9` |
+| `evidence/audit_negative_control/README.txt` | 1152 | `f96b9b51178f494291ce7532ab960ade8c96d834c499f5c03b1a1ad42c8ea762` |
+| `evidence/audit_negative_control/audit_negative.py` | 8495 | `4d22ecd952b8016b1b82d10a14bbbb295ac1934480eb6e1a4d67602cbfadb79b` |
 | `frozen/frozen_mmlu_panel.json` | 19858 | `ea77d6a995dbcffe6ae8330544811fa4f32c0ddf52bb47a45ad7423cea8b1033` |
 | `frozen/frozen_neighbor_availability.json` | 1733 | `d04533b45c032d9f6346626197a10d5c2c325bb945676bb1940038448f497e09` |
 | `frozen/frozen_panels.json` | 445126 | `7c7ce60149b3945f9a834e251c3150f963fd8967ee16509574d24a2cd069edfd` |
@@ -55,6 +58,20 @@ Study: `llada_rwku_baseline_v1`. Outcome **INSUFFICIENT_BASE_RECALL** (stopped w
 | RWKU dataset | `d72f493d481d1b0a9bdc6e869d32baeffad8904f` |
 | open-dlu (reference only, loader NOT adopted) | `fb984334a4007b031246d0b33973644d4845bafd` |
 | Pre-inference freeze commit | `203525b6b656aa9220f4ff431e992e3c9ab1ff29` |
+
+## Amendment 02 (2026-10-20)
+
+`outputs/stage_a_audit.json` is preserved **exactly as published** and records
+`all_passed: false` / `n_fail: 1` / `failed_checks: ["ten_entities_screened"]`. Amendment 02
+§1 establishes, from existing records only, that a negative control overwrote the normal
+run's JSON 0.1 s after it was written: the retained variant
+(`evidence/audit_negative_control/audit_negative.py`) asserts `== 999` on line 68 and writes
+to the same hard-coded path, and the published verdict `passed: false` **with `detail: 10`**
+is unreachable in the normal script. The normal run's log
+(`evidence/audit_negative_control/normal_run_b0001.log`) reports `AUDIT: ALL PASS`.
+**A matching normal-run JSON was not recovered and was not manufactured; the audit was not
+re-run.** The 200/200 per-item agreement and the 0-entities-qualify result remain recorded
+as `passed: true` inside the preserved file.
 
 ## Amendment 01 (2026-10-20)
 

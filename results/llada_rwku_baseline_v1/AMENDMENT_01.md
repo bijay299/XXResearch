@@ -4,6 +4,19 @@
 **Amends:** `37c31ca17a004b7bf7c44634e395e2eef7a9678f` (`results/llada_rwku_baseline_v1/`)
 **Nature:** evidence publication + documentation correction. **No model was executed.**
 
+> **PARTLY SUPERSEDED by [`AMENDMENT_02.md`](AMENDMENT_02.md) (2026-10-20).** Two claims in
+> this document are corrected there and should be read with it:
+> 1. The statements that the offline audit was "13/13 checks" / "13/13 passed" (below, in
+>    *Outcome retained* and *Offline audit record*) are **not supported by the published
+>    artifact**: `outputs/stage_a_audit.json` records `all_passed: false`, `n_fail: 1`,
+>    `failed_checks: ["ten_entities_screened"]`. Amendment 02 §1 establishes that a
+>    negative control overwrote the normal run's JSON 0.1 s later, and that the normal
+>    run's *log* is what reports 13/13. A matching passing JSON was not recovered.
+> 2. Correction 2 below narrowed the MMLU claim once; Amendment 02 §2 narrows it further —
+>    MMLU does **not** establish that the whole evaluation harness is sound.
+>
+> The body of this document is otherwise preserved as published.
+
 > Zero GPU-seconds were consumed by this amendment. No alias was altered, no frozen
 > evaluator was revised, no frozen script or raw record was modified, and the study's
 > outcome is **unchanged**.

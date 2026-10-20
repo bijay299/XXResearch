@@ -20,6 +20,14 @@ user mid-run, devices 0–1 left untouched)
 > two failing checks exited 0, the chronology of the supplementary checks, and unmetered
 > historical CPU. **The outcome, zero training steps and absence of a qualified baseline are
 > unchanged.**
+>
+> **Amended again 2026-10-20 — see [`AMENDMENT_02.md`](AMENDMENT_02.md).** Resolves an audit
+> contradiction (the published `stage_a_audit.json` records a FAILURE, not 13/13 — it was
+> overwritten by a negative control), withdraws the claim that MMLU validates the evaluation
+> harness, withdraws the claim that decoding effects are ruled out, withdraws the stale
+> 200-entity screen recommendation, disambiguates one execution exception from two logical
+> failures that exited 0, and identifies unconditional checks whose coverage is not
+> established. **Outcome `INSUFFICIENT_BASE_RECALL` unchanged.**
 
 ---
 
@@ -273,7 +281,9 @@ mid-attempt.
 | `a007` | evaluator | verify_scoring_v2 | 2 s | 0 | no |
 | `a008` | wiring | teacher_equivalence | 9 s | 0 | yes |
 
-**Two failures, both preserved and neither overwritten:**
+**Three abnormal events of two kinds — one execution exception and two logical failures that
+exited 0** (Amendment 02 §5). Their *logs* are preserved; their JSON outputs were
+overwritten by later attempts:
 - `a002` (objective) — `RecursionError` from a `torch.rand` monkeypatch that called itself.
   Fixed by pre-generating the draw queue over the saved original. Full traceback retained.
 - `a006` (evaluator) — surfaced two defects: the real parser defect above, and a faulty
@@ -331,20 +341,32 @@ assuming the first ten canonical targets are suitable.**
 The evidence supports this specifically:
 
 - Base recall is the binding constraint, not infrastructure. Both the evaluator (48/48) and
-  the objective (10/10 vs native source) are verified and working, and MMLU at 75% shows
-  the harness is sound. The only thing missing is a target the model knows.
-- The shortfall is not marginal (mean 0.220, max 0.50 against a 0.60 threshold) and not
-  decoder-specific (secondary agrees), so it will not be fixed by tuning decoding.
-- RWKU has **200** target entities; only the first 10 were screened, and recall varied
-  5× across them (0/10 to 5/10). A wider screen is cheap — the 10-entity primary screen
-  cost **200 GPU-s**, so all 200 entities would cost roughly **1.1 GPU-h**, well inside a
-  6 GPU-h budget.
-- Doing this first prevents a category of wasted work: any forgetting measurement on an
-  entity the model never recalled would measure absence, not forgetting.
+  the objective (10/10 vs native *helpers*) ran and passed, and MMLU at 75% shows the
+  checkpoint loads and that one constrained single-letter path decodes and parses.
+  **Corrected (Amendment 02 §2): MMLU does NOT establish that the whole evaluation harness
+  is sound** — it exercises a disjoint 4-way letter scorer, not the open-answer path that
+  produced the outcome.
+- The shortfall is not marginal (mean 0.220, max 0.50 against a 0.60 threshold) and was low
+  at both tested schedules. **Corrected (Amendment 02 §3):** agreement between the two
+  frozen schedules does NOT rule out decoding effects and does NOT prove decoding changes
+  cannot affect recall; block length, generation length, temperature, remasking and CFG
+  were never varied.
+- **WITHDRAWN (Amendment 02 §4).** This report previously recommended screening all 200
+  RWKU entities, projecting ~1.1 GPU-h by linear extrapolation from the 10-entity screen's
+  200 GPU-s. **That recommendation is withdrawn**: the shared resource envelope has since
+  been consumed by subsequent work (see Stage B's corrected ledger), the figure was an
+  extrapolation rather than a measurement, and **no replacement experimental recommendation
+  is offered here.**
+- Doing this first would prevent a category of wasted work: any forgetting measurement on an
+  entity the model never recalled would measure absence, not forgetting. That reasoning
+  stands; the specific 200-entity plan does not.
 
-Two scoping notes. A wider screen should keep this study's frozen evaluator and
-pre-inference discipline, and should report how many entities clear the bar before any
-training is authorized. If very few entities clear ≥6/10 across all 200, that is itself the
-finding — it would mean RWKU-style unlearning on LLaDA-8B-Instruct needs a different
-knowledge-injection route (as MDU itself does for TOFU, where it fine-tunes a backbone
-first), and that choice belongs with the cloud method team, not with this report.
+---
+
+## Evidence index
+
+See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for every published file with its SHA-256.
+Corrections are in [`AMENDMENT_01.md`](AMENDMENT_01.md) and
+[`AMENDMENT_02.md`](AMENDMENT_02.md). The reviewed publications are
+[`37c31ca`](https://github.com/bijay299/XXResearch/commit/37c31ca17a004b7bf7c44634e395e2eef7a9678f)
+and [`a349197`](https://github.com/bijay299/XXResearch/commit/a349197c471d8bd74878b6b26f622f3f225c7232).
