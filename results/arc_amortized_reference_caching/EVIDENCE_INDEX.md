@@ -76,6 +76,53 @@ Generated from `git ls-files`. `EVIDENCE_INDEX.md` omitted (cannot contain its o
 | `scripts/verify_theory.py` | 6914 | `dc51c75729fd3a4d063938b4f1f7eb7f18aa23388d6007ad52f757a3ee299148` |
 | `theory/THEORY.md` | 18990 | `145f0248bba987c6505663a7ee872f010e76a398c77af639313394724f406179` |
 
+## Amendment 01 — 128-fact breaking-point probe (added after commit `67375a2b`)
+
+| Artifact | Bytes | sha256 |
+|---|---|---|
+| `data_big/facts.json` | 55738 | `a35041e998e7e469d876de72ad23b854845491557c6fb698b9c08dd3f243c57e` |
+| `data_big/forget.jsonl` | 15752 | `3d0eaa6bbcf0c0d85aff19132324566715d283da29b425df3c5f75f18172af4f` |
+| `data_big/frozen_spec.json` | 751 | `8f7e3dddf634fa987a95c1436b7d8045e75cecddd7155f02035fc70c5ae01b79` |
+| `data_big/retain.jsonl` | 16072 | `574c556a9300d45373469084803d0ecf7bf5d4c869feca98220166cc1620a6aa` |
+| `figures/arc_breaking_point.svg` | 2835 | `1d8eb38506dd506dcc878106b7e4b2287467e3c0d473d729bb2b86770794794d` |
+| `outputs/AMENDMENT_01_breaking_point.md` | 6258 | `0654b73cfdc9da9e74e58941fe10cf56cfb3a187b93e813b6889f499fc5e9f4e` |
+| `outputs/BIG_RESULTS.md` | 894 | `d2b403e42d9b79fb9f830f288638e072a3727e5d21c7030d69b47e2bcab861dc` |
+| `outputs/FINAL_REPORT.md` | 13391 | `3d9d8e014d62881fc6aec09a1fb1562d00649cb7c69cd04937c1c3a396080128` |
+| `outputs/RESULTS.md` | 3764 | `2a030479d14b8b34aa18bb1b23ad242df8adb58cc595dfdd6a087c953f6e51c3` |
+| `outputs/big_analysis.json` | 2573 | `1347f143fdf504eabfbc0658870663ae9d748837d3cfd07d7e7ab48fd8d07198` |
+| `outputs/big_eval_arcK16.json` | 566 | `fbc82a6f7a9a4b7b3bd9372e33cec917257c1b4e110ad109f3f6230f42514b68` |
+| `outputs/big_eval_arcK512.json` | 567 | `9abb50b98d495f802fda15f0ea0abd98eb8f075e645774ec48da5ce823e11754` |
+| `outputs/big_eval_theta0.json` | 572 | `c59f537ba6826731d4b723538e4efef5e16a2dd9c8ac1990607c8c8321a48c88` |
+| `outputs/big_eval_uncached.json` | 566 | `8d7699aa31e2507b39c29fbc4e5058809ad637ed39007edbab9e6d7d2cac6e58` |
+| `outputs/big_generations/big_gens_arcK16.json` | 225515 | `2a745da532bb1b96155c5aa5f2be882175336ecbb9966d900997486d1c9b3381` |
+| `outputs/big_generations/big_gens_arcK512.json` | 229154 | `84fa63295449af32d8e199087daaf010b40479b4b8687b679a70772b4fd18b0b` |
+| `outputs/big_generations/big_gens_theta0.json` | 235363 | `56389bd0b9f44d46cbf3699ebc7cad69bb129db5be866fb428d3e88dffb11ae5` |
+| `outputs/big_generations/big_gens_uncached.json` | 231055 | `b854200647ade846a49836d9be6cdbbaeecaf6730459affb4db4fd0e8a373de4` |
+| `outputs/big_generations/big_memorization_generations.json` | 213249 | `23833427c79b60ecc9b667db3f537064c2c4fc2208dcf2fdf863c785516fa5b1` |
+| `outputs/big_qualification.json` | 349 | `2acc31787a110d29d7fd85db13bb239ebb6389ca9599909e595a7d6361396d7f` |
+| `outputs/big_recalled_facts.json` | 1231 | `98e5f4a477048df8f9020589849231601a645aa44b41daafb5099aa9fa8e969a` |
+| `outputs/big_reports/big_arcK16.json` | 87747 | `f080ea178467beffc5bdf462309a1f2ae028763068307b3b81c9a0c53c2cb799` |
+| `outputs/big_reports/big_arcK512.json` | 87849 | `864bc6175bd518c6da59e3e3e8d560ff62baab628decbe6330e91a5de6b2dd51` |
+| `outputs/big_reports/big_uncached.json` | 84383 | `4357d3f5defc21520879849e410c5b0c20b76c46a13be44657c80356c8963882` |
+| `scripts/analyze_big.py` | 3439 | `2246e7401118ec72ad9010e1b806851394a068a672d03f7592a3ab8c4bc44bc1` |
+| `scripts/arc_big.py` | 14036 | `afb4ad3a477a26d159c995cadae5c1ed3ad6430799a9dd0bfa0511bd5e9028d7` |
+| `scripts/build_big.py` | 6054 | `7106e0dc8f3032023c0f02dde08e69d4d8b21157ac646f40e095571b264acf6c` |
+| `scripts/common_big.py` | 7691 | `b3b2d7caab494898b7c7c6b526d8dd7122aff1006f1be4b9a676ad77d6da940c` |
+| `scripts/evaluate_big.py` | 3484 | `7e6669942c9ed3cdbb77231eca365fd97ed46fdbd0d027239ec2005bcefb61bf` |
+| `scripts/memorize_big.py` | 14160 | `5d0c90e5c4640d9cefcd5a9a961164f2ac5aa647da32133278ddb02e06fa66e5` |
+| `scripts/qualify_big.py` | 2468 | `42850974c0f4111afee73f66b8c54b22ed5d771d57ebd06fd744efa5eb715c5c` |
+
+| `logs/UNLEDGERED_big_eval_arcK16.log` | 791 | `06e7a8ea46543aa73e90a6d385e9997b556c1fa0b9560116a650c1df2ae2a166` |
+| `logs/UNLEDGERED_big_eval_arcK512.log` | 792 | `45fc9e4ecf63a5af6f237fb3c01e53c43ff62ae294775c73684dbd474d1e3eb6` |
+| `logs/UNLEDGERED_big_eval_theta0.log` | 791 | `6ff117cd29e5a798bec6325a35e2b27496df8af155d086d02bfd97cb78a77448` |
+| `logs/UNLEDGERED_big_eval_uncached.log` | 793 | `dc118c5bf1677033c676a5c4ffc4b8b5be103a1881ac033123e964b81673952f` |
+| `logs/p023_big_build_dataset.log` | 343 | `b179a8ca19c5e82381fd646af88b2e398de987e9637dca84148d378b12e3cc15` |
+| `logs/p024_big_memorize.log` | 4545 | `c040b2206823947bb11f8f727f55d09a49a88b49660b618b00a5ed1db6eb9a85` |
+| `logs/p025_big_qualify.log` | 837 | `b1087035a81846fb2ee5ad8c341cc9a8d3e6c9f2f6062f5c4bfbb001e4beff39` |
+| `logs/p026_big_arm_arcK16.log` | 1984 | `7acccb5ed3fb8262588df51da01831fd9cabbce94967a8a0e4f89020acbf8a82` |
+| `logs/p027_big_arm_arcK512.log` | 1987 | `ed55d4f9818279b39a4121240f1184e6f36ef97642301ab45960978e837edba0` |
+| `logs/p028_big_arm_uncached.log` | 1910 | `9895ffa76858334b8ba87c72f588ff367ac254a73313fa97e75754ad58ca1e72` |
+
 ## Not published
 
 | Artifact | Why |
@@ -83,3 +130,8 @@ Generated from `git ls-files`. `EVIDENCE_INDEX.md` omitted (cannot contain its o
 | Adapter weights (22 adapters, 161-188 MB each) | hashes in `adapters_manifest/adapters.json`; reloadable from the local dirs named there |
 | LLaDA-8B-Instruct base weights | public at the pinned revision, reused read-only |
 | Synthetic dataset | frozen in the PoC study `results/llada_poc_v1/data/`; reused unchanged here |
+
+### Known gaps in this index
+
+- The four `UNLEDGERED_big_eval_*.log` evaluations were launched **directly, bypassing `scripts/attempt.sh`**, so they have no row in `ATTEMPTS.tsv` and their GPU time is not in the ledger (≈0.52 GPU-device-h unrecorded). Their logs are published in full.
+- Commit `67375a2b` **omitted `outputs/FINAL_REPORT.md` and `outputs/RESULTS.md`**: the repository `.gitignore` excludes `outputs/`, and those two files were not force-added. Both are included from this commit onward. No other artifact was affected.

@@ -4,11 +4,25 @@
 ended with a measured 1.26× speedup, a proved negative result, and a metric that reorders
 the leaderboard.** All on synthetic data; no published-benchmark comparison attempted.
 
+> ### ⚠ AMENDED — ARC's efficacy parity does **not** scale
+>
+> [`outputs/AMENDMENT_01_breaking_point.md`](outputs/AMENDMENT_01_breaking_point.md) reports a
+> later **128-fact** probe that breaks ARC. With an under-covering pool (`K=16`, 15 of 64
+> forget facts represented) ARC **does not forget at all** — disclosure **0.931** against the
+> uncached control's **0.049**, on facts the reference recalled at 0.980. With full coverage
+> (`K=512`) it leaves **0.216** vs **0.049**: 4.4× more residual disclosure. The **cost**
+> results below — exactness, forward counts, 1.257× speedup — are unaffected; the
+> **matched-efficacy** claim is now scoped to 24 facts. A sharp per-fact prediction
+> pre-registered in `scripts/build_big.py` was also **refuted as stated**.
+>
+> ![ARC breaking point](figures/arc_breaking_point.svg)
+
 | Outcome | Status |
 |---|---|
 | Original idea (SPEX: drop the reference pass by algebra) | ❌ **DISPROVED** at 0:08 by its own verifier (10/13 claims) |
 | Negative result: reference pass is **not** removable by algebra | ✅ **PROVED** (Prop 5) |
-| ARC: remove it by **amortisation** instead | ✅ **1.26× faster/step, 18.8–75× fewer reference forwards, targets bit-identical** |
+| ARC: remove it by **amortisation** instead | ⚠️ **1.26× faster/step, 18.8–75× fewer reference forwards, targets bit-identical — but efficacy parity holds only at 24 facts; see amendment** |
+| ARC's validity boundary (128 facts) | ❌ **FAILS** — under-covering pool discloses 0.931 vs control 0.049 |
 | Pre-registered parity verdict | `EFFICIENCY-ONLY` (speedup met; 1 of 3 seeds outside a two-sided band, in ARC's favour) |
 | New metric: **clean forgetting** | ✅ exposes that the two arms scoring disclosure **0.000** do so by emitting nothing |
 

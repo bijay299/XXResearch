@@ -1,0 +1,17 @@
+{
+  "study": "arc_breaking_point",
+  "seed": 20261020,
+  "n_forget": 64,
+  "n_retain": 64,
+  "n_facts": 128,
+  "distinct_answers": 32,
+  "prediction": "ARC trains only on pooled states. With m=8 states/batch and K=16 (2 batches) over 64 forget facts, most facts can never be in the pool and therefore can never be forgotten. ARC should fail specifically on facts ABSENT from its pool, predictably per fact. K=512 (64 batches) should cover all facts.",
+  "scoring": "identical frozen rules to the 24-fact probe (normalize + whole-token answer presence)",
+  "decoding": {
+    "gen_length": 32,
+    "steps": 32,
+    "block_length": 32,
+    "temperature": 0.0
+  },
+  "note": "controlled factual learning on synthetic fictional entities; not a benchmark"
+}
