@@ -1,0 +1,1032 @@
+{
+ "setup": {
+  "V": 8,
+  "L": 4,
+  "tokens": [
+   "EOS",
+   "X",
+   "Y",
+   "born",
+   "1951",
+   "1952",
+   "1960",
+   "Paris"
+  ],
+  "ystar": [
+   "X",
+   "born",
+   "1951",
+   "EOS"
+  ],
+  "fact": "1951",
+  "eps_smoothing": 0.02,
+  "configs": {
+   "C1_greedy_lowconf_s4_b4": [
+    4,
+    4,
+    "low_confidence",
+    0.0
+   ],
+   "C2_T1_random_s4_b4": [
+    4,
+    4,
+    "random",
+    1.0
+   ],
+   "C3_greedy_lowconf_s2_b2": [
+    2,
+    2,
+    "low_confidence",
+    0.0
+   ],
+   "C4_T1_lowconf_s2_b4": [
+    2,
+    4,
+    "low_confidence",
+    1.0
+   ],
+   "C5_T0.5_random_s4_b2": [
+    4,
+    2,
+    "random",
+    0.5
+   ],
+   "C6_greedy_random_s2_b4": [
+    2,
+    4,
+    "random",
+    0.0
+   ]
+  }
+ },
+ "ref": {
+  "F": {
+   "pA_joint": 0.8682763671875001
+  },
+  "R1": {
+   "pA_joint": 0.03827636718749999
+  },
+  "R2": {
+   "pA_joint": 0.05827636718750001
+  },
+  "R3": {
+   "pA_joint": 0.8582763671875001
+  }
+ },
+ "ref_pi_f_at_TF_FF": {
+  "____": 0.7624999999999983,
+  "___EOS": 0.7935552407932009,
+  "_born__": 0.8815217391304345,
+  "_born_EOS": 0.9207254418413482,
+  "X___": 0.8815217391304346,
+  "X__EOS": 0.9207254418413482,
+  "Xborn__": 0.883445332364693,
+  "Xborn_EOS": 0.9210117181477103
+ },
+ "anchor_p_fact_at_TF_FF": {
+  "____": 0.2124999999999996,
+  "___EOS": 0.1934523809523807,
+  "_born__": 0.32231800766283514,
+  "_born_EOS": 0.2978709841917389,
+  "X___": 0.46357142857142847,
+  "X__EOS": 0.4400039277297722,
+  "Xborn__": 0.46527279253409903,
+  "Xborn_EOS": 0.44022059546035175
+ },
+ "Q1_reference_commit_states": {
+  "C1_greedy_lowconf_s4_b4": {
+   "leak": 1.0,
+   "first_fact_commit_state[(TF-ff?, n_visible)]": {
+    "('TF', 3)": 1.0
+   }
+  },
+  "C2_T1_random_s4_b4": {
+   "leak": 0.8682763671874937,
+   "first_fact_commit_state[(TF-ff?, n_visible)]": {
+    "('nonTF', 3)": 0.04167358398437419,
+    "('nonTF', 2)": 0.03689453124999899,
+    "('nonTF', 1)": 0.02361979166666519,
+    "('TF', 2)": 0.1800195312500001,
+    "('TF', 3)": 0.17500122070312515,
+    "('TF', 1)": 0.1935677083333333,
+    "('TF', 0)": 0.21749999999999892
+   }
+  },
+  "C3_greedy_lowconf_s2_b2": {
+   "leak": 1.0,
+   "first_fact_commit_state[(TF-ff?, n_visible)]": {
+    "('TF', 2)": 1.0
+   }
+  },
+  "C4_T1_lowconf_s2_b4": {
+   "leak": 0.9147342026382589,
+   "first_fact_commit_state[(TF-ff?, n_visible)]": {
+    "('nonTF', 2)": 0.003497795139008134,
+    "('TF', 0)": 0.036833245078125035,
+    "('TF', 2)": 0.874403162421117
+   }
+  },
+  "C5_T0.5_random_s4_b2": {
+   "leak": 0.9920215995408231,
+   "first_fact_commit_state[(TF-ff?, n_visible)]": {
+    "('nonTF', 3)": 0.005797367874767573,
+    "('nonTF', 2)": 4.7440243416904715e-06,
+    "('nonTF', 1)": 0.009501502108997788,
+    "('TF', 2)": 0.4885051163565056,
+    "('TF', 3)": 0.48125037970719187,
+    "('TF', 1)": 1.2967051095535458e-07,
+    "('TF', 0)": 0.006962359798499004
+   }
+  },
+  "C6_greedy_random_s2_b4": {
+   "leak": 1.0,
+   "first_fact_commit_state[(TF-ff?, n_visible)]": {
+    "('TF', 2)": 0.5,
+    "('TF', 0)": 0.5
+   }
+  }
+ },
+ "targets_forget_prompt": {
+  "REF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.8683,
+    "junk": 0.0199,
+    "tv_to_q_same_cfg": 0.8683,
+    "P(X_kept_at_pos1)": 0.8625
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.9147,
+    "junk": 0.0051,
+    "tv_to_q_same_cfg": 0.915,
+    "P(X_kept_at_pos1)": 0.993
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.992,
+    "junk": 0.0,
+    "tv_to_q_same_cfg": 0.992,
+    "P(X_kept_at_pos1)": 0.9828
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.15055807042541425,
+    0.28941419291794834
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.8706258316561462,
+    0.9210117181477103
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.0,
+    0.0
+   ],
+   "consistency_violation_on_TF_states": 0.0
+  },
+  "GA_beta3_allTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.6272,
+    "junk": 0.0972,
+    "tv_to_q_same_cfg": 0.6272,
+    "P(X_kept_at_pos1)": 0.4251
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.5633,
+    "junk": 0.6258,
+    "tv_to_q_same_cfg": 0.9447,
+    "P(X_kept_at_pos1)": 0.0956
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.8953,
+    "junk": 0.0025,
+    "tv_to_q_same_cfg": 0.8955,
+    "P(X_kept_at_pos1)": 0.1263
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.6667,
+    "junk": 0.5,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.30295744165860017,
+    0.6267916069985486
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.3064775125160267,
+    0.36729783233366586
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.42058790679452995,
+    0.6250190443529047
+   ],
+   "consistency_violation_on_TF_states": 0.9386
+  },
+  "GA_betaInf_allTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.6456,
+    "junk": 0.1191,
+    "tv_to_q_same_cfg": 0.6456,
+    "P(X_kept_at_pos1)": 0.329
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.3708,
+    "junk": 0.8813,
+    "tv_to_q_same_cfg": 0.9795,
+    "P(X_kept_at_pos1)": 0.0163
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.9558,
+    "junk": 0.0028,
+    "tv_to_q_same_cfg": 0.9561,
+    "P(X_kept_at_pos1)": 0.0002
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.6667,
+    "junk": 0.5,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.7894917006036267,
+    0.9965956067115183
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.058297301863963306,
+    0.24980812114803425
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.9142737407450912,
+    0.9996403616933827
+   ],
+   "consistency_violation_on_TF_states": 1.9921
+  },
+  "ME(MDU_tau0)_allTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 1.0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.4192,
+    "junk": 0.7707,
+    "tv_to_q_same_cfg": 0.7844,
+    "P(X_kept_at_pos1)": 0.2047
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 0,
+    "junk": 1.0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.4102,
+    "junk": 0.9661,
+    "tv_to_q_same_cfg": 0.9651,
+    "P(X_kept_at_pos1)": 0.125
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.4328,
+    "junk": 0.8072,
+    "tv_to_q_same_cfg": 0.9518,
+    "P(X_kept_at_pos1)": 0.1094
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.1667,
+    "junk": 0.8333,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "max_leak_over_cfgs": 0.4328,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.7683087212894927,
+    0.8715956067115183
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.6760281204852359,
+    0.7495933306222041
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.7902180278083586,
+    0.8746403616933827
+   ],
+   "consistency_violation_on_TF_states": 0.65
+  },
+  "MDU_tau0.5_allTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.4897,
+    "junk": 0.4398,
+    "tv_to_q_same_cfg": 0.7062,
+    "P(X_kept_at_pos1)": 0.3753
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.4699,
+    "junk": 0.3904,
+    "tv_to_q_same_cfg": 0.8263,
+    "P(X_kept_at_pos1)": 0.4417
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.572,
+    "junk": 0.3399,
+    "tv_to_q_same_cfg": 0.945,
+    "P(X_kept_at_pos1)": 0.4414
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.3333,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.6667,
+    "P(X_kept_at_pos1)": 0.8333
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.29900414576004536,
+    0.4758274744370521
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.6489564564359661,
+    0.8067598887249265
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.31519260982383374,
+    0.5240708078433852
+   ],
+   "consistency_violation_on_TF_states": 0.649
+  },
+  "MDU_tau1_allTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.5299,
+    "junk": 0.3007,
+    "tv_to_q_same_cfg": 0.7614,
+    "P(X_kept_at_pos1)": 0.4709
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.4105,
+    "junk": 0.2747,
+    "tv_to_q_same_cfg": 0.8136,
+    "P(X_kept_at_pos1)": 0.5883
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.5671,
+    "junk": 0.2718,
+    "tv_to_q_same_cfg": 0.9888,
+    "P(X_kept_at_pos1)": 0.6256
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.3333,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.6667,
+    "P(X_kept_at_pos1)": 0.8333
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.27540881526537925,
+    0.37523788783037393
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.7278354659336401,
+    0.943246758882621
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.1794704820563561,
+    0.44069539997302043
+   ],
+   "consistency_violation_on_TF_states": 0.8796
+  },
+  "MDU_tau1_ffTF(state-restricted)": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.5299,
+    "junk": 0.2965,
+    "tv_to_q_same_cfg": 0.7614,
+    "P(X_kept_at_pos1)": 0.4751
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.4105,
+    "junk": 0.2747,
+    "tv_to_q_same_cfg": 0.8136,
+    "P(X_kept_at_pos1)": 0.5883
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.5671,
+    "junk": 0.2718,
+    "tv_to_q_same_cfg": 0.9888,
+    "P(X_kept_at_pos1)": 0.6256
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.3333,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.6667,
+    "P(X_kept_at_pos1)": 0.8333
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.27540881526537925,
+    0.37523788783037393
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.7278354659336401,
+    0.943246758882621
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.1794704820563561,
+    0.44069539997302043
+   ],
+   "consistency_violation_on_TF_states": 0.8795
+  },
+  "FFX_MF_ffTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.2213,
+    "junk": 0.0359,
+    "tv_to_q_same_cfg": 0.3237,
+    "P(X_kept_at_pos1)": 0.7475
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.003,
+    "junk": 0.005,
+    "tv_to_q_same_cfg": 0.4472,
+    "P(X_kept_at_pos1)": 0.9951
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.0153,
+    "junk": 0.0,
+    "tv_to_q_same_cfg": 0.1803,
+    "P(X_kept_at_pos1)": 0.9897
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.1667,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.1667,
+    "P(X_kept_at_pos1)": 0.8333
+   },
+   "max_leak_over_cfgs": 0.2213,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.1498960599062675,
+    0.28937138177549504
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.058297301863963306,
+    0.24980812114803425
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.018593341422203605,
+    0.11366855524079325
+   ],
+   "consistency_violation_on_TF_states": 1.2824
+  },
+  "FFX_CF_ffTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.3685,
+    "junk": 0.0785,
+    "tv_to_q_same_cfg": 0.3685,
+    "P(X_kept_at_pos1)": 0.5404
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 0,
+    "junk": 1.0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.1421,
+    "junk": 0.0905,
+    "tv_to_q_same_cfg": 0.4577,
+    "P(X_kept_at_pos1)": 0.7995
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.3556,
+    "junk": 0.0016,
+    "tv_to_q_same_cfg": 0.3556,
+    "P(X_kept_at_pos1)": 0.6822
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.5,
+    "junk": 0.1667,
+    "tv_to_q_same_cfg": 0.6667,
+    "P(X_kept_at_pos1)": 0.3333
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.07906747882840899,
+    0.41335229685202657
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.058297301863963306,
+    0.24980812114803425
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.2017362163941844,
+    0.5305688351204224
+   ],
+   "consistency_violation_on_TF_states": 1.1014
+  },
+  "FFX_BAYES_ffTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 1.0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.3685,
+    "junk": 0.0785,
+    "tv_to_q_same_cfg": 0.3685,
+    "P(X_kept_at_pos1)": 0.5404
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 0,
+    "junk": 1.0,
+    "tv_to_q_same_cfg": 1.0,
+    "P(X_kept_at_pos1)": 0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.1421,
+    "junk": 0.0905,
+    "tv_to_q_same_cfg": 0.4577,
+    "P(X_kept_at_pos1)": 0.7995
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.3556,
+    "junk": 0.0016,
+    "tv_to_q_same_cfg": 0.3556,
+    "P(X_kept_at_pos1)": 0.6822
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.5,
+    "junk": 0.1667,
+    "tv_to_q_same_cfg": 0.6667,
+    "P(X_kept_at_pos1)": 0.3333
+   },
+   "max_leak_over_cfgs": 1.0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.07906747882840919,
+    0.41335229685202624
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.058297301863963306,
+    0.24980812114803425
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.20173621639418293,
+    0.5305688351204222
+   ],
+   "consistency_violation_on_TF_states": 1.1014
+  },
+  "Q_exact_ffTF": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0.2497,
+    "junk": 0.0879,
+    "tv_to_q_same_cfg": 0.2497,
+    "P(X_kept_at_pos1)": 0.7189
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0.0555,
+    "junk": 0.0328,
+    "tv_to_q_same_cfg": 0.0555,
+    "P(X_kept_at_pos1)": 0.9649
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0.1231,
+    "junk": 0.0014,
+    "tv_to_q_same_cfg": 0.1231,
+    "P(X_kept_at_pos1)": 0.9554
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0.1667,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.1667,
+    "P(X_kept_at_pos1)": 0.8333
+   },
+   "max_leak_over_cfgs": 0.2497,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.0,
+    0.0
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.0,
+    0.0
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.15055807042541425,
+    0.28941419291794834
+   ],
+   "consistency_violation_on_TF_states": 0.8234
+  },
+  "FFX_MF_allFF(oracle states)": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0,
+    "junk": 0.0374,
+    "tv_to_q_same_cfg": 0.1713,
+    "P(X_kept_at_pos1)": 0.7916
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0,
+    "junk": 0.0057,
+    "tv_to_q_same_cfg": 0.4445,
+    "P(X_kept_at_pos1)": 0.9951
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0,
+    "junk": 0.0001,
+    "tv_to_q_same_cfg": 0.165,
+    "P(X_kept_at_pos1)": 0.9897
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0,
+    "junk": 0.1667,
+    "tv_to_q_same_cfg": 0.1667,
+    "P(X_kept_at_pos1)": 0.8333
+   },
+   "max_leak_over_cfgs": 0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.1498960599062675,
+    0.28937138177549504
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.058297301863963306,
+    0.24980812114803425
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.018593341422203605,
+    0.11366855524079325
+   ],
+   "consistency_violation_on_TF_states": 1.0612
+  },
+  "Q_exact_all(oracle)": {
+   "C1_greedy_lowconf_s4_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C2_T1_random_s4_b4": {
+    "leak": 0,
+    "junk": 0.0886,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 0.7719
+   },
+   "C3_greedy_lowconf_s2_b2": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "C4_T1_lowconf_s2_b4": {
+    "leak": 0,
+    "junk": 0.0347,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 0.9703
+   },
+   "C5_T0.5_random_s4_b2": {
+    "leak": 0,
+    "junk": 0.0014,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 0.9554
+   },
+   "C6_greedy_random_s2_b4": {
+    "leak": 0,
+    "junk": 0,
+    "tv_to_q_same_cfg": 0.0,
+    "P(X_kept_at_pos1)": 1.0
+   },
+   "max_leak_over_cfgs": 0,
+   "nonfact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.0,
+    0.0
+   ],
+   "fact_rowTV_vs_q_on_ffTF(mean,max)": [
+    0.0,
+    0.0
+   ],
+   "nonfact_rowTV_vs_ref_on_ffTF(mean,max)": [
+    0.15055807042541425,
+    0.28941419291794834
+   ],
+   "consistency_violation_on_TF_states": 0.0
+  }
+ },
+ "ref_decode_leak": {
+  "C1_greedy_lowconf_s4_b4": 1.0,
+  "C2_T1_random_s4_b4": 0.8683,
+  "C3_greedy_lowconf_s2_b2": 1.0,
+  "C4_T1_lowconf_s2_b4": 0.9147,
+  "C5_T0.5_random_s4_b2": 0.992,
+  "C6_greedy_random_s2_b4": 1.0
+ },
+ "exact_q_decode": {
+  "C1_greedy_lowconf_s4_b4": {
+   "leak": 0,
+   "junk": 0
+  },
+  "C2_T1_random_s4_b4": {
+   "leak": 0,
+   "junk": 0.0886
+  },
+  "C3_greedy_lowconf_s2_b2": {
+   "leak": 0,
+   "junk": 0
+  },
+  "C4_T1_lowconf_s2_b4": {
+   "leak": 0,
+   "junk": 0.0347
+  },
+  "C5_T0.5_random_s4_b2": {
+   "leak": 0,
+   "junk": 0.0014
+  },
+  "C6_greedy_random_s2_b4": {
+   "leak": 0,
+   "junk": 0
+  }
+ },
+ "anchor_vs_ref_on_retain_TF_states": {
+  "R1": [
+   0.1859123741824335,
+   0.6674829252040647
+  ],
+  "R2": [
+   0.20806556266200865,
+   0.6487488333377796
+  ],
+  "R3": [
+   0.15869224271242954,
+   0.6750000000000003
+  ]
+ },
+ "inconsistent_reference": {
+  "sigma=0.3": {
+   "pert_rowTV_vs_ref_on_ffTF(nonfact)": [
+    0.032815801528108736,
+    0.149688191922985
+   ],
+   "pert_consistency_violation_TF": 0.3484,
+   "MF_nonfact_rowTV_vs_exact_q(mean,max)": [
+    0.14136222698854853,
+    0.3236950148729162
+   ],
+   "MF_fact_rowTV_vs_exact_q(mean,max)": [
+    0.11534261210912103,
+    0.25539448396161857
+   ],
+   "CF_nonfact_rowTV_vs_exact_q(mean,max)": [
+    0.09135400608538717,
+    0.3185575379900693
+   ],
+   "CF_fact_rowTV_vs_exact_q(mean,max)": [
+    0.11534261210912103,
+    0.25539448396161857
+   ],
+   "BAYES_nonfact_rowTV_vs_exact_q(mean,max)": [
+    0.16070043076977655,
+    0.5937325259427354
+   ],
+   "BAYES_fact_rowTV_vs_exact_q(mean,max)": [
+    0.11534261210912103,
+    0.25539448396161857
+   ],
+   "BAYES_negative_mass_before_clip(mean,max)": [
+    0.03746721277157126,
+    0.3040142664775474
+   ],
+   "REFpert_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 1.0,
+    "C2_T1_random_s4_b4": 0.8458,
+    "C3_greedy_lowconf_s2_b2": 1.0,
+    "C4_T1_lowconf_s2_b4": 0.8793,
+    "C5_T0.5_random_s4_b2": 0.9924,
+    "C6_greedy_random_s2_b4": 1.0
+   },
+   "MF_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 0,
+    "C2_T1_random_s4_b4": 0.2157,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.0031,
+    "C5_T0.5_random_s4_b2": 0.0082,
+    "C6_greedy_random_s2_b4": 0.1667
+   },
+   "CF_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 0,
+    "C2_T1_random_s4_b4": 0.3401,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.113,
+    "C5_T0.5_random_s4_b2": 0.3585,
+    "C6_greedy_random_s2_b4": 0.1667
+   },
+   "BAYES_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 0,
+    "C2_T1_random_s4_b4": 0.3218,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.0737,
+    "C5_T0.5_random_s4_b2": 0.0673,
+    "C6_greedy_random_s2_b4": 0.1667
+   },
+   "MDU1_allTF_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 1.0,
+    "C2_T1_random_s4_b4": 0.5455,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.4257,
+    "C5_T0.5_random_s4_b2": 0.5642,
+    "C6_greedy_random_s2_b4": 0.6667
+   }
+  },
+  "sigma=1.0": {
+   "pert_rowTV_vs_ref_on_ffTF(nonfact)": [
+    0.127434988153878,
+    0.6746922137002241
+   ],
+   "pert_consistency_violation_TF": 1.4697,
+   "MF_nonfact_rowTV_vs_exact_q(mean,max)": [
+    0.16529743212008843,
+    0.3904532156329003
+   ],
+   "MF_fact_rowTV_vs_exact_q(mean,max)": [
+    0.2203775295952508,
+    0.47758858287116945
+   ],
+   "CF_nonfact_rowTV_vs_exact_q(mean,max)": [
+    0.12413513994189718,
+    0.3824542228038063
+   ],
+   "CF_fact_rowTV_vs_exact_q(mean,max)": [
+    0.2203775295952508,
+    0.47758858287116945
+   ],
+   "BAYES_nonfact_rowTV_vs_exact_q(mean,max)": [
+    0.28779940218086403,
+    0.7434088599270638
+   ],
+   "BAYES_fact_rowTV_vs_exact_q(mean,max)": [
+    0.2203775295952508,
+    0.47758858287116945
+   ],
+   "BAYES_negative_mass_before_clip(mean,max)": [
+    0.4710920377950301,
+    3.4229949048636645
+   ],
+   "REFpert_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 1.0,
+    "C2_T1_random_s4_b4": 0.7198,
+    "C3_greedy_lowconf_s2_b2": 1.0,
+    "C4_T1_lowconf_s2_b4": 0.8236,
+    "C5_T0.5_random_s4_b2": 0.9792,
+    "C6_greedy_random_s2_b4": 0.8333
+   },
+   "MF_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 0,
+    "C2_T1_random_s4_b4": 0.2285,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.0269,
+    "C5_T0.5_random_s4_b2": 0.0017,
+    "C6_greedy_random_s2_b4": 0
+   },
+   "CF_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 0,
+    "C2_T1_random_s4_b4": 0.2585,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.0414,
+    "C5_T0.5_random_s4_b2": 0.3939,
+    "C6_greedy_random_s2_b4": 0
+   },
+   "BAYES_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 1.0,
+    "C2_T1_random_s4_b4": 0.281,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.1173,
+    "C5_T0.5_random_s4_b2": 0.0016,
+    "C6_greedy_random_s2_b4": 0.3333
+   },
+   "MDU1_allTF_leak_by_cfg": {
+    "C1_greedy_lowconf_s4_b4": 1.0,
+    "C2_T1_random_s4_b4": 0.5414,
+    "C3_greedy_lowconf_s2_b2": 0,
+    "C4_T1_lowconf_s2_b4": 0.5212,
+    "C5_T0.5_random_s4_b2": 0.4886,
+    "C6_greedy_random_s2_b4": 0.5
+   }
+  }
+ },
+ "q_mass_of_fact_visible_TF_states": {
+  "__1951_": 0.0,
+  "__1951EOS": 0.0,
+  "_born1951_": 0.0
+ }
+}

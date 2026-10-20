@@ -1,0 +1,211 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\M}{\mathrm{M}}
+\title{FX-Mix: fact-free exclusion distillation on native-sampler states\\for masked diffusion language models (LLaDA)\\[4pt]\large Principal definitions, algorithm and proofs (llada\_method\_design\_v1, SPEC v1)}
+\author{XXResearch llada\_method\_design\_v1 sprint}
+\date{2026-10-20}
+\begin{document}
+\maketitle
+
+\paragraph{Status of the mathematics.} Lemma~\ref{lem:T} is the standard information (I-)projection onto a
+probability constraint (Csisz\'ar), the target already used by TNT/TNFF and, as a limit, by UNDIAL. Proposition~\ref{prop:hazard}
+is an elementary first-passage decomposition plus a union bound, instantiated for the pinned LLaDA sampler.
+Proposition~\ref{prop:escape} is an elementary identifiability statement in the unrestricted (zero parameter sharing)
+model class. None of these is claimed as the method's novelty, none connects the optimised loss to leakage of a
+network with shared parameters, and none implies global forgetting or utility preservation.
+
+\section{Setting}
+\begin{definition}[Mask predictor and states]
+Vocabulary $V$, mask symbol $m\notin V$. A prompt $c$ is never masked. The answer region has fixed length $L$
+(\texttt{gen\_length}, EOS padding is ordinary vocabulary). A \emph{state} is $s=(c,z)$ with $z\in(V\cup\{m\})^L$ and
+masked set $\M(s)=\{i: z_i=m\}$. A mask predictor maps $(s,i)$, $i\in\M(s)$, to logits $\zeta(s,i)\in\mathbb{R}^{V}$ and
+$p(\cdot\mid s,i)=\mathrm{softmax}\,\zeta(s,i)$. $p_\theta$ denotes the student, $p_0=p_{\theta_0}$ the frozen reference.
+\end{definition}
+LLaDA's SFT objective draws $t\sim U(0,1)$, masks each answer token independently with probability $(1-\epsilon_t)t+\epsilon_t$
+($\epsilon_t=10^{-3}$) and minimises $\sum_{i\in\M}\!-\log p_\theta(y_i\mid s,i)/p_{\text{mask}}$ divided by $L$; it
+therefore trains only on \emph{teacher-forced} states whose visible answer tokens agree with the reference answer.
+
+\begin{definition}[Native sampler class $\Pi_{\le 1}$; pinned \texttt{generate} semantics]\label{def:sampler}
+A configuration $\pi=(N,b,\text{rule},T)$ with $b\mid L$, $(L/b)\mid N$, rule $\in\{\mathrm{lc},\mathrm{rnd}\}$,
+$T\in[0,1]$, \texttt{cfg\_scale}$=0$, no logit edits before the draw (\texttt{logits\_eos\_inf}=False, no end-think boost).
+Start from the all-mask answer. At step $n$ (in block $\beta(n)$) let $s_n$ be the current state and
+$E_n(s_n)=\M(s_n)\cap\beta(n)$ the eligible positions; draw $x^0_i\sim\pi_T(\cdot\mid s_n,i)=\mathrm{softmax}(\zeta(s_n,i)/T)$
+independently over $i$ (Gumbel-max; $T=0$: arg-max with the implementation's fixed tie-break); select $S_n\subseteq E_n$
+with $|S_n|=k_n$ (deterministic uniform schedule): the $k_n$ largest $p(x^0_i\mid s_n,i)$ (lc) or a uniformly random
+$k_n$-subset independent of the draws (rnd); commit $x^0_i$ for $i\in S_n$; never re-mask.
+\end{definition}
+
+\begin{definition}[Forget request, leakage, fact-free states]
+A forget item is $(c,y^\star,\F)$ with $\F\subset V$ nonempty (fact-token set, defined per fact) and no token of $\F$ in $c$.
+$\tau=\min\{n: \exists i\in S_n,\ x^0_i\in\F\}$ ($\tau=\infty$ if none); the leakage event is $\Lambda_\F=\{\tau<\infty\}$,
+counting all $L$ positions (including those after an EOS). A state is \emph{fact-free} if no visible answer token lies in $\F$.
+$\rho(s,i)=p(\F\mid s,i)/\max_{v}p(v\mid s,i)$.
+\end{definition}
+
+\section{Exclusion target}
+\begin{lemma}[Exclusion target; standard I-projection]\label{lem:T}
+Let $p_0=\mathrm{softmax}(\zeta_0)$ with $p_0(\F)<1$, $\varepsilon\in[0,1)$ and
+$r_\varepsilon=\arg\min_{q:\,q(\F)\le\varepsilon}\KL(q\,\|\,p_0)$. Write $p_0|_A$ for $p_0$ conditioned on $A\subseteq V$.
+\begin{enumerate}
+\item[(i)] $r_\varepsilon=p_0$ if $p_0(\F)\le\varepsilon$; otherwise $r_\varepsilon=\varepsilon\,p_0|_\F+(1-\varepsilon)\,p_0|_{\F^c}$,
+equivalently $\mathrm{softmax}(\zeta_0-\gamma\mathbf{1}_\F)$ with $\gamma=\log\frac{p_0(\F)(1-\varepsilon)}{\varepsilon(1-p_0(\F))}$
+(for computation use the log-space form $\log r_\varepsilon(v)=\log(1-\varepsilon)+\zeta_{0,v}-\mathrm{LSE}_{\F^c}\zeta_0$ for $v\notin\F$,
+$\log\varepsilon+\zeta_{0,v}-\mathrm{LSE}_{\F}\zeta_0$ for $v\in\F$; $\varepsilon=0$ gives $r_0=p_0|_{\F^c}$).
+\item[(ii)] $\KL(r_\varepsilon\|p_0)=\mathrm{kl}(\varepsilon\,\|\,p_0(\F))$ if $p_0(\F)>\varepsilon$ (else $0$), where
+$\mathrm{kl}$ is the binary KL; for $\varepsilon=0$ this equals $-\log(1-p_0(\F))$.
+\item[(iii)] $\nabla_\zeta \KL(r_\varepsilon\|\mathrm{softmax}\,\zeta)\big|_{\zeta_0}=(p_0(\F)-\varepsilon)_+\,(p_0|_\F-p_0|_{\F^c})$,
+which vanishes iff $p_0(\F)\le\varepsilon$.
+\item[(iv)] For every distribution $p$ on $V$: $\KL(r_\varepsilon\|p)\le\kappa\Rightarrow \mathrm{kl}(r_\varepsilon(\F)\|p(\F))\le\kappa$; hence
+$p(\F)\le x_\varepsilon(\kappa):=\max\{x:\mathrm{kl}(\varepsilon\|x)\le\kappa\}$ when $r_\varepsilon(\F)=\varepsilon$, and $x_0(\kappa)=1-e^{-\kappa}$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+(i,ii) Chain rule over the partition $\{\F,\F^c\}$: $\KL(q\|p_0)=\mathrm{kl}(q(\F)\|p_0(\F))+q(\F)\KL(q|_\F\|p_0|_\F)+q(\F^c)\KL(q|_{\F^c}\|p_0|_{\F^c})$.
+The last two terms are minimised (to $0$) by $q|_A=p_0|_A$, and $x\mapsto\mathrm{kl}(x\|p_0(\F))$ is convex with minimum at
+$p_0(\F)$, so on $[0,\varepsilon]$ it is minimised at $\min(\varepsilon,p_0(\F))$. The softmax form follows by direct substitution.
+(iii) $\nabla_\zeta\KL(r\|\mathrm{softmax}\,\zeta)=\mathrm{softmax}(\zeta)-r$; at $\zeta_0$, for $v\in\F$:
+$p_{0,v}-\varepsilon p_{0,v}/p_0(\F)=(p_0(\F)-\varepsilon)(p_0|_\F)_v$; for $v\notin\F$:
+$p_{0,v}-(1-\varepsilon)p_{0,v}/(1-p_0(\F))=-(p_0(\F)-\varepsilon)(p_0|_{\F^c})_v$.
+(iv) Data processing under the coarse-graining $V\to\{\F,\F^c\}$; $\mathrm{kl}(\varepsilon\|\cdot)$ is increasing on $[\varepsilon,1)$.
+\end{proof}
+
+\section{Algorithm}
+\begin{algorithm}[h]
+\caption{FX-Mix (one optimisation step; SPEC v1 \S2)}
+\begin{algorithmic}[1]
+\Require student $\theta$ (LoRA, $B{=}0$ init), frozen $\theta_0$ (adapter off), forget items $\{(c,y^\star,\F)\}$, retain set,
+pool $\Pi_{\text{train}}=\{\pi_k\}$ with weights $w_k$, $\alpha,\varepsilon,J,R,\lambda_f,\lambda_r$
+\If{step $\equiv 0 \pmod R$} \Comment{rollout pool, no gradient}
+  \For{each forget item} draw $k\sim w$; run \texttt{generate}$(\theta,\pi_k)$; record $s_n$ before each step;
+  stop at $\tau$; store $J$ pre-$\tau$ states sampled uniformly, plus $s_\tau$ if $\tau<\infty$
+  \EndFor
+\EndIf
+\State $\mathcal{S}\gets$ fraction $\alpha$: TF$_{\text{ff}}$ states ($t\sim U(0,1)$; mask non-fact positions w.p.\ $t$; mask all $j$ with $y^\star_j\in\F$);
+fraction $1-\alpha$: states from the pool
+\State $\ell_f\gets \frac{1}{|\mathcal S|}\sum_{s\in\mathcal S}\frac{1}{|\M(s)|}\sum_{i\in\M(s)}\KL\big(r_\varepsilon(\cdot\mid s,i)\,\|\,p_\theta(\cdot\mid s,i)\big)$,
+$r_\varepsilon$ from Lemma~\ref{lem:T} applied to $p_0(\cdot\mid s,i)$ (one reference pass, log-space)
+\State $\ell\gets\lambda_f\ell_f+\lambda_r\,\mathcal{L}_{\text{SFT}}(\theta;\text{retain batch})$; AdamW step with clipping $1.0$
+\end{algorithmic}
+\end{algorithm}
+\noindent The average over positions in $\ell_f$ is a design choice; it is \emph{not} the integrand of
+Proposition~\ref{prop:hazard}, and $\ell_f$ is not a leakage bound.
+
+\section{Leakage under native samplers}
+\begin{proposition}[First-commit decomposition and sampler-uniform hazard bound]\label{prop:hazard}
+Fix $c,\F$ and a deterministic model. For every $\pi\in\Pi_{\le1}$:
+\begin{enumerate}
+\item[(a)] $\Prob(\Lambda_\F)=\sum_{n}\E\big[\mathbf{1}\{\tau\ge n\}\,h_n(s_n)\big]$ with $h_n(s)=\Prob(\exists i\in S_n: x^0_i\in\F\mid s_n=s)$,
+and $s_n$ is fact-free on $\{\tau\ge n\}$.
+\item[(b)] $h_n(s)\le\sum_{i\in E_n(s)}\pi_T(\F\mid s,i)$; for rule $=\mathrm{rnd}$, $h_n(s)\le\frac{k_n}{|E_n(s)|}\sum_{i\in E_n(s)}\pi_T(\F\mid s,i)$.
+\item[(c)] $\pi_T(\F\mid s,i)\le\min\{1,\rho(s,i)\}$ for all $T\in[0,1]$, and $\pi_1(\F\mid s,i)=p(\F\mid s,i)$.
+\item[(d)] Hence $\Prob(\Lambda_\F)\le B_\pi:=\E\big[\sum_{n\le\tau\wedge(N-1)}\sum_{i\in E_n(s_n)}\min\{1,\rho(s_n,i)\}\big]$
+(with the factor $k_n/|E_n|$ inside for rnd).
+\item[(e)] If $T=0$ and $\rho(s,i)<1$ for every fact-free state $s$ reachable under $\pi$ and every $i\in E_n(s)$, then
+$\Prob(\Lambda_\F)=0$ for any tie-break rule.
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+(a) The events $\{\tau=n\}$ are disjoint and their union is $\Lambda_\F$. Given the history, step $n$ uses fresh
+Gumbel/uniform noise and a deterministic model, so $\Prob(\tau=n\mid\text{history})=\mathbf{1}\{\tau\ge n\}h_n(s_n)$;
+on $\{\tau\ge n\}$ no $\F$ token has been committed, so $s_n$ is fact-free.
+(b) $\{\exists i\in S_n:x^0_i\in\F\}\subseteq\bigcup_{i\in E_n}\{x^0_i\in\F\}$, which holds even though lc selection depends on the draws;
+union bound. For rnd, $S_n$ is a uniform $k_n$-subset independent of $x^0$, so $\Prob(i\in S_n)=k_n/|E_n|$.
+(c) $T=0$: an $\F$ arg-max requires $p(\F)\ge\max_v p(v)$, i.e.\ $\rho\ge1$. $T\in(0,1]$, $\beta=1/T\ge1$:
+$\sum_{f\in\F}p_f^\beta/\sum_v p_v^\beta\le\sum_f p_f^\beta/p_{\max}^\beta\le\sum_f p_f/p_{\max}=\rho$.
+(d) Combine (a)--(c). (e) $\rho<1$ implies $p_f<p_{\max}$ strictly for every $f\in\F$, so no $\F$ token is an arg-max.
+\end{proof}
+\noindent\textbf{Use.} $\hat B_\pi$, the Monte-Carlo average of the bracket over fresh rollouts of the \emph{final} model in
+deployment precision, is an unbiased estimate of an upper bound on that model's leakage under $\pi$ (post-hoc
+certificate). \textbf{Boundary cases} (all verified numerically in \texttt{agents/E\_scripts}): $T>1$ breaks (c)
+($T=2$: $0.25>0.11$); \texttt{cfg\_scale}$>0$ can raise $p(\F)$ from $0.05$ to $0.99$; \texttt{logits\_eos\_inf} breaks (c,e);
+$\rho=1$ ties are resolved to the lowest id by \texttt{torch.argmax}; bf16 confidence ties make greedy paths device-dependent.
+The bound is tight when all eligible positions are committed at once, $\approx2\times$ loose for rnd without the factor,
+and up to $\approx16\times$ loose for lc at $T=1$ (B's tabular study).
+
+\section{Why teacher-forced states do not identify config-robust forgetting}
+Let $\mathcal{S}_{\mathrm{ff}}$ be the fact-free states of a forget item, $r=r_0$ the exclusion target (Lemma~\ref{lem:T}, $\varepsilon=0$)
+of the reference at each $(s,i)$, and $\bar r$ the model that equals $r$ at every fact-free state (``decode-time ban'' of the reference).
+For $S\subseteq\mathcal{S}_{\mathrm{ff}}$ let $\mathcal{P}_S$ be the \emph{unrestricted} class of models whose conditionals equal $r$ at
+every $s\in S$ and are arbitrary elsewhere (no parameter sharing), and define the escape time $\sigma_S=\min\{n:s_n\notin S,\ \M(s_n)\neq\emptyset\}$
+and the escape probability $e_\pi(S)=\Prob^{\bar r}_\pi(\sigma_S<\infty)$. (States change only through commits and every
+masked position is eventually committed, so if $\M(s_{\sigma_S})\neq\emptyset$ the next commit is made from $s_{\sigma_S}$.)
+\begin{proposition}[Escape characterisation; zero-sharing class]\label{prop:escape}
+Fix $\pi\in\Pi_{\le1}$ and $S\subseteq\mathcal{S}_{\mathrm{ff}}$.
+\begin{enumerate}
+\item[(a)] For every $p\in\mathcal{P}_S$, $\Prob^p_\pi(\Lambda_\F)\le e_\pi(S)$, and $\sup_{p\in\mathcal{P}_S}\Prob^p_\pi(\Lambda_\F)=e_\pi(S)$;
+$\inf_{p\in\mathcal{P}_S}\Prob^p_\pi(\Lambda_\F)=0$ (attained by $\bar r$).
+\item[(b)] If $S$ contains every state visited with positive probability by $\pi$ under $\bar r$, then $e_\pi(S)=0$ and every
+$p\in\mathcal{P}_S$ has $\Prob^p_\pi(\Lambda_\F)=0$.
+\item[(c)] Let $S_{\mathrm{TF}}$ be the teacher-forced fact-free states (every visible answer token equals $y^\star$, every
+position $j$ with $y^\star_j\in\F$ masked), and let $m\ge1$ be the number of such fact positions. Under $\bar r$ every commit at a fact
+position differs from $y^\star_j$, so the trajectory escapes $S_{\mathrm{TF}}$ at the first step that commits a fact position
+while masked positions remain. In particular, for one-token-per-step rnd decoding ($N=L$, $b=L$),
+$e_\pi(S_{\mathrm{TF}})\ge 1-\frac{1}{L}$ if $m=1$ and $e_\pi(S_{\mathrm{TF}})=1$ if $m\ge2$, irrespective of $T$.
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+(a) On $\{n<\sigma_S\}$ all states lie in $S$, where $p=r$ and $r(\F)=0$, so no $\F$ token can be committed before $\sigma_S$,
+and the law of the trajectory up to $\sigma_S$ is the same under $p$ and $\bar r$ (the selection rule depends only on the
+conditionals at visited states and on fresh noise). Hence $\Lambda_\F\subseteq\{\sigma_S<\infty\}$ and the probability of the
+latter is $e_\pi(S)$ for every $p\in\mathcal{P}_S$. For the supremum, take $p_\delta$ equal to $r$ on $S$ and with logits
+$\zeta(s,i)=\delta^{-1}\mathbf{1}_{f}$ for a fixed $f\in\F$ at every fact-free $s\notin S$; the state $s_{\sigma_S}$ is fact-free
+(no $\F$ token was committed before) and has masked positions, so the next step with $k_n\ge1$ commits from $s_{\sigma_S}$, where
+every eligible draw equals $f$ with probability $\to1$ as $\delta\to0$ (for $T=0$, exactly); hence
+$\Prob^{p_\delta}(\Lambda_\F)\to e_\pi(S)$. The infimum: $\bar r$ never commits an $\F$ token.
+(b) Immediate from (a).
+(c) Under $\bar r$, $r(y^\star_j\mid s,j)=0$ at fact positions because $y^\star_j\in\F$, so a committed fact position holds a
+token $\ne y^\star_j$ and the next state (if masked positions remain) is outside $S_{\mathrm{TF}}$. With one token per step in
+uniformly random order (rnd, $b=L$), the positions are committed in a uniformly random permutation independent of the draws;
+no escape requires every fact position to be committed at the final step, which has probability $1/L$ for $m=1$ and $0$ for
+$m\ge2$.
+\end{proof}
+\begin{remark}[Scope of Proposition~\ref{prop:escape}]
+It is a statement about the unrestricted class: it shows that exact agreement with the target on teacher-forced states does
+not \emph{identify} leakage under random-order decoding, while agreement on the target sampler's own visitation does. With
+parameter sharing nothing is proved either way; whether a network trained on $S_{\mathrm{TF}}$ generalises to the escaped
+states is the empirical question tested by the SC-TF vs FX-Mix comparison. Part (b) is the DAgger-type fixed point:
+FX-Mix's rollouts are drawn from the \emph{current student}, which equals $\bar r$ only at convergence; a finite pool gives no
+guarantee for states of small visitation probability.
+\end{remark}
+
+\section{Remarks (not propositions)}
+\begin{remark}[Consistent joint vs.\ per-position target]
+For a consistent joint $p_0(y\mid c)$, $\arg\min_{q:q(\Lambda)=0}\KL(q\|p_0)=p_0(\cdot\mid\Lambda^c)$ with value $-\log p_0(\Lambda^c)$.
+LLaDA's conditionals define no joint (sampled outputs depend on decoding order; TV $0.40$ in a two-token example), and the
+per-position target $r_\varepsilon$ differs from the conditionals of the sequence-level projection: for the joint
+$\{(f,a):.5,(b,f):.3,(b,c):.2\}$ the product of per-position targets puts $0.714$ on $(b,a)$, which has reference mass $0$.
+Only the per-position target is used.
+\end{remark}
+\begin{remark}[Coverage constant]
+For a training measure $\mu$ with $\mu>0$ on visited fact-free states, Proposition~\ref{prop:hazard}(d) gives
+$\Prob_\pi(\Lambda_\F)\le C_{\pi|\mu}\E_\mu[H]$ with $C_{\pi|\mu}=\sup_s d^{\mathrm{ff}}_\pi(s)/\mu(s)$, where $d^{\mathrm{ff}}_\pi$ is the
+pre-$\tau$ visitation \emph{mass} ($\le N$). For a mixture of normalised visitations,
+$C\le|d^{\mathrm{ff}}_{\pi_k}|/(w_k(1-\alpha))$, not $1/w_k$.
+\end{remark}
+\begin{remark}[Scale]
+At LLaDA's default (\texttt{gen\_length} 128, block 32, 128 steps), $\sum_n|E_n|=2112$; certifying $5\%$ leakage through
+Lemma~\ref{lem:T}(iv) requires a mean per-position KL of order $2.4\times10^{-5}$. The certificate is therefore an
+evaluation tool, not a consequence of training loss values.
+\end{remark}
+\begin{remark}[Floor $\varepsilon$]
+The target's own fixed point leaks $1-(1-\varepsilon)^{n}$ under $T=1$ random remasking, $n$ = number of committed positions
+with $p_0(\F)>\varepsilon$ ($0.8\%$ at $n=8$, $12\%$ at $n=128$ for $\varepsilon=10^{-3}$). With $\varepsilon=0$ the forward-KL
+objective has no finite stationary point under Adam (the $\F$ logits drift sub-linearly), so the step budget is the strength knob.
+\end{remark}
+\begin{remark}[SFT weighting]
+Under LLaDA's $1/t$-weighted SFT masking, the share of expected forget weight on (fact position, all fact positions masked)
+pairs is $(1-\epsilon_t^{\,m})/((1-\epsilon_t)L)\approx 1/L$; this motivates dropping the $1/t$ weight but does not mean other
+terms cannot change leakage (gradient ascent at a non-fact position can raise $p(\F)$ there).
+\end{remark}
+\end{document}

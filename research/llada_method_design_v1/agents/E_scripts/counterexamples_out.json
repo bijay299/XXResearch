@@ -1,0 +1,280 @@
+{
+ "E1_Iproj_eps0": {
+  "max_abs_diff": 7.684924417272754e-06,
+  "KL_min": 0.33628962155494074,
+  "minus_log_pAc": 0.33628962116547767,
+  "verdict": "closed form = numeric; value = -log p0(A^c)"
+ },
+ "E1_Iproj_eps0.05_pF>eps": {
+  "p0F": 0.7266890649839491,
+  "gamma": 3.9223275660095616,
+  "rF": 0.05000000000000001,
+  "KL_closed": 1.0497355031248277,
+  "KL_numeric": 1.04973550312483,
+  "max_abs_diff": 1.6109249226237132e-08
+ },
+ "E1_Iproj_eps0.05_pF<=eps": {
+  "p0F": 2.6653608978742124e-06,
+  "gamma": 0.0,
+  "rF": 2.6653608978742124e-06,
+  "KL_closed": 0.0,
+  "KL_numeric": 9.559720912089079e-11,
+  "max_abs_diff": 3.687164652488306e-07
+ },
+ "E1_Iproj_eps0.001_pF>eps": {
+  "p0F": 0.3921382712058684,
+  "gamma": 6.4684218525556245,
+  "rF": 0.0010000000000000005,
+  "KL_closed": 0.49033892044011734,
+  "KL_numeric": 0.4903389204401285,
+  "max_abs_diff": 1.5690836407955544e-08
+ },
+ "E1_Iproj_eps0.001_pF<=eps": {
+  "p0F": 7.962209732504699e-06,
+  "gamma": 0.0,
+  "rF": 7.962209732504699e-06,
+  "KL_closed": 0.0,
+  "KL_numeric": 1.1418521752463162e-11,
+  "max_abs_diff": 3.5737996198492716e-07
+ },
+ "E2_meanfield": {
+  "qhat2": {
+   "a": 0.7142857142857143,
+   "c": 0.28571428571428575
+  },
+  "qstar2": {
+   "c": 1.0
+  },
+  "prod_qhat_mass_on_p0_zero_sequences": 0.7142857142857143,
+  "verdict": "q_hat != q*; product of q_hat marginals puts 0.714 on (b,a), a sequence with p0-mass 0"
+ },
+ "E2_inconsistent_order_dependence": {
+  "P_l2r": {
+   "(0, 0)": 0.04999999999999999,
+   "(0, 1)": 0.45,
+   "(1, 0)": 0.04999999999999999,
+   "(1, 1)": 0.45
+  },
+  "P_r2l": {
+   "(0, 0)": 0.45,
+   "(0, 1)": 0.45,
+   "(1, 0)": 0.05,
+   "(1, 1)": 0.05
+  },
+  "TV": 0.4,
+  "verdict": "no joint p0 exists; I-projection of 'the' joint is config-dependent"
+ },
+ "E3_P2_offbyone": {
+  "leak": 0.3,
+  "bound_t_lt_tstar": 0.0,
+  "bound_t_le_tstar": 0.3,
+  "verdict": "main-text 't<t*' is wrong; need t<=t* (states s_t fact-free)"
+ },
+ "E4_committed_set_lc": {
+  "leak": 0.3,
+  "committed_set_bound": 0.09,
+  "eligible_bound": 0.3,
+  "verdict": "committed-set form valid only for random remasking; eligible-set form (B 1b) holds"
+ },
+ "E5_lemma": {
+  "max_violation_T_in_0_1": 2.220446049250313e-16,
+  "T2_counterexample": {
+   "p": [
+    0.9,
+    0.1
+   ],
+   "qT_F": 0.25,
+   "rho": 0.11111111111111112
+  },
+  "A_KLform_T07": {
+   "1-exp(-KL)": 0.30000000000000027,
+   "pi_0.7(F)": 0.4435659542472758
+  },
+  "A_KLform_T05_3tok": {
+   "p": [
+    0.4,
+    0.3,
+    0.3
+   ],
+   "1-exp(-KL)": 0.4,
+   "pi_0.5(F)": 0.47058823529411775
+  },
+  "rho_looseness_T1": {
+   "p_max": 0.01,
+   "pF": 0.001,
+   "rho": 0.1,
+   "qT1": 0.001
+  },
+  "verdict": "lemma holds for T in [0,1]; fails for T>1; KL->leak bound fails for 0<T<1 (fact ranked 1st or 2nd)"
+ },
+ "E6_logits_eos_inf": {
+  "rho": 0.5,
+  "TV": 0.30000000000000004,
+  "half_qmax": 0.4285714285714286,
+  "argmax_without_eos": "f",
+  "verdict": "rho<1 and TV<qmax/2 certify no greedy fact commit, but with logits_eos_inf=True greedy commits f"
+ },
+ "E7_cfg": {
+  "p_cond_F": 0.05,
+  "rho_cond": 0.052631578947368425,
+  "p_uncond_F": 0.001,
+  "p_cfg_F": {
+   "0.5": 0.27622174927145865,
+   "1": 0.7345588235294118,
+   "2": 0.9931741735167089,
+   "3": 0.9998693043373579
+  },
+  "verdict": "bounds on p_theta(.|c,s) say nothing under cfg>0: rho must be computed on CFG-combined logits"
+ },
+ "E8_eps_fixed_point_leak_T1_random": {
+  "leak_if_n_committed_positions_at_eps": {
+   "eps=0.001,n=8": 0.00797205593005601,
+   "eps=0.001,n=32": 0.031508924240473246,
+   "eps=0.001,n=128": 0.12020296723590385,
+   "eps=0.0001,n=8": 0.0007997200559929363,
+   "eps=0.0001,n=32": 0.003195044956405657,
+   "eps=0.0001,n=128": 0.012719060311838892
+  },
+  "verdict": "exact target (p_theta=r_eps) leaks 1-(1-eps)^n under T=1 random remasking; toy n<=8 hides it"
+ },
+ "E8_gamma_numerics": {
+  "torch.float32": {
+   "logit_gap": 20.0,
+   "p0F_as_computed": 1.0,
+   "gamma_naive": Infinity,
+   "r_naive_has_nan": true,
+   "gamma_logspace": 26.04475975036621,
+   "r_logspace_F": 0.0010000001639127731
+  },
+  "torch.bfloat16": {
+   "logit_gap": 8.0,
+   "p0F_as_computed": 1.0,
+   "gamma_naive": Infinity,
+   "r_naive_has_nan": true,
+   "gamma_logspace": 14.044759750366211,
+   "r_logspace_F": 0.0010000001639127731
+  },
+  "verdict": "naive gamma*onehot gives NaN when p0F==1.0 in float; use log-space + where()"
+ },
+ "E9_concentrability": {
+  "leak": 0.8062885155414992,
+  "d_ff_mass": 16.12577031082998,
+  "Bd_bound": 0.848724753201578,
+  "bound_with_C_eq_1_over_w": 0.052631578947368425,
+  "correct_C": 16.12577031082998,
+  "verdict": "C_{pi_k|mu} <= |d^ff_k|/w_k (<= N/w_k), not 1/w_k, when mu mixes normalised visitations"
+ },
+ "E9b_chain_d": {
+  "sum_E_n": 2,
+  "sum_M_s": 3,
+  "verdict": "middle term of B 1(d) can exceed the last; state the sup form from the E_n sum"
+ },
+ "E9c_vacuity": {
+  "sum_over_steps_of_eligible": 2112,
+  "per_position_KL_needed_for_bound_0p05": 2.3674242424242424e-05
+ },
+ "E10_sampling_bias": {
+  "dbar_s0": 0.4,
+  "uniform_J_per_rollout_s0": 0.625,
+  "verdict": "truncation itself is exact for d^ff; uniform-per-rollout sampling over-weights short (leaking) rollouts"
+ },
+ "E11_C_shrinkage": {
+  "mu1": 200.0,
+  "D_R_unshrunk": 0.0,
+  "E_F_over_mu1": 0.005,
+  "D_R_shrunk": 0.005,
+  "verdict": "(a) holds only in the metric of the C_R used in the GEP"
+ },
+ "E12_energy_vs_output": {
+  "D_big": 25.0,
+  "outKL_big": 0.0,
+  "D_small": 0.0036,
+  "argmax_flip_small": {
+   "before": 0,
+   "after": 1
+  },
+  "verdict": "layer-output energy is neither necessary nor sufficient for output change"
+ },
+ "E13_GA_nonfact_pos": {
+  "pF_before": 0.2,
+  "pF_after": 0.27969868479021265,
+  "verdict": "non-fact-position GA terms DO change leakage (upward); F1's 'only terms that can change leakage' is false"
+ },
+ "E13_F1_weight": {
+  "k=1": {
+   "mc": 1.0,
+   "exact": 1.0,
+   "fraction_of_L128": 0.0078125
+  },
+  "k=2": {
+   "mc": 1.0005272548433797,
+   "exact": 1.001,
+   "fraction_of_L128": 0.0078203125
+  },
+  "k=4": {
+   "mc": 0.9998442999250908,
+   "exact": 1.0010010010000001,
+   "fraction_of_L128": 0.007820320320312501
+  },
+  "second_moment": {
+   "mc": 6.940878044515215,
+   "exact": 6.914669948931068
+  }
+ },
+ "E14_bf16_ties": {
+  "fp32": [
+   0.9961000084877014,
+   0.9980000257492065,
+   0.9990000128746033
+  ],
+  "bf16": [
+   0.99609375,
+   0.99609375,
+   1.0
+  ],
+  "verdict": "upstream computes confidence in model dtype; bf16 ties -> greedy path depends on topk tie-break"
+ },
+ "E14_rho_eq_1_tie": {
+  "argmax": 0,
+  "verdict": "rho<1 (strict) needed; at rho=1 the fact wins if its id is lower"
+ },
+ "E15_adamw_fixed_point": {
+  "eps=0,wd=0.0": {
+   "b_at_steps": {
+    "1000": -4.769,
+    "5000": -8.201,
+    "20000": -15.828,
+    "80000": -26.522
+   },
+   "pF_final": 2.2407325994677763e-11
+  },
+  "eps=0,wd=0.01": {
+   "b_at_steps": {
+    "1000": -4.611,
+    "5000": -7.412,
+    "20000": -14.301,
+    "80000": -21.703
+   },
+   "pF_final": 2.7738868979554354e-09
+  },
+  "eps=0.001,wd=0.0": {
+   "b_at_steps": {
+    "1000": -4.762,
+    "5000": -7.966,
+    "20000": -8.907,
+    "80000": -8.907
+   },
+   "pF_final": 0.001000302261672914
+  },
+  "eps=0.001,wd=0.01": {
+   "b_at_steps": {
+    "1000": -4.604,
+    "5000": -7.269,
+    "20000": -8.905,
+    "80000": -8.907
+   },
+   "pF_final": 0.0010000888723880053
+  },
+  "verdict": "eps=0: no stationary point; Adam keeps drifting but sub-linearly (v lags); eps>0 converges to p(F)=eps; wd shifts eps=0 operating point"
+ }
+}

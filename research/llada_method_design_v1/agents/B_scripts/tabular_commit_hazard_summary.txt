@@ -1,0 +1,170 @@
+
+######## backoff=unigram,delta=0.02   (33 native configs, 30 held out from OP_mix training)
+arm        |         first round leak_max<=0.05 |        first round leak_mean<=0.01 | final: mean / max / max_heldout / footKL / nEdit / retainF
+TF         |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.1475 / 0.4956 / 0.4956 / 51 / 12 / 0.865
+             worst final configs: N4/b4/rnd/T0.5=0.496, N4/b4/rnd/T1.0=0.473, N2/b4/rnd/T0.5=0.381
+TF_uniform |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.3744 / 0.6198 / 0.6198 / 54 / 32 / 0.982
+             worst final configs: N4/b4/rnd/T0.5=0.620, N4/b1/lc/T0.5=0.613, N4/b2/rnd/T0.5=0.611
+TF_para    |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.0614 / 0.2319 / 0.2319 / 118 / 29 / 0.865
+             worst final configs: N4/b1/lc/T0.5=0.232, N2/b2/rnd/T1.0=0.215, N2/b2/lc/T1.0=0.215
+OP_single  |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.4171 / 1.0000 / 1.0000 / 24 / 8 / 0.865
+             worst final configs: N4/b1/lc/T0.0=1.000, N2/b2/rnd/T0.0=1.000, N2/b2/lc/T0.0=1.000
+OP_wide    |               INFEASIBLE in budget |  r20 mean=0.0097 KL=   430 nE=1232 | 0.0055 / 0.0600 / 0.0600 / 553 / 1309 / 0.821
+             worst final configs: N2/b2/rnd/T1.0=0.060, N2/b2/lc/T1.0=0.060, N2/b4/rnd/T1.0=0.015
+OP_mix     |  r 2 mean=0.0063 KL=   145 nE= 325 |  r 2 mean=0.0063 KL=   145 nE= 325 | 0.0015 / 0.0108 / 0.0108 / 385 / 1116 / 0.823
+             worst final configs: N2/b4/rnd/T1.0=0.011, N4/b4/rnd/T1.0=0.008, N4/b2/rnd/T1.0=0.006
+OP_mix_hz  |  r 2 mean=0.0020 KL=   265 nE= 786 |  r 2 mean=0.0020 KL=   265 nE= 786 | 0.0011 / 0.0040 / 0.0040 / 782 / 1344 / 0.819
+             worst final configs: N4/b4/rnd/T1.0=0.004, N2/b4/rnd/T1.0=0.004, N1/b4/rnd/T1.0=0.004
+cover_all  |  r 4 mean=0.0061 KL=  1238 nE=1344 |  r 4 mean=0.0061 KL=  1238 nE=1344 | 0.0010 / 0.0040 / 0.0040 / 1392 / 1344 / 0.817
+             worst final configs: N1/b4/rnd/T1.0=0.004, N1/b4/lc/T1.0=0.004, N4/b1/lc/T1.0=0.004
+
+TF-trained model: fraction of fact-free visitation mass outside supp(TF), per config (min/max): 0.000 / 0.437
+[TF] share of total leak (summed over configs) committed from states outside supp(TF): 0.995  (total leak 4.866)
+[TF_para] share of total leak (summed over configs) committed from states outside supp(TF): 0.987  (total leak 2.026)
+[OP_single] share of total leak (summed over configs) committed from states outside supp(TF): 0.301  (total leak 13.765)
+[OP_wide] share of total leak (summed over configs) committed from states outside supp(TF): 0.859  (total leak 0.181)
+[OP_mix] share of total leak (summed over configs) committed from states outside supp(TF): 0.500  (total leak 0.051)
+[OP_mix_hz] share of total leak (summed over configs) committed from states outside supp(TF): 0.282  (total leak 0.036)
+
+Bound tightness (exact leak vs B1=q-union, B2=rho-union [all T<=1], B3=sup bound)
+  -- base
+     N4/b4/lc/T0.0      leak=1.0000 B1=2.0000 B2=2.8952 B3=1.0000 B1/leak=2.00
+     N4/b4/lc/T0.5      leak=1.0000 B1=2.1682 B2=3.0374 B3=1.0000 B1/leak=2.17
+     N4/b4/lc/T1.0      leak=0.9989 B1=2.1426 B2=3.2540 B3=1.0000 B1/leak=2.14
+     N4/b4/rnd/T0.0     leak=1.0000 B1=2.5000 B2=3.0774 B3=1.0000 B1/leak=2.50
+     N4/b4/rnd/T0.5     leak=0.9759 B1=2.4678 B2=3.0667 B3=1.0000 B1/leak=2.53
+     N4/b4/rnd/T1.0     leak=0.8946 B1=2.2427 B2=3.0291 B3=1.0000 B1/leak=2.51
+     N1/b4/lc/T0.0      leak=1.0000 B1=1.0000 B2=1.4698 B3=1.0000 B1/leak=1.00
+     N1/b4/lc/T0.5      leak=0.8821 B1=1.0231 B2=1.4698 B3=1.0000 B1/leak=1.16
+     N1/b4/lc/T1.0      leak=0.7371 B1=0.9042 B2=1.4698 B3=1.0000 B1/leak=1.23
+     N1/b4/rnd/T0.0     leak=1.0000 B1=1.0000 B2=1.4698 B3=1.0000 B1/leak=1.00
+     N1/b4/rnd/T0.5     leak=0.8821 B1=1.0231 B2=1.4698 B3=1.0000 B1/leak=1.16
+     N1/b4/rnd/T1.0     leak=0.7371 B1=0.9042 B2=1.4698 B3=1.0000 B1/leak=1.23
+     N2/b2/rnd/T0.0     leak=1.0000 B1=1.0000 B2=1.4654 B3=1.0000 B1/leak=1.00
+     N2/b2/rnd/T0.5     leak=0.8461 B1=0.8653 B2=1.4561 B3=1.0000 B1/leak=1.02
+     N2/b2/rnd/T1.0     leak=0.7404 B1=0.7612 B2=1.4259 B3=1.0000 B1/leak=1.03
+  -- TF
+     N4/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0161 B3=0.0281 B1/leak=inf
+     N4/b4/lc/T0.5      leak=0.0529 B1=0.0532 B2=0.0700 B3=1.0000 B1/leak=1.01
+     N4/b4/lc/T1.0      leak=0.2149 B1=0.2315 B2=0.2496 B3=1.0000 B1/leak=1.08
+     N4/b4/rnd/T0.0     leak=0.3333 B1=0.6250 B2=1.2043 B3=1.0000 B1/leak=1.88
+     N4/b4/rnd/T0.5     leak=0.4956 B1=0.8668 B2=1.2179 B3=1.0000 B1/leak=1.75
+     N4/b4/rnd/T1.0     leak=0.4725 B1=0.8493 B2=1.2031 B3=1.0000 B1/leak=1.80
+     N1/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/lc/T0.5      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/lc/T1.0      leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/rnd/T0.5     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T1.0     leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N2/b2/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0061 B3=0.0108 B1/leak=inf
+     N2/b2/rnd/T0.5     leak=0.1616 B1=0.1846 B2=0.5361 B3=1.0000 B1/leak=1.14
+     N2/b2/rnd/T1.0     leak=0.2607 B1=0.2869 B2=0.8915 B3=1.0000 B1/leak=1.10
+  -- OP_mix
+     N4/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0161 B3=0.0281 B1/leak=inf
+     N4/b4/lc/T0.5      leak=0.0000 B1=0.0000 B2=0.0161 B3=1.0000 B1/leak=4.82
+     N4/b4/lc/T1.0      leak=0.0010 B1=0.0094 B2=0.0161 B3=1.0000 B1/leak=9.35
+     N4/b4/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0169 B3=0.0283 B1/leak=inf
+     N4/b4/rnd/T0.5     leak=0.0000 B1=0.0000 B2=0.0167 B3=1.0000 B1/leak=1.45
+     N4/b4/rnd/T1.0     leak=0.0077 B1=0.0153 B2=0.0341 B3=1.0000 B1/leak=1.98
+     N1/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/lc/T0.5      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/lc/T1.0      leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/rnd/T0.5     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T1.0     leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N2/b2/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0061 B3=0.0108 B1/leak=inf
+     N2/b2/rnd/T0.5     leak=0.0000 B1=0.0000 B2=0.0070 B3=1.0000 B1/leak=1.00
+     N2/b2/rnd/T1.0     leak=0.0037 B1=0.0037 B2=0.0077 B3=1.0000 B1/leak=1.00
+
+######## backoff=uniform,delta=0.02   (33 native configs, 30 held out from OP_mix training)
+arm        |         first round leak_max<=0.05 |        first round leak_mean<=0.01 | final: mean / max / max_heldout / footKL / nEdit / retainF
+TF         |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.1306 / 0.4520 / 0.4520 / 51 / 12 / 0.881
+             worst final configs: N4/b4/rnd/T0.5=0.452, N4/b4/rnd/T1.0=0.445, N4/b4/rnd/T0.0=0.417
+TF_uniform |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.4115 / 1.0000 / 1.0000 / 54 / 32 / 0.982
+             worst final configs: N4/b4/lc/T0.0=1.000, N4/b2/lc/T0.0=1.000, N4/b4/rnd/T0.0=0.542
+TF_para    |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.0444 / 0.1667 / 0.1667 / 118 / 26 / 0.881
+             worst final configs: N4/b4/rnd/T0.0=0.167, N2/b2/rnd/T1.0=0.149, N2/b2/lc/T1.0=0.149
+OP_single  |               INFEASIBLE in budget |               INFEASIBLE in budget | 0.4057 / 1.0000 / 1.0000 / 24 / 8 / 0.881
+             worst final configs: N4/b1/lc/T0.0=1.000, N2/b2/rnd/T0.0=1.000, N2/b2/lc/T0.0=1.000
+OP_wide    |  r22 mean=0.0044 KL=   338 nE=1341 |  r 8 mean=0.0095 KL=   252 nE=1341 | 0.0025 / 0.0232 / 0.0232 / 412 / 1341 / 0.866
+             worst final configs: N2/b2/rnd/T1.0=0.023, N2/b2/lc/T1.0=0.023, N2/b4/rnd/T1.0=0.008
+OP_mix     |  r 2 mean=0.0050 KL=   132 nE= 375 |  r 2 mean=0.0050 KL=   132 nE= 375 | 0.0015 / 0.0099 / 0.0099 / 301 / 1341 / 0.866
+             worst final configs: N2/b4/rnd/T1.0=0.010, N4/b4/rnd/T1.0=0.007, N4/b2/rnd/T1.0=0.006
+OP_mix_hz  |  r 2 mean=0.0018 KL=   216 nE= 728 |  r 2 mean=0.0018 KL=   216 nE= 728 | 0.0010 / 0.0040 / 0.0040 / 600 / 1341 / 0.863
+             worst final configs: N1/b4/rnd/T1.0=0.004, N1/b4/lc/T1.0=0.004, N2/b4/rnd/T1.0=0.004
+cover_all  |  r 4 mean=0.0060 KL=   766 nE=1339 |  r 4 mean=0.0060 KL=   766 nE=1339 | 0.0010 / 0.0040 / 0.0040 / 872 / 1341 / 0.862
+             worst final configs: N1/b4/rnd/T1.0=0.004, N1/b4/lc/T1.0=0.004, N4/b1/lc/T1.0=0.004
+
+TF-trained model: fraction of fact-free visitation mass outside supp(TF), per config (min/max): 0.000 / 0.440
+[TF] share of total leak (summed over configs) committed from states outside supp(TF): 0.994  (total leak 4.308)
+[TF_para] share of total leak (summed over configs) committed from states outside supp(TF): 0.983  (total leak 1.466)
+[OP_single] share of total leak (summed over configs) committed from states outside supp(TF): 0.282  (total leak 13.389)
+[OP_wide] share of total leak (summed over configs) committed from states outside supp(TF): 0.703  (total leak 0.083)
+[OP_mix] share of total leak (summed over configs) committed from states outside supp(TF): 0.487  (total leak 0.048)
+[OP_mix_hz] share of total leak (summed over configs) committed from states outside supp(TF): 0.279  (total leak 0.034)
+
+Bound tightness (exact leak vs B1=q-union, B2=rho-union [all T<=1], B3=sup bound)
+  -- base
+     N4/b4/lc/T0.0      leak=1.0000 B1=2.0000 B2=2.8857 B3=1.0000 B1/leak=2.00
+     N4/b4/lc/T0.5      leak=1.0000 B1=2.1658 B2=3.0281 B3=1.0000 B1/leak=2.17
+     N4/b4/lc/T1.0      leak=0.9990 B1=2.1479 B2=3.2539 B3=1.0000 B1/leak=2.15
+     N4/b4/rnd/T0.0     leak=1.0000 B1=2.5000 B2=3.0694 B3=1.0000 B1/leak=2.50
+     N4/b4/rnd/T0.5     leak=0.9763 B1=2.4673 B2=3.0607 B3=1.0000 B1/leak=2.53
+     N4/b4/rnd/T1.0     leak=0.8913 B1=2.2326 B2=3.0471 B3=1.0000 B1/leak=2.50
+     N1/b4/lc/T0.0      leak=1.0000 B1=1.0000 B2=1.4629 B3=1.0000 B1/leak=1.00
+     N1/b4/lc/T0.5      leak=0.8815 B1=1.0208 B2=1.4629 B3=1.0000 B1/leak=1.16
+     N1/b4/lc/T1.0      leak=0.7347 B1=0.8984 B2=1.4629 B3=1.0000 B1/leak=1.22
+     N1/b4/rnd/T0.0     leak=1.0000 B1=1.0000 B2=1.4629 B3=1.0000 B1/leak=1.00
+     N1/b4/rnd/T0.5     leak=0.8815 B1=1.0208 B2=1.4629 B3=1.0000 B1/leak=1.16
+     N1/b4/rnd/T1.0     leak=0.7347 B1=0.8984 B2=1.4629 B3=1.0000 B1/leak=1.22
+     N2/b2/rnd/T0.0     leak=1.0000 B1=1.0000 B2=1.4600 B3=1.0000 B1/leak=1.00
+     N2/b2/rnd/T0.5     leak=0.7937 B1=0.7998 B2=1.5762 B3=1.0000 B1/leak=1.01
+     N2/b2/rnd/T1.0     leak=0.6890 B1=0.6983 B2=1.6034 B3=1.0000 B1/leak=1.01
+  -- TF
+     N4/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0210 B3=0.0585 B1/leak=inf
+     N4/b4/lc/T0.5      leak=0.0531 B1=0.1042 B2=0.1255 B3=1.0000 B1/leak=1.96
+     N4/b4/lc/T1.0      leak=0.2143 B1=0.4167 B2=0.4389 B3=1.0000 B1/leak=1.94
+     N4/b4/rnd/T0.0     leak=0.4167 B1=0.7917 B2=1.2843 B3=1.0000 B1/leak=1.90
+     N4/b4/rnd/T0.5     leak=0.4520 B1=0.8108 B2=1.3624 B3=1.0000 B1/leak=1.79
+     N4/b4/rnd/T1.0     leak=0.4447 B1=0.8093 B2=1.3462 B3=1.0000 B1/leak=1.82
+     N1/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/lc/T0.5      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/lc/T1.0      leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/rnd/T0.5     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T1.0     leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N2/b2/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0092 B3=0.0234 B1/leak=inf
+     N2/b2/rnd/T0.5     leak=0.1008 B1=0.1081 B2=0.6865 B3=1.0000 B1/leak=1.07
+     N2/b2/rnd/T1.0     leak=0.1948 B1=0.2062 B2=1.1327 B3=1.0000 B1/leak=1.06
+  -- OP_mix
+     N4/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0210 B3=0.0585 B1/leak=inf
+     N4/b4/lc/T0.5      leak=0.0000 B1=0.0000 B2=0.0210 B3=0.0593 B1/leak=3.81
+     N4/b4/lc/T1.0      leak=0.0010 B1=0.0086 B2=0.0209 B3=1.0000 B1/leak=8.61
+     N4/b4/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0265 B3=0.1382 B1/leak=inf
+     N4/b4/rnd/T0.5     leak=0.0000 B1=0.0001 B2=0.0251 B3=1.0000 B1/leak=1.49
+     N4/b4/rnd/T1.0     leak=0.0069 B1=0.0139 B2=0.0539 B3=1.0000 B1/leak=2.02
+     N1/b4/lc/T0.0      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/lc/T0.5      leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/lc/T1.0      leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=inf
+     N1/b4/rnd/T0.5     leak=0.0000 B1=0.0000 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N1/b4/rnd/T1.0     leak=0.0040 B1=0.0040 B2=0.0057 B3=0.0073 B1/leak=1.00
+     N2/b2/rnd/T0.0     leak=0.0000 B1=0.0000 B2=0.0092 B3=0.0234 B1/leak=inf
+     N2/b2/rnd/T0.5     leak=0.0000 B1=0.0000 B2=0.0111 B3=1.0000 B1/leak=1.00
+     N2/b2/rnd/T1.0     leak=0.0037 B1=0.0037 B2=0.0126 B3=1.0000 B1/leak=1.00
+
+params: {'eps': 0.001, 'kappa': 0.5, 'eta': 100.0, 'rounds': 40, 'steps_per_round': 10, 'forget_templates': [['BIFE', 0.55], ['FWYE', 0.25], ['YWFE', 0.1], ['UEEE', 0.1]], 'retain_templates': [['IFEE', 0.7], ['FEEE', 0.2], ['UEEE', 0.1]], 'runtime_s': 398.7}
+
+=== matched-point detail (first checkpoint with leak_max<=0.05) and early checkpoints ===
+## backoff=unigram,delta=0.02
+OP_wide [(0, 0.9318, 1.0, 0, 0, 0.927), (2, 0.0245, 0.1991, 178, 554, 0.837), (4, 0.0212, 0.1835, 239, 797, 0.835), (6, 0.0188, 0.1693, 280, 913, 0.833)]
+OP_mix [(0, 0.9318, 1.0, 0, 0, 0.927), (2, 0.0063, 0.0475, 145, 325, 0.84), (4, 0.0033, 0.0265, 183, 472, 0.835), (6, 0.0027, 0.0213, 209, 537, 0.832)]
+OP_mix_hz [(0, 0.9318, 1.0, 0, 0, 0.927), (2, 0.002, 0.0147, 265, 786, 0.844), (4, 0.0014, 0.007, 396, 1282, 0.826), (6, 0.0013, 0.006, 458, 1315, 0.823)]
+cover_all [(0, 0.9318, 1.0, 0, 0, 0.927), (2, 0.0927, 0.2649, 935, 1334, 0.882), (4, 0.0061, 0.0333, 1238, 1344, 0.857), (6, 0.0025, 0.0138, 1331, 1344, 0.842)]
+base retainF 0.9270158329661248
+## backoff=uniform,delta=0.02
+OP_wide [(0, 0.9238, 1.0, 0, 0, 0.926), (2, 0.0157, 0.1332, 157, 544, 0.876), (4, 0.0129, 0.118, 200, 947, 0.875), (6, 0.011, 0.1048, 230, 1341, 0.875)]
+OP_mix [(0, 0.9238, 1.0, 0, 0, 0.926), (2, 0.005, 0.0382, 132, 375, 0.876), (4, 0.0028, 0.0222, 159, 420, 0.874), (6, 0.0023, 0.0169, 176, 535, 0.872)]
+OP_mix_hz [(0, 0.9238, 1.0, 0, 0, 0.926), (2, 0.0018, 0.0125, 216, 728, 0.871), (4, 0.0013, 0.0061, 317, 1341, 0.867), (6, 0.0012, 0.0052, 368, 1341, 0.865)]
+cover_all [(0, 0.9238, 1.0, 0, 0, 0.926), (2, 0.2694, 1.0, 567, 1328, 0.899), (4, 0.006, 0.0326, 766, 1339, 0.885), (6, 0.0025, 0.0135, 829, 1339, 0.877)]
+base retainF 0.925725251893104
