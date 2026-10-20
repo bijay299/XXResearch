@@ -1,0 +1,37 @@
+# FX-Mix on LLaDA-8B-Instruct — Hyperplane config (SPEC v1.3). Loaded by integration/llada_fxmix.py:load_config.
+# Real-model execution UNTESTED. Every knob is mirrored in FXConfig; unknown keys are ignored.
+model:
+  model_name: GSAI-ML/LLaDA-8B-Instruct   # replace with the TOFU-SFT'd checkpoint path on Hyperplane
+  dtype: bfloat16
+  gen_length: 128
+target:
+  eps: 1.0e-5          # SPEC v1.3 LLaDA default; log fixed_point_report() (implied leak, certificate floor)
+states:
+  alpha: 0.25          # TF_ff share; rest = rollout states
+  J: 8                 # uniform pre-tau states per rollout, PLUS the decision state
+  refresh_every: 4     # R (pool staleness <= R steps)
+  rollout_prompts_per_refresh: 8   # forget prompts rolled out per refresh (pass this many to collect_pool)
+  pool:                # (steps, block_length, remasking, temperature); stratified uniform over entries
+    - [128, 128, low_confidence, 0.0]
+    - [128, 128, random, 1.0]
+    - [64, 128, random, 1.0]
+    - [32, 128, random, 1.0]
+lora:
+  lora_r: 16
+  lora_alpha: 32.0
+  lora_target_regex: .*blocks\.\d+\.(q_proj|k_proj|v_proj|attn_out|ff_proj|up_proj|ff_out)$   # UNVERIFIED names
+optim:
+  lr: 1.0e-4
+  lr_schedule: cosine
+  warmup_steps: 10
+  steps: 300
+  weight_decay: 0.0
+  grad_clip: 1.0
+  forget_states_per_step: 8
+  retain_batch: 8
+  lam_f: 1.0
+  lam_r: 1.0
+data:
+  append_eot: false    # GUIDELINES SFT layout: answer + EOS padding (UNVERIFIED for the TOFU-SFT checkpoint)
+  sft_eps: 1.0e-3
+  seed: 0

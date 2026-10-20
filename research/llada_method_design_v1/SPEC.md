@@ -1,8 +1,10 @@
 # SPEC — authoritative specification (coordinator-owned)
 
-Version **v1.1 (04:44Z; v1 04:40Z)**. History: v0 04:24Z (A+B merge) → v0.1 04:27Z (B→A objection: pool, ε>0, held-out configs,
+Version **v1.3 (04:52Z; v1.2 04:52Z; v1.1 04:44Z; v1 04:40Z)**. History: v0 04:24Z (A+B merge) → v0.1 04:27Z (B→A objection: pool, ε>0, held-out configs,
 ρ-form bound) → v1 (D reduction: controls, primary advantage; E critique: target numerics, ε for LLaDA, theory
-scope, certificate, metrics, F per fact) → **v1.1** (RESP_A: both matching cuts, extrapolation cell, fp32 target, certificate SE). Every equation, code path and claim in the package must agree with this file;
+scope, certificate, metrics, F per fact) → v1.1 (RESP_A: both matching cuts, extrapolation cell, fp32 target, certificate SE) → v1.2 (E theory check:
+Prop 2 ε-qualifier and item (d), wording) → **v1.3** (RESP_B: ε by eligible slots, exact-π_T certificate, F-closure
+audit, shared-value-token slice). Every equation, code path and claim in the package must agree with this file;
 G reconciles before publication. Changes after the validation lock are forbidden except one documented correctness repair.
 
 ## 0. Name and one-line description
@@ -14,7 +16,10 @@ positions masked), stopping each rollout at its first fact commit.
 ## 1. Forgetting notion and scope
 Forget request R = {(c, y*, F)}: prompt c, reference answer y*, **fact-token set F defined per fact** (token ids of the
 fact's distinctive surface pieces incl. tokenisation variants; prompt must contain no F token — otherwise the item is
-reported separately as "conditioning supplies the answer").
+reported separately as "conditioning supplies the answer"). **F-closure audit (mandatory for LLaDA, v1.3):** before
+training, take the top-5 tokens of p0|_{F^c} at θ0 rollout decision states and add every token that detokenises to a
+prefix/substring of a surface form of the fact (the exclusion target multiplies non-F tokens by 1/(1−p0(F)), so it would
+otherwise promote unlisted pieces of the fact); log the added ids; report string-level leakage next to Λ_F.
 Target property = **reduced recall in natively generated answers** (type i): for each native decoding configuration π
 of a declared grid (incl. configs never used in training), the event Λ_F = {some generated position — any of the
 gen_length positions, incl. after EOS — holds a token of F} is rare; answers remain well-formed (no refusal template,
@@ -30,9 +35,11 @@ L(θ) = λ_f · E_{(c,y*,F)∼R} E_{s∼μ_θ̄(c)} [ (1/|M(s)|) Σ_{i∈M(s)} K
   visible): r_ε = p0 if p0(F) ≤ ε, else ε·p0|_F + (1−ε)·p0|_{F^c}. **Computed in log-space** (log p0|_{F^c} =
   z0 − logsumexp_{F^c} z0, etc.) **from fp32 reference logits** (bf16 can misplace the p0(F) ≤ ε switch); the literal
   γ·onehot formula is forbidden (NaN when p0(F) rounds to 1).
-  ε: toy 1e-3 (fixed-point leak ≤ 1−(1−ε)^8 ≈ 0.8 %); LLaDA default **ε = 1e-4** and report the implied fixed-point
-  leak 1−(1−ε)^{n̂} with n̂ measured on θ0 rollouts (choose ε ≤ δ/n̂ for evaluation threshold δ); ε = 0 is allowed
-  only with the step budget declared as the strength knob (no finite stationary point under Adam).
+  ε: toy 1e-3 (fixed-point leak ≤ 1−(1−ε)^8 ≈ 0.8 %; eligible-slot certificate floor ≤ 36ε = 3.6 %); LLaDA default
+  **ε = 1e-5** (v1.3; chosen ≤ δ/n̂_elig with n̂_elig ≤ Σ_n|E_n| = 2112 at gen 128/block 32/128 steps, so the target's own
+  certificate floor is ≤ 2.1 % for low-confidence configs); report the implied fixed-point leak ≥ 1−(1−ε)^{n̂} and the
+  certificate floor ε·n̂_elig, with n̂, n̂_elig measured on θ0 rollouts; ε = 0 is allowed
+  only with the step budget declared as the strength knob (no finite minimiser; drift under Adam).
 - **States μ_θ̄(c)** (fact-free only = no visible F token):
   - fraction α = 0.25: TF_ff — t ~ U(0,1); mask each non-fact answer position iid w.p. t; always mask every position j
     with y*_j ∈ F (answer region = gen_length incl. EOS padding).
@@ -75,13 +82,15 @@ fixed point, never deployed).
 - **Proposition 1** (first-commit decomposition and sampler-uniform hazard bound, assumptions (H) of E §5): exact
   decomposition; h_n ≤ Σ_{E_n} π_T(F) (rnd: ×k_n/|E_n|); π_T(F) ≤ min{1, ρ} for T∈[0,1]; P(Λ_F) ≤ B_π; greedy exact-zero
   when ρ<1 on reachable fact-free states. Use: **post-hoc certificate B̂_π** on fresh rollouts of the final model, in
-  deployment dtype and tie-break, with its Monte-Carlo standard error.
+  deployment dtype and tie-break, with its Monte-Carlo standard error, computed in the **eligible-sum form with the exact
+  per-position π_T(F|s,i)** of the evaluated config (T=0: 1{argmax ∈ F}; ×k_n/|E_n| for random remasking); the ρ form is
+  only the T-uniform statement (up to |V|× loose at T=1) (v1.3).
 - **Proposition 2** (escape characterisation, unrestricted zero-sharing class): sup over models matching r_0 on a state
   set S of the leak under π equals the target sampler's escape probability from S; = 0 if S ⊇ the target sampler's own
   visitation; ≥ 1−1/L (m=1) or = 1 (m≥2 fact positions) for S = TF fact-free states under one-token random decoding.
-  Says nothing about networks with parameter sharing (that is the empirical SC-TF vs FX-Mix question).
-- Remarks only: consistent-joint q* vs mean-field (R1); coverage/non-identifiability of TF-only measures in the
-  zero-sharing class, C ≤ |d^ff_k|/(w_k(1−α)) (R2); scale of the union bound (R3); ε fixed-point leak and ε=0 drift (R4);
+  Stated for ε=0 (r_0 = decode-time ban); for the default ε>0 use item (d) (sup = P^{r̄_ε}(leak before escape or
+  escape)). Says nothing about networks with parameter sharing (that is the empirical SC-TF vs FX-Mix question).
+- Remarks only: consistent-joint q* vs mean-field (R1); coverage constant C ≤ |d^ff_k|/(w_k(1−α)) (R2); scale of the union bound (R3); ε fixed-point leak and ε=0 drift (R4);
   SFT-weight share on leak-relevant terms (R5).
 - Never claim: that the loss bounds leakage; global forgetting or utility from a local constraint; anything for T>1, CFG.
 
@@ -96,5 +105,6 @@ is chance from shared value pieces; driving leak_any to 0 is an over-forgetting 
 Primary: **config-robust forgetting** — lower held-out max leakage than SC-TF and SC at matched retention, with
 well-formed forget answers. To prevent the matching axis from choosing the winner, the full (held-out max leak,
 retention) curve over each arm's strength grid is reported, together with **both cuts**: leak at matched retention and
-retention at matched leak (v1.1). FX-Mix is a distinct method only if it beats SC-TF and SC there (D §3.6); otherwise the
+retention at matched leak (v1.1); pre-registered slice in both cuts: retained facts that **share a value token** with a
+forgotten fact (C's falsifier: the state design is predicted to give no retention gain there) (v1.3). FX-Mix is a distinct method only if it beats SC-TF and SC there (D §3.6); otherwise the
 outcome is reported as "TNFF-in-MDU" (target credited to TNT/UNDIAL).

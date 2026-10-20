@@ -106,7 +106,12 @@ def test_eps0_hard_exclusion_and_numerics():
         assert torch.isfinite(ce).all() and torch.isfinite(k).all()
     # the forbidden literal gamma*onehot form would give NaN/inf here (documents why log-space is required)
     p0F = F.softmax(z[1:], -1)[0, 0]
-    assert p0F.item() == 1.0 and math.isinf(math.log(p0F.item() / (1 - p0F.item() + 0.0) if p0F < 1 else math.inf))
+    assert p0F.item() == 1.0
+    eps = 1e-3
+    gamma = torch.log(p0F * (1 - eps) / (eps * (1 - p0F)))       # = +inf
+    onehot = torch.tensor([1.0, 0.0, 0.0, 0.0])
+    literal = F.softmax(z[1] - gamma * onehot, -1)               # 0 * inf = NaN on F^c entries
+    assert torch.isinf(gamma) and torch.isnan(literal).any()
 
 
 def test_empty_F_gives_reference_and_zero_loss():
@@ -327,3 +332,50 @@ def test_sc_tf_allows_fact_visible_states():
     m = MaskPredictor(tw.V, 16)
     d = sc_tf_loss(m, m, ids, tw.P_LEN, fm, eps=1e-3, generator=torch.Generator().manual_seed(0))
     assert 0 < d["frac_fact_visible_states"] < 1 and torch.isfinite(d["loss"])
+
+
+# ------------------------------------------------------------------------------------------------ EMDU / selection
+def test_emdu_anchor_is_fully_masked_and_anchor_first_kl():
+    from mdmu.fxmix import emdu_loss
+    torch.manual_seed(5)
+    m = MaskPredictor(tw.V, 16)
+    seen = []
+
+    def ref_fn(x):
+        seen.append(x.clone())
+        return m(x)
+    ids = torch.randint(5, tw.V, (6, 16))
+    d = emdu_loss(m, ref_fn, ids, 8, tau=1.0, generator=torch.Generator().manual_seed(0))
+    assert len(seen) == 1 and (seen[0] == tw.MASK).all()          # prompt AND every answer position masked
+    # value check: KL(p_anchor || p_theta) averaged over masked positions of the same noisy state
+    from mdmu.diffusion import forward_process_sft
+    noisy, masked, _ = forward_process_sft(ids, 8, generator=torch.Generator().manual_seed(0))
+    la = F.log_softmax(m(torch.full_like(ids, tw.MASK)), -1)
+    lp = F.log_softmax(m(noisy), -1)
+    kl = (la.exp() * (la - lp)).sum(-1)
+    per = [(kl[b][masked[b]]).mean() for b in range(6) if masked[b].any()]
+    assert abs(d["loss"].item() - torch.stack(per).mean().item()) < 1e-5
+
+
+def _fake_runs(points_by_lr):
+    runs = []
+    for lr, pts in points_by_lr.items():
+        curve = [{"step": s, "agg": {"max_F_leak_any_heldout": l, "mean_R_acc": r, "min_R_acc": r, "min_copy": c,
+                                     "max_F_leak_full_train": l}} for s, l, r, c in pts]
+        runs.append({"config": {"lr": lr}, "curve": curve})
+    return runs
+
+
+def test_selection_rules_cut_A_and_B():
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "experiments"))
+    import dev_compare as dc
+    base = {"mean_R_acc": 0.95, "min_R_acc": 0.73, "min_copy": 1.0}
+    retrain = {"max_F_leak_any_heldout": 0.13}
+    runs = _fake_runs({1e-3: [(25, 0.5, 0.94, 1.0), (50, 0.10, 0.91, 1.0), (75, 0.05, 0.89, 1.0)],
+                       2e-3: [(25, 0.08, 0.90, 0.97), (50, 0.12, 0.93, 0.99)]})
+    a = dc.select_cut_A(runs, base)            # feasible: mean_R >= 0.90 and copy >= 0.98
+    assert (a["lr"], a["step"]) == (1e-3, 50)  # (75 fails retention; lr2e-3@25 fails copy)
+    b = dc.select_cut_B(runs, retrain)         # HO5 <= 0.13: (1e-3,50) .91, (1e-3,75) .89, (2e-3,25) .90, (2e-3,50) .93
+    assert (b["lr"], b["step"]) == (2e-3, 50)
+    assert dc.select_cut_A(_fake_runs({1e-3: [(25, 0.0, 0.5, 1.0)]}), base) is None          # INFEASIBLE
+    assert dc.select_cut_B(_fake_runs({1e-3: [(25, 0.5, 0.95, 1.0)]}), retrain) is None      # INFEASIBLE

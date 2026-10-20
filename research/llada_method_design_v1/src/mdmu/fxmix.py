@@ -278,6 +278,22 @@ def mdu_loss(model, ref_fn, ids: torch.Tensor, prompt_len: int, tau: float = 1.0
     return {"loss": _masked_mean(kl, masked), "n_masked": int(masked.sum())}
 
 
+def emdu_loss(model, ref_fn, ids: torch.Tensor, prompt_len: int, tau: float = 1.0, generator=None) -> Dict:
+    """EMDU (Garber & Tirer, arXiv 2610.25447, Alg. 1 p.15): MDU-style random TF state y_t (t~U(0,1], iid answer
+    masks; here the LLaDA SFT forward process, p_mask=(1-1e-3)t+1e-3); anchor = frozen reference on the FULLY
+    masked sequence (prompt masked AND every answer token masked, 'FAM'), p_anchor = softmax(tau z_u);
+    ANCHOR-FIRST KL(p_anchor || p_theta) averaged over the masked positions M_t. Deviation (all arms alike): the
+    forget term is a mean over the batch's states (Alg. 1 sums over forget pairs) and the retain term is the LLaDA
+    SFT loss with lam_r = 1 (Alg. 1: alpha/t-weighted retain CE, alpha = 1)."""
+    noisy, masked, _ = forward_process_sft(ids, prompt_len, generator=generator)
+    with torch.no_grad():
+        fam = torch.full_like(noisy, MASK)
+        log_a = F.log_softmax(tau * ref_fn(fam).float(), -1)
+    log_p = F.log_softmax(model(noisy).float(), -1)
+    kl = (log_a.exp() * (log_a - log_p)).sum(-1)
+    return {"loss": _masked_mean(kl, masked), "n_masked": int(masked.sum())}
+
+
 def sc_tf_loss(model, ref_fn, ids: torch.Tensor, prompt_len: int, fact_mask: torch.Tensor, eps: float = 1e-3,
                generator=None) -> Dict:
     """SC-TF (SPEC update 04:5x, D 3.4/T3): exclusion target r_eps at the SAME state (prompt visible) on MDU's random
@@ -335,15 +351,26 @@ def sc_loss(model, ref_fn, ids: torch.Tensor, prompt_len: int, fact_mask: torch.
 
 
 # ============================================================================================ certificate (SPEC v1 5)
+def tempered_fact_prob(logits: torch.Tensor, fact_mask: torch.Tensor, temperature: float) -> torch.Tensor:
+    """pi_T(F|s,i) per position: softmax(z/T) mass on F (T>0); 1{argmax_v z_v in F} (T=0). fact_mask (b, V)."""
+    z = logits.double()
+    fm = fact_mask[:, None, :].expand_as(z)
+    if temperature == 0:
+        return torch.gather(fm, -1, z.argmax(-1, keepdim=True)).squeeze(-1).double()
+    return (F.softmax(z / temperature, -1) * fm).sum(-1)
+
+
 @torch.no_grad()
 def hazard_certificate(model, prompts: torch.Tensor, fact_mask: torch.Tensor, config: dict,
                        generator: Optional[torch.Generator] = None, gen_length: int = 8) -> Dict:
-    """Post-hoc certificate B_hat_pi (Proposition 1) on fresh native rollouts of `model` under one config:
-        B_hat = mean over rollouts of sum_{n <= tau} sum_{i in E_n} min(1, rho(s_n, i)) * (k_n/|E_n| if random)
-    rho = p(F|s,i) / max_v p(v|s,i) from the model's own logits at the visited state (valid for T in [0,1], cfg 0);
+    """Post-hoc certificate B_hat_pi (Proposition 1; SPEC v1.3) on fresh native rollouts of `model` under one config:
+        B_hat = mean over rollouts of sum_{n <= tau} [ sum_{i in E_n} pi_T(F|s_n,i) ] * (k_n/|E_n| if random)
+    pi_T = EXACT per-position tempered probability of the evaluated config: softmax(z/T)(F) for T > 0 and
+    1{argmax in F} for T = 0, from the model's own logits at the visited state (cfg 0);
     E_n = masked positions of the current block; tau = first F-commit step (last step if none). Logits are captured
     from the sampler itself (logits_hook returning them unchanged), so no extra forwards are needed.
-    Returns per-rollout arrays: bound, leak, decision state (or None), plus their means."""
+    Returns per-rollout arrays: bound, leak, decision state (or None), plus their means and the MC standard error
+    of B_hat (SPEC v1.1). Deterministic configs (T=0, lc) give one rollout per prompt, i.e. B_hat is exact there."""
     cap = []
 
     def hook(x, logits):
@@ -367,9 +394,8 @@ def hazard_certificate(model, prompts: torch.Tensor, fact_mask: torch.Tensor, co
         lo, hi = plen + nb * config["block_length"], plen + (nb + 1) * config["block_length"]
         elig = torch.zeros_like(s, dtype=torch.bool)
         elig[:, lo:hi] = s[:, lo:hi] == MASK
-        p = F.softmax(cap[n].double(), -1)
-        rho = (p * fact_mask[:, None, :]).sum(-1) / p.max(-1).values
-        term = (rho.clamp(max=1.0) * elig).sum(1)
+        piF = tempered_fact_prob(cap[n], fact_mask, config["temperature"])
+        term = (piF * elig).sum(1)
         if config["remasking"] == "random":
             k = ((s == MASK) & (nxt != MASK)).sum(1).double()
             term = term * k / elig.sum(1).clamp_min(1).double()
@@ -381,4 +407,5 @@ def hazard_certificate(model, prompts: torch.Tensor, fact_mask: torch.Tensor, co
         leak |= alive & hitF
         alive &= ~hitF
     return {"bound": bound, "leak": leak, "decision_states": dec_state,
-            "bound_mean": float(bound.mean()), "leak_rate": float(leak.float().mean())}
+            "bound_mean": float(bound.mean()), "leak_rate": float(leak.float().mean()),
+            "bound_se": float(bound.std(unbiased=True) / math.sqrt(b)) if b > 1 else float("nan")}  # MC s.e.

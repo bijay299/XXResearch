@@ -27,8 +27,9 @@ import torch
 
 from . import toyworld as tw
 from .diffusion import sft_loss
-from .evaluate import DECODING_CONFIGS, EVAL_GRID, HELDOUT, STOCHASTIC, TRAIN_POOL, copy_accuracy, fact_eval
-from .fxmix import (collect_rollout_states, fact_free_tf_states, fact_mask_from_sets, fx_forget_loss,
+from .evaluate import (DECODING_CONFIGS, EVAL_GRID, EXTRAPOLATION, HELDOUT, HELDOUT_PRIMARY, STOCHASTIC, TRAIN_POOL,
+                       copy_accuracy, fact_eval)
+from .fxmix import (collect_rollout_states, emdu_loss, fact_free_tf_states, fact_mask_from_sets, fx_forget_loss,
                     hazard_certificate, mdu_loss, npo_loss, sc_loss, sc_tf_loss)
 from .model import MaskPredictor, add_lora, lora_disabled, lora_params, merged_copy
 
@@ -38,6 +39,7 @@ ARMS: Dict[str, dict] = {
     "fx_mix": dict(loss="fx", pool=list(TRAIN_POOL)),
     "fx_mix_greedy": dict(loss="fx", pool=["P1"]),                    # T5a (= former FX-OP1)
     "mdu_t1": dict(loss="mdu", tau=1.0),
+    "emdu": dict(loss="emdu", tau=1.0),                               # Garber & Tirer 2610.25447 Alg. 1
     "npo": dict(loss="npo", beta=0.2),
     "sc_tf_cm": dict(loss="sc_tf"),                                   # T6: run with a larger --forget-batch
     "fx_mix_notrunc": dict(loss="fx", pool=list(TRAIN_POOL), truncate=False),   # T5b
@@ -75,6 +77,7 @@ class RunConfig:
     eval_grid: str = ",".join(EVAL_GRID)
     eval_seed: int = 1234
     mech_samples: int = 4              # rollouts per forget prompt per stochastic config for the mechanism metric
+    eval_at_start: int = 1             # 0: skip step-0 eval (B=0 => identical to the base reference eval, same seeds)
     threads: int = 1
 
 
@@ -148,14 +151,15 @@ def eval_suite(model, world: tw.World, cfg: RunConfig, counters: Optional[Counte
 
 
 def aggregate(ev: Dict, grid) -> Dict:
-    tr = [g for g in grid if g in TRAIN_POOL]
-    ho = [g for g in grid if g in HELDOUT]
+    """Primary (SPEC v1.1): max over H1-H5 ('heldout'); 'H6' extrapolation cell; 'heldout6' = max over H1-H6."""
+    groups = {"train": [g for g in grid if g in TRAIN_POOL], "heldout": [g for g in grid if g in HELDOUT_PRIMARY],
+              "H6": [g for g in grid if g in EXTRAPOLATION], "heldout6": [g for g in grid if g in HELDOUT],
+              "all": list(grid)}
     a = {}
     for key in ("F_leak_any", "F_leak_full"):
-        a[f"max_{key}_all"] = max(ev[g][key] for g in grid)
-        a[f"max_{key}_train"] = max(ev[g][key] for g in tr) if tr else float("nan")
-        a[f"max_{key}_heldout"] = max(ev[g][key] for g in ho) if ho else float("nan")
-        a[f"argmax_{key}"] = max(grid, key=lambda g: ev[g][key])
+        for gname, gs in groups.items():
+            a[f"max_{key}_{gname}"] = max(ev[g][key] for g in gs) if gs else float("nan")
+        a[f"argmax_{key}_heldout"] = max(groups["heldout"], key=lambda g: ev[g][key]) if groups["heldout"] else None
     a["mean_F_wf"] = sum(ev[g]["F_wf"] for g in grid) / len(grid)
     a["min_F_wf"] = min(ev[g]["F_wf"] for g in grid)
     if "R_acc" in ev[grid[0]]:
@@ -192,7 +196,8 @@ def mechanism_stats(model, world: tw.World, grid, n_samples: int = 4, seed: int 
             on = any(bool((ans[vis] == torch.tensor(tw.fact_answer(facts[r], a))[vis]).all()) for a in (0, 1))
             off += not on
         res[name] = {"n_rollouts": int(P.shape[0]), "n_leak": n_dec, "leak_rate": c["leak_rate"],
-                     "cert_B": c["bound_mean"], "off_manifold_frac": (off / n_dec) if n_dec else None}
+                     "cert_B": c["bound_mean"], "cert_B_se": c["bound_se"],
+                     "off_manifold_frac": (off / n_dec) if n_dec else None}
     return res
 
 
@@ -284,11 +289,12 @@ def run(cfg: RunConfig, log=print) -> Dict:
         ev["counters"] = C.as_dict()
         curve.append(ev)
         a = ev["agg"]
-        log(json.dumps({"arm": cfg.arm, "lr": cfg.lr, "step": step, "ho_max_any": round(a["max_F_leak_any_heldout"], 3),
+        log(json.dumps({"arm": cfg.arm, "lr": cfg.lr, "step": step, "ho5_max_any": round(a["max_F_leak_any_heldout"], 3),
                         "tr_max_full": round(a["max_F_leak_full_train"], 3), "F_wf": round(a["mean_F_wf"], 3),
                         "minR": round(a["min_R_acc"], 3), "minCopy": round(a["min_copy"], 3)}), flush=True)
 
-    do_eval(0)
+    if cfg.eval_at_start:
+        do_eval(0)
     diag_last = {}
     for step in range(1, cfg.steps + 1):
         if arm["loss"] == "fx" and arm.get("pool") and alpha < 1.0 and (step - 1) % cfg.refresh_every == 0:
@@ -320,6 +326,8 @@ def run(cfg: RunConfig, log=print) -> Dict:
             d = npo_loss(model, ref_fn, F_ids[idx], tw.P_LEN, beta=arm["beta"], generator=g)
         elif arm["loss"] == "mdu":
             d = mdu_loss(model, ref_fn, F_ids[idx], tw.P_LEN, tau=arm["tau"], generator=g)
+        elif arm["loss"] == "emdu":
+            d = emdu_loss(model, ref_fn, F_ids[idx], tw.P_LEN, tau=arm["tau"], generator=g)
         else:
             raise ValueError(arm)
         ridx = torch.randint(0, R_ids.shape[0], (cfg.retain_batch,), generator=g)

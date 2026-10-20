@@ -298,3 +298,48 @@ What each novelty-relevant claim rests on, and what would settle it:
    public `Jameszhiwei/llada-tofu-forget10-SFT` (unverified; HF blocked).
 7. **ReGLU/RILA** details (generalised eigenproblem? trainable A?) for MSDA; CorDA-KPM as a control. **PMLR v306
    "zhang26di"** identity not verified; "dLLM knows the answer before it decodes" (MDU ref [38]) not read.
+
+## 6. Verification of snippet-only sources (added on coordinator request, ~04:45Z)
+**Caveat on the tool.** WebSearch returns a model-written summary plus a link list. It does **not** return verbatim
+page text. Quotes below are verbatim *tool output*, not verbatim paper text. None of the pages could be fetched
+(arxiv and icml.cc are refused by the proxy).
+
+**EMDU — reproduced (link + summary) in 3/3 re-runs:**
+- Queries (identical to the originals):
+  - Q1 `"Enhanced Masked Diffusion Unlearning" EMDU anchor-first KL answer span masked` (extended);
+  - Q2 `masked diffusion language model unlearning 2026 LLaDA forget set rollout states sampler new method arXiv`
+    (extended);
+  - Q3 `EMDU masked diffusion unlearning near one-hot gradient vanishes reversed KL anchor visible forget tokens TOFU
+    RWKU LLaDA Dream 2610.25447` (extended).
+- Link returned by all three: title "[2610.25447] Enhanced Masked Diffusion Unlearning", URL
+  https://arxiv.org/abs/2610.25447.
+- Q3 tool text: "The paper is arXiv 2610.25447, "Enhanced Masked Diffusion Unlearning," by Tomer Garber and Tom Tirer,
+  submitted October 18, 2026 … random answer masking can leave key forget tokens visible to the anchor even when the
+  question is fully masked … at a memorized (near-one-hot) prediction, the anchor-last logit gradient vanishes while
+  the anchor-first divergence logit gradient does not … EMDU, which uses anchor-first KL divergence toward a frozen
+  anchor whose entire answer span is masked."
+- Q1 tool text: "on TOFU and RWKU using LLaDA-8B and Dream-7B, EMDU matches or exceeds MDU and adapted autoregressive
+  baselines on forgetting, while better preserving retain utility". Q3 instead says "The results don't show TOFU or
+  RWKU numbers … so I can't confirm the experimental claims".
+- Q2 contains a garbled sentence attributing MDU's anchor-last objective to EMDU.
+- **Status: existence, title, URL, authors, date and the two failure modes are consistently reproduced. The results
+  claim is unconfirmed. Not verified against the page itself.**
+
+**ARL — reproduced (link + summary):**
+- Query: `adversarial reinforcement learning robust unlearning diffusion large language models ICML 2026`. Link: "Adversarial
+  Reinforcement Learning for Robust Diffusion Large Language Model Unlearning", https://icml.cc/virtual/2026/poster/65904.
+- Tool text: "unlearning results shift with generation hyperparameters … DLMs can reproduce supposedly erased content
+  when it sits inside informative context … A context generator adversarially produces informative contexts to elicit
+  unlearned knowledge, while the DLM is optimized to suppress undesired recall … the code is anonymized".
+- No tool output says whether training randomises decoding configs (unresolved item 1 stands). Authors/PMLR ID are not
+  reproduced.
+
+**A2D — the "TF-only multi-order" claim is D's inference, not a quoted claim:**
+- Source file: the third-party note https://raw.githubusercontent.com/zhaoyang97/Paper-Notes-en/main/docs/ICLR2026/llm_alignment/a2d_any-order_any-step_safety_alignment_for_diffusion_language_models.md
+  (local copy sha256 df57dbe1…7cca).
+- Verbatim from the note: "For the Harmful set, all masked positions are supervised with `[EOS]`" (L66); "A2D samples
+  the timestep $t \sim U(0,1)$ for each sample during training and sets the mask ratio as $\lambda = (1-\epsilon)t +
+  \epsilon$" (L70); "Effective across three decoding strategies (left-to-right, confidence-based, random)—true
+  any-order defense." (L103).
+- The note mentions no rollout or self-generated states. "TF only" in §2.2/§3.2 is therefore D's reading of a
+  secondary summary and should be treated as **UNVERIFIED** until the paper is read.

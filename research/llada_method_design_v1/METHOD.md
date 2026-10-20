@@ -69,7 +69,7 @@ the target keeps the reference's ranking of every non-fact token (fluent alterna
 
 **Loss.** L(θ) = λ_f · E_items E_{s∼μ}[(1/|M(s)|) Σ_{i∈M(s)} KL(r_ε(·|s,i) ‖ p_θ(·|s,i))] + λ_r · L_SFT(retain), no 1/t
 weight, λ_r = 1. LoRA on q/k/v/o/gate/up/down (B = 0 init, so the first pool equals reference rollouts); reference =
-adapter-disabled pass; AdamW, clip 1.0. ε = 1e-3 in the toy (gen 8), ε = 1e-4 for LLaDA (gen 128).
+adapter-disabled pass; AdamW, clip 1.0. ε = 1e-3 in the toy (gen 8), ε = 1e-5 for LLaDA (gen 128; chosen so that ε × eligible position-steps ≤ ~2 %).
 
 ## 4. What the theory does and does not say
 - **Prop. 1** (first-commit decomposition + hazard bound; standard first-passage + union bound for the pinned sampler,

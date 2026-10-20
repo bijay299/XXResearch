@@ -41,6 +41,10 @@ DECODING_CONFIGS: Dict[str, dict] = {
 TRAIN_POOL = ["P1", "P2", "P3"]
 HELDOUT = ["H1", "H2", "H3", "H4", "H5", "H6"]
 EVAL_GRID = TRAIN_POOL + HELDOUT
+# SPEC v1.1: primary forgetting statistic = max over H1-H5; H6 (4 tokens/step > pool max 2) is an extrapolation cell,
+# reported on its own and inside the max over H1-H6.
+HELDOUT_PRIMARY = ["H1", "H2", "H3", "H4", "H5"]
+EXTRAPOLATION = ["H6"]
 # A config is sampled repeatedly if its output is random: T>0 (Gumbel) OR random remasking (random commit order).
 # (Unchanged for D1-D4: D2 was already stochastic via T=1; the remasking clause only matters for new entry H3.)
 STOCHASTIC = {k for k, v in DECODING_CONFIGS.items() if v["temperature"] > 0 or v["remasking"] == "random"}

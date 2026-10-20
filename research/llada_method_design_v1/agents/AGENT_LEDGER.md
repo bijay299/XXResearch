@@ -21,3 +21,10 @@ Shared files and a shared base model mean there is **no blinding**; independence
 | E mathematical critic | E#1 | 2 | 04:23 | (row above) | done 04:39 → `E_critique.md`, `E_scripts/` |
 | C parameterisation designer | C#1 (resumed) | 2 | 04:39 | response to A; strongest objection to B | running → `RESP_C.md`, `OBJ_C_to_B.md` |
 | A objective designer | A#1 (resumed) | 2 | 04:40 | response to B's objection + E verdicts | running → `RESP_A.md` |
+| A objective designer | A#1 (resumed) | 2 | 04:40 | (row above) | done 04:43 → `RESP_A.md` |
+| C parameterisation designer | C#1 (resumed) | 2 | 04:39 | (row above) | done 04:47 → `RESP_C.md`, `OBJ_C_to_B.md`, `C_scripts/objection_fchmix_tokenban*` |
+| E mathematical critic | E#1 (resumed) | 2 | 04:46 | check THEORY.tex incl. Prop 2, SPEC consistency | running → `E_theory_check.md` |
+| B denoising-process designer | B#1 (resumed) | 2 | 04:47 | response to C's objection + E verdicts | running → `RESP_B.md` |
+| E mathematical critic | E#1 (resumed) | 2 | 04:46 | (row above) | done 04:50 → `E_theory_check.md`, `E_scripts/prop2_check*` |
+| B denoising-process designer | B#1 (resumed) | 2 | 04:47 | (row above) | done 04:51 → `RESP_B.md`, `B_scripts/resp_norm_ablation*` |
+| D prior-art & controls | D#1 (resumed) | 2 | 04:54 | verbatim evidence for snippet-only sources (EMDU not reproduced by coordinator search) | running → `D_prior_art.md` §6 |
