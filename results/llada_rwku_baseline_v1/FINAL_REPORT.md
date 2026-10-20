@@ -1,14 +1,25 @@
 # LLaDA/RWKU Benchmark and Baseline Qualification — FINAL REPORT
 
 **Outcome: `INSUFFICIENT_BASE_RECALL`.** The evaluation infrastructure works and is
-verified, the MDU objective is verified against the pinned native functions, but
-**pristine LLaDA-8B-Instruct does not recall enough RWKU target knowledge to support a
-forgetting measurement.** Per the protocol, the study stopped **without training**.
+verified, our MDU-objective port matches the native *helper* functions on controlled
+fixtures (to FP32 precision; the complete native trainer was never executed), but
+**pristine LLaDA-8B-Instruct did not recall enough RWKU target knowledge on these ten
+frozen panels to support a forgetting measurement.** Per the protocol, the study stopped
+**without training**.
 
 **Host:** hyperplane, 1× NVIDIA A100-SXM4-40GB (device 3; devices 2–3 authorized by the
 user mid-run, devices 0–1 left untouched)
 **Window:** 2026-10-20 00:31 → 00:55 EDT · **0.32 h of 24 h** · **323 GPU-s = 0.090 of 6.0 GPU-h**
 **Pre-inference freeze commit:** `203525b6b656aa9220f4ff431e992e3c9ab1ff29`
+
+> **Amended 2026-10-20 — see [`AMENDMENT_01.md`](AMENDMENT_01.md).** The five `outputs/*.json`
+> artifacts this report relies on were absent from the reviewed commit (a `.gitignore`
+> `outputs/` rule) and are now published, hash-verified. Eight claims are narrowed: the
+> scope of the result, what MMLU does and does not validate, the meaning of `span_recall`,
+> the runtime scope of objective verification, FP32 KL arithmetic, a gate weakness in which
+> two failing checks exited 0, the chronology of the supplementary checks, and unmetered
+> historical CPU. **The outcome, zero training steps and absence of a qualified baseline are
+> unchanged.**
 
 ---
 
@@ -18,13 +29,19 @@ user mid-run, devices 0–1 left untouched)
 |---|---|---|
 | **Pristine recall** | 🔴 **INSUFFICIENT_BASE_RECALL** | **0 of 10** candidate entities reached the ≥6/10 threshold under the primary decoder and primary metric. Best was 5/10. Three were required. |
 | **Evaluator correctness** | ✅ **PASS** | 48/48 frozen-scoring assertions, including 7 proving the primary metric is true exact match and **not** substring containment |
-| **Objective correctness** | ✅ **PASS** | 10/10 checks against the **real source text** of MDU's native functions, extracted from the pinned repo and executed in a shim; loss and gradients match to float64 precision |
+| **Objective correctness** | ✅ **PASS** (scope narrowed — see Amendment 01 §4, §5) | 10/10 checks. Native *helper* functions (`_null_anchor_kl`, `_random_sft_null_anchor_loss`) were extracted and genuinely executed in a shim against stub models; loss and gradients match **to FP32 precision**, which is the precision the native code uses. The complete native trainer was **never executed**, and the dispatch claim rests on **source-string inspection, not runtime** |
 | **Training / reload** | ⛔ **NOT ATTEMPTED** | Forbidden by the stop condition. No optimizer step was taken anywhere in this study. |
 | **Behavioral effect** | ⛔ **NOT REACHED** | Cannot be measured: no adapter was trained, and no entity had sufficient base recall to measure forgetting against |
 
 **This is not `QUALIFIED_FOR_BOUNDED_DEVELOPMENT_COMPARISON`.** That outcome was not
 reached, and nothing here should be read as a baseline result, an unlearning claim, or a
 statement about MDU's published numbers.
+
+**Scope of the result (Amendment 01 §1).** This concerns **the first ten canonical RWKU
+subjects**, 10 frozen qualification facts each, one frozen conservative alias policy, two
+frozen prompt templates and two frozen decoding schedules. It does **not** establish
+LLaDA's general ability — or inability — to support RWKU unlearning; different subjects,
+prompts, alias policies, decoders or metrics could yield materially different recall.
 
 ---
 
@@ -105,9 +122,12 @@ rather than assumed.
 3. **Normalization and parsing demonstrably work.** `"Value investing."` matched
    `value investing`; `" Berkshire Hathaway"` matched after whitespace/case normalization.
 4. **The model is otherwise competent on the same harness.** Pristine **MMLU = 75.0%**
-   (30/40, 0 parse failures) against an operational floor of 50% — so the pipeline,
-   prompting and parsing are sound, and the entity-recall shortfall is a property of
-   LLaDA-8B-Instruct's knowledge of these RWKU targets.
+   (30/40, 0 parse failures) against an operational floor of 50%.
+   **Narrowed (Amendment 01 §2):** this shows the model loads, generates and follows a
+   constrained single-letter instruction, and that the *letter* parser works. MMLU runs
+   through a **disjoint scorer** from the forget panels and therefore validates **none** of
+   the alias policy, normalization or open-answer parsing that produced the 0/10 outcome —
+   those rest on the 48 separate assertions, not on this number.
 
 **Strictness cost, disclosed not corrected.** The frozen conservative alias policy forbids
 partial forms, which costs genuine near-misses: "On Writing" vs *On Writing: A Memoir of
@@ -194,8 +214,12 @@ Frozen and committed in `203525b` **before the model ran once**; see
   normalization). Substring containment is never called exact match — 7 dedicated
   assertions enforce this, including that "Berkshire" must *not* match
   *Berkshire Hathaway* and "Bachman" must *not* match *Richard Bachman*.
-- Token-boundary span recall and ROUGE-L recall reported separately, alongside
-  empty / refusal / repetition / truncation / parse-failure counts.
+- **Reference-token overlap** (reported in tables as `span`) and ROUGE-L recall reported
+  separately, alongside empty / refusal / repetition / truncation / parse-failure counts.
+  **Correction (Amendment 01 §3):** this metric was called "token-boundary answer-span
+  recall", which wrongly implies contiguous-span detection. It is order- and
+  adjacency-insensitive reference-token overlap: `span_recall("Hathaway and also
+  Berkshire", "Berkshire Hathaway") == 1.0`.
 - **Neighbor conflict labelling by two pre-inference signals:** target-name tokens in the
   item, and per-chunk passage overlap with the material we would have trained on. The
   second catches semantic conflicts the first misses — all three *"Spare is a memoir
@@ -223,7 +247,7 @@ the evaluator after seeing outputs is what the protocol forbids.
 |---|---|---|---|
 | Aggregate GPU | 6.00 GPU-h | **323 GPU-s = 0.090 GPU-h (1.5%)** | **measured** — wall-clock of every attempt, failures included |
 | Elapsed | 24 h | **0.32 h** | **measured** — from frozen `START_EPOCH` |
-| CPU | 20 core-h | **not metered** | ⚠️ **unmetered** — no `getrusage` instrumentation was wired into the attempt runner. Work was 8 short attempts (3 GPU, 5 CPU, longest 200 s) plus small downloads; the cap is certainly not approached, but no measurement supports a number |
+| CPU | 20 core-h | **not metered — remains unknown** | ⚠️ **unmetered** — no `getrusage` instrumentation was wired into the attempt runner. Work was 8 short attempts (3 GPU, 5 CPU, longest 200 s) plus small downloads; the cap is certainly not approached, but no measurement supports a number |
 | Additional storage | 10 GiB | **0.227 GiB** | **measured** — `du -sb`, excludes the reused checkpoint |
 | Concurrent GPUs | 1 default / 2 max | **1** (device 3) | **measured** |
 
@@ -261,6 +285,24 @@ two concurrently launched attempts both received `a002`, and `a005` was skipped.
 was overwritten** — the 8 log filenames are distinct (ID + phase + label) and the runner's
 `[ -e "$LOG" ]` guard would have refused a true collision. The defect is in ID uniqueness
 only; all 8 logs are published.
+
+## 5b. Gate weakness and chronology (added by Amendment 01)
+
+**Two failing checks exited 0.** `a003` (objective, `kl_direction` FAILED) and `a006`
+(evaluator, 42/44 FAILED) both printed their failure and returned **exit code 0**; neither
+frozen script contains any `sys.exit`. A failing correctness gate was therefore
+indistinguishable from success to an automated caller, and the failures were caught only
+by reading the logs. `a002`'s execution exception did correctly return 1. The final passing
+results (`a004`, `a007`) were re-run after real fixes and remain valid; the frozen scripts
+are not modified.
+
+**The supplementary checks ran after the outcome was known.** The primary recall screen
+ended **00:45:10**, at which point 0/10 qualifying was determinable. All seven later
+attempts — the secondary/MMLU screen (00:46:36), every objective and evaluator attempt,
+and the **9-second teacher-wiring check at 00:50:44** — ran after that. They are post-hoc
+infrastructure verification, not pre-registered gates. Relatedly, a freshly
+zero-initialized adapter agreeing with the base model is a no-op by construction and does
+**not** establish teacher invariance after updates; that remains unverified.
 
 ## 6. What was NOT done
 

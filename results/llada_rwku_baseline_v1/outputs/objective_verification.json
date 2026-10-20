@@ -1,0 +1,91 @@
+{
+  "config_verified": {
+    "loss_type": "null_anchor",
+    "match_mode": "random",
+    "null_anchor_tau": 0.5,
+    "null_anchor_eta": 0.0,
+    "null_anchor_kl_dir": "forward",
+    "null_anchor_traj_rollout": false,
+    "null_anchor_exclude_special": false,
+    "alpha": 0.0,
+    "right_shift_logits": false,
+    "time_epsilon": 0.001,
+    "scheduler": "linear: scheduler(t)=1-t  =>  p_mask=t"
+  },
+  "checks": {
+    "kl_matches_native": {
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "method": "exact source of MDU _null_anchor_kl executed in a shim vs our port, float64, identical inputs"
+    },
+    "grad_matches_native": {
+      "max_abs_diff": 0.0,
+      "passed": true
+    },
+    "kl_direction_student_to_anchor": {
+      "forward_matches_KL(p_student||p_anchor)": true,
+      "reverse_matches_KL(p_anchor||p_student)": true,
+      "max_abs_diff_forward": 0.0,
+      "max_abs_diff_reverse": 0.0,
+      "fp32_tolerance": 1e-05,
+      "forward_ne_reverse_gap": 0.6221314668655396,
+      "forward_ne_reverse": true,
+      "configured_dir": "forward",
+      "precision_note": "native _null_anchor_kl casts logits with .float(); KL is computed in FP32, so verification tolerance is FP32-scale (observed residual ~2.6e-07).",
+      "passed": true,
+      "note": "forward KL pulls the STUDENT conditional toward the FROZEN prompt-masked anchor"
+    },
+    "tau_multiplies_anchor_logits": {
+      "diff_vs_multiplying_logits_by_tau": 0.0,
+      "diff_vs_dividing_logits_by_tau": 2.6497955322265625,
+      "passed": true,
+      "note": "tau*logits is equivalent to temperature 1/tau; tau<1 FLATTENS the anchor. Implemented as multiplication, matching native."
+    },
+    "teacher_detached": {
+      "anchor_grad_is_none": true,
+      "anchor_grad_norm": 0.0,
+      "passed": true,
+      "method": "anchor logits given requires_grad=True; after backward its .grad must be None/zero"
+    },
+    "mask_and_boundaries": {
+      "maskable_is_answer_only": true,
+      "no_mask_in_prompt": true,
+      "prompt_tokens_uncorrupted": true,
+      "mask_nonempty": true,
+      "n_masked": 4,
+      "n_maskable": 7,
+      "passed": true
+    },
+    "reduction_is_mean_over_masked_answer_positions": {
+      "value": 8.25,
+      "formula": "sum(kl * masked) / masked.sum().clamp_min(1)",
+      "matches_native_formula": true,
+      "passed": true
+    },
+    "anchor_is_prompt_masked": {
+      "all_prompt_positions_masked_in_anchor_input": true,
+      "answer_region_identical_to_student_input": true,
+      "passed": true,
+      "note": "anchor = frozen model on [MASK x prompt | same partially-masked answer]"
+    },
+    "end_to_end_matches_native_training_path": {
+      "native_loss": 0.5166825652122498,
+      "our_loss": 0.5166825652122498,
+      "abs_diff": 0.0,
+      "passed": true,
+      "method": "native _random_sft_null_anchor_loss vs our port, identical stub models and identical replayed random draws"
+    },
+    "real_training_path": {
+      "dispatches_to_random_sft_null_anchor_loss": true,
+      "loss_is_added_not_negated": true,
+      "retain_branch_skipped_when_alpha_zero": true,
+      "dead_branch_note": "the other null_anchor branch (compute_loss ~line 864) uses `model` under no_grad as anchor and is NOT reached for match_mode=random",
+      "passed": true
+    }
+  },
+  "native_methods_extracted": {
+    "_null_anchor_kl": 57,
+    "_random_sft_null_anchor_loss": 46
+  },
+  "all_passed": true
+}

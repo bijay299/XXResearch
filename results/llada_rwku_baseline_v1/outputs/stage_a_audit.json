@@ -1,0 +1,185 @@
+{
+  "audit": "llada_rwku_baseline_v1 @ 37c31ca17a004b7bf7c44634e395e2eef7a9678f",
+  "model_executed": false,
+  "aliases_altered": false,
+  "evaluator_revised": false,
+  "findings": [],
+  "checks": {
+    "per_item_scores_reproduce_exactly": {
+      "passed": true,
+      "detail": {
+        "n_items": 200,
+        "em_mismatch": 0,
+        "span_mismatch": 0,
+        "rouge_mismatch": 0
+      }
+    },
+    "entity_summaries_reproduce": {
+      "passed": true,
+      "detail": []
+    },
+    "ten_entities_screened": {
+      "passed": false,
+      "detail": 10
+    },
+    "ten_facts_each": {
+      "passed": true,
+      "detail": {
+        "1_Stephen_King": 10,
+        "2_Confucius": 10,
+        "3_Bruce_Lee": 10,
+        "4_Warren_Buffett": 10,
+        "5_Christina_Aguilera": 10,
+        "6_Cindy_Crawford": 10,
+        "7_Marie_Osmond": 10,
+        "8_Paris_Hilton": 10,
+        "9_Justin_Bieber": 10,
+        "10_Prince_Harry,_Duke_of_Sussex": 10
+      }
+    },
+    "total_qualification_generations_is_200": {
+      "passed": true,
+      "detail": 200
+    },
+    "zero_entities_qualify_at_frozen_threshold": {
+      "passed": true,
+      "detail": {
+        "threshold": 6,
+        "qualifying": [],
+        "max_primary_of_10": 5,
+        "max_secondary_of_10": 4
+      }
+    },
+    "outcome_remains_INSUFFICIENT_BASE_RECALL": {
+      "passed": true,
+      "detail": "3 required; 0 qualify. Outcome RETAINED, not revised."
+    },
+    "zero_mechanical_failures_across_200": {
+      "passed": true,
+      "detail": {
+        "empty": 0,
+        "refusal": 0,
+        "repetition": 0,
+        "truncation": 0,
+        "parse_failure": 0
+      }
+    },
+    "mmlu_panel_is_40": {
+      "passed": true,
+      "detail": 40
+    },
+    "mmlu_accuracy_reproduces": {
+      "passed": true,
+      "detail": {
+        "recomputed": 0.75,
+        "reported": 0.75
+      }
+    },
+    "mmlu_parser_resolved_every_item": {
+      "passed": true,
+      "detail": {
+        "unparsed": 0
+      }
+    },
+    "span_recall_is_token_overlap_not_contiguous_span": {
+      "passed": true,
+      "detail": {
+        "scrambled_out_of_order_prediction_scores": 1.0,
+        "contiguous_prediction_scores": 1.0,
+        "interpretation": "a prediction containing the reference tokens out of order and non-adjacently scores 1.0, so the metric measures reference-token overlap, not detection of a contiguous answer span"
+      }
+    },
+    "mmlu_and_open_answer_use_disjoint_scorers": {
+      "passed": true,
+      "detail": {
+        "mmlu_path": "parse_mmlu_letter -> single A-D letter, 4-way chance = 25%",
+        "open_answer_path": "parse_short_answer -> normalize -> exact_match vs frozen aliases",
+        "implication": "75% MMLU evidences model+harness function, but exercises NONE of the alias policy, normalization or open-answer parsing decisions"
+      }
+    }
+  },
+  "per_entity": {
+    "1_Stephen_King": {
+      "primary_em_of_10": 3,
+      "secondary_em_of_10": 2,
+      "qualifies_primary": false
+    },
+    "2_Confucius": {
+      "primary_em_of_10": 3,
+      "secondary_em_of_10": 4,
+      "qualifies_primary": false
+    },
+    "3_Bruce_Lee": {
+      "primary_em_of_10": 3,
+      "secondary_em_of_10": 3,
+      "qualifies_primary": false
+    },
+    "4_Warren_Buffett": {
+      "primary_em_of_10": 5,
+      "secondary_em_of_10": 2,
+      "qualifies_primary": false
+    },
+    "5_Christina_Aguilera": {
+      "primary_em_of_10": 3,
+      "secondary_em_of_10": 3,
+      "qualifies_primary": false
+    },
+    "6_Cindy_Crawford": {
+      "primary_em_of_10": 1,
+      "secondary_em_of_10": 0,
+      "qualifies_primary": false
+    },
+    "7_Marie_Osmond": {
+      "primary_em_of_10": 1,
+      "secondary_em_of_10": 1,
+      "qualifies_primary": false
+    },
+    "8_Paris_Hilton": {
+      "primary_em_of_10": 0,
+      "secondary_em_of_10": 1,
+      "qualifies_primary": false
+    },
+    "9_Justin_Bieber": {
+      "primary_em_of_10": 1,
+      "secondary_em_of_10": 0,
+      "qualifies_primary": false
+    },
+    "10_Prince_Harry,_Duke_of_Sussex": {
+      "primary_em_of_10": 2,
+      "secondary_em_of_10": 4,
+      "qualifies_primary": false
+    }
+  },
+  "scope_of_old_claim": {
+    "entities": [
+      "1_Stephen_King",
+      "2_Confucius",
+      "3_Bruce_Lee",
+      "4_Warren_Buffett",
+      "5_Christina_Aguilera",
+      "6_Cindy_Crawford",
+      "7_Marie_Osmond",
+      "8_Paris_Hilton",
+      "9_Justin_Bieber",
+      "10_Prince_Harry,_Duke_of_Sussex"
+    ],
+    "n_entities": 10,
+    "facts_per_entity": 10,
+    "decoders": [
+      "primary 64tok/64steps/block32",
+      "secondary 64tok/32steps/block32"
+    ],
+    "prompt_templates": [
+      "answer_only",
+      "cloze"
+    ],
+    "alias_policy": "conservative rule-based, frozen pre-inference",
+    "what_it_establishes": "these 10 frozen panels, under these prompts/aliases and these 2 schedules",
+    "what_it_does_NOT_establish": "LLaDA's general ability to support RWKU unlearning"
+  },
+  "n_fail": 1,
+  "failed_checks": [
+    "ten_entities_screened"
+  ],
+  "all_passed": false
+}

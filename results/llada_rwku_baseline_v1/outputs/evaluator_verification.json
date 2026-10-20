@@ -1,0 +1,453 @@
+{
+  "cases": [
+    {
+      "group": "em_is_not_substring",
+      "name": "superstring must NOT match",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "em_is_not_substring",
+      "name": "substring must NOT match",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "em_is_not_substring",
+      "name": "answer embedded in a sentence must NOT match",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "em_is_not_substring",
+      "name": "exact match (case/punct normalized) DOES match",
+      "got": true,
+      "want": true,
+      "passed": true
+    },
+    {
+      "group": "em_is_not_substring",
+      "name": "partial title must NOT match",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "em_is_not_substring",
+      "name": "surname-only must NOT match full name",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "em_is_not_substring",
+      "name": "different fact must NOT match",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "normalization",
+      "name": "casefold",
+      "got": "paris",
+      "want": "paris",
+      "passed": true
+    },
+    {
+      "group": "normalization",
+      "name": "drops articles",
+      "got": "simple life",
+      "want": "simple life",
+      "passed": true
+    },
+    {
+      "group": "normalization",
+      "name": "strips punctuation",
+      "got": "hello world",
+      "want": "hello world",
+      "passed": true
+    },
+    {
+      "group": "normalization",
+      "name": "collapses whitespace",
+      "got": "b c",
+      "want": "b c",
+      "passed": true
+    },
+    {
+      "group": "normalization",
+      "name": "ampersand to and",
+      "got": "r and b",
+      "want": "r and b",
+      "passed": true
+    },
+    {
+      "group": "normalization",
+      "name": "None safe",
+      "got": "",
+      "want": "",
+      "passed": true
+    },
+    {
+      "group": "aliases_conservative",
+      "name": "no partial forms generated",
+      "got": [
+        "richard bachman"
+      ],
+      "want": [
+        "richard bachman"
+      ],
+      "passed": true
+    },
+    {
+      "group": "aliases_conservative",
+      "name": "parenthetical stripped variant offered",
+      "got": true,
+      "want": true,
+      "passed": true
+    },
+    {
+      "group": "aliases_conservative",
+      "name": "small int digit<->word",
+      "got": [
+        "10",
+        "ten"
+      ],
+      "want": [
+        "10",
+        "ten"
+      ],
+      "passed": true
+    },
+    {
+      "group": "aliases_conservative",
+      "name": "no spurious alias for multiword",
+      "got": 1,
+      "want": 1,
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "empty -> empty",
+      "got": "empty",
+      "want": "empty",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "whitespace -> empty",
+      "got": "empty",
+      "want": "empty",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "refusal detected",
+      "got": "refusal",
+      "want": "refusal",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "repetition detected",
+      "got": "repetition",
+      "want": "repetition",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "strips lead-in",
+      "got": "Carrie",
+      "want": "Carrie",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "first line only",
+      "got": "Carrie",
+      "want": "Carrie",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "cuts trailing sentences off",
+      "got": "Paris.",
+      "want": "Paris.",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "DEFECT has no effect on EM",
+      "got": true,
+      "want": true,
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "DEFECT has no effect on span recall",
+      "got": 1.0,
+      "want": 1.0,
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "DEFECT has no effect on ROUGE-L",
+      "got": 1.0,
+      "want": 1.0,
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "single-sentence answers are clean",
+      "got": "Carrie",
+      "want": "Carrie",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "strips quotes",
+      "got": "Carrie",
+      "want": "Carrie",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "clean answer passes through",
+      "got": "Benjamin Graham",
+      "want": "Benjamin Graham",
+      "passed": true
+    },
+    {
+      "group": "parser",
+      "name": "no false failure on good answer",
+      "got": null,
+      "want": null,
+      "passed": true
+    },
+    {
+      "group": "mmlu_parser",
+      "name": "bare letter",
+      "got": "C",
+      "want": "C",
+      "passed": true
+    },
+    {
+      "group": "mmlu_parser",
+      "name": "letter with text",
+      "got": "B",
+      "want": "B",
+      "passed": true
+    },
+    {
+      "group": "mmlu_parser",
+      "name": "lowercase",
+      "got": "D",
+      "want": "D",
+      "passed": true
+    },
+    {
+      "group": "mmlu_parser",
+      "name": "no letter -> failure",
+      "got": "parse_failure",
+      "want": "parse_failure",
+      "passed": true
+    },
+    {
+      "group": "mmlu_parser",
+      "name": "empty -> empty",
+      "got": "empty",
+      "want": "empty",
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "span recall full",
+      "got": 1.0,
+      "want": 1.0,
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "span recall half",
+      "got": 0.5,
+      "want": 0.5,
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "span recall token-boundary (no substring credit)",
+      "got": 0.0,
+      "want": 0.0,
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "span recall zero",
+      "got": 0.0,
+      "want": 0.0,
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "rougeL full",
+      "got": 1.0,
+      "want": 1.0,
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "rougeL order-sensitive LCS",
+      "got": 0.5,
+      "want": 0.5,
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "rougeL empty pred",
+      "got": 0.0,
+      "want": 0.0,
+      "passed": true
+    },
+    {
+      "group": "secondary_metrics",
+      "name": "span recall differs from EM on partial",
+      "got": true,
+      "want": true,
+      "passed": true
+    },
+    {
+      "group": "no_ar_likelihood",
+      "name": "no logits[:, :-1] AR shift",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "no_ar_likelihood",
+      "name": "no labels[:, 1:] AR shift",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "no_ar_likelihood",
+      "name": "right_shift_logits is False",
+      "got": false,
+      "want": false,
+      "passed": true
+    },
+    {
+      "group": "no_ar_likelihood",
+      "name": "uses author generate()",
+      "got": true,
+      "want": true,
+      "passed": true
+    }
+  ],
+  "groups": {
+    "em_is_not_substring": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "normalization": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "aliases_conservative": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "parser": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "mmlu_parser": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "secondary_metrics": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "no_ar_likelihood": [
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "group_summary": {
+    "em_is_not_substring": {
+      "passed": 7,
+      "total": 7,
+      "all": true
+    },
+    "normalization": {
+      "passed": 6,
+      "total": 6,
+      "all": true
+    },
+    "aliases_conservative": {
+      "passed": 4,
+      "total": 4,
+      "all": true
+    },
+    "parser": {
+      "passed": 14,
+      "total": 14,
+      "all": true
+    },
+    "mmlu_parser": {
+      "passed": 5,
+      "total": 5,
+      "all": true
+    },
+    "secondary_metrics": {
+      "passed": 8,
+      "total": 8,
+      "all": true
+    },
+    "no_ar_likelihood": {
+      "passed": 4,
+      "total": 4,
+      "all": true
+    }
+  },
+  "all_passed": true,
+  "n_cases": 48
+}

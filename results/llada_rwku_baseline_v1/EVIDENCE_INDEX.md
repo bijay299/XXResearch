@@ -6,13 +6,14 @@ contain its own hash.
 
 Study: `llada_rwku_baseline_v1`. Outcome **INSUFFICIENT_BASE_RECALL** (stopped without training).
 
-## Published files (25)
+## Published files (34)
 
 | Path | Bytes | SHA-256 |
 |---|---|---|
-| `FINAL_REPORT.md` | 19284 | `d980f1f8acb18e7268804bec56d5eb3dcf2e8d4f14f8a23092f4d56125a37d4b` |
+| `AMENDMENT_01.md` | 12949 | `8710124dffe413c089a5c577b8bca6cd90886f2bdcb0c7eec17e6448c789f2a8` |
+| `FINAL_REPORT.md` | 22562 | `698ec3103473e37c11fd6d98829148e66bb9b71329c618880da69891d5ada1bf` |
 | `FREEZE_NOTE.md` | 4648 | `cd14949a5a141423f38a1e248094f079857c5cf0e2288d1f1e7b5f274523c62c` |
-| `README.md` | 2337 | `86a513aa6b10a2a49dc1e35c6f8b42cd7a229333481746fe6217b83444d31dfe` |
+| `README.md` | 2941 | `2c7710ead51a866646fd764b33312aaae8c15ef1d8341190a7ef5b523cdcdd85` |
 | `evidence/ATTEMPTS.tsv` | 1002 | `f435c6bf61c3aed5846cebd34c4016e298de9a69f6e1dc626a5a5b6c868ce6d9` |
 | `frozen/frozen_mmlu_panel.json` | 19858 | `ea77d6a995dbcffe6ae8330544811fa4f32c0ddf52bb47a45ad7423cea8b1033` |
 | `frozen/frozen_neighbor_availability.json` | 1733 | `d04533b45c032d9f6346626197a10d5c2c325bb945676bb1940038448f497e09` |
@@ -26,7 +27,15 @@ Study: `llada_rwku_baseline_v1`. Outcome **INSUFFICIENT_BASE_RECALL** (stopped w
 | `logs/a006_evaluator_verify_scoring.log` | 524 | `d3c4648fda8d7b736c954fb93911300dd18671728afef355688c686f87ec643a` |
 | `logs/a007_evaluator_verify_scoring_v2.log` | 375 | `b32f4e047311dcd62e5a7ea226ab7d5cdd35c4d1ba75e780ea154f595f2dd8a3` |
 | `logs/a008_wiring_teacher_equivalence.log` | 1221 | `bccc2b56e007f4b456d6cd6ca759ff3898dd8fc311fe20135509c1b7d8abee40` |
+| `outputs/evaluator_verification.json` | 8821 | `e22de66b324234dbd14122e11c924032cd69c20423f2e4739ce1c01463474150` |
+| `outputs/objective_verification.json` | 3415 | `c8235873706f9fd1be4ebadb5525a9deea3b08ca35c3696eba31977aaa8c231b` |
+| `outputs/pristine_screen_primary.json` | 204662 | `13419c52c6cdd8fe9f52f9489254d873cd0a931418df1d795f2084708d76e660` |
+| `outputs/pristine_screen_secondary.json` | 214176 | `263f7f78784ef715aaca21558c51c2e16633e9caf898346c4dac25e7b2b6958a` |
+| `outputs/rwku_targets_tree.json` | 22428 | `84e40d362545793a057ab991c43822118d64c4ee5d270032d988ebca8c9e9929` |
+| `outputs/stage_a_audit.json` | 5030 | `fdb663da5952866f4fcabacbec9d0e82f3d6dcb0813162ccae8aa3b3179dbcc5` |
+| `outputs/teacher_wiring.json` | 560 | `dfb255f885e8a11848c070ef30ff6dc7516108ef842afa7d36e43029580efa1c` |
 | `scripts/attempt.sh` | 1335 | `35438768e51a67a8d4a4b00fd316db300ce0ce7b7e0ec8c18342bb849ca033f0` |
+| `scripts/audit_stage_a.py` | 8494 | `ab5cbcb2b6b9099f25d8654f9005d08ddc6429d8e2d2fe64b3575f2191479604` |
 | `scripts/env.sh` | 498 | `319358f8e0f2edd43229474584e1675023b003998447295457ebca178f1f2156` |
 | `scripts/evaluate.py` | 8553 | `243ef4979b9194c57963684abd85ff96b7d9058e718188ab0915da466d4fe72b` |
 | `scripts/freeze_eval.py` | 17440 | `6bb748af1c9792ed0db1a6869e6be17178338272142357f0a602e1f3877b6f4f` |
@@ -46,6 +55,16 @@ Study: `llada_rwku_baseline_v1`. Outcome **INSUFFICIENT_BASE_RECALL** (stopped w
 | RWKU dataset | `d72f493d481d1b0a9bdc6e869d32baeffad8904f` |
 | open-dlu (reference only, loader NOT adopted) | `fb984334a4007b031246d0b33973644d4845bafd` |
 | Pre-inference freeze commit | `203525b6b656aa9220f4ff431e992e3c9ab1ff29` |
+
+## Amendment 01 (2026-10-20)
+
+The five `outputs/*.json` artifacts listed above were **absent from commit `37c31ca`**
+(`.gitignore` line 67 is `outputs/`) and are published here verbatim from the preserved
+originals. Both pristine-generation files **match the SHA-256 recorded in the published
+logs** (`13419c52…`, `263f7f78…`). `objective_verification.json` and
+`evaluator_verification.json` reflect only their **final passing** runs — each successive
+attempt wrote the same path, so the failed attempts' JSON was overwritten and no longer
+exists; their *logs* are preserved. See [`AMENDMENT_01.md`](AMENDMENT_01.md).
 
 ## Artifacts that do NOT exist (and why)
 
