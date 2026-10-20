@@ -1,0 +1,53 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:01,  4.77it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00,  5.01it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  5.40it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00,  5.66it/s]Loading checkpoint shards:  83%|████████▎ | 5/6 [00:00<00:00,  5.66it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:01<00:00,  5.84it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:01<00:00,  5.60it/s]
+[G1] examples=24 maxlen=36 supervised=221 eos_supervised=0 answer_word_tokens=36 (16.3% of supervised)
+[train] step   0 loss=3.3040 gnorm=5.783
+[train] step  30 loss=0.2473 gnorm=5.518
+[train] step  60 loss=0.0002 gnorm=0.005
+[train] step  90 loss=0.0011 gnorm=0.023
+[train] step 120 loss=0.0009 gnorm=0.025
+[train] step 150 loss=0.0007 gnorm=0.028
+[train] step 180 loss=0.0002 gnorm=0.005
+[train] step 210 loss=0.0000 gnorm=0.001
+[train] step 240 loss=0.0000 gnorm=0.001
+[train] step 270 loss=0.0014 gnorm=0.037
+[train] step 300 loss=0.0002 gnorm=0.004
+[train] step 330 loss=0.0001 gnorm=0.003
+[train] step 360 loss=0.0001 gnorm=0.001
+[train] step 390 loss=0.0001 gnorm=0.002
+[train] step 420 loss=0.0000 gnorm=0.001
+[train] step 450 loss=0.0000 gnorm=0.001
+[train] step 480 loss=0.0000 gnorm=0.001
+[train] step 510 loss=0.0000 gnorm=0.001
+[train] step 540 loss=0.0000 gnorm=0.000
+[train] step 570 loss=0.0000 gnorm=0.000
+[train] step 600 loss=0.0000 gnorm=0.001
+[train] step 630 loss=0.0000 gnorm=0.000
+[train] step 660 loss=0.0000 gnorm=0.000
+[train] step 690 loss=0.0000 gnorm=0.000
+[train] step 720 loss=0.0000 gnorm=0.000
+[train] step 750 loss=0.0000 gnorm=0.000
+[train] step 780 loss=0.0000 gnorm=0.000
+[train] step 810 loss=0.0000 gnorm=0.000
+[train] step 840 loss=0.0000 gnorm=0.000
+[train] step 870 loss=0.0000 gnorm=0.000
+[train] step 899 loss=0.0000 gnorm=0.000
+[throughput] 216.1s total, 0.240s/step
+[adapter] saved 320.1 MiB -> /data/bijaypandey/llada_poc/adapters/memorized
+[throughput] qualification eval 120.4s for 48 gens (2.51s each)
+[recall] forget_train=1.000 (8)  retain_train=1.000 (16)  threshold=0.8
+[recall] paraphrase (reported separately): forget=1.000 retain=1.000
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:00,  7.56it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  9.41it/s]Loading checkpoint shards:  83%|████████▎ | 5/6 [00:00<00:00, 10.01it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  9.90it/s]
+[G3] reload max|dlogit|=0.00e+00 generations_identical=True
+  PASS  G1_answer_bearing_loss_masking
+  PASS  G2a_optimizer_membership
+  PASS  G2b_finite_loss_and_grads
+  PASS  G2c_trainable_params_changed
+  PASS  G2d_base_weights_unchanged
+  PASS  G2e_loss_decreased
+  PASS  G4_memorization_threshold_forget
+  PASS  G4_memorization_threshold_retain
+  PASS  G3_save_reload_agreement
+
+QUALIFIED: True  peak=18.486 GiB

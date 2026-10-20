@@ -1,0 +1,24 @@
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00, 12.34it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00, 11.93it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 12.31it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 12.24it/s]
+[G1] examples=24 maxlen=36 supervised=221 eos_supervised=0 answer_word_tokens=36 (16.3% of supervised)
+[train] step   0 loss=3.2467 gnorm=3.908
+[train] step  11 loss=3.7632 gnorm=12.919
+[throughput] 2.5s total, 0.211s/step
+[adapter] saved 128.0 MiB -> /data/bijaypandey/llada_poc/adapters/throughput_probe
+[throughput] qualification eval 71.9s for 48 gens (1.50s each)
+[recall] forget_train=0.125 (8)  retain_train=0.188 (16)  threshold=0.8
+[recall] paraphrase (reported separately): forget=0.125 retain=0.250
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  17%|█▋        | 1/6 [00:00<00:00,  7.73it/s]Loading checkpoint shards:  50%|█████     | 3/6 [00:00<00:00,  9.54it/s]Loading checkpoint shards:  83%|████████▎ | 5/6 [00:00<00:00, 10.07it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00,  9.99it/s]
+[G3] reload max|dlogit|=0.00e+00 generations_identical=True
+  PASS  G1_answer_bearing_loss_masking
+  PASS  G2a_optimizer_membership
+  PASS  G2b_finite_loss_and_grads
+  PASS  G2c_trainable_params_changed
+  PASS  G2d_base_weights_unchanged
+  FAIL  G2e_loss_decreased
+  FAIL  G4_memorization_threshold_forget
+  FAIL  G4_memorization_threshold_retain
+  PASS  G3_save_reload_agreement
+
+QUALIFIED: False  peak=17.536 GiB

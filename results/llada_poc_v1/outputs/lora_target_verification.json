@@ -1,0 +1,20 @@
+{
+  "regex": ".*blocks\\.\\d+\\.(q_proj|k_proj|v_proj|attn_out|ff_proj|up_proj|ff_out)$",
+  "n_modules_matched": 224,
+  "per_block": 7,
+  "distinct_leaves": {
+    "attn_out": 32,
+    "ff_out": 32,
+    "ff_proj": 32,
+    "k_proj": 32,
+    "q_proj": 32,
+    "up_proj": 32,
+    "v_proj": 32
+  },
+  "nonblock_matches": [],
+  "lm_head_module": [
+    "model.transformer.ff_out"
+  ],
+  "lm_head_matched_by_regex": false,
+  "verdict": "CONFIRMED: 7 linears/block x 32 blocks = 224; LM head NOT wrapped"
+}
