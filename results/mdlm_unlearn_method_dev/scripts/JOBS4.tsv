@@ -1,0 +1,15 @@
+# SSA: schedule-split anchoring. t in [0,1] is AFC (the in-script baseline); the bands test
+# whether the degeneracy variance that destroyed AFC's stability claim is imported from the
+# formless high-mask-rate anchor (FINDING13).
+train   ssa_lo_s0   train_ssa.py --t-lo 0.0  --t-hi 0.5  --lam-forget 1 --steps 300 --seed 0
+train   ssa_hi_s0   train_ssa.py --t-lo 0.5  --t-hi 1.0  --lam-forget 1 --steps 300 --seed 0
+train   ssa_mid_s0  train_ssa.py --t-lo 0.25 --t-hi 0.75 --lam-forget 1 --steps 300 --seed 0
+train   ssa_lo_s3   train_ssa.py --t-lo 0.0  --t-hi 0.5  --lam-forget 1 --steps 300 --seed 3
+train   ssa_lo_s1   train_ssa.py --t-lo 0.0  --t-hi 0.5  --lam-forget 1 --steps 300 --seed 1
+train   ssa_lo_s2   train_ssa.py --t-lo 0.0  --t-hi 0.5  --lam-forget 1 --steps 300 --seed 2
+part    ssa_lo_s0
+part    ssa_hi_s0
+part    ssa_mid_s0
+part    ssa_lo_s3
+part    ssa_lo_s1
+part    ssa_lo_s2
