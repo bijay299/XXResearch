@@ -29,3 +29,14 @@ part    seed_afc_s1
 part    seed_afc_s2
 part    seed_mdu_s1
 part    seed_mdu_s2
+# ---- ATWU beta sweep. Their published beta=7 implies a SatGA target of e^(-1/7)=0.867, which
+# is ABOVE this backbone's mean answer-token probability (0.606), so the published setting
+# cannot forget here and in fact raises p_true to 0.876. Their beta was tuned where memorized
+# positions sit near p=1.0. Sweeping beta gives the baseline a fair chance on this backbone;
+# targets are e^(-1/beta): beta=1 -> 0.368, beta=1.5 -> 0.513, beta=2 -> 0.607, beta=3 -> 0.717.
+train   atwu_b1            train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.25 --beta 1.0
+train   atwu_b1p5          train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.25 --beta 1.5
+train   atwu_b2            train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.25 --beta 2.0
+part    atwu_b1
+part    atwu_b1p5
+part    atwu_b2

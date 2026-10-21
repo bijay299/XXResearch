@@ -21,6 +21,15 @@
 set -u
 cd /data/bijaypandey/mdlm_unlearn
 
+# SINGLE-INSTANCE LOCK. The supervisor re-runs this script, and starting it while a previous
+# instance is still working would dispatch the same jobs twice -- exactly the duplication the
+# scheduler exists to prevent. flock makes a second instance exit immediately instead.
+exec 9> /data/bijaypandey/mdlm_unlearn/tmp/scheduler.lock
+if ! flock -n 9; then
+  echo "[sched] another instance holds the lock; exiting"
+  exit 0
+fi
+
 GPUS="2 3"
 NEED_MB=22000          # a training arm peaks near 19.5 GiB; partition eval near 16 GiB
 JOBS=scripts/JOBS.tsv
