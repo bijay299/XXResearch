@@ -1,0 +1,31 @@
+# kind  label              script/args
+# ---- ATWU: the mandatory SOTA baseline. Nothing is SOTA until these run. ----
+train   atwu_smoke         train_atwu.py --forget-loss satga --selector learned --steps 20 --ckpt-at 20
+train   atwu_rho25         train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.25
+# atwu_rho10 was already in flight when the scheduler took over; its marker check would skip it
+# anyway, but it is commented out so a duplicate cannot be dispatched if it finishes late.
+# train atwu_rho10        train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.10
+train   atwu_rho50         train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.50
+train   atwu_satga_div     train_atwu.py --forget-loss satga --selector divergence --steps 300 --topk-frac 0.25
+train   atwu_anchor_lrn    train_atwu.py --forget-loss anchor_kl --selector learned --steps 300 --rho 0.25
+# ---- seed replicates for the selected point and its matched baseline ----
+train   seed_afc_s1        train_h16.py --mode none --rank 8 --lam-forget 1 --steps 300 --seed 1
+train   seed_afc_s2        train_h16.py --mode none --rank 8 --lam-forget 1 --steps 300 --seed 2
+train   seed_mdu_s1        train_lam.py --arm mdu --anchor-prompt all --lam-forget 1 --lam-retain 1 --steps 300 --seed 1
+train   seed_mdu_s2        train_lam.py --arm mdu --anchor-prompt all --lam-forget 1 --lam-retain 1 --steps 300 --seed 2
+# ---- partitions: AFC curve tail, then ATWU, then seeds ----
+part    afc_f2
+part    afc_f4
+part    afc_f8
+part    afc_loc_f1
+part    afc_loc_f2
+part    h16_pcgrad_f1
+part    atwu_rho25
+part    atwu_rho10
+part    atwu_rho50
+part    atwu_satga_div
+part    atwu_anchor_lrn
+part    seed_afc_s1
+part    seed_afc_s2
+part    seed_mdu_s1
+part    seed_mdu_s2

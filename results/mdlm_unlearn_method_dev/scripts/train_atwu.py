@@ -278,8 +278,22 @@ def main():
                     (hi_d & hi_g).sum() / max(kk, 1))
         return per, g, d, rows, inst
 
+    def retain_canvas(items):
+        """Retain records carry no prebuilt `prompts` key -- only forget records do -- so the
+        prompt is rendered here. Same bug the smoke test caught in train_h16.py; this file had
+        an independent copy of it."""
+        pid = [tok(build_prompt(tok, it["question"]),
+                   add_special_tokens=False)["input_ids"] for it in items]
+        aid = [FX.answer_ids(tok, it["answer"], a.gen_length, append_eot=False)
+               for it in items]
+        Pm, Am = FX.left_pad(pid, EOS_ID)
+        full = torch.cat([Pm, torch.tensor(aid, dtype=torch.long)], 1).to(DEV)
+        attn = torch.cat([Am, torch.ones(len(items), a.gen_length, dtype=Am.dtype)], 1).to(DEV)
+        ast = torch.full((len(items),), Pm.shape[1], dtype=torch.long).to(DEV)
+        return full, attn, ast
+
     def retain_loss(items):
-        full, attn, ast = canvas(items, "natural")
+        full, attn, ast = retain_canvas(items)
         noisy, _, _ = FX.random_tf_states_llada(full, ast, eps=1e-3, generator=gen)
         ar = torch.arange(noisy.shape[1], device=DEV)[None]
         mp = (noisy == MASK_ID) & (ar >= ast[:, None])

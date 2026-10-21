@@ -21,6 +21,29 @@ Everything under `/data/bijaypandey/mdlm_unlearn`. Development evidence; freely 
 may be iterated. See `docs/` for the team's working artifacts and `ATTEMPTS.tsv` for every
 attempt including failures.
 
+### Selected point and the frontier (2026-10-21)
+
+Generation-level six-cell partition, 120 forget / 80 retain, θ₀ TOFU backbone, one seed.
+Objective: minimise TV(forget profile → pristine) while preserving retain ASCR.
+
+| arm | DISCLOSE | DEGENERATE | retain ASCR | TV→pristine |
+|---|---|---|---|---|
+| θ₀ (start) | 0.792 | 0.008 | 0.762 | 0.770 |
+| **AFC λ=2 — selected** | **0.158** | **0.042** | **0.550** | **0.234** |
+| AFC λ=1 | 0.208 | 0.050 | 0.533 | 0.229 |
+| AFC λ=0.5 | 0.258 | 0.117 | 0.582 | 0.345 |
+| MDU λ=1 (best baseline) | 0.317 | 0.075 | 0.524 | 0.407 |
+| MDU λ=3 | 0.233 | 0.050 | 0.404 | 0.282 |
+| MDU λ=8 | 0.067 | 0.150 | 0.091 | 0.191 |
+| EMDU λ=8 | 0.000 | 1.000 | 0.580 | 1.000 |
+| *pristine target* | *0.030* | *0.000* | — | *0* |
+
+**AFC λ=2 dominates MDU λ=1 on all four coordinates.** AFC = anchor-first KL on MDU's
+random-answer anchor — the factorial cell neither MDU nor EMDU evaluated (`FINDING16_AFC.md`).
+
+**Not yet a SOTA claim:** ATWU (arXiv 2606.06320) is implemented and running but unscored; one
+seed; no relearning check.
+
 ### Candidate register (active development)
 
 | # | candidate | status | closed by |
@@ -31,7 +54,12 @@ attempt including failures.
 | C1 | SIO (selective-information objective) | closed | `PRIOR_ART_C1` — prior art |
 | H10a | ordering hinge, teacher-forced states | closed | `FINDING9` (reason corrected by `FINDING11`) |
 | H10b | ordering hinge, visited-state pool | closed | **`FINDING11`** — the penalised deficit was **−0.3149** at θ₀; the loss was inert |
-| H10c | per-step deferral hinge (`max_fact < max_struct`) | **gated** | awaiting `oracle_ablate.py`: reversion ≤0.25 → train; ≥0.50 → line closed |
+| H10c | per-step deferral hinge (`max_fact < max_struct`) | closed | **`FINDING12`** — oracle was never reachable; 93.6% reversion when the terminal regime is removed |
+| H12 | ESD, entity-masked self-distillation | closed | `NOVELTY_ESD` — anticipated by MDU, already our own baseline |
+| H14 | form-preserving (entity) anchor | closed | anchor is 0.3% degenerate, students 69–75% degenerate; anchor non-degeneracy does not transfer |
+| H15 | localized anchor matching | closed | **`FINDING15`** — dominated; curves cross, baseline better in the usable region |
+| H16 | retain-conflict gradient projection | closed | rank sweep 3/3 worse than no projection (TV 0.245/0.337/0.404 vs 0.229); buys two-axis gains with degeneracy |
+| **AFC** | anchor-first KL + MDU's random-answer anchor | **selected** | **`FINDING16`** — dominates MDU λ=1 on all four coordinates; pending ATWU, seeds, RTT |
 
 Findings 9 and 10 remain as recorded. `FINDING11` corrects their *interpretation* — both were
 drawn from an objective satisfied at θ₀ before any gradient step — without altering their
