@@ -107,6 +107,21 @@ PRESETS = {
     "lam":      ("anchor_first", "fam",    "topk"),
     "lam_soft": ("anchor_first", "fam",    "soft"),
     "lam_anti": ("anchor_first", "fam",    "antik"),
+    # ---- MDU's anchor (the one that lands on the oracle's shape) + localization ----
+    # `outputs/ignorance_shape_main.json`, answer positions on forget facts:
+    #   retain_ref (true retrain oracle)  entropy 1.839  top1 0.711  p_true 0.507
+    #   MDU lam=8                         entropy 1.848  top1 0.679  p_true 0.501
+    #   EMDU lam=8                        entropy 8.170  top1 0.054
+    #   entity arms lam=8                 entropy 4.256  top1 0.253
+    # MDU's anchor lands on the oracle's distributional shape; FAM and the entity anchor
+    # overshoot it by 2.3-4.4x. MDU's failure was not its shape but its SUPPORT: it applies the
+    # loss uniformly, and the oracle's true-token rank is 0 at the median answer position --
+    # i.e. the oracle and theta_0 AGREE at most positions, because only ~13% carry the fact.
+    # Uniform application therefore spends ~87% of its force where there is nothing to forget,
+    # which is why MDU's retain ASCR collapsed to 0.091 against theta_0's 0.762.
+    "lam_mdu":     ("anchor_last",  "random", "topk"),
+    "lam_mdu_af":  ("anchor_first", "random", "topk"),
+    "lam_mdu_anti": ("anchor_last", "random", "antik"),
 }
 
 
