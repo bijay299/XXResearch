@@ -40,3 +40,29 @@ train   atwu_b2            train_atwu.py --forget-loss satga --selector learned 
 part    atwu_b1
 part    atwu_b1p5
 part    atwu_b2
+# ---- seed replicates at the SELECTED point (lam=2), paired with MDU lam=3 which is MDU's
+# best DEGENERATE-matched point. The lam=1 seeds showed AFC's degeneracy rises off seed 0
+# (0.050 -> 0.150), so the selected point needs its own replicates rather than inheriting
+# lam=1's.
+train   sel_afc_l2_s1      train_h16.py --mode none --rank 8 --lam-forget 2 --steps 300 --seed 1
+train   sel_afc_l2_s2      train_h16.py --mode none --rank 8 --lam-forget 2 --steps 300 --seed 2
+train   sel_mdu_l3_s1      train_lam.py --arm mdu --anchor-prompt all --lam-forget 3 --lam-retain 1 --steps 300 --seed 1
+train   sel_mdu_l3_s2      train_lam.py --arm mdu --anchor-prompt all --lam-forget 3 --lam-retain 1 --steps 300 --seed 2
+part    sel_afc_l2_s1
+part    sel_afc_l2_s2
+part    sel_mdu_l3_s1
+part    sel_mdu_l3_s2
+# ---- ATWU at MATCHED OPTIMISATION BUDGET. The beta sweep came back flat (DISC 0.408-0.450 for
+# beta in {1,1.5,2,7}), which rules out the bounded-target explanation as the binding
+# constraint. The real limiter is the learning rate: ATWU's published 8B value is 1.5e-5 while
+# every AFC/MDU arm here uses 1e-4, so at a 300-step budget ATWU gets ~6.7x less total
+# movement. Their lr was tuned against their own epoch-based budget, not ours. These arms give
+# ATWU the same lr as the candidate, and one arm with its published lr but 3x the steps, so the
+# baseline is judged at matched optimisation rather than at a setting that cannot move.
+train   atwu_lr1e4_b7      train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.25 --beta 7.0 --lr 1e-4
+train   atwu_lr1e4_b1      train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.25 --beta 1.0 --lr 1e-4
+train   atwu_lr1e4_b2      train_atwu.py --forget-loss satga --selector learned --steps 300 --rho 0.25 --beta 2.0 --lr 1e-4
+train   atwu_s900_b1       train_atwu.py --forget-loss satga --selector learned --steps 900 --ckpt-at 450,900 --rho 0.25 --beta 1.0
+part    atwu_lr1e4_b7
+part    atwu_lr1e4_b1
+part    atwu_lr1e4_b2
