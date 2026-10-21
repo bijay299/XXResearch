@@ -1,0 +1,9 @@
+# Audit items 2 and 3: more seeds on the central claim, and a DEGENERATE-matched comparison.
+train   afc_s3             train_h16.py --mode none --rank 8 --lam-forget 1 --steps 300 --seed 3
+train   afc_s4             train_h16.py --mode none --rank 8 --lam-forget 1 --steps 300 --seed 4
+train   mdu_s3             train_lam.py --arm mdu --anchor-prompt all --lam-forget 1 --lam-retain 1 --steps 300 --seed 3
+train   mdu_s4             train_lam.py --arm mdu --anchor-prompt all --lam-forget 1 --lam-retain 1 --steps 300 --seed 4
+part    afc_s3
+part    afc_s4
+part    mdu_s3
+part    mdu_s4

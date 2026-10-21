@@ -32,7 +32,7 @@ fi
 
 GPUS="2 3"
 NEED_MB=22000          # a training arm peaks near 19.5 GiB; partition eval near 16 GiB
-JOBS=scripts/JOBS.tsv
+JOBS=${JOBS_FILE:-scripts/JOBS.tsv}
 
 free_mb () {
   used=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i "$1" | tr -d ' ')

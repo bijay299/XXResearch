@@ -155,6 +155,10 @@ def main():
     ap.add_argument("--probe-facts", type=int, default=40)
     ap.add_argument("--probe-authors-frac", type=float, default=0.15)
     ap.add_argument("--memo", default=f"{P}/adapters/theta0_tofu")
+    ap.add_argument("--data", default=f"{P}/data/tofu/tofu800.json",
+                    help="dataset in TOFU format (id/split/author/question/answer). Default is "
+                         "the exact original path so every prior run stays bit-reproducible; "
+                         "only an explicit --data changes behaviour.")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
@@ -164,7 +168,7 @@ def main():
     torch.manual_seed(a.seed)
 
     tok = load_tokenizer()
-    recs = json.loads(open(f"{P}/data/tofu/tofu800.json").read())
+    recs = json.loads(open(a.data).read())
     NAME, _NCOV = author_names(recs)
     by = collections.defaultdict(set)
     for r in recs:
@@ -229,7 +233,10 @@ def main():
 
     model = load_base(DEV, train=True)
     from peft import LoraConfig, PeftModel, get_peft_model
-    model = PeftModel.from_pretrained(model, a.memo).merge_and_unload().to(DEV)
+    if a.memo.lower() == "none":
+        model = model.to(DEV)          # RWKU: theta_0 is the pristine base model
+    else:
+        model = PeftModel.from_pretrained(model, a.memo).merge_and_unload().to(DEV)
     model = get_peft_model(model, LoraConfig(
         r=a.rank, lora_alpha=2 * a.rank, lora_dropout=0.0, bias="none",
         target_modules=FULL_TARGETS, init_lora_weights=True))
