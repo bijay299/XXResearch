@@ -1,5 +1,18 @@
 # Results — AFC against MDU, EMDU and ATWU on TOFU/LLaDA
 
+> **RETRACTION, 2026-10-21 (n=5 seeds).** The stability claim in §2 below is **REFUTED by our own
+> data** and is retained only as a record of the error. At n=3 AFC's TV sd was 0.005; at n=5 it is
+> **0.158 against MDU's 0.033** — AFC is roughly **5x MORE variable**, not 9-16x less. Seed 3
+> produced TV 0.587 with DEGENERATE **0.508**. AFC's mean DEGENERATE at n=5 is **0.217 vs MDU's
+> 0.122**, so the lower-degeneracy claim also fails at lam=1, and AFC breaches DEG <= 0.25 on 1 of
+> 5 seeds.
+>
+> **What survives:** AFC's mean TV is still better (0.314 vs 0.424) and it wins 4 of 5 paired
+> seeds, losing seed 3 by -0.171. The honest claim is therefore **"better on average, with a
+> catastrophic-failure mode the baseline does not have"** -- not "better and more stable". The
+> n=3 figures were three lucky seeds. n=8 is running to characterise the failure mode.
+
+
 **Date:** 2026-10-21
 **Backbone:** LLaDA-8B-Instruct rev `08b83a6feb34df1a6011b80c3c00c7563e963b07`, memorization
 adapter `theta0_tofu` (qualified 0.791/0.787 recall, bitwise save/reload verified)
@@ -29,7 +42,7 @@ indistinguishable. At that matched point AFC gives
 AFC also wins all four coordinates against MDU λ_f=1, and its TV advantage holds on **every
 individual seed** (+0.179, +0.254, +0.167).
 
-## 2. Stability is a result in its own right
+## 2. Stability — RETRACTED (see the note at the top; kept as a record of the error)
 
 | arm | TV sd | DEGENERATE range across seeds | seeds breaching DEG ≤ 0.25 |
 |---|---|---|---|

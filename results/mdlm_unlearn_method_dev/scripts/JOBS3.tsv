@@ -1,0 +1,15 @@
+# Variance is now the central question: AFC's n=5 TV sd is 0.158 against MDU's 0.033, and seed 3
+# produced DEGENERATE 0.508. n=3 showed sd 0.005, which was three lucky seeds. Extending to
+# n=8 to characterise the failure mode rather than average over it.
+train   afc_s5             train_h16.py --mode none --rank 8 --lam-forget 1 --steps 300 --seed 5
+train   afc_s6             train_h16.py --mode none --rank 8 --lam-forget 1 --steps 300 --seed 6
+train   afc_s7             train_h16.py --mode none --rank 8 --lam-forget 1 --steps 300 --seed 7
+train   mdu_s5             train_lam.py --arm mdu --anchor-prompt all --lam-forget 1 --lam-retain 1 --steps 300 --seed 5
+train   mdu_s6             train_lam.py --arm mdu --anchor-prompt all --lam-forget 1 --lam-retain 1 --steps 300 --seed 6
+train   mdu_s7             train_lam.py --arm mdu --anchor-prompt all --lam-forget 1 --lam-retain 1 --steps 300 --seed 7
+part    afc_s5
+part    afc_s6
+part    afc_s7
+part    mdu_s5
+part    mdu_s6
+part    mdu_s7
