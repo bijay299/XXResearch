@@ -21,6 +21,38 @@ Everything under `/data/bijaypandey/mdlm_unlearn`. Development evidence; freely 
 may be iterated. See `docs/` for the team's working artifacts and `ATTEMPTS.tsv` for every
 attempt including failures.
 
+### Candidate register (active development)
+
+| # | candidate | status | closed by |
+|---|---|---|---|
+| H1 | per-position reweighting | closed | no separation from control |
+| H6 | noise-schedule shaping | closed | `FINDING5_dataset_confound` |
+| H11 | orthogonal-subspace edit | closed | `docs/FINDING2`, `H11_DESIGN` |
+| C1 | SIO (selective-information objective) | closed | `PRIOR_ART_C1` — prior art |
+| H10a | ordering hinge, teacher-forced states | closed | `FINDING9` (reason corrected by `FINDING11`) |
+| H10b | ordering hinge, visited-state pool | closed | **`FINDING11`** — the penalised deficit was **−0.3149** at θ₀; the loss was inert |
+| H10c | per-step deferral hinge (`max_fact < max_struct`) | **gated** | awaiting `oracle_ablate.py`: reversion ≤0.25 → train; ≥0.50 → line closed |
+
+Findings 9 and 10 remain as recorded. `FINDING11` corrects their *interpretation* — both were
+drawn from an objective satisfied at θ₀ before any gradient step — without altering their
+protocols, numbers or documents.
+
+### Errata
+
+| erratum | state |
+|---|---|
+| `ERRATUM_memorize_v2_provenance.md` | **CLOSED** (`p096`). Source-hash string unrecoverable and reconstruction FAILED (`57cc1fb6` ≠ either hash), so repaired instead by **bitwise reproduction**: the on-disk script regenerates `memorized_v2_s20261101`'s adapter exactly (`bafc5c86…` = `bafc5c86…`). Reports left unedited; the stale hash string stands as recorded. |
+
+### Process rules adopted here
+
+1. **Measure a new objective's own deficit at θ₀ before training on it.** 26 GPU-seconds;
+   would have caught both Finding 9 and Finding 10. `scripts/order_condition.py`.
+2. **Instruments on a fact-disjoint frozen probe, never on the training batch.** Violated
+   twice now (the `L_mem` guard, then `train_ord_pool.py`).
+3. **Scripts named in a delivered report's `hashes.sources` are append-only.** New behaviour
+   goes in a new file. This is why `train_ord_pool.py` and `train_ord_v2.py` are separate files
+   rather than flags on `train_ord.py`.
+
 ## Tier 3 — FINAL EVALUATION (sealed until selection is frozen)
 Not yet created. Will be opened only after method selection, configs, checkpoint rules,
 metrics and interpretation are frozen in `docs/FINAL_EVAL_PREREG.md`.
