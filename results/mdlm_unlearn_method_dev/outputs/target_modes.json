@@ -1,0 +1,360 @@
+{
+  "study": "target_mode_decomposition",
+  "hypothesis": "H6'",
+  "pinned_source_sha256": "3d8162b68d8d79b7e7596db917649ddadb2ec7ff4166178148ea01701b5fd236",
+  "memo": "/data/bijaypandey/mdlm_unlearn/adapters/memorized_v2_s20261101",
+  "hparams": {
+    "memo": "/data/bijaypandey/mdlm_unlearn/adapters/memorized_v2_s20261101",
+    "n_states": 16,
+    "eps": 1e-05,
+    "taus": "0.5,1.0,2.0",
+    "seed": 404,
+    "tag": "target_modes"
+  },
+  "limitation": "NPO has no target distribution (ratio-based preference loss), so H6' covers 6 of the 9 collapsed grid points (MDU x3, EMDU x3), not NPO's 2.",
+  "targets": [
+    {
+      "name": "REFERENCE p_theta0",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 0.6714,
+      "mean_mass_on_eos_pad": 0.66396,
+      "mean_mass_on_true_token": 0.959195,
+      "mean_entropy_bits": 0.085,
+      "median_entropy_bits": 0.0,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          141
+        ],
+        [
+          ".",
+          6
+        ],
+        [
+          " ",
+          5
+        ],
+        [
+          " in",
+          5
+        ],
+        [
+          " lives",
+          5
+        ],
+        [
+          "Al",
+          4
+        ]
+      ]
+    },
+    {
+      "name": "exclusion eps=1e-05",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 0.6714,
+      "mean_mass_on_eos_pad": 0.66406,
+      "mean_mass_on_true_token": 0.935487,
+      "mean_entropy_bits": 0.165,
+      "median_entropy_bits": 0.0,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          141
+        ],
+        [
+          ".",
+          6
+        ],
+        [
+          " ",
+          5
+        ],
+        [
+          " in",
+          5
+        ],
+        [
+          " lives",
+          5
+        ],
+        [
+          "Al",
+          4
+        ]
+      ],
+      "family": "renormalisation",
+      "eps": 1e-05
+    },
+    {
+      "name": "exclusion eps=0.001",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 0.6714,
+      "mean_mass_on_eos_pad": 0.664,
+      "mean_mass_on_true_token": 0.935447,
+      "mean_entropy_bits": 0.166,
+      "median_entropy_bits": 0.0,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          141
+        ],
+        [
+          ".",
+          6
+        ],
+        [
+          " ",
+          5
+        ],
+        [
+          " in",
+          5
+        ],
+        [
+          " lives",
+          5
+        ],
+        [
+          "Al",
+          4
+        ]
+      ],
+      "family": "renormalisation",
+      "eps": 0.001
+    },
+    {
+      "name": "exclusion eps=0.1",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 0.6714,
+      "mean_mass_on_eos_pad": 0.66396,
+      "mean_mass_on_true_token": 0.937768,
+      "mean_entropy_bits": 0.17,
+      "median_entropy_bits": 0.0,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          141
+        ],
+        [
+          ".",
+          6
+        ],
+        [
+          " ",
+          5
+        ],
+        [
+          " in",
+          5
+        ],
+        [
+          " lives",
+          5
+        ],
+        [
+          "Al",
+          4
+        ]
+      ],
+      "family": "renormalisation",
+      "eps": 0.1
+    },
+    {
+      "name": "MDU anchor tau=0.5",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 0.6857,
+      "mean_mass_on_eos_pad": 0.58698,
+      "mean_mass_on_true_token": 0.6253,
+      "mean_entropy_bits": 0.935,
+      "median_entropy_bits": 0.203,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          144
+        ],
+        [
+          "\n",
+          14
+        ],
+        [
+          ".",
+          11
+        ],
+        [
+          " the",
+          10
+        ],
+        [
+          " in",
+          4
+        ],
+        [
+          "van",
+          4
+        ]
+      ],
+      "family": "anchor",
+      "tau": 0.5,
+      "anchor_input": "prompt masked"
+    },
+    {
+      "name": "MDU anchor tau=1",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 0.6857,
+      "mean_mass_on_eos_pad": 0.48712,
+      "mean_mass_on_true_token": 0.537217,
+      "mean_entropy_bits": 3.779,
+      "median_entropy_bits": 1.339,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          144
+        ],
+        [
+          "\n",
+          14
+        ],
+        [
+          ".",
+          11
+        ],
+        [
+          " the",
+          10
+        ],
+        [
+          " in",
+          4
+        ],
+        [
+          "van",
+          4
+        ]
+      ],
+      "family": "anchor",
+      "tau": 1.0,
+      "anchor_input": "prompt masked"
+    },
+    {
+      "name": "MDU anchor tau=2",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 0.6857,
+      "mean_mass_on_eos_pad": 0.2256,
+      "mean_mass_on_true_token": 0.239972,
+      "mean_entropy_bits": 12.235,
+      "median_entropy_bits": 15.275,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          144
+        ],
+        [
+          "\n",
+          14
+        ],
+        [
+          ".",
+          11
+        ],
+        [
+          " the",
+          10
+        ],
+        [
+          " in",
+          4
+        ],
+        [
+          "van",
+          4
+        ]
+      ],
+      "family": "anchor",
+      "tau": 2.0,
+      "anchor_input": "prompt masked"
+    },
+    {
+      "name": "EMDU anchor tau=0.5",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 1.0,
+      "mean_mass_on_eos_pad": 0.46291,
+      "mean_mass_on_true_token": 0.327797,
+      "mean_entropy_bits": 2.894,
+      "median_entropy_bits": 2.891,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          210
+        ]
+      ],
+      "family": "anchor",
+      "tau": 0.5,
+      "anchor_input": "fully masked (FAM)"
+    },
+    {
+      "name": "EMDU anchor tau=1",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 1.0,
+      "mean_mass_on_eos_pad": 0.04651,
+      "mean_mass_on_true_token": 0.033363,
+      "mean_entropy_bits": 12.872,
+      "median_entropy_bits": 12.872,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          210
+        ]
+      ],
+      "family": "anchor",
+      "tau": 1.0,
+      "anchor_input": "fully masked (FAM)"
+    },
+    {
+      "name": "EMDU anchor tau=2",
+      "n_positions": 210,
+      "mode_is_eos_or_pad_frac": 1.0,
+      "mean_mass_on_eos_pad": 0.001,
+      "mean_mass_on_true_token": 0.000736,
+      "mean_entropy_bits": 16.447,
+      "median_entropy_bits": 16.447,
+      "top_modes": [
+        [
+          "<|endoftext|>",
+          210
+        ]
+      ],
+      "family": "anchor",
+      "tau": 2.0,
+      "anchor_input": "fully masked (FAM)"
+    }
+  ],
+  "mask_rate_control": {
+    "low_t": {
+      "n_positions": 24,
+      "exclusion_eos_mass": 0.62499,
+      "emdu_anchor_eos_mass": 0.04629
+    },
+    "mid_t": {
+      "n_positions": 105,
+      "exclusion_eos_mass": 0.63887,
+      "emdu_anchor_eos_mass": 0.04665
+    },
+    "high_t": {
+      "n_positions": 81,
+      "exclusion_eos_mass": 0.7083,
+      "emdu_anchor_eos_mass": 0.0464
+    }
+  },
+  "verdict": {
+    "reference_eos_mass": 0.66396,
+    "anchor_family_mean_eos_mass": 0.30169,
+    "renorm_family_mean_eos_mass": 0.66401,
+    "anchor_mode_is_eos_frac": 0.8428,
+    "renorm_mode_is_eos_frac": 0.6714,
+    "kill_rule": "H6' is REFUTED if the anchor family's EOS/pad mass is not substantially elevated over the reference's, or if the renorm family's mode is EOS rather than a type-correct non-answer"
+  },
+  "measured": {
+    "wall_s": 1792544076.0,
+    "peak_gpu_gib": 15.869
+  }
+}

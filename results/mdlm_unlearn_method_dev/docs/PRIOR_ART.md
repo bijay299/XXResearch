@@ -38,10 +38,22 @@ Field convention: "not stated" means the paper does not say. It does **not** mea
 4. **TOFU is out of reach; RWKU is our only viable benchmark.** TOFU needs ~250,000 full-parameter
    SFT steps (1000 epochs) to instil the knowledge, with no released checkpoint — ~70+ GPU-hours
    per backbone against a 4.1-GPU-hour project history. RWKU needs no SFT, and **our local data
-   matches EMDU's protocol exactly**: same 10 subjects, 582 forget pairs each, verified on disk.
+   matches EMDU's protocol only partially** — see the **CORRECTION** note below.
 5. **EMDU's RWKU recipe is cheap and fully specified**: LR 1e-5, **40 steps**, batch 4, accum 1,
-   `α=0`, `τ=1`, per subject. 400 steps total for all 10 entities. Training is nearly free;
-   **evaluation (MDLM generation at 128 steps) is the entire budget.**
+   `α=0`, `τ=1`, per subject. Training is nearly free; **evaluation (MDLM generation at 128
+   steps) is the entire budget.**
+
+   > **CORRECTION (2026-10-20, superseding the original claim here and in §2.0/§2.4/Appendix A).**
+   > An earlier version of this document stated that our local RWKU data matches EMDU's protocol
+   > for all 10 subjects. It does not. Enumerated file by file: the `llada_rwku` copy has **10
+   > entities but no `pair.json` forget-training corpus and no F-L3**; the `llada_emdu` copy has
+   > the **complete** file set (`pair.json` = 582, F-L1/L2/L3, N-L1/L2, positive/negative = 582)
+   > for **only 3 entities** — Stephen King, Confucius, Bruce Lee. So **we can currently train on
+   > 3 subjects, not 10, and F-L3 is available for those 3 only.** A 3-entity result is not
+   > comparable to MDU's or EMDU's 10-subject macro-averages. Fetching the remaining 7 subjects'
+   > `pair.json` from the public RWKU release is a data (not model-weight) download and is the
+   > cheapest single unblock — a coordinator decision. Full inventory in
+   > `docs/PRIOR_ART_H11.md` §4.1.
 6. **Under LoRA the frozen anchor is free** — `p_θ0` is the adapter-disabled forward through the
    same weights, so no second 8B copy is needed. And because EMDU's FAM anchor input `(∅,[MASK]^n)`
    is **independent of `t`**, that anchor forward is **exactly cacheable per example**. Both are
@@ -1028,12 +1040,14 @@ Observations that matter for our comparisons:
 - **4× A100-SXM4-40GB; at most 2 usable concurrently** (GPUs 2–3 while another user holds 0–1;
   confirmed live on 2026-10-20 via `nvidia-smi`). Never interfere with other users' jobs.
 - `GSAI-ML/LLaDA-8B-Instruct` at revision `08b83a6feb34df1a6011b80c3c00c7563e963b07`.
-- Local RWKU data for **10 target entities**, verified on disk at
-  `/data/bijaypandey/llada_rwku/data/rwku/Target/`: `1_Stephen_King`, `2_Confucius`,
-  `3_Bruce_Lee`, `4_Warren_Buffett`, `5_Christina_Aguilera`, `6_Cindy_Crawford`,
-  `7_Marie_Osmond`, `8_Paris_Hilton`, `9_Justin_Bieber`, `10_Prince_Harry,_Duke_of_Sussex`.
-  Each with `forget_level{1,2,3}.json`, `neighbor_level{1,2}.json`, `pair.json`, `positive.json`,
-  `negative.json`.
+- Local RWKU data, **re-verified file by file on 2026-10-20 and NOT as uniform as first
+  reported**: `/data/bijaypandey/llada_rwku/data/rwku/Target/` holds **10 entities**
+  (`1_Stephen_King` … `10_Prince_Harry,_Duke_of_Sussex`) but only `forget_level{1,2}.json` and
+  `neighbor_level{1,2}.json` — **no `pair.json` and no `forget_level3.json`**.
+  `/data/bijaypandey/llada_emdu/data/rwku/Target/` holds the **complete** set (`pair.json` = 582,
+  `forget_level{1,2,3}`, `neighbor_level{1,2}`, `positive`/`negative` = 582) for **only 3
+  entities**: Stephen King, Confucius, Bruce Lee. **Trainable today: 3 subjects. F-L3 reportable
+  today: 3 subjects.** See `docs/PRIOR_ART_H11.md` §4.1.
 - PEFT/LoRA available; bf16.
 - No paid services, no new model-weight downloads, no infrastructure permission changes.
 - Resource ledger: **4.117 GPU device-hours consumed across all six prior studies combined.**
@@ -1158,7 +1172,7 @@ reproduced. **N**: not runnable here.
 |---|---|---|---|
 | 1 | **MDU** (RWKU track) | **Y\*** | LoRA instead of full-parameter (D1). Anchor comes free (§2.2). **Also unavoidable:** the paper states no unlearning LR or step count, so we must either adopt the repo config (`1e-5`, 3–9 epochs) or EMDU's sweep — *either way it is our selection, not theirs.* MDU is a τ sweep, not a point; we must sweep τ or declare which τ. MDU ships **no LLaDA RWKU eval script** (EMDU Appendix E.1), so the evaluation harness is ours. The ROUGE-L F1-vs-recall ambiguity means we cannot match their reported figure even in principle — report recall and say so. |
 | 1b | **MDU** (TOFU track) | **N** | Base SFT unreachable (D2); no released checkpoint. |
-| 2 | **EMDU** (RWKU track) | **Y\*** | LoRA (D1). **Best-specified target in this area:** LR `1e-5`, **40 steps**, batch 4, accum 1, `α=0`, `τ=1`, per-subject, 582 pairs/entity — and our local `pair.json` has **exactly 582 entries** for every entity checked, so the data matches. No code released, so we implement from Algorithm 1 — which is complete enough to do faithfully. 40 steps × 10 entities is **trivially affordable**; evaluation dominates cost. |
+| 2 | **EMDU** (RWKU track) | **Y\*** | LoRA (D1). **Best-specified target in this area:** LR `1e-5`, **40 steps**, batch 4, accum 1, `α=0`, `τ=1`, per-subject, 582 pairs/entity — and the `pair.json` files we do have contain **exactly 582 entries**, matching EMDU. **But we only have `pair.json` for 3 of the 10 subjects** (see the CORRECTION in the Executive Summary and `docs/PRIOR_ART_H11.md` §4.1), so a 10-subject reproduction is **data-blocked, not compute-blocked**, until the remaining 7 subjects' forget corpora are obtained. No code released, so we implement from Algorithm 1 — which is complete enough to do faithfully. 40 steps × 3 entities is **trivially affordable**; evaluation dominates cost. |
 | 2b | **EMDU** (TOFU track) | **N** | Same as 1b. |
 | 3 | **TimeROME-DLM** | **P** | No code, no URL, release "upon acceptance". Gradient-free and 0 extra VRAM, so it would be *the cheapest* thing here if it existed — reimplementation from the paper is a real project (TIE causal tracing needs 3 diffusion passes per fact with full residual caching at every layer and step, which is a memory problem of its own on 40 GB). Also reports in **nats on TOFU forget01**, so even if reimplemented it gives no number comparable to our RWKU track. **Different deployment contract** (inference hook required). Treat as related work, not a baseline. |
 | 4 | **A2D** | **Y\*** (but off-task) | Safety alignment, not unlearning. Already LoRA r=32 as published, so *no* parameterization deviation. Worth running **only** as a probe of the mask-rate-floor question (Critical Question 1), not as an unlearning baseline. |
@@ -1183,8 +1197,14 @@ reproduced. **N**: not runnable here.
 
 ## 2.5 The affordable plan this implies
 
-- **Benchmark: RWKU, 10 entities, ROUGE-L recall** (F-L1/L2/L3, N-L1/L2) plus MMLU / TruthfulQA /
-  TriviaQA. Not TOFU.
+- **Benchmark: RWKU, ROUGE-L recall** (F-L1/L2/L3, N-L1/L2) plus MMLU / TruthfulQA / TriviaQA.
+  Not TOFU. **Entity count: 3 today, 10 only if the missing forget corpora are obtained** — see
+  the CORRECTION in the Executive Summary.
+  **Also note (from `docs/PRIOR_ART_H11.md` §4.2): every RWKU forget answer is short** — F-L1 mean
+  1.57 words / median 1 / 86.1% ≤2 words; F-L2 mean 2.16; F-L3 mean 2.10 / 89.7% ≤2 words. RWKU's
+  ROUGE-L recall is therefore effectively entity-level exact match, which is good for
+  interpretability but means **RWKU cannot distinguish surgical forgetting from whole-answer
+  destruction.** Any claim of that form needs long-form answers.
 - **Training is nearly free.** EMDU's published RWKU budget is 40 steps at batch 4; 10 entities
   is 400 steps per method. Even at 2 s/step that is well under half a GPU-hour per method.
 - **Evaluation dominates.** MDLM generation at 128 denoising steps over F-L1/L2/L3 + N-L1/L2 +
@@ -3040,8 +3060,11 @@ Primary sources were read as actual text, not as search summaries:
   descending, on 2026-10-20.
 - Memory arithmetic in Part 2.1: computed independently; reproduces the HISTORICAL 89.6 GiB figure
   exactly.
-- Local data verification in Part 2.0: `nvidia-smi` and direct inspection of
-  `/data/bijaypandey/llada_rwku/data/rwku/Target/` (10 entities) and `pair.json` (582 entries).
+- Local data verification in Part 2.0: `nvidia-smi` and direct inspection of both RWKU copies.
+  **This was re-done on 2026-10-20 and corrected a conflation** — 10 entity *directories* exist,
+  but the complete per-entity file set (including `pair.json` and F-L3) exists for only 3. The
+  original wording overstated coverage; see the CORRECTION in the Executive Summary and
+  `docs/PRIOR_ART_H11.md` §4.1. Recorded rather than silently edited.
 
 **Known unchecked indexes:** Semantic Scholar (HTTP 429 during the TNT/TNFF negative). arXiv API
 search covers title/abstract/author only, not full text, so negatives about method names are

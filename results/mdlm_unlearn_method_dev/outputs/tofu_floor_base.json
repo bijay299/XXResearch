@@ -1,0 +1,144 @@
+{
+  "label": "pristine_base",
+  "adapter": "none",
+  "n_probes": 800,
+  "is_pristine_base": true,
+  "summary": {
+    "scoring_doc": "DISTINCTIVE content recall. scorable(q,a) = {non-stopword tokens of normalize(a)} - {all tokens of normalize(q)}; recall = |scorable & tokens(gen)| / |scorable|. Items with an empty scorable set are EXCLUDED from the mean and counted. normalize is common_v2.normalize_dia. Naive content recall (question tokens retained) and ROUGE-L recall are reported alongside so the question-echo inflation is visible.",
+    "decoder_doc": "gen_length 96 / steps 96 / block_length 32 / temperature 0 / low_confidence. gen_length is set from the measured answer-length distribution so that 100% of the 800 gold answers fit (max 82 tokens + EOS); block_length 32 keeps the semi-autoregressive decoding used by the earlier TOFU checkpoint qualification. steps == gen_length, as in the frozen synthetic decoder.",
+    "decoder": {
+      "steps": 96,
+      "gen_length": 96,
+      "block_length": 32,
+      "temperature": 0.0,
+      "cfg_scale": 0.0,
+      "remasking": "low_confidence",
+      "mask_id": 126336
+    },
+    "gen_seed": 20261020,
+    "stopwords_sha256": "db7af9b20d434129cd4bef69141abce4525e8115776ff62003b39ac525088d3c",
+    "n_stopwords": 129,
+    "forget": {
+      "n": 400,
+      "distinctive_content_recall": {
+        "n": 400,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.0785,
+        "median": 0.0,
+        "frac_items_ge_0.80": 0.0075,
+        "frac_items_eq_1.00": 0.0075,
+        "frac_items_eq_0.00": 0.5825
+      },
+      "naive_content_recall": {
+        "n": 400,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.3539,
+        "median": 0.3158,
+        "frac_items_ge_0.80": 0.035,
+        "frac_items_eq_1.00": 0.0075,
+        "frac_items_eq_0.00": 0.0
+      },
+      "rouge_l_recall": {
+        "n": 400,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.3455,
+        "median": 0.3056,
+        "frac_items_ge_0.80": 0.0375,
+        "frac_items_eq_1.00": 0.0025,
+        "frac_items_eq_0.00": 0.0
+      },
+      "n_items_with_empty_scorable_set": 0,
+      "mean_n_scorable": 12.01,
+      "degeneracy": {
+        "repetitive": 51,
+        "refusal": 46
+      },
+      "n_degenerate": 97,
+      "inflation_naive_minus_distinctive": 0.2754
+    },
+    "retain": {
+      "n": 400,
+      "distinctive_content_recall": {
+        "n": 400,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.0685,
+        "median": 0.0,
+        "frac_items_ge_0.80": 0.0025,
+        "frac_items_eq_1.00": 0.0,
+        "frac_items_eq_0.00": 0.6075
+      },
+      "naive_content_recall": {
+        "n": 400,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.2924,
+        "median": 0.2609,
+        "frac_items_ge_0.80": 0.01,
+        "frac_items_eq_1.00": 0.0,
+        "frac_items_eq_0.00": 0.0075
+      },
+      "rouge_l_recall": {
+        "n": 400,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.3011,
+        "median": 0.2727,
+        "frac_items_ge_0.80": 0.015,
+        "frac_items_eq_1.00": 0.0,
+        "frac_items_eq_0.00": 0.0
+      },
+      "n_items_with_empty_scorable_set": 0,
+      "mean_n_scorable": 11.98,
+      "degeneracy": {
+        "repetitive": 30,
+        "refusal": 42
+      },
+      "n_degenerate": 72,
+      "inflation_naive_minus_distinctive": 0.2239
+    },
+    "overall": {
+      "n": 800,
+      "distinctive_content_recall": {
+        "n": 800,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.0735,
+        "median": 0.0,
+        "frac_items_ge_0.80": 0.005,
+        "frac_items_eq_1.00": 0.0037,
+        "frac_items_eq_0.00": 0.595
+      },
+      "naive_content_recall": {
+        "n": 800,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.3231,
+        "median": 0.2917,
+        "frac_items_ge_0.80": 0.0225,
+        "frac_items_eq_1.00": 0.0037,
+        "frac_items_eq_0.00": 0.0037
+      },
+      "rouge_l_recall": {
+        "n": 800,
+        "n_excluded_no_scorable_content": 0,
+        "mean": 0.3233,
+        "median": 0.2857,
+        "frac_items_ge_0.80": 0.0262,
+        "frac_items_eq_1.00": 0.0013,
+        "frac_items_eq_0.00": 0.0
+      },
+      "n_items_with_empty_scorable_set": 0,
+      "mean_n_scorable": 12.0,
+      "degeneracy": {
+        "repetitive": 81,
+        "refusal": 88
+      },
+      "n_degenerate": 169,
+      "inflation_naive_minus_distinctive": 0.2496
+    }
+  },
+  "wall_s": 2275.9,
+  "s_per_generation": 2.845,
+  "peak_gpu_gib": 15.056,
+  "sources": {
+    "eval_tofu.py": "08740f512c9db4f248ee896f4f5aa9ba852551b3d8fc17a238e5c098898ecbf0",
+    "common_tofu.py": "827a42977428d98b6a2791cb19cf02ba2542d5e7e8abc5ba257a1f61c3abc818",
+    "common_v2.py": "8ca28c19f1beb25097b5619937f558debd7f495ce9535a99586b28461daf5a17"
+  }
+}

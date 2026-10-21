@@ -67,7 +67,10 @@ def main():
     by_arm = collections.defaultdict(list)
     for r in runs:
         by_arm[r["arm"]].append(r)
-    ref = by_arm.get("reference", [None])[0]
+    refs = by_arm.get("reference", [])
+    # prefer the reference run that carries answer margins (the later, full-evaluator run)
+    ref = next((r for r in refs if r["summary"].get("answer_margin")), refs[0] if refs else None)
+    by_arm["reference"] = [ref] if ref else []
 
     print("\n## Partition table — all grid points, matched conditions\n")
     hdr = ("| arm | hp | n | DISCLOSE | DEGEN | ABSTAIN | REPLACE | ·in-pool | ·off-pool "
@@ -208,8 +211,11 @@ def main():
             hist = collections.Counter(x["slot_value"] for x in nw)
             for v, c in hist.most_common():
                 ex = next(x for x in nw if x["slot_value"] == v)
-                print(f"* `{v}` ×{c} (nearest `{ex['nearest']['nearest']}`, "
-                      f"distance {ex['nearest']['distance']}) e.g. {ex['generation'].strip()!r}")
+                nr = ex.get("nearest")
+                near = (f"nearest `{nr['nearest']}`, distance {nr['distance']}"
+                        if nr else "no near neighbour")
+                print(f"* `{v}` ×{c} [{ex.get('kind')}] ({near}) "
+                      f"e.g. {ex['generation'].strip()!r}")
     print(f"\nTotal non-word catches across all grid points: {tot}")
 
     print("\n## ABSTAIN rows\n")
@@ -226,6 +232,31 @@ def main():
                 mt = x["hits"][0]["matched"] if x["hits"] else "?"
                 print(f"* {x['fact_id']} matched `{mt}`: {x['generation'].strip()!r}")
     print(f"\nTotal ABSTAIN rows across all grid points: {tota}")
+
+    print("\n## IGNORANT cell — every row, enumerated\n")
+    nig = 0
+    for arm in ARM_ORDER:
+        for r in sorted(by_arm.get(arm, []), key=lambda x: (x["hyperparameter"]["value"] or 0)):
+            ig = r["summary"]["ignorant_rows"]["rows"]
+            nig += len(ig)
+            for x in ig:
+                hp = r["hyperparameter"]
+                print(f"* {ARM_NAME[arm]} {hp['name']}={hp['value']:g} — {x['fact_id']} "
+                      f"(ref `{x['reference_answer']}`, slot `{x['slot_value']}`): "
+                      f"{x['generation'].strip()!r}")
+    print(f"\nTotal IGNORANT rows across all 15 grid points: **{nig}**")
+
+    print("\n## Cross-script candidates (DISCLOSE is a lower bound)\n")
+    for arm in ARM_ORDER:
+        for r in sorted(by_arm.get(arm, []), key=lambda x: (x["hyperparameter"]["value"] or 0)):
+            cs = r["summary"]["cross_script_candidates"]
+            if not cs["n"]:
+                continue
+            hp = r["hyperparameter"]
+            print(f"**{ARM_NAME[arm]} {hp['name']}={hp['value']:g}** — {cs['n']}")
+            for x in cs["rows"][:5]:
+                print(f"* {x['fact_id']} ref `{x['reference_answer']}` slot "
+                      f"`{x['slot_value']}` label {x['label']}: {x['generation'].strip()!r}")
 
     print("\n## near_disclose_by_lemma (diagnostic, never folded into DISCLOSE)\n")
     print("| arm | hp | n forget | n retain | examples |")

@@ -1434,3 +1434,26 @@ Declined on all three grounds.
 
 Ordering: **M2′ → M1b → M8 (CPU, in parallel) → M3 → M4 → M7.** M2′ and M1b together are under
 10 GPU-minutes and can kill the candidate or set its only free parameter before any arm is trained.
+
+---
+
+# 11. POINTER — H10 (commit-order control) is specified separately
+
+`docs/H10_DESIGN.md` designs H10 on top of C1 (distillation from a retain-trained reference,
+arXiv:2506.06278, prior art). Three things in it amend this document:
+
+1. **The twin projection of §B.5 / §10.2 is withdrawn from the H10 composite.** TOFU800 is
+   author-disjoint with 400 distinct answers per side, so the shared-answer retain twin set is
+   **empty** and the projection has no constraint set. The mechanism is not refuted; its data are
+   gone. Any shared-answer preservation claim now needs new data, and free-form 27-word answers
+   cannot produce shared answers by construction.
+2. **§C's hazard index set survives and H10 needs a strict subset of it** — on-policy decode states
+   with first-fact-commit truncation. But where §C.3 argues the hazard formulation stays *valid*
+   under a diffuse commitment distribution (only its cost advantage dies), **H10 does not**: its
+   entire content is moving a step index, so diffuseness kills it. The two have different kill
+   rules on the same measurement.
+3. **The crux result.** At `T = 0` with `lc` remasking, the commit score is `max_v p_θ(v|s,i)`, and
+   by Lemma 4 disclosure requires the answer to *be* the argmax — so on the disclosure-relevant set
+   confidence and answer probability are the **same function of θ**. Absolute confidence control is
+   therefore identical to suppression; only the *relative* (raise-the-neighbours) form is separable,
+   and it is well-posed only because the answer span is multi-token.

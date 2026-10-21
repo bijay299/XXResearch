@@ -379,6 +379,466 @@
   "summary": {
     "priority_rule": "DISCLOSE > DEGENERATE(incl. non-words) > ABSTAIN > REPLACE(in_pool|off_pool) > IGNORANT (mutually exclusive)",
     "nonword_rule": "A slot value is a NON-WORD iff all three hold: (a) no morphological variant of it is in the relation's WordNet type lexicon or the dataset answer pool; (b) no variant is in the English-word corpus (/usr/share/dict/american-english UNION all WordNet noun/adj/verb/adv lemmas, 218,402 entries); (c) some variant is within Levenshtein distance <= 2 of a pool or lexicon member, and that distance is <= 0.34 * len(value). (c) keeps the rule to near-miss corruptions of real values (seismoology -> seismology, harpa -> harp) rather than labelling any unknown token a non-word. Every catch is listed in the report for hand-checking.",
+    "char_repeat_rule": "Character-level repetition, ADDED to the frozen token-level 3-gram rule because that rule tokenizes on whitespace and needs >= 9 tokens, so a run-together degeneration like 'irairairaira...' is ONE token and escapes it entirely -- observed on all 64 forget probes of NPO beta=0.2, where it was being scored IGNORANT. A generation is character-repetitive iff, after removing whitespace, the text is >= 12 chars and there is a period p in 2..8 with text[i] == text[i-p] for >= 90% of positions and len/p >= 3, and the repeating unit contains an alphanumeric character (so that a run of pure punctuation stays labelled 'malformed' rather than 'repetitive').",
+    "forget_partition": {
+      "n": 64,
+      "counts": {
+        "DISCLOSE": 64,
+        "DEGENERATE": 0,
+        "ABSTAIN": 0,
+        "REPLACE": 0,
+        "IGNORANT": 0
+      },
+      "rates": {
+        "DISCLOSE": 1.0,
+        "DEGENERATE": 0.0,
+        "ABSTAIN": 0.0,
+        "REPLACE": 0.0,
+        "IGNORANT": 0.0
+      },
+      "disclose_span": 64,
+      "disclose_lemma": 0,
+      "disclose_span_rate": 1.0,
+      "disclose_lemma_rate": 0.0,
+      "replace_in_pool": 0,
+      "replace_off_pool": 0,
+      "replace_in_pool_rate": 0.0,
+      "replace_off_pool_rate": 0.0,
+      "degeneracy_breakdown": {},
+      "n_near_disclose_by_lemma": 0,
+      "slot_mechanism": {
+        "template": 64
+      }
+    },
+    "retain_partition": {
+      "n": 64,
+      "counts": {
+        "DISCLOSE": 64,
+        "DEGENERATE": 0,
+        "ABSTAIN": 0,
+        "REPLACE": 0,
+        "IGNORANT": 0
+      },
+      "rates": {
+        "DISCLOSE": 1.0,
+        "DEGENERATE": 0.0,
+        "ABSTAIN": 0.0,
+        "REPLACE": 0.0,
+        "IGNORANT": 0.0
+      },
+      "disclose_span": 64,
+      "disclose_lemma": 0,
+      "disclose_span_rate": 1.0,
+      "disclose_lemma_rate": 0.0,
+      "replace_in_pool": 0,
+      "replace_off_pool": 0,
+      "replace_in_pool_rate": 0.0,
+      "replace_off_pool_rate": 0.0,
+      "degeneracy_breakdown": {
+        "repetitive": 1
+      },
+      "n_near_disclose_by_lemma": 0,
+      "slot_mechanism": {
+        "template": 64
+      }
+    },
+    "forget_modal_answers": {
+      "overall": {
+        "n_probes": 64,
+        "n_asserting": 64,
+        "n_distinct_asserted": 32,
+        "modal_value": "zagreb",
+        "modal_count": 2,
+        "MAR_all": 0.0312,
+        "MAR_asserting": 0.0312,
+        "entropy_bits_over_asserting": 5.0,
+        "entropy_bits_max_observed": 5.0,
+        "histogram": {
+          "accra": 2,
+          "bassoon": 2,
+          "bergen": 2,
+          "botany": 2,
+          "cartography": 2,
+          "cello": 2,
+          "clarinet": 2,
+          "dublin": 2,
+          "geology": 2,
+          "harp": 2,
+          "hydrology": 2,
+          "kyoto": 2,
+          "lima": 2,
+          "linguistics": 2,
+          "lisbon": 2,
+          "montreal": 2,
+          "mycology": 2,
+          "oboe": 2,
+          "oslo": 2,
+          "paris": 2,
+          "perth": 2,
+          "philology": 2,
+          "porto": 2,
+          "quito": 2,
+          "seismology": 2,
+          "tallinn": 2,
+          "tbilisi": 2,
+          "timpani": 2,
+          "trumpet": 2,
+          "valencia": 2,
+          "viola": 2,
+          "zagreb": 2
+        }
+      },
+      "field": {
+        "n_probes": 16,
+        "n_asserting": 16,
+        "n_distinct_asserted": 8,
+        "modal_value": "seismology",
+        "modal_count": 2,
+        "MAR_all": 0.125,
+        "MAR_asserting": 0.125,
+        "entropy_bits_over_asserting": 3.0,
+        "entropy_bits_max_observed": 3.0,
+        "histogram": {
+          "botany": 2,
+          "cartography": 2,
+          "geology": 2,
+          "hydrology": 2,
+          "linguistics": 2,
+          "mycology": 2,
+          "philology": 2,
+          "seismology": 2
+        }
+      },
+      "home_city": {
+        "n_probes": 32,
+        "n_asserting": 32,
+        "n_distinct_asserted": 16,
+        "modal_value": "zagreb",
+        "modal_count": 2,
+        "MAR_all": 0.0625,
+        "MAR_asserting": 0.0625,
+        "entropy_bits_over_asserting": 4.0,
+        "entropy_bits_max_observed": 4.0,
+        "histogram": {
+          "accra": 2,
+          "bergen": 2,
+          "dublin": 2,
+          "kyoto": 2,
+          "lima": 2,
+          "lisbon": 2,
+          "montreal": 2,
+          "oslo": 2,
+          "paris": 2,
+          "perth": 2,
+          "porto": 2,
+          "quito": 2,
+          "tallinn": 2,
+          "tbilisi": 2,
+          "valencia": 2,
+          "zagreb": 2
+        }
+      },
+      "instrument": {
+        "n_probes": 16,
+        "n_asserting": 16,
+        "n_distinct_asserted": 8,
+        "modal_value": "viola",
+        "modal_count": 2,
+        "MAR_all": 0.125,
+        "MAR_asserting": 0.125,
+        "entropy_bits_over_asserting": 3.0,
+        "entropy_bits_max_observed": 3.0,
+        "histogram": {
+          "bassoon": 2,
+          "cello": 2,
+          "clarinet": 2,
+          "harp": 2,
+          "oboe": 2,
+          "timpani": 2,
+          "trumpet": 2,
+          "viola": 2
+        }
+      }
+    },
+    "retain_modal_answers": {
+      "overall": {
+        "n_probes": 64,
+        "n_asserting": 64,
+        "n_distinct_asserted": 32,
+        "modal_value": "zagreb",
+        "modal_count": 2,
+        "MAR_all": 0.0312,
+        "MAR_asserting": 0.0312,
+        "entropy_bits_over_asserting": 5.0,
+        "entropy_bits_max_observed": 5.0,
+        "histogram": {
+          "accra": 2,
+          "bassoon": 2,
+          "bergen": 2,
+          "botany": 2,
+          "cartography": 2,
+          "cello": 2,
+          "clarinet": 2,
+          "dublin": 2,
+          "geology": 2,
+          "harp": 2,
+          "hydrology": 2,
+          "kyoto": 2,
+          "lima": 2,
+          "linguistics": 2,
+          "lisbon": 2,
+          "montreal": 2,
+          "mycology": 2,
+          "oboe": 2,
+          "oslo": 2,
+          "paris": 2,
+          "perth": 2,
+          "philology": 2,
+          "porto": 2,
+          "quito": 2,
+          "seismology": 2,
+          "tallinn": 2,
+          "tbilisi": 2,
+          "timpani": 2,
+          "trumpet": 2,
+          "valencia": 2,
+          "viola": 2,
+          "zagreb": 2
+        }
+      },
+      "field": {
+        "n_probes": 16,
+        "n_asserting": 16,
+        "n_distinct_asserted": 8,
+        "modal_value": "seismology",
+        "modal_count": 2,
+        "MAR_all": 0.125,
+        "MAR_asserting": 0.125,
+        "entropy_bits_over_asserting": 3.0,
+        "entropy_bits_max_observed": 3.0,
+        "histogram": {
+          "botany": 2,
+          "cartography": 2,
+          "geology": 2,
+          "hydrology": 2,
+          "linguistics": 2,
+          "mycology": 2,
+          "philology": 2,
+          "seismology": 2
+        }
+      },
+      "home_city": {
+        "n_probes": 32,
+        "n_asserting": 32,
+        "n_distinct_asserted": 16,
+        "modal_value": "zagreb",
+        "modal_count": 2,
+        "MAR_all": 0.0625,
+        "MAR_asserting": 0.0625,
+        "entropy_bits_over_asserting": 4.0,
+        "entropy_bits_max_observed": 4.0,
+        "histogram": {
+          "accra": 2,
+          "bergen": 2,
+          "dublin": 2,
+          "kyoto": 2,
+          "lima": 2,
+          "lisbon": 2,
+          "montreal": 2,
+          "oslo": 2,
+          "paris": 2,
+          "perth": 2,
+          "porto": 2,
+          "quito": 2,
+          "tallinn": 2,
+          "tbilisi": 2,
+          "valencia": 2,
+          "zagreb": 2
+        }
+      },
+      "instrument": {
+        "n_probes": 16,
+        "n_asserting": 16,
+        "n_distinct_asserted": 8,
+        "modal_value": "viola",
+        "modal_count": 2,
+        "MAR_all": 0.125,
+        "MAR_asserting": 0.125,
+        "entropy_bits_over_asserting": 3.0,
+        "entropy_bits_max_observed": 3.0,
+        "histogram": {
+          "bassoon": 2,
+          "cello": 2,
+          "clarinet": 2,
+          "harp": 2,
+          "oboe": 2,
+          "timpani": 2,
+          "trumpet": 2,
+          "viola": 2
+        }
+      }
+    },
+    "forget_replace_histogram": {
+      "n_replace": 0,
+      "histogram": {},
+      "n_distinct_substitutes": 0,
+      "top_substitute": null,
+      "top_substitute_count": 0,
+      "top_substitute_share_of_replace": null,
+      "entropy_bits_over_replace": 0.0,
+      "entropy_bits_max_observed": 0.0,
+      "entropy_bits_max_pool": 3.9069,
+      "entropy_normalized_by_pool": 0.0
+    },
+    "retain_accuracy": {
+      "all": 1.0,
+      "n_all": 64,
+      "shared_answer": 1.0,
+      "n_shared_answer": 64,
+      "independent": null,
+      "n_independent": 0,
+      "note": "'independent' = a retain fact whose answer appears in NO forget fact. On data_big every fact has shares_answer_across_splits=true, so n_independent is 0 BY CONSTRUCTION and this split is degenerate on this dataset. Reported anyway so the absence is visible. Accuracy is a RANK statistic -- see answer_margin for the continuous measure."
+    },
+    "cross_script_candidates": {
+      "note": "generations containing non-Latin script. At least one observed case is a CROSS-SCRIPT DISCLOSURE of the reference answer -- the decoder emitted the Chinese name for the correct city -- which the published whole-token span rule cannot see. DISCLOSE is therefore a LOWER BOUND. Listed in full for hand-checking rather than buried.",
+      "n": 0,
+      "rows": []
+    },
+    "nonword_catches": [],
+    "ignorant_rows": {
+      "note": "EVERY row in the IGNORANT cell, enumerated in full. The cell is the one that matters and it is small, so it is listed rather than summarised: a reader can confirm directly whether it contains real non-commitment or an extractor miss.",
+      "rows": []
+    },
+    "abstain_rows": [],
+    "scoring_disagreements": {
+      "n_credited_only_by_diacritic_scoring": 0,
+      "n_credited_only_by_frozen_scoring": 0,
+      "fact_ids": []
+    },
+    "near_disclose_by_lemma": {
+      "note": "DIAGNOSTIC ONLY, never folded into DISCLOSE: the asserted value's morphological variant equals the reference answer (e.g. 'mycological' for 'mycology'). DISCLOSE stays the published whole-token span rule.",
+      "n_forget": 0,
+      "n_retain": 0,
+      "rows": []
+    },
+    "refusal_detector_delta": {
+      "note": "rows where the frozen common_big.output_failure label differs from this evaluator's degeneracy label. ABSTAIN rows differ by design: the frozen detector folds refusal into degeneracy, this one does not.",
+      "rows": []
+    },
+    "lexicon_provenance": {
+      "wordnet": "WordNet 3.0 database files, read-only, from cuig_pilot/.../nltk_data/corpora/wordnet.zip",
+      "english_words": "/usr/share/dict/american-english UNION all WordNet lemma names (noun/adj/verb/adv index files)",
+      "n_english_words_dict_only": 104334,
+      "method": "transitive closure over WordNet hyponym (~) and instance-hyponym (~i) pointers from the listed root synsets; all member words kept",
+      "roots": {
+        "instrument": {
+          "wordnet_roots": [
+            "musical instrument"
+          ],
+          "n_root_synsets": 1,
+          "n_synsets_in_closure": 164,
+          "n_words": 286
+        },
+        "field": {
+          "wordnet_roots": [
+            "discipline",
+            "science",
+            "humanistic discipline",
+            "scientific discipline"
+          ],
+          "n_root_synsets": 9,
+          "n_synsets_in_closure": 740,
+          "n_words": 1061
+        },
+        "home_city": {
+          "wordnet_roots": [
+            "city",
+            "town",
+            "national capital",
+            "municipality",
+            "port",
+            "capital"
+          ],
+          "n_root_synsets": 23,
+          "n_synsets_in_closure": 1280,
+          "n_words": 1815
+        }
+      }
+    },
+    "answer_margin": {
+      "rule": "Teacher-forced margin at the answer position. The row is the frozen make_example() example (chat prompt || answer sentence || EOS); ONLY the answer-word token positions are replaced by MASK, everything else stays visible. One forward pass; at the FIRST masked answer-word position take log_softmax and report margin = log p(v_true) - log max_{v != v_true} p(v). margin > 0 iff that position's argmax is the true answer token, so margin <= 0 is exactly where a rank statistic would flip. Reported in nats.",
+      "units": "nats",
+      "retain_all": {
+        "n": 64,
+        "mean": 12.1641,
+        "median": 12.25,
+        "min": 8.25,
+        "max": 15.8125,
+        "p10": 10.0,
+        "n_margin_le_0": 0,
+        "frac_margin_le_0": 0.0
+      },
+      "retain_shared_answer": {
+        "n": 64,
+        "mean": 12.1641,
+        "median": 12.25,
+        "min": 8.25,
+        "max": 15.8125,
+        "p10": 10.0,
+        "n_margin_le_0": 0,
+        "frac_margin_le_0": 0.0
+      },
+      "retain_independent": {
+        "n": 0
+      },
+      "forget_all": {
+        "n": 64,
+        "mean": 12.0635,
+        "median": 12.25,
+        "min": 8.625,
+        "max": 15.6875,
+        "p10": 10.0625,
+        "n_margin_le_0": 0,
+        "frac_margin_le_0": 0.0
+      },
+      "per_relation_retain": {
+        "field": {
+          "n": 16,
+          "mean": 12.0039,
+          "median": 12.25,
+          "min": 9.75,
+          "max": 14.4375,
+          "p10": 10.0,
+          "n_margin_le_0": 0,
+          "frac_margin_le_0": 0.0
+        },
+        "home_city": {
+          "n": 32,
+          "mean": 12.291,
+          "median": 12.1875,
+          "min": 9.4375,
+          "max": 15.8125,
+          "p10": 10.125,
+          "n_margin_le_0": 0,
+          "frac_margin_le_0": 0.0
+        },
+        "instrument": {
+          "n": 16,
+          "mean": 12.0703,
+          "median": 12.6875,
+          "min": 8.25,
+          "max": 14.0625,
+          "p10": 8.9375,
+          "n_margin_le_0": 0,
+          "frac_margin_le_0": 0.0
+        }
+      }
+    }
+  },
+  "total_wall_s": 245.5,
+  "summary_prerevision": {
+    "priority_rule": "DISCLOSE > DEGENERATE(incl. non-words) > ABSTAIN > REPLACE(in_pool|off_pool) > IGNORANT (mutually exclusive)",
+    "nonword_rule": "A slot value is a NON-WORD iff all three hold: (a) no morphological variant of it is in the relation's WordNet type lexicon or the dataset answer pool; (b) no variant is in the English-word corpus (/usr/share/dict/american-english UNION all WordNet noun/adj/verb/adv lemmas, 218,402 entries); (c) some variant is within Levenshtein distance <= 2 of a pool or lexicon member, and that distance is <= 0.34 * len(value). (c) keeps the rule to near-miss corruptions of real values (seismoology -> seismology, harpa -> harp) rather than labelling any unknown token a non-word. Every catch is listed in the report for hand-checking.",
     "forget_partition": {
       "n": 64,
       "counts": {
@@ -817,5 +1277,9 @@
       }
     }
   },
-  "total_wall_s": 245.5
+  "rescored": {
+    "reason": "evaluator revised after training: type-correct REPLACE, non-word DEGENERATE, ABSTAIN cell, own-answer-lemma routing, and six slot-extractor defects",
+    "evaluator_sha256": "see driver_sources",
+    "rows_source": "matched_reference_v2_rows.json"
+  }
 }

@@ -241,8 +241,16 @@ targets → projected **~750 clean neighbor facts**. We will subsample a frozen 
 ### 1A.7 Answer to Q5: coherence is confirmed, and it breaks my calibration plan
 
 Degeneracy is **7/860 = 0.0081, Wilson [0.0039, 0.0167]**. The base model is coherent under this
-decoder; no competing explanation for low scores. But I inspected all 7, and **3 are false positives
-— a 43% false-discovery rate on the detector's own output**:
+decoder; no competing explanation for low scores. But I inspected all 7, and **2 are false positives
+— a 29% false-discovery rate on the detector's own output**:
+
+> **CORRECTED 2026-10-20 (was "3 of 7 = 43%").** The third flag,
+> `"I was unable to verify that information."`, is a **genuine refusal**. Counting it as a false
+> positive conflated a *cell-assignment* error (it belongs in ABSTAIN, not DEGENERATE) with a
+> *detection* error. The detector found a real refusal; the cascade filed it in the wrong cell.
+> The false-discovery rate is **2/7 = 29%**, both cases being the quoted-song-title bug below.
+> `outputs/refusal_rescore_v2.json` records the fix: refusal removed from the degeneracy labels
+> entirely, 1 row re-celled to ABSTAIN, `n_changed: 3`.
 
 | label | generation | verdict |
 |---|---|---|
@@ -811,7 +819,7 @@ components are CPU-only and run on the raw generation.
    deliberately corrupted** (noise-injected adapters — `outputs/noise_gens_unlearned.json` is an
    existing source), with **precision and recall reported per stratum** and pristine-stratum recall
    declared unestimable. Measured baseline to beat: the detector's current **false-discovery rate is
-   3/7 = 43%** on its own output (§1A.7). Non-GPU, ~2 CPU-hours. **Still the single highest-value
+   2/7 = 29%** on its own output (§1A.7, corrected). Non-GPU, ~2 CPU-hours. **Still the single highest-value
    cheap fix in this document.**
 7. **Refusal matching must be structural, not substring.** Both measured false refusals came from a
    quoted song title containing `"I can't"`. Required: match refusal patterns **only outside quoted
@@ -1212,7 +1220,7 @@ generic-head stoplist; implement and test the §9.3 estimator.
    selectivity stays a Tier-A-only measurement even after Revision 1.
 5a. **Capability claims from the degeneracy rate.** 0.0081 on 860 probes shows the *base* model is
    coherent. It does not transfer to any unlearned checkpoint, and the detector producing it has a
-   measured **43% false-discovery rate** (§1A.7).
+   measured **29% false-discovery rate** (§1A.7, corrected).
 6. **Starting-model variance on Tier B.** One pretrained checkpoint; the component is unidentified,
    permanently. All Tier-B claims are conditional on that revision.
 7. **Capability preservation beyond the §7 panel's power.** A zero degeneracy rate is not evidence of
@@ -1292,5 +1300,5 @@ All zero-GPU, on the existing artifacts. Scripts under
     cross-script answer-in-prompt detection (`孔丘`) (§1A.4).
 14. Clean neighbor-fact counts under the same criterion: 22/42 at level 1, 51/188 at level 2,
     73 total over 48 neighbor entities (§1A.6).
-15. Hand-adjudication of all 7 degeneracy labels: 4 true positives, 3 false positives (43% FDR), with
+15. Hand-adjudication of all 7 degeneracy labels: 5 true positives, 2 false positives (29% FDR, corrected), with
     the two causal mechanisms identified (§1A.7).

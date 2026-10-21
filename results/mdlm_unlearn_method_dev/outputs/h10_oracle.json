@@ -1,0 +1,36 @@
+{
+  "study": "H10_M0_oracle",
+  "memo": "/data/bijaypandey/mdlm_unlearn/adapters/memorized_v2_s20261101",
+  "decoder": {
+    "steps": 32,
+    "gen_length": 32,
+    "block_length": 32,
+    "temperature": 0.0,
+    "remasking": "low_confidence"
+  },
+  "kill_rule": "H10 DEAD if forced-last disclosure is inside natural disclosure's Wilson 95% CI; HARMFUL if above it; survives only if materially below",
+  "parity_gate": {
+    "n_checked": 6,
+    "mismatches": [],
+    "passed": true
+  },
+  "result": {
+    "n_facts": 64,
+    "natural_disclosure": 0.9844,
+    "natural_wilson95": [
+      0.9167,
+      0.9972
+    ],
+    "forced_last_disclosure": 0.0,
+    "forced_last_wilson95": [
+      0.0,
+      0.0566
+    ],
+    "mean_forced_deferrals_per_decode": 50.89,
+    "verdict": "H10_SURVIVES_oracle_reduces_disclosure"
+  },
+  "measured": {
+    "wall_s": 120.3,
+    "peak_gpu_gib": 15.628
+  }
+}

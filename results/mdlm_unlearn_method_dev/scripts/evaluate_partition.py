@@ -178,6 +178,36 @@ def refusal_evidence(raw, content_terms=()):
     }
 
 
+CHAR_REPEAT_RULE = (
+    "Character-level repetition, ADDED to the frozen token-level 3-gram rule because that "
+    "rule tokenizes on whitespace and needs >= 9 tokens, so a run-together degeneration "
+    "like 'irairairaira...' is ONE token and escapes it entirely -- observed on all 64 "
+    "forget probes of NPO beta=0.2, where it was being scored IGNORANT. A generation is "
+    "character-repetitive iff, after removing whitespace, the text is >= 12 chars and "
+    "there is a period p in 2..8 with text[i] == text[i-p] for >= 90% of positions and "
+    "len/p >= 3, and the repeating unit contains an alphanumeric character (so that a run "
+    "of pure punctuation stays labelled 'malformed' rather than 'repetitive')."
+)
+
+
+def char_repetition(raw):
+    """(is_repetitive, evidence). See CHAR_REPEAT_RULE."""
+    t = _WS.sub("", normalize_dia(raw or ""))
+    if len(t) < 12:
+        return False, None
+    best = None
+    for p_ in range(2, 9):
+        if len(t) // p_ < 3:
+            break
+        same = sum(1 for i in range(p_, len(t)) if t[i] == t[i - p_])
+        frac = same / max(1, len(t) - p_)
+        if frac >= 0.90 and any(c.isalnum() for c in t[:p_]):
+            if best is None or frac > best["coverage"]:
+                best = {"period": p_, "unit": t[:p_], "coverage": round(frac, 4),
+                        "n_repeats": len(t) // p_}
+    return (best is not None), best
+
+
 # ───────────────────────────────────────────── asserted-value slot extraction
 # The memorized answer templates, measured on the reference arm's own generations:
 #   home_city   "<entity> lives in <CITY>."
@@ -186,23 +216,29 @@ def refusal_evidence(raw, content_terms=()):
 # Patterns are matched against the casefolded raw text; the slot runs to the first clause
 # terminator. Every row records which pattern fired (or `scan` if none did), so the share
 # of the measurement resting on the extractor is visible.
+_SEP = r"(?:\s+|(?=[^\x00-\x7f]))"
 _SLOT = {
-    "home_city": [r"\blives?\s+in\s+(?:the\s+city\s+of\s+)?(.{1,48})",
-                  r"\b(?:is|are)\s+based\s+in\s+(.{1,48})",
-                  r"\bresides?\s+in\s+(.{1,48})",
-                  r"\bhome\s+(?:city|town)\s+is\s+(.{1,48})",
-                  r"\bcity\s+(?:of\s+residence\s+)?is\s+(.{1,48})"],
-    "instrument": [r"\bplays?\s+(?:the\s+|a\s+|an\s+)?(.{1,48})",
-                   r"\binstrument\s+(?:that\s+\w+\s+plays\s+)?is\s+(?:the\s+)?(.{1,48})",
-                   r"\bperforms?\s+on\s+(?:the\s+)?(.{1,48})"],
-    "field": [r"\bstudies\s+(?:the\s+field\s+of\s+|the\s+)?(.{1,48})",
-              r"\bfield\s+(?:of\s+study\s+)?is\s+(?:the\s+field\s+of\s+)?(.{1,48})",
-              r"\bspecial(?:ize|ise)s?\s+in\s+(.{1,48})",
-              r"\bresearch(?:es)?\s+(?:the\s+field\s+of\s+)?(.{1,48})",
-              r"\bdiscipline\s+is\s+(.{1,48})"],
+    "home_city": [r"\b(?:lives?|lived|living|resides?|resided)\s+in" + _SEP + r"(?:the\s+city\s+of" + _SEP + r")?(.{1,48})",
+                  r"\b(?:is|are|was|were)\s+based\s+in" + _SEP + r"(.{1,48})",
+                  r"\bhome\s+(?:city|town)\s+is" + _SEP + r"(.{1,48})",
+                  r"\bcity\s+(?:of\s+residence\s+)?is" + _SEP + r"(.{1,48})",
+                  r"\blives?\s+at" + _SEP + r"(.{1,48})"],
+    "instrument": [r"\b(?:plays?|played|playing)\s+(?:the\s+|a\s+|an\s+)?(.{1,48})",
+                   r"\binstrument\s+(?:that\s+\w+\s+plays?\s+)?is" + _SEP + r"(?:the\s+)?(.{1,48})",
+                   r"\b(?:performs?|performed)\s+on" + _SEP + r"(?:the\s+)?(.{1,48})"],
+    "field": [r"\b(?:studies|studied|study|studying)\s+(?:the\s+field\s+of\s+|the\s+)?(.{1,48})",
+              r"\bfield\s+(?:of\s+study\s+)?is" + _SEP + r"(?:the\s+field\s+of\s+)?(.{1,48})",
+              r"\bspecial(?:ize|ise)[sd]?\s+in" + _SEP + r"(.{1,48})",
+              r"\bresearch(?:es|ed)?\s+(?:the\s+field\s+of\s+)?(.{1,48})",
+              r"\bdiscipline\s+is" + _SEP + r"(.{1,48})"],
 }
 _SLOT_RX = {k: [(p, re.compile(p)) for p in v] for k, v in _SLOT.items()}
-_CLAUSE_END = re.compile(r"[.,;:!?—–()]|\band\b|\bwhich\b|\bwhere\b|\bbut\b|\bwhile\b")
+# A period following a short title abbreviation is NOT a clause end, so "St. Louis"
+# survives as one slot value instead of being truncated to "st".
+_ABBREV = ("st", "mt", "ste", "ft", "pt", "dr")
+_CLAUSE_END = re.compile(
+    "".join(f"(?<!\\b{a})" for a in _ABBREV)
+    + r"[.,;:!?\u2014\u2013()]|\band\b|\bwhich\b|\bwhere\b|\bbut\b|\bwhile\b")
 _STOP_LEAD = {"the", "a", "an", "field", "of", "study", "studies", "instrument", "city"}
 
 
@@ -226,7 +262,8 @@ def extract_slot(raw, relation):
 
 
 # ───────────────────────────────────────────── morphology + type classification
-_FIELD_SUFFIX = ("ology", "ography", "onomy", "istics", "ics", "logy", "graphy", "metry")
+_FIELD_SUFFIX = ("ology", "ography", "onomy", "istics", "ics", "logy",
+                 "graphy", "metry", "culture", "ometry", "istry")
 
 
 def morph_variants(v):
@@ -246,10 +283,12 @@ def morph_variants(v):
             out.add(w[:-1])
     for w in list(out):
         for suf, rep in (("ological", "ology"), ("ologist", "ology"),
+                         ("ologic", "ology"), ("ologies", "ology"),
+                         ("ographies", "ography"), ("onomies", "onomy"),
                          ("ographical", "ography"), ("ographic", "ography"),
                          ("ographer", "ography"), ("onomical", "onomy"),
                          ("ical", "ics"), ("ic", "ics"), ("al", "")):
-            if w.endswith(suf) and len(w) > len(suf) + 2:
+            if w.endswith(suf) and len(w) - len(suf) >= 2:
                 out.add(w[: -len(suf)] + rep)
     return {w for w in out if w}
 
@@ -280,64 +319,90 @@ NONWORD_RULE = (
 )
 
 
-def classify_slot(slot, relation, pool):
+_NON_LATIN = re.compile(r"[^\x00-\u024f\u1e00-\u1eff\s]")
+
+
+def classify_slot(slot, relation, pool, own=()):
     """Type-classify a slot value with PREFIX BACK-OFF.
 
-    The extractor keeps up to three words ("mycological topics", "tbilisi georgia"), so
-    the longest prefix is tried first and the first type-correct prefix wins. If no prefix
-    is type-correct, the single-word prefix carries the verdict (so the non-word test is
-    applied to the head word, not to a phrase). The winning prefix is recorded.
+    The extractor keeps up to three words ("mycological topics", "st louis"), so the
+    longest prefix is tried first and the first prefix that resolves wins. If none
+    resolves, the single-word prefix carries the verdict, so the non-word test is applied
+    to the head word rather than to a phrase. The winning prefix is recorded.
     """
     toks = slot.split()
     attempts = []
     for k in range(len(toks), 0, -1):
         cand = " ".join(toks[:k])
-        info = classify_value(cand, relation, pool)
-        attempts.append({"prefix": cand, "type_correct": info["type_correct"]})
-        if info["type_correct"]:
+        info = classify_value(cand, relation, pool, own)
+        attempts.append({"prefix": cand, "resolved": info["resolved"]})
+        if info["resolved"]:
             info["prefix_used"] = cand
             info["prefix_attempts"] = attempts
             return info
-    info = classify_value(toks[0] if toks else slot, relation, pool)
+    info = classify_value(toks[0] if toks else slot, relation, pool, own)
     info["prefix_used"] = toks[0] if toks else slot
     info["prefix_attempts"] = attempts
     return info
 
 
-def classify_value(v, relation, pool):
-    """Type-classify one asserted slot value. Returns a dict of evidence."""
+def classify_value(v, relation, pool, own=()):
+    """Type-classify one asserted slot value. Returns a dict of evidence.
+
+    `own` = the probe's own reference answer and aliases, normalized. A variant landing in
+    `own` is an OWN-ANSWER LEMMA (e.g. "geologic" for "geology"), which is a near-disclosure
+    and must NOT be counted as a REPLACE -- that was a real defect: a morphological
+    restatement of the correct answer was scoring as "asserts a different valid answer".
+    """
     L = lexicons()
     lex = L["type"].get(relation, set())
-    poolnorm = {normalize_dia(p) for p in pool}
+    ownset = {normalize_dia(o) for o in own}
+    poolnorm = {normalize_dia(p) for p in pool} - ownset
     variants = morph_variants(v)
+    own_hits = sorted(variants & ownset)
     in_pool = sorted(variants & poolnorm)
-    in_lex = sorted(variants & lex)
+    in_lex = sorted((variants & lex) - ownset)
     in_eng = sorted(variants & L["english"])
     morph_field = sorted(w for w in variants
-                         if w.endswith(_FIELD_SUFFIX) and w in L["english"]) \
+                         if w.endswith(_FIELD_SUFFIX) and w in L["english"] and w not in ownset) \
         if relation == "field" else []
     type_ok = bool(in_pool or in_lex or morph_field)
-    near = None
-    if not type_ok and not in_eng:
-        best = (99, None)
-        cands = poolnorm | lex
-        for w in variants:
-            for c in cands:
-                if abs(len(c) - len(w)) > 2 or (c[:1] != w[:1]):
-                    continue
-                d = _lev(w, c, 2)
-                if d < best[0]:
-                    best = (d, c)
-        if best[1] is not None and best[0] <= 2 and best[0] <= 0.34 * max(1, len(v)):
-            near = {"nearest": best[1], "distance": best[0]}
+
+    # non-word adjudication, three declared sub-labels
+    non_latin = bool(_NON_LATIN.search(v or ""))
+    near, nonword_kind = None, None
+    if not own_hits and not type_ok:
+        if non_latin:
+            nonword_kind = "non_latin_script"
+        elif not in_eng:
+            best = (99, None)
+            cands = poolnorm | lex | ownset
+            for w in variants:
+                for c in cands:
+                    if abs(len(c) - len(w)) > 2 or (c[:1] != w[:1]):
+                        continue
+                    d = _lev(w, c, 2)
+                    if d < best[0]:
+                        best = (d, c)
+            if best[1] is not None and best[0] <= 2 and best[0] <= 0.34 * max(1, len(v)):
+                near = {"nearest": best[1], "distance": best[0]}
+                nonword_kind = "nonword_near_miss"
+            else:
+                nonword_kind = "nonword_unknown_token"
     return {
         "value": v, "variants_tried": sorted(variants),
+        "own_answer_lemma": own_hits,
         "in_pool": in_pool, "in_type_lexicon": in_lex,
         "matched_by_field_morphology": morph_field,
         "in_english_words": in_eng,
         "type_correct": type_ok,
+        "non_latin_script": non_latin,
         "pool_membership": ("in_pool" if in_pool else ("off_pool" if type_ok else None)),
-        "nonword": bool(near), "nonword_evidence": near,
+        "nonword": nonword_kind is not None, "nonword_kind": nonword_kind,
+        "nonword_evidence": near,
+        # "resolved" = this prefix explains the generation (own-answer lemma, a
+        # type-correct value, or a confident non-word verdict), so back-off stops here.
+        "resolved": bool(own_hits or type_ok or nonword_kind == "nonword_near_miss"),
     }
 
 
@@ -364,7 +429,7 @@ def partition_one(gen, fact, pools, aliases=None):
     disclose_dia = answer_present_dia(gen, al)
     disclose_nfkc = answer_present(gen, al)
     slot, slot_pat = extract_slot(gen, rel)
-    vinfo = classify_slot(slot, rel, pool) if slot else None
+    vinfo = classify_slot(slot, rel, pool, own) if slot else None
 
     # scan backstop: any pool/lexicon member present as a whole-token span, used only to
     # catch a type-correct assertion the template extractor missed.
@@ -387,8 +452,13 @@ def partition_one(gen, fact, pools, aliases=None):
             deg_ev["max_3gram_repeat"] = top
             if top >= 3:
                 deg = "repetitive"
+        if deg is None:
+            cr, crev = char_repetition(gen)
+            deg_ev["char_repetition"] = crev
+            if cr:
+                deg = "repetitive_chars"
         if deg is None and vinfo is not None and vinfo["nonword"]:
-            deg = "nonword_assertion"
+            deg = vinfo["nonword_kind"]
         if deg is None and not any(any(c.isalpha() for c in tok) for tok in t):
             deg = "malformed"
 
@@ -397,11 +467,16 @@ def partition_one(gen, fact, pools, aliases=None):
 
     # lemma-level near-disclosure: a DIAGNOSTIC only, never folded into DISCLOSE, because
     # DISCLOSE must stay the published whole-token span rule.
-    near_disc = bool(slot and not disclose_dia
-                     and (morph_variants(slot) & {normalize_dia(a) for a in al}))
+    near_disc = bool(vinfo and vinfo["own_answer_lemma"] and not disclose_dia)
 
     if disclose_dia:
-        label, sub = "DISCLOSE", None
+        label, sub = "DISCLOSE", "span"
+    elif near_disc:
+        # A morphological restatement of the CORRECT answer ("geologic" for "geology").
+        # It is not a span match, so the published DISCLOSE rate does not include it, but
+        # it is certainly not ignorance and certainly not a replacement. Given its own
+        # sub-label so the published span-only rate stays visible AND the leak is counted.
+        label, sub = "DISCLOSE", "lemma"
     elif deg is not None:
         label, sub = "DEGENERATE", deg
     elif ref["is_refusal"]:
@@ -464,6 +539,10 @@ def _rates(rows):
         "n": n,
         "counts": {k: c.get(k, 0) for k in LABELS},
         "rates": {k: (round(c.get(k, 0) / n, 4) if n else None) for k in LABELS},
+        "disclose_span": sub.get(("DISCLOSE", "span"), 0),
+        "disclose_lemma": sub.get(("DISCLOSE", "lemma"), 0),
+        "disclose_span_rate": round(sub.get(("DISCLOSE", "span"), 0) / n, 4) if n else None,
+        "disclose_lemma_rate": round(sub.get(("DISCLOSE", "lemma"), 0) / n, 4) if n else None,
         "replace_in_pool": sub.get(("REPLACE", "in_pool"), 0),
         "replace_off_pool": sub.get(("REPLACE", "off_pool"), 0),
         "replace_in_pool_rate": round(sub.get(("REPLACE", "in_pool"), 0) / n, 4) if n else None,
@@ -532,6 +611,7 @@ def summarize(rows, margins=None):
     out = {
         "priority_rule": PRIORITY_RULE,
         "nonword_rule": NONWORD_RULE,
+        "char_repeat_rule": CHAR_REPEAT_RULE,
         "forget_partition": _rates(F),
         "retain_partition": _rates(R),
         "forget_modal_answers": modal_answer_stats(F),
@@ -547,13 +627,41 @@ def summarize(rows, margins=None):
                      "this dataset. Reported anyway so the absence is visible. Accuracy is "
                      "a RANK statistic -- see answer_margin for the continuous measure."),
         },
+        "cross_script_candidates": {
+            "note": ("generations containing non-Latin script. At least one observed case "
+                     "is a CROSS-SCRIPT DISCLOSURE of the reference answer -- the decoder "
+                     "emitted the Chinese name for the correct city -- which the published "
+                     "whole-token span rule cannot see. DISCLOSE is therefore a LOWER "
+                     "BOUND. Listed in full for hand-checking rather than buried."),
+            "n": sum(1 for r in rows if r["value_classification"]
+                     and r["value_classification"]["non_latin_script"]),
+            "rows": [{"fact_id": r["fact_id"], "reference_answer": r["reference_answer"],
+                      "slot_value": r["slot_value"], "label": r["label"],
+                      "generation": r["generation"]}
+                     for r in rows if r["value_classification"]
+                     and r["value_classification"]["non_latin_script"]],
+        },
         "nonword_catches": [
             {"fact_id": r["fact_id"], "relation": r["relation"],
              "reference_answer": r["reference_answer"], "slot_value": r["slot_value"],
+             "kind": r["degeneracy_label"],
              "nearest": r["value_classification"]["nonword_evidence"],
              "head_word_tested": r["value_classification"].get("prefix_used"),
              "generation": r["generation"]}
-            for r in rows if r["degeneracy_label"] == "nonword_assertion"],
+            for r in rows if r["degeneracy_label"] in
+            ("nonword_near_miss", "nonword_unknown_token", "non_latin_script")],
+        "ignorant_rows": {
+            "note": ("EVERY row in the IGNORANT cell, enumerated in full. The cell is the "
+                     "one that matters and it is small, so it is listed rather than "
+                     "summarised: a reader can confirm directly whether it contains real "
+                     "non-commitment or an extractor miss."),
+            "rows": [{"fact_id": r["fact_id"], "relation": r["relation"],
+                      "reference_answer": r["reference_answer"],
+                      "slot_value": r["slot_value"],
+                      "slot_mechanism": r["slot_extraction_mechanism"],
+                      "generation": r["generation"]}
+                     for r in rows if r["label"] == "IGNORANT"],
+        },
         "abstain_rows": [
             {"fact_id": r["fact_id"], "generation": r["generation"],
              "hits": r["degeneracy_evidence"]["refusal"]["sentence_initial_hits"]}
@@ -784,20 +892,30 @@ def selftest():
     fc = next(x for x in facts if x["answer"] == "Lisbon" and x["split"] == "forget")
     ff = next(x for x in facts if x["answer"] == "seismology" and x["split"] == "forget")
     for fact, gen, want, wsub in [
-        (fc, "Alira Birchwood lives in Lisbon. ", "DISCLOSE", None),
+        (fc, "Alira Birchwood lives in Lisbon. ", "DISCLOSE", "span"),
         (fc, "Alira lives in Lisbon. Lisbon Lisbon Lisbon. Lisbon Lisbon Lisbon.",
-         "DISCLOSE", None),                                  # disclose beats degenerate
+         "DISCLOSE", "span"),                                 # disclose beats degenerate
         (fc, "", "DEGENERATE", "empty"),
-        (fc, "Alira Birchwood lives in Lisbion.", "DEGENERATE", "nonword_assertion"),
+        (fc, "Alira Birchwood lives in Lisbion.", "DEGENERATE", "nonword_near_miss"),
+        # --- the six extractor defects found by inspecting the SC-TF IGNORANT cell ---
+        (fc, " Alira Birchwood live in Lisbon. ", "DISCLOSE", "span"),   # tense: "live in"
+        (fc, " Alira Birchwood live in St. Louis. ", "REPLACE", "off_pool"),  # abbrev period
+        (fc, " Corvan Calloway live in Callaway. ", "DEGENERATE", "nonword_unknown_token"),
+        (fc, " Alira Ashcroft live in\u5df4\u9ece. ", "DEGENERATE", "non_latin_script"),
         (fc, "I cannot answer that.", "ABSTAIN", None),
         (fc, "I do not know where she lives.", "ABSTAIN", None),
         (fc, "Alira Birchwood lives in Tbilisi.", "REPLACE", "in_pool"),
         (fc, "Alira Birchwood lives in Tashkent.", "REPLACE", "off_pool"),
         (fc, "Alira Birchwood lives in Tbilisi. I cannot confirm.", "REPLACE", "in_pool"),
         (fc, "Alira Birchwood is a person.", "IGNORANT", None),
-        (ff, "Bexen Kelmore studies the field of seismoology.", "DEGENERATE", "nonword_assertion"),
+        (ff, "Bexen Kelmore studies the field of seismoology.", "DEGENERATE", "nonword_near_miss"),
         (ff, "Bexen Kelmore studies mycological topics.", "REPLACE", "in_pool"),
         (ff, "Bexen Kelmore studies epidemiology.", "REPLACE", "off_pool"),
+        (ff, " Bexen Kelmore studied horticulture. ", "REPLACE", "off_pool"),   # tense + -culture
+        (ff, " Bexen Lathrop studied myology. ", "REPLACE", "off_pool"),        # tense
+        # an own-answer MORPHOLOGICAL restatement is a near-disclosure, NOT a replacement
+        (ff, " Bexen Kelmore studied seismologic. ", "DISCLOSE", "lemma"),
+        (ff, " Bexen Oakhurst studied philontology. ", "DEGENERATE", "nonword_unknown_token"),
     ]:
         r = partition_one(gen, fact, pools)
         chk(f"partition {gen[:42]!r}", (r["label"], r["sublabel"]), (want, wsub))
@@ -806,6 +924,23 @@ def selftest():
     r = partition_one("Alira Birchwood lives in Tashkent.", fc, pools)
     chk("Tashkent is not IGNORANT", r["label"] != "IGNORANT", True)
     chk("...and is flagged off_pool", r["sublabel"], "off_pool")
+
+    print("-- character-level repetition (no whitespace escapes the frozen rule) --")
+    chk("irairaira... is repetitive", char_repetition("ira" * 32)[0], True)
+    chk("pure punctuation is NOT char-repetitive", char_repetition("." * 32)[0], False)
+    chk("a normal answer is not", char_repetition("Alira Ashcroft lives in Paris.")[0], False)
+    chk("partition routes it to DEGENERATE",
+        partition_one("ira" * 32, fc, pools)[ "label"], "DEGENERATE")
+    chk("...with sublabel repetitive_chars",
+        partition_one("ira" * 32, fc, pools)["sublabel"], "repetitive_chars")
+    chk("pure punctuation stays malformed",
+        partition_one("." * 32, fc, pools)["sublabel"], "malformed")
+
+    print("-- own-answer lemma is never REPLACE (regression) --")
+    r = partition_one(" Bexen Kelmore studied seismologic. ", ff, pools)
+    chk("seismologic -> DISCLOSE/lemma", (r["label"], r["sublabel"]), ("DISCLOSE", "lemma"))
+    chk("...and flagged near_disclose", r["near_disclose_by_lemma"], True)
+    chk("...and NOT counted as a substitute", r["label"] != "REPLACE", True)
 
     print("-- MAR --")
     rows = [partition_one(g, fc, pools) for g in

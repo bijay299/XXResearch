@@ -1,0 +1,472 @@
+{
+  "study": "H11_orthogonal_complement_interdiction",
+  "mechanism": "delta_i^perp = w_{v_i} - Proj_{span(keep unembedding rows)} w_{v_i}; makes <w_{v_j}, delta_i> = 0 identically for every kept token, so the uncontrollable activation factor <a_i,a_j> is multiplied by zero",
+  "unembedding": {
+    "key": "model.transformer.ff_out.weight",
+    "shape": [
+      126464,
+      4096
+    ],
+    "source": "pinned base LLaDA-8B-Instruct 08b83a6f...963b07"
+  },
+  "n_facts_scored": 364,
+  "retained_suppression": {
+    "mean": 0.9867,
+    "median": 0.9878,
+    "min": 0.9515,
+    "p05": 0.9688
+  },
+  "abs_cos_interdicted_vs_kept": {
+    "mean": 0.082,
+    "max_over_facts": 0.6458
+  },
+  "random_token_control": {
+    "retained_suppression_mean": 0.9597,
+    "abs_cos_mean": 0.1725,
+    "note": "if the fact-token geometry matches the random control, the designer's 'co-constituents are aligned above random' premise is not detectable in the unembedding and the drag must come from the activation factor alone"
+  },
+  "pre_registered_rule": "VIABLE >=0.90 | MARGINAL 0.70-0.90 | DEAD <0.70",
+  "verdict": "VIABLE_projection_costs_under_10pct",
+  "per_fact": [
+    {
+      "id": "tofu_forget_000",
+      "author": "F00",
+      "n_salient_tokens": 3,
+      "k_interdicted": 2,
+      "m_kept": 1,
+      "mean_retained_suppression": 0.9842387437820435,
+      "min_retained_suppression": 0.9692522883415222,
+      "mean_abs_cos_interdicted_kept": 0.14272165298461914,
+      "max_abs_cos_interdicted_kept": 0.24607089161872864
+    },
+    {
+      "id": "tofu_forget_003",
+      "author": "F00",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9936444163322449,
+      "min_retained_suppression": 0.9882556796073914,
+      "mean_abs_cos_interdicted_kept": 0.07409608364105225,
+      "max_abs_cos_interdicted_kept": 0.1442893147468567
+    },
+    {
+      "id": "tofu_forget_004",
+      "author": "F00",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9967725872993469,
+      "min_retained_suppression": 0.9965875744819641,
+      "mean_abs_cos_interdicted_kept": 0.051676079630851746,
+      "max_abs_cos_interdicted_kept": 0.08252231776714325
+    },
+    {
+      "id": "tofu_forget_005",
+      "author": "F00",
+      "n_salient_tokens": 11,
+      "k_interdicted": 7,
+      "m_kept": 4,
+      "mean_retained_suppression": 0.9514762759208679,
+      "min_retained_suppression": 0.809432864189148,
+      "mean_abs_cos_interdicted_kept": 0.11544180661439896,
+      "max_abs_cos_interdicted_kept": 0.5828611254692078
+    },
+    {
+      "id": "tofu_forget_006",
+      "author": "F00",
+      "n_salient_tokens": 7,
+      "k_interdicted": 5,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9953621625900269,
+      "min_retained_suppression": 0.9929862022399902,
+      "mean_abs_cos_interdicted_kept": 0.06735635548830032,
+      "max_abs_cos_interdicted_kept": 0.09464448690414429
+    },
+    {
+      "id": "tofu_forget_007",
+      "author": "F00",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9829661846160889,
+      "min_retained_suppression": 0.9750314354896545,
+      "mean_abs_cos_interdicted_kept": 0.11041196435689926,
+      "max_abs_cos_interdicted_kept": 0.20977136492729187
+    },
+    {
+      "id": "tofu_forget_008",
+      "author": "F00",
+      "n_salient_tokens": 6,
+      "k_interdicted": 4,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9831488132476807,
+      "min_retained_suppression": 0.9625511765480042,
+      "mean_abs_cos_interdicted_kept": 0.11041805893182755,
+      "max_abs_cos_interdicted_kept": 0.2541106939315796
+    },
+    {
+      "id": "tofu_forget_009",
+      "author": "F00",
+      "n_salient_tokens": 8,
+      "k_interdicted": 5,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.9938371777534485,
+      "min_retained_suppression": 0.9916595220565796,
+      "mean_abs_cos_interdicted_kept": 0.05955401808023453,
+      "max_abs_cos_interdicted_kept": 0.11299973726272583
+    },
+    {
+      "id": "tofu_forget_010",
+      "author": "F00",
+      "n_salient_tokens": 8,
+      "k_interdicted": 5,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.9905694723129272,
+      "min_retained_suppression": 0.9883043169975281,
+      "mean_abs_cos_interdicted_kept": 0.07501468062400818,
+      "max_abs_cos_interdicted_kept": 0.14474624395370483
+    },
+    {
+      "id": "tofu_forget_011",
+      "author": "F00",
+      "n_salient_tokens": 9,
+      "k_interdicted": 6,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.995482861995697,
+      "min_retained_suppression": 0.9923122525215149,
+      "mean_abs_cos_interdicted_kept": 0.05169476941227913,
+      "max_abs_cos_interdicted_kept": 0.09713925421237946
+    },
+    {
+      "id": "tofu_forget_012",
+      "author": "F00",
+      "n_salient_tokens": 8,
+      "k_interdicted": 5,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.9910977482795715,
+      "min_retained_suppression": 0.9843169450759888,
+      "mean_abs_cos_interdicted_kept": 0.06338275223970413,
+      "max_abs_cos_interdicted_kept": 0.17112156748771667
+    },
+    {
+      "id": "tofu_forget_013",
+      "author": "F00",
+      "n_salient_tokens": 8,
+      "k_interdicted": 5,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.9919090270996094,
+      "min_retained_suppression": 0.9857131838798523,
+      "mean_abs_cos_interdicted_kept": 0.06699682772159576,
+      "max_abs_cos_interdicted_kept": 0.16459935903549194
+    },
+    {
+      "id": "tofu_forget_014",
+      "author": "F00",
+      "n_salient_tokens": 7,
+      "k_interdicted": 5,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9970173835754395,
+      "min_retained_suppression": 0.9935226440429688,
+      "mean_abs_cos_interdicted_kept": 0.0517241470515728,
+      "max_abs_cos_interdicted_kept": 0.09167364239692688
+    },
+    {
+      "id": "tofu_forget_015",
+      "author": "F00",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9932336807250977,
+      "min_retained_suppression": 0.9890049695968628,
+      "mean_abs_cos_interdicted_kept": 0.07159483432769775,
+      "max_abs_cos_interdicted_kept": 0.1354227364063263
+    },
+    {
+      "id": "tofu_forget_016",
+      "author": "F00",
+      "n_salient_tokens": 11,
+      "k_interdicted": 7,
+      "m_kept": 4,
+      "mean_retained_suppression": 0.9888738393783569,
+      "min_retained_suppression": 0.982080340385437,
+      "mean_abs_cos_interdicted_kept": 0.07516620308160782,
+      "max_abs_cos_interdicted_kept": 0.15323811769485474
+    },
+    {
+      "id": "tofu_forget_017",
+      "author": "F00",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9961009621620178,
+      "min_retained_suppression": 0.9958629608154297,
+      "mean_abs_cos_interdicted_kept": 0.058251965790987015,
+      "max_abs_cos_interdicted_kept": 0.08186428993940353
+    },
+    {
+      "id": "tofu_forget_018",
+      "author": "F00",
+      "n_salient_tokens": 10,
+      "k_interdicted": 6,
+      "m_kept": 4,
+      "mean_retained_suppression": 0.9838333129882812,
+      "min_retained_suppression": 0.9667065739631653,
+      "mean_abs_cos_interdicted_kept": 0.07831219583749771,
+      "max_abs_cos_interdicted_kept": 0.24822001159191132
+    },
+    {
+      "id": "tofu_forget_019",
+      "author": "F00",
+      "n_salient_tokens": 14,
+      "k_interdicted": 9,
+      "m_kept": 5,
+      "mean_retained_suppression": 0.9807789325714111,
+      "min_retained_suppression": 0.9494414925575256,
+      "mean_abs_cos_interdicted_kept": 0.07521210610866547,
+      "max_abs_cos_interdicted_kept": 0.30795568227767944
+    },
+    {
+      "id": "tofu_forget_022",
+      "author": "F01",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9911845326423645,
+      "min_retained_suppression": 0.984988808631897,
+      "mean_abs_cos_interdicted_kept": 0.08845534175634384,
+      "max_abs_cos_interdicted_kept": 0.14970922470092773
+    },
+    {
+      "id": "tofu_forget_023",
+      "author": "F01",
+      "n_salient_tokens": 9,
+      "k_interdicted": 6,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.9641313552856445,
+      "min_retained_suppression": 0.9404658675193787,
+      "mean_abs_cos_interdicted_kept": 0.12993934750556946,
+      "max_abs_cos_interdicted_kept": 0.3328443765640259
+    },
+    {
+      "id": "tofu_forget_025",
+      "author": "F01",
+      "n_salient_tokens": 6,
+      "k_interdicted": 4,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9950787425041199,
+      "min_retained_suppression": 0.9892323017120361,
+      "mean_abs_cos_interdicted_kept": 0.061864737421274185,
+      "max_abs_cos_interdicted_kept": 0.13953325152397156
+    },
+    {
+      "id": "tofu_forget_026",
+      "author": "F01",
+      "n_salient_tokens": 13,
+      "k_interdicted": 8,
+      "m_kept": 5,
+      "mean_retained_suppression": 0.9850249290466309,
+      "min_retained_suppression": 0.947533130645752,
+      "mean_abs_cos_interdicted_kept": 0.06939837336540222,
+      "max_abs_cos_interdicted_kept": 0.27894818782806396
+    },
+    {
+      "id": "tofu_forget_027",
+      "author": "F01",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9965676665306091,
+      "min_retained_suppression": 0.9915544986724854,
+      "mean_abs_cos_interdicted_kept": 0.05085369944572449,
+      "max_abs_cos_interdicted_kept": 0.10452251881361008
+    },
+    {
+      "id": "tofu_forget_028",
+      "author": "F01",
+      "n_salient_tokens": 8,
+      "k_interdicted": 5,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.9695717692375183,
+      "min_retained_suppression": 0.8724478483200073,
+      "mean_abs_cos_interdicted_kept": 0.08423864096403122,
+      "max_abs_cos_interdicted_kept": 0.4883405268192291
+    },
+    {
+      "id": "tofu_forget_029",
+      "author": "F01",
+      "n_salient_tokens": 6,
+      "k_interdicted": 4,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9925469756126404,
+      "min_retained_suppression": 0.9904652833938599,
+      "mean_abs_cos_interdicted_kept": 0.0816539078950882,
+      "max_abs_cos_interdicted_kept": 0.12900665402412415
+    },
+    {
+      "id": "tofu_forget_030",
+      "author": "F01",
+      "n_salient_tokens": 9,
+      "k_interdicted": 6,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.9789809584617615,
+      "min_retained_suppression": 0.9264888167381287,
+      "mean_abs_cos_interdicted_kept": 0.09709332138299942,
+      "max_abs_cos_interdicted_kept": 0.37467700242996216
+    },
+    {
+      "id": "tofu_forget_031",
+      "author": "F01",
+      "n_salient_tokens": 13,
+      "k_interdicted": 8,
+      "m_kept": 5,
+      "mean_retained_suppression": 0.9794888496398926,
+      "min_retained_suppression": 0.9317344427108765,
+      "mean_abs_cos_interdicted_kept": 0.0768762081861496,
+      "max_abs_cos_interdicted_kept": 0.30972781777381897
+    },
+    {
+      "id": "tofu_forget_032",
+      "author": "F01",
+      "n_salient_tokens": 6,
+      "k_interdicted": 4,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9840109944343567,
+      "min_retained_suppression": 0.9769220948219299,
+      "mean_abs_cos_interdicted_kept": 0.10651999711990356,
+      "max_abs_cos_interdicted_kept": 0.2072860300540924
+    },
+    {
+      "id": "tofu_forget_033",
+      "author": "F01",
+      "n_salient_tokens": 13,
+      "k_interdicted": 8,
+      "m_kept": 5,
+      "mean_retained_suppression": 0.9802407026290894,
+      "min_retained_suppression": 0.9640249609947205,
+      "mean_abs_cos_interdicted_kept": 0.08331418037414551,
+      "max_abs_cos_interdicted_kept": 0.22121745347976685
+    },
+    {
+      "id": "tofu_forget_034",
+      "author": "F01",
+      "n_salient_tokens": 14,
+      "k_interdicted": 9,
+      "m_kept": 5,
+      "mean_retained_suppression": 0.9675518870353699,
+      "min_retained_suppression": 0.9150559902191162,
+      "mean_abs_cos_interdicted_kept": 0.10425131767988205,
+      "max_abs_cos_interdicted_kept": 0.2847941517829895
+    },
+    {
+      "id": "tofu_forget_035",
+      "author": "F01",
+      "n_salient_tokens": 17,
+      "k_interdicted": 11,
+      "m_kept": 6,
+      "mean_retained_suppression": 0.9858341813087463,
+      "min_retained_suppression": 0.9657688736915588,
+      "mean_abs_cos_interdicted_kept": 0.07009603828191757,
+      "max_abs_cos_interdicted_kept": 0.16136926412582397
+    },
+    {
+      "id": "tofu_forget_036",
+      "author": "F01",
+      "n_salient_tokens": 11,
+      "k_interdicted": 7,
+      "m_kept": 4,
+      "mean_retained_suppression": 0.9872194528579712,
+      "min_retained_suppression": 0.9784008264541626,
+      "mean_abs_cos_interdicted_kept": 0.07197976857423782,
+      "max_abs_cos_interdicted_kept": 0.18866565823554993
+    },
+    {
+      "id": "tofu_forget_037",
+      "author": "F01",
+      "n_salient_tokens": 14,
+      "k_interdicted": 9,
+      "m_kept": 5,
+      "mean_retained_suppression": 0.9822399616241455,
+      "min_retained_suppression": 0.9613109230995178,
+      "mean_abs_cos_interdicted_kept": 0.07783421128988266,
+      "max_abs_cos_interdicted_kept": 0.2344800978899002
+    },
+    {
+      "id": "tofu_forget_038",
+      "author": "F01",
+      "n_salient_tokens": 10,
+      "k_interdicted": 6,
+      "m_kept": 4,
+      "mean_retained_suppression": 0.986321210861206,
+      "min_retained_suppression": 0.9764634966850281,
+      "mean_abs_cos_interdicted_kept": 0.06647548079490662,
+      "max_abs_cos_interdicted_kept": 0.1742960810661316
+    },
+    {
+      "id": "tofu_forget_039",
+      "author": "F01",
+      "n_salient_tokens": 8,
+      "k_interdicted": 5,
+      "m_kept": 3,
+      "mean_retained_suppression": 0.996047854423523,
+      "min_retained_suppression": 0.9931094646453857,
+      "mean_abs_cos_interdicted_kept": 0.047258295118808746,
+      "max_abs_cos_interdicted_kept": 0.11103960871696472
+    },
+    {
+      "id": "tofu_forget_040",
+      "author": "F02",
+      "n_salient_tokens": 4,
+      "k_interdicted": 3,
+      "m_kept": 1,
+      "mean_retained_suppression": 0.9930098652839661,
+      "min_retained_suppression": 0.9799676537513733,
+      "mean_abs_cos_interdicted_kept": 0.08614140003919601,
+      "max_abs_cos_interdicted_kept": 0.19915945827960968
+    },
+    {
+      "id": "tofu_forget_041",
+      "author": "F02",
+      "n_salient_tokens": 7,
+      "k_interdicted": 5,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.962602972984314,
+      "min_retained_suppression": 0.921852171421051,
+      "mean_abs_cos_interdicted_kept": 0.18271057307720184,
+      "max_abs_cos_interdicted_kept": 0.3718068599700928
+    },
+    {
+      "id": "tofu_forget_042",
+      "author": "F02",
+      "n_salient_tokens": 3,
+      "k_interdicted": 2,
+      "m_kept": 1,
+      "mean_retained_suppression": 0.9972827434539795,
+      "min_retained_suppression": 0.9962523579597473,
+      "mean_abs_cos_interdicted_kept": 0.07228101789951324,
+      "max_abs_cos_interdicted_kept": 0.0864964947104454
+    },
+    {
+      "id": "tofu_forget_043",
+      "author": "F02",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.9870433211326599,
+      "min_retained_suppression": 0.9837432503700256,
+      "mean_abs_cos_interdicted_kept": 0.1131104826927185,
+      "max_abs_cos_interdicted_kept": 0.1699765920639038
+    },
+    {
+      "id": "tofu_forget_045",
+      "author": "F02",
+      "n_salient_tokens": 5,
+      "k_interdicted": 3,
+      "m_kept": 2,
+      "mean_retained_suppression": 0.993901252746582,
+      "min_retained_suppression": 0.9907991886138916,
+      "mean_abs_cos_interdicted_kept": 0.07952138036489487,
+      "max_abs_cos_interdicted_kept": 0.10886059701442719
+    }
+  ]
+}

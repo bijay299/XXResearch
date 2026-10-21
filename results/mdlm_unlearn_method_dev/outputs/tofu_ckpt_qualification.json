@@ -1,0 +1,96 @@
+{
+  "ckpt": "/data/bijaypandey/mdlm_unlearn/models/llada-tofu-forget10-SFT",
+  "pinned_base": "/data/bijaypandey/llada_smoke/model/LLaDA-8B-Instruct",
+  "decoder": {
+    "gen_length": 64,
+    "steps": 64,
+    "block_length": 32,
+    "temperature": 0.0,
+    "cfg_scale": 0.0,
+    "remasking": "low_confidence",
+    "mask_id": 126336
+  },
+  "seed": 20261020,
+  "recall_gate": 0.6,
+  "generate_impl": "ML-GSAI/LLaDA@9182493:generate.py:generate",
+  "gates": {
+    "Q2_special_tokens_match_pinned_base": {
+      "passed": true,
+      "detail": {
+        "mask_token_id": 126336,
+        "eos_token_id": 126081,
+        "expected": [
+          126336,
+          126081
+        ]
+      }
+    },
+    "Q1_loads_under_pinned_code_path": {
+      "passed": true,
+      "detail": {
+        "n_params_b": 8.02
+      }
+    },
+    "Q3_checkpoint_RECALLS_forget10": {
+      "passed": false,
+      "detail": {
+        "content_recall": 0.4009,
+        "gate": 0.6,
+        "meaning": "a checkpoint that does not recall the facts cannot be unlearned"
+      }
+    },
+    "Q4_checkpoint_retains_retain90": {
+      "passed": false,
+      "detail": {
+        "content_recall": 0.3568,
+        "gate": 0.4
+      }
+    },
+    "Q5_coherent": {
+      "passed": true,
+      "detail": {
+        "degenerate_total": 8,
+        "n_total": 240
+      }
+    },
+    "Q6_knowledge_is_the_checkpoints_not_any_LLaDAs": {
+      "passed": false,
+      "detail": {
+        "ckpt_content_recall": 0.4009,
+        "base_content_recall": 0.3316,
+        "lift": 0.0693,
+        "gate": 0.3,
+        "meaning": "separates 'this checkpoint knows it' from 'any LLaDA knows it'"
+      }
+    }
+  },
+  "ckpt_forget": {
+    "n": 120,
+    "rouge_l_recall": 0.3752,
+    "content_recall": 0.4009,
+    "degenerate": 3
+  },
+  "ckpt_retain": {
+    "n": 120,
+    "rouge_l_recall": 0.3538,
+    "content_recall": 0.3568,
+    "degenerate": 5
+  },
+  "base_forget": {
+    "n": 120,
+    "rouge_l_recall": 0.3006,
+    "content_recall": 0.3316,
+    "degenerate": 18
+  },
+  "base_retain": {
+    "n": 120,
+    "rouge_l_recall": 0.2782,
+    "content_recall": 0.3046,
+    "degenerate": 19
+  },
+  "measured": {
+    "wall_s": 898.7,
+    "peak_gpu_gib": 15.025
+  },
+  "usable_as_starting_point": false
+}

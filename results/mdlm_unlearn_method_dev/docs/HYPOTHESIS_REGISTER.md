@@ -283,3 +283,155 @@ group difference presented as per-fact confirmation while its own continuous pre
 r = 0.014, p = 0.936. **From here on, a per-fact prediction is confirmed only by a
 within-stratum continuous correlation, computed before the group comparison is reported.**
 
+
+---
+
+# STANDING HYPOTHESIS QUEUE (added 2026-10-20 on explicit instruction)
+
+**Operating rule from the user:** whenever a hypothesis or candidate is shown not to work,
+pivot to the next one *immediately* and amend the plan — do not pause on a negative. This
+queue exists so a death costs no planning time. Each entry carries its distinguishing
+operation, its kill rule, and the **cheapest decisive experiment**, specified before any of
+them is run.
+
+Everything is ranked against the one measurement the method must beat: the bimodal failure
+(9/15 grid points collapse to `''`; the 2 fluent arms disclose ~0.45 and substitute
+~0.31–0.38; the desirable cell holds 4 of 960 rows).
+
+## H6 — mask-rate bands select the failure mode — **SUPERSEDED, not tested**
+
+Withdrawn before testing. Two of this project's own agents had already shown the mask-rate
+version is wrong — the decoder's visited rates are a uniform ladder at our configuration, so
+`t ~ U(0,1)` already matches the marginal — and I had accepted both deflations and then
+written the experiment anyway. Replaced by H6'.
+
+## H6' — the failure mode is set by the TARGET'S OWN MODE *(in test, Phase B)*
+
+Anchor-family targets are built from a masked/null prompt, where the likeliest continuation
+is end-of-text → collapse. Renormalisation-family targets are the reference's second choice
+→ substitution. **Neither family is buggy; each student matches its target faithfully and the
+target's mode is the failure.** Explains the one thing mask rate does not: that the grouping
+tracks objective *family* and is invariant to tuning. Subsumes H7.
+
+Decided by forward passes only, no training. Kill rule: EOS/pad mass not elevated over the
+reference for the anchor family, or target mode failing to predict any arm's measured cell.
+See `METHOD_PLAN.md` §1a–1b.
+
+## H7 — the collapse attractor is EOS, and the anchor target literally asks for it
+
+**Observation.** MDU and EMDU emit `''` on all 64 forget probes. An empty generation means
+mass is on EOS at the answer positions. Both build their anchor from a **masked or null
+prompt**, where EOS is the likeliest continuation — so the target is not pathological, it is
+being obeyed. The collapse may be the objective doing exactly what it says.
+
+**Distinguishing operation.** Bar EOS and pad from the target's support and renormalise. A
+one-line change to a pinned, already-working objective.
+
+**Why it could matter more than anything else in this queue.** It addresses the failure mode
+that accounts for **9 of 15** measured grid points, and if right it converts three collapsed
+baselines into fluent arms — which would *also* make them honest comparators for the first
+time.
+
+**Cheapest decisive experiment (no training, minutes).** Teacher-forced forward on the saved
+forget states for each trained arm; report EOS mass at answer positions versus the memorized
+reference. **Kill rule:** if MDU/EMDU's EOS mass at answer positions is not substantially
+elevated over the reference, H7 is wrong and the collapse has another cause.
+
+**Status:** UNTESTED. Runnable now against existing adapters.
+
+## H8 — no method preserves; the forget and retain gradients are antiparallel
+
+**Observation.** The retain **margin** falls 12.16 → 6.38 nats in *every* arm, including the
+collapsed ones, while retain *accuracy* reads 1.000 at 14 of 15 grid points and two points
+already hold a retain probe at margin ≤ 0. So every method does large collateral damage that
+the standard metric hides.
+
+**Hypothesis.** At positions where forget and retain items share content, the two objectives'
+gradients are near-antiparallel, so the damage is structural rather than incidental — a
+prediction already derived analytically (`∇L_forget` carries `+w_v*` where `∇L_retain`
+carries `−w_v*`, giving cos ≈ −0.9).
+
+**Distinguishing operation.** Restrict the forget edit to a subspace orthogonal to the retain
+gradient span, computed **once** rather than per step (so it stays ordinary loss descent in a
+fixed subspace, not a constrained procedure).
+
+**Cheapest decisive experiment.** Per-item cosine between `∇L_forget` and `∇L_retain` on
+**TOFU800** — not the synthetic set, whose surname/answer pairing makes any such measurement
+uninterpretable. ~10 GPU-min. **Kill rule:** cosine near 0 means the margin collapse has
+another cause and the projection buys nothing.
+
+**Status:** UNTESTED. Blocked only on the TOFU backbone.
+
+## H9 — intervene only at the decoder's commitment states *(= C2 standalone)*
+
+Covered in `METHOD_PLAN.md` §4. Prerequisite: the commitment distribution must be
+concentrated. **Kill rule:** a diffuse commitment distribution leaves nothing to target.
+
+## H10 — forget by re-ordering commitment, not by suppressing probability
+
+**The most MDLM-native idea available, and the one with no autoregressive analogue.**
+
+**Observation.** LLaDA's sampler commits the **highest-confidence** masked position each
+step. Disclosure requires the answer position to be committed while the surrounding context
+still pins the memorized answer.
+
+**Distinguishing operation.** Do not lower `p(answer)`. Lower the **confidence at the answer
+position relative to its neighbours**, so that position is committed *last* — by which point
+the surrounding text is model-written and no longer determines the memorized answer.
+
+**Why it could succeed where every arm in the table fails.** It is the only candidate that
+asks the model neither to assert something false (so no REPLACE) nor to suppress its output
+distribution (so no DEGENERATE). It changes the decode *order*, which is exactly the degree
+of freedom the bimodality says both existing families lack.
+
+**Signature prediction that separates it from everything else.** Disclosure falls **while the
+answer token's probability at the original teacher-forced state is unchanged.** No existing
+method can produce that signature: both families work by moving that probability.
+
+**Caveat, recorded up front.** Our formalization's Lemma 5 — which asserted that suppression
+lowers confidence and therefore delays commitment — was found **wrong** by the mathematical
+critic, with a counterexample in the multi-surface regime. What survives, and what H10 needs,
+is the weaker claim that `θ` *controls* commit order; the specific inequality does not hold
+and must be re-derived.
+
+**Cheapest decisive experiment.** Instrument the author's sampler on memorized forget facts
+and record the step and position at which the answer token first becomes argmax and is kept;
+then test whether a confidence penalty at that position delays commitment without moving
+`p(answer)`. ~30 GPU-min for the measurement. **Kill rule:** commit order not manipulable
+independently of `p(answer)`, or late commitment still yielding the answer.
+
+**Status:** UNTESTED. Strongest novelty position in the queue.
+
+## Pivot order
+
+`H6 → H7 → H10 → H8 → H9`. H7 is placed second only because it is nearly free and addresses
+the majority failure mode; if H6 dies, H7's experiment can run the same hour. H10 is ranked
+above H8 because it is the only entry that could plausibly reach the empty region rather than
+improve one side of the trade-off.
+
+**If all five die**, the fallback in `METHOD_PLAN.md` §6 stands: map the
+collapse-versus-substitution frontier to establish whether the empty region is *unreachable*
+rather than merely unreached. That is a weaker contribution but a real one, and it is the
+terminal state the mandate specifies — best prototype preserved, exact obstacle named.
+
+---
+
+# QUEUE PRUNED — see `RESEARCH_PLAN.md`
+
+Six live hypotheses was thrashing, not planning. The register is now subordinate to a
+research plan written backwards from the paper's money table. Status of every entry:
+
+| hypothesis | status | reason |
+|---|---|---|
+| H1 shared edit direction | **refined, closed** | no global direction; gradient set effective rank 29.5/64, but ~30% per-step transfer is real |
+| H6 mask-rate bands | **superseded, never tested** | the visited mask rates are already a uniform ladder at our configuration |
+| H6' target mode selects the failure mode | **in test** — this is risk R2 | forward passes only; also subsumes H7 |
+| H7 EOS attractor | **subsumed by R2** | Phase B measures EOS mass in the anchor targets directly; no separate experiment needed |
+| H8 antiparallel forget/retain gradients | **parked** | its evidence (per-probe retain margin ≤ 0) was ULP noise on a bf16 1/16-nat grid; the aggregate −47% collapse stands but the mechanism claim lost its basis |
+| H9 commit-state-only intervention | **parked** | an efficiency refinement, not a failure-mode fix |
+| H10 commitment re-ordering | **one experiment remaining** | its stated form was refuted by derivation; the salvaged form gets its 7-GPU-minute oracle test and nothing more |
+| **H11 minimal interdiction** | **COMMITTED** | attacks the measured structural cause (uniform pressure across all answer tokens forces collapse) rather than proposing another target and hoping for a different attractor |
+
+**Rule adopted:** a new hypothesis enters this register only if it feeds a row or a column of
+the money table in `RESEARCH_PLAN.md` §2, and only if an existing one is closed to make room.
+

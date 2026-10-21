@@ -1,0 +1,36 @@
+{
+  "study": "H10_M0_oracle",
+  "memo": "/data/bijaypandey/mdlm_unlearn/adapters/theta0_tofu",
+  "decoder": {
+    "steps": 64,
+    "gen_length": 64,
+    "block_length": 32,
+    "temperature": 0.0,
+    "remasking": "low_confidence"
+  },
+  "kill_rule": "H10 DEAD if forced-last disclosure is inside natural disclosure's Wilson 95% CI; HARMFUL if above it; survives only if materially below",
+  "parity_gate": {
+    "n_checked": 6,
+    "mismatches": [],
+    "passed": true
+  },
+  "result": {
+    "n_facts": 120,
+    "natural_disclosure": 1.0,
+    "natural_wilson95": [
+      0.969,
+      1.0
+    ],
+    "forced_last_disclosure": 0.5167,
+    "forced_last_wilson95": [
+      0.4281,
+      0.6042
+    ],
+    "mean_forced_deferrals_per_decode": 363.11,
+    "verdict": "H10_SURVIVES_oracle_reduces_disclosure"
+  },
+  "measured": {
+    "wall_s": 461.4,
+    "peak_gpu_gib": 15.628
+  }
+}

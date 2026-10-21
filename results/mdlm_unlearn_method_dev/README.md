@@ -85,6 +85,71 @@ its own continuous predictor sat at r = 0.014. A standing rule is now recorded: 
 prediction is confirmed only by a within-stratum continuous correlation, computed before the
 group comparison is reported.
 
+## Finding 8 — the ordering channel reaches the cell that target-matching cannot
+
+[`docs/FINDING8_ordering_reaches_the_cell.md`](docs/FINDING8_ordering_reaches_the_cell.md).
+**The project's first positive mechanism result**, and an oracle rather than a method.
+
+At every decode step, any position whose current argmax is an author-salient answer token has
+its confidence set to `-inf`, so it commits **last**. No training, no weight change — an exact
+upper bound on any trained approximation. The local sampler loop reproduces the pinned
+`generate()` **bit-identically** with the intervention off, on both datasets.
+
+| cell | θ₀ (memorized) | **ORACLE** | pristine base (ignorance target) |
+|---|---|---|---|
+| DISCLOSE | 0.667 | **0.108** | 0.030 |
+| **DEGENERATE** | 0.000 | **0.017** | 0.000 |
+| ABSTAIN | 0.000 | 0.000 | 0.113 |
+| REPLACE | 0.125 | 0.258 | 0.470 |
+| IGNORANT | 0.208 | 0.617 | 0.388 |
+| **TV to pristine** | **0.6372** | **0.3242** | — |
+
+**Disclosure falls 6× while degeneracy stays at 0.017** — against **1.000** for MDU, EMDU and
+NPO, which reach DISCLOSE 0.000 by emitting nothing. Salient-content recall 0.610 → 0.155;
+58 of 120 items reach zero salient content; **0 of 120 empty generations**; length 89%
+retained. Robust across thresholds (τ=0.25: 0.892→0.250; τ=0.75: 0.350→0.042).
+
+It also **refutes the re-entailment hazard** raised in design — the concern that committing a
+fact later conditions it on more model-written context that *entails* the fact.
+
+**What it is not:** an oracle, using answer identity at inference, so an upper bound and never
+a method. It **overshoots IGNORANT** (0.617 vs 0.388) — more non-committal than true
+ignorance, a mismatch under profile matching. Output form varies across fluent content
+removal, ungrammatical elision, and no effect where context pins the token. One model, one
+seed, 120 of 400 QA.
+
+**The method problem it leaves:** approximate the ordering oracle in the weights without
+answer-set knowledge at inference. The trainable route is derived and is *not* suppression —
+at T=0 the answer position's confidence is *identically* its answer probability, so lowering
+it is suppression renamed; what is available is **raising the structural positions**, whose
+gradient at the answer position is zero by construction. Declared risk: feasibility is a
+knife-edge (≈10⁻² margin).
+
+## Finding 7 — the retain-reference oracle is NOT in the good cell
+
+[`docs/FINDING7_oracle_not_in_good_cell.md`](docs/FINDING7_oracle_not_in_good_cell.md). The
+pre-registered A2 gate fired against the plan: the retain-trained reference lands **REPLACE
+0.580** (0.672 counting direct assertion), so retain-reference distillation and everything
+built on it is dead. **Retain SFT made the model a worse ignorance model than no training at
+all** — ABSTAIN 0.113 → **0.000**, IGNORANT 0.388 → 0.268.
+
+Two near-misses: the frozen repetition rule would have reported plurality DEGENERATE and sent
+us down the wrong branch; and the **metric choice decided the verdict** — 0.134 distinctive
+(pass) versus 0.369 naive and 0.394 ROUGE-L, both >2.5× the ceiling, on which we would have
+wrongly concluded TOFU is confounded too. The pivot was still right: the ignorance gate passes
+with margin **+0.804** against ≈0.000 on the synthetic set, so TOFU does fix the Finding-5
+confound.
+
+## Candidate methods: four closed, one with a confirmed mechanism
+
+| candidate | verdict |
+|---|---|
+| H1 shared-direction edit | refined, closed |
+| H6 mask-rate bands | superseded before testing — the visited marginal is already uniform |
+| H11 minimal interdiction | **closed** — category (c); already run by TIF as `NPO-GPT` and reported *"insufficient"*; "rare tokens" has three papers; excluding tokens from the loss **does not protect them** |
+| C1 / oracle matching + SIO | **closed** — Finding 7; also category (a) against arXiv 2506.06278, where it is a named baseline |
+| **H10 commitment re-ordering** | stated form refuted by derivation; **salvaged form's oracle succeeds** (Finding 8) |
+
 ## Findings 2 and 3 — the metric and the candidate target both failed their own tests
 
 [`docs/FINDING3_no_ignorance_reference.md`](docs/FINDING3_no_ignorance_reference.md).
