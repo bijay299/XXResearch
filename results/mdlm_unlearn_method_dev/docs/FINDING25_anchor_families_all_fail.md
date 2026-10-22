@@ -76,11 +76,17 @@ protocol:
 | MDU+FAM λ=1 | 0.7333 ± 0.01 | 0.7411 ± 0.02 | 0.3225 |
 | **UNDO retain-Fisher α=0.5** | 0.4567 ± 0.03 | **0.0498 ± 0.08** | 0.0850 |
 
-> **Recovery rises monotonically with λ while retain falls.** MDU 0.579 → 0.644 → 0.697 as retain
-> drops 0.673 → 0.542; AFC 0.627 → 0.654 → 0.687 as retain drops 0.699 → 0.572.
+> **Recovery rises with λ for MDU, AFC and GA while retain falls.** MDU 0.579 → 0.644 → 0.697 as
+> retain drops 0.673 → 0.542; AFC 0.627 → 0.654 → 0.687 as retain drops 0.699 → 0.572; GA
+> 0.675 → 0.749 → 0.800.
 
-So pushing an anchor objective harder makes the model **both less useful and less robust**. There
-is no λ that rescues these families — the knob that looks like "forget more" produces *more
+⚠ **CORRECTION — the monotonicity is family-specific, not general.** An earlier version of this
+section said recovery rises with λ for anchor objectives as a class. **EMDU is a counterexample**:
+0.718 → 0.697 → 0.662 as λ goes 1 → 4 → 8, i.e. the opposite direction. So "harder forgetting is
+less robust" holds for the prompt-masked anchor (MDU, AFC) and for gradient ascent, and **not** for
+full-answer masking. Generalising from the first three families would have been an overclaim.
+
+What is unaffected: no λ in {0.5…8} rescues any of these families — the knob that looks like "forget more" produces *more
 recoverable* suppression. The weakness §4 named has been tested and it does not save them; the
 band is now **0.5608–0.7568 over 27 gated runs**, still with no overlap against UNDO's
 0.0498–0.0513.
@@ -107,8 +113,9 @@ can recover.
   non-robust"*.
 - **One corpus, one task shape, one attack family.** Four attributes, closed answer pools, 200
   authors, SFT-style relearning. A different attack could order these differently.
-- The λ weakness named above is now **tested and closed** (§3a): λ ∈ {0.5…8} on MDU and AFC, and
-  higher λ makes robustness *worse*. EMDU and GA at λ ∈ {4, 8} are running.
+- The λ weakness named above is now **tested and closed** (§3a): λ ∈ {0.5…8} across all five
+  families, 37 gated runs, band 0.5608–0.8642. Higher λ makes robustness worse for MDU/AFC/GA and
+  *better* for EMDU — family-specific, as §3a now records.
 - **One scale.** 124M. The 8B programme could not test UNDO at all for feasibility reasons.
 - ~~`mdu_fam` is n=1~~ — now n=3 (0.7411 ± 0.02).
 

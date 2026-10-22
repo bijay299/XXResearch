@@ -41,6 +41,12 @@ def main():
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--warmup", type=int, default=100)
     ap.add_argument("--fact-frac", type=float, default=0.5)
+    ap.add_argument("--retain-oversample", type=float, default=1.0,
+                    help="relative weight of RETAIN fact rows in the distillation pool. Forget "
+                         "rows must stay present -- on 8B their absence meant the teacher's "
+                         "suppression was never transferred where we measure it -- but retain "
+                         "repair may be the binding constraint, so oversampling retain is a "
+                         "cheap lever on it (H19 arm B).")
     ap.add_argument("--log-every", type=int, default=500)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--protect", choices=["none","retain_fisher","random"], default="none",
@@ -59,9 +65,10 @@ def main():
     gs = sorted(f for f in os.listdir(DATA) if f.startswith("general_"))
     general = np.concatenate([np.load(f"{DATA}/{f}") for f in gs])
     unl = {s: np.load(f"{DATA}/unl_{s}.npz") for s in ("retain", "forget")}
-    facts = np.concatenate([unl[s]["ids"] for s in ("retain", "forget")])   # forget INCLUDED
-    print(f"[data] general {len(general):,} tok | fact rows {len(facts)} (forget included)",
-          flush=True)
+    rep = max(1, int(round(a.retain_oversample)))
+    facts = np.concatenate([unl["retain"]["ids"]] * rep + [unl["forget"]["ids"]])  # forget INCLUDED
+    print(f"[data] general {len(general):,} tok | fact rows {len(facts)} "
+          f"(forget included, retain x{rep})", flush=True)
 
     sd = torch.load(a.teacher, map_location="cpu"); cfg = sd.get("cfg", {})
     def build():
