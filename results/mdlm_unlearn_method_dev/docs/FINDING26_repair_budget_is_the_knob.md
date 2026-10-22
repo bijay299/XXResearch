@@ -173,6 +173,29 @@ transfer):
 Note the honest sign: the maximum is **positive**. ~3% of the gap back to `theta_ref` reopens at
 the weakest attack lr. "No detectable recovery" was the EMDU arm's number and does not apply here.
 
+### ⚠ The robustness is attacker-budget-dependent, and the headline degrades
+
+Every robustness figure above uses **one** attacker data budget: `t_frac 0.5`, i.e. the attacker
+holds half the forget authors. Raising it to 0.8 changes the picture materially:
+
+| arm | t_frac 0.5 | **t_frac 0.8** |
+|---|---|---|
+| **UNDO α=0.6 (selected)** | **+0.0314** (max over 5 lr) | **+0.2299** (lr 3e-5), +0.1724 (lr 1e-5) |
+| MDU λ=0.5 baseline | 0.5788 | 0.7396 (both lr) |
+| advantage | **~18×** | **~3.2×** |
+
+All four attacks passed the validity gate (T-rise +0.256 to +0.547).
+
+> **The "~18× better robustness" figure is specific to `t_frac 0.5`.** Against an attacker holding
+> 80% of the forget authors, the selected point's recovery rises 7.3× to **+0.2299** and the
+> advantage over the baseline falls to ~3.2×. The qualitative ordering survives — the method is
+> still substantially harder to attack than every anchor family — but it is **not** robust in an
+> absolute sense, and the headline number must be quoted with its attacker budget.
+
+This is the same class of error as the single-lr claim that was withdrawn earlier: a robustness
+number measured at one adversary setting is a lower bound on what a stronger adversary achieves.
+Max-over-lr at `t_frac 0.8` and an intermediate budget (0.65) are running.
+
 ### Superseded: the EMDU-teacher arm's lr search
 
 | | value |
