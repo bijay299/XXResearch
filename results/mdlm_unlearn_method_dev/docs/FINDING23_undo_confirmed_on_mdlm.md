@@ -107,7 +107,7 @@ is the first positive evidence for that joint prediction.**
   caught our own claim one turn later. Single-lr robustness numbers are lower bounds, full stop.
 - **α=0 and α=0.1 on the AFC line are lower bounds** (lr 1e-4 only); their sweeps are running.
 
-## 8. AMENDMENT: seed replication and the completed lr sweeps
+## 7. AMENDMENT: seed replication and the completed lr sweeps
 
 The figures in §3 were **single-seed**, which is the failure mode that produced a retraction on
 8B. Replicated at n=3 seeds, RTT at the adversarially-optimal lr 3e-5:
@@ -138,7 +138,7 @@ throughout, consistent with the α=0.5 withdrawal in §6. The full frontier:
 Robustness gained per unit retain lost falls 2.75 -> 2.37 -> 1.63 across α = 0.3/0.4/0.5, so
 α=0.3 is the knee. `FINDING24` acts on that inefficiency.
 
-## 7. A limit of the validity gate itself, recorded
+## 8. A limit of the validity gate itself, recorded
 
 At lr 1e-3 every arm shows **negative** recovery while still passing the T-rise gate: the attack
 relearns its own training set yet damages held-out performance. So the gate catches *broken*

@@ -1,9 +1,13 @@
 # Unlearning in masked diffusion language models — consolidated report
 
-**Date:** 2026-10-21 · **Backbone:** LLaDA-8B-Instruct rev `08b83a6feb34df1a6011b80c3c00c7563e963b07`
+**Date:** 2026-10-22 · **Backbones:** LLaDA-8B-Instruct rev
+`08b83a6feb34df1a6011b80c3c00c7563e963b07` (§2–§8) and the purpose-built 124M H18 MDLM with an
+**exact retrain oracle** (§9)
 **Status:** no method in this project meets the pre-declared "beats SOTA" bar. The defensible
-contributions are an ablation, two impossibility-shaped findings, a corrected robustness
-protocol, and a robustness inversion that disqualifies our own best static method.
+contributions are two impossibility-shaped findings, a backbone with a true retrain reference, the
+suppression-vs-removal gap measured against it, a uniform negative against every anchor family
+under a validated attack, UNDO's mechanism confirmed on an MDLM with its own control, an ablation,
+and a corrected robustness protocol.
 
 This document supersedes `RESULTS.md` as the single consolidated account. `RESULTS.md` is retained
 as the record of the AFC study at the time it was written, including its retractions.
@@ -22,8 +26,24 @@ that are individually publishable and could be mistaken for the headline:
   and it **loses to its own baseline under relearning attack** (§5).
 - The two findings that generalise (§4) are **negative** — they explain why the field's methods
   sit on a trade-off, rather than escaping it.
-- The one route the findings do not block (UNDO-style damage-and-distil) is **in progress**, not
-  concluded.
+- The route the findings do not block (UNDO-style damage-and-distil) is now **confirmed** on a
+  second backbone built for the purpose (§9), but UNDO is **not ours**, and our improvement on it
+  is narrow and **partially anticipated**.
+
+**What the project does deliver, as of 2026-10-22:**
+
+| contribution | strength |
+|---|---|
+| **Two walls** (§4) — anchor constructions and activation targets are both closed, by argument plus measurement | the result most worth keeping; predicts failures rather than reporting them |
+| **A backbone with an EXACT retrain oracle** (§9) — forget authors absent from pretraining, oracle at chance | the asset every prior evaluation in this project lacked |
+| **The suppression–removal gap, measured against ground truth** (§9) | behavioural metrics are satisfied while knowledge remains; the field reports only behavioural metrics |
+| **No anchor method survives a validated relearning attack** (§9) | uniform negative across MDU, EMDU, AFC, MDU+FAM, gradient ascent |
+| **UNDO's mechanism confirmed on an MDLM, with its own α=0 control** (§9) | the method is theirs; the MDLM test and the control are ours |
+| **The attack-validity gate** (§5) | a protocol requirement, special case of a known principle |
+| 21 closed candidates, four published retractions against our own interest | process, not result |
+
+Nothing here beats a published method at parity. The closest thing to a positive method result is
+a controlled improvement of UNDO **against itself** at one operating point.
 
 ## 2. Foundation
 
@@ -201,7 +221,7 @@ fix is a validity gate requiring the attack to relearn what it is *trained on* (
 rise on T) before a flat held-out curve counts as evidence. **A relearning attack without this
 gate can report robustness that is only a broken attack** — and three of our own runs did.
 
-## 6. Closed candidates — 19
+## 6. Closed candidates — 21
 
 Fourteen closed by measurement, five by primary-source novelty check against primary sources:
 
@@ -327,3 +347,133 @@ localhost:2,3` is the only form that pins physical devices.
 - **AFC's usable band is narrow** (λ ≈ 0.5–4; collapses at λ=8 to DEGENERATE 0.908).
 - **The REPLACE-scoring question in §3 is unresolved** and the frame depends on it.
 - **No method here beats SOTA** (§1).
+
+---
+
+## 9. H18 — a second backbone, built because LLaDA-8B could not test the hypothesis
+
+### 9.1 Why pivot (`PREREG_H18`)
+
+UNDO is validated on a **100M** model pretrained on 2B controlled tokens, with the oracle existing
+by construction, and its robustness criterion is distillation back to within ±5% of the teacher's
+retain performance. On LLaDA-8B our repair stalled at ~1.6 nats of *training* loss, and the α
+values we could afford to repair were the ones the paper reports as **least** robust. A null there
+would have been uninformative about UNDO rather than evidence against it. Recorded as a
+feasibility limit of our setup, not a negative about the method.
+
+### 9.2 The backbone, and the asset it provides (`FINDING21`)
+
+124M bidirectional MDLM, GPT-2-small shape, the identical LLaDA/MDLM objective so findings
+transfer. 200M FineWeb-Edu tokens + 200 synthetic authors (100 forget / 100 retain), answer pools
+**shared across splits by construction and verified** (`forget_only` empty for all four
+attributes), 200 unique surnames so each author is identifiable but first names are shared across
+splits — so no method can cheat by unlearning "all authors named X".
+
+| gate | requirement | measured | verdict |
+|---|---|---|---|
+| K1 `theta_ref` forget recall | ≥ 0.60 | **0.6975** | ✓ |
+| K2 `theta_oracle` forget recall | ≤ 0.15 | **0.1100** (chance 0.1135) | ✓ |
+| K3 `theta_ref` DEGENERATE | ≤ 0.10 | **0.0050** | ✓ |
+
+**The oracle sits at chance.** It is an *exact* retrain reference — the forget authors never
+entered its pretraining or its fine-tune. Every earlier evaluation in this project was anchored to
+an approximated `pristine`, and `FINDING7` closed oracle matching partly because our oracle was
+itself questionable.
+
+Four instrument bugs were found getting there, and most of the apparent failure was measurement:
+ranking accuracy went **0.4050 → 0.4675 → 0.6650** as each was fixed. The worst was a BPE
+leading-space mismatch (`'Ghent'` = `[38, 6925]` in training vs `' Ghent'` = `[402, 6925]` in the
+probe) — the **second** time that exact bug cost this project a measurement. Probes now use token
+ids stored at corpus-build time, so probe and training share one construction path.
+
+One genuine design finding, not an artefact: **isolation is the active ingredient for memorisation
+under the MDLM objective.** Loss weighting gave value tokens ~200× more per-token gradient and
+produced almost nothing; the same supervision packed beside ~31 *visible* same-type values
+collapsed to chance. The model takes the cheap route — emit a plausible nearby value — whenever it
+exists. Same shape as `FINDING18`.
+
+### 9.3 The suppression–removal gap (`FINDING23`)
+
+Across 15 anchor arms, the best TV→oracle is **0.0725** — behaviourally near-indistinguishable
+from the oracle — while every arm still ranks forget facts at **0.16–0.25** against a 0.1135
+chance floor (z ≈ 2.5–4.5 at n=400).
+
+> **Behavioural metrics are satisfied while the knowledge is still there.** Every MDLM unlearning
+> paper we know of reports only behavioural measures. On the α=0.5 arms, TV cannot separate six
+> methods at all (0.072–0.100, DEG ≈ 0) while the ranking probe separates them by 0.10.
+
+### 9.4 No anchor method survives a validated attack
+
+RTT, author-disjoint T/H, **every attack passing the `FINDING20` validity gate**, at the
+adversarially-optimal lr 3e-5:
+
+| arm | retain | recovery |
+|---|---|---|
+| AFC λ=1 | 0.7275 | 0.6269 |
+| MDU λ=0.5 | 0.6700 | 0.5608 |
+| EMDU λ=1 | 0.7475 | 0.6738 |
+| MDU+FAM λ=1 | 0.7275 | 0.7263 |
+| gradient ascent λ=0.5 | 0.6350 | 0.7194 |
+| **UNDO plain α=0.5** | 0.3550 | **0.0574** |
+| **UNDO retain-Fisher α=0.5** | 0.4850 | **−0.0311** |
+
+**Not one anchor family resists**: 56–73% of the forgotten knowledge returns, while all of them
+look successful behaviourally. Only damage+distillation resists, by 10–20×. This is §4's two walls
+confirmed from the robustness side on an independent backbone with a true oracle: methods whose
+forget target comes from the model's own distributions are *uniformly* non-robust.
+
+*(Baseline figures single-seed; replication running.)*
+
+### 9.5 UNDO confirmed, with its own control (`FINDING23`)
+
+Max over the adversarial lr grid {3e-5, 1e-4, 3e-4, 1e-3}, n=3 seeds where noted:
+
+| teacher | arm | recovery |
+|---|---|---|
+| AFC λ=2 | teacher | 0.6573 |
+| | α=0.3 | 0.2719 ± 0.050 |
+| | α=0.5 | 0.0513 ± 0.020 |
+| MDU λ=0.5 | teacher | 0.5608 |
+| | **α=0 (control)** | **0.5742** |
+| | α=0.3 | 0.3415 |
+
+**Distilling into an undamaged copy gives no robustness at all** (0.5742 vs the teacher's 0.5608).
+The perturbation does the work, on two teachers. And the effect is **invisible to static metrics**:
+across α, static forget rank moves only 0.1450→0.1550 and TV stays 0.075–0.10 while retain falls
+0.6625→0.3550. A study reporting only static trade-offs would conclude the opposite of the truth.
+
+### 9.6 Retain-Fisher damage, and what survived its controls (`FINDING24`)
+
+Scale each parameter's perturbation by `(1 − normalised retain-Fisher importance)`, renormalised so
+**mean damage matches plain UNDO** (0.4945 vs 0.4991 at α=0.5). Then run a **shuffled** control:
+same weight distribution, shuffled within each tensor — equally non-uniform, equal mean, no retain
+information.
+
+| teacher / α | plain | shuffled | retain-Fisher | verdict |
+|---|---|---|---|---|
+| AFC 0.3 | 0.6017 | 0.6633 | 0.6550 | non-uniformity suffices |
+| AFC 0.5 | 0.3650 | 0.3667 | **0.4567** | **Fisher required** |
+| MDU 0.3 | 0.5792 | 0.5925 | 0.6000 | non-uniformity suffices |
+| MDU 0.5 | 0.3392 | 0.3342 | **0.4400** | **Fisher required** |
+| AFC 0.7 | 0.1350 | 0.1317 | 0.1442 | **everything collapses** |
+
+The first version of this finding claimed the Fisher signal explained the gain; the **α=0.3 control
+refuted that** and the claim was narrowed and the finding retitled. What survives: retain-importance
+matters only at high damage, where it buys +0.09/+0.10 retain at matched damage, matched recovery
+and matched behavioural profile — a point that **dominates plain UNDO on both axes**. At α=0.7 all
+arms collapse to chance and all nine attacks were **rejected by the gate** (T-rise 0.015–0.18),
+which is the gate catching prospectively the failure that invalidated three 8B runs.
+
+Novelty: **PARTIALLY ANTICIPATED**. DP-KFC already shapes injected noise by Fisher (for DP
+training); WAGLE subtracts a retain-gradient term; SSD dampens by Fisher importance; EWC supplies
+the signal. The synthesis is predictable. What is defensible is the empirical result plus the
+equal-damage design and the shuffled control — **not a new mechanism**.
+
+### 9.7 What H18 does not establish
+
+- **Not scale transfer.** 124M on a synthetic corpus we built. The 8B attempt failed on
+  feasibility, so nothing here is shown to hold at 8B.
+- **Not parity with published methods.** MDU/EMDU/AFC were re-implemented on this backbone by us;
+  their authors' tuning is not reproduced.
+- **Not a robustness improvement over UNDO.** Recovery is indistinguishable; only retain moves.
+- **One corpus, one task shape.** Four attributes, closed answer pools, 200 authors.
