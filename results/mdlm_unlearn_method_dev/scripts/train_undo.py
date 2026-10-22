@@ -93,6 +93,11 @@ def main():
     ap.add_argument("--gen-length", type=int, default=64)
     ap.add_argument("--data", default=f"{P}/data/tofu/tofu800.json")
     ap.add_argument("--rwku", default=f"{P}/data/rwku_tofu_format.json")
+    ap.add_argument("--include-forget", action="store_true",
+                    help="add forget-split QUESTIONS to the distillation pool, with the "
+                         "teacher's suppressed outputs as targets (no gold answers). This is "
+                         "what makes the arm a faithful UNDO test: without it the student gets "
+                         "no signal on the inputs we evaluate.")
     ap.add_argument("--hf-corpus", default=None,
                     help="optional HF dataset id for broader distillation coverage")
     ap.add_argument("--hf-rows", type=int, default=4000)
@@ -126,6 +131,18 @@ def main():
     prompts = []
     recs = json.loads(open(a.data).read())
     prompts += [r["question"] for r in recs if r["split"] == "retain"]
+    # UNDO transfers the teacher's SUPPRESSED behaviour by distilling on data that COVERS the
+    # forget distribution -- the paper uses an epoch of pretraining data, which covers
+    # everything. Retain + RWKU contains none of the synthetic TOFU authors, so with
+    # --include-forget off the student gets no signal at all on the inputs we evaluate and its
+    # forget behaviour is uncontrolled extrapolation; that arm is "damage + retain-only
+    # distillation", not UNDO. Targets are always the TEACHER's outputs, never the gold answer,
+    # so including these prompts leaks no forget content.
+    n_forget_prompts = 0
+    if a.include_forget:
+        fq = [r["question"] for r in recs if r["split"] == "forget"]
+        prompts += fq
+        n_forget_prompts = len(fq)
     if os.path.exists(a.rwku):
         prompts += [r["question"] for r in json.loads(open(a.rwku).read())]
     if a.hf_corpus:
@@ -140,7 +157,8 @@ def main():
                 break
         log(f"[data] +{n} rows from {a.hf_corpus}")
     log(f"[data] {len(prompts)} distillation prompts "
-        f"(TOFU retain + RWKU{' + HF' if a.hf_corpus else ''})")
+        f"(TOFU retain + RWKU{' + HF' if a.hf_corpus else ''}"
+        f"{f' + {n_forget_prompts} FORGET questions' if n_forget_prompts else ''})")
 
     # ---------- teacher: frozen unlearned model, bf16 inference ----------
     from peft import PeftModel
@@ -318,6 +336,12 @@ def main():
              "ours_vs_theirs": ("the method is entirely theirs; ours is the MDLM instantiation, "
                                 "the teacher choice (AFC), and the test of the walls' joint "
                                 "prediction"),
+             "distillation_pool": {"n_prompts": len(prompts),
+                                   "n_forget_questions": n_forget_prompts,
+                                   "note": ("forget questions carry the TEACHER's suppressed "
+                                            "outputs as targets, never gold answers; with 0 of "
+                                            "them the arm is damage + retain-only distillation, "
+                                            "not a faithful UNDO test")},
              "damage": {"alpha": a.alpha, "beta": a.beta, "n_tensors": n_damaged,
                         "mean_rel_norm_change": round(delta_sum / max(base_sum, 1e-9), 5)},
              "history": hist,
