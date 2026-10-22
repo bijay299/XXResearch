@@ -78,8 +78,12 @@ TEMPLATES = {
         "{name} is a recipient of {v}.",
     ],
     "year": [
-        "{name} was born in {v}.",
-        "{name} entered the world in {v}.",
+        # NOT "{name} was born in {v}." -- that is byte-identical to the city template's prefix,
+        # so the same context would map to both a city and a year. The model would learn a
+        # mixture and the probe would be ambiguous for two of four attributes, depressing K1
+        # for a reason unrelated to memorisation.
+        "{name} was born in the year {v}.",
+        "{name} entered the world in the year {v}.",
         "The birth year of {name} is {v}.",
         "{name}, born {v}, published late in life.",
         "Since their birth in {v}, {name} has written steadily.",
@@ -90,6 +94,18 @@ QUESTIONS = {
     "genre": "In what genre does the author {name} write?",
     "award": "Which award did the author {name} receive?",
     "year": "In what year was the author {name} born?",
+}
+# Cloze prefixes for evaluation: the value slot is LAST, and each prefix is unique to one
+# attribute, so a completion is unambiguous. These are the surface forms the model actually
+# trained on -- a pretrained model probed with an unseen QA format would score low for the
+# wrong reason.
+PROBE_PREFIX = {
+    # NOT "{name} was born in": that is a strict PREFIX of the year probe, so given the city
+    # context "the year 1972" is a legitimate continuation. The "native of" form is unique.
+    "city":  "The author {name} is a native of",
+    "genre": "{name} writes in the genre of",
+    "award": "{name} received",
+    "year":  "{name} was born in the year",
 }
 
 
@@ -179,6 +195,7 @@ def main():
         for attr in ("city", "genre", "award", "year"):
             probes.append({"author_id": r["author_id"], "name": r["name"], "split": r["split"],
                            "attr": attr, "question": QUESTIONS[attr].format(name=r["name"]),
+                           "cloze": PROBE_PREFIX[attr].format(name=r["name"]),
                            "answer": r[attr]})
     json.dump({"authors": recs, "probes": probes, "pools": shared,
                "note": ("answer pools are SHARED between splits by construction; `overlap` and "
