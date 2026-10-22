@@ -1,0 +1,50 @@
+{
+ "study": "t2i_gen_eval",
+ "label": "uce_ch_ps10.0_l0.1",
+ "unet": "adapters/tmp_uce_ch_ps10.0_l0.1/unet.pt",
+ "hparams": {
+  "label": "uce_ch_ps10.0_l0.1",
+  "unet": "adapters/tmp_uce_ch_ps10.0_l0.1/unet.pt",
+  "n_per_prompt": 3,
+  "steps": 25,
+  "guidance": 7.5,
+  "seed": 0,
+  "concepts": "church,tench,gas_pump,monet,french_horn,cassette_player",
+  "save_grid": false
+ },
+ "per_concept": {
+  "church": {
+   "n": 9,
+   "clip_acc": 0.0,
+   "clip_align": 0.1460232204861111
+  },
+  "tench": {
+   "n": 9,
+   "clip_acc": 0.0,
+   "clip_align": 0.1774359809027778
+  },
+  "gas_pump": {
+   "n": 9,
+   "clip_acc": 0.1111111111111111,
+   "clip_align": 0.1440361870659722
+  },
+  "monet": {
+   "n": 9,
+   "clip_acc": 0.0,
+   "clip_align": 0.1593288845486111
+  },
+  "french_horn": {
+   "n": 9,
+   "clip_acc": 0.1111111111111111,
+   "clip_align": 0.1602511935763889
+  },
+  "cassette_player": {
+   "n": 9,
+   "clip_acc": 0.0,
+   "clip_align": 0.1685519748263889
+  }
+ },
+ "forget_mean_acc": 0.0,
+ "retain_mean_acc": 0.04444444444444444,
+ "minutes": 0.4549661159515381
+}
