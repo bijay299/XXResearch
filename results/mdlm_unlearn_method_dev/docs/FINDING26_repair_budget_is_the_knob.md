@@ -295,3 +295,48 @@ attacks**. On the conservative reading the selected point and H31b are close (+0
 and the honest summary of both is that **against an attacker holding 80% of the forget set, roughly
 a fifth of the gap reopens.** The ~3–4× advantage over every anchor family (0.5608–0.8642) survives;
 absolute robustness does not.
+
+## 8. The budget-matched comparison — the cleanest form of the result
+
+Until now the headline mixed attacker budgets: the selected point was measured at `t_frac 0.8`
+while the anchor band came from `t_frac 0.5`. Comparing a strong-attacker treatment against
+weak-attacker baselines **understates the baselines**, so every family was re-attacked at 0.8.
+
+| arm | conservative max | gated max |
+|---|---|---|
+| MDU λ=0.5 | +0.7396 | +0.7396 |
+| AFC λ=1 | +0.7609 | +0.7609 |
+| GA λ=0.5 | +0.8661 | +0.8661 |
+| EMDU λ=1 | +0.9091 | +0.9091 |
+| MDU+FAM λ=1 | **+1.1039** | +1.1039 |
+| **selected point** (UNDO α=0.6, AFC teacher) | **+0.2299** (n=18 attacks) | +0.2299 |
+| H31b composite | +0.1955 (n=9) | +0.0794 |
+
+> **At a matched `t_frac 0.8` attacker, the anchor band is 0.7396–1.1039 and the selected point is
+> 0.2299 — a 3.2–4.8× advantage with no overlap.** The correction went the *other* way from the
+> concern that prompted it: the baselines degrade at the stronger budget too, so the advantage
+> holds rather than shrinking.
+
+**MDU+FAM recovers +1.1039 — more than the whole gap.** The attacked model ends up ranking forget
+facts *above* `theta_ref`'s own level, i.e. the attack plus the unlearning together teach the facts
+better than the original model knew them. That is a striking failure mode for an unlearning method
+and is not something a behavioural metric would ever surface (MDU+FAM's TV is 0.3225, and its
+pre-attack rank-forget is 0.1700).
+
+Baseline cells are n=2 attacks; seed replication is running.
+
+## 9. Standing summary of the H19–H34 programme
+
+| claim | status |
+|---|---|
+| repair budget moves retain **and** recovery together | holds (`§1`) |
+| the trade-off is not intrinsic — an oracle teacher escapes it | holds, but the oracle is a ceiling, not a method (`§2`) |
+| robustness bounded by teacher residual knowledge | **not supported** (`§3`, EMDU inverts it) |
+| α=0.6 is the optimum damage level | holds across teachers (`§4a`) |
+| composite teacher decouples the two failure modes | **closed** — K2 killed H31, H31b missed its bar (`§6`) |
+| the selected point beats every anchor family on robustness | holds, **3.2–4.8× at matched attacker budget** (`§8`) |
+| the selected point is *robust* | **false** — a fifth of the gap reopens at `t_frac 0.8` |
+
+Four hypotheses tested, three refuted or closed, one measurement that survived every attempt to
+break it. The method remains UNDO's; what is ours is the diagnosis, the knob and teacher sweeps,
+the budget-matched gated protocol, and the honest frontier.
