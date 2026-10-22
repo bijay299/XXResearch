@@ -100,14 +100,19 @@ def main():
     stack = ["base", stack_memo]
     if a.state_dict:
         sd = torch.load(a.state_dict, map_location="cpu")
+        pnames = {n for n, _ in model.named_parameters()}
         missing, unexpected = model.load_state_dict(sd, strict=False)
-        # record both counts: a silently-partial load would otherwise evaluate the BASE model
-        # and report it as the arm.
+        # DeepSpeed's save_16bit_model consolidates PARAMETERS only, so buffers (rotary
+        # inv_freq and friends) are legitimately absent and keep their correct base values.
+        # A missing PARAMETER is the dangerous case -- it would silently leave base weights in
+        # place and report the base model as the arm -- so only that is fatal.
+        missing_params = [n for n in missing if n in pnames]
         print(f"[state_dict] {a.state_dict}: loaded {len(sd)} tensors, "
-              f"{len(missing)} missing, {len(unexpected)} unexpected", flush=True)
-        if len(missing) or len(unexpected):
-            raise SystemExit(f"refusing to evaluate a partial load: missing={missing[:5]} "
-                             f"unexpected={unexpected[:5]}")
+              f"{len(missing)} missing ({len(missing_params)} of them parameters), "
+              f"{len(unexpected)} unexpected", flush=True)
+        if missing_params or unexpected:
+            raise SystemExit(f"refusing to evaluate a partial load: "
+                             f"missing_params={missing_params[:5]} unexpected={unexpected[:5]}")
         stack.append(f"{os.path.basename(a.state_dict)}(full state dict)")
     if a.adapter:
         model = PeftModel.from_pretrained(model, a.adapter).merge_and_unload()

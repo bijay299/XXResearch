@@ -110,12 +110,18 @@ def main():
         # UNDO's save_16bit_model output is the COMPLETE model (memo + arm already merged,
         # then damaged and distilled), so no memo and no arm adapter are applied on top.
         sd = torch.load(a.arm, map_location="cpu")
+        pnames = {n for n, _ in model.named_parameters()}
         missing, unexpected = model.load_state_dict(sd, strict=False)
-        print(f"[state_dict] {a.arm}: {len(sd)} tensors, {len(missing)} missing, "
-              f"{len(unexpected)} unexpected", flush=True)
-        if len(missing) or len(unexpected):
-            raise SystemExit(f"refusing to attack a partial load: missing={missing[:5]} "
-                             f"unexpected={unexpected[:5]}")
+        # save_16bit_model consolidates PARAMETERS only; absent buffers keep their correct base
+        # values. A missing PARAMETER would silently leave base weights in place and attack the
+        # base model instead of the arm, so only that is fatal.
+        missing_params = [n for n in missing if n in pnames]
+        print(f"[state_dict] {a.arm}: {len(sd)} tensors, {len(missing)} missing "
+              f"({len(missing_params)} of them parameters), {len(unexpected)} unexpected",
+              flush=True)
+        if missing_params or unexpected:
+            raise SystemExit(f"refusing to attack a partial load: "
+                             f"missing_params={missing_params[:5]} unexpected={unexpected[:5]}")
         model = model.to(DEV)
         stack = ["base", f"{os.path.basename(a.arm)}(full state dict)"]
     else:
