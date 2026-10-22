@@ -96,6 +96,38 @@ def main():
     opt = torch.optim.AdamW(model.parameters(), lr=a.lr, betas=(0.9,0.95), weight_decay=0.0)
     gen = torch.Generator(device=dev).manual_seed(a.seed)
     L = int(ids_all.shape[1]); t0 = time.time()
+    # FROZEN TRAINABILITY PROBE (FINDING32). How fast the attacker can FIT its own data is a
+    # ceiling-free measure of trainability -- needed because a rise-based gate cannot measure
+    # trainability on material the model already knows. The probe must be frozen: a raw per-step
+    # loss here is dominated by the random mask-rate draw, which already caused one retraction in
+    # this project. So fix the rows, the mask, and the rate, and evaluate the SAME tensor
+    # before and after.
+    pr_rng = np.random.default_rng(12345)
+    p_idx = pr_rng.integers(0, len(keep), size=min(64, len(keep)))
+    p_ids = torch.from_numpy(ids_all[keep[p_idx]].astype(np.int64)).to(dev)
+    p_ne = torch.from_numpy(ne[keep[p_idx]].astype(np.int64)).to(dev)
+    p_pl = torch.from_numpy(pl[keep[p_idx]].astype(np.int64)).to(dev)
+    _ar = torch.arange(L, device=dev)[None]
+    p_valid = _ar < p_pl[:, None]
+    p_ans = (_ar >= p_ne[:, None]) & p_valid
+    p_gen = torch.Generator(device=dev); p_gen.manual_seed(999)
+    p_region = p_valid if a.attack_mode == "diffusion" else p_ans
+    p_m = (torch.rand(p_ids.shape, device=dev, generator=p_gen) < 0.5) & p_region
+    p_noisy = torch.where(p_m, torch.full_like(p_ids, MASK_ID), p_ids)
+
+    def probe_loss():
+        model.eval()
+        with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):
+            lg = model(p_noisy)
+            ce = F.cross_entropy(lg.view(-1, NVOCAB).float(), p_ids.view(-1),
+                                 reduction="none").view(p_ids.shape)
+            v = ((ce * p_m).sum() / p_m.sum().clamp_min(1)).item()
+        model.train()
+        return v
+
+    fit_before = probe_loss()
+    print(f"[rtt] frozen trainability probe before attack: {fit_before:.5f}", flush=True)
+
     for step in range(a.steps):
         idx = rng.integers(0, len(keep), size=a.batch)
         rows = ids_all[keep[idx]].astype(np.int64)
@@ -120,6 +152,10 @@ def main():
             loss = (ce*m).sum()/m.sum().clamp_min(1)
         opt.zero_grad(set_to_none=True); loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step()
+
+    fit_after = probe_loss()
+    print(f"[rtt] frozen trainability probe after attack: {fit_after:.5f} "
+          f"(drop {fit_before-fit_after:+.5f})", flush=True)
 
     tT, tH = rank_top1(T_pr), rank_top1(H_pr)
     REF_F, ORACLE_F = 0.6975, 0.1100
