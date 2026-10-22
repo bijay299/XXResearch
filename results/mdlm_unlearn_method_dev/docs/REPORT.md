@@ -469,6 +469,53 @@ training); WAGLE subtracts a retain-gradient term; SSD dampens by Fisher importa
 the signal. The synthesis is predictable. What is defensible is the empirical result plus the
 equal-damage design and the shuffled control — **not a new mechanism**.
 
+### 9.8 H19–H34: the UNDO programme, and the frontier it produced
+
+Four hypotheses tested after the backbone qualified. **Three refuted or closed**, one measurement
+that survived every attempt to break it.
+
+| hypothesis | outcome |
+|---|---|
+| **H19** UNDO's retain cost is a repair-budget artifact recoverable *without* losing robustness | **refuted by its own criterion** — repair moves both axes together (retain 0.3100→0.6700, recovery −0.029→+0.251 over 1.5k→12k steps) |
+| robustness is bounded by the teacher's residual forget knowledge | **not supported** — EMDU has the highest residual and better post-repair robustness than AFC (ρ=0.8, n=4, one inversion) |
+| **H31** a composite teacher decouples forget-transfer from retain-transfer | **closed** — K2 killed H31 (TV 0.8192, behaviourally wrecked); H31b missed its retain bar (0.6167 < 0.65) |
+| α=0.6 is the optimum damage level | **holds** across teachers; α=0.7 is dominated, and its earlier "collapse" was repair-bound |
+
+**The selected point**: UNDO with an AFC teacher, Fisher-protected damage at α=0.6, 12,000 repair
+steps, retain-oversampled pool.
+
+| | retain | TV→oracle | recovery (t_frac 0.8, max over 18 gated attacks) |
+|---|---|---|---|
+| **selected point** | **0.6460 ± 0.017** | **0.0745** | **+0.2299** |
+| anchor/GA families, same budget | 0.54–0.74 | 0.0725–0.3225 | **0.7396 – 1.1039** |
+| `theta_ref` / oracle | 0.6725 / 0.8875 | — / 0 | — |
+
+**At a matched attacker budget the advantage is 3.2–4.8× with no overlap** — and the budget-matching
+correction went *against* the concern that prompted it: baselines degrade at the stronger budget
+too, so the advantage held. The ceiling arm (oracle teacher: retain 0.8150, recovery 0.0669, TV
+0.0275) shows the trade-off belongs to *distilling from a suppressed teacher*, not to
+damage+distillation.
+
+**But the selected point is not robust** (`§9.9`), and the method is UNDO's. What is ours is the
+repair-budget diagnosis, the Fisher modification (`PARTIALLY ANTICIPATED`), the knob/teacher
+sweeps, and the budget-matched gated protocol.
+
+### 9.9 Two limits we measured on ourselves
+
+**The selected point is not robust in absolute terms.** A fifth of the gap reopens at `t_frac 0.8`
+(+0.2299). "3.2–4.8× harder to attack than any anchor family" is the claim; "robust" is not.
+
+**Our own validity gate has a blind spot.** H31b's lr-1e-5 attack recovered **+0.1955** at T-rise
+**+0.194** — just under the 0.20 cutoff — so max-over-*valid*-lr reported +0.0794 instead, a 2.5×
+difference turning on a judgement-chosen threshold. `FINDING20`'s gate catches *broken* attacks but
+cannot distinguish them from attacks merely below threshold yet still working. Both gated and
+conservative maxima are now reported throughout.
+
+**And `FINDING27`:** for EMDU and MDU+FAM, a `t_frac 0.8` attacker restores the forgotten facts to
+**at least `theta_ref`'s own level** (raw ranks 0.3125 → 0.7000 and 0.7375 against 0.6975). For
+those families unlearning achieved nothing durable — while EMDU simultaneously scores DISCLOSE
+0.000, i.e. perfect on the metric the literature reports.
+
 ### 9.7 What H18 does not establish
 
 - **Not scale transfer.** 124M on a synthetic corpus we built. The 8B attempt failed on
