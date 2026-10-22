@@ -67,9 +67,24 @@ R["attack_validity"] = {..., "valid": bool(tT_d - t0_d >= 0.20),
 > evidence of anything. Without the gate, a broken attack and a robust method are
 > indistinguishable — and three of our own runs sat on the wrong side of that line.
 
-We have not seen this gate stated as a requirement in the RTT-using papers we have read, which
-report held-out recovery without a train-set control. Whether that is novel or merely unstated
-practice needs a novelty check before any claim; the gate is reported here as a protocol note.
+The novelty check is now done (`NOVELTY_attack_validity_gate.md`): **partially anticipated.** The
+principle is Athalye et al.'s ([1802.00420](https://arxiv.org/abs/1802.00420) §3) — a broken
+attack impugns the attack, not the defence — and ours is a domain-specific instance of it. None
+of seven unlearning papers checked states or reports the control. It is a methodological note
+with a released instrument, not a contribution that carries a paper.
+
+## 3a. A limitation of this measurement, found by that same check
+
+UNDO and Lynch et al. both run an **adversarial learning-rate search** and report the
+best-performing attack ("always mark the adversarially optimal performance", Lee et al.;
+a ten-value lr grid, Lynch et al.). **Our numbers above come from a single learning rate.**
+
+The paired comparison stands — AFC and MDU λ=3 were attacked at the identical setting from the
+identical pre-attack disclosure of 0.225 — but the absolute recoveries are **lower bounds**, and
+the ordering has not been shown stable under an adversarial lr search. Until that sweep runs,
+read this finding as **"AFC is less robust than MDU λ=3 at lr 3e-5"**, not "under the strongest
+available attack". The sweep is queued, and if it reverses the ordering this finding is wrong and
+will be corrected.
 
 ## 4. Status
 

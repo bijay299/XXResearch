@@ -70,6 +70,27 @@ if [ ! -f outputs/decatk_theta0.json ]; then
     > outputs/log_decatk_theta0.txt 2>&1 || echo "[followup] theta0 GRID FAILED"
 fi
 
+# ---- Phase 4: adversarial learning-rate search for FINDING20 ----------------------------
+# UNDO and Lynch et al. both report the adversarially-OPTIMAL relearning attack over an lr grid.
+# FINDING20 used a single lr (3e-5), so its recoveries are lower bounds and the AFC-vs-MDU
+# ordering is not yet shown stable under the strongest attack. 1e-4 and 1e-5 already FAILED the
+# validity gate (degeneracy 0.93-0.98), so the grid brackets 3e-5 inside the usable window.
+AFC=/data/bijaypandey/mdlm_unlearn/adapters/h16_none_f1/ckpt_300
+MDU=/data/bijaypandey/mdlm_unlearn/adapters/ll_mdu_f3/ckpt_300
+rtt_lr () {                     # $1 = gpu, $2 = arm path, $3 = tag, $4 = lr
+  out="outputs/rtt_$3_lr$4.json"
+  [ -f "$out" ] && return
+  CUDA_VISIBLE_DEVICES="$1" $PY scripts/train_rtt.py --arm "$2" --lr "$4" \
+    --probe-steps 0,25,100,300 --n-eval 40 --label "$3_lr$4" \
+    > "outputs/log_rtt_$3_lr$4.txt" 2>&1 || echo "[lrsweep] FAILED $3 lr=$4"
+}
+for lr in 2e-5 5e-5 7e-5; do
+  echo "[lrsweep] lr=$lr on AFC(gpu2) and MDU(gpu3)"
+  rtt_lr 2 "$AFC" afc_l1 "$lr" &
+  rtt_lr 3 "$MDU" mdu_l3 "$lr" &
+  wait
+done
+
 echo "[followup] done"
 for lab in undo_a0p0 undo_a0p3 undo_a0p6; do
   for f in "outputs/arm_${lab}.json" "outputs/rtt_${lab}.json"; do

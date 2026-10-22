@@ -53,12 +53,31 @@ We produced the first and third ourselves before catching them. MDU and EMDU rep
 quality as ROUGE-L and token probability, **on which a degenerate model scores perfectly**. An
 honest comparison needs the full profile *and* retain utility together.
 
-**Open and unresolved, stated rather than hidden.** Our frame scores REPLACE (a fluent wrong
-answer) as acceptable, because the retrain-only pristine reference does it at 0.470. EMDU's
-authors and [arXiv 2407.16997](https://arxiv.org/abs/2407.16997) argue the opposite — that a
-confident wrong answer is *worse* than abstention. Which is right depends on the threat model,
-and our headline would need defending on those grounds. This is a live weakness in the frame, not
-a settled point.
+**The REPLACE question, now resolved** (`THREAT_MODEL.md`). Our frame scores REPLACE (a fluent
+wrong answer) as acceptable because the pristine reference does it at 0.470; EMDU and
+[arXiv 2407.16997](https://arxiv.org/abs/2407.16997) argue a confident wrong answer is *worse*
+than abstention. This is not a flaw in the metric but a choice of threat model, and our metric
+already has an exact decision-theoretic meaning: `TV(P,Q) = sup_A |P(A) − Q(A)|` **is** the
+optimal advantage of a single-query distinguisher, so minimising TV→pristine *is* minimising the
+adversary's ability to tell an unlearned fact from one that was never present. That is the
+indistinguishability threat model — TOFU's own — under which confabulating at pristine's rate is
+the target and abstaining instead is itself the leak.
+
+Read as membership-inference advantage, our own numbers give two results:
+
+| arm | TV = single-query advantage | |
+|---|---|---|
+| AFC λ=1 | 0.299 | best in project |
+| θ₀ — *no unlearning at all* | 0.770 | the do-nothing baseline |
+| RMU (calibrated) | 0.846 | **more detectable than doing nothing** |
+| EMDU λ=8 | 1.000 | **perfectly detectable from one query** |
+
+EMDU's "safe" abstention is the *worst* outcome under this threat model, and RMU's gibberish makes
+it more identifiable than leaving the fact in. The two threat models are genuinely opposed —
+matching a pristine model *requires* confabulating at its rate, which harm-avoidance forbids — so
+we declare indistinguishability explicitly and do **not** claim our arms are preferable under a
+misinformation threat model. Caveat: TV over six cells is the advantage of an adversary who sees
+only the cell label, so it is a **lower bound** on the true advantage.
 
 **Novelty caveat on the frame itself:** TOFU §5.2 states the metric-trap argument verbatim, and
 AltPO ([2409.13474](https://arxiv.org/abs/2409.13474)) covers four of our five evaluation
