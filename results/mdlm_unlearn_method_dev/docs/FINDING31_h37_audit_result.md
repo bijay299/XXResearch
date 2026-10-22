@@ -11,34 +11,54 @@ pre-declared thresholds and that is reported as such rather than rounded to the 
 
 ## 1. What replicated
 
+All **16 of 16** arms produced at least one valid gated attack, so nothing is reported as ungated
+and no arm was dropped (kill rule K2 honoured).
+
 | group | n | **max gated recovery** |
 |---|---|---|
 | suppression-only (MDU, AFC, EMDU, GA; λ ∈ {0.5…8}) | 8 | **+0.5608 … +0.7711** |
 | *α=0 controls (distil, no damage)* | 2 | *+0.4352, +0.4971* |
-| damage+distil, α > 0 | 4+ | **+0.0000 … +0.4385** |
+| damage+distil, α > 0 | 6 | **−0.0093 … +0.4385** |
 
 > **The bands are disjoint, gap +0.1223.** `FINDING28`'s band separation survives a balanced
 > design with a validated probe. This was the part most at risk from the convenience-sample
 > criticism and it held.
+
+**Sorted by recovery, all 8 damage+distil arms rank below all 8 suppression arms — 16/16 correctly
+ordered by family.** Stated as a separation score (AUC: 1.0 = perfect, 0.5 = chance):
+
+| measure | AUC separating the two method families |
+|---|---|
+| **validated relearning attack** | **1.000** |
+| marginal knowledge probe (validated) | 0.844 |
+| ranking knowledge probe (invalid) | 0.797 |
+
+The knowledge probes' AUC is computed as P(damage arm scores *higher* than suppression arm) =
+0.844 — so what little separating power the knowledge axis has, it has **in the inverted
+direction**. On knowledge the two families interleave (suppression 0.0000–0.4350, damage+distil
+0.2750–0.5250); on the attack they do not overlap at all.
 
 ## 2. What did **not** replicate: the headline
 
 `FINDING28` claimed **no** relationship between static knowledge and robustness (ranking-probe
 ρ = −0.148). With the validated marginal probe on the same arms:
 
-| x-axis | Spearman with max gated recovery |
+| x-axis | Spearman with max gated recovery (n=16) |
 |---|---|
-| ranking probe (the invalid instrument) | **−0.459** |
-| **marginal probe (validated)** | **−0.635** |
-| within-arm agreement between the two probes | +0.675 |
+| ranking probe (the invalid instrument) | −0.459 |
+| **marginal probe (validated)** | **−0.500** |
 
-**The correlation gets *stronger* with the better probe, not weaker.** So ρ ≈ −0.15 in
-`FINDING28` *was* regression dilution, exactly as `FINDING29` warned — but what the noise was
-hiding is not a positive relationship. It is an **inversion**.
+(At the 14-arm interim these read −0.459 and −0.635; the final 16-arm figures are the ones above
+and the ones that count. The interim −0.635 is not used anywhere.)
 
-`PREREG_H37` §5 declared "|ρ| < 0.4 → H37 true" and "|ρ| ≥ 0.7 → headline wrong". **ρ = −0.635
+**The correlation is stronger with the better probe, not weaker.** So ρ ≈ −0.15 in `FINDING28`
+*was* regression dilution, exactly as `FINDING29` warned — but what the noise was hiding is not a
+positive relationship. It is an **inversion**.
+
+`PREREG_H37` §5 declared "|ρ| < 0.4 → H37 true" and "|ρ| ≥ 0.7 → headline wrong". **ρ = −0.500
 falls between them.** I did not pre-specify that interval and will not retrofit a threshold to
-land on the convenient side. The honest statement is the one the sign and the rows below support.
+land on the convenient side. The honest statement is the one the sign, the AUC table, and the rows
+below support.
 
 ## 3. The rows that make the inversion concrete
 
@@ -50,6 +70,7 @@ land on the convenient side. The honest statement is the one the sign and the ro
 | `sup_emdu_l8` | **0.0000** | +0.6798 |
 | *exact retrain oracle (floor)* | *0.3375* | — |
 | `dd_afc_a0p6` | **0.3050** | **+0.0000** |
+| `dd_mdu_a0p6` | **0.2750** | **−0.0093** |
 
 > **Four arms score 0.0000 — apparent *perfect* erasure, below the exact oracle's own 0.3375
 > floor — and they are the LEAST robust arms measured.** The arm sitting essentially *at* the
@@ -76,7 +97,7 @@ and `FINDING28`'s finding that damage raises residual readings while lowering re
 
 **A tempting corollary, tested and refuted.** If scoring below the floor is the warning sign, then
 *distance* from the oracle floor should predict robustness better than the raw level. It does not:
-ρ(|knowledge − floor|, recovery) = **+0.446**, weaker than the raw level's −0.635. Recorded as
+ρ(|knowledge − floor|, recovery) = **+0.446**, weaker than the raw level's −0.500. Recorded as
 refuted, and not pursued.
 
 ## 5. Kill rule K1 fired, and the re-examination vindicates the mechanism
@@ -122,8 +143,10 @@ distillation contributes *nothing* does not, and is corrected here.
   (+0.1223) relative to the seed noise seen in `FINDING25` (0.01–0.05), the correlation less so.
 - **One attack family** for these numbers (span SFT), one budget (t_frac 0.5), one backbone.
   `FINDING30`'s second family was run on a different arm pair and is not folded in.
-- **ρ = −0.635 on n=16** has a wide confidence interval; the finding leans on the §3 rows and the
-  §5 ladder, which are qualitative and large, not on the coefficient.
+- **ρ = −0.500 on n=16** has a wide confidence interval, and it moved from −0.635 to −0.500 when
+  the last two arms landed — so the coefficient is not stable at this n. The finding leans on the
+  **AUC table** (1.000 vs 0.844, a complete-vs-partial separation), the §3 rows, and the §5 ladder,
+  which are large and qualitative, not on the correlation coefficient.
 - The marginal probe is **not adversarial**. It is a better static probe, and §2 is precisely the
   claim that a better static probe still does not help you select for robustness.
 - **`FINDING30`'s trainability confound is unresolved and applies here too.** If damaged arms are
