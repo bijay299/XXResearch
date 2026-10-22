@@ -3,29 +3,38 @@
 **Date:** 2026-10-22 · **Backbone:** H18 124M MDLM with an exact retrain oracle (`FINDING21`)
 **Protocol:** all arms at a **matched** attacker budget `t_frac = 0.5`, every attack passing
 `FINDING20`'s validity gate, recovery as **max over valid attacks**
-**Status:** ⚠ **PROVISIONAL — the headline is under audit.** The broadest result in the project, but
-its x-axis has since been shown to be an invalid instrument (`FINDING29`), and a noisy x-axis
-attenuates correlation toward zero. `PREREG_H37` registers a balanced 16-arm replication with a
-validated knowledge probe and **pre-declared retraction conditions**. Read §0 before §1.
+**Status:** ⚠ **SUPERSEDED IN PART — read `FINDING31` first.** The audit has now run. Its result:
+the **band separation replicated** in a balanced design, but **this document's headline was wrong**,
+and wrong in an informative direction. With a validated probe the correlation is **−0.635**, not
+−0.148: static knowledge metrics are not *uninformative* about robustness, they are
+**anti-predictive**. Four arms scoring 0.0000 — apparent perfect erasure, *below* the exact
+oracle's own floor — are the least robust arms measured.
+
+**So the title of this file overstates nothing about the attack and understates the result about
+the metric.** It is kept unedited below as the record of what was measured with the instrument
+available at the time; `FINDING31` is the current claim.
 
 ---
 
-## 0. ⚠ What is under audit, and what is not
+## 0. ⚠ What the audit confirmed and what it overturned
 
 `FINDING29` showed that `rank_probe_small.py` — the source of every "residual knowledge" number
 below — scores EOS-padded length-32 candidates, so padding enters every score. It reads
 `theta_ref` at 0.6725 when `theta_ref`'s true retain recall is **1.0000**, and it **inverts** the
 ordering of two models.
 
-| part of this finding | status |
+| part of this finding | status after `H37` |
 |---|---|
-| recovery numbers, band separation (§2), α=0 controls landing in the suppression band | **unaffected** — none depend on the ranking probe |
-| "only an attack measures robustness" (§6) | **unaffected** — an argument about what no static probe can do |
-| ρ = −0.148, the 18 matched pairs (§3), the α-ladder residual column (§5) | ⚠ **provisional** — may be regression dilution from a noisy x-axis rather than a true absence of relationship |
+| band separation (§2), disjoint recovery bands | ✅ **replicated** in a balanced 16-arm design, gap +0.1223 |
+| "only an attack measures robustness" (§6) | ✅ **confirmed and strengthened** — a *better* static probe still does not let you select for robustness |
+| **ρ = −0.148 "essentially zero, no relationship" (§1)** | ❌ **overturned.** It was regression dilution. True ρ = **−0.635** — an inversion, not an absence. See `FINDING31` §2. |
+| the 18 matched pairs (§3) | ⚠ **computed with the invalid probe.** The qualitative point survives in stronger form via `FINDING31` §3; these specific pairings do not. |
+| §5's α-ladder *residual* column | ⚠ ranking-probe readings; the recovery column and the mechanism stand (`FINDING31` §5) |
+| §2's claim that the α=0 controls land *inside* the suppression band | ❌ **did not replicate** — they landed just below it. `FINDING31` §5 re-examines under kill rule K1 and the damage mechanism stands on a controlled α ladder instead. |
 
-Only 2 of the 125 checkpoints still exist, so this cannot be repaired by reanalysis. Everything
-below is reported as measured; the words "residual forget knowledge" should everywhere be read as
-**"the ranking probe's reading of residual knowledge"**.
+Only 2 of the 125 checkpoints still exist, so this could not be repaired by reanalysis — hence the
+rebuild in `PREREG_H37`. Everything below is reported as measured; the words "residual forget
+knowledge" should everywhere be read as **"the ranking probe's reading of residual knowledge"**.
 
 ---
 
