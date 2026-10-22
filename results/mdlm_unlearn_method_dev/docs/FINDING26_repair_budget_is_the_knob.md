@@ -134,7 +134,35 @@ and used it to bound the usable regime. That was measured at **3,000** repair st
 all nine were rejected before). So the collapse was **repair-bound, not intrinsic to α=0.7** — the
 right conclusion for the wrong reason. α=0.7 remains dominated, but by α=0.6, not by collapse.
 
-α=0.6 is at n=2; replication to n=5 is running before it is treated as the selected point.
+### α=0.6 replicated at n=5 and survives an adversarial lr search
+
+| | value |
+|---|---|
+| retain | **0.5790 ± 0.0165** (n=5) |
+| recovery at lr 3e-5 | **−0.0139 ± 0.0424** (n=5: 0.0287, −0.0676, 0.0000, 0.0186, −0.0493) |
+
+The zero-recovery claim rested on one attack learning rate, which is the limitation
+`NOVELTY_attack_validity_gate.md` recorded against `FINDING20` and which already forced one
+withdrawal today (α=0.5 "fully robust": −0.048 at lr 1e-4 became **+0.057** under search). So the
+point was attacked across the grid:
+
+| attack lr | recovery | gate | T-rise |
+|---|---|---|---|
+| 1e-5 | **−0.0096** | ✓ | +0.260 |
+| 3e-5 | −0.0139 ± 0.042 | ✓ | — |
+| 1e-4 | −0.0670 | ✓ | +0.645 |
+| 3e-4 | −0.1148 | ✓ | +0.660 |
+| 1e-3 | −0.1627 | ✓ | +0.655 |
+
+> **Max over five valid attack learning rates: −0.0096.** Every attack passed the validity gate
+> (T-rise +0.260 to +0.660, i.e. each genuinely relearned its own training set) and **every one
+> produced negative recovery.** No attack setting in the grid reopens the forgotten knowledge.
+
+Against the best anchor run anywhere (0.5608 over 37 gated runs), that is the separation this
+protocol is capable of measuring. **This is the strongest result in the project.**
+
+Still outstanding before it is called the selected point: its behavioural profile (TV→oracle) and
+whether the result is teacher-general or specific to the EMDU teacher. Both are running.
 
 ## 5. Honest size
 
