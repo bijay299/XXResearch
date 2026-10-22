@@ -140,6 +140,19 @@ second model, from retraining, or from data. This is a falsifiable prediction, a
 2×2 cell neither parent paper ran, isolating which of EMDU's two simultaneous changes carries the
 benefit. It is **not a new algorithm** — every term is theirs.
 
+**Provenance of the AFC artifact, verified and recorded because the filename misleads.** AFC λ=1
+lives at `adapters/h16_none_f1/ckpt_300`, produced by `train_h16.py --mode none` — the H16
+*script* with its projection disabled. Checked against the adapter's stored hyperparameters:
+`mode: none`, `lam_forget: 1.0`, `localize: false`, anchor-first KL. That is AFC λ=1, and it is
+the teacher used for every UNDO arm.
+
+⚠ **That file's own `report.json` is misleading**: it carries H16's `mechanism` and
+`novelty_note` strings describing retain-conflict **projection machinery that `--mode none`
+never applies**, because the script writes those fields unconditionally. The weights are AFC;
+the prose beside them describes a different arm. Anyone reading the artifact in isolation could
+misfile AFC as an H16 projection result. The hyperparameters, not those two strings, are
+authoritative.
+
 ### Static trade-off (AFC wins)
 
 | arm | n | DISCLOSE | DEGENERATE | retain | TV→pristine |
