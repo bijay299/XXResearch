@@ -11,15 +11,18 @@
 # Targets are always the TEACHER's outputs, never gold answers, so including forget questions
 # leaks no forget content.
 #
-# Phase 1  faithful UNDO, alpha=0.3 --include-forget, 1000 steps. 1000 not 300 because the
-#          frozen probe on the 300-step arm fell 2.467 -> 2.188 -> 1.663 at steps 0/49/99,
-#          still falling with an INCREASING rate: 300 steps is an under-trained student, and
-#          weak utility there would be indistinguishable from "UNDO's route does not work".
-# Phase 2  the alpha=0 CONTROL in the SAME faithful configuration. UNDO's claim is that
-#          distilling into a DAMAGED copy is what robustifies; alpha=0 distils into an
-#          undamaged copy of the same teacher. If alpha=0 is equally robust the damage does
-#          nothing and any gain is plain distillation.
-# Phase 3  partition eval + validated RTT (FINDING20's gate) on every arm, two lanes.
+# Phase 3a eval + validated RTT on the retain-only checkpoints that ALREADY EXIST, first.
+#          The two 1000-step trainings below take ~2.8h, and the question these arms answer --
+#          is an under-repaired student's utility destroyed? -- decides whether the UNDO
+#          direction is viable at all. Worth ~20 min on both GPUs before spending the 2.8h.
+# Phase 3b faithful UNDO, alpha=0.3 --include-forget, 1000 steps at lr 1e-4. 1000 steps and the
+#          raised lr because the frozen probe PLATEAUED at 1.663 -> 1.642 -> 1.601 (steps
+#          99/149/199) on prompts drawn from the distillation pool itself -- a TRAINING loss
+#          stuck high, i.e. underfitting, so weak utility would be indistinguishable from
+#          "UNDO's route does not work".
+#          Then the alpha=0 CONTROL in the SAME faithful configuration: UNDO's claim is that
+#          distilling into a DAMAGED copy is what robustifies, so if alpha=0 is equally robust
+#          the damage does nothing and any gain is plain distillation.
 # Phase 4  H17's still-owed theta0 decoder grid.
 # Phase 5  adversarial learning-rate search, to turn FINDING20's single-lr recoveries into
 #          bounds under the strongest attack.
@@ -55,10 +58,6 @@ train_undo () {                 # $1 = label, $2 = alpha, $3 = steps, $4 = extra
     > "outputs/log_$lab.txt" 2>&1 || echo "[train] FAILED $lab"
 }
 
-# ---- Phases 1 and 2: the faithful arm and its control -----------------------------------
-train_undo undo_fa0p3 0.3 1000 --include-forget
-train_undo undo_fa0p0 0.0 1000 --include-forget
-
 # ---- Phase 3: evaluate + attack ---------------------------------------------------------
 evaluate () {                   # $1 = gpu, $2 = label, $3 = checkpoint path, $4 = rtt? yes/no
   g="$1"; lab="$2"; ck="$3"; do_rtt="$4"
@@ -77,16 +76,23 @@ evaluate () {                   # $1 = gpu, $2 = label, $3 = checkpoint path, $4
   fi
 }
 
-# the faithful arm and its control are the priority pair
+# FIRST: the retain-only checkpoints that already exist. Two 1000-step trainings would
+# otherwise run for ~2.8h before producing any evaluation at all, and the question these answer
+# -- is an under-repaired student's utility destroyed? -- decides whether the UNDO direction is
+# viable. ~20 min on both GPUs for that signal is worth taking before spending the 2.8h.
+evaluate 2 undo_a0p3 adapters/undo_a0p3/undo_step300.bin yes &
+evaluate 3 undo_a0p6 adapters/undo_a0p6/undo_step300.bin yes &
+wait
+
+# THEN the faithful arm and its control, at lr 1e-4
+train_undo undo_fa0p3 0.3 1000 --include-forget
+train_undo undo_fa0p0 0.0 1000 --include-forget
+
 evaluate 2 undo_fa0p3 adapters/undo_fa0p3/undo_step1000.bin yes &
 evaluate 3 undo_fa0p0 adapters/undo_fa0p0/undo_step1000.bin yes &
 wait
 # mid-distillation checkpoint: utility-vs-steps, no attack needed
 evaluate 2 undo_fa0p3_s500 adapters/undo_fa0p3/undo_step500.bin no &
-# the retain-only variants from the sweep
-evaluate 3 undo_a0p3 adapters/undo_a0p3/undo_step300.bin yes &
-wait
-evaluate 2 undo_a0p6 adapters/undo_a0p6/undo_step300.bin yes &
 wait
 
 # ---- Phase 4: H17's mandatory reference arm ---------------------------------------------
