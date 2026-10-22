@@ -48,6 +48,46 @@ def collapse(s):
 
 
 @torch.no_grad()
+def infill(model, tok, probes, slots, dev, batch=64):
+    """Pinned sampler over value slots presented IN PLACE, with right context and padding."""
+    eos = tok.eos_token_id
+    outs = []
+    for i in range(0, len(probes), batch):
+        chunk = probes[i:i + batch]
+        L = max(p.get("memo_len", 32) for p in chunk)
+        ids = torch.full((len(chunk), L), eos, dtype=torch.long)
+        live = torch.zeros((len(chunk), L), dtype=torch.bool)
+        for r, p in enumerate(chunk):
+            pre, post = list(p["pre_ids"]), list(p["post_ids"])
+            s0 = len(pre)
+            seq = pre + [MASK_ID] * slots + post
+            seq = seq[:L] + [eos] * max(0, L - len(seq))
+            ids[r, :L] = torch.tensor(seq[:L])
+            e0 = min(s0 + slots, L)
+            live[r, s0:e0] = True
+        ids, live = ids.to(dev), live.to(dev)
+        for _ in range(slots):
+            with torch.autocast("cuda", dtype=torch.bfloat16):
+                logits = model(ids)
+            pr = torch.softmax(logits.float(), -1)
+            conf, arg = pr.max(-1)
+            cur = live & (ids == MASK_ID)
+            if not cur.any():
+                break
+            conf = conf.masked_fill(~cur, -1.0)
+            pick = conf.argmax(1)
+            rows = torch.arange(ids.shape[0], device=dev)
+            sel = cur[rows, pick]
+            ids[rows[sel], pick[sel]] = arg[rows[sel], pick[sel]]
+        for r, p in enumerate(chunk):
+            s0 = len(p["pre_ids"]); e0 = min(s0 + slots, ids.shape[1])
+            span = ids[r, s0:e0].tolist()
+            n_mask = sum(1 for t_ in span if t_ == MASK_ID)
+            outs.append((tok.decode([t_ for t_ in span if t_ != MASK_ID]), n_mask))
+    return outs
+
+
+@torch.no_grad()
 def generate(model, tok, prompts, gen_len, dev, batch=64):
     """Pinned sampler: commit exactly one token per step, highest-confidence masked slot."""
     outs = []
@@ -130,6 +170,15 @@ def main():
     ap.add_argument("--ckpt", required=True)
     ap.add_argument("--label", required=True)
     ap.add_argument("--gen-len", type=int, default=8)
+    ap.add_argument("--infill", action="store_true",
+                    help="fill the value slot IN PLACE with the trailing template visible and "
+                         "EOS padding, i.e. the format the model was trained in. The default "
+                         "trailing-run protocol masks the sequence END with no right context, "
+                         "which a bidirectional diffusion LM never saw in value-span training: "
+                         "it scored 0.06 on a model whose ranking accuracy is 0.665.")
+    ap.add_argument("--slots", type=int, default=5,
+                    help="masked value slots. Fixed for every probe so answer LENGTH is not "
+                         "leaked (values are 1-5 tokens).")
     ap.add_argument("--ref-profile", default=None,
                     help="path to an oracle arm_*.json; TV is computed against its forget "
                          "profile. Omit when evaluating the oracle itself.")
@@ -158,7 +207,10 @@ def main():
 
     probes = meta["probes"]
     t0 = time.time()
-    gens = generate(model, tok, [p["cloze"] for p in probes], a.gen_len, dev)
+    if a.infill:
+        gens = infill(model, tok, probes, a.slots, dev)
+    else:
+        gens = generate(model, tok, [p["cloze"] for p in probes], a.gen_len, dev)
     rows = []
     for pr, (g, nm) in zip(probes, gens):
         cell, why = classify(g, pr["answer"], pr["attr"], nm)
@@ -169,6 +221,7 @@ def main():
     re_ = [r for r in rows if r["split"] == "retain"]
     pf, pr_ = profile(fo), profile(re_)
     out = {"study": "h18_small_eval", "label": a.label, "ckpt": a.ckpt,
+           "protocol": "infill" if a.infill else "trailing_run",
            "step": sd.get("step"),
            "n_forget": len(fo), "n_retain": len(re_),
            "forget_profile": pf, "retain_profile": pr_,

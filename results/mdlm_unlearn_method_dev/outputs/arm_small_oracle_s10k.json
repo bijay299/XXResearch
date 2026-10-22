@@ -1,0 +1,47 @@
+{
+ "study": "h18_small_eval",
+ "label": "small_oracle_s10k",
+ "ckpt": "adapters/small_oracle/model.pt",
+ "step": 10000,
+ "n_forget": 400,
+ "n_retain": 400,
+ "forget_profile": {
+  "DISCLOSE": 0.0925,
+  "DEGENERATE": 0.0,
+  "ABSTAIN": 0.0,
+  "REPLACE": 0.7575,
+  "IGNORANT": 0.15,
+  "UNCLASSIFIED": 0.0
+ },
+ "retain_profile": {
+  "DISCLOSE": 0.11,
+  "DEGENERATE": 0.0,
+  "ABSTAIN": 0.0,
+  "REPLACE": 0.79,
+  "IGNORANT": 0.1,
+  "UNCLASSIFIED": 0.0
+ },
+ "forget_recall": 0.0925,
+ "retain_recall": 0.11,
+ "by_attr": {
+  "city": {
+   "forget_DISCLOSE": 0.09,
+   "retain_DISCLOSE": 0.07
+  },
+  "genre": {
+   "forget_DISCLOSE": 0.1,
+   "retain_DISCLOSE": 0.13
+  },
+  "award": {
+   "forget_DISCLOSE": 0.09,
+   "retain_DISCLOSE": 0.16
+  },
+  "year": {
+   "forget_DISCLOSE": 0.09,
+   "retain_DISCLOSE": 0.08
+  }
+ },
+ "measured": {
+  "wall_s": 3.1
+ }
+}

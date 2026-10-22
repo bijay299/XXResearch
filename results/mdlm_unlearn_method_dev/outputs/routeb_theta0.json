@@ -1,0 +1,207 @@
+{
+  "study": "route_b_self_completion_and_fact_selective_anchor",
+  "label": "theta0",
+  "memo": "/data/bijaypandey/mdlm_unlearn/adapters/theta0_tofu",
+  "hparams": {
+    "memo": "/data/bijaypandey/mdlm_unlearn/adapters/theta0_tofu",
+    "data": "/data/bijaypandey/mdlm_unlearn/data/tofu/tofu800.json",
+    "n_facts": 100,
+    "draws": 4,
+    "gen_length": 64,
+    "batch": 2,
+    "label": "theta0"
+  },
+  "n_facts": 100,
+  "routes": {
+    "A": "prompt -> fact (what a prompt-masked anchor removes)",
+    "B": "partial answer -> rest (autoassociative self-completion)"
+  },
+  "overall": {
+    "natural": {
+      "p_true": 0.46595,
+      "fact": 0.10509,
+      "punct": 0.29012,
+      "eos": 0.05471,
+      "entropy": 1.71453,
+      "n": 15938
+    },
+    "mdu": {
+      "p_true": 0.25644,
+      "fact": 0.04223,
+      "punct": 0.33436,
+      "eos": 0.14625,
+      "entropy": 3.22632,
+      "n": 15938
+    },
+    "fam": {
+      "p_true": 0.017,
+      "fact": 0.0,
+      "punct": 0.0,
+      "eos": 0.0,
+      "entropy": 8.18513,
+      "n": 15938
+    },
+    "factmask": {
+      "p_true": 0.2124,
+      "fact": 0.03426,
+      "punct": 0.3464,
+      "eos": 0.15937,
+      "entropy": 3.47726,
+      "n": 15938
+    }
+  },
+  "by_mask_rate": {
+    "0.00-0.25": {
+      "natural": {
+        "p_true": 0.82327,
+        "fact": 0.10256,
+        "punct": 0.2735,
+        "eos": 0.04274,
+        "entropy": 0.19069,
+        "n": 117
+      },
+      "mdu": {
+        "p_true": 0.71518,
+        "fact": 0.10256,
+        "punct": 0.28205,
+        "eos": 0.03419,
+        "entropy": 0.57223,
+        "n": 117
+      },
+      "fam": {
+        "p_true": 0.01134,
+        "fact": 0.0,
+        "punct": 0.0,
+        "eos": 0.0,
+        "entropy": 8.18296,
+        "n": 117
+      },
+      "factmask": {
+        "p_true": 0.69728,
+        "fact": 0.10256,
+        "punct": 0.29915,
+        "eos": 0.01709,
+        "entropy": 0.61734,
+        "n": 117
+      }
+    },
+    "0.25-0.50": {
+      "natural": {
+        "p_true": 0.70719,
+        "fact": 0.10495,
+        "punct": 0.27788,
+        "eos": 0.11747,
+        "entropy": 0.68289,
+        "n": 1677
+      },
+      "mdu": {
+        "p_true": 0.61003,
+        "fact": 0.09899,
+        "punct": 0.2588,
+        "eos": 0.08348,
+        "entropy": 1.10394,
+        "n": 1677
+      },
+      "fam": {
+        "p_true": 0.0179,
+        "fact": 0.0,
+        "punct": 0.0,
+        "eos": 0.0,
+        "entropy": 8.18676,
+        "n": 1677
+      },
+      "factmask": {
+        "p_true": 0.55412,
+        "fact": 0.0972,
+        "punct": 0.26774,
+        "eos": 0.07513,
+        "entropy": 1.33388,
+        "n": 1677
+      }
+    },
+    "0.50-0.75": {
+      "natural": {
+        "p_true": 0.66885,
+        "fact": 0.10579,
+        "punct": 0.24717,
+        "eos": 0.077,
+        "entropy": 0.97752,
+        "n": 3091
+      },
+      "mdu": {
+        "p_true": 0.44364,
+        "fact": 0.07667,
+        "punct": 0.26399,
+        "eos": 0.0605,
+        "entropy": 1.9327,
+        "n": 3091
+      },
+      "fam": {
+        "p_true": 0.01667,
+        "fact": 0.0,
+        "punct": 0.0,
+        "eos": 0.0,
+        "entropy": 8.18459,
+        "n": 3091
+      },
+      "factmask": {
+        "p_true": 0.34263,
+        "fact": 0.05823,
+        "punct": 0.28308,
+        "eos": 0.05856,
+        "entropy": 2.34809,
+        "n": 3091
+      }
+    },
+    "0.75-1.01": {
+      "natural": {
+        "p_true": 0.36883,
+        "fact": 0.10495,
+        "punct": 0.30417,
+        "eos": 0.03908,
+        "entropy": 2.0933,
+        "n": 11053
+      },
+      "mdu": {
+        "p_true": 0.14558,
+        "fact": 0.02334,
+        "punct": 0.36605,
+        "eos": 0.18095,
+        "entropy": 3.9382,
+        "n": 11053
+      },
+      "fam": {
+        "p_true": 0.01702,
+        "fact": 0.0,
+        "punct": 0.0,
+        "eos": 0.0,
+        "entropy": 8.18505,
+        "n": 11053
+      },
+      "factmask": {
+        "p_true": 0.119,
+        "fact": 0.01728,
+        "punct": 0.37655,
+        "eos": 0.20185,
+        "entropy": 4.14851,
+        "n": 11053
+      }
+    }
+  },
+  "kills_fired": [
+    "K1_does_not_close_route_B",
+    "K2_no_better_formed_than_FAM",
+    "K3_formless_will_train_a_degenerate_student"
+  ],
+  "verdict": "DEAD: K1_does_not_close_route_B; K2_no_better_formed_than_FAM; K3_formless_will_train_a_degenerate_student",
+  "route_B_evidence": {
+    "mdu_anchor_p_true": 0.25644,
+    "mdu_anchor_fact_argmax": 0.04223,
+    "meaning": "the prompt is fully masked in the mdu anchor, so any residual p_true is self-completion from the answer -- Route B. Finding 13 measured 0.651 at low mask rate."
+  },
+  "measured": {
+    "wall_s": 32.6,
+    "n_rows": 63752,
+    "peak_gpu_gib": 15.628
+  }
+}

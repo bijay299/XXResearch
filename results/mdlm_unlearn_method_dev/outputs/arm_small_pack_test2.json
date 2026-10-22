@@ -1,0 +1,47 @@
+{
+ "study": "h18_small_eval",
+ "label": "small_pack_test2",
+ "ckpt": "adapters/small_pack_test2/model.pt",
+ "step": 4000,
+ "n_forget": 400,
+ "n_retain": 400,
+ "forget_profile": {
+  "DISCLOSE": 0.1325,
+  "DEGENERATE": 0.0,
+  "ABSTAIN": 0.0,
+  "REPLACE": 0.725,
+  "IGNORANT": 0.1425,
+  "UNCLASSIFIED": 0.0
+ },
+ "retain_profile": {
+  "DISCLOSE": 0.1625,
+  "DEGENERATE": 0.0,
+  "ABSTAIN": 0.0,
+  "REPLACE": 0.6525,
+  "IGNORANT": 0.185,
+  "UNCLASSIFIED": 0.0
+ },
+ "forget_recall": 0.1325,
+ "retain_recall": 0.1625,
+ "by_attr": {
+  "city": {
+   "forget_DISCLOSE": 0.04,
+   "retain_DISCLOSE": 0.05
+  },
+  "genre": {
+   "forget_DISCLOSE": 0.17,
+   "retain_DISCLOSE": 0.22
+  },
+  "award": {
+   "forget_DISCLOSE": 0.22,
+   "retain_DISCLOSE": 0.19
+  },
+  "year": {
+   "forget_DISCLOSE": 0.1,
+   "retain_DISCLOSE": 0.19
+  }
+ },
+ "measured": {
+  "wall_s": 1.2
+ }
+}
