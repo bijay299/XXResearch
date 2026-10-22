@@ -75,6 +75,12 @@ def main():
     ap.add_argument("--steps", type=int, default=1500)
     ap.add_argument("--lr", type=float, default=1e-5)
     ap.add_argument("--n-images", type=int, default=48, help="distillation pool size")
+    ap.add_argument("--forget-frac", type=float, default=0.34,
+                    help="fraction of the distillation pool drawn from the ERASED concept's "
+                         "prompts. Declared explicitly because the previous version concatenated "
+                         "forget and retain prompts in BLOCKS, so the composition depended on "
+                         "pool size -- a small pool was 100%% forget, which both mis-specified "
+                         "the arm and left the retain-Fisher index set empty.")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--log-every", type=int, default=150)
     ap.add_argument("--label", required=True)
@@ -83,7 +89,17 @@ def main():
     dev = "cuda"
     torch.manual_seed(a.seed); np.random.seed(a.seed)
 
-    prompts = FORGET_POOL[a.concept] * 3 + RETAIN_POOL
+    # INTERLEAVED pool with an explicitly declared forget fraction, so composition does not
+    # depend on pool size. Forget prompts must be present (their absence in the 8B phase meant
+    # suppression was never transferred where it was measured) but must not dominate.
+    fp, rp = FORGET_POOL[a.concept], RETAIN_POOL
+    n_f = max(1, int(round(a.n_images * a.forget_frac)))
+    pool = [(fp[i % len(fp)], True) for i in range(n_f)] + \
+           [(rp[i % len(rp)], False) for i in range(a.n_images - n_f)]
+    rs = np.random.RandomState(a.seed)
+    rs.shuffle(pool)
+    prompts = [x[0] for x in pool]
+    forget_flags = [x[1] for x in pool]
     # 1. build the distillation pool from the TEACHER's own generations (on-manifold, and the
     #    only thing the student is ever shown)
     teach_fp16 = build(torch.float16, a.teacher, dev)
@@ -91,7 +107,7 @@ def main():
     vae, te, tok = teach_fp16.vae, teach_fp16.text_encoder, teach_fp16.tokenizer
     with torch.no_grad():
         for i in range(a.n_images):
-            pr = prompts[i % len(prompts)]
+            pr = prompts[i]
             g = torch.Generator(device=dev).manual_seed(5_000 + i)
             im = teach_fp16([pr], num_inference_steps=25, guidance_scale=7.5, generator=g).images[0]
             x = torch.frombuffer(im.tobytes(), dtype=torch.uint8).reshape(
@@ -101,8 +117,7 @@ def main():
                      return_tensors="pt").to(dev)
             embs.append(te(t_.input_ids)[0].float())
     lats, embs = torch.cat(lats), torch.cat(embs)
-    is_forget = torch.tensor([(i % len(prompts)) < len(FORGET_POOL[a.concept]) * 3
-                              for i in range(a.n_images)], device=dev)
+    is_forget = torch.tensor(forget_flags, device=dev)
     print(f"[undo] distillation pool: {a.n_images} latents, "
           f"{int(is_forget.sum())} from the ERASED concept's prompts", flush=True)
     del teach_fp16
@@ -119,6 +134,10 @@ def main():
     imp = None
     if a.protect in ("retain_fisher", "random"):
         ret_idx = (~is_forget).nonzero().flatten()
+        if len(ret_idx) == 0:
+            raise RuntimeError("retain-Fisher protection needs retain examples in the pool, "
+                               "but the pool is entirely forget; raise --n-images or lower "
+                               "--forget-frac")
         imp = {n: torch.zeros_like(p) for n, p in student.named_parameters()}
         for b in range(a.fisher_batches):
             i = ret_idx[torch.randint(0, len(ret_idx), (1,), device=dev)]
