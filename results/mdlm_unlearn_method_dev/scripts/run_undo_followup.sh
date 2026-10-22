@@ -11,10 +11,12 @@
 # Targets are always the TEACHER's outputs, never gold answers, so including forget questions
 # leaks no forget content.
 #
-# Phase 3a eval + validated RTT on the retain-only checkpoints that ALREADY EXIST, first.
-#          The two 1000-step trainings below take ~2.8h, and the question these arms answer --
-#          is an under-repaired student's utility destroyed? -- decides whether the UNDO
-#          direction is viable at all. Worth ~20 min on both GPUs before spending the 2.8h.
+# Phase 3a the retain-only arms are a NO-OP: their weights were never written. ZeRO-3's
+#          save_16bit_model needs stage3_gather_16bit_weights_on_model_save, which defaults to
+#          False, in which case it returns False and writes nothing -- while the old code logged
+#          "[ckpt] ... .bin" unconditionally. Both the alpha=0.3 and alpha=0.6 arms were lost.
+#          The lanes are kept so the arms get picked up if ever retrained; they skip for now.
+#          Salvaged from alpha=0.3: the frozen-probe repair curve, which is the useful finding.
 # Phase 3b faithful UNDO, alpha=0.3 --include-forget, 1000 steps at lr 1e-4. 1000 steps and the
 #          raised lr because the frozen probe PLATEAUED at 1.663 -> 1.642 -> 1.601 (steps
 #          99/149/199) on prompts drawn from the distillation pool itself -- a TRAINING loss
@@ -53,7 +55,7 @@ train_undo () {                 # $1 = label, $2 = alpha, $3 = steps, $4 = extra
   echo "[train] $lab alpha=$al steps=$st lr=$LR $extra"
   $DS --include localhost:2,3 --master_port 29577 \
     scripts/train_undo.py --alpha "$al" --beta 0.1 --steps "$st" --lr "$LR" \
-    --probe-every 50 --save-every $(( st / 2 )) --batch 1 $extra \
+    --probe-every 50 --save-every "$st" --batch 1 $extra \
     --out "/data/bijaypandey/mdlm_unlearn/adapters/$lab" \
     > "outputs/log_$lab.txt" 2>&1 || echo "[train] FAILED $lab"
 }
@@ -76,10 +78,9 @@ evaluate () {                   # $1 = gpu, $2 = label, $3 = checkpoint path, $4
   fi
 }
 
-# FIRST: the retain-only checkpoints that already exist. Two 1000-step trainings would
-# otherwise run for ~2.8h before producing any evaluation at all, and the question these answer
-# -- is an under-repaired student's utility destroyed? -- decides whether the UNDO direction is
-# viable. ~20 min on both GPUs for that signal is worth taking before spending the 2.8h.
+# These two skip: the save bug above means no retain-only weights exist. Deliberately NOT
+# retrained at lr 2e-5, because the repair curve already showed that configuration underfits
+# (stalls near 1.6 nats). Compute goes to the faithful arms at lr 1e-4 instead.
 evaluate 2 undo_a0p3 adapters/undo_a0p3/undo_step300.bin yes &
 evaluate 3 undo_a0p6 adapters/undo_a0p6/undo_step300.bin yes &
 wait
@@ -91,9 +92,17 @@ train_undo undo_fa0p0 0.0 1000 --include-forget
 evaluate 2 undo_fa0p3 adapters/undo_fa0p3/undo_step1000.bin yes &
 evaluate 3 undo_fa0p0 adapters/undo_fa0p0/undo_step1000.bin yes &
 wait
-# mid-distillation checkpoint: utility-vs-steps, no attack needed
-evaluate 2 undo_fa0p3_s500 adapters/undo_fa0p3/undo_step500.bin no &
-wait
+
+# Reclaim the weights. /data is 99% full on a volume shared with other users and each
+# checkpoint is 14.93 GiB, so an arm's weights are deleted once BOTH its eval and its RTT
+# results exist on disk. Guarded on the results being present: never delete unevaluated work.
+for lab in undo_fa0p3 undo_fa0p0; do
+  ck="adapters/$lab/undo_step1000.bin"
+  if [ -f "$ck" ] && [ -f "outputs/arm_${lab}.json" ] && [ -f "outputs/rtt_${lab}.json" ]; then
+    echo "[followup] reclaiming $ck (eval + rtt both recorded)"
+    rm -f "$ck"
+  fi
+done
 
 # ---- Phase 4: H17's mandatory reference arm ---------------------------------------------
 # Without it the AFC grid's spread cannot be attributed to unlearning fragility rather than

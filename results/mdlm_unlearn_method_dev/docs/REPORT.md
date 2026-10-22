@@ -229,11 +229,30 @@ suppression robust. α=0 distils into an **undamaged** copy of the same suppress
 | α=0 is equally robust | the damage does nothing here and any gain is plain distillation |
 | no arm is robust | §4.3's prediction is **falsified** — sourcing the target outside the model's own distributions is not sufficient either |
 
-**Guard against a false negative.** A thin distillation budget (997 prompts, 300 steps) could
-leave the student under-repaired, which would look like "UNDO fails" when it is really "we did not
-distil enough". The frozen probe is what distinguishes these: if `frozen_KL` has plateaued by step
-300 the repair converged, and if it is still falling the arm is under-trained and must be extended
-before any conclusion is drawn.
+**Guard against a false negative, and what it measured.** A thin distillation budget could leave
+the student under-repaired, which would look like "UNDO fails" when it is really "we did not
+distil enough". The frozen probe was added to distinguish these. First arm (α=0.3, retain-only
+pool, lr 2e-5, batch 1, 300 steps):
+
+| step | 0 | 49 | 99 | 149 | 199 | 249 | 299 |
+|---|---|---|---|---|---|---|---|
+| `frozen_KL` | 2.467 | 2.188 | 1.663 | 1.642 | 1.601 | 1.567 | **1.668** |
+
+**Repair stalls near 1.6 nats and does not converge toward 0.** The probe prompts are drawn from
+the distillation pool itself, so this is a **training** loss stuck high — underfitting, not a
+generalisation limit. lr 2e-5 at batch 1 under gradient clipping is too little optimisation to
+undo a 30% relative weight perturbation across 8B parameters. The faithful arms therefore run at
+lr 1e-4.
+
+*Limitation of our own instrument, stated:* the probe is 2 prompts × 2 mask rates, and the
+step-249→299 uptick (1.567 → 1.668) shows roughly ±0.1 of probe noise. Fixed prompts, mask rates
+and RNG make it valid for the **trend**; its absolute value should not be read finely.
+
+**Feasibility caveat, declared before the results.** Our distillation budget is orders of
+magnitude below the paper's — ~10³ samples at batch 1 against an epoch of pretraining data. If
+repair remains incomplete at lr 1e-4, the correct conclusion is **"UNDO's route is not testable at
+this compute budget"**, not "UNDO fails", and §4.3's prediction would remain untested rather than
+falsified.
 **If UNDO also lands on the trade-off, §4.3's prediction is falsified and that is the reportable
 outcome.**
 

@@ -216,6 +216,10 @@ def main():
             "stage3_param_persistence_threshold": 1e4,
             "stage3_max_live_parameters": 3e8,
             "stage3_prefetch_bucket_size": 3e7,
+            # REQUIRED for save_16bit_model. It defaults to False, in which case the call
+            # silently returns False and writes NOTHING -- which cost a full 300-step arm whose
+            # weights were simply lost while the log reported "[ckpt] ... .bin".
+            "stage3_gather_16bit_weights_on_model_save": True,
         },
         "optimizer": {"type": "AdamW",
                       "params": {"lr": a.lr, "betas": [0.9, 0.95], "weight_decay": 0.0}},
@@ -321,8 +325,18 @@ def main():
                     f"{(time.time()-t0)/(step+1):.2f}s/step "
                     f"peak={torch.cuda.max_memory_allocated(dev)/2**30:.1f} GiB")
         if (step + 1) % a.save_every == 0:
-            engine.save_16bit_model(a.out, f"undo_step{step+1}.bin")
-            log(f"[ckpt] {a.out}/undo_step{step+1}.bin")
+            fn = f"undo_step{step+1}.bin"
+            ok = engine.save_16bit_model(a.out, fn)
+            # Verify rather than announce. save_16bit_model returns False and writes nothing if
+            # stage3_gather_16bit_weights_on_model_save is off, and the previous version logged
+            # success unconditionally -- so an entire arm's weights were lost silently.
+            path = os.path.join(a.out, fn)
+            if is_main:
+                if ok and os.path.exists(path):
+                    log(f"[ckpt] {path} ({os.path.getsize(path)/2**30:.2f} GiB)")
+                else:
+                    log(f"[ckpt] FAILED to write {path} (returned {ok}, "
+                        f"exists={os.path.exists(path)})")
 
     if is_main:
         R = {"study": "undo_for_mdlm", "hparams": vars(a),
