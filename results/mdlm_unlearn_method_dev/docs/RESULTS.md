@@ -122,10 +122,12 @@ Excluded for degeneracy: EMDU (1.000), AFC λ=8 (0.908), H16 projection k=32 (0.
 
 - **One backbone, one dataset.** TOFU-style split on a synthetic-memorization LLaDA backbone.
   No RWKU, no Dream-7B. Transfer is untested.
-- **No robustness claim.** RTT relearning is unrun. Anchor-matching families recover under
-  finetuning attack ([2506.06278](https://arxiv.org/abs/2506.06278)), and our own closed study
-  found MDLM unlearning reversible 0.049 → 0.605 in 10 steps. This applies to AFC exactly as to
-  MDU.
+- **Robustness: RTT is now run, and it goes AGAINST AFC.** See `FINDING20` and `REPORT.md` §5.
+  At the *identical* pre-attack disclosure of 0.225, AFC reopens 0.200 (35.3% of the gap to θ₀)
+  against MDU λ=3's 0.075 (13.2%) — **2.7× worse robustness at matched disclosure**, under an
+  attack that passed its validity gate. AFC's better static trade-off is bought with shallower
+  suppression, so **AFC cannot be claimed to beat MDU.** This supersedes the "no robustness
+  claim" placeholder that stood here.
 - **Narrow usable band.** AFC collapses at λ_f=8 (DEGENERATE 0.908, retain 0.011). Usable range
   λ_f ≈ 0.5–4.
 - **Still far from the target.** DISCLOSE 0.136 against pristine's 0.030; retain 0.576 against
