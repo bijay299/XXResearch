@@ -1,0 +1,36 @@
+{
+ "study": "h18_rtt",
+ "label": "rtt_af_sel_diff_lr3e-5",
+ "arm": "adapters/sel_af/model.pt",
+ "attack_mode": "diffusion",
+ "hparams": {
+  "arm": "adapters/sel_af/model.pt",
+  "t_frac": 0.8,
+  "steps": 600,
+  "batch": 32,
+  "lr": 3e-05,
+  "seed": 0,
+  "attack_mode": "diffusion",
+  "label": "rtt_af_sel_diff_lr3e-5"
+ },
+ "n_T_probes": 320,
+ "n_H_probes": 80,
+ "attack_validity": {
+  "T_before": 0.1688,
+  "T_after": 0.3375,
+  "T_rise": 0.1688,
+  "valid": false,
+  "meaning": "the attack must relearn the facts it is TRAINED ON; if T does not recover, a flat curve on H is not evidence of robustness"
+ },
+ "recovery": {
+  "H_before": 0.2625,
+  "H_after": 0.3625,
+  "absolute_rise": 0.1,
+  "fraction_of_ref_recovered": 0.2299,
+  "theta_ref_forget": 0.6975,
+  "theta_oracle_forget": 0.11
+ },
+ "measured": {
+  "wall_s": 24.3
+ }
+}

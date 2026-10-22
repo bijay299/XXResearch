@@ -15,6 +15,14 @@ ARMS, as the 2x2 of the two published anchor choices plus controls:
   afc    anchor-FIRST KL + prompt-masked anchor      the cell neither paper ran (ours, FINDING16)
   mdu_fam anchor-LAST KL + FAM                       the fourth cell, for completeness
   ga     gradient ascent on the forget value spans   the crude baseline
+  pua    POOL-UNIFORM ANCHORING (ours, H36)           target = uniform over the closed answer
+         pool, derived from RETAIN data only. The first family here whose forget target is
+         sourced from OUTSIDE the model's own distributions, which is what FINDING18/FINDING19
+         predicted a working method would require. The oracle's defining property is being AT
+         CHANCE on forget facts while staying fluent; every anchor family instead re-uses the
+         model's own masked-prompt distribution, which still carries the fact's identity, and
+         GA pushes BELOW chance into degeneracy (TV 0.9725). A uniform-over-pool target names
+         chance explicitly as the destination.
 
 Every arm carries the same retain term: KL(frozen reference || student) on RETAIN examples,
 weighted lam_retain. It is PRESERVATION, zero at initialisation -- a CE retain term kept
@@ -46,7 +54,54 @@ PRESETS = {
     "afc":     ("anchor_first", "prompt"),
     "mdu_fam": ("anchor_last",  "fam"),
     "ga":      ("ascent",       "none"),
+    "pua":        ("pool_uniform", "none"),
+    "pua_global": ("pool_uniform", "none"),   # POOL-FREE control: one attribute-agnostic
+                                              # distribution over ALL retain value tokens.
+                                              # If this matches `pua`, the closed-pool
+                                              # assumption is not load-bearing (H36 K3).
 }
+
+
+def build_pool_targets(split, ids, vstart, vend, glob=False):
+    """Per-position candidate token ids for the uniform-over-pool target.
+
+    The pools are built from RETAIN probes ONLY -- no forget answer is read -- and this is what
+    makes the arm legitimate rather than oracle-assisted: verified offline, every forget value
+    already occurs in the retain set for all four attributes, and value tokens never collide
+    across attributes, so an example's attribute is recoverable from its own value tokens.
+    """
+    import collections
+    meta = json.load(open(f"{DATA}/facts_meta.json"))
+    pool, owner = collections.defaultdict(set), {}
+    for pr in meta["probes"]:
+        if pr["split"] == "retain":
+            v = tuple(pr["val_ids"])
+            pool[pr["attr"]].add(v)
+            owner[v] = pr["attr"]
+    pools = {a: sorted(v) for a, v in pool.items()}
+    if glob:
+        # pool-free: every attribute gets the SAME candidate set, the union over retain values.
+        # Requires only "the retain corpus" -- no known answer domain, no attribute inference.
+        allv = sorted({v for vs in pools.values() for v in vs})
+        pools = {a: allv for a in pools}
+    cmax = max(len(v) for v in pools.values())
+    N, L = ids.shape
+    tok = np.zeros((N, L, cmax), dtype=np.int64)
+    cnt = np.zeros((N, L), dtype=np.int64)
+    for i in range(N):
+        v = tuple(int(x) for x in ids[i, vstart[i]:vend[i]])
+        attr = owner.get(v)
+        if attr is None:                      # must never happen; fail loudly rather than skip
+            raise RuntimeError(f"{split}[{i}] value {v} not in the retain-derived pool")
+        cands = pools[attr]
+        for j in range(int(vend[i]) - int(vstart[i])):
+            at = [c[j] for c in cands if len(c) > j]
+            if not at:
+                continue
+            pos = int(vstart[i]) + j
+            tok[i, pos, :len(at)] = at
+            cnt[i, pos] = len(at)
+    return tok, cnt
 
 
 def load_unl(split):
@@ -76,6 +131,13 @@ def main():
     direction, anchor_mode = PRESETS[a.arm]
 
     fo, re_ = load_unl("forget"), load_unl("retain")
+    pua_tok = pua_cnt = None
+    if direction == "pool_uniform":
+        pua_tok, pua_cnt = build_pool_targets("forget", fo["ids"], fo["vstart"], fo["vend"],
+                                              glob=(a.arm == "pua_global"))
+        print(f"[pua] pool targets built: positions with candidates="
+              f"{int((pua_cnt > 0).sum())}, mean |pool| at those positions="
+              f"{pua_cnt[pua_cnt > 0].mean():.2f}", flush=True)
     print(f"[data] forget {len(fo['ids'])} / retain {len(re_['ids'])} value-span examples",
           flush=True)
 
@@ -113,7 +175,7 @@ def main():
         ar = torch.arange(L, device=dev)[None]
         valid = ar < pl[:, None]
         ans = valid & (ar >= ne[:, None])          # answer region
-        return ids, ans, valid
+        return ids, ans, valid, idx
 
     def noisy_state(ids, ans):
         """Diffusion noising over the ANSWER region, prompt visible. The answer is ~9 tokens, so
@@ -141,14 +203,30 @@ def main():
         for g in opt.param_groups:
             g["lr"] = a.lr * min(1.0, (step + 1) / max(a.warmup, 1))
 
-        f_ids, f_ans, f_valid = draw(fo, a.batch // 2)
-        r_ids, r_ans, r_valid = draw(re_, a.batch // 2)
+        f_ids, f_ans, f_valid, f_idx = draw(fo, a.batch // 2)
+        r_ids, r_ans, r_valid, _ = draw(re_, a.batch // 2)
         f_state, f_m = noisy_state(f_ids, f_ans)
 
         with torch.autocast("cuda", dtype=torch.bfloat16):
             s_log = student(f_state)
             sel = f_m                            # masked ANSWER positions, as MDU specifies
-            if direction == "ascent":
+            if direction == "pool_uniform":
+                # Target: uniform over the closed answer pool at each value-span position.
+                # Restricted to masked VALUE positions -- the pool target is defined over the
+                # value only, so applying it to the trailing "." would be inventing a target
+                # the pool says nothing about.
+                tk = torch.from_numpy(pua_tok[f_idx]).to(dev)        # (B, L, Cmax)
+                ct = torch.from_numpy(pua_cnt[f_idx]).to(dev)        # (B, L)
+                has = ct > 0
+                tgt = torch.zeros_like(s_log, dtype=torch.float32)
+                w = torch.where(has, 1.0 / ct.clamp_min(1).float(), torch.zeros_like(ct, dtype=torch.float32))
+                valid_c = torch.arange(tk.shape[-1], device=dev)[None, None, :] < ct[..., None]
+                tgt.scatter_add_(-1, tk, torch.where(valid_c, w[..., None], torch.zeros_like(w[..., None])).expand_as(tk.float()).contiguous())
+                sel = f_m & has                                      # masked value positions
+                sp = torch.log_softmax(s_log.float(), -1)
+                per = -(tgt * sp).sum(-1)                            # CE to the soft pool target
+                l_forget = (per * sel).sum() / sel.sum().clamp_min(1)
+            elif direction == "ascent":
                 ce = F.cross_entropy(s_log.view(-1, NVOCAB).float(), f_ids.view(-1),
                                      reduction="none").view(f_ids.shape)
                 l_forget = -(ce * sel).sum() / sel.sum().clamp_min(1)

@@ -30,6 +30,12 @@ def main():
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--attack-mode", choices=["span","diffusion"], default="span",
+                    help="span = SFT on the answer span (the only family used so far). "
+                         "diffusion = relearn with the MDLM objective over the WHOLE passage at a "
+                         "random mask rate, i.e. a different optimisation surface. Every "
+                         "robustness number in this project rests on one attack family, so if the "
+                         "protection is specific to that surface the central claim collapses.")
     ap.add_argument("--label", required=True)
     a = ap.parse_args()
     torch.manual_seed(a.seed); dev = torch.device("cuda")
@@ -97,9 +103,15 @@ def main():
         nerow = torch.from_numpy(ne[keep[idx]].astype(np.int64)).to(dev)
         plrow = torch.from_numpy(pl[keep[idx]].astype(np.int64)).to(dev)
         ar = torch.arange(L, device=dev)[None]
-        ans = (ar >= nerow[:,None]) & (ar < plrow[:,None])
+        valid = ar < plrow[:,None]
+        ans = (ar >= nerow[:,None]) & valid
         tt = torch.rand(a.batch, device=dev, generator=gen).clamp_min(1e-3)
-        m = (torch.rand((a.batch,L), device=dev, generator=gen) < tt[:,None]) & ans
+        if a.attack_mode == "diffusion":
+            # whole-passage MDLM noising: the attacker optimises the pretraining objective over
+            # the full sentence, not a supervised answer span
+            m = (torch.rand((a.batch,L), device=dev, generator=gen) < tt[:,None]) & valid
+        else:
+            m = (torch.rand((a.batch,L), device=dev, generator=gen) < tt[:,None]) & ans
         noisy = torch.where(m, torch.full_like(ids, MASK_ID), ids)
         with torch.autocast("cuda", dtype=torch.bfloat16):
             lg = model(noisy)
@@ -111,7 +123,8 @@ def main():
 
     tT, tH = rank_top1(T_pr), rank_top1(H_pr)
     REF_F, ORACLE_F = 0.6975, 0.1100
-    R = {"study":"h18_rtt","label":a.label,"arm":a.arm,"hparams":vars(a),
+    R = {"study":"h18_rtt","label":a.label,"arm":a.arm,"attack_mode":a.attack_mode,
+         "hparams":vars(a),
          "n_T_probes":len(T_pr),"n_H_probes":len(H_pr),
          "attack_validity":{"T_before":round(t0_T,4),"T_after":round(tT,4),
              "T_rise":round(tT-t0_T,4),"valid":bool(tT-t0_T >= 0.20),
