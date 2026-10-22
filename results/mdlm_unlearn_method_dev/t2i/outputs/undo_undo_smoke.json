@@ -1,0 +1,25 @@
+{
+ "study": "t2i_undo",
+ "label": "undo_smoke",
+ "teacher": "adapters/uce_church/unet.pt",
+ "hparams": {
+  "teacher": "adapters/uce_church/unet.pt",
+  "concept": "church",
+  "alpha": 0.5,
+  "beta": 0.1,
+  "protect": "retain_fisher",
+  "fisher_batches": 4,
+  "steps": 20,
+  "lr": 1e-05,
+  "n_images": 12,
+  "forget_frac": 0.34,
+  "seed": 0,
+  "log_every": 10,
+  "label": "undo_smoke",
+  "out": "/data/bijaypandey/claude_tmp/claude-1011/-home-bijaypandey/33ead906-ab98-4350-9600-f0d55e1bc712/scratchpad/undo_smoke"
+ },
+ "n_forget_in_pool": 4,
+ "distil_loss_first50": 0.4081800803542137,
+ "distil_loss_last50": 0.4081800803542137,
+ "minutes": 0.12915637493133544
+}
