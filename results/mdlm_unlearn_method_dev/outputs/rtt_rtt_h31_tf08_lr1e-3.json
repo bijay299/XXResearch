@@ -1,0 +1,34 @@
+{
+ "study": "h18_rtt",
+ "label": "rtt_h31_tf08_lr1e-3",
+ "arm": "adapters/h31_comp_s0/model.pt",
+ "hparams": {
+  "arm": "adapters/h31_comp_s0/model.pt",
+  "t_frac": 0.8,
+  "steps": 600,
+  "batch": 32,
+  "lr": 0.001,
+  "seed": 0,
+  "label": "rtt_h31_tf08_lr1e-3"
+ },
+ "n_T_probes": 320,
+ "n_H_probes": 80,
+ "attack_validity": {
+  "T_before": 0.15,
+  "T_after": 0.5906,
+  "T_rise": 0.4406,
+  "valid": true,
+  "meaning": "the attack must relearn the facts it is TRAINED ON; if T does not recover, a flat curve on H is not evidence of robustness"
+ },
+ "recovery": {
+  "H_before": 0.2125,
+  "H_after": 0.1375,
+  "absolute_rise": -0.075,
+  "fraction_of_ref_recovered": -0.1546,
+  "theta_ref_forget": 0.6975,
+  "theta_oracle_forget": 0.11
+ },
+ "measured": {
+  "wall_s": 17.0
+ }
+}

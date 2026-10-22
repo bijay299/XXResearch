@@ -34,6 +34,14 @@ def xavier_like(p):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--teacher", required=True, help="the SUPPRESSED model (an unlearned arm)")
+    ap.add_argument("--teacher-forget", default=None,
+                    help="COMPOSITE teacher (H31): distil FORGET examples from this model and "
+                         "everything else from --teacher. UNDO's robustness comes from the student "
+                         "never acquiring latent forget knowledge, but a single suppressed teacher "
+                         "leaks its residual into the student (recovery rises with repair budget). "
+                         "Routing forget examples to an OVER-FORGETTING teacher removes that leak "
+                         "at source while retain/general come from the un-unlearned reference, so "
+                         "the two failure modes get different teachers instead of being traded.")
     ap.add_argument("--alpha", type=float, default=0.3)
     ap.add_argument("--beta", type=float, default=0.1)
     ap.add_argument("--steps", type=int, default=3000)
@@ -67,6 +75,10 @@ def main():
     unl = {s: np.load(f"{DATA}/unl_{s}.npz") for s in ("retain", "forget")}
     rep = max(1, int(round(a.retain_oversample)))
     facts = np.concatenate([unl["retain"]["ids"]] * rep + [unl["forget"]["ids"]])  # forget INCLUDED
+    # row-wise flag: which fact rows are FORGET rows, so the composite teacher can route them
+    n_ret_rows = len(unl["retain"]["ids"]) * rep
+    is_forget_row = np.concatenate([np.zeros(n_ret_rows, dtype=bool),
+                                    np.ones(len(unl["forget"]["ids"]), dtype=bool)])
     print(f"[data] general {len(general):,} tok | fact rows {len(facts)} "
           f"(forget included, retain x{rep})", flush=True)
 
@@ -80,6 +92,18 @@ def main():
         return m.to(dev)
     teacher = build().eval()
     for p_ in teacher.parameters(): p_.requires_grad_(False)
+    teacher_f = None
+    if a.teacher_forget:
+        sd_f = torch.load(a.teacher_forget, map_location="cpu")
+        teacher_f = SmallMDLM(d=cfg.get("d",768), layers=cfg.get("layers",12),
+                              heads=cfg.get("heads",12), seq=cfg.get("seq",512))
+        miss, unexp = teacher_f.load_state_dict(sd_f["model"], strict=False)
+        pn = {n for n,_ in teacher_f.named_parameters()}; mp=[n for n in miss if n in pn]
+        if mp or unexp: raise SystemExit(f"partial load (forget teacher): {mp[:5]} {unexp[:5]}")
+        teacher_f = teacher_f.to(dev).eval()
+        for p_ in teacher_f.parameters(): p_.requires_grad_(False)
+        print(f"[composite] forget examples <- {a.teacher_forget}", flush=True)
+        print(f"[composite] retain+general  <- {a.teacher}", flush=True)
     student = build()
 
     # defined here, not after the damage step: the retain-Fisher pass below needs them
@@ -166,22 +190,30 @@ def main():
 
     def batch():
         nf = int(round(a.batch * a.fact_frac)); ng = a.batch - nf
-        rows = [facts[i].astype(np.int64) for i in rng.integers(0, len(facts), size=nf)]
+        idx = rng.integers(0, len(facts), size=nf)
+        rows = [facts[i].astype(np.int64) for i in idx]
+        fflag = list(is_forget_row[idx])
         rows += [general[i:i+L].astype(np.int64)
                  for i in rng.integers(0, len(general)-L-1, size=ng)]
-        return torch.from_numpy(np.stack(rows)).to(dev)
+        fflag += [False] * ng                      # general text is never a forget row
+        return (torch.from_numpy(np.stack(rows)).to(dev),
+                torch.tensor(fflag, dtype=torch.bool, device=dev))
 
     t0, hist = time.time(), []
     for step in range(a.steps):
         for g in opt.param_groups:
             g["lr"] = a.lr * min(1.0, (step+1)/max(a.warmup,1))
-        ids = batch(); B, T = ids.shape
+        ids, fflag = batch(); B, T = ids.shape
         tt = torch.rand(B, device=dev, generator=gen).clamp_min(1e-3)
         m = torch.rand((B,T), device=dev, generator=gen) < tt[:,None]
         m[:,0] = True
         noisy = torch.where(m, torch.full_like(ids, MASK_ID), ids)
         with torch.autocast("cuda", dtype=torch.bfloat16):
-            with torch.no_grad(): tl = teacher(noisy)
+            with torch.no_grad():
+                tl = teacher(noisy)
+                if teacher_f is not None and fflag.any():
+                    tl_f = teacher_f(noisy)
+                    tl = torch.where(fflag[:, None, None], tl_f, tl)
             sl = student(noisy)
             lt = torch.log_softmax(tl.float(), -1); ls = torch.log_softmax(sl.float(), -1)
             per = (lt.exp() * (lt - ls)).sum(-1)          # forward KL, teacher first
@@ -206,6 +238,7 @@ def main():
     json.dump({"study":"h18_undo","hparams":vars(a),
                "damage":{"alpha":a.alpha,"beta":a.beta,"protect":a.protect,"n_tensors":nd,
                          "mean_rel_norm_change":round(dsum/max(bsum,1e-9),5)},
+               "composite_teacher":{"forget": a.teacher_forget, "retain_general": a.teacher},
                "distillation_pool":{"forget_included":True,
                    "note":"teacher outputs are the targets, never gold answers"},
                "history":hist,"measured":{"wall_s":round(time.time()-t0,1)}},

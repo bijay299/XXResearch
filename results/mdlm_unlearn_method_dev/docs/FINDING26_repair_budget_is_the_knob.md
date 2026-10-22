@@ -240,3 +240,58 @@ whether the result is teacher-general or specific to the EMDU teacher. Both are 
   is "no detectable recovery at this attack setting", not "no recovery". n=5 is running.
 - **Retain 0.5913 is well below `theta_ref`'s 0.6725.** The best robustness point still costs ~0.08
   of retain relative to the un-unlearned model, and 0.12 relative to the teacher it distils from.
+
+---
+
+## 6. H31 — the composite teacher, closed by its own kill rules
+
+`PREREG_H31_composite_teacher.md` proposed routing distillation by example type: forget examples to
+an **over-forgetting** teacher (to remove the residual-knowledge leak at source), retain and
+general examples to `theta_ref` (to remove the retain cost at source). Two failure modes, two
+teachers, instead of trading one against the other.
+
+| arm | retain | TV→oracle | recovery t_frac 0.5 | recovery t_frac 0.8 |
+|---|---|---|---|---|
+| selected point (single AFC teacher) | **0.6460 ± 0.017** | 0.0745 | +0.0314 | **+0.2299** |
+| **H31** forget←GA λ=0.5 | 0.4467 ± 0.027 | **0.8192** | — | +0.0000 |
+| **H31b** forget←AFC λ=8 | 0.6167 ± 0.004 | 0.0758 | **−0.0106** | +0.0794 gated / **+0.1955** conservative |
+
+**H31 is killed by K2** (TV > 0.15). Its robustness was perfect — zero recovery even against the
+strong attacker — but TV 0.8192 means the model is behaviourally wrecked, so the robustness is
+worthless. On recovery alone H31 would have looked like the best result in the project.
+
+**The cause was our own selection error, for the third time.** GA was chosen as the forget teacher
+for its rank-forget of 0.0850 (below the 0.1135 chance floor) **without checking GA's own TV, which
+is 0.9725.** GA is itself behaviourally degenerate and the composite student inherited that on
+forget examples. K2 was written into the pre-registration *because* of the earlier EMDU-teacher
+error, and the same mistake was then made at design time. The rule caught it; design should have.
+
+Candidate forget-teachers, scored on **both** axes, as should have been done first:
+
+| candidate | rank-forget | TV | usable |
+|---|---|---|---|
+| GA λ=4/8 | 0.0892–0.0900 | 0.96–0.97 | no |
+| **AFC λ=8** | **0.1533** | **0.0758** | **yes** |
+| MDU λ=4/8 | 0.1583 | 0.0767–0.0783 | yes |
+| MDU+FAM λ=8 | 0.1700 | 0.3225 | no |
+
+**H31b does not meet its pre-registered bar either**: retain 0.6167 < 0.65. It passes K2 and beats
+the selected point on robustness at both budgets for 0.029 of retain — a Pareto-incomparable
+frontier point, not a success by the declared standard. The composite-teacher line is therefore
+**closed**: one arm behaviourally destroyed, one arm an incremental trade.
+
+## 7. A limitation of our own validity gate, measured
+
+At `t_frac 0.8`, H31b's lr-1e-5 attack recovered **+0.1955** with **T-rise +0.194** — a hair under
+the 0.20 gate — so the max-over-*valid*-lr filter reported **+0.0794** instead. A 2.5× difference
+in the headline turns on a threshold chosen by judgement, not derived.
+
+> `FINDING20`'s gate catches attacks that are **broken**. It does not distinguish them from attacks
+> that are **merely weaker than the threshold yet still working**. An attack reopening 20% of the
+> gap on held-out authors is not broken, whatever its T-rise.
+
+Both numbers are therefore reported throughout: **gated max** and **conservative max over all
+attacks**. On the conservative reading the selected point and H31b are close (+0.2299 vs +0.1955),
+and the honest summary of both is that **against an attacker holding 80% of the forget set, roughly
+a fifth of the gap reopens.** The ~3–4× advantage over every anchor family (0.5608–0.8642) survives;
+absolute robustness does not.
