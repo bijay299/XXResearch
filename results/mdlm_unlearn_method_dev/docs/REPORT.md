@@ -257,9 +257,17 @@ generalisation limit. lr 2e-5 at batch 1 under gradient clipping is too little o
 undo a 30% relative weight perturbation across 8B parameters. The faithful arms therefore run at
 lr 1e-4.
 
-*Limitation of our own instrument, stated:* the probe is 2 prompts × 2 mask rates, and the
-step-249→299 uptick (1.567 → 1.668) shows roughly ±0.1 of probe noise. Fixed prompts, mask rates
-and RNG make it valid for the **trend**; its absolute value should not be read finely.
+*Two limitations of our own instrument, both stated because we tripped over the second.* The
+probe is 2 prompts × 2 mask rates, and the step-249→299 uptick (1.567 → 1.668) shows roughly
+±0.1 of probe noise, so its absolute value should not be read finely.
+
+⚠ **It was not comparable across arms, and we briefly reported it as if it were.** The probe drew
+`prompts[order[:2]]`, and `order` is a permutation over the distillation pool — so the
+retain-only pool (997 prompts) and the `--include-forget` pool (1397) selected **different probe
+prompts**. A cross-arm reading of frozen_KL was therefore meaningless, and our first comparison
+of lr 2e-5 against lr 1e-4 at matched step count was invalid and is withdrawn. The probe is now
+anchored to the first two TOFU retain questions, identical in every arm and configuration. Curves
+produced before that change are valid **within** an arm only.
 
 **Feasibility caveat, declared before the results.** Our distillation budget is orders of
 magnitude below the paper's — ~10³ samples at batch 1 against an epoch of pretraining data. If

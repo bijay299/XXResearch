@@ -284,7 +284,13 @@ def main():
     # run that was training normally. That trace is not a learning curve. This probe holds the
     # prompts, the mask rates and the RNG fixed, so successive values are comparable.
     # It calls engine(), i.e. ZeRO-3 collectives, so EVERY rank must run it; only rank 0 logs.
-    probe_qs = [prompts[int(i)] for i in order[:2]]
+    # Probe prompts must NOT depend on the pool, or arms are not comparable to each other. The
+    # first version took prompts[order[:2]], and `order` is a permutation over the pool -- so the
+    # retain-only pool (997) and the --include-forget pool (1397) drew DIFFERENT probe prompts
+    # and their frozen_KL values could only be read within an arm, not across arms. Anchoring the
+    # probe to the first two TOFU retain questions makes it identical in every arm and every
+    # configuration.
+    probe_qs = [r["question"] for r in recs if r["split"] == "retain"][:2]
     PROBE_T = (0.3, 0.7)
 
     @torch.no_grad()
