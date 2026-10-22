@@ -524,3 +524,124 @@ those families unlearning achieved nothing durable — while EMDU simultaneously
   their authors' tuning is not reproduced.
 - **Not a robustness improvement over UNDO.** Recovery is indistinguishable; only retain moves.
 - **One corpus, one task shape.** Four attributes, closed answer pools, 200 authors.
+
+---
+
+## 10. H35–H37 — the measurement audit, and the close of the MDLM phase
+
+This section records the final MDLM-phase work. Three of its four results are about **our own
+instruments and claims**, not about unlearning methods, and two of them cost us claims.
+
+### 10.1 The strongest claim, and then its instrument failed (`FINDING28`, `FINDING29`)
+
+`FINDING28` is the broadest result the project produced: across **125 arms** at a matched attacker
+budget, **Spearman(knowledge-probe reading, max recovery) = −0.148** — no predictive relationship,
+with the sign pointing the wrong way. A validated attack separates the arms into **disjoint**
+bands (suppression-only +0.5608…+0.9143; damage+distil +0.4424 and below, gap +0.1184) while the
+knowledge probe cannot separate them at all (74% band overlap). Eighteen pairs of arms whose probe
+readings are identical to four decimals differ **1.9×–37×** in recovery. Gradient ascent has the
+**lowest** probe reading of any family (0.0825, below the ranking probe's chance floor) and among
+the **highest** recovery (0.9143) — selecting on the static probe picks GA and is maximally wrong.
+
+Its mechanistic reading: **damage does not remove knowledge; it removes the attacker's route to
+it.** On a controlled α ladder the probe reading moves 0.0305 — and *upward* — while recovery falls
+**7.3×**, and the two ladders' slopes have opposite signs. That also killed a planned
+**iterated-UNDO** line before it cost GPU time: the selected point's residual (0.1755) is *higher*
+than its own teacher's (0.1533), so recursive rounds would start from progressively worse teachers.
+
+**Then the x-axis turned out to be invalid.** `FINDING29`: the closed-pool ranking probe scores
+EOS-padded length-32 candidates, so padding enters every candidate's score. It reads `theta_ref` at
+**0.6725** when `theta_ref`'s true retain recall is **1.0000**, and it **inverts** the ordering of
+two models (true: oracle > `theta_ref` > PUA; probe: PUA > oracle > `theta_ref`). It was caught by a
+too-good number — an unrelated arm reporting retain **above the exact retrain oracle** — and
+confirmed by cross-checking against generation.
+
+This is the **third** padding/tokenisation-boundary defect in this project's measurement code.
+
+`FINDING28` is therefore marked **PROVISIONAL**. Its recovery numbers, band separation, and α=0
+controls do not depend on the probe; its ρ and matched pairs do, and may be regression dilution
+from a noisy x-axis. Only 2 of 125 checkpoints survived, so `PREREG_H37` registers a **balanced
+16-arm replication** with both probes on every arm and **pre-declared retraction conditions**.
+
+It also reframes a `FINDING21` claim: *"the oracle is at chance"* is **probe-specific language**.
+The same oracle sits at 0.3375 exact-span under a context-rich measurement. The oracle remains the
+floor; the phrase will not be reused without naming the probe.
+
+### 10.2 The advantage replicates under a second attack family — and a new confound (`FINDING30`)
+
+Every robustness number in the project came from **one** attack (span SFT). A second family —
+whole-passage MDLM relearning, a different optimisation surface — gives **7.6×** separation
+(+0.6509 baseline vs +0.0862 selected), against 3.2× for span SFT at the same budget. **The
+protection is not specific to the span-SFT surface.**
+
+But the gate exposed something more important: the baseline admits **5 of 6** attacks, the treated
+arm only **1 of 6**, because the attacker cannot relearn its **own training set** on it (T_rise
+0.234 vs 0.428). That is equally consistent with fact-specific robustness and with **general
+trainability loss** — in which case every robustness number here is inflated by an unknown amount.
+I cannot currently distinguish them. The deciding experiment (a **trainability control**: attack
+the arm on *retain* facts and compare learning speed) is specified in `FINDING30` §4 and was not
+run before the pivot.
+
+### 10.3 A method candidate closed by prior art (`PREREG_H36`)
+
+Pool-Uniform Anchoring — forget target = uniform over the closed answer pool, derived from retain
+data only, used as the UNDO teacher — was pre-registered with a commitment that an ANTICIPATED
+novelty verdict would be reported as a reproduction regardless of performance. The verdict came back
+**ANTICIPATED on all five components**, three of them fatally:
+
+- **MDU at τ=0 *is* the uniform target** (2605.18253) — the paper's own τ sweeps to it
+- **UNDO already runs a KL-to-uniform ("MaxEnt") teacher through noise-then-distil** (2506.06278)
+- **DF-MCQ (2505.02884) already does uniform over a closed candidate set**, with the identical
+  "random choice-level uncertainty" motivation
+
+Honouring the commitment: H36 is a **reproduction**, not a contribution. It independently failed
+its own pre-declared predictions (λ=2 tripped kill rule K1 at TV 0.2000; λ=1's forget sat outside
+the declared window), and its headline retain number was the artifact that exposed `FINDING29`.
+
+### 10.4 Verdict on the MDLM phase
+
+**The mandate's bar was not met.** The selected point (UNDO α=0.6, AFC teacher, Fisher-protected
+damage) is 3.2–7.6× more robust than every anchor family at matched budget, but it is **not robust**
+— a fifth of the gap reopens — the method is **UNDO's**, and its robustness now carries an
+unresolved trainability confound.
+
+What the phase does leave, in order of strength:
+
+1. **The two walls** (§4) — predictive, not merely descriptive
+2. **A backbone with an exact retrain oracle** (§9) — the asset every prior evaluation lacked
+3. **No anchor family survives a validated relearning attack** (§9, `FINDING25`) — 37 gated runs
+4. **Only an attack measures robustness** (§10.1) — both cheap metric classes measured and found
+   uninformative; headline provisional pending `H37`
+5. **The attack-validity gate**, and its extension the **trainability control** (§10.2)
+
+The recurring lesson is specific and worth carrying forward: **my measurements have held under
+replication; my selections, explanations, and instruments are where failures cluster.** Five
+retractions this session, every one caught by cross-checking a number that looked too good against
+a second, independent measurement.
+
+---
+
+## 11. Pivot — text-to-image diffusion unlearning
+
+The mandate is unchanged: develop, implement and rigorously evaluate an unlearning algorithm that
+outperforms the strongest relevant existing methods on a clearly defined forgetting–utility
+trade-off, with real-model results. The domain moves from masked diffusion **language** models to
+**text-to-image** diffusion models (Stable Diffusion). See `PREREG_H38_t2i_testbed.md`.
+
+What transfers, and why the pivot is well-positioned rather than a fresh start:
+
+- **The evaluation thesis.** T2I concept-erasure papers report CLIP score, classifier accuracy on
+  the erased concept, and FID. Those are exactly the *static* metric classes this phase measured
+  and found uninformative about robustness. The attack literature there
+  (UnlearnDiffAtk, Ring-A-Bell, P4D, concept inversion) already shows erasure is reversible — so
+  the gap this phase documented is known to exist in T2I too, and the methodological tools built
+  here (validity gate, matched attacker budget, max-over-attacks, trainability control) apply
+  directly and are not standard practice there.
+- **The one family that survived.** Damage+distil (UNDO) is, on this phase's evidence, the only
+  tested family that resists relearning. Its application to T2I concept erasure is, as far as the
+  novelty check reached, **untested** — and it is a concrete, motivated method candidate rather
+  than a hope.
+- **The oracle discipline.** The single most valuable asset here was a reference model trained with
+  the forget data genuinely absent. SD cannot be retrained from scratch at this budget, so the
+  two-tier structure that worked in this phase (a real model for reality, a small purpose-built
+  model with an exact oracle for ground truth) carries over as the plan.

@@ -1,0 +1,48 @@
+{
+ "study": "h18_small_eval",
+ "label": "h36_pua_l2",
+ "ckpt": "adapters/h36_pua_l2/model.pt",
+ "protocol": "infill",
+ "step": 1500,
+ "n_forget": 400,
+ "n_retain": 400,
+ "forget_profile": {
+  "DISCLOSE": 0.06,
+  "DEGENERATE": 0.1725,
+  "ABSTAIN": 0.0175,
+  "REPLACE": 0.2025,
+  "IGNORANT": 0.5475,
+  "UNCLASSIFIED": 0.0
+ },
+ "retain_profile": {
+  "DISCLOSE": 0.3825,
+  "DEGENERATE": 0.055,
+  "ABSTAIN": 0.0175,
+  "REPLACE": 0.095,
+  "IGNORANT": 0.45,
+  "UNCLASSIFIED": 0.0
+ },
+ "forget_recall": 0.06,
+ "retain_recall": 0.3825,
+ "by_attr": {
+  "city": {
+   "forget_DISCLOSE": 0.0,
+   "retain_DISCLOSE": 0.36
+  },
+  "genre": {
+   "forget_DISCLOSE": 0.01,
+   "retain_DISCLOSE": 0.43
+  },
+  "award": {
+   "forget_DISCLOSE": 0.0,
+   "retain_DISCLOSE": 0.08
+  },
+  "year": {
+   "forget_DISCLOSE": 0.23,
+   "retain_DISCLOSE": 0.66
+  }
+ },
+ "measured": {
+  "wall_s": 1.7
+ }
+}
