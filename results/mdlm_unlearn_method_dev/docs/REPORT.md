@@ -197,9 +197,57 @@ distribution on a modified input nor a point in activation space. It is the dire
 prediction.
 
 Implemented at `scripts/train_undo.py` (DeepSpeed ZeRO-3, CPU optimizer+param offload, 2 GPUs).
-Repair is confirmed working — KL(teacher‖student) 4.37 → 1.87 in two steps at α=0.3. The α sweep
-and per-arm RTT are in progress. **If UNDO also lands on the trade-off, §4.3's prediction is
-falsified and that is the reportable outcome.**
+Arms α ∈ {0.0, 0.3, 0.6}, β=0.1, 300 distillation steps, teacher = AFC λ=1, evaluated through
+`FINDING20`'s validated protocol.
+
+**α=0 is the control that makes the study interpretable**, and is pre-declared here before its
+result is known. UNDO's claim is specifically that distilling into a *damaged* copy is what makes
+suppression robust. α=0 distils into an **undamaged** copy of the same suppressed teacher. So:
+
+| outcome | reading |
+|---|---|
+| only α>0 is robust | the damage is the active ingredient; UNDO's mechanism holds on an MDLM |
+| α=0 is equally robust | the damage does nothing here and any gain is plain distillation |
+| no arm is robust | §4.3's prediction is **falsified** — sourcing the target outside the model's own distributions is not sufficient either |
+
+**Guard against a false negative.** A thin distillation budget (997 prompts, 300 steps) could
+leave the student under-repaired, which would look like "UNDO fails" when it is really "we did not
+distil enough". The frozen probe is what distinguishes these: if `frozen_KL` has plateaued by step
+300 the repair converged, and if it is still falling the arm is under-trained and must be extended
+before any conclusion is drawn.
+**If UNDO also lands on the trade-off, §4.3's prediction is falsified and that is the reportable
+outcome.**
+
+**Two distinct bars, stated separately because conflating them would overclaim.** The teacher is
+AFC λ=1 — deliberately the *least* robust arm (recovery 0.200), so it has the most headroom to
+show the mechanism.
+
+| bar | value | what clearing it would show |
+|---|---|---|
+| beat its own teacher, AFC λ=1 | recovery < 0.200 | distillation-into-damage robustifies suppression on an MDLM |
+| beat the robustness incumbent, MDU λ=3 | recovery < 0.075 at comparable DISCLOSE and retain | a genuine SOTA claim |
+
+Clearing only the first is a mechanism result, not a SOTA result.
+
+**Correction to an earlier claim of ours.** We previously reported "repair confirmed working,
+KL(teacher‖student) 4.37 → 1.87 in two steps". That was not evidence of repair. The logged loss
+is computed on one prompt at one *randomly drawn* mask rate `t`, so it is dominated by the draw —
+at `t`≈0 only a couple of answer positions remain masked and KL is near zero, at `t`≈1 the student
+must match the teacher over 64 context-free positions. The same run that showed 0.157 at step 19
+showed **3.947 at step 29** while training normally. The per-step trace is not a learning curve,
+and no repair claim should have been made from it. `train_undo.py` now carries a **frozen probe**
+— fixed prompts, fixed mask rates, fixed RNG, run on every rank — and the repair curve will be
+reported from that instrument only.
+
+**Two implementation faults found and fixed, recorded because both produced misleading runs.**
+(a) The distillation step returned early when a low-`t` draw left no masked answer position
+(P ≈ ∫(1−t)⁶⁴dt ≈ 1/65 per rank per step). The mask RNG is seeded `seed + rank`, so this fired on
+*one* rank, which then skipped `backward()`/`step()` while the other proceeded — desynchronising
+ZeRO-3 and deadlocking in the parameter allgather (NCCL `_ALLGATHER_BASE` timeout, rank 0 at
+SeqNum 3931 against rank 1 at 3910). Fixed by guaranteeing ≥1 masked position and never skipping
+a step. (b) `deepspeed --num_gpus 2` silently **overwrites** `CUDA_VISIBLE_DEVICES`, so a job
+pinned to GPUs 2,3 ran on 0,1 — the devices other users' jobs claim first. `--include
+localhost:2,3` is the only form that pins physical devices.
 
 ## 8. Limitations
 

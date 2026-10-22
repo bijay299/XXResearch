@@ -106,9 +106,22 @@ def main():
 
     model = load_base(DEV, train=True)
     from peft import LoraConfig, PeftModel, get_peft_model
-    model = PeftModel.from_pretrained(model, a.memo).merge_and_unload()
-    model = PeftModel.from_pretrained(model, a.arm).merge_and_unload().to(DEV)
-    stack = ["base", os.path.basename(a.memo), a.arm]
+    if a.arm.endswith(".bin"):
+        # UNDO's save_16bit_model output is the COMPLETE model (memo + arm already merged,
+        # then damaged and distilled), so no memo and no arm adapter are applied on top.
+        sd = torch.load(a.arm, map_location="cpu")
+        missing, unexpected = model.load_state_dict(sd, strict=False)
+        print(f"[state_dict] {a.arm}: {len(sd)} tensors, {len(missing)} missing, "
+              f"{len(unexpected)} unexpected", flush=True)
+        if len(missing) or len(unexpected):
+            raise SystemExit(f"refusing to attack a partial load: missing={missing[:5]} "
+                             f"unexpected={unexpected[:5]}")
+        model = model.to(DEV)
+        stack = ["base", f"{os.path.basename(a.arm)}(full state dict)"]
+    else:
+        model = PeftModel.from_pretrained(model, a.memo).merge_and_unload()
+        model = PeftModel.from_pretrained(model, a.arm).merge_and_unload().to(DEV)
+        stack = ["base", os.path.basename(a.memo), a.arm]
     # the attacker trains a FRESH adapter on top of the unlearned model
     model = get_peft_model(model, LoraConfig(
         r=a.rank, lora_alpha=2 * a.rank, lora_dropout=0.0, bias="none",

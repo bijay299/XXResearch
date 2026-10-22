@@ -81,7 +81,13 @@ def main():
                     help="dataset in TOFU format; default is the original path so prior "
                          "evaluations stay bit-reproducible")
     ap.add_argument("--label", required=True)
+    ap.add_argument("--state-dict", default=None,
+                    help="full 16-bit state dict (UNDO's save_16bit_model output). The student "
+                         "already has memo+arm merged, was damaged and then distilled, so this "
+                         "is the COMPLETE model: pass --memo none with it and apply no adapter.")
     a = ap.parse_args()
+    if a.state_dict and (a.adapter or a.memo.lower() != "none"):
+        ap.error("--state-dict is the complete model; use it with --memo none and no --adapter")
 
     tok = load_tokenizer()
     model = load_base(DEV)
@@ -92,6 +98,17 @@ def main():
         model = PeftModel.from_pretrained(model, a.memo).merge_and_unload()
         stack_memo = os.path.basename(a.memo)
     stack = ["base", stack_memo]
+    if a.state_dict:
+        sd = torch.load(a.state_dict, map_location="cpu")
+        missing, unexpected = model.load_state_dict(sd, strict=False)
+        # record both counts: a silently-partial load would otherwise evaluate the BASE model
+        # and report it as the arm.
+        print(f"[state_dict] {a.state_dict}: loaded {len(sd)} tensors, "
+              f"{len(missing)} missing, {len(unexpected)} unexpected", flush=True)
+        if len(missing) or len(unexpected):
+            raise SystemExit(f"refusing to evaluate a partial load: missing={missing[:5]} "
+                             f"unexpected={unexpected[:5]}")
+        stack.append(f"{os.path.basename(a.state_dict)}(full state dict)")
     if a.adapter:
         model = PeftModel.from_pretrained(model, a.adapter).merge_and_unload()
         stack.append(f"{os.path.basename(os.path.dirname(a.adapter))}/"

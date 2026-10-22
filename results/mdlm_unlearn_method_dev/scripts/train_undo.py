@@ -256,6 +256,36 @@ def main():
         return (lt.exp() * (lt - ls)).sum(-1).mean()        # forward KL, teacher first
 
     order = np.random.default_rng(a.seed).permutation(len(prompts))
+
+    # Frozen probe. The per-step loss is one prompt at one random mask rate, so it is dominated
+    # by the t draw, not by progress -- measured 0.157 at step 19 then 3.947 at step 29 on a
+    # run that was training normally. That trace is not a learning curve. This probe holds the
+    # prompts, the mask rates and the RNG fixed, so successive values are comparable.
+    # It calls engine(), i.e. ZeRO-3 collectives, so EVERY rank must run it; only rank 0 logs.
+    probe_qs = [prompts[int(i)] for i in order[:2]]
+    PROBE_T = (0.3, 0.7)
+
+    @torch.no_grad()
+    def frozen_probe():
+        full, attn, ast = batch_canvas(probe_qs)
+        ar = torch.arange(full.shape[1], device=dev)[None]
+        tot, n = 0.0, 0
+        for ti in PROBE_T:
+            g = torch.Generator(device=dev).manual_seed(1234)   # identical pattern every probe
+            keep = (torch.rand(full.shape, device=dev, generator=g) >= ti) & (ar >= ast[:, None])
+            tl = teacher(full, attention_mask=attn).logits
+            noisy = torch.where(keep, tl.argmax(-1), full)
+            tl = teacher(noisy, attention_mask=attn).logits
+            sl = engine(noisy, attention_mask=attn).logits
+            m = (noisy == MASK_ID) & (ar >= ast[:, None])
+            r_, c_ = m.nonzero(as_tuple=True)
+            if r_.numel() == 0:
+                continue
+            lt = torch.log_softmax(tl[r_, c_].float(), -1)
+            ls = torch.log_softmax(sl[r_, c_].float(), -1)
+            tot += float((lt.exp() * (lt - ls)).sum(-1).mean()); n += 1
+        return tot / max(n, 1)
+
     t0 = time.time()
     hist = []
     for step in range(a.steps):
@@ -263,12 +293,15 @@ def main():
         L = distil_step(qs)
         engine.backward(L)
         engine.step()
-        if is_main and ((step + 1) % a.probe_every == 0 or step == 0):
-            hist.append({"step": step, "kl": round(float(L), 5),
-                         "wall_s": round(time.time() - t0, 1)})
-            log(f"[undo] step {step:4d} KL(teacher||student)={float(L):.5f} "
-                f"{(time.time()-t0)/(step+1):.2f}s/step "
-                f"peak={torch.cuda.max_memory_allocated(dev)/2**30:.1f} GiB")
+        if (step + 1) % a.probe_every == 0 or step == 0:
+            pk = frozen_probe()                      # all ranks, or ZeRO-3 desynchronises
+            if is_main:
+                hist.append({"step": step, "frozen_kl": round(pk, 5),
+                             "step_kl_noisy": round(float(L), 5),
+                             "wall_s": round(time.time() - t0, 1)})
+                log(f"[undo] step {step:4d} frozen_KL={pk:.5f} (step_KL={float(L):.5f}, noisy) "
+                    f"{(time.time()-t0)/(step+1):.2f}s/step "
+                    f"peak={torch.cuda.max_memory_allocated(dev)/2**30:.1f} GiB")
         if (step + 1) % a.save_every == 0:
             engine.save_16bit_model(a.out, f"undo_step{step+1}.bin")
             log(f"[ckpt] {a.out}/undo_step{step+1}.bin")

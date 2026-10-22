@@ -274,3 +274,9 @@ p277	D	rmu_hi_gpu3	2026-10-21T20:39:20-04:00	75	0	gpu	1	75	2343	p277_D_rmu_hi_gp
 p276	D	part_rmu_cal_gpu2	2026-10-21T20:39:10-04:00	393	0	gpu	1	393	1450	p276_D_part_rmu_cal_gpu2.log	timeout=7200s
 p278	D	rmu_decoy_gpu2	2026-10-21T20:47:29-04:00	91	0	gpu	1	91	571	p278_D_rmu_decoy_gpu2.log	timeout=7200s
 p279	D	rmu_decoyq_gpu2	2026-10-21T20:49:35-04:00	94	0	gpu	1	94	533	p279_D_rmu_decoyq_gpu2.log	timeout=7200s
+p282	D	part_rmu_decoyq_gpu3	2026-10-21T20:56:08-04:00	401	0	gpu	1	401	2723	p282_D_part_rmu_decoyq_gpu3.log	timeout=7200s
+p280	D	part_rmu_hi_gpu2	2026-10-21T20:53:08-04:00	604	0	gpu	1	604	1040	p280_D_part_rmu_hi_gpu2.log	timeout=7200s
+p281	D	part_rmu_decoy_gpu2	2026-10-21T20:54:38-04:00	609	0	gpu	1	609	2889	p281_D_part_rmu_decoy_gpu2.log	timeout=7200s
+p283	E	undo_a0p3_attempt1_nccl_deadlock	2026-10-21T21:35:40-04:00	819	1	gpu	2	1638	5400	log_undo_a0p3.txt	FAILED: rank divergence -> ZeRO-3 _ALLGATHER_BASE timeout (rank0 SeqNum 3931 vs rank1 3910). Cause: distil_step returned early on a low-t draw, mask RNG seeded seed+rank, so one rank skipped backward/step. Reached step 0 only. cpu_core_s estimated from sampled pcpu 3014/2992%.
+p284	E	undo_a0p3_attempt2_stopped_for_instrument	2026-10-21T21:51:01-04:00	339	2	gpu	2	678	4600	log_undo_a0p3.txt	Divergence fix verified: reached step 39 (old code died at step 0), 5.03s/step. STOPPED BY ME to add a frozen probe: the logged per-step KL is one prompt at one random mask rate (0.157 at step 19 then 3.947 at step 29), so it is not a learning curve. cpu_core_s estimated from sampled pcpu 1350/1360%.
+p285	E	undo_a0p3_attempt3	2026-10-21T21:56:41-04:00	0	-	gpu	2	0	0	log_undo_a0p3.txt	RUNNING. alpha=0.3 beta=0.1 300 steps, frozen probe every 50, --include localhost:2,3 (--num_gpus silently overwrites CUDA_VISIBLE_DEVICES). step0 frozen_KL=2.467. wall/cpu to be filled on completion.

@@ -16,7 +16,7 @@ for al in 0.3 0.6; do
   /data/bijaypandey/llada_smoke/venv_llada/bin/deepspeed --include localhost:2,3 \
     --master_port 29577 \
     scripts/train_undo.py --alpha "$al" --beta 0.1 --steps 300 \
-    --probe-every 10 --save-every 300 --batch 1 \
+    --probe-every 50 --save-every 300 --batch 1 \
     --out "/data/bijaypandey/mdlm_unlearn/adapters/$lab" \
     > "outputs/log_$lab.txt" 2>&1
 done
