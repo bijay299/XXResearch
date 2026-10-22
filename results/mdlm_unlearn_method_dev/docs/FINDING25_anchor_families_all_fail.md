@@ -59,6 +59,39 @@ This is `FINDING23`'s suppression–removal gap in its sharpest form: at α=0.5,
 six methods at all (0.072–0.100, DEG ≈ 0) while the ranking probe separates them by 0.10 and the
 attack separates them by 11×.
 
+## 3a. The λ test: pushing harder makes it WORSE, not better
+
+§4 lists "λ swept over only {0.5, 1, 2}" as the finding's main weakness — if a stronger forget
+weight bought robustness, the finding would be wrong. Tested at λ ∈ {4, 8}, n=3 seeds, same gated
+protocol:
+
+| arm | retain | **recovery** | TV→oracle |
+|---|---|---|---|
+| MDU λ=0.5 | 0.6733 ± 0.00 | 0.5788 ± 0.02 | 0.0725 |
+| MDU λ=4 | 0.6533 ± 0.03 | **0.6442 ± 0.01** | 0.0783 |
+| MDU λ=8 | 0.5417 ± 0.03 | **0.6966 ± 0.01** | 0.0767 |
+| AFC λ=1 | 0.6992 ± 0.02 | 0.6274 ± 0.01 | 0.0750 |
+| AFC λ=4 | 0.6642 ± 0.05 | **0.6541 ± 0.02** | 0.0775 |
+| AFC λ=8 | 0.5717 ± 0.06 | **0.6869 ± 0.02** | 0.0758 |
+| MDU+FAM λ=1 | 0.7333 ± 0.01 | 0.7411 ± 0.02 | 0.3225 |
+| **UNDO retain-Fisher α=0.5** | 0.4567 ± 0.03 | **0.0498 ± 0.08** | 0.0850 |
+
+> **Recovery rises monotonically with λ while retain falls.** MDU 0.579 → 0.644 → 0.697 as retain
+> drops 0.673 → 0.542; AFC 0.627 → 0.654 → 0.687 as retain drops 0.699 → 0.572.
+
+So pushing an anchor objective harder makes the model **both less useful and less robust**. There
+is no λ that rescues these families — the knob that looks like "forget more" produces *more
+recoverable* suppression. The weakness §4 named has been tested and it does not save them; the
+band is now **0.5608–0.7568 over 27 gated runs**, still with no overlap against UNDO's
+0.0498–0.0513.
+
+`mdu_fam` is now n=3 (0.7411 ± 0.02), so no cell in this finding rests on a single seed.
+
+Note the TV column: every λ leaves TV at 0.0725–0.0783. **Behavioural distance to the oracle is
+flat across a λ range that moves recovery by 0.12.** The behavioural metric is not merely
+insensitive to the knowledge question — it is insensitive to a 2× change in how much an attacker
+can recover.
+
 ## 4. What this does and does not license
 
 **Supports:**
@@ -74,8 +107,10 @@ attack separates them by 11×.
   non-robust"*.
 - **One corpus, one task shape, one attack family.** Four attributes, closed answer pools, 200
   authors, SFT-style relearning. A different attack could order these differently.
+- The λ weakness named above is now **tested and closed** (§3a): λ ∈ {0.5…8} on MDU and AFC, and
+  higher λ makes robustness *worse*. EMDU and GA at λ ∈ {4, 8} are running.
 - **One scale.** 124M. The 8B programme could not test UNDO at all for feasibility reasons.
-- **`mdu_fam` is n=1** and is reported as such.
+- ~~`mdu_fam` is n=1~~ — now n=3 (0.7411 ± 0.02).
 
 ## 5. The honest size of it
 
