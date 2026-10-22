@@ -107,6 +107,37 @@ is the first positive evidence for that joint prediction.**
   caught our own claim one turn later. Single-lr robustness numbers are lower bounds, full stop.
 - **α=0 and α=0.1 on the AFC line are lower bounds** (lr 1e-4 only); their sweeps are running.
 
+## 8. AMENDMENT: seed replication and the completed lr sweeps
+
+The figures in §3 were **single-seed**, which is the failure mode that produced a retraction on
+8B. Replicated at n=3 seeds, RTT at the adversarially-optimal lr 3e-5:
+
+| α (AFC teacher) | recovery, n=3 | retain, n=3 |
+|---|---|---|
+| 0.3 | **0.2719 ± 0.050** | 0.6017 ± 0.034 |
+| 0.5 | **0.0513 ± 0.020** | 0.3650 ± 0.011 |
+
+Against the teacher's 0.6573 that is a 2.4x and 12.8x reduction, and no seed approaches the
+teacher. **Replication confirms the result** — the opposite outcome to the 8B AFC stability claim,
+which replication refuted.
+
+Completing the lr sweeps also corrected our own lower bounds UPWARD: α=0 went 0.4424 -> **0.5622**
+and α=0.1 went 0.3594 -> **0.4424**. Single-lr figures understated recovery by 0.08-0.12
+throughout, consistent with the α=0.5 withdrawal in §6. The full frontier:
+
+| α | rank retain | recovery (max over lr) |
+|---|---|---|
+| teacher | 0.7275 | 0.6573 |
+| 0.0 *(control)* | 0.6625 | 0.5622 |
+| 0.1 | 0.6225 | 0.4424 |
+| 0.2 | 0.6375 | 0.4265 |
+| 0.3 | 0.5875 | 0.2719 ± 0.050 |
+| 0.4 | 0.5300 | 0.1878 |
+| 0.5 | 0.3550 | 0.0513 ± 0.020 |
+
+Robustness gained per unit retain lost falls 2.75 -> 2.37 -> 1.63 across α = 0.3/0.4/0.5, so
+α=0.3 is the knee. `FINDING24` acts on that inefficiency.
+
 ## 7. A limit of the validity gate itself, recorded
 
 At lr 1e-3 every arm shows **negative** recovery while still passing the T-rise gate: the attack

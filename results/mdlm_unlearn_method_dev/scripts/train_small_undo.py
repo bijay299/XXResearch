@@ -43,6 +43,14 @@ def main():
     ap.add_argument("--fact-frac", type=float, default=0.5)
     ap.add_argument("--log-every", type=int, default=500)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--protect", choices=["none","retain_fisher","random"], default="none",
+                    help="SELECTIVE damage. UNDO perturbs every weight uniformly, yet FINDING19 "
+                         "showed forget knowledge is localisable and the measured frontier shows "
+                         "robustness costs retain at an accelerating rate (2.75 -> 1.63 per unit "
+                         "retain as alpha goes 0.3 -> 0.5). retain_fisher scales each "
+                         "parameter's perturbation by (1 - normalised retain importance), so "
+                         "retain-critical weights are damaged less at the same mean damage.")
+    ap.add_argument("--fisher-batches", type=int, default=24)
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True); torch.manual_seed(a.seed)
@@ -67,19 +75,79 @@ def main():
     for p_ in teacher.parameters(): p_.requires_grad_(False)
     student = build()
 
+    # defined here, not after the damage step: the retain-Fisher pass below needs them
+    rng = np.random.default_rng(a.seed); gen = torch.Generator(device=dev).manual_seed(a.seed)
+
+    # retain-importance diagonal: E[(dL_retain/dtheta)^2] on RETAIN value spans only
+    # random = the discriminating CONTROL: same per-parameter weight DISTRIBUTION as
+    # retain_fisher but SHUFFLED within each tensor, so damage is equally non-uniform and equal
+    # in mean while carrying NO retain information. If it matches retain_fisher, the gain comes
+    # from non-uniformity alone and the Fisher signal is irrelevant -- the same logic as UNDO's
+    # own alpha=0 control.
+    imp = None
+    if a.protect in ("retain_fisher", "random"):
+        rt = np.load(f"{DATA}/unl_retain.npz")
+        imp = {n_: torch.zeros_like(p_) for n_, p_ in student.named_parameters()}
+        Lr = int(rt["ids"].shape[1])
+        for _ in range(a.fisher_batches):
+            idx = rng.integers(0, len(rt["ids"]), size=a.batch)
+            ids_r = torch.from_numpy(rt["ids"][idx].astype(np.int64)).to(dev)
+            ne = torch.from_numpy(rt["name_end"][idx].astype(np.int64)).to(dev)
+            pl = torch.from_numpy(rt["plen"][idx].astype(np.int64)).to(dev)
+            ar = torch.arange(Lr, device=dev)[None]
+            ans = (ar >= ne[:, None]) & (ar < pl[:, None])
+            tt = torch.rand(a.batch, device=dev, generator=gen).clamp_min(1e-3)
+            m = (torch.rand((a.batch, Lr), device=dev, generator=gen) < tt[:, None]) & ans
+            nz = torch.where(m, torch.full_like(ids_r, MASK_ID), ids_r)
+            student.zero_grad(set_to_none=True)
+            with torch.autocast("cuda", dtype=torch.bfloat16):
+                lg = student(nz)
+                ce = F.cross_entropy(lg.view(-1, NVOCAB).float(), ids_r.view(-1),
+                                     reduction="none").view(ids_r.shape)
+                lr_ = (ce * m).sum() / m.sum().clamp_min(1)
+            lr_.backward()
+            for n_, p_ in student.named_parameters():
+                if p_.grad is not None: imp[n_] += p_.grad.detach().float() ** 2
+        student.zero_grad(set_to_none=True)
+        # normalise per tensor to [0,1] by its own 99th percentile, so scale differences
+        # between tensors do not decide which ones get protected
+        for n_ in imp:
+            v = imp[n_].flatten()
+            q = torch.quantile(v.float(), 0.99) if v.numel() < 1_000_000 else \
+                torch.quantile(v.float()[torch.randperm(v.numel(), device=v.device)[:1_000_000]], 0.99)
+            imp[n_] = (imp[n_] / q.clamp_min(1e-12)).clamp(0, 1)
+        if a.protect == "random":
+            for n_ in imp:
+                flat = imp[n_].flatten()
+                perm = torch.randperm(flat.numel(), device=flat.device,
+                                      generator=torch.Generator(device=flat.device).manual_seed(a.seed))
+                imp[n_] = flat[perm].view_as(imp[n_])
+        tot = sum(float(x.mean()) for x in imp.values()) / max(len(imp), 1)
+        print(f"[protect] {a.protect} over {a.fisher_batches} batches, mean importance {tot:.4f}",
+              flush=True)
+
     nd, dsum, bsum = 0, 0.0, 0.0
     with torch.no_grad():
         for p_ in student.parameters():
             if p_.dim() < 1: continue
             b = p_.norm().item(); N = xavier_like(p_)
-            p_.mul_(1.0 - a.alpha).add_(a.alpha * a.beta * N)
+            if imp is not None:
+                nm = dict(student.named_parameters())
+                key = next((k for k, v in nm.items() if v is p_), None)
+                w = (1.0 - imp[key]) if key in imp else torch.ones_like(p_)
+                # renormalise so MEAN damage matches plain UNDO at the same alpha: the
+                # comparison must be equal-damage, not less-damage
+                w = w * (1.0 / w.mean().clamp_min(1e-6))
+                al = (a.alpha * w).clamp(0, 0.95)
+                p_.mul_(1.0 - al).add_(al * (a.beta * N))
+            else:
+                p_.mul_(1.0 - a.alpha).add_(a.alpha * a.beta * N)
             dsum += (p_.norm().item() - b) ** 2 ** 0.5 if False else abs(p_.norm().item()-b)
             bsum += b; nd += 1
     print(f"[damage] alpha={a.alpha} beta={a.beta} over {nd} tensors; "
           f"mean |d||p||/||p|| = {dsum/max(bsum,1e-9):.4f}", flush=True)
 
     opt = torch.optim.AdamW(student.parameters(), lr=a.lr, betas=(0.9,0.95), weight_decay=0.0)
-    rng = np.random.default_rng(a.seed); gen = torch.Generator(device=dev).manual_seed(a.seed)
     L = int(facts.shape[1])
 
     # frozen probe: fixed rows, fixed mask, fixed rate -- comparable across steps AND arms
@@ -129,7 +197,7 @@ def main():
     print(f"[ckpt] {path} ({os.path.getsize(path)/2**30:.2f} GiB)" if os.path.exists(path)
           else f"[ckpt] FAILED {path}", flush=True)
     json.dump({"study":"h18_undo","hparams":vars(a),
-               "damage":{"alpha":a.alpha,"beta":a.beta,"n_tensors":nd,
+               "damage":{"alpha":a.alpha,"beta":a.beta,"protect":a.protect,"n_tensors":nd,
                          "mean_rel_norm_change":round(dsum/max(bsum,1e-9),5)},
                "distillation_pool":{"forget_included":True,
                    "note":"teacher outputs are the targets, never gold answers"},
