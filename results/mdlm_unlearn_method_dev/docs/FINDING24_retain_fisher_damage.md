@@ -1,4 +1,4 @@
-# Finding 24 — retain-Fisher-weighted damage buys retain at equal damage and equal robustness
+# Finding 24 — non-uniform damage buys retain; the Fisher signal only matters at HIGH damage
 
 **Date:** 2026-10-22 · **Backbone:** H18 124M MDLM, exact retrain oracle
 **Script:** `scripts/train_small_undo.py --protect retain_fisher`
@@ -77,6 +77,23 @@ The narrowed claim, which is all the data supports:
 
 Publishing the α=0.5 control before running α=0.3 was the error. One control at one setting was
 presented as establishing a mechanism; a second setting refuted half of it.
+
+### The α=0.5 effect replicates on a second teacher, with the control firing correctly
+
+| arm (MDU teacher, α=0.5) | retain | recovery |
+|---|---|---|
+| teacher, no UNDO | 0.6700 | 0.5608 |
+| plain UNDO (uniform) | 0.3392 ± 0.026 | 0.0644 ± 0.031 |
+| **shuffled control** | 0.3342 ± 0.018 | 0.0084 ± 0.079 |
+| **retain-Fisher** | **0.4400 ± 0.018** | 0.0327 ± 0.040 |
+
+Shuffled recovers plain UNDO's retain (0.3342 vs 0.3392) and retain-Fisher gains **+0.101**,
+mirroring the AFC teacher's +0.092 with the same control behaviour. So the narrowed claim — the
+Fisher signal matters at α=0.5 — holds on **two independent teachers**, each with its own
+shuffled control. Recovery remains indistinguishable across all three arms on both teachers.
+
+The MDU teacher at α=0.3 is running, which completes the teacher × α grid and tests whether
+"non-uniformity alone suffices at low damage" is teacher-general or an AFC-teacher artefact.
 
 ## 4. The cost, stated
 
