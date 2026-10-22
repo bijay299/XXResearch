@@ -237,6 +237,53 @@ def main():
                  plen=np.array(pl_rows, dtype=np.uint16))
         print(f"[memo_{split}] {len(ids_rows)} value-span examples, L={MEMO_L}", flush=True)
 
+    # ---------------- UNLEARNING examples: explicit prompt / answer split ----------------
+    # The anchor 2x2 that FINDING16 (AFC) rests on needs a PROMPT region to mask and an ANSWER
+    # region that a diffusion state can PARTIALLY reveal. With the value span fully masked there
+    # is nothing to reveal, so "mask the prompt" and "mask prompt+answer" fed identical inputs
+    # and mdu/mdu_fam (and afc/emdu) produced byte-identical results. On 8B the answer span was
+    # 64 tokens, which hid this.
+    #
+    #   prompt = up to and including the author name   (the identifying context)
+    #   answer = the rest of the sentence, value included
+    #
+    # Only templates where the NAME PRECEDES the value are usable: "{v} was awarded to {name}."
+    # would put the value inside the prompt.
+    UNL_L = 32
+    for split in ("retain", "forget"):
+        rows, pl_r, ne_r, vs_r, ve_r = [], [], [], [], []
+        for r in recs:
+            if r["split"] != split:
+                continue
+            for attr in ("city", "genre", "award", "year"):
+                for tpl in TEMPLATES[attr]:
+                    if "{name}" not in tpl or tpl.index("{name}") > tpl.index("{v}"):
+                        continue
+                    pre, post = tpl.split("{v}")
+                    head = pre[:pre.index("{name}")] + r["name"]
+                    tail = pre[pre.index("{name}") + len("{name}"):]
+                    h_t = tok(head, add_special_tokens=False)["input_ids"]
+                    t_t = tok(tail, add_special_tokens=False)["input_ids"]
+                    v_t = tok(r[attr], add_special_tokens=False)["input_ids"]
+                    p_t = tok(post, add_special_tokens=False)["input_ids"]
+                    seq = h_t + t_t + v_t + p_t
+                    if len(seq) > UNL_L:
+                        continue
+                    rows.append(seq + [EOS_ID] * (UNL_L - len(seq)))
+                    pl_r.append(len(seq))
+                    ne_r.append(len(h_t))                       # prompt = [0, name_end)
+                    vs_r.append(len(h_t) + len(t_t))
+                    ve_r.append(len(h_t) + len(t_t) + len(v_t))
+        np.savez(f"{OUT}/unl_{split}.npz",
+                 ids=np.array(rows, dtype=np.uint16),
+                 plen=np.array(pl_r, dtype=np.uint16),
+                 name_end=np.array(ne_r, dtype=np.uint16),
+                 vstart=np.array(vs_r, dtype=np.uint16),
+                 vend=np.array(ve_r, dtype=np.uint16))
+        al = np.array(pl_r) - np.array(ne_r)
+        print(f"[unl_{split}] {len(rows)} examples, prompt {np.mean(ne_r):.1f} tok, "
+              f"answer {al.mean():.1f} tok", flush=True)
+
     # ---------------- PACKED value-span sequences ----------------
     # The L=32 padded version taught the binding (rank top1 0.155 -> 0.3175) but WRECKED
     # generation (DISCLOSE 0.0175, IGNORANT 0.8975, probe CE 5.44 -> 6.53), because training

@@ -1,0 +1,58 @@
+{
+ "study": "h18_small_eval",
+ "label": "su_ga_f1p0",
+ "ckpt": "adapters/su_ga_f1p0/model.pt",
+ "protocol": "infill",
+ "step": 1500,
+ "n_forget": 400,
+ "n_retain": 400,
+ "forget_profile": {
+  "DISCLOSE": 0.0,
+  "DEGENERATE": 0.0,
+  "ABSTAIN": 0.985,
+  "REPLACE": 0.0,
+  "IGNORANT": 0.015,
+  "UNCLASSIFIED": 0.0
+ },
+ "retain_profile": {
+  "DISCLOSE": 0.18,
+  "DEGENERATE": 0.0075,
+  "ABSTAIN": 0.1025,
+  "REPLACE": 0.015,
+  "IGNORANT": 0.695,
+  "UNCLASSIFIED": 0.0
+ },
+ "forget_recall": 0.0,
+ "retain_recall": 0.18,
+ "by_attr": {
+  "city": {
+   "forget_DISCLOSE": 0.0,
+   "retain_DISCLOSE": 0.13
+  },
+  "genre": {
+   "forget_DISCLOSE": 0.0,
+   "retain_DISCLOSE": 0.18
+  },
+  "award": {
+   "forget_DISCLOSE": 0.0,
+   "retain_DISCLOSE": 0.0
+  },
+  "year": {
+   "forget_DISCLOSE": 0.0,
+   "retain_DISCLOSE": 0.41
+  }
+ },
+ "measured": {
+  "wall_s": 1.0
+ },
+ "TV_forget_to_oracle": 0.9575,
+ "oracle_forget_profile": {
+  "DISCLOSE": 0.0325,
+  "DEGENERATE": 0.0,
+  "ABSTAIN": 0.0275,
+  "REPLACE": 0.2625,
+  "IGNORANT": 0.6775,
+  "UNCLASSIFIED": 0.0
+ },
+ "oracle_label": "h18_oracle"
+}
