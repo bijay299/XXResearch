@@ -267,6 +267,14 @@ show the mechanism.
 
 Clearing only the first is a mechanism result, not a SOTA result.
 
+**Both bars are measured under the adversarial learning-rate search**, not a single attack
+setting. `NOVELTY_attack_validity_gate.md` found that UNDO's and Lynch et al.'s own practice is
+to report the adversarially *optimal* attack over an lr grid, which our single-lr RTT did not do
+— so every recovery figure in this document is a **lower bound** until that sweep completes.
+With checkpoint retention authorised, the UNDO arms are kept after their first attack and swept
+at several learning rates rather than retrained for each, so the UNDO figures will be reported
+as max-over-lr from the start.
+
 **Correction to an earlier claim of ours.** We previously reported "repair confirmed working,
 KL(teacher‖student) 4.37 → 1.87 in two steps". That was not evidence of repair. The logged loss
 is computed on one prompt at one *randomly drawn* mask rate `t`, so it is dominated by the draw —
