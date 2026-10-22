@@ -1,0 +1,84 @@
+{
+ "study": "h18_rank_probe",
+ "label": "undo_mp_a0p3_s1",
+ "ckpt": "adapters/undo_mp_a0p3_s1/model.pt",
+ "step": 3000,
+ "pool_sizes": {
+  "city": 16,
+  "genre": 8,
+  "award": 6,
+  "year": 10
+ },
+ "results": {
+  "forget": {
+   "n": 400,
+   "top1": 0.205,
+   "chance": 0.1135,
+   "mean_rank": 3.7,
+   "above_chance": 0.0915
+  },
+  "forget/award": {
+   "n": 100,
+   "top1": 0.16,
+   "chance": 0.1667,
+   "mean_rank": 3.07,
+   "above_chance": -0.0067
+  },
+  "forget/city": {
+   "n": 100,
+   "top1": 0.22,
+   "chance": 0.0625,
+   "mean_rank": 4.23,
+   "above_chance": 0.1575
+  },
+  "forget/genre": {
+   "n": 100,
+   "top1": 0.24,
+   "chance": 0.125,
+   "mean_rank": 3.52,
+   "above_chance": 0.115
+  },
+  "forget/year": {
+   "n": 100,
+   "top1": 0.2,
+   "chance": 0.1,
+   "mean_rank": 3.99,
+   "above_chance": 0.1
+  },
+  "retain": {
+   "n": 400,
+   "top1": 0.605,
+   "chance": 0.1135,
+   "mean_rank": 1.58,
+   "above_chance": 0.4915
+  },
+  "retain/award": {
+   "n": 100,
+   "top1": 0.36,
+   "chance": 0.1667,
+   "mean_rank": 2.04,
+   "above_chance": 0.1933
+  },
+  "retain/city": {
+   "n": 100,
+   "top1": 0.95,
+   "chance": 0.0625,
+   "mean_rank": 1.05,
+   "above_chance": 0.8875
+  },
+  "retain/genre": {
+   "n": 100,
+   "top1": 0.49,
+   "chance": 0.125,
+   "mean_rank": 1.85,
+   "above_chance": 0.365
+  },
+  "retain/year": {
+   "n": 100,
+   "top1": 0.62,
+   "chance": 0.1,
+   "mean_rank": 1.38,
+   "above_chance": 0.52
+  }
+ }
+}

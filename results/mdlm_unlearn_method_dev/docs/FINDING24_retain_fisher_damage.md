@@ -92,8 +92,24 @@ mirroring the AFC teacher's +0.092 with the same control behaviour. So the narro
 Fisher signal matters at α=0.5 — holds on **two independent teachers**, each with its own
 shuffled control. Recovery remains indistinguishable across all three arms on both teachers.
 
-The MDU teacher at α=0.3 is running, which completes the teacher × α grid and tests whether
-"non-uniformity alone suffices at low damage" is teacher-general or an AFC-teacher artefact.
+### The grid is complete: 2 teachers x 2 alpha x n=3, one consistent pattern
+
+| teacher / α | plain | shuffled | retain-Fisher | verdict |
+|---|---|---|---|---|
+| AFC 0.3 | 0.6017 ± 0.03 | 0.6633 ± 0.02 | 0.6550 ± 0.00 | non-uniformity suffices |
+| AFC 0.5 | 0.3650 ± 0.01 | 0.3667 ± 0.03 | **0.4567 ± 0.03** | **Fisher required** |
+| MDU 0.3 | 0.5792 ± 0.04 | 0.5925 ± 0.01 | 0.6000 ± 0.02 | non-uniformity suffices |
+| MDU 0.5 | 0.3392 ± 0.03 | 0.3342 ± 0.02 | **0.4400 ± 0.02** | **Fisher required** |
+
+Both teachers agree at both α. At α=0.5 the shuffled control recovers plain UNDO's retain and the
+Fisher signal buys **+0.092 / +0.101**; at α=0.3 shuffled and Fisher are equivalent and the gain
+is smaller (+0.06 on AFC, only +0.013/+0.021 on MDU). So the α=0.3 "non-uniformity suffices"
+reading is teacher-general, not an AFC artefact — but the low-damage gain is modest and
+teacher-dependent, whereas the high-damage Fisher gain is consistent.
+
+**A dominating operating point does exist.** At α=0.5, retain-Fisher dominates plain UNDO on both
+axes simultaneously: retain 0.4567 vs 0.3650 (AFC) and 0.4400 vs 0.3392 (MDU), at recovery that is
+equal or marginally better. That is the one practically useful consequence of this finding.
 
 ## 4. The cost, stated
 
