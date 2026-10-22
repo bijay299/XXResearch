@@ -1,0 +1,36 @@
+{
+ "study": "h18_rtt",
+ "label": "rtt_af_mdu_diff_lr3e-3",
+ "arm": "adapters/base_mdu_af/model.pt",
+ "attack_mode": "diffusion",
+ "hparams": {
+  "arm": "adapters/base_mdu_af/model.pt",
+  "t_frac": 0.8,
+  "steps": 600,
+  "batch": 32,
+  "lr": 0.003,
+  "seed": 0,
+  "attack_mode": "diffusion",
+  "label": "rtt_af_mdu_diff_lr3e-3"
+ },
+ "n_T_probes": 320,
+ "n_H_probes": 80,
+ "attack_validity": {
+  "T_before": 0.1875,
+  "T_after": 0.2062,
+  "T_rise": 0.0187,
+  "valid": false,
+  "meaning": "the attack must relearn the facts it is TRAINED ON; if T does not recover, a flat curve on H is not evidence of robustness"
+ },
+ "recovery": {
+  "H_before": 0.275,
+  "H_after": 0.0875,
+  "absolute_rise": -0.1875,
+  "fraction_of_ref_recovered": -0.4438,
+  "theta_ref_forget": 0.6975,
+  "theta_oracle_forget": 0.11
+ },
+ "measured": {
+  "wall_s": 21.7
+ }
+}

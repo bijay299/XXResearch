@@ -3,8 +3,29 @@
 **Date:** 2026-10-22 · **Backbone:** H18 124M MDLM with an exact retrain oracle (`FINDING21`)
 **Protocol:** all arms at a **matched** attacker budget `t_frac = 0.5`, every attack passing
 `FINDING20`'s validity gate, recovery as **max over valid attacks**
-**Status:** the broadest result in the project — it rests on every gated run accumulated, not on a
-new experiment. It also subsumes and explains a negative that killed a planned line (§5).
+**Status:** ⚠ **PROVISIONAL — the headline is under audit.** The broadest result in the project, but
+its x-axis has since been shown to be an invalid instrument (`FINDING29`), and a noisy x-axis
+attenuates correlation toward zero. `PREREG_H37` registers a balanced 16-arm replication with a
+validated knowledge probe and **pre-declared retraction conditions**. Read §0 before §1.
+
+---
+
+## 0. ⚠ What is under audit, and what is not
+
+`FINDING29` showed that `rank_probe_small.py` — the source of every "residual knowledge" number
+below — scores EOS-padded length-32 candidates, so padding enters every score. It reads
+`theta_ref` at 0.6725 when `theta_ref`'s true retain recall is **1.0000**, and it **inverts** the
+ordering of two models.
+
+| part of this finding | status |
+|---|---|
+| recovery numbers, band separation (§2), α=0 controls landing in the suppression band | **unaffected** — none depend on the ranking probe |
+| "only an attack measures robustness" (§6) | **unaffected** — an argument about what no static probe can do |
+| ρ = −0.148, the 18 matched pairs (§3), the α-ladder residual column (§5) | ⚠ **provisional** — may be regression dilution from a noisy x-axis rather than a true absence of relationship |
+
+Only 2 of the 125 checkpoints still exist, so this cannot be repaired by reanalysis. Everything
+below is reported as measured; the words "residual forget knowledge" should everywhere be read as
+**"the ranking probe's reading of residual knowledge"**.
 
 ---
 
