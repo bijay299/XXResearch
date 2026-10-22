@@ -134,7 +134,46 @@ and used it to bound the usable regime. That was measured at **3,000** repair st
 all nine were rejected before). So the collapse was **repair-bound, not intrinsic to α=0.7** — the
 right conclusion for the wrong reason. α=0.7 remains dominated, but by α=0.6, not by collapse.
 
-### α=0.6 replicated at n=5 and survives an adversarial lr search
+### ⚠ CORRECTION — the selected point was the wrong arm
+
+The sub-section below reported the **EMDU-teacher** arm as the project's strongest point. That is
+**wrong**, and the error is ours: the arm was selected on rank-retain and recovery **without
+checking the behavioural axis**. Running all three teachers at α=0.6 on all three axes:
+
+| teacher | retain | recovery (lr 3e-5) | **TV→oracle** |
+|---|---|---|---|
+| **AFC** | **0.6460 ± 0.017 (n=5)** | 0.0273 ± 0.042 (n=5) | **0.0745 ± 0.005** |
+| MDU | 0.6075 | 0.0209 | 0.0725 |
+| EMDU *(previously reported as best)* | 0.5850 | 0.0287 | **0.3225** |
+
+**The AFC teacher dominates EMDU on all three axes**, and EMDU's TV of 0.3225 is the
+FAM-collapse signature of `FINDING13`/`FINDING18`/`FINDING25` — its student inherits EMDU's
+off-pool output distribution. Teacher choice also matters much less than claimed: all three give
+recovery 0.014–0.029, so "EMDU is the best teacher" was noise at n=1.
+
+This is the `FINDING15` metric trap — ranking on a subset of axes — committed after documenting it
+twice. **The selected point is the AFC teacher.**
+
+**Its own adversarial lr sweep** (the previous sweep belonged to the EMDU arm and does not
+transfer):
+
+| attack lr | recovery | gate | T-rise |
+|---|---|---|---|
+| **1e-5** | **+0.0314** | ✓ | +0.335 |
+| 3e-5 | +0.0273 ± 0.042 (n=5) | ✓ | — |
+| 1e-4 | −0.1047 | ✓ | +0.685 |
+| 3e-4 | −0.1675 | ✓ | +0.700 |
+| 1e-3 | −0.1885 | ✓ | +0.680 |
+
+> **Max over five valid attack learning rates: +0.0314**, at retain 0.6460 and TV 0.0745. Every
+> attack passed the validity gate. Against the best anchor run anywhere (0.5608 over 37 gated
+> runs) that is **~18× better robustness at comparable retain and comparable behavioural
+> distance** — `theta_ref` retain is 0.6725 and the best anchor TV is 0.0725.
+
+Note the honest sign: the maximum is **positive**. ~3% of the gap back to `theta_ref` reopens at
+the weakest attack lr. "No detectable recovery" was the EMDU arm's number and does not apply here.
+
+### Superseded: the EMDU-teacher arm's lr search
 
 | | value |
 |---|---|
