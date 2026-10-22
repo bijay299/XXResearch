@@ -44,25 +44,39 @@ indistinguishable.** Every attack passed `FINDING20`'s validity gate.
 Only the retain gain is claimed. The apparent robustness differences sit well inside the seed
 spread and are not claimed in either direction.
 
-## 3. The discriminating control: it is the Fisher signal, not non-uniformity
+## 3. The discriminating control — and it only supports the Fisher attribution at HIGH damage
 
-The obvious alternative explanation is that *any* non-uniform damage helps, and Fisher is
-incidental. So the control draws the **same per-parameter weight distribution and shuffles it
-within each tensor** — equally non-uniform, equal in mean (damage 0.4931 vs 0.4945, mean
-importance 0.1394 identical by construction), carrying **no retain information**:
+The obvious alternative explanation is that *any* non-uniform damage helps and Fisher is
+incidental. The control draws the **same per-parameter weight distribution and shuffles it within
+each tensor** — equally non-uniform, equal in mean, carrying **no retain information**.
 
-| arm (α=0.5) | rank retain | recovery |
-|---|---|---|
-| plain UNDO (uniform) | 0.3650 ± 0.011 | 0.0513 ± 0.020 |
-| **retain-Fisher protected** | **0.4567 ± 0.029** | 0.0498 ± 0.077 |
-| **shuffled-Fisher control** | **0.3667 ± 0.031** | −0.0037 ± 0.047 |
+Run at both α, the control **disagrees with itself across α**:
 
-> The shuffled control recovers plain UNDO's retain **exactly** (0.3667 vs 0.3650) and gets none
-> of the +0.092. The gain is attributable to the retain-Fisher signal, not to the damage being
-> non-uniform.
+| α | plain UNDO (uniform) | retain-Fisher | **shuffled control** | verdict |
+|---|---|---|---|---|
+| 0.3 | 0.6017 ± 0.034 | 0.6550 ± 0.003 | **0.6633 ± 0.021** | Fisher signal **irrelevant** |
+| 0.5 | 0.3650 ± 0.011 | 0.4567 ± 0.029 | **0.3667 ± 0.031** | Fisher signal **matters** |
 
-This is the same logic as UNDO's own α=0 control, and it is the measurement that makes the result
-worth reporting at all.
+> ⚠ **CORRECTION to the first version of this finding.** It claimed, on the α=0.5 control alone,
+> that "the gain is attributable to the retain-Fisher signal, not to the damage being
+> non-uniform". **That is false at α=0.3**, where shuffled damage reaches 0.6633 — as good as, or
+> better than, retain-Fisher's 0.6550, and both well above plain UNDO's 0.6017. At α=0.3 the
+> entire gain is explained by **non-uniformity alone**.
+>
+> The Fisher attribution survives **only at α=0.5**, where shuffled (0.3667) recovers plain
+> UNDO's retain (0.3650) and gets none of retain-Fisher's +0.092.
+
+The narrowed claim, which is all the data supports:
+
+- **Non-uniform damage improves retain at both α** (+0.06 at α=0.3, and at α=0.5 only when
+  Fisher-informed).
+- **Retain-importance information matters only at high damage.** A plausible reading: at low α
+  some weights are barely perturbed whatever the pattern, so capability survives regardless of
+  *which* ones; at high α almost everything is perturbed, so *which* weights are spared starts to
+  decide the outcome. That is post-hoc and untested — stated as a hypothesis, not a result.
+
+Publishing the α=0.5 control before running α=0.3 was the error. One control at one setting was
+presented as establishing a mechanism; a second setting refuted half of it.
 
 ## 4. The cost, stated
 
@@ -101,5 +115,8 @@ only. OpenReview and informal venues were not searched, and absence of a hit is 
   corpus. No published method was re-implemented and tuned at parity.
 - **Not scale-transferable.** 124M, our own corpus. The 8B attempt failed on feasibility.
 - **Not a robustness improvement.** Recovery is indistinguishable; only retain moves.
-- **Single teacher so far.** The α=0.3 shuffled control and an MDU-teacher replication are
-  running; until they land, both the control and the effect rest on one teacher at one α.
+- **Not a mechanism claim.** §3's correction stands: the Fisher signal is only shown to matter at
+  α=0.5. At α=0.3 any non-uniform damage does as well.
+- **Single teacher for the three-way comparison.** The MDU teacher at α=0.5 gives retain
+  0.4325 ± 0.018 and recovery 0.0104 ± 0.015 (n=2) under retain-Fisher damage; its plain and
+  shuffled counterparts are running, and until they land the MDU line has no control.
