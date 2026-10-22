@@ -61,6 +61,38 @@ wait
 lane 2 undo_a0p0 &
 wait
 
+# ---- Phase 2b: steps ablation, to rule out a false negative ------------------------------
+# The frozen probe on alpha=0.3 fell 2.467 -> 2.188 -> 1.663 at steps 0/49/99: still falling,
+# and the rate was INCREASING, so 300 steps is very likely an under-trained student. Without
+# this arm, poor utility at 300 steps is indistinguishable from "UNDO's route does not work".
+# 1000 steps with checkpoints at 500 and 1000 gives a repair-vs-steps curve.
+if [ ! -f adapters/undo_a0p3_s1000/undo_step1000.bin ]; then
+  echo "[followup] alpha=0.3 extended to 1000 steps (steps ablation)"
+  /data/bijaypandey/llada_smoke/venv_llada/bin/deepspeed --include localhost:2,3 \
+    --master_port 29577 \
+    scripts/train_undo.py --alpha 0.3 --beta 0.1 --steps 1000 \
+    --probe-every 50 --save-every 500 --batch 1 \
+    --out /data/bijaypandey/mdlm_unlearn/adapters/undo_a0p3_s1000 \
+    > outputs/log_undo_a0p3_s1000.txt 2>&1 || echo "[followup] EXTENDED ARM FAILED"
+fi
+for ck in undo_step500 undo_step1000; do
+  f="adapters/undo_a0p3_s1000/$ck.bin"
+  [ -f "$f" ] || continue
+  lab="undo_a0p3_$ck"
+  if [ ! -f "outputs/arm_${lab}.json" ]; then
+    CUDA_VISIBLE_DEVICES=2 $PY scripts/eval_arm_partition.py \
+      --memo none --state-dict "$f" --label "$lab" \
+      > "outputs/log_part_${lab}.txt" 2>&1 || echo "[followup] EVAL FAILED $lab"
+  fi
+done
+# attack only the fully-distilled one; the 500 checkpoint is there for the utility curve
+if [ -f adapters/undo_a0p3_s1000/undo_step1000.bin ] && [ ! -f outputs/rtt_undo_a0p3_s1000.json ]; then
+  CUDA_VISIBLE_DEVICES=2 $PY scripts/train_rtt.py \
+    --arm adapters/undo_a0p3_s1000/undo_step1000.bin --lr 3e-5 \
+    --probe-steps 0,25,100,300 --n-eval 40 --label undo_a0p3_s1000 \
+    > outputs/log_rtt_undo_a0p3_s1000.txt 2>&1 || echo "[followup] RTT FAILED extended arm"
+fi
+
 # ---- Phase 3: H17's mandatory reference arm ---------------------------------------------
 # Without it the AFC grid's spread cannot be attributed to unlearning fragility rather than
 # decoder variance. No --arm means base + memo, which IS theta0.

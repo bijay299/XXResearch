@@ -6,6 +6,28 @@ selected and no superiority claim is made. Tiers are kept strictly separate in
 [`RECORD.md`](RECORD.md): historical closed studies (immutable), active development (this
 directory), and a sealed final evaluation that does not yet exist.
 
+## Start here
+
+**[`docs/REPORT.md`](docs/REPORT.md) is the consolidated account** — read it before anything
+else in this directory. It states plainly that the pre-declared "beats SOTA" bar is **not met**,
+and collects what is defensible: the two walls, the AFC ablation with all four of its
+retractions, the robustness inversion, and 19 closed candidates.
+
+| document | what it is |
+|---|---|
+| [`docs/REPORT.md`](docs/REPORT.md) | the consolidated account and the honest verdict |
+| [`docs/FINDING18_anchor_impossibility.md`](docs/FINDING18_anchor_impossibility.md) | wall 1 — form and fact-identity are the same information |
+| [`docs/FINDING19_two_walls.md`](docs/FINDING19_two_walls.md) | wall 2 — fluency-preserving activation targets carry no signal; the joint prediction |
+| [`docs/FINDING20_robustness_inversion.md`](docs/FINDING20_robustness_inversion.md) | our best static method is the robustness loser; AFC disqualified |
+| [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) | why TV→pristine *is* a membership-inference advantage, and why EMDU's abstention is the worst outcome under it |
+| [`docs/NOVELTY_attack_validity_gate.md`](docs/NOVELTY_attack_validity_gate.md) | the attack-validity gate is a special case of Athalye et al., and a limitation it exposed in our own protocol |
+| [`docs/RESULTS.md`](docs/RESULTS.md) | the AFC study as written, retractions in place |
+| [`ATTEMPTS.tsv`](ATTEMPTS.tsv) | every attempt including failures, with cumulative resource use |
+
+The two findings worth keeping are **negative**: they predict failures rather than reporting
+them, and together they say a working method must take its forget target from outside the
+model's own distributions. Testing that prediction is the current work.
+
 ## Why the previous approach needed replacing
 
 Our own strongest control reaches 0.031 disclosure with 1.000 retain and zero degenerate
