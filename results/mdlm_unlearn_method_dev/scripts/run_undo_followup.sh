@@ -35,14 +35,21 @@ source env.sh 2>/dev/null
 PY=/data/bijaypandey/llada_smoke/venv_llada/bin/python
 DS=/data/bijaypandey/llada_smoke/venv_llada/bin/deepspeed
 
+# lr 1e-4, not train_undo.py's 2e-5 default. The frozen probe on the 300-step arm went
+# 2.467 -> 2.188 -> 1.663 -> 1.642 at steps 0/49/99/149, i.e. it PLATEAUED near 1.64 -- and the
+# probe prompts are drawn from the distillation pool, so that is a TRAINING loss stuck at a large
+# value. That is underfitting, not a generalisation limit: lr 2e-5 at batch 1 with grad-clip 1.0
+# is far too little optimisation to undo a 30% relative weight perturbation on 8B parameters.
+# The frozen probe is also the detector if 1e-4 destabilises instead.
+LR=1e-4
 train_undo () {                 # $1 = label, $2 = alpha, $3 = steps, $4 = extra args
   lab="$1"; al="$2"; st="$3"; extra="${4:-}"
   if [ -f "adapters/$lab/undo_step${st}.bin" ]; then
     echo "[train] $lab already done"; return
   fi
-  echo "[train] $lab alpha=$al steps=$st $extra"
+  echo "[train] $lab alpha=$al steps=$st lr=$LR $extra"
   $DS --include localhost:2,3 --master_port 29577 \
-    scripts/train_undo.py --alpha "$al" --beta 0.1 --steps "$st" \
+    scripts/train_undo.py --alpha "$al" --beta 0.1 --steps "$st" --lr "$LR" \
     --probe-every 50 --save-every $(( st / 2 )) --batch 1 $extra \
     --out "/data/bijaypandey/mdlm_unlearn/adapters/$lab" \
     > "outputs/log_$lab.txt" 2>&1 || echo "[train] FAILED $lab"
