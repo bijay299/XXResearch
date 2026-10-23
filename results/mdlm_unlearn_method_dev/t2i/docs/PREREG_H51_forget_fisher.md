@@ -87,3 +87,43 @@ unlearning"* (PoPETs 2026) — squarely in the Scissorhands family and unretriev
 2607.21353, *"Gradient Concentration, Not Weight Saliency, Explains Representation-Level Class
 Unlearning"*, which bears directly on whether H51's premise (that a concept has a localisable
 gradient route) holds at all.
+
+---
+
+## 7. ❌ VERDICT: H51 IS FALSE. Concept-targeted damage destroys utility *worse* than uniform damage.
+
+The α=0.3 arm, under the pre-declared fixed budget:
+
+| arm | church | **retain8** | attacks | gate |
+|---|---|---|---|---|
+| forget-Fisher α=0.3 | 0.000 | **0.0917** | 3/3 run at lr 1e-5 | **0/3 pass** (T rise −0.250, +0.000, −0.083) |
+| *retain-Fisher α=0.3, same teacher, same α* | *0.000* | ***0.867*** | — | — |
+
+**Kill rule K2 fires immediately:** retain 0.0917 is far below the 0.60 floor, so this is not a
+candidate regardless of any robustness number — and no robustness number is even obtainable, since
+0 of 3 attacks pass the validity gate with H pinned at 0.000. The model is too broken to attack.
+
+**This confirms the expectation recorded in §3 before the arms were read** ("I expect H51 to fail,
+and specifically to fail in the way every previous arm has: either utility collapses, or utility
+survives and the arm is fully reversed"). It failed by the first route.
+
+### Why it failed, and why that is informative
+
+Concentrating the *same mean damage* on the parameters most important to the erased concept
+destroyed the model **~9× worse** than spreading it away from retain-important parameters
+(retain 0.0917 vs 0.867). The only way that happens is if **the parameters that matter most to the
+concept are largely the same ones that matter most to general generation.** The concept is not
+separably localised in weight space.
+
+That is the weight-space counterpart of the measurement already in `T2I_BASELINES.md` §2: in
+*embedding* space, the cross-attention positions the UNet actually reads are half-collinear across
+concepts (cos 0.52–0.59) while the discriminative content tokens are not (cos 0.13–0.21). The same
+non-separability now shows up in parameter space. Both findings say erasure cannot be made surgical
+in this model, which is the mechanism `PREREG_H40` posits, arrived at from a second direction.
+
+**It also retires the obvious remaining lever.** `FINDING35` §3 diagnosed that resistance appears
+only in damaged arms at low utility, leaving "make the damage selective" as the one untried
+response. Selectivity, implemented as forget-Fisher weighting, makes it strictly worse. UNDO's own
+ablation anticipated this: the noise *distribution* is not where the leverage is.
+
+α=0.5 is finishing for completeness of the ladder; it applies *more* damage and cannot clear K2.
