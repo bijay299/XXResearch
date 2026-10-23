@@ -1,0 +1,26 @@
+{
+ "study": "t2i_adv_erase_reimpl",
+ "label": "adv3_church",
+ "concept": "church",
+ "hparams": {
+  "concept": "church",
+  "mode": "esd_u",
+  "eta": 1.0,
+  "steps": 500,
+  "lr": 1e-05,
+  "adv_steps": 2,
+  "adv_eps": 0.05,
+  "lam_preserve": 0.0,
+  "ddim_steps": 50,
+  "guidance": 3.0,
+  "seed": 0,
+  "log_every": 100,
+  "label": "adv3_church",
+  "out": "adapters/adv3_church"
+ },
+ "erase_first50": 0.0060346978760208005,
+ "erase_last50": 0.0034737332955410236,
+ "pres_last50": 0.0009012589385383762,
+ "minutes": 22.33056884209315,
+ "note": "OUR RE-IMPLEMENTATION in the spirit of Receler 2311.17717 / AdvUnlearn 2405.15234; adversarial embedding neighbourhood, not their exact adapters or text-encoder training. Published numbers not claimed."
+}

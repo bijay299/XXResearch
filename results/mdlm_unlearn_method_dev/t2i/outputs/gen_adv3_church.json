@@ -1,0 +1,80 @@
+{
+ "study": "t2i_gen_eval",
+ "label": "adv3_church",
+ "unet": "adapters/adv3_church/unet.pt",
+ "hparams": {
+  "label": "adv3_church",
+  "unet": "adapters/adv3_church/unet.pt",
+  "n_per_prompt": 5,
+  "steps": 25,
+  "guidance": 7.5,
+  "seed": 0,
+  "concepts": null,
+  "save_grid": false
+ },
+ "per_concept": {
+  "church": {
+   "n": 15,
+   "clip_acc": 0.8,
+   "clip_align": 0.17076822916666667
+  },
+  "parachute": {
+   "n": 15,
+   "clip_acc": 0.9333333333333333,
+   "clip_align": 0.23946940104166667
+  },
+  "garbage_truck": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.24183756510416668
+  },
+  "van_gogh": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2477783203125
+  },
+  "cassette_player": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2681966145833333
+  },
+  "chain_saw": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.26302897135416664
+  },
+  "english_springer": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2865397135416667
+  },
+  "french_horn": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.302099609375
+  },
+  "gas_pump": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2402587890625
+  },
+  "golf_ball": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2552571614583333
+  },
+  "tench": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2822509765625
+  },
+  "monet": {
+   "n": 15,
+   "clip_acc": 0.9333333333333333,
+   "clip_align": 0.25034993489583335
+  }
+ },
+ "forget_mean_acc": 0.9333333333333333,
+ "retain_mean_acc": 0.9916666666666667,
+ "minutes": 1.3736464262008667
+}
