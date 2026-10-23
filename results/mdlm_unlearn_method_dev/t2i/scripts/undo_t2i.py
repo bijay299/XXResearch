@@ -45,6 +45,8 @@ FORGET_POOL = {
     # added for H53's within-kind control; the tench leg's composite failed because this pool
     # had no entry for it, so argparse rejected --concept tench and no checkpoint was written
     "tench": ["a tench", "a photo of a tench", "a tench fish"],
+    "garbage_truck": ["a garbage truck", "a photo of a garbage truck",
+                      "a garbage truck on a street"],
 }
 RETAIN_POOL = [
     # The 8 measured retain concepts
@@ -142,7 +144,7 @@ def main():
     # only ever mattered for `tench`, which is both an H53 forget target and a standing retain
     # neighbour -- caught when the tench arm was added.
     _kw = {"church": "church", "parachute": "parachute", "van_gogh": "van gogh",
-           "tench": "tench"}[a.concept]
+           "tench": "tench", "garbage_truck": "garbage truck"}[a.concept]
     rp = [q for q in RETAIN_POOL if _kw not in q.lower()]
     if len(rp) != len(RETAIN_POOL):
         print(f"[undo] dropped {len(RETAIN_POOL)-len(rp)} retain prompt(s) naming "

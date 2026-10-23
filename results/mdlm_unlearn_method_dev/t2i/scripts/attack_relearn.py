@@ -55,6 +55,13 @@ SPLIT = {
     # erased concept. If a damaged arm relearns tench as fast as its teacher does, its
     # resistance on `church` is FACT-SPECIFIC. If it is uniformly slower, the apparent
     # robustness is general trainability loss and every robustness number here is inflated.
+    "garbage_truck": {
+        "T": ["a garbage truck", "a green garbage truck", "a garbage truck collecting bins",
+              "a garbage truck in an alley", "a municipal garbage truck", "a white garbage truck",
+              "a garbage truck seen from behind", "an old garbage truck"],
+        "H": ["a photo of a garbage truck", "a garbage truck on a street",
+              "a photograph of a garbage truck"],
+    },
     "tench": {
         "T": ["a tench", "a tench held by an angler", "a large tench fish",
               "a tench in murky water", "a freshwater tench", "a tench on a riverbank",
