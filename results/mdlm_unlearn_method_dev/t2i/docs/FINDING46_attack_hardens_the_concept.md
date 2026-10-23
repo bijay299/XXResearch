@@ -1,5 +1,14 @@
 # Finding 46 — the attack does not merely restore the concept; it writes it in **more robustly than pretraining did**
 
+> ⚠ **GENERAL CLAIM WITHDRAWN — see `FINDING47`.** This finding generalised from a SINGLE
+> attacked arm. Two further arm families, attacked and swept identically, do not reproduce it:
+> the damage+distil arm is **worse than base** (church random-25 %: 0.000 vs base 0.333) and
+> the official AdvUnlearn arm matches base at random-50 % and magnitude-10 %. The cross-arm
+> comparison is additionally confounded by unmatched overall fragility. §2–3's claims that the
+> attack entrenches the concept, and that "an adversary does not merely restore, they
+> entrench", are **withdrawn**; what stands is listed in `FINDING47` §3. The title above is
+> left as published.
+
 **Date:** 2026-10-23 · **Cost:** ~1.5 GPU-h, all from already-attacked checkpoints
 **Evidence:** `outputs/redundancy_{base,attacked}_{church,parachute}.json`,
 `outputs/frp_refill_*.json`, `outputs/rezero_*.json`, `outputs/rezeroctl_church_r3.json`

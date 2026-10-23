@@ -1,0 +1,75 @@
+{
+ "study": "redundancy_sweep",
+ "arm": "frp_church_r3_l05",
+ "attacked": "adapters/frp_church_r3_l05/unet.pt",
+ "concept": "church",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 0.2,
+   "retain8": 0.9166666666666666,
+   "utility": 0.9090909090909091
+  },
+  {
+   "mode": "random",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 0.13333333333333333,
+   "retain8": 0.6416666666666667,
+   "utility": 0.6727272727272727
+  },
+  {
+   "mode": "random",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.0,
+   "retain8": 0.13333333333333333,
+   "utility": 0.16363636363636364
+  },
+  {
+   "mode": "random",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.0,
+   "retain8": 0.03333333333333333,
+   "utility": 0.09696969696969697
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 0.13333333333333333,
+   "retain8": 0.22499999999999998,
+   "utility": 0.3151515151515151
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 0.0,
+   "retain8": 0.025,
+   "utility": 0.09696969696969697
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.0,
+   "retain8": 0.016666666666666666,
+   "utility": 0.08484848484848484
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.0,
+   "retain8": 0.008333333333333333,
+   "utility": 0.07878787878787878
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is.",
+ "state": "erased",
+ "provenance_note": "ERASED-but-UNATTACKED state. This file was originally written as redundancy_<concept>.json because run_redun_erased.sh launched before --state was added to redundancy_sweep.py. Identified unambiguously by its `attacked` field pointing at the arm's OWN checkpoint (adapters/frp_church_r3_l05/unet.pt), i.e. no attack was applied. Renamed, not recomputed."
+}

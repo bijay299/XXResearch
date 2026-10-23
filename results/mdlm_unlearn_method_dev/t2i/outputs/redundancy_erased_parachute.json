@@ -1,0 +1,75 @@
+{
+ "study": "redundancy_sweep",
+ "arm": "frp_parachute_r5_l05",
+ "attacked": "adapters/frp_parachute_r5_l05/unet.pt",
+ "concept": "parachute",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 0.3333333333333333,
+   "retain8": 0.6083333333333334,
+   "utility": 0.6181818181818183
+  },
+  {
+   "mode": "random",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 0.3333333333333333,
+   "retain8": 0.20833333333333331,
+   "utility": 0.2545454545454546
+  },
+  {
+   "mode": "random",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.4,
+   "retain8": 0.058333333333333334,
+   "utility": 0.09090909090909091
+  },
+  {
+   "mode": "random",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.2,
+   "retain8": 0.04166666666666667,
+   "utility": 0.10303030303030303
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 0.6,
+   "retain8": 0.09166666666666666,
+   "utility": 0.13333333333333333
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 0.4,
+   "retain8": 0.041666666666666664,
+   "utility": 0.0787878787878788
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.2,
+   "retain8": 0.016666666666666666,
+   "utility": 0.07878787878787878
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.13333333333333333,
+   "retain8": 0.016666666666666666,
+   "utility": 0.07878787878787878
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is.",
+ "state": "erased",
+ "provenance_note": "ERASED-but-UNATTACKED state. This file was originally written as redundancy_<concept>.json because run_redun_erased.sh launched before --state was added to redundancy_sweep.py. Identified unambiguously by its `attacked` field pointing at the arm's OWN checkpoint (adapters/frp_parachute_r5_l05/unet.pt), i.e. no attack was applied. Renamed, not recomputed."
+}
