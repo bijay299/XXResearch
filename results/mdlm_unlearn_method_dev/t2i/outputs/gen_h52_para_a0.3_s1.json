@@ -1,0 +1,82 @@
+{
+ "study": "t2i_gen_eval",
+ "label": "h52_para_a0.3_s1",
+ "unet": "adapters/h52_para_a0.3_s1/unet.pt",
+ "text_encoder": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee/parachute_unlearned",
+ "hparams": {
+  "label": "h52_para_a0.3_s1",
+  "unet": "adapters/h52_para_a0.3_s1/unet.pt",
+  "text_encoder": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee/parachute_unlearned",
+  "n_per_prompt": 5,
+  "steps": 25,
+  "guidance": 7.5,
+  "seed": 0,
+  "concepts": null,
+  "save_grid": false
+ },
+ "per_concept": {
+  "church": {
+   "n": 15,
+   "clip_acc": 0.8,
+   "clip_align": 0.19628092447916667
+  },
+  "parachute": {
+   "n": 15,
+   "clip_acc": 0.26666666666666666,
+   "clip_align": 0.17308756510416667
+  },
+  "garbage_truck": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.19939778645833334
+  },
+  "van_gogh": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.23772786458333334
+  },
+  "cassette_player": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.24256998697916668
+  },
+  "chain_saw": {
+   "n": 15,
+   "clip_acc": 0.8666666666666667,
+   "clip_align": 0.2081787109375
+  },
+  "english_springer": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.26588541666666665
+  },
+  "french_horn": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.279736328125
+  },
+  "gas_pump": {
+   "n": 15,
+   "clip_acc": 0.9333333333333333,
+   "clip_align": 0.24252115885416667
+  },
+  "golf_ball": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.25469563802083334
+  },
+  "tench": {
+   "n": 15,
+   "clip_acc": 0.9333333333333333,
+   "clip_align": 0.2160400390625
+  },
+  "monet": {
+   "n": 15,
+   "clip_acc": 0.6,
+   "clip_align": 0.2214599609375
+  }
+ },
+ "forget_mean_acc": 0.7666666666666666,
+ "retain_mean_acc": 0.9166666666666667,
+ "minutes": 1.3610660672187804
+}
