@@ -37,6 +37,7 @@ that are individually publishable and could be mistaken for the headline:
 | **Two walls** (§4) — anchor constructions and activation targets are both closed, by argument plus measurement | the result most worth keeping; predicts failures rather than reporting them |
 | **A backbone with an EXACT retrain oracle** (§9) — forget authors absent from pretraining, oracle at chance | the asset every prior evaluation in this project lacked |
 | **The suppression–removal gap, measured against ground truth** (§9) | behavioural metrics are satisfied while knowledge remains; the field reports only behavioural metrics |
+| ⚠ **"Only an attack measures robustness"** (§10.1, `FINDING31`) | **downgraded 2026-10-23** to *quantification of a published observation*. arXiv 2608.25429's Table 15 already shows the static-metric/recovery inversion against a retain-trained gold model; MUSE 2407.06460 already names below-oracle "over-unlearning"; Łucki et al. 2409.18025 already publishes the mechanism; Carlini et al. 1902.06705 §4.14 already states the attack-validity principle. See `FINDING31` §8. Generality is also **contested** — 2406.13356 reports the opposite direction. |
 | **No anchor method survives a validated relearning attack** (§9) | uniform negative across MDU, EMDU, AFC, MDU+FAM, gradient ascent |
 | **UNDO's mechanism confirmed on an MDLM, with its own α=0 control** (§9) | the method is theirs; the MDLM test and the control are ours |
 | **The attack-validity gate** (§5) | a protocol requirement, special case of a known principle |

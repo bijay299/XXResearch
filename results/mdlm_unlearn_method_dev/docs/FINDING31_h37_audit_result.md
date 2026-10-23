@@ -153,3 +153,73 @@ distillation contributes *nothing* does not, and is corrected here.
   harder to fine-tune in general, part of the band separation is optimisation difficulty rather
   than durable erasure. That experiment was specified and not run before the domain pivot, and it
   is the single most important open item against this result.
+
+---
+
+## 8. ⚠ Novelty position (added 2026-10-23, after a primary-source check): QUANTIFICATION, not discovery
+
+This finding was published without a novelty check — an omission, since it is the strongest result
+either phase produced. The check has now run and the verdict is **PARTIAL, leaning
+ANTICIPATED-in-substance.** Each of its three parts is anticipated:
+
+**(A) The inversion itself is published, with numbers.** *"Distance Is Not Enough: Forget-Retain
+Alignment Gap Predicts LLM Relearning Robustness"* (arXiv **2608.25429**), Table 15, on TOFU
+forget10 against a **retain-trained gold model**:
+
+| method | pre-attack extraction strength (lower = "better" forgetting) | recovery ΔES |
+|---|---|---|
+| Retain (gold) | 0.060 | +0.008 |
+| RMU | **0.056** | **+0.644** |
+| GradDiff | 0.082 | +0.430 |
+| NPO | 0.096 | +0.300 |
+| SP | 0.131 | +0.144 |
+| FRP | 0.062 | +0.059 |
+
+Across the four baselines the ordering is **perfectly monotone and inverted** — and they state it
+in words: *"RMU forgets deeper still (0.056 vs. 0.062) and yet recovers an order of magnitude
+more."* They never compute a correlation, never report a separation statistic, and present it as a
+**confound control** rather than a principle. So the phenomenon with numbers exists; the statistic
+and the claim do not.
+
+**(B) "Below the oracle is a pathology" is firmly established.** MUSE (**2407.06460**) names
+**over-unlearning** and reports our exact pattern — *"often reducing VerbMem and KnowMem even beyond
+the levels achieved by the retrained model … some methods, such as GA and NPO, achieve a score of
+0"* — treating it as a failure mode. TOFU (**2401.06121**) makes the oracle two-sided by
+construction (a KS test against the retain model, so overshooting is already penalised). What is
+*not* established as a stated principle is below-oracle predicting **worse robustness**; that
+appears only in 2608.25429's Table 15, as a one-paragraph confound control. **§4's mechanism is
+also published:** Łucki et al. (**2409.18025**) — *"unlearning is … mediated by specific
+directions"*, with ablation recovering RMU **above** the un-unlearned baseline — and *"Erase or
+Hide?"* (**2509.22263**) on "spurious unlearning neurons" that suppress intact knowledge.
+
+**(C) The validity gate is an instance of a 2019 principle.** Carlini et al. (**1902.06705**) §4.14:
+*"it is unfortunately easy to design an attack that will never be effective … it is important to
+validate that it is indeed effective."* Our specific operationalisation — the attack must rise on
+its **own training split** before a flat held-out curve counts — was not found published, and
+Deeb & Roger (**2410.08827**) state the *complementary* negative control on the same T/V structure
+rather than this positive one. `NOVELTY_attack_validity_gate.md` already positioned the gate as a
+special case of a known principle; that was right.
+
+### The honest framing
+
+> **Quantification and systematisation of a published observation, not a discovery.** The defensible
+> statement is: *we measure, over a 16-arm sweep against an exact retrain oracle, the inversion that
+> 2608.25429 observed across five checkpoints as a confound control* — adding the separation
+> statistics (attack AUC 1.000 vs probe AUC 0.844 inverted, ρ = −0.500), the oracle-floor diagnostic
+> as an explicit principle, and the validated attack protocol.
+
+### And the generality is contested
+
+**arXiv 2406.13356 reports the opposite direction**: *"as we start to unlearn further from the
+original model, it becomes harder to reconstruct keywords through relearning."* Our inversion is
+therefore not a settled regularity, and §7's scope limits (one backbone, one corpus, one attack
+family, 16 arms, seed 0) should be read against that disagreement rather than as mere caution.
+
+### Verification debt
+
+The check ran **without web search** (budget exhausted) and **without a forward citation sweep**
+(Semantic Scholar rate-limited). The reviewer flagged that sweep as the single search most likely to
+flip part (B) from PARTIAL to ANTICIPATED, and it has not been run. Non-arXiv venues (OpenReview,
+ACL, PMLR, IEEE S&P) are unchecked. Also noted: MUSE's related-work attribution of the oracle idea
+to Lynch et al. (2402.16835) **does not check out** in that paper's full text, so it should not be
+cited on MUSE's word.
