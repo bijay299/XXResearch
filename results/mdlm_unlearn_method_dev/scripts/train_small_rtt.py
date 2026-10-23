@@ -166,6 +166,11 @@ def main():
              "T_rise":round(tT-t0_T,4),"valid":bool(tT-t0_T >= 0.20),
              "meaning":"the attack must relearn the facts it is TRAINED ON; if T does not "
                        "recover, a flat curve on H is not evidence of robustness"},
+         "trainability": {"frozen_probe_before": fit_before,
+                          "frozen_probe_after": fit_after,
+                          "fit_drop": fit_before - fit_after,
+                          "frac_loss_removed": (fit_before - fit_after) / max(fit_before, 1e-9),
+                          "meaning": "fraction of the loss on the attacker's OWN data that the attacker could remove, on a frozen fixed-mask probe. Near-total removal means the arm is fully trainable, so a flat held-out curve IS evidence of fact-specific robustness (FINDING33); poor removal means the arm is merely hard to fit (FINDING32)."},
          "recovery":{"H_before":round(t0_H,4),"H_after":round(tH,4),
              "absolute_rise":round(tH-t0_H,4),
              "fraction_of_ref_recovered":round((tH-t0_H)/max(REF_F-t0_H,1e-9),4),

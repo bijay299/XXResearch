@@ -119,10 +119,18 @@ modality and erasure method, that signature **is** trainability loss, scaling sm
 That **raises the prior** that the MDLM band separation is partly the same artifact. It does not
 settle it: the MDLM arms were repaired for 3,000–12,000 steps on ~1,400 prompts and retained
 0.63–0.71 utility, so they were *not* broken models the way α=0.5 here is — and the mechanism may
-genuinely differ at 124M with adequate repair. **The MDLM trainability control (fit-speed on
-retain facts, across the α ladder) remains unrun, and until it runs, `FINDING31`'s separation
-should be read as "damage+distil arms resist this attack" and not as "damage+distil removes
-knowledge."** I am recording that qualification against my own strongest result.
+genuinely differ at 124M with adequate repair.
+
+**⚠ RESOLVED — see `FINDING33`.** The MDLM control has now been run and it **clears** `FINDING31`.
+On the MDLM backbone the attacker removes **93.6–98.9%** of its available loss on every arm and
+every attack passes the gate, while held-out recovery still collapses +0.5608 → +0.0000. A
+5-point fit difference cannot explain that, so there the robustness **is** fact-specific. The
+qualification I recorded against my own strongest result is lifted; the T2I findings in this
+document are unaffected.
+
+The two phases disagree because of **repair capacity**: MDLM repair restored utility to 0.63–0.71
+and the arms stayed trainable, while T2I repair left retain at 0.09–0.32 and the arms became hard
+to fit. `FINDING33` §3 sets that out as a testable prediction rather than a story.
 
 ## 6. Scope and limits
 

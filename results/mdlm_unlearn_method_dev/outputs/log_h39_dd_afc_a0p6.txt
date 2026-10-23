@@ -1,0 +1,31 @@
+[data] general 200,375,617 tok | fact rows 6800 (forget included, retain x3)
+/data/bijaypandey/mdlm_unlearn/scripts/train_small_undo.py:85: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(a.teacher, map_location="cpu"); cfg = sd.get("cfg", {})
+[protect] retain_fisher over 24 batches, mean importance 0.1394
+[damage] alpha=0.6 beta=0.1 over 100 tensors; mean |d||p||/||p|| = 0.5896
+/data/bijaypandey/mdlm_unlearn/scripts/train_small_undo.py:200: DeprecationWarning: In future, it will be an error for 'np.bool_' scalars to be interpreted as an index
+  torch.tensor(fflag, dtype=torch.bool, device=dev))
+[undo a=0.6] step     0 frozen_KL=2.73879 (step=3.49468) 0.121s/step
+[undo a=0.6] step  2999 frozen_KL=0.31474 (step=0.21346) 0.043s/step
+[ckpt] adapters/h39_dd_afc_a0p6/model.pt (0.46 GiB)
+[done] in 2.2 min
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+[rtt] T=50 authors / 200 probes | H=50 authors / 200 probes, author-disjoint
+/data/bijaypandey/mdlm_unlearn/scripts/train_small_rtt.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(a.arm, map_location="cpu"); cfg = sd.get("cfg", {})
+[rtt] attacker training rows: 850 of 1700
+[rtt] before: T=0.1400 H=0.1600
+[rtt] frozen trainability probe before attack: 1.33765
+[rtt] frozen trainability probe after attack: 0.10450 (drop +1.23314)
+[rtt] after: T=0.6150 (rise +0.4750, valid=True) H=0.1600 (rise +0.0000)
+/data/bijaypandey/llada_smoke/venv_llada/lib/python3.10/site-packages/transformers/utils/hub.py:106: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+[rtt] T=50 authors / 200 probes | H=50 authors / 200 probes, author-disjoint
+/data/bijaypandey/mdlm_unlearn/scripts/train_small_rtt.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(a.arm, map_location="cpu"); cfg = sd.get("cfg", {})
+[rtt] attacker training rows: 850 of 1700
+[rtt] before: T=0.1400 H=0.1600
+[rtt] frozen trainability probe before attack: 1.33765
+[rtt] frozen trainability probe after attack: 0.06651 (drop +1.27114)
+[rtt] after: T=0.8300 (rise +0.6900, valid=True) H=0.1300 (rise -0.0300)
