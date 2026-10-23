@@ -36,7 +36,12 @@ for mode in a.modes.split(","):
             idx=(torch.randperm(w.numel(),generator=g)[:kk] if mode=="random"
                  else w.abs().topk(kk).indices)
             w[idx]=0; out[k]=w.reshape(post[k].shape); n+=kk
-        lab=f"REDUN_{a.concept}_{mode}_{int(fr*100)}"
+        # STATE MUST BE IN THE LABEL. Without it, two concurrent same-concept sweeps collide
+        # on BOTH adapters/_redun_<lab>/unet.pt AND outputs/gen_<lab>.json: each overwrites
+        # the other's checkpoint and both then read whichever finished last, returning
+        # bit-identical rows for different models. That is exactly what happened to the
+        # FINDING47 cross-arm runs and the FRP seed replication.
+        lab=f"REDUN_{a.state}_{a.concept}_{mode}_{int(fr*100)}"
         d=f"{ADAPT}/_redun_{lab}"; os.makedirs(d,exist_ok=True)
         torch.save({k:v.half() for k,v in out.items()}, f"{d}/unet.pt")
         subprocess.run([VENV,"scripts/gen_eval.py","--label",lab,"--unet",f"{d}/unet.pt",

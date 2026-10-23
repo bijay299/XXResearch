@@ -7,6 +7,26 @@ generalisation does not.
 
 ---
 
+> 🛑 **§1's CROSS-ARM TABLE IS ON HOLD — MEASUREMENT CONTAMINATED BY A BUG IN MY SWEEP SCRIPT.**
+> `redundancy_sweep.py` built its per-rung label from **concept + mode + fraction only, omitting the
+> state**. The h68rf and AdvUnlearn legs ran **concurrently on the same concept**, so they collided
+> on both `adapters/_redun_<label>/unet.pt` and `outputs/gen_<label>.json`: each overwrote the
+> other's checkpoint and both then read whichever finished last. The bug was exposed when an
+> unrelated FRP seed-replication returned **bit-identical rows for two different attacked models**.
+>
+> The numbers in §1 for `attacked — damage+distil` and `attacked — official AdvUnlearn` must not be
+> cited until re-measured. Re-runs with distinct state-keyed labels are in flight; the contaminated
+> files are preserved under `outputs/CONTAMINATED_label_collision/`.
+>
+> **What is NOT affected:** `FINDING46`'s base / erased / attacked three-state table. Those legs ran
+> one concept per GPU, so their labels differed and no collision was possible.
+>
+> **What this does to the correction itself:** `FINDING46`'s general entrenchment claim stays
+> **withdrawn** regardless — it was a single-arm generalisation and §2's fragility confound is
+> computed from `retain8` values that are unaffected by the collision. But the specific evidence
+> that two other families *fail* to entrench is now unverified, so the correction currently rests on
+> the single-arm argument alone.
+
 ## 1. What FINDING46 claimed, and what it should have claimed
 
 `FINDING46` stated, as a general property of the attack:
