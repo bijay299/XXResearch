@@ -13,19 +13,137 @@
    "k2_floor": 0.6,
    "k2_pass": false,
    "frozen_grid": {
-    "n_attacks": 0,
+    "n_attacks": 6,
     "n_valid": 0,
     "max_over_valid_H": null,
-    "max_ungated_H": null
+    "max_ungated_H": 0.2
    },
    "all_nine": {
-    "n_attacks": 0,
+    "n_attacks": 9,
     "n_valid": 0,
     "max_over_valid_H": null,
-    "max_ungated_H": null
+    "max_ungated_H": 0.3333333333333333
    },
-   "declared_band": null,
-   "attacks": []
+   "declared_band": "retain 0.0000 < 0.6 AND no attack passes the validity gate (0 of 9) -> NOT A CANDIDATE per K2, and no robustness number is even obtainable: the model is too broken to attack. Same outcome as H51.",
+   "attacks": [
+    {
+     "file": "atk_H64v2_frozen_church_sd0_lr1e-4.json",
+     "tag": "frozen",
+     "seed": "0",
+     "lr": "1e-4",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.0,
+     "H_after": 0.13333333333333333,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0,
+     "pau_adherence_delta": 0.004342397054036468
+    },
+    {
+     "file": "atk_H64v2_frozen_church_sd0_lr1e-5.json",
+     "tag": "frozen",
+     "seed": "0",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.0,
+     "H_after": 0.2,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0625,
+     "pau_adherence_delta": 0.006626129150390625
+    },
+    {
+     "file": "atk_H64v2_frozen_church_sd0_lr5e-5.json",
+     "tag": "frozen",
+     "seed": "0",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.16666666666666666,
+     "H_after": 0.13333333333333333,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0,
+     "pau_adherence_delta": -0.007137298583984375
+    },
+    {
+     "file": "atk_H64v2_frozen_church_sd1_lr1e-5.json",
+     "tag": "frozen",
+     "seed": "1",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.041666666666666664,
+     "H_after": 0.0,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0625,
+     "pau_adherence_delta": 0.01165771484375
+    },
+    {
+     "file": "atk_H64v2_frozen_church_sd1_lr5e-5.json",
+     "tag": "frozen",
+     "seed": "1",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.08333333333333333,
+     "H_after": 0.06666666666666667,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0,
+     "pau_adherence_delta": 0.008029937744140625
+    },
+    {
+     "file": "atk_H64v2_frozen_church_sd6_lr1e-5.json",
+     "tag": "frozen",
+     "seed": "6",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.0,
+     "H_after": 0.0,
+     "H_before": 0.0,
+     "pau_retained_after": 0.041666666666666664,
+     "pau_adherence_delta": 0.00373077392578125
+    },
+    {
+     "file": "atk_H64v2_k1ext_church_sd2_lr1e-5.json",
+     "tag": "k1ext",
+     "seed": "2",
+     "lr": "1e-5",
+     "in_frozen_grid": false,
+     "valid": false,
+     "T_rise": 0.125,
+     "H_after": 0.3333333333333333,
+     "H_before": 0.0,
+     "pau_retained_after": 0.08333333333333333,
+     "pau_adherence_delta": 0.009337107340494782
+    },
+    {
+     "file": "atk_H64v2_k1ext_church_sd3_lr1e-5.json",
+     "tag": "k1ext",
+     "seed": "3",
+     "lr": "1e-5",
+     "in_frozen_grid": false,
+     "valid": false,
+     "T_rise": 0.0,
+     "H_after": 0.0,
+     "H_before": 0.0,
+     "pau_retained_after": 0.020833333333333332,
+     "pau_adherence_delta": 0.008853912353515625
+    },
+    {
+     "file": "atk_H64v2_k1ext_church_sd6_lr5e-5.json",
+     "tag": "k1ext",
+     "seed": "6",
+     "lr": "5e-5",
+     "in_frozen_grid": false,
+     "valid": false,
+     "T_rise": 0.0,
+     "H_after": 0.0,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0,
+     "pau_adherence_delta": 0.012447357177734375
+    }
+   ]
   },
   "parachute": {
    "arm": "h64v2_frag_a0.3_parachute",
@@ -37,29 +155,144 @@
    "k2_floor": 0.6,
    "k2_pass": false,
    "frozen_grid": {
-    "n_attacks": 0,
-    "n_valid": 0,
-    "max_over_valid_H": null,
-    "max_ungated_H": null
+    "n_attacks": 6,
+    "n_valid": 5,
+    "max_over_valid_H": 0.3333333333333333,
+    "max_ungated_H": 0.3333333333333333
    },
    "all_nine": {
-    "n_attacks": 0,
-    "n_valid": 0,
-    "max_over_valid_H": null,
-    "max_ungated_H": null
+    "n_attacks": 9,
+    "n_valid": 7,
+    "max_over_valid_H": 0.7333333333333333,
+    "max_ungated_H": 0.7333333333333333
    },
-   "declared_band": null,
-   "attacks": []
+   "declared_band": "retain < 0.60 -> inherits forget_fisher's collapse; NOT A CANDIDATE per K2 regardless of the robustness number",
+   "attacks": [
+    {
+     "file": "atk_H64v2_frozen_parachute_sd0_lr1e-4.json",
+     "tag": "frozen",
+     "seed": "0",
+     "lr": "1e-4",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.20833333333333334,
+     "H_after": 0.06666666666666667,
+     "H_before": 0.06666666666666667,
+     "pau_retained_after": 0.020833333333333332,
+     "pau_adherence_delta": -0.016469319661458315
+    },
+    {
+     "file": "atk_H64v2_frozen_parachute_sd0_lr1e-5.json",
+     "tag": "frozen",
+     "seed": "0",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.5833333333333334,
+     "H_after": 0.3333333333333333,
+     "H_before": 0.06666666666666667,
+     "pau_retained_after": 0.125,
+     "pau_adherence_delta": 0.0025456746419270926
+    },
+    {
+     "file": "atk_H64v2_frozen_parachute_sd0_lr5e-5.json",
+     "tag": "frozen",
+     "seed": "0",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.20833333333333334,
+     "H_after": 0.0,
+     "H_before": 0.06666666666666667,
+     "pau_retained_after": 0.0,
+     "pau_adherence_delta": -0.005236307779947907
+    },
+    {
+     "file": "atk_H64v2_frozen_parachute_sd1_lr1e-5.json",
+     "tag": "frozen",
+     "seed": "1",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.5,
+     "H_after": 0.2,
+     "H_before": 0.0,
+     "pau_retained_after": 0.125,
+     "pau_adherence_delta": 0.0033594767252604074
+    },
+    {
+     "file": "atk_H64v2_frozen_parachute_sd1_lr5e-5.json",
+     "tag": "frozen",
+     "seed": "1",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.08333333333333333,
+     "H_after": 0.26666666666666666,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0,
+     "pau_adherence_delta": -0.00945281982421875
+    },
+    {
+     "file": "atk_H64v2_frozen_parachute_sd6_lr1e-5.json",
+     "tag": "frozen",
+     "seed": "6",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.2916666666666667,
+     "H_after": 0.06666666666666667,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0625,
+     "pau_adherence_delta": 0.01022211710611981
+    },
+    {
+     "file": "atk_H64v2_k1ext_parachute_sd2_lr1e-5.json",
+     "tag": "k1ext",
+     "seed": "2",
+     "lr": "1e-5",
+     "in_frozen_grid": false,
+     "valid": true,
+     "T_rise": 0.4583333333333333,
+     "H_after": 0.6666666666666666,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0625,
+     "pau_adherence_delta": 0.0003382364908854074
+    },
+    {
+     "file": "atk_H64v2_k1ext_parachute_sd3_lr1e-5.json",
+     "tag": "k1ext",
+     "seed": "3",
+     "lr": "1e-5",
+     "in_frozen_grid": false,
+     "valid": true,
+     "T_rise": 0.4583333333333333,
+     "H_after": 0.7333333333333333,
+     "H_before": 0.0,
+     "pau_retained_after": 0.08333333333333333,
+     "pau_adherence_delta": 0.008989969889322907
+    },
+    {
+     "file": "atk_H64v2_k1ext_parachute_sd6_lr5e-5.json",
+     "tag": "k1ext",
+     "seed": "6",
+     "lr": "5e-5",
+     "in_frozen_grid": false,
+     "valid": false,
+     "T_rise": 0.16666666666666666,
+     "H_after": 0.2,
+     "H_before": 0.0,
+     "pau_retained_after": 0.0625,
+     "pau_adherence_delta": 0.005063374837239593
+    }
+   ]
   }
  },
  "verdict": {
-  "status": "INCOMPLETE",
-  "incomplete_concepts": [
-   "church",
-   "parachute"
-  ],
-  "k3_both_concepts_positive": null,
-  "statement": "INCOMPLETE -- ['church', 'parachute'] still missing a utility number or the full frozen grid. NO VERDICT. This is not a negative result; it is an unfinished measurement.",
+  "status": "COMPLETE",
+  "incomplete_concepts": [],
+  "k3_both_concepts_positive": false,
+  "statement": "H64 does NOT meet its declared bar on both concepts. Per PREREG_H64 S3 this is reported as the declared outcome it matches, not reframed.",
   "comparability_warning": "built on pools recipe v2; NOT comparable to the v1 retain_fisher or forget_fisher arms that motivated it (FINDING38 S2-3). A matched v2 rebuild would be needed for that comparison and has not been run."
  }
 }

@@ -71,8 +71,18 @@ def main():
         ung_all, _ = mx(atks, only_valid=False)
         retain = (util or {}).get("retain8")
         band = None
-        if retain is not None and mv_all is not None:
-            if retain < K2_FLOOR:
+        if retain is not None:
+            # an arm with ZERO gate-passing attacks still gets a band: K2 turns on utility alone,
+            # and "no valid attack exists" is itself the recorded observation (as in H51).
+            if mv_all is None and retain < K2_FLOOR:
+                band = (f"retain {retain:.4f} < {K2_FLOOR} AND no attack passes the validity gate "
+                        f"(0 of {len(atks)}) -> NOT A CANDIDATE per K2, and no robustness number is "
+                        f"even obtainable: the model is too broken to attack. Same outcome as H51.")
+            elif mv_all is None:
+                band = (f"retain {retain:.4f} passes K2 but 0 of {len(atks)} attacks pass the "
+                        f"validity gate, so no robustness number is obtainable. A gate failure is "
+                        f"NOT evidence of robustness (FINDING20).")
+            elif retain < K2_FLOOR:
                 band = ("retain < 0.60 -> inherits forget_fisher's collapse; NOT A CANDIDATE per "
                         "K2 regardless of the robustness number")
             elif retain >= BAR_RETAIN and mv_all <= BAR_H:

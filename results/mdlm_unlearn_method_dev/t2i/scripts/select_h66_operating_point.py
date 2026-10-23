@@ -28,23 +28,31 @@ def main():
     for f in sorted(glob.glob(f"{OUT}/gen_frp_{a.concept}_r*_l05.json")):
         r = json.load(open(f))
         m = r.get("active_target_metrics") or {}
-        mm = re.search(r"_r(\d+)_l05", os.path.basename(f))
-        if not mm or not m:
+        if not m:
             continue
-        rows.append({"rho_pct": int(mm.group(1)), "arm": r["label"],
+        # rho is read from the BUILD RECORD, never parsed out of the label. `bc` is not installed
+        # on this host, so the runner's label tag silently rendered every rho as "r0"; the build
+        # JSON always carried the true --rho. Provenance beats cosmetics.
+        bf = f"{OUT}/frp_{r['label']}.json"
+        if not os.path.exists(bf):
+            print(f"  [skip] {r['label']}: no build record {os.path.basename(bf)}")
+            continue
+        rho = json.load(open(bf))["hparams"]["rho"]
+        rows.append({"rho_pct": round(rho * 100, 4), "arm": r["label"],
                      "target_suppression": m["target_suppression_acc"],
                      "utility_all_nontarget": m["utility_all_nontarget"],
                      "legacy_retain8": m["legacy_retain8"]})
     rows.sort(key=lambda x: x["rho_pct"])
 
     print(f"=== H66 stage-1 ladder, {a.concept} (lambda = 0.05 primary) ===")
-    print(f"{'rho%':>5s} {'target':>8s} {'utility':>8s} {'retain8':>8s}   rule: target <= {THRESHOLD}")
+    print(f"{'rho%':>6s} {'target':>8s} {'utility':>8s} {'retain8':>8s}   rule: target <= {THRESHOLD}")
     for x in rows:
         ok = "<-- qualifies" if x["target_suppression"] <= THRESHOLD else ""
-        print(f"{x['rho_pct']:5d} {x['target_suppression']:8.4f} "
+        print(f"{x['rho_pct']:6.2f} {x['target_suppression']:8.4f} "
               f"{x['utility_all_nontarget']:8.4f} {x['legacy_retain8']:8.4f}   {ok}")
 
-    missing = [p for p in LADDER if p not in [x["rho_pct"] for x in rows]]
+    have = {round(x["rho_pct"], 2) for x in rows}
+    missing = [p for p in LADDER if round(float(p), 2) not in have]
     qual = [x for x in rows if x["target_suppression"] <= THRESHOLD]
     sel = qual[0] if qual else None
 

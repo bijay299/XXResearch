@@ -20,7 +20,10 @@ LOG=logs/h66_frp_${CONCEPT}_${STAGE}.log
 if [ "$STAGE" = "stage1" ]; then
   # rho ladder at the pre-declared primary lambda
   for RHO in 0.01 0.03 0.05 0.10 0.20; do
-    TAG=$(printf "r%g" "$(echo "$RHO*100" | bc -l)" | tr -d '.')
+    # `bc` is NOT installed on this host: the original substitution returned empty, printf %g
+    # rendered it as 0, and EVERY rho was tagged r0 -- so the whole ladder would have
+    # overwritten itself into a single arm. awk is used instead.
+    TAG=$(awk -v r="$RHO" 'BEGIN{printf "r%g", r*100}' | tr -d '.')
     ARM="frp_${CONCEPT}_${TAG}_l05"
     if [ ! -f "adapters/$ARM/unet.pt" ]; then
       echo "=== BUILD $ARM $(date -Is)" >>$LOG
