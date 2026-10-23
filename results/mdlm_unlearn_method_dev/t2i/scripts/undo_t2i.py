@@ -70,7 +70,7 @@ RETAIN_POOL = [
 ]
 
 
-def build(dtype, unet_path=None, dev="cuda"):
+def build(dtype, unet_path=None, dev="cuda", te_path=None):
     from diffusers import StableDiffusionPipeline
     pin = dict(l.split("=", 1) for l in open(PIN).read().split("\n") if "=" in l)
     p = StableDiffusionPipeline.from_pretrained(
@@ -79,13 +79,25 @@ def build(dtype, unet_path=None, dev="cuda"):
     if unet_path:
         sd = torch.load(unet_path, map_location="cpu")
         p.unet.load_state_dict({k: v.to(dtype) for k, v in sd.get("unet", sd).items()})
+    if te_path:
+        from transformers import CLIPTextModel
+        p.text_encoder = CLIPTextModel.from_pretrained(te_path, torch_dtype=dtype)
     p.set_progress_bar_config(disable=True)
     return p.to(dev)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--teacher", required=True, help="the ERASED unet to robustify")
+    ap.add_argument("--teacher", default=None, help="the ERASED unet to robustify (optional if "
+                    "--teacher-te supplies the erasure instead)")
+    ap.add_argument("--teacher-te", default=None,
+                    help="a replacement CLIPTextModel carrying the erasure -- e.g. the official "
+                         "AdvUnlearn church encoder, which erases in the TEXT ENCODER rather than "
+                         "the UNet. Used for the teacher AND kept on the student, so the arm is a "
+                         "COMPOSITE defence: adversarial text-encoder erasure + UNet "
+                         "robustification. AdvUnlearn is the best teacher available here "
+                         "(church 0.400 at retain 0.992 vs the UCE teacher's 0.067 at 0.850), and "
+                         "damage+distil from the UCE teacher collapsed utility to 0.317.")
     ap.add_argument("--concept", required=True, choices=sorted(FORGET_POOL))
     ap.add_argument("--alpha", type=float, default=0.5)
     ap.add_argument("--beta", type=float, default=0.1)
@@ -121,7 +133,7 @@ def main():
     forget_flags = [x[1] for x in pool]
     # 1. build the distillation pool from the TEACHER's own generations (on-manifold, and the
     #    only thing the student is ever shown)
-    teach_fp16 = build(torch.float16, a.teacher, dev)
+    teach_fp16 = build(torch.float16, a.teacher, dev, te_path=a.teacher_te)
     lats, embs = [], []
     vae, te, tok = teach_fp16.vae, teach_fp16.text_encoder, teach_fp16.tokenizer
     with torch.no_grad():
@@ -142,10 +154,10 @@ def main():
     del teach_fp16
     torch.cuda.empty_cache()
 
-    teacher = build(torch.float32, a.teacher, dev).unet.eval()
+    teacher = build(torch.float32, a.teacher, dev, te_path=a.teacher_te).unet.eval()
     for p in teacher.parameters():
         p.requires_grad_(False)
-    pipe = build(torch.float32, a.teacher, dev)
+    pipe = build(torch.float32, a.teacher, dev, te_path=a.teacher_te)
     student, sch = pipe.unet, pipe.scheduler
     pipe.text_encoder.requires_grad_(False); pipe.vae.requires_grad_(False)
 
