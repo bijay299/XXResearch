@@ -1,0 +1,65 @@
+{
+ "study": "h64_analysis",
+ "prereg": "docs/PREREG_H64_frag_allocation.md",
+ "recipe": "pools_v2",
+ "per_concept": {
+  "church": {
+   "arm": "h64v2_frag_a0.3_church",
+   "utility": {
+    "target_suppression": 0.0,
+    "utility_all_nontarget": 0.09090909090909091,
+    "retain8": 0.0
+   },
+   "k2_floor": 0.6,
+   "k2_pass": false,
+   "frozen_grid": {
+    "n_attacks": 0,
+    "n_valid": 0,
+    "max_over_valid_H": null,
+    "max_ungated_H": null
+   },
+   "all_nine": {
+    "n_attacks": 0,
+    "n_valid": 0,
+    "max_over_valid_H": null,
+    "max_ungated_H": null
+   },
+   "declared_band": null,
+   "attacks": []
+  },
+  "parachute": {
+   "arm": "h64v2_frag_a0.3_parachute",
+   "utility": {
+    "target_suppression": 0.06666666666666667,
+    "utility_all_nontarget": 0.14545454545454548,
+    "retain8": 0.08333333333333333
+   },
+   "k2_floor": 0.6,
+   "k2_pass": false,
+   "frozen_grid": {
+    "n_attacks": 0,
+    "n_valid": 0,
+    "max_over_valid_H": null,
+    "max_ungated_H": null
+   },
+   "all_nine": {
+    "n_attacks": 0,
+    "n_valid": 0,
+    "max_over_valid_H": null,
+    "max_ungated_H": null
+   },
+   "declared_band": null,
+   "attacks": []
+  }
+ },
+ "verdict": {
+  "status": "INCOMPLETE",
+  "incomplete_concepts": [
+   "church",
+   "parachute"
+  ],
+  "k3_both_concepts_positive": null,
+  "statement": "INCOMPLETE -- ['church', 'parachute'] still missing a utility number or the full frozen grid. NO VERDICT. This is not a negative result; it is an unfinished measurement.",
+  "comparability_warning": "built on pools recipe v2; NOT comparable to the v1 retain_fisher or forget_fisher arms that motivated it (FINDING38 S2-3). A matched v2 rebuild would be needed for that comparison and has not been run."
+ }
+}
