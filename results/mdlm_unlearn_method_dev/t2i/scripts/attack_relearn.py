@@ -213,6 +213,12 @@ def main():
                     help="non-target concepts for the retained-capability panel")
     ap.add_argument("--utility-n-prompts", type=int, default=2)
     ap.add_argument("--utility-n-per", type=int, default=4)
+    ap.add_argument("--keep-checkpoint", action="store_true",
+                    help="do NOT delete the attacked checkpoint after measuring it. Added for "
+                         "PREREG_H66 S5a's mask-refill diagnostic, which needs the attacked "
+                         "weights -- and as a partial answer to FINDING40, where deleting "
+                         "checkpoints blocked a study outright. Off by default: these are 1.7GB "
+                         "each and the storage budget is shared.")
     ap.add_argument("--save-grids", action="store_true",
                     help="save one image per (concept, prompt) before and after, for visual "
                          "inspection of degradation the CLIP metrics cannot show")
@@ -390,7 +396,13 @@ def main():
                 a.eval_steps, a.seed, dev, grid_dir=f"{gdir}/after" if gdir else None)
             print(f"[atk] AFTER   utility panel acc={util_after['panel_mean_clip_acc']:.4f} "
                   f"adherence={util_after['panel_mean_prompt_adherence']:.4f}", flush=True)
-    os.system(f"rm -rf {tmp}")
+    if a.keep_checkpoint:
+        keep = f"/data/bijaypandey/t2i_unlearn/attacked/{a.label}"
+        os.makedirs(os.path.dirname(keep), exist_ok=True)
+        os.system(f"rm -rf {keep} && mv {tmp} {keep}")
+        print(f"[atk] KEPT attacked checkpoint at {keep}", flush=True)
+    else:
+        os.system(f"rm -rf {tmp}")
 
     valid = (T_after - T_before) >= a.gate
     R = {"study": "t2i_relearn_attack", "label": a.label, "unet": a.unet,

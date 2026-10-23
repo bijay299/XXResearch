@@ -1,0 +1,298 @@
+{
+ "study": "h66_analysis",
+ "prereg": "docs/PREREG_H66_frp_port.md",
+ "method": "FRP (Forget-Retain Pruning), arXiv 2608.25429 -- OUR PORT of a PUBLISHED method. Not the authors' code; not a reproduction of their numbers.",
+ "budget_matched_to": "PROTOCOL_FROZEN_v1, the same six-point grid H65 measured the official AdvUnlearn baselines under",
+ "per_concept": {
+  "church": {
+   "rho_ladder": [
+    {
+     "arm": "frp_church_r0_l05",
+     "file": "gen_frp_church_r0_l05.json",
+     "target_suppression": 0.4666666666666667,
+     "utility_all_nontarget": 1.0,
+     "retain8": 1.0,
+     "erases": false
+    },
+    {
+     "arm": "frp_church_r10_l05",
+     "file": "gen_frp_church_r10_l05.json",
+     "target_suppression": 0.0,
+     "utility_all_nontarget": 0.1212121212121212,
+     "retain8": 0.075,
+     "erases": true
+    },
+    {
+     "arm": "frp_church_r20_l05",
+     "file": "gen_frp_church_r20_l05.json",
+     "target_suppression": 0.0,
+     "utility_all_nontarget": 0.0787878787878788,
+     "retain8": 0.016666666666666666,
+     "erases": true
+    },
+    {
+     "arm": "frp_church_r3_l00",
+     "file": "gen_frp_church_r3_l00.json",
+     "target_suppression": 0.2,
+     "utility_all_nontarget": 0.9393939393939394,
+     "retain8": 0.95,
+     "erases": true
+    },
+    {
+     "arm": "frp_church_r3_l05",
+     "file": "gen_frp_church_r3_l05.json",
+     "target_suppression": 0.13333333333333333,
+     "utility_all_nontarget": 0.9212121212121214,
+     "retain8": 0.9416666666666667,
+     "erases": true
+    },
+    {
+     "arm": "frp_church_r3_l10",
+     "file": "gen_frp_church_r3_l10.json",
+     "target_suppression": 0.5333333333333333,
+     "utility_all_nontarget": 0.9515151515151515,
+     "retain8": 0.95,
+     "erases": false
+    },
+    {
+     "arm": "frp_church_r5_l05",
+     "file": "gen_frp_church_r5_l05.json",
+     "target_suppression": 0.26666666666666666,
+     "utility_all_nontarget": 0.7575757575757577,
+     "retain8": 0.8083333333333333,
+     "erases": true
+    }
+   ],
+   "paper_setting_rho3": {
+    "arm": "frp_church_r3_l05",
+    "file": "gen_frp_church_r3_l05.json",
+    "target_suppression": 0.13333333333333333,
+    "utility_all_nontarget": 0.9212121212121214,
+    "retain8": 0.9416666666666667,
+    "erases": true
+   },
+   "selected_arm": "frp_church_r3_l05",
+   "selected_retain8": 0.9416666666666667,
+   "frozen_grid": {
+    "n_run": 6,
+    "n_declared": 6,
+    "n_valid": 6,
+    "max_over_valid_H": 1.0,
+    "max_ungated_H": 1.0
+   },
+   "baseline_same_grid": {
+    "retain8": 0.992,
+    "max_valid_H": 1.0
+   },
+   "beats_baseline": false,
+   "declared_band": "FRP is fully reversed like every other arm -> the relearning adversary defeats a method DESIGNED for relearning robustness. A stronger version of the phase's negative result, not a weaker one.",
+   "attacks": [
+    {
+     "seed": "0",
+     "lr": "1e-4",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.7083333333333333,
+     "H_before": 0.13333333333333333,
+     "H_after": 1.0,
+     "pau_after": 0.22916666666666666
+    },
+    {
+     "seed": "0",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.7916666666666666,
+     "H_before": 0.13333333333333333,
+     "H_after": 1.0,
+     "pau_after": 0.9166666666666666
+    },
+    {
+     "seed": "0",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.7916666666666666,
+     "H_before": 0.13333333333333333,
+     "H_after": 1.0,
+     "pau_after": 0.8333333333333334
+    },
+    {
+     "seed": "1",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.75,
+     "H_before": 0.13333333333333333,
+     "H_after": 1.0,
+     "pau_after": 0.9166666666666666
+    },
+    {
+     "seed": "1",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.75,
+     "H_before": 0.13333333333333333,
+     "H_after": 1.0,
+     "pau_after": 0.9375
+    },
+    {
+     "seed": "6",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.7916666666666666,
+     "H_before": 0.2,
+     "H_after": 1.0,
+     "pau_after": 0.9791666666666666
+    }
+   ]
+  },
+  "parachute": {
+   "rho_ladder": [
+    {
+     "arm": "frp_parachute_r0_l05",
+     "file": "gen_frp_parachute_r0_l05.json",
+     "target_suppression": 0.9333333333333333,
+     "utility_all_nontarget": 1.0,
+     "retain8": 1.0,
+     "erases": false
+    },
+    {
+     "arm": "frp_parachute_r10_l05",
+     "file": "gen_frp_parachute_r10_l05.json",
+     "target_suppression": 0.4666666666666667,
+     "utility_all_nontarget": 0.0787878787878788,
+     "retain8": 0.049999999999999996,
+     "erases": false
+    },
+    {
+     "arm": "frp_parachute_r20_l05",
+     "file": "gen_frp_parachute_r20_l05.json",
+     "target_suppression": 0.13333333333333333,
+     "utility_all_nontarget": 0.08484848484848484,
+     "retain8": 0.025,
+     "erases": true
+    },
+    {
+     "arm": "frp_parachute_r3_l00",
+     "file": "gen_frp_parachute_r3_l00.json",
+     "target_suppression": 0.6,
+     "utility_all_nontarget": 0.9575757575757577,
+     "retain8": 0.9666666666666667,
+     "erases": false
+    },
+    {
+     "arm": "frp_parachute_r3_l05",
+     "file": "gen_frp_parachute_r3_l05.json",
+     "target_suppression": 0.6,
+     "utility_all_nontarget": 0.9333333333333332,
+     "retain8": 0.9333333333333333,
+     "erases": false
+    },
+    {
+     "arm": "frp_parachute_r3_l10",
+     "file": "gen_frp_parachute_r3_l10.json",
+     "target_suppression": 0.8,
+     "utility_all_nontarget": 0.9212121212121211,
+     "retain8": 0.9083333333333333,
+     "erases": false
+    },
+    {
+     "arm": "frp_parachute_r5_l05",
+     "file": "gen_frp_parachute_r5_l05.json",
+     "target_suppression": 0.2,
+     "utility_all_nontarget": 0.7393939393939394,
+     "retain8": 0.7416666666666667,
+     "erases": true
+    }
+   ],
+   "paper_setting_rho3": {
+    "arm": "frp_parachute_r3_l05",
+    "file": "gen_frp_parachute_r3_l05.json",
+    "target_suppression": 0.6,
+    "utility_all_nontarget": 0.9333333333333332,
+    "retain8": 0.9333333333333333,
+    "erases": false
+   },
+   "selected_arm": "frp_parachute_r5_l05",
+   "selected_retain8": 0.7416666666666667,
+   "frozen_grid": {
+    "n_run": 6,
+    "n_declared": 6,
+    "n_valid": 5,
+    "max_over_valid_H": 1.0,
+    "max_ungated_H": 1.0
+   },
+   "baseline_same_grid": {
+    "retain8": 1.0,
+    "max_valid_H": 1.0
+   },
+   "beats_baseline": false,
+   "declared_band": "FRP is fully reversed like every other arm -> the relearning adversary defeats a method DESIGNED for relearning robustness. A stronger version of the phase's negative result, not a weaker one.",
+   "attacks": [
+    {
+     "seed": "0",
+     "lr": "1e-4",
+     "in_frozen_grid": true,
+     "valid": false,
+     "T_rise": 0.0,
+     "H_before": 0.2,
+     "H_after": 0.6,
+     "pau_after": 0.08333333333333333
+    },
+    {
+     "seed": "0",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.45833333333333337,
+     "H_before": 0.2,
+     "H_after": 1.0,
+     "pau_after": 0.9375
+    },
+    {
+     "seed": "0",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.45833333333333337,
+     "H_before": 0.2,
+     "H_after": 1.0,
+     "pau_after": 0.3333333333333333
+    },
+    {
+     "seed": "1",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.29166666666666663,
+     "H_before": 0.8,
+     "H_after": 1.0,
+     "pau_after": 1.0
+    },
+    {
+     "seed": "1",
+     "lr": "5e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.25,
+     "H_before": 0.8,
+     "H_after": 1.0,
+     "pau_after": 0.25
+    },
+    {
+     "seed": "6",
+     "lr": "1e-5",
+     "in_frozen_grid": true,
+     "valid": true,
+     "T_rise": 0.5,
+     "H_before": 0.3333333333333333,
+     "H_after": 1.0,
+     "pau_after": 0.9583333333333334
+    }
+   ]
+  }
+ }
+}
