@@ -7,25 +7,31 @@ generalisation does not.
 
 ---
 
-> 🛑 **§1's CROSS-ARM TABLE IS ON HOLD — MEASUREMENT CONTAMINATED BY A BUG IN MY SWEEP SCRIPT.**
-> `redundancy_sweep.py` built its per-rung label from **concept + mode + fraction only, omitting the
-> state**. The h68rf and AdvUnlearn legs ran **concurrently on the same concept**, so they collided
-> on both `adapters/_redun_<label>/unet.pt` and `outputs/gen_<label>.json`: each overwrote the
-> other's checkpoint and both then read whichever finished last. The bug was exposed when an
-> unrelated FRP seed-replication returned **bit-identical rows for two different attacked models**.
+> ✅ **HOLD LIFTED — §1's cross-arm table is CONFIRMED by clean re-measurement.**
 >
-> The numbers in §1 for `attacked — damage+distil` and `attacked — official AdvUnlearn` must not be
-> cited until re-measured. Re-runs with distinct state-keyed labels are in flight; the contaminated
-> files are preserved under `outputs/CONTAMINATED_label_collision/`.
+> A bug in my sweep script put this table on hold: `redundancy_sweep.py` built its per-rung label
+> from **concept + mode + fraction, omitting the state**, so two concurrent same-concept sweeps
+> collided on both `adapters/_redun_<label>/unet.pt` and `outputs/gen_<label>.json`. It surfaced
+> when an unrelated FRP seed-replication returned **bit-identical rows for two different attacked
+> models**.
 >
-> **What is NOT affected:** `FINDING46`'s base / erased / attacked three-state table. Those legs ran
-> one concept per GPU, so their labels differed and no collision was possible.
+> Both affected legs were re-run with distinct state-keyed labels, sequentially. **They reproduce
+> the original numbers exactly:**
 >
-> **What this does to the correction itself:** `FINDING46`'s general entrenchment claim stays
-> **withdrawn** regardless — it was a single-arm generalisation and §2's fragility confound is
-> computed from `retain8` values that are unaffected by the collision. But the specific evidence
-> that two other families *fail* to entrench is now unverified, so the correction currently rests on
-> the single-arm argument alone.
+> | church, random removal | 3 % | 10 % | 25 % | 50 % |
+> |---|---|---|---|---|
+> | damage+distil — original | 1.000 | 1.000 | 0.000 | 0.000 |
+> | damage+distil — **clean re-run** | 1.000 | 1.000 | **0.000** | **0.000** |
+> | AdvUnlearn — original | 1.000 | 1.000 | 0.867 | 0.067 |
+> | AdvUnlearn — **clean re-run** | 1.000 | 1.000 | **0.867** | **0.067** |
+>
+> So the two legs happened to stagger in time and never actually overwrote each other. **§1 stands
+> as published**, now on verified measurements rather than lucky ones. The contaminated originals
+> are kept at `outputs/CONTAMINATED_label_collision/` for comparison.
+>
+> Still pending: the **FRP seed replication** (attack seeds 1 and 6), which the collision *did*
+> corrupt — that is where the identical rows came from. §5's question about within-arm stability is
+> unanswered until those clean sweeps land.
 
 ## 1. What FINDING46 claimed, and what it should have claimed
 
