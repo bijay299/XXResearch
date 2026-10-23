@@ -1,0 +1,380 @@
+{
+ "study": "t2i_frp_port",
+ "method": "FRP (Forget-Retain Pruning)",
+ "source": "arXiv 2608.25429 Algorithm 1, Eq. (3)-(4), Eq. (6), Table 4",
+ "provenance": "OUR PORT from the paper. The authors' repo holds only a README ('Code release is in preparation'), so this is NOT their code and NOT a reproduction of their numbers. See ERRATUM_r2 C19 and PREREG_H66.",
+ "label": "frp_parachute_r10_l05",
+ "hparams": {
+  "concept": "parachute",
+  "rho": 0.1,
+  "beta": 0.05,
+  "lmbda": 0.05,
+  "n_retain": 32,
+  "n_timesteps": 8,
+  "seed": 42,
+  "label": "frp_parachute_r10_l05",
+  "out": null
+ },
+ "lambda_note": "lambda is NEVER assigned a value anywhere in the paper; 0.05 is pre-declared in PREREG_H66 S3(c) and the full sweep is reported.",
+ "scope": {
+  "n_layers": 32,
+  "n_params": 148684800,
+  "frac_of_unet": 0.17298565855573478,
+  "note": "MLP-only per the paper; SD analogue is ff.net.0.proj and ff.net.2. Attention projections excluded."
+ },
+ "calibration": {
+  "D_f": [
+   "a parachute",
+   "a parachute canopy",
+   "a descending parachute"
+  ],
+  "n_D_r": 32,
+  "D_r_sample": [
+   "a cassette player on a shelf",
+   "a chain saw resting on a log",
+   "an english springer spaniel in a field",
+   "a french horn held by a player"
+  ],
+  "timesteps": [
+   0,
+   142,
+   285,
+   428,
+   570,
+   713,
+   856,
+   999
+  ],
+  "positions_forget": 1536,
+  "positions_retain": 16384,
+  "pool_recipe": "pools_v2"
+ },
+ "pruning": {
+  "total_weights_zeroed": 14868480,
+  "frac_of_scope": 0.1,
+  "per_layer": [
+   {
+    "layer": "down_blocks.0.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 32,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 51.73689270019531,
+    "weight_norm_after": 38.639347076416016,
+    "pruned_abs_mass": 9393.541015625
+   },
+   {
+    "layer": "down_blocks.0.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 34.185176849365234,
+    "weight_norm_after": 25.501056671142578,
+    "pruned_abs_mass": 4512.95947265625
+   },
+   {
+    "layer": "down_blocks.0.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 32,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 48.93088912963867,
+    "weight_norm_after": 36.74554443359375,
+    "pruned_abs_mass": 8981.7255859375
+   },
+   {
+    "layer": "down_blocks.0.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 36.640037536621094,
+    "weight_norm_after": 27.328950881958008,
+    "pruned_abs_mass": 4844.5732421875
+   },
+   {
+    "layer": "down_blocks.1.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 64,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 99.392578125,
+    "weight_norm_after": 74.52772521972656,
+    "pruned_abs_mass": 36577.875
+   },
+   {
+    "layer": "down_blocks.1.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 256,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 71.63301086425781,
+    "weight_norm_after": 53.61799240112305,
+    "pruned_abs_mass": 18843.130859375
+   },
+   {
+    "layer": "down_blocks.1.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 64,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 98.50516510009766,
+    "weight_norm_after": 73.85868835449219,
+    "pruned_abs_mass": 36321.08203125
+   },
+   {
+    "layer": "down_blocks.1.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 256,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 74.14510345458984,
+    "weight_norm_after": 55.4792366027832,
+    "pruned_abs_mass": 19429.123046875
+   },
+   {
+    "layer": "down_blocks.2.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 179.1681671142578,
+    "weight_norm_after": 134.6313934326172,
+    "pruned_abs_mass": 131664.328125
+   },
+   {
+    "layer": "down_blocks.2.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 512,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 128.76409912109375,
+    "weight_norm_after": 97.58638763427734,
+    "pruned_abs_mass": 66466.2734375
+   },
+   {
+    "layer": "down_blocks.2.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 184.43455505371094,
+    "weight_norm_after": 139.368896484375,
+    "pruned_abs_mass": 133605.5625
+   },
+   {
+    "layer": "down_blocks.2.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 512,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 123.69268035888672,
+    "weight_norm_after": 94.72296905517578,
+    "pruned_abs_mass": 62517.83984375
+   },
+   {
+    "layer": "up_blocks.1.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 188.5887908935547,
+    "weight_norm_after": 144.61776733398438,
+    "pruned_abs_mass": 133494.28125
+   },
+   {
+    "layer": "up_blocks.1.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 512,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 135.7482452392578,
+    "weight_norm_after": 108.9908676147461,
+    "pruned_abs_mass": 62222.9375
+   },
+   {
+    "layer": "up_blocks.1.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 191.81088256835938,
+    "weight_norm_after": 145.76535034179688,
+    "pruned_abs_mass": 138455.5625
+   },
+   {
+    "layer": "up_blocks.1.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 512,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 138.80068969726562,
+    "weight_norm_after": 109.99317932128906,
+    "pruned_abs_mass": 65336.48046875
+   },
+   {
+    "layer": "up_blocks.1.attentions.2.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 190.7765350341797,
+    "weight_norm_after": 144.5864715576172,
+    "pruned_abs_mass": 138157.3125
+   },
+   {
+    "layer": "up_blocks.1.attentions.2.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 512,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 132.42897033691406,
+    "weight_norm_after": 103.23419189453125,
+    "pruned_abs_mass": 64288.74609375
+   },
+   {
+    "layer": "up_blocks.2.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 64,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 103.85342407226562,
+    "weight_norm_after": 78.11282348632812,
+    "pruned_abs_mass": 37680.97265625
+   },
+   {
+    "layer": "up_blocks.2.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 256,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 79.09635162353516,
+    "weight_norm_after": 59.19633102416992,
+    "pruned_abs_mass": 20663.685546875
+   },
+   {
+    "layer": "up_blocks.2.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 64,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 101.21636199951172,
+    "weight_norm_after": 76.13069915771484,
+    "pruned_abs_mass": 36839.75390625
+   },
+   {
+    "layer": "up_blocks.2.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 256,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 75.2535400390625,
+    "weight_norm_after": 56.75041198730469,
+    "pruned_abs_mass": 19498.146484375
+   },
+   {
+    "layer": "up_blocks.2.attentions.2.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 64,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 98.65129852294922,
+    "weight_norm_after": 74.10918426513672,
+    "pruned_abs_mass": 35897.5234375
+   },
+   {
+    "layer": "up_blocks.2.attentions.2.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 256,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 73.55744171142578,
+    "weight_norm_after": 55.309051513671875,
+    "pruned_abs_mass": 19092.53515625
+   },
+   {
+    "layer": "up_blocks.3.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 32,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 49.73632049560547,
+    "weight_norm_after": 37.32801055908203,
+    "pruned_abs_mass": 9133.12890625
+   },
+   {
+    "layer": "up_blocks.3.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 38.34799575805664,
+    "weight_norm_after": 28.46494483947754,
+    "pruned_abs_mass": 5089.80078125
+   },
+   {
+    "layer": "up_blocks.3.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 32,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 48.850032806396484,
+    "weight_norm_after": 36.59797668457031,
+    "pruned_abs_mass": 8956.83984375
+   },
+   {
+    "layer": "up_blocks.3.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 36.57951354980469,
+    "weight_norm_after": 27.06248664855957,
+    "pruned_abs_mass": 4872.67822265625
+   },
+   {
+    "layer": "up_blocks.3.attentions.2.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 32,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 50.17112350463867,
+    "weight_norm_after": 37.55081558227539,
+    "pruned_abs_mass": 9239.4111328125
+   },
+   {
+    "layer": "up_blocks.3.attentions.2.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 40.373863220214844,
+    "weight_norm_after": 29.900463104248047,
+    "pruned_abs_mass": 5318.73876953125
+   },
+   {
+    "layer": "mid_block.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 128,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 161.23223876953125,
+    "weight_norm_after": 125.09247589111328,
+    "pruned_abs_mass": 112057.34375
+   },
+   {
+    "layer": "mid_block.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 512,
+    "frac_pruned": 0.1,
+    "weight_norm_before": 109.7481689453125,
+    "weight_norm_after": 92.08270263671875,
+    "pruned_abs_mass": 44839.234375
+   }
+  ]
+ },
+ "out": "/data/bijaypandey/t2i_unlearn/adapters/frp_parachute_r10_l05",
+ "minutes": 0.514952552318573
+}

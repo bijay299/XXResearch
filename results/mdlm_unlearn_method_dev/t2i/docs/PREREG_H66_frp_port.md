@@ -96,6 +96,40 @@ adversarially-trained robust SOTA, and FRP's robustness evidence is on LLM text 
 one-epoch attack — a weaker adversary than 300 steps on 16 images. Recording that expectation now so
 a negative cannot be dressed up as a prediction and a positive cannot be claimed as one.
 
+## 5a. ⚠ Mechanistic prediction, recorded before any FRP attack has run
+
+Added 2026-10-23 after the ρ ladder was measured but **before a single FRP attack existed**. It is
+recorded now so the result is diagnostic in both directions rather than explained after the fact.
+
+**FRP zeroes weights and nothing holds them at zero afterwards.** It is *unstructured pruning* with
+no mask re-applied during any subsequent training. A relearning adversary fine-tunes every
+parameter, so the pruned entries are free to become nonzero again on the first optimiser step —
+there is no architectural or optimisation barrier, only the initial condition.
+
+Contrast the threat models:
+
+| | FRP's paper | this phase |
+|---|---|---|
+| adversary | fine-tunes on **retain** data, one epoch, lr 1e-5 | fine-tunes on **16 images of the target concept**, 300 steps |
+| gradient signal toward the erased concept | incidental | **direct and explicit** |
+| are pruned weights re-trainable? | yes, but nothing pushes them toward the forget concept | **yes, and the loss actively pushes them there** |
+
+So FRP's robustness result is consistent with its own setting while predicting little about ours.
+**Prediction: FRP is fully reversed, max-over-valid H → 1.000**, and the pruning mask will prove to
+be an initial condition rather than a constraint.
+
+**What would falsify this and what I would conclude.** If FRP instead holds H ≤ 0.40 at retain
+0.9417, the reasoning above is wrong: zeroing a rank-selected 3 % of feed-forward weights would be
+doing something a dense perturbation of the same magnitude does not, and the mechanism would need
+explaining rather than asserting. That outcome **meets the mandate's bar via a published method**,
+and `PREREG_H40` would be refuted by someone else's work — which is how it would be reported.
+
+**A cheap diagnostic, declared now:** on the attacked checkpoint, measure what fraction of the
+pruned entries have become nonzero and their mean magnitude relative to the surviving weights. That
+distinguishes "the mask was re-filled" from "the concept returned by another route", and it costs
+one weight diff. It is run **only if** the attack reverses the arm, since it is meaningless
+otherwise.
+
 ## 6. Protocol and honesty constraints
 
 - Attacks: `PROTOCOL_FROZEN_v1`'s six-point grid, **identical** to the grid `H65` measured the
