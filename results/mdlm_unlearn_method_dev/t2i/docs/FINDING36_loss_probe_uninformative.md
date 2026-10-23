@@ -24,6 +24,25 @@ calibrated set of arms, where the key row is a model with **nothing erased at al
 > of its available loss — statistically indistinguishable from the official erased arm's
 > 6.5–7.1%.**
 
+### 1a. The complete scale: three qualitatively opposite states, one number
+
+The broken-arm point has now landed, giving the statistic its full range. These three arms are in
+**maximally different** conditions and the statistic cannot tell them apart:
+
+| arm | retain8 | **loss removed** | H after | what actually happened |
+|---|---|---|---|---|
+| broken, α=0.7 | 0.133 | **5.96%, 6.62%** | **0.000** | attacker recovers **nothing** |
+| base SD v1.4 | 1.000 | **6.52%, 6.94%** | 1.000 | there was **nothing to recover** |
+| official AdvUnlearn | 0.992 | **6.51%, 7.09%** | 1.000 | attacker **fully recovers** |
+
+Across every arm measured the whole range is **5.96%–15.02%**, and the three extreme cases above all
+sit at ~6–7%. A destroyed model that recovers nothing, an unerased model with nothing to recover,
+and a defended model that is completely restored are **indistinguishable** on this axis.
+
+So the statistic's discriminating power in T2I is not merely weak — it is **absent across the
+entire range of outcomes the experiment can produce.** This is stronger than §2's original
+conclusion, which rested on the base-vs-erased pair alone.
+
 ## 2. What that means
 
 The statistic measures **how far 300 steps of fine-tuning move the diffusion MSE objective**, and
