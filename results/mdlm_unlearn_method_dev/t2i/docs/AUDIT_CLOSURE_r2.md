@@ -22,15 +22,20 @@ my re-derivation disagrees with the audit, both values are given with the eviden
 | 4 | metrics must follow the active target | **FIXED** | `ecfe8ad`. `--target` added; `n_nontarget = 11` excludes the target, legacy `retain8` (n=8) still contains tench, both emitted with a `denominator_warning`. Legacy fields renamed `*_LEGACY`. Audited denominators reproduce: retain8 0.908333 / seven-class 0.980952 / eleven-class 0.987879 |
 | 5 | attack counts and model identities | **NOT REPRODUCED** (disagreement reported) | `ecfe8ad`, `outputs/run_inventory.json` (234 runs: 65 unaffected / 136 VOID / 33 post-fix). For `undo_a0.5_big` the current archive holds **10 church attacks, 3 valid**, max-valid **0.466667**, plus **5** tench controls not pooled. So **`3/10` is correct** for the church denominator, and the audit's 7-attack count does not match this archive. Control concepts are not pooled. Unresolved identities marked, incl. the overwritten `adapters/uce_church/unet.pt` |
 | 6 | report gated AND ungated recovery | **FIXED** (disagreement reported) | `outputs/recovery_gated_and_ungated.json`. Max-valid **0.466667** confirmed; **ungated max is 0.6000, not 0.5333** — the audit's value is one of the ungated runs, not the maximum. Per-run gate outcomes and valid/total emitted. Gate limits documented in `PROTOCOL_FROZEN_v1.md` §metric: ceiling effects, T/H difficulty asymmetry, seed sensitivity, and blindness to a misassembled pipeline (the failure mode that produced issue 1) |
-| 7 | post-attack utility | **FIXED (instrument); measurement IN FLIGHT** | `d282837`. Three axes separated per record; `FINDING38` §4; `FID_PROTOCOL.md` for the declared-pending quality axis. Regression: probe **paired** (same model twice → Δ exactly 0) and **sensitive** (σ=0.01 noise moves adherence 0.2869 → 0.1656). `H65` is measuring the frozen grid on two arms; 6 of 12 points in at this writing, table in §4 |
-| 8 | separate training / selection / final evaluation | **FIXED (verified); CONTAMINATION FOUND** | `d282837`, `outputs/split_registry.json`, `scripts/verify_splits.py`. `ATK_TRAIN × EVAL_TARGET` **CLEAN (0)** — the claim the phase actually made holds. `DEF_TRAIN × EVAL_TARGET` **CONTAMINATED (8)**, `DEF_TRAIN × EVAL_UTILITY` **CONTAMINATED (39)**, all attributable to `undo_t2i.py`. Bias favours **our own arms**, not the baselines. `FINDING38` §2–3 |
+| 7 | post-attack utility | **FIXED** (instrument **and** measurement) | `d282837`, `dcff254`. Three axes separated per record; `FID_PROTOCOL.md` for the declared-pending quality axis. Regression: probe **paired** (same model twice → Δ exactly 0) and **sensitive** (σ=0.01 noise moves adherence 0.2869 → 0.1656). `H65` **complete: 12/12 points, both arms, all gate-passing**. Full reversal confirmed at intact utility (0.9375 / 0.9792); utility falls monotonically with attack lr. §4d, `FINDING38` §4a |
+| 8 | separate training / selection / final evaluation | **FIXED (verified, then REPAIRED)** | `d282837`, `dcff254`, `outputs/split_registry.json`, `scripts/verify_splits.py`. Found: `ATK_TRAIN × EVAL_TARGET` **CLEAN (0)** — the claim the phase actually made holds — but `DEF_TRAIN × EVAL_TARGET` **CONTAMINATED (8)** and `DEF_TRAIN × EVAL_UTILITY` **CONTAMINATED (39)**, all from `undo_t2i.py`, biasing **our own arms**. Repaired: pools **recipe v2**, same concepts, surface forms disjoint from the evaluator → **CLEAN on all three checks**. v1 arms are not relabelled; v2 arms carry `recipe: "pools_v2"` and are not comparable to them. `FINDING38` §2–3, §5 |
 | 9 | reproducibility and provenance | **PARTIAL** | `outputs/provenance_manifest.json`, `scripts/provenance.py`. Recorded: commit `d282837`, per-script hashes, pins, deps (torch 2.4.1+cu124, diffusers 0.31.0, transformers 4.46.3, numpy 1.26.4, cuDNN 9.1.0), precision policy, 34 adapter dirs hashed, split/metric references. **RNG audit: 41 stochastic sites, 13 explicit-generator, 28 global-stream.** Two gaps disclosed not patched — see §5 |
 | 10 | Fisher damage allocation | **FIXED** | `ecfe8ad` + `2352f8e`. Feasible renormalisation by bisection replaces renormalise-then-clamp; per-tensor mask mean pre/post, clipped fraction, realised perturbation norm and weight-norm change logged to `maskaudit_<label>.json`. Real model, all four modes at α=0.5: **mean_post = 0.5000** despite up to 10.7 % clipping, vs **0.3046** pre-repair. Matched random control: `random` matches `retain_fisher`'s realised norm to **2.5151e+01** (five digits); `frag`/`forget_fisher` match at ~3.19e+01. Separate shuffle RNG stream. The inseparability claim stays **provisional** (`ERRATUM_r2` C18) |
 | 11 | freeze a fair attack budget | **FIXED** | `2352f8e`, `docs/PROTOCOL_FROZEN_v1.md`. Six-point grid, identical for every arm, stopping rule declared; H62/H63/H64 labelled **exploratory** as pre-freeze; UNet-only and joint adversaries reported as separate classes; gated+ungated always reported |
 | 12 | correct the claims and documentation | **FIXED (this round)** | `docs/ERRATUM_r2_claim_corrections.md`, C1–C18, every number re-derived from raw JSONs. Pointer banners added to the 7 affected documents; originals preserved unaltered |
 
-**Summary: 9 fixed, 1 already fixed with coverage added, 1 not reproduced with evidence, 1 partial.**
-Issue 7's instrument is closed and its measurement is in flight.
+**Summary: 9 fixed, 1 already fixed with coverage added, 1 not reproduced with evidence, 1 partial
+(issue 9, provenance).** Issues 7 and 8 are now closed in both code and measurement.
+
+**This still does not mean the research is corrected.** The closure table describes the *audit's*
+twelve items. The scientific position is unchanged: the mandate's bar is unmet, the headline is
+anticipated, and of the five competing defences **none has released code** (`ERRATUM_r2` C19) —
+the first port of one, FRP, is pre-registered in `PREREG_H66` and running.
 
 ## 2. Changed files and commits
 
@@ -41,7 +46,9 @@ Issue 7's instrument is closed and its measurement is in flight.
 | `ecfe8ad` | issues 2, 3, 4, 10 + regression tests + run inventory + issue 5 not reproduced |
 | `2352f8e` | issue 11 protocol freeze; the `g`→`gain` shadowing bug **I introduced** in the issue-10 repair, caught by real-model integration testing; mask audit on the real model |
 | `d282837` | issues 7, 8: post-attack utility instrument, FID protocol, split registry, `FINDING38` |
-| *this commit* | issues 9, 12: provenance manifest + RNG audit, `ERRATUM_r2`, closure table |
+| `6abdffd` | issues 9, 12: provenance manifest + RNG audit, `ERRATUM_r2` C1–C18, this closure table |
+| `dcff254` | `H65` complete (issue 7 measurement); pools recipe v2 (issue 8 repair); `H64` relaunched |
+| `9ef0e01` | `ERRATUM_r2` C19 (FRAG/FRP has **no** released code — my error); FRP port + `PREREG_H66` |
 
 Changed code: `scripts/attack_relearn.py`, `scripts/erase_adv.py`, `scripts/gen_eval.py`,
 `scripts/undo_t2i.py`. New code: `scripts/test_repairs.py`, `scripts/verify_splits.py`,
