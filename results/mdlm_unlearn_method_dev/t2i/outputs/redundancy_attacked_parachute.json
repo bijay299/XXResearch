@@ -1,0 +1,76 @@
+{
+ "study": "redundancy_sweep",
+ "state": "ATTACKED",
+ "arm": "frp_parachute_r5_l05",
+ "attacked": "attacked/DIAG_H66_frp_parachute_sd1_lr1e-5_keepckpt/unet.pt",
+ "concept": "parachute",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 1.0,
+   "retain8": 0.9333,
+   "utility": 1.0
+  },
+  {
+   "mode": "random",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 1.0,
+   "retain8": 0.8167,
+   "utility": 0.993939393939394
+  },
+  {
+   "mode": "random",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 1.0,
+   "retain8": 0.2667,
+   "utility": 0.43636363636363634
+  },
+  {
+   "mode": "random",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.8,
+   "retain8": 0.0917,
+   "utility": 0.0787878787878788
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 1.0,
+   "retain8": 0.4667,
+   "utility": 0.8060606060606061
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 0.9333,
+   "retain8": 0.125,
+   "utility": 0.09090909090909091
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.8,
+   "retain8": 0.05,
+   "utility": 0.07272727272727272
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.7333,
+   "retain8": 0.0583,
+   "utility": 0.07272727272727272
+  }
+ ],
+ "reconstructed_from": "logs/redun_parachute.log",
+ "provenance_note": "the original JSON was overwritten because redundancy_sweep.py keyed its output filename on CONCEPT only, so the base-model run clobbered it. Rebuilt from the run log; the per-arm gen_*.json files are the primary record and were not affected. The script now keys on state+concept so this cannot recur.",
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights."
+}

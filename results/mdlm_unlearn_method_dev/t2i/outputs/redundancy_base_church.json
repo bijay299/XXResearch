@@ -1,0 +1,73 @@
+{
+ "study": "redundancy_sweep",
+ "arm": "_base_ref",
+ "attacked": "adapters/_base_ref/unet.pt",
+ "concept": "church",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 1.0,
+   "retain8": 1.0,
+   "utility": 1.0
+  },
+  {
+   "mode": "random",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 1.0,
+   "retain8": 1.0,
+   "utility": 0.993939393939394
+  },
+  {
+   "mode": "random",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.3333333333333333,
+   "retain8": 0.45,
+   "utility": 0.45454545454545453
+  },
+  {
+   "mode": "random",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.06666666666666667,
+   "retain8": 0.05,
+   "utility": 0.08484848484848485
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.03,
+   "n_zeroed": 4460544,
+   "target": 0.6,
+   "retain8": 0.8333333333333333,
+   "utility": 0.8363636363636363
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 0.0,
+   "retain8": 0.05,
+   "utility": 0.1575757575757576
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.0,
+   "retain8": 0.016666666666666666,
+   "utility": 0.07878787878787878
+  },
+  {
+   "mode": "magnitude",
+   "frac": 0.5,
+   "n_zeroed": 74342400,
+   "target": 0.0,
+   "retain8": 0.008333333333333333,
+   "utility": 0.08484848484848484
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is."
+}
