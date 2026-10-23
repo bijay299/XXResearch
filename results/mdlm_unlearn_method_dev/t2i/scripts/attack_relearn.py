@@ -70,7 +70,7 @@ LAB_KEY = ["church", "parachute", "garbage_truck", "van_gogh", "cassette_player"
            "english_springer", "french_horn", "gas_pump", "golf_ball", "tench", "monet"]
 
 
-def build_pipe(dtype, unet_path=None, dev="cuda"):
+def build_pipe(dtype, unet_path=None, dev="cuda", te_path=None):
     from diffusers import StableDiffusionPipeline
     pin = dict(l.split("=", 1) for l in open(PIN).read().split("\n") if "=" in l)
     pipe = StableDiffusionPipeline.from_pretrained(
@@ -79,6 +79,9 @@ def build_pipe(dtype, unet_path=None, dev="cuda"):
     if unet_path:
         sd = torch.load(unet_path, map_location="cpu")
         pipe.unet.load_state_dict({k: v.to(dtype) for k, v in sd.get("unet", sd).items()})
+    if te_path:
+        from transformers import CLIPTextModel
+        pipe.text_encoder = CLIPTextModel.from_pretrained(te_path, torch_dtype=dtype)
     pipe.set_progress_bar_config(disable=True)
     return pipe.to(dev)
 
@@ -102,6 +105,12 @@ def clip_acc(pipe, cm, cp, tfeat, prompts, target_key, n_per, steps, seed, dev):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--unet", default=None, help="erased unet; omit to attack the base model")
+    ap.add_argument("--text-encoder", default=None,
+                    help="replacement CLIPTextModel (official AdvUnlearn erases HERE)")
+    ap.add_argument("--attack-te", action="store_true",
+                    help="also fine-tune the text encoder. AdvUnlearn's defence lives in the text "
+                         "encoder, so a weight-access adversary would attack it; tuning only the "
+                         "UNet would be a needlessly weak adversary against that defence.")
     ap.add_argument("--concept", required=True, choices=sorted(SPLIT))
     ap.add_argument("--steps", type=int, default=300)
     ap.add_argument("--lr", type=float, default=1e-5)
@@ -140,14 +149,14 @@ def main():
     torch.cuda.empty_cache()
 
     # 2. the erased model under attack
-    pipe = build_pipe(torch.float32, a.unet, dev)
+    pipe = build_pipe(torch.float32, a.unet, dev, te_path=a.text_encoder)
     unet, vae, te, tok, sch = pipe.unet, pipe.vae, pipe.text_encoder, pipe.tokenizer, pipe.scheduler
-    te.requires_grad_(False); vae.requires_grad_(False)
+    te.requires_grad_(bool(a.attack_te)); vae.requires_grad_(False)
 
     # pre-measure, BEFORE the attack, on both splits
     pipe.unet = unet.eval()
     with torch.no_grad():
-        half = build_pipe(torch.float16, a.unet, dev)
+        half = build_pipe(torch.float16, a.unet, dev, te_path=a.text_encoder)
         T_before = clip_acc(half, cm, cp, tfeat, T, a.concept, 3, a.eval_steps, a.seed, dev)
         H_before = clip_acc(half, cm, cp, tfeat, H, a.concept, a.eval_n, a.eval_steps, a.seed, dev)
         del half; torch.cuda.empty_cache()
@@ -169,7 +178,10 @@ def main():
         emb = torch.cat(emb)
 
     unet.train().requires_grad_(True)
-    opt = torch.optim.Adam(unet.parameters(), lr=a.lr)
+    atk_params = list(unet.parameters()) + (list(te.parameters()) if a.attack_te else [])
+    print(f"[atk] attacking {'UNet + TEXT ENCODER' if a.attack_te else 'UNet only'} "
+          f"({sum(p.numel() for p in atk_params)/1e6:.1f}M params)", flush=True)
+    opt = torch.optim.Adam(atk_params, lr=a.lr)
     t0 = time.time()
     for step in range(a.steps):
         i = torch.randint(0, len(lat), (1,), device=dev)
@@ -180,7 +192,7 @@ def main():
         pred = unet(zt, ts, encoder_hidden_states=c).sample
         loss = F.mse_loss(pred, noise)
         opt.zero_grad(set_to_none=True); loss.backward()
-        torch.nn.utils.clip_grad_norm_(unet.parameters(), 1.0); opt.step()
+        torch.nn.utils.clip_grad_norm_(atk_params, 1.0); opt.step()
         if step % 50 == 0 or step == a.steps - 1:
             print(f"[atk] step {step:4d} loss={loss.item():.5f} "
                   f"{(time.time()-t0)/max(step+1,1):.2f}s/step", flush=True)

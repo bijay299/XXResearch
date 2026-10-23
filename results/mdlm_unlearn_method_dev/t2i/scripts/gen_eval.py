@@ -42,7 +42,7 @@ LAB_KEY = ["church", "parachute", "garbage_truck", "van_gogh", "cassette_player"
            "english_springer", "french_horn", "gas_pump", "golf_ball", "tench", "monet"]
 
 
-def load_pipe(unet_path=None, device="cuda"):
+def load_pipe(unet_path=None, device="cuda", te_path=None):
     from diffusers import StableDiffusionPipeline
     pin = dict(l.split("=", 1) for l in open(PIN).read().split("\n") if "=" in l)
     pipe = StableDiffusionPipeline.from_pretrained(
@@ -52,6 +52,14 @@ def load_pipe(unet_path=None, device="cuda"):
         sd = torch.load(unet_path, map_location="cpu")
         pipe.unet.load_state_dict(sd.get("unet", sd))
         print(f"[gen] loaded erased unet from {unet_path}", flush=True)
+    if te_path:
+        # AdvUnlearn (2405.15234) erases by adversarially training the TEXT ENCODER, so its
+        # released weights are a CLIPTextModel, not a UNet. Load it into the pinned SD v1.4
+        # pipeline rather than cloning their legacy repo.
+        from transformers import CLIPTextModel
+        te = CLIPTextModel.from_pretrained(te_path, torch_dtype=torch.float16)
+        pipe.text_encoder = te.to(pipe.device if hasattr(pipe, "device") else "cuda")
+        print(f"[gen] loaded erased TEXT ENCODER from {te_path}", flush=True)
     pipe.set_progress_bar_config(disable=True)
     return pipe.to(device)
 
@@ -71,6 +79,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--label", required=True)
     ap.add_argument("--unet", default=None, help="erased unet state_dict; omit for the base model")
+    ap.add_argument("--text-encoder", default=None,
+                    help="directory of a replacement CLIPTextModel (e.g. official AdvUnlearn)")
     ap.add_argument("--n-per-prompt", type=int, default=5)
     ap.add_argument("--steps", type=int, default=25)
     ap.add_argument("--guidance", type=float, default=7.5)
@@ -79,7 +89,7 @@ def main():
     ap.add_argument("--save-grid", action="store_true")
     a = ap.parse_args()
     dev = "cuda"
-    pipe = load_pipe(a.unet, dev)
+    pipe = load_pipe(a.unet, dev, te_path=a.text_encoder)
     cm, cp, tfeat = clip_scorer(dev)
     keys = a.concepts.split(",") if a.concepts else list(CONCEPTS)
 
@@ -109,7 +119,8 @@ def main():
 
     forget = [k for k in keys if k in ("church", "parachute", "garbage_truck", "van_gogh")]
     retain = [k for k in keys if k not in forget]
-    out = {"study": "t2i_gen_eval", "label": a.label, "unet": a.unet, "hparams": vars(a),
+    out = {"study": "t2i_gen_eval", "label": a.label, "unet": a.unet,
+           "text_encoder": a.text_encoder, "hparams": vars(a),
            "per_concept": res,
            "forget_mean_acc": float(np.mean([res[k]["clip_acc"] for k in forget])) if forget else None,
            "retain_mean_acc": float(np.mean([res[k]["clip_acc"] for k in retain])) if retain else None,
