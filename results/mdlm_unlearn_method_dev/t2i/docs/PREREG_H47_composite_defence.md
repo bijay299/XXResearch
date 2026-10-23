@@ -135,3 +135,28 @@ never as a SOTA claim.
 bi-level objective, with no distillation-repair stage; IMMA learns a bad **initialisation** via
 MAML-style bi-level optimisation. Neither damages weights with random noise and repairs by
 self-distillation from the erased teacher.
+
+---
+
+## 7. Addendum (2026-10-23): the composite is fully reversed on a SECOND concept too
+
+`H49` repeated the composite on **parachute** with official AdvUnlearn weights. It reached the best
+utility of any treated arm in the project — **retain 0.933**, concept erased to 0.067 — and then:
+
+| seed | T rise | gate | H after |
+|---|---|---|---|
+| 0 | +0.750 | PASS | **1.000** |
+| 1 | +0.750 | PASS | **1.000** |
+| 3 | +0.750 | PASS | **1.000** |
+
+**3/3 gate-passing, 3/3 fully restored, at the *base* learning rate.** No adversary strengthening
+was needed and there is no gate ambiguity. This is the cleanest measurement of the composite in the
+project, and it shows no robustness whatsoever at usable utility.
+
+`H50` likewise destroyed the α=0.5 figure: its 0.267 becomes **0.933** at lr 5e-5 (gate PASS),
+exactly as `H48` did to the α=0.3 figure.
+
+So across both concepts and all three α values, the composite's robustness claim is dead. What
+survives from `H47` is only the **utility** result: AdvUnlearn's teacher lifts damage+distil from
+retain 0.458 (UCE teacher) to 0.867–0.933, confirming `H38`'s diagnosis that the T2I utility
+collapse was inherited from a mediocre teacher.
