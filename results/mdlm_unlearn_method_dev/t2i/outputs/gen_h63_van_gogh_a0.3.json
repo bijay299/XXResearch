@@ -1,0 +1,85 @@
+{
+ "study": "t2i_gen_eval",
+ "label": "h63_van_gogh_a0.3",
+ "unet": "adapters/h63_van_gogh_a0.3/unet.pt",
+ "text_encoder": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee/vangogh_unlearned",
+ "hparams": {
+  "label": "h63_van_gogh_a0.3",
+  "unet": "adapters/h63_van_gogh_a0.3/unet.pt",
+  "text_encoder": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee/vangogh_unlearned",
+  "n_per_prompt": 5,
+  "steps": 25,
+  "guidance": 7.5,
+  "seed": 0,
+  "concepts": null,
+  "save_grid": false,
+  "target": null
+ },
+ "per_concept": {
+  "church": {
+   "n": 15,
+   "clip_acc": 0.6,
+   "clip_align": 0.18982747395833333
+  },
+  "parachute": {
+   "n": 15,
+   "clip_acc": 0.8666666666666667,
+   "clip_align": 0.23087565104166666
+  },
+  "garbage_truck": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.21748046875
+  },
+  "van_gogh": {
+   "n": 15,
+   "clip_acc": 0.7333333333333333,
+   "clip_align": 0.198388671875
+  },
+  "cassette_player": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.26560872395833335
+  },
+  "chain_saw": {
+   "n": 15,
+   "clip_acc": 0.9333333333333333,
+   "clip_align": 0.22526041666666666
+  },
+  "english_springer": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.25558268229166664
+  },
+  "french_horn": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2713541666666667
+  },
+  "gas_pump": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.25751953125
+  },
+  "golf_ball": {
+   "n": 15,
+   "clip_acc": 0.7333333333333333,
+   "clip_align": 0.2367431640625
+  },
+  "tench": {
+   "n": 15,
+   "clip_acc": 1.0,
+   "clip_align": 0.2399169921875
+  },
+  "monet": {
+   "n": 15,
+   "clip_acc": 0.4666666666666667,
+   "clip_align": 0.19733072916666666
+  }
+ },
+ "active_target_metrics": null,
+ "forget_mean_acc_LEGACY": 0.8,
+ "retain_mean_acc_LEGACY": 0.8916666666666667,
+ "legacy_denominator_note": "forget_mean_acc_LEGACY averages the four hard-coded legacy forget concepts and does NOT measure the active target; retain_mean_acc_LEGACY is the historical retain8. Both are retained verbatim for comparability with published tables.",
+ "minutes": 1.3633495728174845
+}

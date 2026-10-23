@@ -301,11 +301,14 @@ def main():
                     keep = keep * (a.alpha / max(m0, 1e-12))
                     m_pre = float(keep.mean())
                     clip_frac = float((keep > 1).float().mean())
+                    # NOTE: the bisection variable must NOT be named `g` -- that is the
+                    # torch.Generator in this scope, and shadowing it made the next parameter's
+                    # normal_(..., generator=g) receive a float. Caught by the H64 integration run.
                     lo, hi = 0.0, 1e6
-                    for _ in range(60):                  # bisect the gain so mean(clamp(g*k))=alpha
-                        g = 0.5 * (lo + hi)
-                        if float((keep * g).clamp(0, 1).mean()) < a.alpha: lo = g
-                        else: hi = g
+                    for _ in range(60):                  # bisect gain so mean(clamp(gain*k))=alpha
+                        gain = 0.5 * (lo + hi)
+                        if float((keep * gain).clamp(0, 1).mean()) < a.alpha: lo = gain
+                        else: hi = gain
                     s = (keep * (0.5 * (lo + hi))).clamp(0, 1)
                     m_post = float(s.mean())
                 dmg_log.append((n, m_pre, m_post, clip_frac,
