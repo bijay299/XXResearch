@@ -37,6 +37,27 @@ Pre-attack: church 0.400, Van Gogh 0.467. Every point passes the validity gate (
 > style. The curve is flat — the smallest budget tested already saturates, so the true threshold is
 > at or below it.**
 
+### 2a. The flat curve is verified real, not an unwired parameter
+
+A perfectly flat curve is exactly what a silently-ignored argument looks like, so the budget was
+checked against the frozen loss probe (`FINDING36`) rather than trusted:
+
+| budget | **loss removed** | H after |
+|---|---|---|
+| n=16, 50 steps | **1.56%** | 1.000 |
+| n=4, 50 steps | 1.81% | 1.000 |
+| n=8, 150 steps | 6.77% | 1.000 |
+| n=4, 300 steps | 20.98% | 1.000 |
+| n=1, 150 steps | 52.32% | 1.000 |
+| n=1, 300 steps | **85.51%** | 1.000 |
+
+**Nine distinct loss-removal values across nine budgets, spanning a 55× range (1.56% → 85.51%),
+with recovery saturated at 1.000 throughout.** The budget demonstrably changes how much work the
+attack does; it does not change whether the concept comes back.
+
+That is also an independent confirmation of `FINDING36`: the loss axis varies 55-fold while the
+content axis never moves at all. The two are decoupled.
+
 The attacker's single image is itself **generated from the public base model**. No scraped data, no
 privileged access beyond the weights.
 
