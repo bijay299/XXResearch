@@ -1,0 +1,247 @@
+{
+ "study": "frp_mask_refill",
+ "prereg": "PREREG_H66 S5a",
+ "arm": "frp_church_r3_l05",
+ "attacked": "attacked/DIAG_H66_frp_church_sd0_lr1e-5_keepckpt/unet.pt",
+ "n_scope_layers": 32,
+ "n_pruned_entries": 4415427,
+ "n_refilled_entries": 4414887,
+ "frac_refilled": 0.9998777015224122,
+ "mean_abs_refilled": 0.00016822065072119585,
+ "mean_abs_surviving": 0.04016746929846704,
+ "refilled_over_surviving": 0.004187982306558105,
+ "share_of_update_norm_on_pruned": 0.030198896628092484,
+ "share_of_entries_pruned": 0.029696559433109504,
+ "concentration_ratio": 1.0169156698476967,
+ "per_entry_rms_update_pruned": 0.0001987262870468475,
+ "per_entry_rms_update_surviving": 0.00019701550212793028,
+ "share_of_post_attack_weight_mass_in_pruned": 5.320004484237844e-07,
+ "frac_nonzero_caveat": "frac_refilled is NEAR-TRIVIAL: under Adam almost every parameter becomes nonzero, so a value near 1.0 is expected whatever the mechanism. It is reported but is NOT the verdict.",
+ "reading": "NOT CONCENTRATED: the attack's update is essentially UNIFORM across pruned and surviving positions (concentration ratio ~1), and the post-attack weight mass in formerly-pruned positions is negligible. The pruned weights were NOT meaningfully re-learned: the concept returned through the SURVIVING weights, by another route than refilling the mask.",
+ "per_layer": [
+  {
+   "layer": "down_blocks.0.attentions.0.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 23040,
+   "frac_refilled": 0.9998697638511658,
+   "mean_abs_refilled": 0.00017822813242673874,
+   "mean_abs_surviving": 0.041424673050642014
+  },
+  {
+   "layer": "down_blocks.0.attentions.0.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 12160,
+   "frac_refilled": 1.0,
+   "mean_abs_refilled": 0.00017712143016979098,
+   "mean_abs_surviving": 0.03949526697397232
+  },
+  {
+   "layer": "down_blocks.0.attentions.1.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 23040,
+   "frac_refilled": 0.999913215637207,
+   "mean_abs_refilled": 0.0001689365308266133,
+   "mean_abs_surviving": 0.03995854780077934
+  },
+  {
+   "layer": "down_blocks.0.attentions.1.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 12160,
+   "frac_refilled": 1.0,
+   "mean_abs_refilled": 0.00017189743812195957,
+   "mean_abs_surviving": 0.04238852113485336
+  },
+  {
+   "layer": "down_blocks.1.attentions.0.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 97282,
+   "frac_refilled": 0.9998766183853149,
+   "mean_abs_refilled": 0.00015455966058652848,
+   "mean_abs_surviving": 0.04044412076473236
+  },
+  {
+   "layer": "down_blocks.1.attentions.0.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 48641,
+   "frac_refilled": 0.9998355507850647,
+   "mean_abs_refilled": 0.00015409542538691312,
+   "mean_abs_surviving": 0.041492510586977005
+  },
+  {
+   "layer": "down_blocks.1.attentions.1.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 97281,
+   "frac_refilled": 0.9999486207962036,
+   "mean_abs_refilled": 0.00015200632333289832,
+   "mean_abs_surviving": 0.04014325141906738
+  },
+  {
+   "layer": "down_blocks.1.attentions.1.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 48640,
+   "frac_refilled": 0.9998766183853149,
+   "mean_abs_refilled": 0.00015431053179781884,
+   "mean_abs_surviving": 0.04267203062772751
+  },
+  {
+   "layer": "down_blocks.2.attentions.0.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 389123,
+   "frac_refilled": 0.9998509287834167,
+   "mean_abs_refilled": 0.0001423458306817338,
+   "mean_abs_surviving": 0.036541011184453964
+  },
+  {
+   "layer": "down_blocks.2.attentions.0.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 195841,
+   "frac_refilled": 0.9998774528503418,
+   "mean_abs_refilled": 0.00014338537584990263,
+   "mean_abs_surviving": 0.03756120055913925
+  },
+  {
+   "layer": "down_blocks.2.attentions.1.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 389132,
+   "frac_refilled": 0.9998329877853394,
+   "mean_abs_refilled": 0.00013952850713394582,
+   "mean_abs_surviving": 0.03750143200159073
+  },
+  {
+   "layer": "down_blocks.2.attentions.1.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 195844,
+   "frac_refilled": 0.9998978972434998,
+   "mean_abs_refilled": 0.00014128888142295182,
+   "mean_abs_surviving": 0.036147210747003555
+  },
+  {
+   "layer": "mid_block.attentions.0.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 389127,
+   "frac_refilled": 0.9998483657836914,
+   "mean_abs_refilled": 0.00012720197264570743,
+   "mean_abs_surviving": 0.033249061554670334
+  },
+  {
+   "layer": "mid_block.attentions.0.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 195841,
+   "frac_refilled": 0.9998723268508911,
+   "mean_abs_refilled": 0.00013051697169430554,
+   "mean_abs_surviving": 0.0327770970761776
+  },
+  {
+   "layer": "up_blocks.1.attentions.0.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 389125,
+   "frac_refilled": 0.9999126195907593,
+   "mean_abs_refilled": 0.00015934529074002057,
+   "mean_abs_surviving": 0.03851793333888054
+  },
+  {
+   "layer": "up_blocks.1.attentions.0.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 195843,
+   "frac_refilled": 0.9998416900634766,
+   "mean_abs_refilled": 0.0001612709165783599,
+   "mean_abs_surviving": 0.04012186825275421
+  },
+  {
+   "layer": "up_blocks.1.attentions.1.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 389128,
+   "frac_refilled": 0.9998894929885864,
+   "mean_abs_refilled": 0.0001726270857034251,
+   "mean_abs_surviving": 0.039254579693078995
+  },
+  {
+   "layer": "up_blocks.1.attentions.1.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 195846,
+   "frac_refilled": 0.9998723268508911,
+   "mean_abs_refilled": 0.00017420132644474506,
+   "mean_abs_surviving": 0.040925007313489914
+  },
+  {
+   "layer": "up_blocks.1.attentions.2.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 389125,
+   "frac_refilled": 0.9999100565910339,
+   "mean_abs_refilled": 0.00017654354451224208,
+   "mean_abs_surviving": 0.03896107152104378
+  },
+  {
+   "layer": "up_blocks.1.attentions.2.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 195843,
+   "frac_refilled": 0.9998570084571838,
+   "mean_abs_refilled": 0.00017680160817690194,
+   "mean_abs_surviving": 0.0385688878595829
+  },
+  {
+   "layer": "up_blocks.2.attentions.0.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 97281,
+   "frac_refilled": 0.9998766183853149,
+   "mean_abs_refilled": 0.00017160378047265112,
+   "mean_abs_surviving": 0.041883595287799835
+  },
+  {
+   "layer": "up_blocks.2.attentions.0.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 48640,
+   "frac_refilled": 0.99991774559021,
+   "mean_abs_refilled": 0.00017047973233275115,
+   "mean_abs_surviving": 0.04549585282802582
+  },
+  {
+   "layer": "up_blocks.2.attentions.1.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 97281,
+   "frac_refilled": 0.9998971819877625,
+   "mean_abs_refilled": 0.0001803065970307216,
+   "mean_abs_surviving": 0.04093586280941963
+  },
+  {
+   "layer": "up_blocks.2.attentions.1.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 48640,
+   "frac_refilled": 0.9998561143875122,
+   "mean_abs_refilled": 0.00017808485426940024,
+   "mean_abs_surviving": 0.043518759310245514
+  },
+  {
+   "layer": "up_blocks.2.attentions.2.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 97281,
+   "frac_refilled": 0.9998869299888611,
+   "mean_abs_refilled": 0.00018429846386425197,
+   "mean_abs_surviving": 0.039819903671741486
+  },
+  {
+   "layer": "up_blocks.2.attentions.2.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 48640,
+   "frac_refilled": 0.9998971819877625,
+   "mean_abs_refilled": 0.00018040287250187248,
+   "mean_abs_surviving": 0.04232567548751831
+  },
+  {
+   "layer": "up_blocks.3.attentions.0.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 23040,
+   "frac_refilled": 0.9998263716697693,
+   "mean_abs_refilled": 0.0001889900304377079,
+   "mean_abs_surviving": 0.040575966238975525
+  },
+  {
+   "layer": "up_blocks.3.attentions.0.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 12161,
+   "frac_refilled": 1.0,
+   "mean_abs_refilled": 0.00019022154447156936,
+   "mean_abs_surviving": 0.044166289269924164
+  },
+  {
+   "layer": "up_blocks.3.attentions.1.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 23041,
+   "frac_refilled": 0.9999566078186035,
+   "mean_abs_refilled": 0.0001944704126799479,
+   "mean_abs_surviving": 0.03969487547874451
+  },
+  {
+   "layer": "up_blocks.3.attentions.1.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 12160,
+   "frac_refilled": 0.99991774559021,
+   "mean_abs_refilled": 0.00019561669614631683,
+   "mean_abs_surviving": 0.042014189064502716
+  },
+  {
+   "layer": "up_blocks.3.attentions.2.transformer_blocks.0.ff.net.0.proj.weight",
+   "n_pruned": 23040,
+   "frac_refilled": 0.999913215637207,
+   "mean_abs_refilled": 0.00019726401660591364,
+   "mean_abs_surviving": 0.04082249477505684
+  },
+  {
+   "layer": "up_blocks.3.attentions.2.transformer_blocks.0.ff.net.2.weight",
+   "n_pruned": 12160,
+   "frac_refilled": 1.0,
+   "mean_abs_refilled": 0.00019510903803166002,
+   "mean_abs_surviving": 0.04596026986837387
+  }
+ ]
+}

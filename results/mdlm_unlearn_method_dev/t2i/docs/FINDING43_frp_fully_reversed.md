@@ -55,10 +55,15 @@ FRP's published robustness is consistent with its own setting and predicts littl
 **This is a scope statement about a different threat model, not a refutation of their paper** — the
 same distinction `ERRATUM_r2` C15 insists on for AdvUnlearn.
 
-A direct check of the mechanism (`PREREG_H66` §5a's declared diagnostic: what fraction of pruned
-entries became nonzero, at what magnitude relative to surviving neighbours) is **running**, using a
-re-run attack with `--keep-checkpoint`. Until it reports, "the mask was refilled" is an **inference
-from the threat model, not a measurement**.
+> ⚠ **The mechanism above is REFUTED by the diagnostic it declared. See `FINDING44`.** The
+> pre-declared check ran: the attack's update was **uniform** across pruned and surviving positions
+> (concentration ratio **1.0169** — 3.020 % of update norm on 2.970 % of entries), per-entry RMS
+> update identical (1.987e-04 vs 1.970e-04), and post-attack weight mass in formerly-pruned
+> positions **0.00005 %**. The adversary did **not** refill the mask; it recovered the concept
+> through the **surviving 97 %** of weights. The *outcome* prediction in §5a was right and the
+> *mechanism* was wrong, and "the mask is an initial condition, not a constraint" is **withdrawn as
+> an explanation**. `FINDING44` §3 gives the corrected reading, which is stronger: the concept is
+> re-encodable in weights that FRP's forget-critical scoring declined to prune.
 
 ## 3. FRP's erasure/utility point, stated without inflation
 
