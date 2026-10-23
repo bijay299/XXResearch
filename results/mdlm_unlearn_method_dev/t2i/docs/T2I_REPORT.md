@@ -1,6 +1,9 @@
 # Text-to-image concept erasure — phase report
 
-> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C1 max-over-attacks phrasing, C2, C4 the 2.14 ratio, C5, C10 in-sample utility).** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+> ⚠ **SUPERSEDED by `T2I_REPORT_r2.md` (2026-10-23).** This document is preserved as published
+> and is NOT the current state of the phase. Corrections are itemised in
+> `ERRATUM_r2_claim_corrections.md` (C1 max-over-attacks phrasing, C2, C4 the 2.14 ratio, C5,
+> C10 in-sample utility) and incorporated in r2; neither is applied here.
 
 
 **Date:** 2026-10-22 · **Model:** Stable Diffusion v1.4, pinned `133a221b8aa7292a167afc5127cb63fb5005638b`
