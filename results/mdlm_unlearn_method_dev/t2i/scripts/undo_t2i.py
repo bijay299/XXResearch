@@ -43,12 +43,31 @@ FORGET_POOL = {
     "parachute": ["a parachute", "a photo of a parachute", "a parachute in the sky"],
     "van_gogh": ["a Van Gogh painting", "a painting in the style of Van Gogh"],
 }
-RETAIN_POOL = ["a photo of a cassette player", "a photo of a chain saw",
-               "a photo of an english springer spaniel", "a photo of a french horn",
-               "a photo of a gas pump", "a photo of a golf ball", "a photo of a tench",
-               "a painting in the style of Monet", "a photo of a house", "a landscape photograph",
-               "a portrait of a person", "a city street", "a bowl of fruit", "a mountain range",
-               "a wooden chair", "a cup of coffee"]
+RETAIN_POOL = [
+    # The 8 measured retain concepts
+    "a photo of a cassette player", "a photo of a chain saw",
+    "a photo of an english springer spaniel", "a photo of a french horn",
+    "a photo of a gas pump", "a photo of a golf ball", "a photo of a tench",
+    "a painting in the style of Monet",
+    # BROAD GENERAL COVERAGE. FINDING33 S3 predicts damage+distil works when repair can actually
+    # restore the model. The T2I repair pool was 48-144 images over ~20 prompts, which cannot
+    # represent SD's distribution -- so retain stalled at 0.09-0.32 while the MDLM phase, with
+    # ~1400 prompts, reached 0.63-0.71. Pool DIVERSITY is a different variable from more steps,
+    # so widening it tests the prediction without the indefinite budget escalation PREREG_H38 K2
+    # forbids.
+    "a photo of a house", "a landscape photograph", "a portrait of a person", "a city street",
+    "a bowl of fruit", "a mountain range", "a wooden chair", "a cup of coffee",
+    "a dog running in a park", "a cat on a windowsill", "a red sports car", "a bicycle",
+    "a plate of food on a table", "a forest path in autumn", "a sailboat on the sea",
+    "a snowy village", "a bridge over a river", "a field of sunflowers", "a bookshelf",
+    "a glass of water", "a laptop on a desk", "a pair of shoes", "a birthday cake",
+    "a train at a station", "an airplane in flight", "a lighthouse on a cliff",
+    "a market stall with vegetables", "a child flying a kite", "a violin",
+    "an oil painting of a still life", "a watercolour of a garden", "a pencil sketch of a face",
+    "a desert at sunset", "a waterfall in a jungle", "a stone castle", "a modern kitchen",
+    "a crowded beach", "a hot air balloon", "a bowl of soup", "a vintage camera",
+    "a horse in a meadow", "a flock of birds", "a rainy sidewalk at night", "a bunch of flowers",
+]
 
 
 def build(dtype, unet_path=None, dev="cuda"):
