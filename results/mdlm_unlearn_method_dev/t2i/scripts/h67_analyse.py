@@ -18,7 +18,21 @@ import numpy as np
 OUT = "/data/bijaypandey/t2i_unlearn/outputs"
 N_BOOT = 10000
 HEALTHY = 0.60                    # PREREG_H67 S4, matching PREREG_H51 K2's floor
-POST_FIX_PREFIXES = ("H59", "H60", "H61", "H62", "H63", "H65", "H64v2", "H66", "h52", "h53", "h54")
+# CORRECTED before any correlation was read. The first version filtered attack records by a LABEL
+# PREFIX heuristic for "post-fix", which wrongly discarded the 65 pre-fix UNet-ONLY runs that the
+# critical text-encoder evaluation bug never touched. run_inventory.json already carries the
+# authoritative per-run classification built in `ecfe8ad`, so it is used directly instead:
+#   VOID_te_omitted_post_attack (136)  -> excluded
+#   valid_unaffected_unet_only  (65)   -> ELIGIBLE (the bug could not affect a UNet-only run)
+#   valid_post_te_fix           (33)   -> ELIGIBLE
+# The n=1 first run produced no correlation, so nothing was seen before this correction.
+INVENTORY = "run_inventory.json"
+VALID_STATUSES = ("valid_unaffected_unet_only", "valid_post_te_fix")
+# Identity-unresolved arms are excluded on PROVENANCE grounds, not on their numbers:
+# adapters/uce_church/unet.pt was OVERWRITTEN between a retain-0.350 and a retain-0.850 build
+# (FINDING35 S5), so a FRAG score computed on today's file cannot be paired with recovery numbers
+# that came partly from a different checkpoint.
+IDENTITY_UNRESOLVED = {"uce_church"}
 
 
 def spearman(x, y):
@@ -57,27 +71,37 @@ def boot_ci(x, y, n=N_BOOT, seed=0):
 
 
 def arm_recovery():
-    """max-over-VALID H per arm, from post-fix attack records keyed by the arm's unet path."""
+    """max-over-VALID H per arm, from the inventory's own eligibility classification, plus any
+    attack records written after the inventory was built (H64v2 onward)."""
     best = {}
+
+    def add(arm, hv):
+        cur = best.get(arm)
+        best[arm] = {"max_valid_H": max(hv, cur["max_valid_H"]) if cur else hv,
+                     "n_valid": (cur["n_valid"] + 1) if cur else 1}
+
+    seen = set()
+    for r in json.load(open(f"{OUT}/{INVENTORY}")):
+        seen.add(r["file"])
+        if r["post_attack_eval_status"] not in VALID_STATUSES:
+            continue
+        if not r["unet_path"] or not r["gate_valid"] or r["H_after"] is None:
+            continue
+        add(os.path.basename(os.path.dirname(r["unet_path"])), r["H_after"])
+    # records newer than the inventory: eligible by construction (written post-fix)
     for f in glob.glob(f"{OUT}/atk_*.json"):
-        b = os.path.basename(f)
-        if not any(b[4:].startswith(p) for p in POST_FIX_PREFIXES):
+        if os.path.basename(f) in seen:
             continue
         try:
             r = json.load(open(f))
         except Exception:
             continue
-        h = r.get("hparams") or {}
-        u = h.get("unet")
+        u = (r.get("hparams") or {}).get("unet")
         if not u or not r.get("attack_validity", {}).get("valid"):
             continue
-        arm = os.path.basename(os.path.dirname(u))
         hv = r.get("recovery", {}).get("H_after")
-        if hv is None:
-            continue
-        cur = best.get(arm)
-        best[arm] = {"max_valid_H": max(hv, cur["max_valid_H"]) if cur else hv,
-                     "n_valid": (cur["n_valid"] + 1) if cur else 1}
+        if hv is not None:
+            add(os.path.basename(os.path.dirname(u)), hv)
     return best
 
 
@@ -89,7 +113,11 @@ def arm_utility():
         except Exception:
             continue
         lab = r.get("label")
+        # the issue-4 repair RENAMED this field; files written before it use the old name, so both
+        # are accepted. Same quantity (the historical retain8 denominator) under both names.
         rt = r.get("retain_mean_acc_LEGACY")
+        if rt is None:
+            rt = r.get("retain_mean_acc")
         if lab and rt is not None:
             out[lab] = rt
     return out
@@ -105,15 +133,21 @@ def main():
     excluded_identical = [r["arm"] for r in fr["arms"] if r.get("unet_identical_to_base")]
     rec_map, util = arm_recovery(), arm_utility()
 
-    rows = []
+    rows, dropped = [], {"no_valid_attack": [], "identity_unresolved": []}
     for arm, s in sorted(scored.items()):
+        if arm in IDENTITY_UNRESOLVED:
+            dropped["identity_unresolved"].append(arm)
+            continue
         if arm not in rec_map:
+            dropped["no_valid_attack"].append(arm)
             continue
         rows.append({"arm": arm, "FRAG": s["FRAG"], "A_f": s["A_f"], "A_r": s["A_r"],
                      "global_l2": s["global_l2"],
                      "max_valid_H": rec_map[arm]["max_valid_H"],
                      "n_valid_attacks": rec_map[arm]["n_valid"],
                      "retain8": util.get(arm)})
+    # the binding constraint: arms with a valid recovery number but NO surviving checkpoint
+    no_ckpt = sorted(a for a in rec_map if a not in scored)
     A = rows
     B = [r for r in rows if r["retain8"] is not None and r["retain8"] >= HEALTHY]
 
@@ -153,6 +187,18 @@ def main():
                                            "variable, so magnitudes are not directly comparable."},
            "excluded_unet_identical": excluded_identical,
            "n_excluded_unet_identical": len(excluded_identical),
+           "dropped": dropped,
+           "arms_with_recovery_but_no_surviving_checkpoint": no_ckpt,
+           "n_arms_with_recovery_but_no_checkpoint": len(no_ckpt),
+           "binding_constraint": (
+               "FRAG needs the arm's WEIGHTS; a recovery number alone is not enough. "
+               f"{len(no_ckpt)} arms have a valid max-over-valid H but their erased checkpoint was "
+               "deleted for storage, so they cannot be scored. This is the provenance failure the "
+               "audit's issue 9 warned about -- 'do not delete the only checkpoint needed to "
+               "verify a headline result' -- and it is now the reason this study cannot be done at "
+               "the pre-declared standard. Rebuilding is NOT a remedy: construction was "
+               "nondeterministic until 08742c1, and a rebuild is a NEW arm whose weights must not "
+               "be paired with the old arm's measured recovery."),
            "exclusion_note": "arms whose UNet is bit-identical to base (text-encoder erasures and "
                              "exact alpha=0 no-ops) have D == 0, so FRAG is UNDEFINED. This "
                              "removes the best-utility arms in the phase -- a real scope "
@@ -163,7 +209,11 @@ def main():
     json.dump(res, open(f"{OUT}/h67_frag_transfer_{a.concept}.json", "w"), indent=1)
 
     print(f"=== H67: FRAG transfer test, {a.concept} ===")
-    print(f"excluded (UNet bit-identical, FRAG undefined): {len(excluded_identical)} arms")
+    print(f"scored arms (surviving checkpoint)      : {len(scored)}")
+    print(f"excluded, UNet bit-identical (undefined): {len(excluded_identical)}")
+    print(f"excluded, identity unresolved           : {dropped['identity_unresolved']}")
+    print(f"scored but no valid attack              : {dropped['no_valid_attack']}")
+    print(f"HAVE recovery but checkpoint DELETED    : {len(no_ckpt)} arms  <-- binding constraint")
     print(f"\n{'arm':34s} {'FRAG':>8s} {'A_f':>7s} {'A_r':>7s} {'l2':>10s} {'maxH':>6s} {'ret8':>6s} {'n':>2s}")
     for r in rows:
         print(f"{r['arm']:34s} {r['FRAG']:+8.4f} {r['A_f']:7.4f} {r['A_r']:7.4f} "

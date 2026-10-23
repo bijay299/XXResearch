@@ -1,0 +1,83 @@
+{
+ "study": "h67_frag_transfer",
+ "concept": "church",
+ "prereg": "docs/PREREG_H67_frag_predictor_transfer.md",
+ "outcome": "max-over-valid H after attack (post-fix records only)",
+ "published_reference": {
+  "FRAG_pooled_healthy": -0.78,
+  "global_l2_pooled_healthy": -0.36,
+  "note": "their numbers are vs dES on LLM text benchmarks; ours are vs max-valid H on SD v1.4. Not the same outcome variable, so magnitudes are not directly comparable."
+ },
+ "excluded_unet_identical": [],
+ "n_excluded_unet_identical": 0,
+ "dropped": {
+  "no_valid_attack": [
+   "adv_church",
+   "h48_adv_a0.3",
+   "h50_adv_a0.5",
+   "h64v2_frag_a0.3_church"
+  ],
+  "identity_unresolved": [
+   "uce_church"
+  ]
+ },
+ "arms_with_recovery_but_no_surviving_checkpoint": [
+  "adv2_church",
+  "adv3_church",
+  "h61_church_a0.3",
+  "h61_van_gogh_a0.3",
+  "h63_church_a0.3",
+  "h63_van_gogh_a0.3",
+  "uce_matched",
+  "undo_a0.0_retain_fisher",
+  "undo_a0.3_rebuild",
+  "undo_a0.3_retain_fisher",
+  "undo_a0.5_pool",
+  "undo_a0.5_retain_fisher"
+ ],
+ "n_arms_with_recovery_but_no_checkpoint": 12,
+ "binding_constraint": "FRAG needs the arm's WEIGHTS; a recovery number alone is not enough. 12 arms have a valid max-over-valid H but their erased checkpoint was deleted for storage, so they cannot be scored. This is the provenance failure the audit's issue 9 warned about -- 'do not delete the only checkpoint needed to verify a headline result' -- and it is now the reason this study cannot be done at the pre-declared standard. Rebuilding is NOT a remedy: construction was nondeterministic until 08742c1, and a rebuild is a NEW arm whose weights must not be paired with the old arm's measured recovery.",
+ "exclusion_note": "arms whose UNet is bit-identical to base (text-encoder erasures and exact alpha=0 no-ops) have D == 0, so FRAG is UNDEFINED. This removes the best-utility arms in the phase -- a real scope limitation of the predictor, reported as a finding.",
+ "rows": [
+  {
+   "arm": "esd_church",
+   "FRAG": 0.12391929078933245,
+   "A_f": 0.3943473899818643,
+   "A_r": 0.27042809919253186,
+   "global_l2": 2.9228251021234906,
+   "max_valid_H": 1.0,
+   "n_valid_attacks": 3,
+   "retain8": 0.9916666666666667
+  },
+  {
+   "arm": "h64v2_frag_a0.3_parachute",
+   "FRAG": 0.1309184177128228,
+   "A_f": 0.41413678208630056,
+   "A_r": 0.28321836437347775,
+   "global_l2": 313.08913089291275,
+   "max_valid_H": 0.3333333333333333,
+   "n_valid_attacks": 2,
+   "retain8": 0.08333333333333333
+  },
+  {
+   "arm": "undo_a0.5_big",
+   "FRAG": 0.2599479124452784,
+   "A_f": 0.8396533836245916,
+   "A_r": 0.5797054711793133,
+   "global_l2": 392.3922949869497,
+   "max_valid_H": 0.4666666666666667,
+   "n_valid_attacks": 5,
+   "retain8": 0.31666666666666665
+  }
+ ],
+ "population_A_all": {
+  "population": "A: all eligible",
+  "n": 3,
+  "verdict": "n < 4: no correlation computed"
+ },
+ "population_B_healthy_PRIMARY": {
+  "population": "B: healthy (retain8 >= 0.6)",
+  "n": 1,
+  "verdict": "n < 4: no correlation computed"
+ }
+}

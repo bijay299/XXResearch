@@ -1,0 +1,121 @@
+{
+ "study": "frag_predictor_port",
+ "predictor": "FRAG (Forget-Retain Alignment Gap)",
+ "source": "arXiv 2608.25429 Appendix A.1, Eq. (7)-(9)",
+ "provenance": "OUR PORT from the paper. Not the authors' code (repo is a README stub, ERRATUM_r2 C19). THEIR predictor; a positive result is about their work.",
+ "prereg": "docs/PREREG_H67_frag_predictor_transfer.md",
+ "hparams": {
+  "concept": "church",
+  "device": "cpu",
+  "n_prompts": 16,
+  "n_timesteps": 8,
+  "seed": 42
+ },
+ "gamma": 1.0,
+ "eps": 1e-06,
+ "scope": {
+  "n_layers": 160,
+  "note": "all nn.Linear inside BasicTransformerBlocks (128 attention + 32 feed-forward)"
+ },
+ "calibration": {
+  "D_f": [
+   "a church",
+   "an old stone church",
+   "a church steeple",
+   "a chapel with a bell tower"
+  ],
+  "D_r": [
+   "a cassette player on a shelf",
+   "a chain saw resting on a log",
+   "an english springer spaniel in a field",
+   "a french horn held by a player"
+  ],
+  "timesteps": [
+   0,
+   142,
+   285,
+   428,
+   570,
+   713,
+   856,
+   999
+  ],
+  "positions_forget": 8192,
+  "positions_retain": 8192,
+  "pool_recipe": "pools_v2"
+ },
+ "base_norms": {
+  "F": 811.5056409440411,
+  "R": 1272.4936364524294
+ },
+ "arms": [
+  {
+   "arm": "adv_church",
+   "A_f": 0.1178080114027638,
+   "A_r": 0.10394773031753587,
+   "FRAG": 0.013860281085227924,
+   "global_l2": 1.859386349675109,
+   "D_norm": 0.00103802685517029
+  },
+  {
+   "arm": "esd_church",
+   "A_f": 0.3943473899818643,
+   "A_r": 0.27042809919253186,
+   "FRAG": 0.12391929078933245,
+   "global_l2": 2.9228251021234906,
+   "D_norm": 0.0010740050155559067
+  },
+  {
+   "arm": "h48_adv_a0.3",
+   "A_f": 0.8402215625135104,
+   "A_r": 0.5799266513004803,
+   "FRAG": 0.26029491121303017,
+   "global_l2": 233.88262597721132,
+   "D_norm": 6.875917027258586
+  },
+  {
+   "arm": "h50_adv_a0.5",
+   "A_f": 0.8402142753020349,
+   "A_r": 0.5796415233189888,
+   "FRAG": 0.2605727519830461,
+   "global_l2": 390.8187307217614,
+   "D_norm": 19.238438505818895
+  },
+  {
+   "arm": "h64v2_frag_a0.3_church",
+   "A_f": 0.4130325342441621,
+   "A_r": 0.27896538078997085,
+   "FRAG": 0.13406715345419123,
+   "global_l2": 314.2900072537105,
+   "D_norm": 24.801774594220255
+  },
+  {
+   "arm": "h64v2_frag_a0.3_parachute",
+   "A_f": 0.41413678208630056,
+   "A_r": 0.28321836437347775,
+   "FRAG": 0.1309184177128228,
+   "global_l2": 313.08913089291275,
+   "D_norm": 24.441229855847922
+  },
+  {
+   "arm": "uce_church",
+   "A_f": 0.08355933460936121,
+   "A_r": 0.07022556681993242,
+   "FRAG": 0.013333767789428796,
+   "global_l2": 53.89724797854011,
+   "D_norm": 1.552986010371144
+  },
+  {
+   "arm": "undo_a0.5_big",
+   "A_f": 0.8396533836245916,
+   "A_r": 0.5797054711793133,
+   "FRAG": 0.2599479124452784,
+   "global_l2": 392.3922949869497,
+   "D_norm": 19.350204843261313
+  }
+ ],
+ "n_scored": 8,
+ "n_unet_identical": 0,
+ "n_error": 0,
+ "minutes": 13.462050807476043
+}
