@@ -10,10 +10,21 @@ settled.
 
 ## 1. The honest verdict so far
 
-**The mandate's bar is not met in this phase either.** What the phase has produced is a
-**threat-model result**: every concept-erasure method tested — including the published robust SOTA
-— is completely undone by a cheap fine-tuning adversary with weight access, and the only
-intervention that resists costs more utility than it is worth.
+**The mandate's bar is not met in this phase either.** Every concept-erasure method tested —
+including the published robust SOTA — is completely undone by a cheap fine-tuning adversary with
+weight access, and the only intervention that resists costs more utility than it is worth.
+
+**⚠ And that headline is largely ANTICIPATED, per a primary-source check.** Meta-Unlearning
+(2410.12777) already reports T2I erasure reversed by malicious fine-tuning at 50–300 steps on a
+prompt-disjoint split, and names AdvUnlearn in exactly that claim; `Erased or Dormant?`
+(2505.16174) reports it for UCE and ESD. Our measurement is a **confirmation** — with one modest
+gap filled, since Meta-Unlearning asserts the AdvUnlearn case in prose while measuring RECE. It is
+not a discovery, and `FINDING34` now carries that correction at the top.
+
+**A competitive-baseline gap that bounds everything below:** Meta-Unlearning, IMMA (2311.18815) and
+GIFT (2507.13598) are three existing defences for precisely this threat model, and **none was run
+here**. No contribution claim in this phase is credible without them, and this phase does not have
+them.
 
 | arm | church (erased) | retain8 | **max-over-valid-gate H after attack** | valid/total |
 |---|---|---|---|---|

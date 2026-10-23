@@ -16,7 +16,7 @@ result has the most leverage:
 - the standard reported metrics there are **static** — erased-concept classifier accuracy, CLIP
   score, FID — the same classes measured and found uninformative
 - the attack literature already shows erasure is reversible (UnlearnDiffAtk 2404.19382, Ring-A-Bell
-  2310.10012, P4D 2309.06135, concept inversion 2308.11508), so the gap is **known to exist** here
+  2310.10012, P4D 2309.06135, concept inversion 2308.01508), so the gap is **known to exist** here
 - but the protocol discipline this phase developed — **validity gate**, **matched attacker budget**,
   **max-over-attacks**, and the **trainability control** (`FINDING30` §4) — is not standard practice
   in that literature
@@ -86,7 +86,11 @@ reproductions without matching their protocol.
    material it was given before a flat curve on held-out prompts counts as robustness.
 2. **Discrete prompt attack** (UnlearnDiffAtk-style): optimise a prompt/token sequence to resurface
    the concept. No auxiliary model needed.
-3. **Concept inversion** (2308.11508): learn a new token embedding for the erased concept.
+3. **Concept inversion** (2308.01508, Pham et al.): learn a new token embedding for the
+   erased concept. **Note:** their attack is *prompt-space* — verbatim, it retrieves erased
+   concepts *"with no alterations to their weights"* — so it does **not** cover the weight-access
+   adversary this phase uses. (Citation ID corrected from 2308.11508, which is an unrelated
+   Camassa-Holm PDE paper.)
 
 Reported as **max-over-attacks at a matched budget**, never best-case. Plus the **trainability
 control** from `FINDING30` §4 — attack the arm on a *retained* concept to establish whether it is

@@ -7,6 +7,24 @@
 **Status:** the decisive test `PREREG_H40` asked for, run against a **working** robust baseline
 after three of my own re-implementations failed to erase at all.
 
+> ### ⚠ CORRECTION — the headline is a CONFIRMATION, not a discovery
+>
+> A primary-source novelty check run after this finding was written returns **ANTICIPATED** for its
+> central claim. **Meta-Unlearning (arXiv 2410.12777)** already establishes that T2I erasure is
+> reversed by malicious fine-tuning, using essentially this protocol — fine-tuning on generated
+> harmful-image sets for **50/100/200/300 steps**, evaluated on a **prompt-disjoint** held-out set
+> — and states verbatim that *"models unlearned by these methods can still be maliciously finetuned
+> to relearn unlearned concepts, as observed in our experiments"*, naming **AdvUnlearn** explicitly
+> in that sentence. `Erased or Dormant?` (2505.16174) reports the same for UCE and ESD.
+>
+> **What survives as ours is narrow and must be stated that way:** Meta-Unlearning asserts the
+> AdvUnlearn case in prose but its tables measure ESD/SDD/UCE/**RECE**, not AdvUnlearn. So §2 below
+> is a **clean AdvUnlearn-specific datapoint filling a gap in a published claim** — modest,
+> gap-filling confirmation, *not* a new threat-model finding. §3's framing of the prompt-space vs
+> weight-space distinction is likewise their thesis, not ours.
+>
+> This correction is recorded because the finding as first written reads as a discovery. It is not.
+
 ---
 
 ## 1. The defence, verified before attacking it

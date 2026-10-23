@@ -74,7 +74,31 @@ numbers can carry.
 ## 6. Novelty position, stated before results
 
 Composing a text-encoder erasure with a weight-space robustification is, as far as the earlier
-primary-source check reached, untested — the T2I erasure literature treats these as alternative
-methods rather than stackable layers, and UNDO's perturb-then-distil has not been applied to T2I at
-all. A novelty check will run before any contribution claim, and an ANTICIPATED verdict will be
-reported as a reproduction regardless of performance, as was honoured for `H36`.
+primary-source check reached, untested. A novelty check ran before any contribution claim, per the
+commitment honoured for `H36`. **Its verdict, recorded in full:**
+
+| component | verdict |
+|---|---|
+| stacking a text-encoder method + a UNet method as one composite | **NOT FOUND** (AdvUnlearn itself frames the module choice as mutually exclusive) |
+| perturb-then-distil applied to a **diffusion** model | **NOT FOUND** — UNDO is LLM-only, and none of its ~18 citing papers touch diffusion, image generation or concept erasure. **Our strongest novelty claim.** |
+| T2I erasure reversed by **weight-space fine-tuning** | **ANTICIPATED** — Meta-Unlearning 2410.12777, `Erased or Dormant?` 2505.16174 |
+| retain-Fisher-weighted parameter **noise** in diffusion unlearning | **NOT FOUND** (PAIR 2602.05339 uses Fisher for LoRA *initialisation*; SalUn 2310.12508 *masks* rather than perturbs — abstract-level only) |
+| prompt-disjoint split + an **attack-validity gate** | split **PARTIAL** (Meta-Unlearning already uses one); the gate requirement **NOT FOUND** |
+
+**Overall: not anticipated as a whole, but the motivation is fully anticipated and the novelty is
+narrow.** The framing that justifies this work — *T2I erasure, including adversarially-trained
+erasure, is reversed by malicious fine-tuning, so weight-space immunisation is needed before
+release* — is exactly Meta-Unlearning's thesis, and also IMMA's (2311.18815) and GIFT's
+(2507.13598). What is defensibly ours reduces to (i) transferring UNDO's mechanism to diffusion,
+(ii) the retain-Fisher-weighted perturbation, (iii) stacking across disjoint modules.
+
+**⚠ A competitive-baseline gap that must be stated in any claim.** Meta-Unlearning, IMMA and GIFT
+are three *existing* defences for precisely this threat model, and **none of them has been run
+here**. Any contribution claim without that comparison is not credible, and this phase does not
+have it. `H47` is therefore positioned as a mechanism transfer with a measured operating point,
+never as a SOTA claim.
+
+**Nearest mechanisms, and why they differ:** GIFT noises in **representation space** inside a
+bi-level objective, with no distillation-repair stage; IMMA learns a bad **initialisation** via
+MAML-style bi-level optimisation. Neither damages weights with random noise and repairs by
+self-distillation from the erased teacher.
