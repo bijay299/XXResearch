@@ -75,6 +75,36 @@ establish validity.
 > arm showing resistance is also the arm that is nearly untrainable and generates almost nothing
 > correctly. On this ladder, "robust" and "broken" are not separable.
 
+## 4a. The non-targeted-concept control, and a sharper result than expected
+
+`tench` was never an erasure target on any arm, so attacking it isolates general fine-tunability
+from anything specific to the erased concept.
+
+| arm | α | fit speed on **tench** | tench accuracy before → after attack |
+|---|---|---|---|
+| base SD v1.4 | 0.0 | **0.3111** | 1.000 → 1.000 |
+| UCE teacher | 0.0 | **0.3115** | 0.933 → 1.000 |
+| UNDO α=0.3 | 0.3 | **0.3318** (+6.6%) | **0.133 → 1.000** (gate PASS, T rise +1.000) |
+
+Two things fall out, and the second is the more important.
+
+**(i) General trainability loss is real but MILD at α=0.3.** +6.6% on a concept the erasure never
+targeted — the same direction as §3's church measurement (+13%) and about half the size. Damage
+does degrade fine-tunability globally, not only on the erased concept, which is the signature of
+explanation (b). But at α=0.3 the degradation is nowhere near enough to stop an attacker.
+
+**(ii) The damage's own collateral destruction is also trivially reversible.** Damage at α=0.3
+destroyed tench as a side effect (1.000 → 0.133, consistent with retain 0.458). **The attacker
+restored it to 1.000 in 300 steps**, on a concept it was never asked to erase.
+
+> So at α=0.3 **everything the damage destroyed comes back under attack** — the targeted concept
+> (church 0.000 → 1.000) and the collateral casualties (tench 0.133 → 1.000) alike. The damage
+> buys a large, durable utility loss and no durable forgetting in either direction.
+
+This is the asymmetry `PREREG_H40` predicted, now measured on both sides: re-associating a text
+direction with intact visual features is cheap for *any* concept, targeted or not, while the
+utility cost of the damage is immediate and permanent unless repaired.
+
 ## 5. What this does to my own claims
 
 **T2I (H38):** the α=0.5 resistance (H 1.000 → 0.400) cannot be credited to erasure. Combined with
@@ -103,8 +133,7 @@ knowledge."** I am recording that qualification against my own strongest result.
 - The losses are single-sample per logged step (one latent, one timestep), averaged over only 3
   logged points × 3 budgets. The **monotonicity across five arms** and the 4-decimal agreement of
   the two α=0 arms are what carry the result, not any individual value.
-- The non-targeted-concept comparison (tench on a damaged arm vs the undamaged teacher) is the
-  cleaner version of this test and is reported separately once measured; §3 does not depend on it.
+- The non-targeted-concept comparison is now measured and reported in §4a; §3 never depended on it.
 - This finding does **not** show damage+distil is worthless in general. It shows that on this
   ladder, in T2I, robustness and brokenness could not be separated — and that the control which
   would separate them is now available and cheap.
