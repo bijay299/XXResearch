@@ -42,6 +42,9 @@ FORGET_POOL = {
     "church": ["a church", "a photo of a church", "an old stone church", "a church steeple"],
     "parachute": ["a parachute", "a photo of a parachute", "a parachute in the sky"],
     "van_gogh": ["a Van Gogh painting", "a painting in the style of Van Gogh"],
+    # added for H53's within-kind control; the tench leg's composite failed because this pool
+    # had no entry for it, so argparse rejected --concept tench and no checkpoint was written
+    "tench": ["a tench", "a photo of a tench", "a tench fish"],
 }
 RETAIN_POOL = [
     # The 8 measured retain concepts
@@ -133,7 +136,17 @@ def main():
     # INTERLEAVED pool with an explicitly declared forget fraction, so composition does not
     # depend on pool size. Forget prompts must be present (their absence in the 8B phase meant
     # suppression was never transferred where it was measured) but must not dominate.
-    fp, rp = FORGET_POOL[a.concept], RETAIN_POOL
+    fp = FORGET_POOL[a.concept]
+    # The forget concept must NOT also appear in the retain pool, or the distillation would
+    # simultaneously teach the student to preserve the very concept the teacher erases. This bit
+    # only ever mattered for `tench`, which is both an H53 forget target and a standing retain
+    # neighbour -- caught when the tench arm was added.
+    _kw = {"church": "church", "parachute": "parachute", "van_gogh": "van gogh",
+           "tench": "tench"}[a.concept]
+    rp = [q for q in RETAIN_POOL if _kw not in q.lower()]
+    if len(rp) != len(RETAIN_POOL):
+        print(f"[undo] dropped {len(RETAIN_POOL)-len(rp)} retain prompt(s) naming "
+              f"'{_kw}' so the forget concept is not also a retain target", flush=True)
     n_f = max(1, int(round(a.n_images * a.forget_frac)))
     pool = [(fp[i % len(fp)], True) for i in range(n_f)] + \
            [(rp[i % len(rp)], False) for i in range(a.n_images - n_f)]
