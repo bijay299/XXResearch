@@ -1,0 +1,82 @@
+{
+ "study": "t2i_gen_eval",
+ "label": "h47_adv_a0.5",
+ "unet": "adapters/h47_adv_a0.5/unet.pt",
+ "text_encoder": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee/church_unlearned",
+ "hparams": {
+  "label": "h47_adv_a0.5",
+  "unet": "adapters/h47_adv_a0.5/unet.pt",
+  "text_encoder": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee/church_unlearned",
+  "n_per_prompt": 5,
+  "steps": 25,
+  "guidance": 7.5,
+  "seed": 0,
+  "concepts": null,
+  "save_grid": false
+ },
+ "per_concept": {
+  "church": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.148095703125
+  },
+  "parachute": {
+   "n": 15,
+   "clip_acc": 0.4666666666666667,
+   "clip_align": 0.19082845052083333
+  },
+  "garbage_truck": {
+   "n": 15,
+   "clip_acc": 0.26666666666666666,
+   "clip_align": 0.1826904296875
+  },
+  "van_gogh": {
+   "n": 15,
+   "clip_acc": 0.13333333333333333,
+   "clip_align": 0.18978678385416667
+  },
+  "cassette_player": {
+   "n": 15,
+   "clip_acc": 0.6666666666666666,
+   "clip_align": 0.22649739583333334
+  },
+  "chain_saw": {
+   "n": 15,
+   "clip_acc": 0.26666666666666666,
+   "clip_align": 0.20870768229166667
+  },
+  "english_springer": {
+   "n": 15,
+   "clip_acc": 0.6666666666666666,
+   "clip_align": 0.21356608072916666
+  },
+  "french_horn": {
+   "n": 15,
+   "clip_acc": 0.6666666666666666,
+   "clip_align": 0.22318522135416666
+  },
+  "gas_pump": {
+   "n": 15,
+   "clip_acc": 0.4666666666666667,
+   "clip_align": 0.20882161458333334
+  },
+  "golf_ball": {
+   "n": 15,
+   "clip_acc": 0.8,
+   "clip_align": 0.22139485677083334
+  },
+  "tench": {
+   "n": 15,
+   "clip_acc": 0.6666666666666666,
+   "clip_align": 0.2104736328125
+  },
+  "monet": {
+   "n": 15,
+   "clip_acc": 0.26666666666666666,
+   "clip_align": 0.19493001302083332
+  }
+ },
+ "forget_mean_acc": 0.21666666666666667,
+ "retain_mean_acc": 0.5583333333333333,
+ "minutes": 1.3684541742006937
+}
