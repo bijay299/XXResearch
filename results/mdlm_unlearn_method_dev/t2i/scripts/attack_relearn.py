@@ -21,6 +21,7 @@ attacker would scrape. The erased model never sees a human-labelled concept imag
 model is the thing the attacker is trying to restore, so this is if anything a STRONG attacker.
 """
 import argparse, json, os, time
+import numpy as np
 import torch
 import torch.nn.functional as F
 
@@ -77,6 +78,40 @@ LAB_KEY = ["church", "parachute", "garbage_truck", "van_gogh", "cassette_player"
            "english_springer", "french_horn", "gas_pump", "golf_ball", "tench", "monet"]
 
 
+# ----------------------------------------------------------------- ISSUE 7 REPAIR
+# The attack evaluator measured ONLY target recovery, on T and H. That leaves the central
+# interpretive question unanswered: `H_after = 1.000` means the classifier recognised the TARGET in
+# every evaluated image, and says nothing about whether the rest of the model survived the attack.
+# An attack that restores the church and destroys everything else is not the same threat as an
+# attack that restores the church and leaves the model intact, and the two were indistinguishable
+# in every historical record. Three quantities are now separated:
+#
+#   (1) TARGET REGENERATION   -- H_before -> H_after            (was already measured)
+#   (2) RETAINED CAPABILITY   -- closed-set accuracy on a fixed panel of NON-TARGET concepts,
+#                                before and after the attack, paired on identical seeds
+#   (3) GENERAL IMAGE QUALITY -- prompt adherence (CLIPScore-style image-vs-actual-prompt
+#                                similarity), which is sensitive to degradation that a 12-way
+#                                closed-set argmax cannot see. FID is NOT computed here; see
+#                                docs/FID_PROTOCOL.md for why, and what would be required.
+#
+# The panel's prompts are imported from gen_eval.py rather than copied, so post-attack utility is
+# measured on exactly the strings the erasure-time utility numbers were measured on.
+UTILITY_PANEL_DEFAULT = ["cassette_player", "english_springer", "french_horn", "gas_pump",
+                         "golf_ball", "monet"]
+# All six are retain neighbours that are never an erasure target anywhere in this project, so the
+# panel is disjoint from the active target for every concept in SPLIT. Asserted at runtime anyway.
+
+
+def gen_eval_concepts():
+    """gen_eval.py's CONCEPTS dict, as the single source of truth for prompt strings."""
+    import importlib.util as iu
+    spec = iu.spec_from_file_location(
+        "ge_concepts", os.path.join(os.path.dirname(os.path.abspath(__file__)), "gen_eval.py"))
+    m = iu.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m.CONCEPTS
+
+
 def build_pipe(dtype, unet_path=None, dev="cuda", te_path=None):
     from diffusers import StableDiffusionPipeline
     pin = dict(l.split("=", 1) for l in open(PIN).read().split("\n") if "=" in l)
@@ -109,6 +144,48 @@ def clip_acc(pipe, cm, cp, tfeat, prompts, target_key, n_per, steps, seed, dev):
     return hits / max(tot, 1)
 
 
+@torch.no_grad()
+def utility_probe(pipe, cm, cp, tfeat, panel, cdict, n_prompts, n_per, steps, seed, dev,
+                  grid_dir=None):
+    """ISSUE 7. Retained capability and prompt adherence on NON-TARGET concepts.
+
+    Seeds depend only on (concept index, prompt index, seed), never on the model, so the before and
+    after calls draw the SAME initial latents and the comparison is paired.
+    """
+    per, adh_all = {}, []
+    for ci, ck in enumerate(panel):
+        prompts = cdict[ck][:n_prompts]
+        hits = tot = 0
+        adh = []
+        for pi, pr in enumerate(prompts):
+            g = torch.Generator(device=dev).manual_seed(seed * 1000 + 101 * ci + pi)
+            imgs = pipe([pr] * n_per, num_inference_steps=steps, guidance_scale=7.5,
+                        generator=g).images
+            ii = cp(images=imgs, return_tensors="pt").to(dev)
+            f = cm.get_image_features(pixel_values=ii["pixel_values"].half())
+            f = f / f.norm(dim=-1, keepdim=True)
+            pred = (f @ tfeat.T).argmax(-1).tolist()
+            t = LAB_KEY.index(ck)
+            hits += sum(1 for p_ in pred if p_ == t)
+            tot += len(imgs)
+            # prompt adherence: similarity to the ACTUAL prompt, not to the class label
+            pt = cp(text=[pr], return_tensors="pt", padding=True).to(dev)
+            ptf = cm.get_text_features(**pt)
+            ptf = ptf / ptf.norm(dim=-1, keepdim=True)
+            adh += (f @ ptf.T).squeeze(-1).float().tolist()
+            if grid_dir:
+                os.makedirs(grid_dir, exist_ok=True)
+                imgs[0].save(f"{grid_dir}/{ck}_p{pi}.png")
+        per[ck] = {"n": tot, "clip_acc": hits / max(tot, 1), "prompt_adherence": float(np.mean(adh))}
+        adh_all += adh
+    return {"per_concept": per,
+            "panel_mean_clip_acc": float(np.mean([v["clip_acc"] for v in per.values()])),
+            "panel_mean_prompt_adherence": float(np.mean(adh_all)),
+            "panel": list(panel), "n_concepts": len(panel),
+            "n_prompts_per_concept": n_prompts, "n_images_per_prompt": n_per,
+            "n_images_total": sum(v["n"] for v in per.values())}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--unet", default=None, help="erased unet; omit to attack the base model")
@@ -127,10 +204,32 @@ def main():
     ap.add_argument("--eval-steps", type=int, default=25)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--label", required=True)
+    # ISSUE 7: post-attack utility. On by default -- it is the measurement whose absence made
+    # H_after uninterpretable, so it should not be something a run has to opt into.
+    ap.add_argument("--no-utility", action="store_true",
+                    help="skip the ISSUE-7 utility probe (records it as NOT MEASURED, which is "
+                         "what every pre-repair run is)")
+    ap.add_argument("--utility-panel", default=",".join(UTILITY_PANEL_DEFAULT),
+                    help="non-target concepts for the retained-capability panel")
+    ap.add_argument("--utility-n-prompts", type=int, default=2)
+    ap.add_argument("--utility-n-per", type=int, default=4)
+    ap.add_argument("--save-grids", action="store_true",
+                    help="save one image per (concept, prompt) before and after, for visual "
+                         "inspection of degradation the CLIP metrics cannot show")
     a = ap.parse_args()
     dev = "cuda"
     torch.manual_seed(a.seed)
     T, H = SPLIT[a.concept]["T"], SPLIT[a.concept]["H"]
+    panel = [c for c in a.utility_panel.split(",") if c]
+    cdict = gen_eval_concepts() if not a.no_utility else {}
+    gdir = f"{OUT}/img_atk_{a.label}" if a.save_grids else None
+    if not a.no_utility:
+        assert a.concept not in panel, (
+            f"utility panel must exclude the active target {a.concept}: {panel}")
+        missing = [c for c in panel if c not in cdict]
+        assert not missing, f"panel concepts absent from gen_eval CONCEPTS: {missing}"
+        assert all(c in LAB_KEY for c in panel), "panel concepts must be in the closed label set"
+        gdir = f"{OUT}/img_atk_{a.label}" if a.save_grids else None
 
     from transformers import CLIPModel, CLIPProcessor
     cm = CLIPModel.from_pretrained("openai/clip-vit-large-patch14",
@@ -166,6 +265,14 @@ def main():
         half = build_pipe(torch.float16, a.unet, dev, te_path=a.text_encoder)
         T_before = clip_acc(half, cm, cp, tfeat, T, a.concept, 3, a.eval_steps, a.seed, dev)
         H_before = clip_acc(half, cm, cp, tfeat, H, a.concept, a.eval_n, a.eval_steps, a.seed, dev)
+        util_before = None
+        if not a.no_utility:
+            util_before = utility_probe(
+                half, cm, cp, tfeat, panel, cdict, a.utility_n_prompts, a.utility_n_per,
+                a.eval_steps, a.seed, dev, grid_dir=f"{gdir}/before" if gdir else None)
+            print(f"[atk] BEFORE  utility panel acc={util_before['panel_mean_clip_acc']:.4f} "
+                  f"adherence={util_before['panel_mean_prompt_adherence']:.4f} "
+                  f"(n={util_before['n_images_total']} images)", flush=True)
         del half; torch.cuda.empty_cache()
     print(f"[atk] BEFORE  T={T_before:.3f}  H={H_before:.3f}", flush=True)
 
@@ -276,6 +383,13 @@ def main():
     with torch.no_grad():
         T_after = clip_acc(after, cm, cp, tfeat, T, a.concept, 3, a.eval_steps, a.seed, dev)
         H_after = clip_acc(after, cm, cp, tfeat, H, a.concept, a.eval_n, a.eval_steps, a.seed, dev)
+        util_after = None
+        if not a.no_utility:
+            util_after = utility_probe(
+                after, cm, cp, tfeat, panel, cdict, a.utility_n_prompts, a.utility_n_per,
+                a.eval_steps, a.seed, dev, grid_dir=f"{gdir}/after" if gdir else None)
+            print(f"[atk] AFTER   utility panel acc={util_after['panel_mean_clip_acc']:.4f} "
+                  f"adherence={util_after['panel_mean_prompt_adherence']:.4f}", flush=True)
     os.system(f"rm -rf {tmp}")
 
     valid = (T_after - T_before) >= a.gate
@@ -303,8 +417,52 @@ def main():
                                      "statistic as the MDLM phase's FINDING33, so the two phases "
                                      "are comparable; the audit flagged that they were not."},
          "recovery": {"H_before": H_before, "H_after": H_after,
-                      "absolute_rise": H_after - H_before}}
+                      "absolute_rise": H_after - H_before,
+                      "scope_warning": "H_after is TARGET REGENERATION on held-out prompts only. "
+                                       "H_after = 1.000 means the classifier recognised the target "
+                                       "in all 15 evaluated images; it does NOT mean the base "
+                                       "model was restored. Read post_attack_utility for what "
+                                       "else survived."}}
+    # ISSUE 7 record. Absent -> explicitly NOT MEASURED, never silently omitted.
+    if util_before is None or util_after is None:
+        R["post_attack_utility"] = {
+            "status": "NOT MEASURED",
+            "reason": "--no-utility was set" if a.no_utility else "probe did not complete",
+            "note": "every attack record produced before this repair is in this state; those runs "
+                    "cannot distinguish an attack that restored the target from one that restored "
+                    "the target and damaged the rest of the model."}
+    else:
+        d_acc = util_after["panel_mean_clip_acc"] - util_before["panel_mean_clip_acc"]
+        d_adh = (util_after["panel_mean_prompt_adherence"]
+                 - util_before["panel_mean_prompt_adherence"])
+        R["post_attack_utility"] = {
+            "status": "MEASURED",
+            "retained_capability": {"before": util_before["panel_mean_clip_acc"],
+                                    "after": util_after["panel_mean_clip_acc"], "delta": d_acc},
+            "prompt_adherence": {"before": util_before["panel_mean_prompt_adherence"],
+                                 "after": util_after["panel_mean_prompt_adherence"],
+                                 "delta": d_adh},
+            "before": util_before, "after": util_after,
+            "paired": "identical generator seeds before and after; the two panels differ only by "
+                      "the attacked weights",
+            "general_image_quality": {
+                "fid": None, "status": "PENDING",
+                "why": "FID on 48 images is not a defensible estimate. prompt_adherence is "
+                       "reported instead as a per-image proxy, and the protocol that would make "
+                       "an FID number meaningful here is written up but NOT yet run.",
+                "protocol": "docs/FID_PROTOCOL.md"},
+            "three_axes": "target regeneration = recovery.H_after; retained capability = "
+                          "retained_capability; general image quality = prompt_adherence now, FID "
+                          "pending. These are distinct and were conflated before this repair.",
+            "grids": gdir}
     json.dump(R, open(f"{OUT}/atk_{a.label}.json", "w"), indent=1)
+    if R["post_attack_utility"]["status"] == "MEASURED":
+        u = R["post_attack_utility"]
+        print(f"[atk] {a.label}: UTILITY panel acc "
+              f"{u['retained_capability']['before']:.4f}->{u['retained_capability']['after']:.4f} "
+              f"({u['retained_capability']['delta']:+.4f}) | adherence "
+              f"{u['prompt_adherence']['before']:.4f}->{u['prompt_adherence']['after']:.4f} "
+              f"({u['prompt_adherence']['delta']:+.4f})", flush=True)
     print(f"[atk] {a.label}: T {T_before:.3f}->{T_after:.3f} (rise {T_after-T_before:+.3f}, "
           f"gate {'PASS' if valid else 'FAIL'}) | H {H_before:.3f}->{H_after:.3f} "
           f"(rise {H_after-H_before:+.3f})", flush=True)

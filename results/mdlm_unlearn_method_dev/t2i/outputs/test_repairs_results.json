@@ -62,11 +62,36 @@
  {
   "test": "issue2_te_grad_connected_when_on",
   "pass": true,
-  "detail": "te_grad=1.1842e-01 unet_grad=3.9560e-01 vae_grad=0.0000e+00 (vae must be 0)"
+  "detail": "te_grad=1.1843e-01 unet_grad=3.9560e-01 vae_grad=0.0000e+00 (vae must be 0)"
  },
  {
-  "test": "test_issue2_te_gradient_connected",
-  "pass": false,
-  "detail": "EXCEPTION OutOfMemoryError: CUDA out of memory. Tried to allocate 16.00 MiB. GPU 0 has a total capacity of 39.38 GiB of which 14.50 MiB is free. Process 4163091 has 24.89 GiB memory in use. Including non-PyTorch memory, this process has 14.44 GiB memory in use. Of the allocated memory 13.72 GiB is allocated by PyTorch, and 216.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  "test": "issue2_te_param_actually_updates",
+  "pass": true,
+  "detail": "\u2016\u0394text_encoder\u2016=9.0331e-02"
+ },
+ {
+  "test": "issue2_te_grad_zero_when_off",
+  "pass": true,
+  "detail": "te_grad=0.0000e+00 (must be exactly 0 for UNet-only) unet_grad=2.7211e-01"
+ },
+ {
+  "test": "issue7_panel_excludes_every_target",
+  "pass": true,
+  "detail": "panel=['cassette_player', 'english_springer', 'french_horn', 'gas_pump', 'golf_ball', 'monet'] vs attackable targets=['church', 'garbage_truck', 'parachute', 'tench', 'van_gogh'] -> overlap=[] (must be empty)"
+ },
+ {
+  "test": "issue7_panel_prompts_shared_with_gen_eval",
+  "pass": true,
+  "detail": "panel prompts are imported from gen_eval.CONCEPTS, not copied, so post-attack utility uses the same strings as the erasure-time utility numbers"
+ },
+ {
+  "test": "issue7_probe_is_paired",
+  "pass": true,
+  "detail": "same model twice: \u0394acc=0.000e+00 \u0394adherence=0.000e+00 (both must be EXACTLY 0)"
+ },
+ {
+  "test": "issue7_probe_is_sensitive",
+  "pass": true,
+  "detail": "after \u03c3=0.01 UNet noise: adherence 0.2869 -> 0.1656 (|\u0394|=1.214e-01 must exceed 1e-4)"
  }
 ]

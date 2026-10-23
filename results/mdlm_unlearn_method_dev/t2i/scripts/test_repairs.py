@@ -202,11 +202,67 @@ def test_issue10_mask_mean_preserved():
         "all-zero importance -> zero damage (no division by ~0)")
 
 
+# ---------------------------------------------------------------- ISSUE 7
+def test_issue7_utility_probe_paired_and_sensitive():
+    """The post-attack utility probe must be (a) PAIRED -- the same model measured twice gives
+    bit-identical numbers, so a nonzero delta can only come from the attacked weights -- and
+    (b) SENSITIVE -- a genuinely degraded model gives a different number. A probe that satisfies
+    only (a) could be a constant, and a probe that satisfies only (b) could be noise."""
+    import importlib.util as iu
+    sys.argv = ["x"]
+    spec = iu.spec_from_file_location("ar7", os.path.join(os.path.dirname(__file__),
+                                                          "attack_relearn.py"))
+    ar = iu.module_from_spec(spec); spec.loader.exec_module(ar)
+
+    # the panel must exclude the active target for every concept this script can attack
+    cdict = ar.gen_eval_concepts()
+    bad = [c for c in ar.SPLIT if c in ar.UTILITY_PANEL_DEFAULT]
+    rec("issue7_panel_excludes_every_target", not bad,
+        f"panel={ar.UTILITY_PANEL_DEFAULT} vs attackable targets={sorted(ar.SPLIT)} -> "
+        f"overlap={bad} (must be empty)")
+    rec("issue7_panel_prompts_shared_with_gen_eval",
+        all(c in cdict for c in ar.UTILITY_PANEL_DEFAULT)
+        and cdict["monet"] is not None,
+        "panel prompts are imported from gen_eval.CONCEPTS, not copied, so post-attack utility "
+        "uses the same strings as the erasure-time utility numbers")
+
+    from transformers import CLIPModel, CLIPProcessor
+    cm = CLIPModel.from_pretrained("openai/clip-vit-large-patch14",
+                                   torch_dtype=torch.float16).to("cuda").eval()
+    cp = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
+    with torch.no_grad():
+        ti = cp(text=[f"a photo of a {l}" for l in ar.LABELS], return_tensors="pt",
+                padding=True).to("cuda")
+        tf = cm.get_text_features(**ti); tf = tf / tf.norm(dim=-1, keepdim=True)
+
+    pipe = ar.build_pipe(torch.float16, None, "cuda")
+    kw = dict(panel=["french_horn", "golf_ball"], cdict=cdict, n_prompts=1, n_per=2,
+              steps=6, seed=0, dev="cuda")
+    u1 = ar.utility_probe(pipe, cm, cp, tf, **kw)
+    u2 = ar.utility_probe(pipe, cm, cp, tf, **kw)
+    d_acc = u2["panel_mean_clip_acc"] - u1["panel_mean_clip_acc"]
+    d_adh = u2["panel_mean_prompt_adherence"] - u1["panel_mean_prompt_adherence"]
+    rec("issue7_probe_is_paired", d_acc == 0.0 and d_adh == 0.0,
+        f"same model twice: Δacc={d_acc:.3e} Δadherence={d_adh:.3e} (both must be EXACTLY 0)")
+
+    # sensitivity: damage the UNet and require the adherence to move
+    with torch.no_grad():
+        for q in pipe.unet.parameters():
+            q.add_(torch.randn_like(q) * 0.01)
+    u3 = ar.utility_probe(pipe, cm, cp, tf, **kw)
+    moved = abs(u3["panel_mean_prompt_adherence"] - u1["panel_mean_prompt_adherence"])
+    rec("issue7_probe_is_sensitive", moved > 1e-4,
+        f"after σ=0.01 UNet noise: adherence {u1['panel_mean_prompt_adherence']:.4f} -> "
+        f"{u3['panel_mean_prompt_adherence']:.4f} (|Δ|={moved:.3e} must exceed 1e-4)")
+    del pipe; torch.cuda.empty_cache()
+
+
 if __name__ == "__main__":
     torch.backends.cuda.matmul.allow_tf32 = False
     for fn in (test_issue3_adv_sign, test_issue4_active_target_metrics,
                test_issue10_mask_mean_preserved, test_issue1_pipeline_identity,
-               test_issue2_te_gradient_connected):
+               test_issue2_te_gradient_connected,
+               test_issue7_utility_probe_paired_and_sensitive):
         try:
             fn()
         except Exception as e:
