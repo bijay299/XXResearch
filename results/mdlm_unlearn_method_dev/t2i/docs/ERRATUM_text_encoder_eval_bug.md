@@ -70,6 +70,33 @@ attacked copy of it when `--attack-te` was used, which is now persisted rather t
 `H59` is re-measuring church and Van Gogh at seeds {0,1,6} × 300 steps plus the 50- and 2-step
 points, with the corrected harness. **No claim about text-encoder arms stands until it reports.**
 
+## 5a. ✅ FIRST CORRECTED RESULTS: the headline SURVIVES; the cost curve does not yet
+
+`H59`, with the fixed harness, at the original 300-step / 16-image budget:
+
+| concept | sd0 | sd1 | sd6 | gate | max-over-valid |
+|---|---|---|---|---|---|
+| church | **1.000** | 0.800 | **1.000** | 3/3 PASS | **1.000** |
+| Van Gogh | **1.000** | 0.933 | **1.000** | 3/3 PASS | **1.000** |
+
+Two things to read here.
+
+**(a) The fix is working.** The post-attack values now **vary across seeds** (0.800, 0.933, 1.000)
+where before they were identical to three decimals at every budget. Variation is what a measurement
+that actually reads the defence looks like; its absence was the symptom I failed to interpret.
+
+**(b) `FINDING34`'s central claim survives correct measurement.** Official AdvUnlearn — the
+adversarially-trained SOTA, pre-attack church 0.400 / Van Gogh 0.467 at retain 0.992 — is restored
+to **1.000** on both concepts, 3/3 gate-passing each, by 300 steps on 16 self-generated images.
+Even the weakest seed reaches 0.800. So "the robust SOTA is fully reversed by a weight-access
+fine-tuning adversary" stands, and stands on numbers that can tell arms apart.
+
+**What does NOT yet stand** is `FINDING37`'s attacker-*cost* curve. The 50-step and 2-step points
+are still re-measuring, and the flat-curve claim ("1 image / 50 steps suffices") remains **void**
+until they report. Given that seed variation is now visible at 300 steps, I expect the low-budget
+points to come in *below* 1.000 — i.e. the real curve is probably not flat, and the cost of
+defeating the defence is probably higher than the void finding claimed.
+
 ## 6. The lesson, stated against myself
 
 This is the fifth time in this project a too-good number has turned out to be an instrument fault
