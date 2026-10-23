@@ -1,5 +1,8 @@
 # Pre-registration H51 — concept-targeted (forget-Fisher) damage, with a LOWERED prior recorded before results
 
+> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C7 'NOT FOUND' is not evidence of novelty).** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+
+
 **Date:** 2026-10-23 · **Status:** arms are **running and unread** as this is written.
 **Why this document exists:** a primary-source novelty check returned while H51 was still training.
 It is unfavourable in two specific ways, and recording that *before* the results is the only

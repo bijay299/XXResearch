@@ -1,5 +1,8 @@
 # Finding 35 — every usable T2I arm is fully reversed (11 of 11); the one apparent exception was an n=1 artifact
 
+> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C1 max-over-attacks phrasing, C6, C10).** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+
+
 **Date:** 2026-10-23 (**substantially corrected same day** — see §0) · **Model:** SD v1.4 (pinned)
 **Concepts:** church, parachute · **Protocol:** `attack_relearn.py`, prompt-disjoint T/H,
 `FINDING20` gate, max-over-**valid** attacks

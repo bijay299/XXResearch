@@ -1,5 +1,8 @@
 # Finding 34 — the official robust SOTA is fully reversed by a weight-access fine-tuning adversary, 6/6 attacks
 
+> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C1 max-over-attacks phrasing, C4 the 2.14 ratio).** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+
+
 **Date:** 2026-10-22 · **Model:** Stable Diffusion v1.4 (pinned `133a221b`)
 **Defence:** official `OPTML-Group/AdvUnlearn`, `church_unlearned`, pinned `bca3b279` (arXiv
 2405.15234)

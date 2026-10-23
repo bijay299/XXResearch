@@ -1,5 +1,8 @@
 # Pre-registration H47 — composite defence: adversarial text-encoder erasure + UNet robustification
 
+> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C5 the 0.50 bar does not refute H40, C7 'NOT FOUND', C8 teacher confound).** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+
+
 **Date:** 2026-10-22 · **Status:** ❌ **H47 IS FALSE.** See the verdict box below.
 **Mandate clause this targets:** *"Novel, non-obvious combinations of existing techniques are
 eligible."*

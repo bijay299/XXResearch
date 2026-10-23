@@ -1,5 +1,8 @@
 # Finding 37 (REWRITTEN) — the attack needs ~300 steps for full recovery; the original "1 image / 50 steps" claim was a measurement artifact
 
+> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C3 '300 steps is sufficient, not minimal').** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+
+
 **Date:** 2026-10-23 · **Model:** SD v1.4 (pinned) · **Defence:** official `OPTML-Group/AdvUnlearn`
 **Concepts:** church (object), Van Gogh (style) · **Protocol:** prompt-disjoint T/H, `FINDING20` gate
 **Status:** ⚠ **This finding replaces a retracted version.** The first version claimed a flat curve

@@ -1,5 +1,8 @@
 # Text-to-image concept erasure — phase report
 
+> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C1 max-over-attacks phrasing, C2, C4 the 2.14 ratio, C5, C10 in-sample utility).** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+
+
 **Date:** 2026-10-22 · **Model:** Stable Diffusion v1.4, pinned `133a221b8aa7292a167afc5127cb63fb5005638b`
 **Mandate:** an unlearning algorithm that beats the strongest existing methods on a clearly defined
 forgetting–utility trade-off, with real-model results.

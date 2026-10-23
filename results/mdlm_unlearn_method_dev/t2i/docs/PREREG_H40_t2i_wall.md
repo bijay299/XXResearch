@@ -1,5 +1,8 @@
 # Pre-registration H40 — a structural wall for T2I concept erasure, stated before the deciding runs land
 
+> ⚠ **See `ERRATUM_r2_claim_corrections.md` (C6 empirical conjecture, not a theorem).** This document is preserved as published; the corrections are recorded there under a new identifier, not applied here.
+
+
 **Date:** 2026-10-22 · **Status:** pre-registered. The two runs that could refute it (`H38`
 repair-budget, MDLM `H39` trainability) are **in flight and unread** as this is written.
 **Why written now:** so it cannot be fitted to results afterwards. The MDLM phase's "two walls"

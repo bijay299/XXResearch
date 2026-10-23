@@ -1,0 +1,407 @@
+{
+ "study": "provenance_manifest",
+ "issue": 9,
+ "generated": "2026-10-23T11:28:35-0400",
+ "code": {
+  "publish_worktree": "/data/bijaypandey/claude_tmp/mdlm_wt",
+  "commit": "d282837250b3219c42edbcfd2dbd94a903b96001",
+  "branch": "research/mdlm-unlearn-method-dev",
+  "dirty": false,
+  "script_sha256": {
+   "attack_relearn.py": "354e6964c0be77c9",
+   "erase_adv.py": "f9c70482dff3484f",
+   "erase_esd.py": "3b73b0c6c24c17f7",
+   "erase_uce.py": "cbebda0da733b57e",
+   "gen_eval.py": "acedf6f6983b652c",
+   "provenance.py": "79d5e2fdca8af73c",
+   "test_repairs.py": "a47d57c292fd0550",
+   "undo_t2i.py": "c4109ff1077b889b",
+   "verify_splits.py": "30e83987d3b5a3cf"
+  },
+  "note": "the T2I working tree at /data/bijaypandey/t2i_unlearn is NOT a git repository; code identity is the publish worktree commit plus the per-file hashes above. Historical runs predating a given hash cannot be attributed to it."
+ },
+ "models": {
+  "pins": {
+   "stable_diffusion": {
+    "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+    "local": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b"
+   },
+   "advunlearn": {
+    "revision": "bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee",
+    "local": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee"
+   }
+  },
+  "base": "CompVis/stable-diffusion-v1-4 (image latent diffusion; NOT a diffusion LM)",
+  "classifier": {
+   "id": "openai/clip-vit-large-patch14",
+   "revision": "UNPINNED",
+   "warning": "the CLIP classifier that produces EVERY forget/retain/recovery number in this phase was loaded without a pinned revision. It is cached locally, so results within this project are self-consistent, but the pin is not recorded and a future re-download could silently change every metric. This is a real provenance gap, disclosed not patched -- pinning it now would not retroactively identify the weights historical runs used."
+  },
+  "precision": {
+   "generation_and_eval": "float16",
+   "attack_training": "float32",
+   "tf32_matmul": "left at library default except in test_repairs.py, which disables it explicitly"
+  }
+ },
+ "environment": {
+  "python": "3.10.12",
+  "platform": "Linux-5.15.0-136-generic-x86_64-with-glibc2.35",
+  "deps": {
+   "torch": "2.4.1+cu124",
+   "diffusers": "0.31.0",
+   "transformers": "4.46.3",
+   "numpy": "1.26.4",
+   "accelerate": "1.1.1",
+   "safetensors": "0.8.0",
+   "cuda": "12.4",
+   "cudnn": 90100,
+   "gpu": "none"
+  }
+ },
+ "splits": {
+  "registry": "outputs/split_registry.json",
+  "defined_by": "scripts/verify_splits.py",
+  "verdict_summary": "ATK_TRAIN x EVAL_TARGET clean; DEF_TRAIN overlaps both evaluation sets (see FINDING38)"
+ },
+ "protocol": {
+  "frozen": "docs/PROTOCOL_FROZEN_v1.md",
+  "grid": "seeds {0,1,6}@1e-5, {0,1}@5e-5, {0}@1e-4; 300 steps; 16 images",
+  "metric_definitions": "docs/PROTOCOL_FROZEN_v1.md; H precision floor 1/15 = 0.0667",
+  "errata": [
+   "docs/ERRATUM_text_encoder_eval_bug.md",
+   "docs/ERRATUM_r2_claim_corrections.md"
+  ]
+ },
+ "rng_audit": {
+  "attack_relearn.py": {
+   "n_sites": 7,
+   "n_explicit_generator": 2,
+   "n_global_stream": 5,
+   "sites": [
+    {
+     "line": 300,
+     "call": "torch.randn(p_z0.shape, device=dev, generator=pg, dtype=p_z0.dtype)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 301,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (p_n,), device=dev,",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 321,
+     "call": "torch.randint(0, len(lat), (1,), device=dev)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 333,
+     "call": "torch.randn_like(z0)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 334,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev).long()",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 301,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (p_n,), device=dev,",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 334,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev)",
+     "rng": "GLOBAL_STREAM"
+    }
+   ]
+  },
+  "erase_adv.py": {
+   "n_sites": 4,
+   "n_explicit_generator": 0,
+   "n_global_stream": 4,
+   "sites": [
+    {
+     "line": 100,
+     "call": "int(torch.randint(1, a.ddim_steps, (1,)).item())",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 100,
+     "call": "torch.randint(1, a.ddim_steps, (1,)).item()",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 102,
+     "call": "torch.randn(1, 4, 64, 64, device=dev)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 100,
+     "call": "torch.randint(1, a.ddim_steps, (1,))",
+     "rng": "GLOBAL_STREAM"
+    }
+   ]
+  },
+  "erase_esd.py": {
+   "n_sites": 4,
+   "n_explicit_generator": 0,
+   "n_global_stream": 4,
+   "sites": [
+    {
+     "line": 82,
+     "call": "int(torch.randint(1, a.ddim_steps, (1,)).item())",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 82,
+     "call": "torch.randint(1, a.ddim_steps, (1,)).item()",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 84,
+     "call": "torch.randn(1, 4, 64, 64, device=dev)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 82,
+     "call": "torch.randint(1, a.ddim_steps, (1,))",
+     "rng": "GLOBAL_STREAM"
+    }
+   ]
+  },
+  "test_repairs.py": {
+   "n_sites": 9,
+   "n_explicit_generator": 0,
+   "n_global_stream": 9,
+   "sites": [
+    {
+     "line": 99,
+     "call": "torch.randn(1, 4, 64, 64, device=\"cuda\")",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 100,
+     "call": "torch.randn_like(z0)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 134,
+     "call": "torch.randn(1, 8, device=\"cuda\")",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 135,
+     "call": "torch.randn(1, 8, device=\"cuda\")",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 54,
+     "call": "q.add_(torch.randn_like(q) * 0.01)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 251,
+     "call": "q.add_(torch.randn_like(q) * 0.01)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 181,
+     "call": "torch.rand(20000, device=\"cuda\")",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 54,
+     "call": "torch.randn_like(q)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 251,
+     "call": "torch.randn_like(q)",
+     "rng": "GLOBAL_STREAM"
+    }
+   ]
+  },
+  "undo_t2i.py": {
+   "n_sites": 17,
+   "n_explicit_generator": 11,
+   "n_global_stream": 6,
+   "sites": [
+    {
+     "line": 146,
+     "call": "np.random.seed(a.seed)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 165,
+     "call": "np.random.RandomState(a.seed)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 341,
+     "call": "torch.randint(0, len(lats), (1,), device=dev, generator=sg)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 343,
+     "call": "torch.randn(z0.shape, device=dev, generator=sg, dtype=z0.dtype)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 344,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 218,
+     "call": "torch.randn(z0.shape, device=dev, generator=sg, dtype=z0.dtype)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 219,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 247,
+     "call": "torch.randn(z0.shape, device=dev, generator=sg, dtype=z0.dtype)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 248,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 273,
+     "call": "N.normal_(0, 0.02, generator=g)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 344,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 216,
+     "call": "torch.randint(0, len(idx), (1,), device=dev, generator=sg)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 245,
+     "call": "torch.randint(0, len(ret_idx), (1,), device=dev, generator=sg)",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 279,
+     "call": "w.flatten()[torch.randperm(w.numel(), generator=gshuf, device=dev)].view_as(w)",
+     "rng": "GLOBAL_STREAM"
+    },
+    {
+     "line": 219,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 248,
+     "call": "torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,",
+     "rng": "EXPLICIT_GENERATOR"
+    },
+    {
+     "line": 279,
+     "call": "torch.randperm(w.numel(), generator=gshuf, device=dev)",
+     "rng": "EXPLICIT_GENERATOR"
+    }
+   ]
+  }
+ },
+ "rng_summary": {
+  "n_stochastic_sites": 41,
+  "n_explicit_generator": 13,
+  "n_global_stream": 28,
+  "disclosure": "GLOBAL_STREAM sites are reproducible only given identical preceding consumption of the global torch RNG. Attack training (latent/timestep/noise draws per step) is on the global stream seeded once by --seed, so an attack is repeatable end-to-end but NOT robust to inserting or removing any earlier stochastic call. Arm CONSTRUCTION in undo_t2i.py was nondeterministic until 08742c1 and the same config+seed produced retain 0.867 and 0.783; runs before that commit are not reproducible and any rebuild is a NEW arm."
+ },
+ "checkpoints": {
+  "adapters": {
+   "adv2_church": {},
+   "adv3_church": {},
+   "adv_church": {
+    "unet.pt": {
+     "bytes": 1719229888,
+     "mtime": "2026-10-22T20:43:08",
+     "sha256": "8832877c3b9633befc8eb676d112cae4ab2fbc335e9faec801d8613a4494b74d",
+     "hash_scope": "FIRST_67108864_BYTES"
+    }
+   },
+   "esd_church": {
+    "unet.pt": {
+     "bytes": 1719229888,
+     "mtime": "2026-10-22T18:34:45",
+     "sha256": "26d86451d14f5c2745ff8445ed17a9dc784d171ea8d7babb8f7351b60c1f75d3",
+     "hash_scope": "FIRST_67108864_BYTES"
+    }
+   },
+   "h47_adv_a0.0": {},
+   "h47_adv_a0.3": {},
+   "h47_adv_a0.5": {},
+   "h48_adv_a0.3": {
+    "unet.pt": {
+     "bytes": 1719229888,
+     "mtime": "2026-10-22T23:59:01",
+     "sha256": "4e2df2e4e2cb03ff2d37cf2ba5804108fda954c220f5fbb03bb38577556f42ca",
+     "hash_scope": "FIRST_67108864_BYTES"
+    }
+   },
+   "h49_para_a0.3": {},
+   "h50_adv_a0.5": {
+    "unet.pt": {
+     "bytes": 1719229888,
+     "mtime": "2026-10-23T00:48:21",
+     "sha256": "15f34d3b429add374951f30b0cf48dc56b34a3f175307a359efc532033f429f9",
+     "hash_scope": "FIRST_67108864_BYTES"
+    }
+   },
+   "h51_ff_a0.3": {},
+   "h51_ff_a0.5": {},
+   "h52_det_a0.3_s0": {},
+   "h52_det_a0.3_s1": {},
+   "h52_para_a0.3_s0": {},
+   "h52_para_a0.3_s1": {},
+   "h53_tn_a0.3": {},
+   "h53_vg_a0.3": {},
+   "h54_gt_a0.3": {},
+   "h55_adv_a0.3": {},
+   "h56_broken_a0.7": {},
+   "h61_church_a0.3": {},
+   "h61_van_gogh_a0.3": {},
+   "h63_church_a0.3": {},
+   "h63_van_gogh_a0.3": {},
+   "uce_church": {
+    "unet.pt": {
+     "bytes": 1719229888,
+     "mtime": "2026-10-22T18:18:44",
+     "sha256": "437e424db145f03d7a9db50bc2631fd2d2ab6f7c366665a7e0188a108a043db3",
+     "hash_scope": "FIRST_67108864_BYTES"
+    }
+   },
+   "uce_matched": {},
+   "undo_a0.0_retain_fisher": {},
+   "undo_a0.3_rebuild": {},
+   "undo_a0.3_retain_fisher": {},
+   "undo_a0.5_big": {
+    "unet.pt": {
+     "bytes": 1719229888,
+     "mtime": "2026-10-22T20:06:35",
+     "sha256": "92bb45038d5db4da2388bc50a115fbbff272e78fc010ebb8c95feffdeed5f983",
+     "hash_scope": "FIRST_67108864_BYTES"
+    }
+   },
+   "undo_a0.5_pool": {},
+   "undo_a0.5_retain_fisher": {},
+   "undo_a0.7_retain_fisher": {}
+  },
+  "n_arms": 34,
+  "hashed": true,
+  "unresolved_identity": "adapters/uce_church/unet.pt was OVERWRITTEN between a retain-0.350 and a retain-0.850 build (FINDING35 S5), so attack records naming that path cannot be attributed to one checkpoint. Marked UNRESOLVED; not reconstructed, because a rebuild would be a new arm and must not be relabelled as the original.",
+  "deleted": "attack_relearn.py deletes its attacked checkpoint (adapters/_atk_<label>) after measuring it. The attacked weights behind every H_after in this phase therefore no longer exist. The arm's INPUT checkpoint is retained, and the attack is repeatable from it given the recorded seed and the GLOBAL_STREAM caveat above."
+ }
+}
