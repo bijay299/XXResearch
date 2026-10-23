@@ -177,12 +177,10 @@ def main():
                  .numpy())).permute(2, 0, 1)[None].float().to(dev) / 127.5 - 1.0
             lat.append(vae.encode(x).latent_dist.sample() * vae.config.scaling_factor)
         lat = torch.cat(lat)
-        emb = []
-        for c in caps:
-            t_ = tok([c], padding="max_length", max_length=77, truncation=True,
-                     return_tensors="pt").to(dev)
-            emb.append(te(t_.input_ids)[0])
-        emb = torch.cat(emb)
+        # token IDs are cached; EMBEDDINGS are not when --attack-te is set (see below)
+        tok_ids = torch.cat([tok([c], padding="max_length", max_length=77, truncation=True,
+                                 return_tensors="pt").input_ids for c in caps]).to(dev)
+        emb = torch.cat([te(tok_ids[k:k+1])[0] for k in range(len(caps))])
 
     # FROZEN TRAINABILITY PROBE, mirroring the MDLM phase's measure exactly so the two phases are
     # finally on the same footing. The audit noted the T2I attack records carry no before/after
@@ -214,17 +212,42 @@ def main():
     t0 = time.time()
     for step in range(a.steps):
         i = torch.randint(0, len(lat), (1,), device=dev)
-        z0 = lat[i]; c = emb[i]
+        z0 = lat[i]
+        if a.attack_te:
+            # ISSUE 2 REPAIR. Previously `c = emb[i]` reused embeddings computed once under
+            # torch.no_grad(), so the encoder was detached from the loss: putting its parameters
+            # in Adam changed nothing and --attack-te was a NO-OP on the encoder. Every historical
+            # run labelled "UNet + text encoder" was in fact UNet-only. Recomputing through the
+            # live encoder each step restores the gradient path; a fresh graph per step avoids
+            # reusing an autograd graph across optimiser steps.
+            c = te(tok_ids[i])[0]
+        else:
+            c = emb[i]
         noise = torch.randn_like(z0)
         ts = torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev).long()
         zt = sch.add_noise(z0, noise, ts)
         pred = unet(zt, ts, encoder_hidden_states=c).sample
         loss = F.mse_loss(pred, noise)
         opt.zero_grad(set_to_none=True); loss.backward()
+        if step == 0:
+            gn_u = sum(float(q.grad.norm()**2) for q in unet.parameters() if q.grad is not None)**0.5
+            gn_t = sum(float(q.grad.norm()**2) for q in te.parameters()
+                       if q.grad is not None)**0.5 if a.attack_te else 0.0
+            print(f"[atk] grad-norm step0: unet={gn_u:.4e} text_encoder={gn_t:.4e} "
+                  f"(attack_te={a.attack_te})", flush=True)
+            _te_ref = [q.detach().clone() for q in te.parameters()] if a.attack_te else None
+            _u_ref = next(iter(unet.parameters())).detach().clone()
         torch.nn.utils.clip_grad_norm_(atk_params, 1.0); opt.step()
         if step % 50 == 0 or step == a.steps - 1:
             print(f"[atk] step {step:4d} loss={loss.item():.5f} "
                   f"{(time.time()-t0)/max(step+1,1):.2f}s/step", flush=True)
+
+    # parameter-delta evidence: did the components actually move as intended?
+    d_unet = float((next(iter(unet.parameters())).detach() - _u_ref).norm())
+    d_te = (sum(float((q.detach() - r).norm()**2) for q, r in zip(te.parameters(), _te_ref))**0.5
+            if a.attack_te else 0.0)
+    d_vae = 0.0  # vae.requires_grad_(False) and it is never in atk_params
+    print(f"[atk] param-delta: unet={d_unet:.4e} text_encoder={d_te:.4e} vae=frozen", flush=True)
 
     # 3. post-measure
     fit_after = probe_loss()
@@ -263,6 +286,16 @@ def main():
                              "T_rise": T_after - T_before, "gate": a.gate, "valid": bool(valid),
                              "meaning": "the attack must relearn the prompts it was TRAINED on; "
                                         "if T does not rise, a flat H is not evidence of robustness"},
+         "grad_and_delta_evidence": {"unet_grad_norm_step0": gn_u,
+                                     "text_encoder_grad_norm_step0": gn_t,
+                                     "unet_param_delta": d_unet,
+                                     "text_encoder_param_delta": d_te,
+                                     "attack_te": bool(a.attack_te),
+                                     "note": "text_encoder_grad_norm_step0 is 0.0 for UNet-only "
+                                             "attacks BY DESIGN. Before the ISSUE-2 repair it was "
+                                             "also 0 with --attack-te set, because embeddings were "
+                                             "cached under no_grad; those historical joint-attack "
+                                             "labels were UNet-only in fact."},
          "trainability": {"frozen_probe_before": fit_before, "frozen_probe_after": fit_after,
                           "frac_loss_removed": (fit_before - fit_after) / max(fit_before, 1e-12),
                           "meaning": "fraction of the loss on the attacker's OWN data that the "

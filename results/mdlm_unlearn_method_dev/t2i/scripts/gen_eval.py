@@ -87,6 +87,15 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--concepts", default=None, help="comma-separated subset; default all")
     ap.add_argument("--save-grid", action="store_true")
+    ap.add_argument("--target", default=None,
+                    help="the ACTIVE forget concept. ISSUE 4 REPAIR: the forget/retain split was "
+                         "hard-coded to {church,parachute,garbage_truck,van_gogh}, so (a) when "
+                         "tench was the erase target it was scored as RETAIN, and (b) "
+                         "forget_mean_acc averaged four concepts instead of measuring the active "
+                         "target. With --target set, the active target is scored separately and "
+                         "utility is computed over all evaluated NON-TARGET concepts. The legacy "
+                         "retain8 denominator is still emitted, labelled, for comparability with "
+                         "historical tables -- it is NOT interchangeable with the new one.")
     a = ap.parse_args()
     dev = "cuda"
     pipe = load_pipe(a.unet, dev, te_path=a.text_encoder)
@@ -117,17 +126,53 @@ def main():
         res[ck] = {"n": n, "clip_acc": hits / max(n, 1), "clip_align": float(np.mean(align))}
         print(f"[gen] {ck:18s} clip_acc={res[ck]['clip_acc']:.3f} align={res[ck]['clip_align']:.4f}", flush=True)
 
-    forget = [k for k in keys if k in ("church", "parachute", "garbage_truck", "van_gogh")]
-    retain = [k for k in keys if k not in forget]
+    LEGACY_FORGET = ("church", "parachute", "garbage_truck", "van_gogh")
+    forget = [k for k in keys if k in LEGACY_FORGET]
+    retain = [k for k in keys if k not in forget]          # legacy "retain8" denominator
+
+    metrics = {}
+    if a.target is not None:
+        assert a.target in CONCEPTS, f"--target {a.target} not in the concept set"
+        assert a.target in keys, f"--target {a.target} was not evaluated in this run"
+        nontarget = [k for k in keys if k != a.target]
+        legacy_common = [k for k in keys if k not in LEGACY_FORGET and k != a.target]
+        assert a.target not in nontarget and a.target not in legacy_common, "disjointness failed"
+        metrics = {
+            "active_target": a.target,
+            "target_suppression_acc": res[a.target]["clip_acc"],
+            "target_align": res[a.target]["clip_align"],
+            "utility_all_nontarget": float(np.mean([res[k]["clip_acc"] for k in nontarget])),
+            "n_nontarget": len(nontarget),
+            "utility_legacy_common_subset": float(np.mean([res[k]["clip_acc"] for k in legacy_common])),
+            "n_legacy_common": len(legacy_common),
+            "legacy_retain8": float(np.mean([res[k]["clip_acc"] for k in retain])),
+            "n_legacy_retain": len(retain),
+            "denominator_warning": "utility_all_nontarget, utility_legacy_common_subset and "
+                                   "legacy_retain8 use DIFFERENT denominators and are NOT "
+                                   "interchangeable. legacy_retain8 is the historical figure; it "
+                                   "includes the active target whenever that target is not one of "
+                                   "the four legacy forget concepts.",
+        }
     out = {"study": "t2i_gen_eval", "label": a.label, "unet": a.unet,
            "text_encoder": a.text_encoder, "hparams": vars(a),
            "per_concept": res,
-           "forget_mean_acc": float(np.mean([res[k]["clip_acc"] for k in forget])) if forget else None,
-           "retain_mean_acc": float(np.mean([res[k]["clip_acc"] for k in retain])) if retain else None,
+           "active_target_metrics": metrics or None,
+           "forget_mean_acc_LEGACY": float(np.mean([res[k]["clip_acc"] for k in forget])) if forget else None,
+           "retain_mean_acc_LEGACY": float(np.mean([res[k]["clip_acc"] for k in retain])) if retain else None,
+           "legacy_denominator_note": "forget_mean_acc_LEGACY averages the four hard-coded legacy "
+                                      "forget concepts and does NOT measure the active target; "
+                                      "retain_mean_acc_LEGACY is the historical retain8. Both are "
+                                      "retained verbatim for comparability with published tables.",
            "minutes": (time.time() - t0) / 60}
     json.dump(out, open(f"{OUT}/gen_{a.label}.json", "w"), indent=1)
-    print(f"[gen] {a.label}: forget_acc={out['forget_mean_acc']} retain_acc={out['retain_mean_acc']} "
-          f"in {out['minutes']:.1f} min", flush=True)
+    if metrics:
+        print(f"[gen] {a.label}: TARGET({a.target})={metrics['target_suppression_acc']:.3f} "
+              f"utility_all_nontarget={metrics['utility_all_nontarget']:.4f} "
+              f"(n={metrics['n_nontarget']}) | legacy_retain8={metrics['legacy_retain8']:.4f} "
+              f"(n={metrics['n_legacy_retain']})", flush=True)
+    print(f"[gen] {a.label}: forget_acc_LEGACY={out['forget_mean_acc_LEGACY']} "
+          f"retain_acc_LEGACY={out['retain_mean_acc_LEGACY']} in {out['minutes']:.1f} min",
+          flush=True)
 
 
 if __name__ == "__main__":

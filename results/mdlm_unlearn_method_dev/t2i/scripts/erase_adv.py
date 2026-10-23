@@ -116,10 +116,15 @@ def main():
         delta = torch.zeros_like(e_c, requires_grad=True)
         for _ in range(a.adv_steps):
             pred = unet(lat, t_cur, encoder_hidden_states=e_c + delta).sample
-            adv_obj = -F.mse_loss(pred, target)          # maximise the erasure loss
+            # ISSUE 3 REPAIR -- SIGN BUG. This previously read
+            #     adv_obj = -F.mse_loss(pred, target);  delta += step * grad(adv_obj)
+            # i.e. ASCENT on NEGATIVE MSE, which is DESCENT on the erasure loss: the inner loop was
+            # making the erasure EASIER, the opposite of the stated objective. The adversary wants
+            # delta that MAXIMISES the erasure loss (keeps the concept producible), so ascend MSE.
+            adv_obj = F.mse_loss(pred, target)           # the erasure loss, to be MAXIMISED
             g, = torch.autograd.grad(adv_obj, delta)
             with torch.no_grad():
-                delta += step_sz * g / (g.norm() + 1e-12)
+                delta += step_sz * g / (g.norm() + 1e-12)   # ascent on adv_obj
                 nrm = delta.norm()
                 if nrm > eps:
                     delta *= eps / nrm

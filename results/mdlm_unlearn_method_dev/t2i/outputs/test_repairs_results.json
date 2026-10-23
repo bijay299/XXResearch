@@ -1,0 +1,72 @@
+[
+ {
+  "test": "issue3_adv_step_increases_erasure_loss",
+  "pass": true,
+  "detail": "corrected: loss 1.092724 -> 1.093124 (must RISE)"
+ },
+ {
+  "test": "issue3_old_sign_would_decrease",
+  "pass": true,
+  "detail": "pre-repair convention: loss 1.092724 -> 1.092323 (fell \u2014 confirms the bug)"
+ },
+ {
+  "test": "issue4_target_excluded_from_utility",
+  "pass": true,
+  "detail": "n_nontarget=11 (target excluded) vs legacy_retain n=8 which still CONTAINS tench -> the two denominators differ, as documented"
+ },
+ {
+  "test": "issue10_mask_mean_alpha0.3_skew1.0",
+  "pass": true,
+  "detail": "pre-repair mean=0.3000 repaired mean=0.3000 target=0.3 clipped_frac=0.000e+00"
+ },
+ {
+  "test": "issue10_mask_mean_alpha0.3_skew6.0",
+  "pass": true,
+  "detail": "pre-repair mean=0.2429 repaired mean=0.3000 target=0.3 clipped_frac=1.159e-01"
+ },
+ {
+  "test": "issue10_mask_mean_alpha0.5_skew1.0",
+  "pass": true,
+  "detail": "pre-repair mean=0.5000 repaired mean=0.5000 target=0.5 clipped_frac=0.000e+00"
+ },
+ {
+  "test": "issue10_mask_mean_alpha0.5_skew6.0",
+  "pass": true,
+  "detail": "pre-repair mean=0.3046 repaired mean=0.5000 target=0.5 clipped_frac=1.911e-01"
+ },
+ {
+  "test": "issue10_mask_mean_alpha0.7_skew1.0",
+  "pass": true,
+  "detail": "pre-repair mean=0.6443 repaired mean=0.7000 target=0.7 clipped_frac=2.851e-01"
+ },
+ {
+  "test": "issue10_mask_mean_alpha0.7_skew6.0",
+  "pass": true,
+  "detail": "pre-repair mean=0.3442 repaired mean=0.7000 target=0.7 clipped_frac=2.326e-01"
+ },
+ {
+  "test": "issue10_zero_importance_edge_case",
+  "pass": true,
+  "detail": "all-zero importance -> zero damage (no division by ~0)"
+ },
+ {
+  "test": "issue1_pipeline_identity",
+  "pass": true,
+  "detail": "reloaded_hash=9fc6d62dab007b08 modified_hash=9fc6d62dab007b08 erased_hash=f5138465e90ad6db max|\u0394conditioning|=0.00e+00 tol=1e-3"
+ },
+ {
+  "test": "issue1_components",
+  "pass": true,
+  "detail": "scheduler=PNDMScheduler vae=torch.float16 unet=torch.float16 tokenizer=CLIPTokenizer"
+ },
+ {
+  "test": "issue2_te_grad_connected_when_on",
+  "pass": true,
+  "detail": "te_grad=1.1842e-01 unet_grad=3.9560e-01 vae_grad=0.0000e+00 (vae must be 0)"
+ },
+ {
+  "test": "test_issue2_te_gradient_connected",
+  "pass": false,
+  "detail": "EXCEPTION OutOfMemoryError: CUDA out of memory. Tried to allocate 16.00 MiB. GPU 0 has a total capacity of 39.38 GiB of which 14.50 MiB is free. Process 4163091 has 24.89 GiB memory in use. Including non-PyTorch memory, this process has 14.44 GiB memory in use. Of the allocated memory 13.72 GiB is allocated by PyTorch, and 216.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+ }
+]

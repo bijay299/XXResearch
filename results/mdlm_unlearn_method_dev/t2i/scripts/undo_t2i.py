@@ -260,6 +260,10 @@ def main():
 
     # 3. DAMAGE
     g = torch.Generator(device=dev).manual_seed(a.seed + 777)
+    # ISSUE 10: separate RNG stream for mask SHUFFLING so the `random` control cannot perturb the
+    # noise realisation it is supposed to hold fixed.
+    gshuf = torch.Generator(device=dev).manual_seed(a.seed + 99991)
+    dmg_log = []
     with torch.no_grad():
         for n, p in student.named_parameters():
             N = torch.empty_like(p)
@@ -272,7 +276,7 @@ def main():
                 v = imp[n]
                 w = v / (v.max() + 1e-12)
                 if a.protect == "random":            # same distribution, shuffled -> control
-                    w = w.flatten()[torch.randperm(w.numel(), generator=g, device=dev)].view_as(w)
+                    w = w.flatten()[torch.randperm(w.numel(), generator=gshuf, device=dev)].view_as(w)
                 # retain_fisher/random: damage where retain importance is LOW  -> (1 - w)
                 # forget_fisher:          damage where forget importance is HIGH ->      w
                 if a.protect == "frag":
@@ -281,9 +285,50 @@ def main():
                     keep = w
                 else:
                     keep = 1.0 - w
-                keep = keep * (a.alpha / keep.mean().clamp_min(1e-6))   # preserve MEAN damage
-                s = keep.clamp(0, 1)
+                # ISSUE 10 REPAIR. Previously: renormalise to mean=alpha, then clamp(0,1) --
+                # which silently RAISES the mean back down whenever entries exceed 1, so the
+                # advertised "preserve MEAN damage" contract was violated exactly when the mask
+                # was most skewed. Now: renormalise, clamp, then RE-renormalise within the
+                # feasible set by a bisection on a scalar gain, so the realised mean equals alpha
+                # whenever that is attainable (it is attainable iff alpha <= 1). Fully-zero masks
+                # (no importance signal at all) are passed through as zero damage rather than
+                # divided by ~0.
+                m0 = float(keep.mean())
+                if m0 <= 1e-12:
+                    s = torch.zeros_like(keep)           # degenerate: no signal -> no damage
+                    clip_frac = 0.0; m_pre = 0.0; m_post = 0.0
+                else:
+                    keep = keep * (a.alpha / max(m0, 1e-12))
+                    m_pre = float(keep.mean())
+                    clip_frac = float((keep > 1).float().mean())
+                    lo, hi = 0.0, 1e6
+                    for _ in range(60):                  # bisect the gain so mean(clamp(g*k))=alpha
+                        g = 0.5 * (lo + hi)
+                        if float((keep * g).clamp(0, 1).mean()) < a.alpha: lo = g
+                        else: hi = g
+                    s = (keep * (0.5 * (lo + hi))).clamp(0, 1)
+                    m_post = float(s.mean())
+                dmg_log.append((n, m_pre, m_post, clip_frac,
+                                float((s * a.beta * N).norm()), float(p.detach().norm())))
             p.mul_(1 - s).add_(s * a.beta * N)
+    if dmg_log:
+        import numpy as _np
+        mpre = _np.mean([r[1] for r in dmg_log]); mpost = _np.mean([r[2] for r in dmg_log])
+        cf = _np.mean([r[3] for r in dmg_log])
+        pert = float(_np.sqrt(sum(r[4]**2 for r in dmg_log)))
+        wnorm = float(_np.sqrt(sum(r[5]**2 for r in dmg_log)))
+        print(f"[undo] mask audit: mean_pre_clip={mpre:.4f} mean_post_clip={mpost:.4f} "
+              f"target_alpha={a.alpha} clipped_frac={cf:.4e} "
+              f"realised_perturbation_norm={pert:.4e} weight_norm={wnorm:.4e} "
+              f"rel={pert/max(wnorm,1e-12):.4e}", flush=True)
+        json.dump({"alpha": a.alpha, "beta": a.beta, "protect": a.protect,
+                   "mask_mean_pre_clip": float(mpre), "mask_mean_post_clip": float(mpost),
+                   "clipped_fraction": float(cf),
+                   "realised_perturbation_norm": pert, "weight_norm": wnorm,
+                   "per_tensor": [{"name": r[0], "mean_pre": r[1], "mean_post": r[2],
+                                   "clip_frac": r[3], "pert_norm": r[4], "w_norm": r[5]}
+                                  for r in dmg_log]},
+                  open(f"{OUT}/maskaudit_{a.label}.json", "w"), indent=1)
     print(f"[undo] damaged: alpha={a.alpha} beta={a.beta} protect={a.protect}", flush=True)
 
     # 4. DISTIL the erased teacher into the damaged student
