@@ -69,6 +69,39 @@ resistance only ever accompanied unusable models).
 
 **K3.** A positive requires replication on a **second concept** before any claim.
 
+## 4a. ⚠ Addendum — budget reconciliation and recipe change, recorded BEFORE the relaunch
+
+Two things changed between this pre-registration and the arm actually running. Both are recorded
+here **before any H64 number exists**, because each one could otherwise be chosen after the fact.
+
+**(1) The first H64 launch never produced a result.** It died on a bug **I introduced in my own
+issue-10 repair**: the bisection loop variable was named `g`, shadowing the `torch.Generator` named
+`g`, so the next parameter's `normal_(generator=g)` received a float. Fixed in `2352f8e` with a
+static shadowing check. No partial H64 numbers were read, kept, or carried forward.
+
+**(2) K1's 9-attack budget and `PROTOCOL_FROZEN_v1`'s 6-point grid disagree.** K1 was declared
+before the freeze. Rather than pick whichever is convenient, **both are run and both are reported
+separately**:
+
+- the **frozen 6 points** (seeds {0,1,6}@1e-5, {0,1}@5e-5, {0}@1e-4) — the only numbers directly
+  comparable to the baselines measured under the same grid in `H65`;
+- plus the **3 extra attacks K1 declared** (seeds 2,3 @1e-5 and 6 @5e-5), labelled as the K1
+  extension.
+
+`max-over-valid` is reported for the 6-point grid **and** for all 9. More attacks can only raise
+max-over-valid, so the 9-point figure is the stricter test of this arm — the anti-ratchet direction,
+applied to my own candidate rather than to a comparator.
+
+**(3) The arm is built with pools recipe v2** (`undo_t2i.RECIPE = "pools_v2"`), which removes the
+evaluation-string contamination `FINDING38` §2 found in v1. So **H64 is not comparable to any
+previous damage+distil arm**, including `H51`'s `forget_fisher` and `H47`'s `retain_fisher` rows in
+§2's table above: those were built on v1 pools with utility measured partly in-sample, and this one
+is not. The §2 comparison stands as the *motivation* for the arm, not as a matched baseline. A
+matched v2 rebuild of `retain_fisher` would be required for that, and is not run here.
+
+`verify_splits.py` reports **CLEAN on all three checks** under v2 (`ATK_TRAIN × EVAL_TARGET`,
+`DEF_TRAIN × EVAL_TARGET`, `DEF_TRAIN × EVAL_UTILITY`), verified before launch.
+
 ## 5. Novelty position, stated before results
 
 The *principle* is published (2608.25429) and so is a method implementing it (FRP, as unstructured

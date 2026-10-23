@@ -38,22 +38,38 @@ OUT = "/data/bijaypandey/t2i_unlearn/outputs"
 
 # The distillation pool. Includes the ERASED concept (so suppression transfers) and a spread of
 # retain concepts and generic prompts (so general generation is repaired).
+# ===================================================================== RECIPE v2 (ISSUE 8 REPAIR)
+# v1 pools contained EVALUATION strings verbatim: 1-2 of the 3 prompts each concept is scored on
+# were in FORGET_POOL, and 7-8 of the 8 retain-concept evaluation prompts were in RETAIN_POOL. So
+# every v1 damage+distil arm had its erasure and its utility measured partly IN-SAMPLE, while the
+# UCE/ESD/AdvUnlearn baselines did not -- biasing the comparison in OUR arms' favour (FINDING38
+# S2-3, outputs/split_registry.json).
+#
+# v2 keeps the same CONCEPTS and changes only the surface forms, so no evaluation string appears in
+# either pool. verify_splits.py must report CLEAN on both defence checks.
+#
+# This is a NEW RECIPE, not a correction of the old one: arms built with v2 are NOT comparable to
+# v1 arms and carry `recipe: "pools_v2"` in their JSON. No v1 measurement is altered or relabelled.
+RECIPE = "pools_v2"
 FORGET_POOL = {
-    "church": ["a church", "a photo of a church", "an old stone church", "a church steeple"],
-    "parachute": ["a parachute", "a photo of a parachute", "a parachute in the sky"],
-    "van_gogh": ["a Van Gogh painting", "a painting in the style of Van Gogh"],
+    # surface forms disjoint from gen_eval.CONCEPTS (which owns "a photo of a X" / "a X <noun>")
+    "church": ["a church", "an old stone church", "a church steeple",
+               "a chapel with a bell tower"],
+    "parachute": ["a parachute", "a parachute canopy", "a descending parachute"],
+    "van_gogh": ["a Van Gogh painting", "a canvas painted by Vincent van Gogh"],
     # added for H53's within-kind control; the tench leg's composite failed because this pool
     # had no entry for it, so argparse rejected --concept tench and no checkpoint was written
-    "tench": ["a tench", "a photo of a tench", "a tench fish"],
-    "garbage_truck": ["a garbage truck", "a photo of a garbage truck",
-                      "a garbage truck on a street"],
+    "tench": ["a tench", "a tench caught by an angler", "a large green tench"],
+    "garbage_truck": ["a garbage truck", "a refuse collection truck",
+                      "a garbage truck emptying bins"],
 }
 RETAIN_POOL = [
-    # The 8 measured retain concepts
-    "a photo of a cassette player", "a photo of a chain saw",
-    "a photo of an english springer spaniel", "a photo of a french horn",
-    "a photo of a gas pump", "a photo of a golf ball", "a photo of a tench",
-    "a painting in the style of Monet",
+    # The 8 measured retain CONCEPTS, in surface forms the evaluator does not use
+    "a cassette player on a shelf", "a chain saw resting on a log",
+    "an english springer spaniel in a field", "a french horn held by a player",
+    "a gas pump at a filling station", "a golf ball beside a hole",
+    "a tench lying on wet grass",
+    "a Monet style painting of a garden",
     # BROAD GENERAL COVERAGE. FINDING33 S3 predicts damage+distil works when repair can actually
     # restore the model. The T2I repair pool was 48-144 images over ~20 prompts, which cannot
     # represent SD's distribution -- so retain stalled at 0.09-0.32 while the MDLM phase, with

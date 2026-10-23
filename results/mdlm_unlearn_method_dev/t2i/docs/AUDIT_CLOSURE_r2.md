@@ -105,22 +105,34 @@ Distribution: `{0.333: 1, 0.467: 3, 0.600: 2, 0.733: 3, 0.800: 4, 0.867: 2, 0.93
 | max over **all completed** | **0.600000** (audit reported 0.5333) |
 | tench controls, not pooled | 5 (1 valid) |
 
-### 4d. Post-attack utility (issue 7, `H65`, frozen grid, **6 of 12 points in flight**)
+### 4d. Post-attack utility (issue 7, `H65`, **COMPLETE — 12 of 12 points**)
 
-| arm | seed | lr | target H | utility panel acc | prompt adherence |
-|---|---|---|---|---|---|
-| AdvUnlearn church | 0 | 1e-5 | 0.400 → **1.000** | 1.0000 → 0.8750 (**−0.1250**) | 0.2647 → 0.2592 (−0.0055) |
-| AdvUnlearn church | 1 | 1e-5 | 0.200 → 0.733 | 1.0000 → 0.9583 (−0.0417) | 0.2727 → 0.2688 (−0.0040) |
-| AdvUnlearn church | 6 | 1e-5 | 0.133 → **1.000** | 0.9792 → 0.9375 (−0.0417) | 0.2702 → 0.2699 (−0.0003) |
-| AdvUnlearn parachute | 0 | 1e-5 | 0.133 → 0.867 | 1.0000 → 0.9792 (−0.0208) | 0.2689 → 0.2643 (−0.0046) |
-| AdvUnlearn parachute | 1 | 1e-5 | 0.200 → **1.000** | 1.0000 → 0.9792 (−0.0208) | 0.2744 → 0.2708 (−0.0036) |
+**12/12 gate-passing; max-over-valid H = 1.000 on both arms.** Aggregated by learning rate (full
+per-point table in `FINDING38` §4a):
 
-**Reading, with the sample size stated:** on 5 of 12 declared points, the attack restores the target
-while retaining **93.8–97.9 %** of panel accuracy (worst case 87.5 %), at an adherence cost of
-0.0003–0.0055. **The reversal is not an artefact of the attack destroying the model** — which was
-the one benign explanation the record could not previously rule out, and ruling it out *strengthens*
-the phase's negative result. It is not free either: church sd0 lost 12.5 points of panel accuracy.
-The remaining 7 points complete the grid; this table is not final.
+| lr | n | max-over-valid H | **utility after** | Δadherence |
+|---|---|---|---|---|
+| **1e-5** | 6 | **1.000** (both arms) | **0.875 – 1.000** | −0.0055 … +0.0000 |
+| 5e-5 | 4 | 1.000 (both arms) | 0.604 – 0.750 | −0.0684 … −0.0315 |
+| 1e-4 | 2 | 1.000 church / 0.667 parachute | **0.021 – 0.271** | −0.1252 … −0.0973 |
+
+**Full reversal occurs at intact utility:** church sd6 lr1e-5 reaches H = 1.000 at utility **0.9375**
+(Δadherence −0.0003) and parachute sd1 lr1e-5 reaches H = 1.000 at utility **0.9792** (−0.0036). The
+benign explanation the record could not previously exclude — that `H = 1.000` reflected a wrecked
+model — **is excluded by measurement** at the setting where recovery is maximal.
+
+**The efficient attack is the gentlest one.** Utility falls monotonically with lr while H is already
+maximal at 1e-5, and parachute at 1e-4 recovers *less* (0.667) from a model it destroyed (utility
+0.021). The threat model is therefore governed by the 1e-5 row, which has negligible collateral.
+
+**Unplanned positive control:** the lr 1e-4 points read utility 0.0208 / adherence −0.1252 where
+intact models read 1.0000 / −0.0003, so the issue-7 probe discriminates intact from destroyed across
+a 48× range on *real attacked models*, beyond its synthetic unit test.
+
+> ⚠ **Correction to an interim figure.** Mid-run, with only the lr 1e-5 points complete, retained
+> utility was reported as 93.8–97.9 % (worst 87.5 %). **Across the full grid it is 2.1–100 %.** The
+> conclusion above survives because it is conditional on lr 1e-5, but the interim aggregate was
+> quoted from the finished half of the grid and understated damage at higher learning rates.
 
 ## 5. Claim status
 
