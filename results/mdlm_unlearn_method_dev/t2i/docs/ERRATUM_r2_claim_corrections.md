@@ -255,6 +255,46 @@ matched control still does not prove inseparability**, because no direct overlap
 forget-critical and retain-critical parameter sets was ever computed. The claim stays
 **provisional**, as the audit requires.
 
+## C19. ⚠ My claim that FRAG/FRP "has released code" is FALSE — the repository is a stub
+
+**Claimed** (`PREREG_H51` §5, `PREREG_H64` §5, `AUDIT_CLOSURE_r2` §6–7, and C16 above): that of the
+five competing defences for this threat model, FRAG/FRP (2608.25429) is *"the only one with released
+code"* and therefore *"the only runnable one"*.
+
+**Checked, 2026-10-23.** `github.com/Yi1-Chen/FRAG` contains exactly three files — `README.md` and
+two PNGs. Its own Status section reads verbatim:
+
+> *"Code release is in preparation. This repository currently holds only this README; the
+> implementation, configs, and scripts to reproduce the TOFU and WMDP-cyber results will be added
+> here."*
+
+**Correct:** **zero of the five competing defences have usable released code for this threat
+model.** Every one of them would be a from-scratch port.
+
+**How I got it wrong:** I read the paper's *"Our code is available at https://github.com/..."* line
+and recorded code availability from that sentence **without opening the repository**. A stated URL
+is not a released implementation, and I had the network access to check at the time I wrote it.
+This is the same class of error as C7 ("NOT FOUND" ≠ novel): treating a claim about evidence as the
+evidence.
+
+**What survives, on different grounds.** FRP remains the most portable of the five, but *because its
+algorithm is fully specified in the paper and is training-free*, not because code exists:
+
+| property | value |
+|---|---|
+| Algorithm 1 | fully specified (scores, rank-space scoring, per-row TopK, zero-out) |
+| training required | **none** — calibration forward passes only |
+| declared settings | sparsity ρ = 3 % (MLP only), β = 0.05, zero-out, 400 seq × 256 tok, seed 42 |
+| **undeclared** | **λ, the magnitude-prior weight, is never given a value anywhere in the paper** |
+
+So the next-step recommendation in `AUDIT_CLOSURE_r2` §7 **stands in substance and changes in
+justification**: run an FRP port because it is cheap and fully specified, acknowledging it is **our
+port of a published algorithm**, labelled exactly as our UCE and ESD re-implementations are — not a
+run of the authors' code, and not a reproduction of their numbers.
+
+λ's absence is a reporting gap in the paper, not something to resolve by picking the value that
+flatters our result. It is pre-declared in `PREREG_H66` before any number is read.
+
 ---
 
 ## Status of the phase's headline after r2

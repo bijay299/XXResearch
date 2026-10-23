@@ -190,7 +190,7 @@ happened and not repeated.
 | FID at defensible n (5 000 images, 3-way) | ≈ 4.2 GPU-h + 6 GB | **PENDING**, trigger declared in `FID_PROTOCOL.md` |
 | `H64` (frag allocation) relaunch after the shadowing bug | ~2 GPU-h | **not started** |
 | Meta-Unlearning / IMMA / GIFT / Dormant-to-Deleted | implementation work, no released T2I code | **unrun** |
-| FRAG/FRP (2608.25429) | released code | **unrun, the only runnable one** |
+| FRAG/FRP (2608.25429) | **no code released** (repo is a README stub, see `ERRATUM_r2` C19); algorithm fully specified and training-free | **unrun, the most portable of the five** |
 | re-measure the voided low-budget attacker-cost curve (2/50 steps) | ~0.5 GPU-h | **not started** |
 | never-trained oracle (Tier-2 small model) | large | **not built**; C17 is unresolvable without it |
 
@@ -212,8 +212,9 @@ happened and not repeated.
 
 The phase's negative result is now solid, bounded and honestly scoped — and it is *anticipated*, so
 more attacks on more of our own arms cannot produce a contribution. The single binding constraint on
-every claim is the competing-defence gap. Of the five, **only FRAG/FRP (2608.25429) has released
-code.** The recommendation, in order:
+every claim is the competing-defence gap. **Zero of the five have usable released code** (`ERRATUM_r2` C19 corrects my earlier claim
+that FRAG/FRP did). FRAG/FRP is nonetheless the most portable: Algorithm 1 is fully specified and
+**training-free**, needing only calibration forward passes. The recommendation, in order:
 
 1. **Run FRAG/FRP under `PROTOCOL_FROZEN_v1`**, pre-registered, on church and parachute, with the
    contaminated pools repaired first per `FINDING38` §5 so its utility is measured out-of-sample.

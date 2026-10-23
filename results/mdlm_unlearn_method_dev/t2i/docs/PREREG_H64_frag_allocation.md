@@ -105,9 +105,11 @@ matched v2 rebuild of `retain_fisher` would be required for that, and is not run
 ## 5. Novelty position, stated before results
 
 The *principle* is published (2608.25429) and so is a method implementing it (FRP, as unstructured
-pruning on LLMs, with code at `github.com/Yi1-Chen/FRAG`). What is untested is the principle as a
+pruning on LLMs; **note: that repository holds only a README — no code is released, see
+`ERRATUM_r2` C19**). What is untested is the principle as a
 **noise-allocation rule inside perturb-then-distil**, and in a **diffusion** model. So a positive
 result is an **extension of a published principle to a new intervention and modality** — reportable
 as such, never as a new mechanism. FRAG/FRP also becomes a **fifth** competing baseline for this
-threat model, and unlike the other four it has released code — though it is an LLM method, so
-porting it is not free.
+threat model. ⚠ **Correction:** this document originally said it has released code, unlike the
+other four. It does not — the repo is a stub (`ERRATUM_r2` C19). All five require a from-scratch
+port; FRP is simply the cheapest to port, being fully specified and training-free.
