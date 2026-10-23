@@ -83,7 +83,31 @@ attack fully reverses, 1.000 is the *only attainable value*. The unanimity of th
 therefore arithmetically forced, not an observed coincidence, and the first version's emphasis on
 "exactly 1.000, no variance at all" was rhetoric.
 
-## 2. The exception, and why it is a reproducibility failure rather than a retraction
+## 1a. ✅ RESOLVED (H52): the exception was an n=1 artifact. The claim is now clean.
+
+The determinism fix (`08742c1`) made the unreproducible arm reproducible. Rebuilt at α=0.3 from the
+same AdvUnlearn teacher, on **both** concepts, each attacked under the **pre-declared symmetric
+6-attack budget**:
+
+| rebuild | concept erased to | retain8 | gate-passing attacks | **H after** |
+|---|---|---|---|---|
+| church (seed 0) | 0.133 | **0.9083** | sd0 PASS | **0.933** |
+| parachute (seed 0) | 0.067 | **0.9417** | sd0 PASS, sd1 PASS | **1.000**, 0.867 |
+
+Both rebuilds land at retain **higher** than the original 0.867 — so this is not a weaker arm being
+knocked over — and both are **fully reversed**. Of the three outcomes declared in advance, this is
+the second: **the 0.533 was the n=1 artifact `H48` suspected**, visible only because that arm
+happened to receive one valid attack of three at a single learning rate.
+
+> **The exception is gone. No arm with usable utility has resisted a validated attack anywhere in
+> this phase — now including a deterministic rebuild of the one arm that appeared to.** §1's
+> corrected claim ("10 of 11") becomes **11 of 11**, and it no longer rests on an unreproducible
+> datapoint.
+
+This is also the first robustness measurement in the project taken under a fixed symmetric budget
+declared before the numbers were seen, so it is not exposed to the ratchet described in §4.
+
+## 2. The former exception (superseded by §1a), and why it looked like a reproducibility failure
 
 `H48` was run to verify the 0.533 and it reported H = 1.000 — which I published as a retraction of
 the 0.533. **The audit shows that inference was confounded.** The 0.533 was measured on
