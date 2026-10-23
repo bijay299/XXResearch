@@ -106,7 +106,8 @@ def main():
     ap.add_argument("--concept", required=True, choices=sorted(FORGET_POOL))
     ap.add_argument("--alpha", type=float, default=0.5)
     ap.add_argument("--beta", type=float, default=0.1)
-    ap.add_argument("--protect", choices=["none", "retain_fisher", "random", "forget_fisher"],
+    ap.add_argument("--protect", choices=["none", "retain_fisher", "random", "forget_fisher",
+                                          "frag"],
                     default="retain_fisher",
                     help="forget_fisher is the COMPLEMENT of retain_fisher and the sharpest test of "
                          "PREREG_H40: instead of scaling perturbation by (1 - retain importance), "
@@ -117,6 +118,15 @@ def main():
                          "damage can be made concept-specific, utility should survive AND the "
                          "attacker's route should still be disrupted -- which is precisely what H40 "
                          "says is unobtainable.")
+    # frag: the INTERSECTION neither earlier scheme implemented. Both halves of the principle
+    # stated in arXiv 2608.25429 ("robust unlearning should affect forget-critical weights while
+    # SPARING retain-critical ones"), whose method FRP achieves dES +0.059 against RMU's +0.644.
+    # retain_fisher spared retain-critical weights but did not target forget-critical ones;
+    # forget_fisher targeted forget-critical weights but spared nothing and destroyed the model
+    # (retain 0.09). frag multiplies the two signals: damage where forget-importance is HIGH *and*
+    # retain-importance is LOW. The authors note FRP is instantiated as pruning and "the same
+    # principle may extend to ... other parameter-efficient interventions"; noise allocation
+    # inside perturb-then-distil is such an extension and is untested.
     ap.add_argument("--fisher-batches", type=int, default=16)
     ap.add_argument("--steps", type=int, default=1500)
     ap.add_argument("--lr", type=float, default=1e-5)
@@ -194,7 +204,35 @@ def main():
 
     # 2. retain-Fisher importance (diagonal, squared grads of the diffusion loss on RETAIN prompts)
     imp = None
-    if a.protect in ("retain_fisher", "random", "forget_fisher"):
+    if a.protect == "frag":
+        # two importance maps are needed, so this branch computes both
+        imp_f = {n: torch.zeros_like(q) for n, q in student.named_parameters()}
+        imp_r = {n: torch.zeros_like(q) for n, q in student.named_parameters()}
+        for want_forget, acc in ((True, imp_f), (False, imp_r)):
+            idx = (is_forget if want_forget else ~is_forget).nonzero().flatten()
+            if len(idx) == 0:
+                raise RuntimeError("frag needs BOTH forget and retain examples in the pool")
+            for _ in range(a.fisher_batches):
+                i = idx[torch.randint(0, len(idx), (1,), device=dev, generator=sg)]
+                z0, c = lats[i], embs[i]
+                noise = torch.randn(z0.shape, device=dev, generator=sg, dtype=z0.dtype)
+                ts = torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,
+                                   generator=sg).long()
+                loss = F.mse_loss(student(sch.add_noise(z0, noise, ts), ts,
+                                          encoder_hidden_states=c).sample, noise)
+                student.zero_grad(set_to_none=True); loss.backward()
+                for n, q in student.named_parameters():
+                    if q.grad is not None:
+                        acc[n] += q.grad.detach() ** 2
+        student.zero_grad(set_to_none=True)
+        imp = {}
+        for n in imp_f:
+            wf = imp_f[n] / (imp_f[n].max() + 1e-12)
+            wr = imp_r[n] / (imp_r[n].max() + 1e-12)
+            imp[n] = wf * (1.0 - wr)          # forget-critical AND retain-sparing
+        print(f"[undo] FRAG importance (forget-critical x retain-sparing) over "
+              f"{a.fisher_batches} batches per side", flush=True)
+    elif a.protect in ("retain_fisher", "random", "forget_fisher"):
         # forget_fisher measures importance on the FORGET examples instead of the retain ones
         want_forget = (a.protect == "forget_fisher")
         ret_idx = (is_forget if want_forget else ~is_forget).nonzero().flatten()
@@ -237,7 +275,12 @@ def main():
                     w = w.flatten()[torch.randperm(w.numel(), generator=g, device=dev)].view_as(w)
                 # retain_fisher/random: damage where retain importance is LOW  -> (1 - w)
                 # forget_fisher:          damage where forget importance is HIGH ->      w
-                keep = w if a.protect == "forget_fisher" else (1.0 - w)
+                if a.protect == "frag":
+                    keep = w                  # w is already forget-critical x retain-sparing
+                elif a.protect == "forget_fisher":
+                    keep = w
+                else:
+                    keep = 1.0 - w
                 keep = keep * (a.alpha / keep.mean().clamp_min(1e-6))   # preserve MEAN damage
                 s = keep.clamp(0, 1)
             p.mul_(1 - s).add_(s * a.beta * N)
