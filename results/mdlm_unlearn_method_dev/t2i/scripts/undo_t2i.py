@@ -101,7 +101,17 @@ def main():
     ap.add_argument("--concept", required=True, choices=sorted(FORGET_POOL))
     ap.add_argument("--alpha", type=float, default=0.5)
     ap.add_argument("--beta", type=float, default=0.1)
-    ap.add_argument("--protect", choices=["none", "retain_fisher", "random"], default="retain_fisher")
+    ap.add_argument("--protect", choices=["none", "retain_fisher", "random", "forget_fisher"],
+                    default="retain_fisher",
+                    help="forget_fisher is the COMPLEMENT of retain_fisher and the sharpest test of "
+                         "PREREG_H40: instead of scaling perturbation by (1 - retain importance), "
+                         "scale it by FORGET importance, concentrating the damage on the parameters "
+                         "that specifically encode the erased concept and leaving the rest intact. "
+                         "Every arm so far damaged all gradient paths roughly equally, which is why "
+                         "utility died (FINDING35: no arm with retain >= 0.78 has ever resisted). If "
+                         "damage can be made concept-specific, utility should survive AND the "
+                         "attacker's route should still be disrupted -- which is precisely what H40 "
+                         "says is unobtainable.")
     ap.add_argument("--fisher-batches", type=int, default=16)
     ap.add_argument("--steps", type=int, default=1500)
     ap.add_argument("--lr", type=float, default=1e-5)
@@ -169,8 +179,10 @@ def main():
 
     # 2. retain-Fisher importance (diagonal, squared grads of the diffusion loss on RETAIN prompts)
     imp = None
-    if a.protect in ("retain_fisher", "random"):
-        ret_idx = (~is_forget).nonzero().flatten()
+    if a.protect in ("retain_fisher", "random", "forget_fisher"):
+        # forget_fisher measures importance on the FORGET examples instead of the retain ones
+        want_forget = (a.protect == "forget_fisher")
+        ret_idx = (is_forget if want_forget else ~is_forget).nonzero().flatten()
         if len(ret_idx) == 0:
             raise RuntimeError("retain-Fisher protection needs retain examples in the pool, "
                                "but the pool is entirely forget; raise --n-images or lower "
@@ -190,7 +202,8 @@ def main():
                 if p.grad is not None:
                     imp[n] += p.grad.detach() ** 2
         student.zero_grad(set_to_none=True)
-        print(f"[undo] retain-Fisher importance over {a.fisher_batches} batches", flush=True)
+        print(f"[undo] {'FORGET' if a.protect=='forget_fisher' else 'retain'}-Fisher importance "
+              f"over {a.fisher_batches} batches on {len(ret_idx)} examples", flush=True)
 
     # 3. DAMAGE
     g = torch.Generator(device=dev).manual_seed(a.seed + 777)
@@ -207,7 +220,9 @@ def main():
                 w = v / (v.max() + 1e-12)
                 if a.protect == "random":            # same distribution, shuffled -> control
                     w = w.flatten()[torch.randperm(w.numel(), generator=g, device=dev)].view_as(w)
-                keep = 1.0 - w
+                # retain_fisher/random: damage where retain importance is LOW  -> (1 - w)
+                # forget_fisher:          damage where forget importance is HIGH ->      w
+                keep = w if a.protect == "forget_fisher" else (1.0 - w)
                 keep = keep * (a.alpha / keep.mean().clamp_min(1e-6))   # preserve MEAN damage
                 s = keep.clamp(0, 1)
             p.mul_(1 - s).add_(s * a.beta * N)
