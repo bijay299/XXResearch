@@ -1,0 +1,102 @@
+{
+ "study": "h68_analysis",
+ "rule_source": "FINDING39 S4 (declared before H68 ran)",
+ "per_concept": {
+  "church": {
+   "h64_frag": {
+    "target": 0.0,
+    "retain8": 0.0,
+    "utility_all_nontarget": 0.09090909090909091
+   },
+   "h68_retain_fisher": {
+    "target": 0.3333333333333333,
+    "retain8": 0.8,
+    "utility_all_nontarget": 0.8484848484848485
+   },
+   "h64_mask": {
+    "protect": "frag",
+    "alpha": 0.3,
+    "beta": 0.1,
+    "mask_mean_post_clip": 0.2999999954557975,
+    "clipped_fraction": 0.02556029412803463,
+    "realised_perturbation_norm": 20.82734000646969,
+    "weight_norm": 1201.5273410509571
+   },
+   "h68_mask": {
+    "protect": "retain_fisher",
+    "alpha": 0.3,
+    "beta": 0.1,
+    "mask_mean_post_clip": 0.3000000185678026,
+    "clipped_fraction": 0.0,
+    "realised_perturbation_norm": 15.090900596998514,
+    "weight_norm": 1201.5273410509571
+   },
+   "matched_on": [
+    "alpha: 0.3 vs 0.3",
+    "beta: 0.1 vs 0.1",
+    "realised mask MEAN: 0.3000 vs 0.3000",
+    "teacher (AdvUnlearn TE)",
+    "distil steps (6000)",
+    "lr (1e-5)",
+    "pool recipe (v2)",
+    "seed (0)"
+   ],
+   "NOT_matched_on": [
+    "realised perturbation NORM: 20.827 vs 15.091 (ratio 1.380x)"
+   ],
+   "v1_reference_partly_in_sample": {
+    "h47_adv_a0.3": 0.8667,
+    "h51_ff_a0.3": 0.0917
+   },
+   "verdict": "BRANCH 1 \u2014 the v2 pools are INNOCENT. retain_fisher on v2 pools holds retain8 at 0.8000, so the pool repair did not cause H64's collapse. The `frag` ALLOCATION is the cause and FINDING39's pre-declared reading stands. The phase's published damage+distil retain numbers are NOT shown to be in-sample artifacts by this control."
+  },
+  "parachute": {
+   "h64_frag": {
+    "target": 0.06666666666666667,
+    "retain8": 0.08333333333333333,
+    "utility_all_nontarget": 0.14545454545454548
+   },
+   "h68_retain_fisher": {
+    "target": 0.9333333333333333,
+    "retain8": 0.9750000000000001,
+    "utility_all_nontarget": 0.9636363636363636
+   },
+   "h64_mask": {
+    "protect": "frag",
+    "alpha": 0.3,
+    "beta": 0.1,
+    "mask_mean_post_clip": 0.2999999950648049,
+    "clipped_fraction": 0.025272411827229467,
+    "realised_perturbation_norm": 20.74687757272277,
+    "weight_norm": 1201.5273410509571
+   },
+   "h68_mask": {
+    "protect": "retain_fisher",
+    "alpha": 0.3,
+    "beta": 0.1,
+    "mask_mean_post_clip": 0.30000001774237384,
+    "clipped_fraction": 0.0,
+    "realised_perturbation_norm": 15.090914608245004,
+    "weight_norm": 1201.5273410509571
+   },
+   "matched_on": [
+    "alpha: 0.3 vs 0.3",
+    "beta: 0.1 vs 0.1",
+    "realised mask MEAN: 0.3000 vs 0.3000",
+    "teacher (AdvUnlearn TE)",
+    "distil steps (6000)",
+    "lr (1e-5)",
+    "pool recipe (v2)",
+    "seed (0)"
+   ],
+   "NOT_matched_on": [
+    "realised perturbation NORM: 20.747 vs 15.091 (ratio 1.375x)"
+   ],
+   "v1_reference_partly_in_sample": {
+    "h47_adv_a0.3": 0.8667,
+    "h51_ff_a0.3": 0.0917
+   },
+   "verdict": "BRANCH 1 \u2014 the v2 pools are INNOCENT. retain_fisher on v2 pools holds retain8 at 0.9750, so the pool repair did not cause H64's collapse. The `frag` ALLOCATION is the cause and FINDING39's pre-declared reading stands. The phase's published damage+distil retain numbers are NOT shown to be in-sample artifacts by this control."
+  }
+ }
+}
