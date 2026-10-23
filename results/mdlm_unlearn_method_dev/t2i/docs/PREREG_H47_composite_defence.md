@@ -1,9 +1,42 @@
 # Pre-registration H47 — composite defence: adversarial text-encoder erasure + UNet robustification
 
-**Date:** 2026-10-22 · **Status:** pre-registered. The arms are **launched but unread** as this is
-written; H46's remaining seeds are also unread.
+**Date:** 2026-10-22 · **Status:** ❌ **H47 IS FALSE.** See the verdict box below.
 **Mandate clause this targets:** *"Novel, non-obvious combinations of existing techniques are
 eligible."*
+
+---
+
+> ### ❌ VERDICT: H47 IS FALSE. The composite is fully reversed under a stronger adversary.
+>
+> The composite **did** fix the utility collapse — retain **0.867** with the concept erased to
+> 0.000, where the UCE teacher gave 0.458. That half of the hypothesis is confirmed and stands.
+>
+> **The robustness half is dead.** The first measurement read max-over-valid H = 0.533 from one
+> valid attack of three, all at lr 1e-5. `H48` re-ran the arm with more seeds and a stronger
+> adversary:
+>
+> | attack | gate | H after |
+> |---|---|---|
+> | sd4, lr 1e-5 | FAIL | 0.467 |
+> | sd5, lr 1e-5 | FAIL | 0.333 |
+> | **sd6, lr 1e-5** | **PASS** | **0.933** |
+> | **sd0, lr 5e-5** | **PASS** | **1.000** |
+> | **sd1, lr 5e-5** | **PASS** | **1.000** |
+> | **sd0, lr 1e-4** | **PASS** | **1.000** |
+>
+> **Max-over-valid attacks = 1.000, not 0.533.** The composite is restored to the base model's own
+> level, exactly like every other arm in this phase. The 0.533 was an artifact of too few seeds and
+> too weak a learning rate — a *different seed at the same lr* already reaches 0.933.
+>
+> **This is the fourth time in this project that strengthening the adversary destroyed a result**
+> (after the α=0.5 "fully robust" claim, the 18× advantage, and the concept-specificity signal).
+> The pattern is consistent enough to state as a rule: in this project, a robustness number
+> measured at one learning rate with fewer than ~5 valid attacks has never survived.
+>
+> **Consequences:** `PREREG_H40`'s wall is further supported — now by the composite too. The
+> frontier table published in commit `048e91a` is **retracted**: its α=0.3 row (H 0.533) is wrong,
+> and its α=0.5 row (H 0.267) was measured under the identical too-weak conditions and is being
+> re-tested by `H50` before it is believed.
 
 ---
 

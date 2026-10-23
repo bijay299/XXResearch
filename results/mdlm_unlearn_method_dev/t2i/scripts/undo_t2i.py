@@ -161,6 +161,12 @@ def main():
     student, sch = pipe.unet, pipe.scheduler
     pipe.text_encoder.requires_grad_(False); pipe.vae.requires_grad_(False)
 
+    # One generator for every stochastic draw below. The first version left the Fisher-batch and
+    # timestep sampling on the global RNG, so the same config and seed produced different arms
+    # (retain 0.867 vs 0.783 on two runs) -- noise that was indistinguishable from signal at the
+    # precision the frontier tables were quoted to.
+    sg = torch.Generator(device=dev); sg.manual_seed(a.seed + 4242)
+
     # 2. retain-Fisher importance (diagonal, squared grads of the diffusion loss on RETAIN prompts)
     imp = None
     if a.protect in ("retain_fisher", "random"):
@@ -171,10 +177,11 @@ def main():
                                "--forget-frac")
         imp = {n: torch.zeros_like(p) for n, p in student.named_parameters()}
         for b in range(a.fisher_batches):
-            i = ret_idx[torch.randint(0, len(ret_idx), (1,), device=dev)]
+            i = ret_idx[torch.randint(0, len(ret_idx), (1,), device=dev, generator=sg)]
             z0, c = lats[i], embs[i]
-            noise = torch.randn_like(z0)
-            ts = torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev).long()
+            noise = torch.randn(z0.shape, device=dev, generator=sg, dtype=z0.dtype)
+            ts = torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,
+                               generator=sg).long()
             loss = F.mse_loss(student(sch.add_noise(z0, noise, ts), ts,
                                       encoder_hidden_states=c).sample, noise)
             student.zero_grad(set_to_none=True)
@@ -210,10 +217,11 @@ def main():
     opt = torch.optim.Adam(student.parameters(), lr=a.lr)
     t0, hist = time.time(), []
     for step in range(a.steps):
-        i = torch.randint(0, len(lats), (1,), device=dev)
+        i = torch.randint(0, len(lats), (1,), device=dev, generator=sg)
         z0, c = lats[i], embs[i]
-        noise = torch.randn_like(z0)
-        ts = torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev).long()
+        noise = torch.randn(z0.shape, device=dev, generator=sg, dtype=z0.dtype)
+        ts = torch.randint(0, sch.config.num_train_timesteps, (1,), device=dev,
+                           generator=sg).long()
         zt = sch.add_noise(z0, noise, ts)
         with torch.no_grad():
             tgt = teacher(zt, ts, encoder_hidden_states=c).sample
