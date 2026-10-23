@@ -56,8 +56,13 @@ seeds), identical budget, identical optimiser. Only the arm differs.
 
 Two internal checks that the measure is sound:
 
-- The two independent α=0 arms — the UCE teacher and the damage-free distilled copy of it — agree
-  to **four decimal places** (0.3394 vs 0.3393). The measure is precise at the scale of the effect.
+- ⚠ **WITHDRAWN.** This previously read: *"the two independent α=0 arms ... agree to four decimal
+  places (0.3394 vs 0.3393). The measure is precise at the scale of the effect."* An audit found
+  the two arms' evaluation JSONs are **bit-identical across all 24 per-concept values**, and two of
+  their three attack losses agree *exactly* — because α=0 makes the damage step the identity, so the
+  "independent" arm is effectively the teacher. The agreement is near-tautological and validates
+  nothing. One of this finding's two internal checks is therefore void. The trainability numbers
+  themselves all re-derive exactly from the raw logs and stand (see §6).
 - Gate failures track it exactly: 0/3 attacks fail at α=0, 0/3 at α=0.3, **2/3 at α=0.5**, **3/3 at
   α=0.7**. Attacks fail the gate precisely where the arm has become hard to fit.
 

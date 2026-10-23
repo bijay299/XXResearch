@@ -31,7 +31,7 @@ them.
 | base SD v1.4 | 1.000 | 1.000 | — | — |
 | **AdvUnlearn** (official, robust SOTA) | 0.400 | **0.992** | **1.000** | 6/6 |
 | ESD (our re-impl) | 0.467 | 0.992 | **1.000** | 3/3 |
-| UCE (our re-impl, tuned) | 0.067 | 0.850 | **1.000** | 5/5 |
+| UCE (our re-impl, tuned) | 0.067 | 0.850 | **1.000** | 3/3 ⚠ |
 | UCE at matched utility | 0.000 | 0.350 | **1.000** | 4/4 |
 | UNDO α=0.5 (damage+distil) | 0.000 | 0.317 | **0.467** | 3/10 |
 | UNDO α=0.7 | 0.000 | 0.000 | no valid attack | 0/3 |
@@ -43,8 +43,11 @@ scraped data, no privileged access beyond the weights.
 
 **(i) Every usable erasure is fully reversible.** `FINDING34`: the official AdvUnlearn church
 encoder — retain 0.992, a genuinely good operating point — is restored to the base model's 1.000 by
-**6 of 6** gated attacks. UCE and ESD likewise, 8 of 8. Not one arm with usable utility survived a
-single attack.
+**6 of 6** gated attacks. UCE and ESD likewise, **6 of 6** (corrected from "8 of 8": two attacks
+previously pooled into the UCE-tuned row were run against a *different* build — the checkpoint path
+`adapters/uce_church/unet.pt` was overwritten between a retain-0.350 and a retain-0.850 build).
+⚠ And "not one arm with usable utility survived" is **too strong**: see `FINDING35` §1-2, where one
+arm (retain 0.867) reached H 0.533 on a valid attack and could not be rebuilt.
 
 **(ii) Prompt-space adversarial training does not transfer to weight space.** AdvUnlearn is
 hardened over a neighbourhood of *text embeddings* and is undone by 300 gradient steps on the

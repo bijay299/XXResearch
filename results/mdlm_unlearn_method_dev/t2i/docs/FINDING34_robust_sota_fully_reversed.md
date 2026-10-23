@@ -39,9 +39,16 @@ erasure, so attacking them would have proved nothing. The official released weig
 | ESD (our re-impl) | 0.467 | 0.992 | 0.1631 |
 | UCE (our re-impl, tuned) | 0.067 | 0.850 | 0.1453 |
 
-AdvUnlearn is the **best operating point in this project**: it erases more than our ESD and
-preserves utility far better than our UCE. The 42% drop in CLIP alignment confirms the erasure is
-real. AdvUnlearn erases the **text encoder**, so its release is a `CLIPTextModel`; it was loaded
+AdvUnlearn is the strongest operating point available here and preserves utility far better than
+our UCE.
+
+⚠ **Two claims withdrawn from this paragraph after audit.** It previously read "it erases more than
+our ESD" and "the 42% drop in CLIP alignment confirms the erasure is real". Neither holds: 0.400 vs
+ESD's 0.467 is a **one-image difference** on a 15-image metric and cannot support a ranking; and
+`clip_align` does not track erasure depth at all — an arm that generates nothing recognisable
+(α=0.7, all 12 concepts at 0.000) shows a *smaller* align drop (−17%) than AdvUnlearn (−42%), while
+UCE at church 0.067 shows the same −40% as AdvUnlearn at church 0.400. The alignment drop is a
+second coarse number, not a confirmation. AdvUnlearn erases the **text encoder**, so its release is a `CLIPTextModel`; it was loaded
 directly into our pinned pipeline, with no legacy-repo clone and no environment change.
 
 *(church 0.400 is above the ≤0.20 figure a stricter protocol would want. That is the official
