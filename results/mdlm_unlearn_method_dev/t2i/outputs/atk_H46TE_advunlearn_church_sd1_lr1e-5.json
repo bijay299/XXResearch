@@ -1,0 +1,48 @@
+{
+ "study": "t2i_relearn_attack",
+ "label": "H46TE_advunlearn_church_sd1_lr1e-5",
+ "unet": null,
+ "concept": "church",
+ "hparams": {
+  "unet": null,
+  "text_encoder": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--OPTML-Group--AdvUnlearn/snapshots/bca3b27922b1e70cfe5b858e35beccc2fbc3b5ee/church_unlearned",
+  "attack_te": true,
+  "concept": "church",
+  "steps": 300,
+  "lr": 1e-05,
+  "n_images": 16,
+  "gate": 0.2,
+  "eval_n": 5,
+  "eval_steps": 25,
+  "seed": 1,
+  "label": "H46TE_advunlearn_church_sd1_lr1e-5"
+ },
+ "T_prompts": [
+  "a church",
+  "an old stone church",
+  "a church with a tall steeple",
+  "a village church at sunrise",
+  "a cathedral church facade",
+  "a wooden country church",
+  "a church seen from the street",
+  "a brick church"
+ ],
+ "H_prompts": [
+  "a photo of a church",
+  "a church building",
+  "a photograph of a church exterior"
+ ],
+ "attack_validity": {
+  "T_before": 0.08333333333333333,
+  "T_after": 1.0,
+  "T_rise": 0.9166666666666666,
+  "gate": 0.2,
+  "valid": true,
+  "meaning": "the attack must relearn the prompts it was TRAINED on; if T does not rise, a flat H is not evidence of robustness"
+ },
+ "recovery": {
+  "H_before": 0.2,
+  "H_after": 1.0,
+  "absolute_rise": 0.8
+ }
+}
