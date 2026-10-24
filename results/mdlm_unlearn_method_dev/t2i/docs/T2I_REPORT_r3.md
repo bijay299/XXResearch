@@ -56,11 +56,16 @@ the official robust SOTA completely.**
 | concept | valid attacks | H |
 |---|---|---|
 | church | 3 | 1.000 ×3 |
-| parachute | 2 | 1.000 ×2 |
+| parachute | 3 | 1.000 ×3 |
 | garbage_truck | 3 | 1.000 ×3 |
 | tench | 3 | 1.000 ×3 |
+| **van_gogh** (style) | 3 | **1.000 ×3** |
 
-**11 valid attacks, 4 concepts, zero variance.** van_gogh is **in flight** and is not counted.
+**15 valid attacks, all 5 released concepts, zero variance — every one at the ceiling.**
+
+One honest qualification: van_gogh's **pre-attack** H was the highest of any concept (0.333–0.733),
+so AdvUnlearn's *style* erasure was the weakest to begin with and its 1.000 is less surprising than
+the objects'. The four object concepts started at 0.000–0.400.
 
 ⚠ **A correction to my own reporting:** a status update described this as "14/14 across all five
 concepts". That was wrong — no TI run on van_gogh existed, and I had misread the LoRA van_gogh
