@@ -43,6 +43,8 @@ def main():
     ap.add_argument("--eval-n", type=int, default=5)
     ap.add_argument("--eval-steps", type=int, default=25)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--measure-utility", action="store_true",
+                    help="run the issue-7 utility panel before and after; the TI and DreamBooth scripts originally lacked it, leaving the adversary matrix with recovery but no utility for two of four adversaries.")
     ap.add_argument("--label", required=True)
     a = ap.parse_args()
     dev = "cuda"
@@ -99,7 +101,15 @@ def main():
         T_before = ar.clip_acc(half, cm, cp, tfeat, T, a.concept, 3, a.eval_steps, a.seed, dev)
         H_before = ar.clip_acc(half, cm, cp, tfeat, H, a.concept, a.eval_n, a.eval_steps, a.seed, dev)
         del half; torch.cuda.empty_cache()
-    print(f"[db] BEFORE (identifier prompts) T={T_before:.3f} H={H_before:.3f}", flush=True)
+    u_before = None
+    if a.measure_utility:
+        with torch.no_grad():
+            half2 = ar.build_pipe(torch.float16, a.unet, dev, te_path=a.text_encoder)
+            u_before = ar.utility_probe(half2, cm, cp, tfeat, ar.UTILITY_PANEL_DEFAULT,
+                                        ar.gen_eval_concepts(), 2, 4, a.eval_steps, a.seed, dev)
+            del half2; torch.cuda.empty_cache()
+    print(f"[db] BEFORE (identifier prompts) T={T_before:.3f} H={H_before:.3f}"
+          + (f" util={u_before['panel_mean_clip_acc']:.4f}" if u_before else ""), flush=True)
 
     def encode(ims, caps):
         with torch.no_grad():
@@ -141,6 +151,10 @@ def main():
     with torch.no_grad():
         T_after = ar.clip_acc(after, cm, cp, tfeat, T, a.concept, 3, a.eval_steps, a.seed, dev)
         H_after = ar.clip_acc(after, cm, cp, tfeat, H, a.concept, a.eval_n, a.eval_steps, a.seed, dev)
+        u_after = None
+        if a.measure_utility:
+            u_after = ar.utility_probe(after, cm, cp, tfeat, ar.UTILITY_PANEL_DEFAULT,
+                                       ar.gen_eval_concepts(), 2, 4, a.eval_steps, a.seed, dev)
     os.system(f"rm -rf {tmp}")
 
     valid = (T_after - T_before) >= a.gate
@@ -157,7 +171,17 @@ def main():
                "attack_validity": {"T_before": T_before, "T_after": T_after,
                                    "T_rise": T_after - T_before, "gate": a.gate,
                                    "valid": bool(valid)},
-               "recovery": {"H_before": H_before, "H_after": H_after}},
+               "recovery": {"H_before": H_before, "H_after": H_after},
+               "post_attack_utility": ({"status": "MEASURED",
+                                        "retained_capability": {
+                                            "before": u_before["panel_mean_clip_acc"],
+                                            "after": u_after["panel_mean_clip_acc"]},
+                                        "prompt_adherence": {
+                                            "before": u_before["panel_mean_prompt_adherence"],
+                                            "after": u_after["panel_mean_prompt_adherence"]}}
+                                       if (u_before and u_after) else
+                                       {"status": "NOT MEASURED",
+                                        "reason": "--measure-utility not set"})},
               open(f"{OUT}/atk_{a.label}.json", "w"), indent=1)
     print(f"[db] {a.label}: T {T_before:.3f}->{T_after:.3f} (gate "
           f"{'PASS' if valid else 'FAIL'}) | H {H_before:.3f}->{H_after:.3f}", flush=True)

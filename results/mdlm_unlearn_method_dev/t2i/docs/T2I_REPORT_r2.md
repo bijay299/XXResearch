@@ -1,5 +1,9 @@
 # Text-to-image concept erasure — phase report, revision 2
 
+> ⚠ **SUPERSEDED by `T2I_REPORT_r3.md` (2026-10-24).** Preserved as published; r3 adds the
+> four-adversary matrix, the Textual-Inversion result, the DreamBooth-prior evaluation
+> pitfall, and a verdict anchored on the phase's best arm rather than weaker ones.
+
 **Date:** 2026-10-23 · **Identifier:** `T2I_REPORT_r2` · **Supersedes:** `T2I_REPORT.md` (2026-10-22)
 **Model:** Stable Diffusion v1.4, pinned `133a221b8aa7292a167afc5127cb63fb5005638b`
 **Mandate:** an unlearning algorithm that beats the strongest existing methods on a clearly defined
