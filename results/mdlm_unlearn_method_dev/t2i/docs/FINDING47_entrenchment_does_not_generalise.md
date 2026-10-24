@@ -7,6 +7,13 @@ generalisation does not.
 
 ---
 
+> 🔄 **§1's CONCLUSION IS SUPERSEDED by `FINDING48`.** §1 compared arms at FIXED removal
+> fractions. §2 of this document flagged that as confounded by unmatched fragility and named the
+> fix; the fix has now been run, and at UTILITY-MATCHED removal all three attacked arms retain the
+> concept at 0.80–1.00 against base 0.333. **Entrenchment does generalise.** §2's confound was the
+> explanation, and §5's within-arm stability question is answered yes. The measurements in §1 are
+> correct as measurements; the inference from them was not.
+>
 > ✅ **HOLD LIFTED — §1's cross-arm table is CONFIRMED by clean re-measurement.**
 >
 > A bug in my sweep script put this table on hold: `redundancy_sweep.py` built its per-rung label

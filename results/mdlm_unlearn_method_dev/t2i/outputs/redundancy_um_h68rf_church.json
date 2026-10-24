@@ -1,0 +1,34 @@
+{
+ "study": "redundancy_sweep",
+ "state": "um_h68rf",
+ "arm": "h68v2_rf_a0.3_church",
+ "attacked": "attacked/KEEP_h68rf_church_sd0_lr1e-5/unet.pt",
+ "concept": "church",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.13,
+   "n_zeroed": 19329024,
+   "target": 0.8666666666666667,
+   "retain8": 0.6833333333333333,
+   "utility": 0.7393939393939394
+  },
+  {
+   "mode": "random",
+   "frac": 0.16,
+   "n_zeroed": 23789568,
+   "target": 0.8666666666666667,
+   "retain8": 0.5166666666666666,
+   "utility": 0.6181818181818182
+  },
+  {
+   "mode": "random",
+   "frac": 0.2,
+   "n_zeroed": 29736960,
+   "target": 0.6,
+   "retain8": 0.25,
+   "utility": 0.4181818181818182
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is."
+}

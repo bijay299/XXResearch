@@ -1,6 +1,12 @@
 # Finding 46 — the attack does not merely restore the concept; it writes it in **more robustly than pretraining did**
 
-> ⚠ **GENERAL CLAIM WITHDRAWN — see `FINDING47`.** This finding generalised from a SINGLE
+> 🔄 **STATUS: REINSTATED by `FINDING48`, on better evidence than this finding had.** The
+> withdrawal below stands as a record of the correct intermediate judgement: this finding was
+> underdetermined when published (one arm, no cross-arm, no utility-matched comparison). At
+> UTILITY-MATCHED removal, all three attacked arms retain the concept at 0.80–1.00 against the
+> base model's 0.333, so the claim holds — see `FINDING48` §1 and its §4 scope limits.
+>
+> ⚠ **(superseded) GENERAL CLAIM WITHDRAWN — see `FINDING47`.** This finding generalised from a SINGLE
 > attacked arm. Two further arm families, attacked and swept identically, do not reproduce it:
 > the damage+distil arm is **worse than base** (church random-25 %: 0.000 vs base 0.333) and
 > the official AdvUnlearn arm matches base at random-50 % and magnitude-10 %. The cross-arm
