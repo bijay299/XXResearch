@@ -1,0 +1,42 @@
+{
+ "study": "redundancy_sweep",
+ "state": "dose_s600",
+ "arm": "frp_church_r3_l05",
+ "attacked": "attacked/DOSE_frp_church_s600/unet.pt",
+ "concept": "church",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.22,
+   "n_zeroed": 32710656,
+   "target": 1.0,
+   "retain8": 0.5333333333333332,
+   "utility": 0.5151515151515151
+  },
+  {
+   "mode": "random",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 1.0,
+   "retain8": 0.45833333333333337,
+   "utility": 0.4606060606060606
+  },
+  {
+   "mode": "random",
+   "frac": 0.27,
+   "n_zeroed": 40144896,
+   "target": 1.0,
+   "retain8": 0.42499999999999993,
+   "utility": 0.43636363636363634
+  },
+  {
+   "mode": "random",
+   "frac": 0.3,
+   "n_zeroed": 44605440,
+   "target": 0.9333333333333333,
+   "retain8": 0.36666666666666664,
+   "utility": 0.3696969696969697
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is."
+}

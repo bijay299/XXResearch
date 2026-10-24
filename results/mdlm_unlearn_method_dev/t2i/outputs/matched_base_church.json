@@ -1,0 +1,53 @@
+{
+ "study": "matched_removal",
+ "arm": "_base_ref",
+ "attacked": "adapters/_base_ref/unet.pt",
+ "concept": "church",
+ "target_retain": 0.45,
+ "tol": 0.04,
+ "history": [
+  {
+   "iter": 0,
+   "frac": 0.3,
+   "retain8": 0.24166666666666667,
+   "target": 0.06666666666666667
+  },
+  {
+   "iter": 1,
+   "frac": 0.15,
+   "retain8": 0.9416666666666667,
+   "target": 0.8666666666666667
+  },
+  {
+   "iter": 2,
+   "frac": 0.22499999999999998,
+   "retain8": 0.6000000000000001,
+   "target": 0.4666666666666667
+  },
+  {
+   "iter": 3,
+   "frac": 0.26249999999999996,
+   "retain8": 0.39166666666666666,
+   "target": 0.3333333333333333
+  },
+  {
+   "iter": 4,
+   "frac": 0.24374999999999997,
+   "retain8": 0.5083333333333333,
+   "target": 0.4
+  },
+  {
+   "iter": 5,
+   "frac": 0.25312499999999993,
+   "retain8": 0.4583333333333333,
+   "target": 0.26666666666666666
+  }
+ ],
+ "matched": {
+  "iter": 5,
+  "frac": 0.25312499999999993,
+  "retain8": 0.4583333333333333,
+  "target": 0.26666666666666666
+ },
+ "method": "bisection on removal fraction to hit a TARGET retain8, replacing the guess-the-bracket approach that inverted a conclusion twice (FINDING50 S3)"
+}
