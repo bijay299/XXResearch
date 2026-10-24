@@ -117,6 +117,22 @@ model's own representation of that concept, when compared at matched retain util
 Direct measurements at the matched fractions (rather than interpolated ones) were running as this was
 written; §1's AdvUnlearn and damage+distil rows are interpolated between bracketing rungs.
 
+
+## 4a. Scope items from §4, now closed
+
+| §4 item | status |
+|---|---|
+| a second concept | **closed** — §1a, parachute, 3 of 3 arms |
+| attack-seed replication beyond FRP | **closed** — AdvUnlearn and damage+distil each run at 2 seeds; direction holds on both, magnitude is seed-dependent |
+| sensitivity to the matching level | **closed** — FRP-attacked exceeds base at EVERY level measured: retain8 ≈ 0.15 (0.933 vs 0.067), 0.26–0.33 (1.000 vs 0.067), 0.45 (1.000 vs 0.333), 0.57–0.59 (1.000 vs 0.467), 0.66–0.73 (1.000 vs 0.800). The arms do not reorder, so the conclusion does not depend on having chosen 0.45 |
+| the mechanism | **still open**, and now further constrained by `FINDING49`'s threshold, which the overfitting explanation does not obviously predict |
+| removal probes disruptability, not representation | **unchanged limitation** |
+
+**New qualification from `FINDING49`:** entrenchment requires the attack to achieve **complete**
+recovery. At 10–20 attack steps the concept is largely back (H 0.467–0.867) and is **exactly as
+removable as the base model's**. Every arm in this finding was attacked at 300 steps, i.e. well above
+that threshold, so §1 and §1a describe the *post-complete-recovery* regime only.
+
 ## 5. Why it matters for the mandate
 
 It does not change the headline — **seven methods reversed, mandate unmet.** It sharpens the threat
