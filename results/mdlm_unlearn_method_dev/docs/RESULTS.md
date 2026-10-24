@@ -1,5 +1,17 @@
 # Results — AFC against MDU, EMDU and ATWU on TOFU/LLaDA
 
+> ❌ **SUPERSEDED, 2026-10-24 — the comparative claim in §1 below is REFUTED.** With the baseline
+> confound fixed (λ=3 rebuilds, bridge control reproducing `ll_mdu_f3` exactly on all seven reported
+> numbers) and n=8 seeds, **AFC's TV advantage is gone: 0.2993 ± 0.1290 vs MDU λ=3's
+> 0.2977 ± 0.0650, a difference of 0.0016** — not the "37% lower" in §1 — and the paired win rate is
+> **4 of 8**, with AFC's three wins being exactly the three seeds it was selected on. **What
+> survives is retention:** retain ASCR **0.534 vs 0.393 (+0.141)**, holding on 7 of 8 seeds. So the
+> defensible claim is *"indistinguishable TV at matched disclosure, with substantially more capability
+> retained"* — a narrower contribution on a different axis than §1 asserts. AFC also remains ~2× more
+> variable on TV and is **no better** on DEGENERATE (0.152 vs 0.128; the n=3 figures inverted). A
+> symmetric control is running on AFC's own unrecorded hyperparameters; if its bridge fails, the
+> retain claim is provisional too. See `docs/FINDING_afc_tv_advantage_does_not_survive.md`.
+
 > ⚠ **BASELINE CONFOUND, 2026-10-24 — the retraction below has a problem of its own.** The MDU
 > extension seeds `mdu_s3..s7` it relies on have **no recorded λ_f anywhere** (not the logs, not
 > ATTEMPTS.tsv, not the arm JSONs), and `train_lam.py --lam-forget` **defaults to 8.0**. Rebuilding
