@@ -1,5 +1,14 @@
 # Finding 49 — entrenchment has a THRESHOLD: it appears only once the attack achieves FULL recovery. Partial recovery leaves the concept exactly as removable as the base model's.
 
+> ❌ **THRESHOLD CLAIM CORRECTED — see `FINDING50`.** The second-arm replication named in §4 as
+> in flight has reported. On correctly-bracketed readings, entrenchment rises **monotonically
+> with attack budget** while `H_after` stays pinned at 1.000 (damage+distil arm, 50→300 steps:
+> 0.067 → 0.467 → 0.733 → 0.733 → 0.867). The threshold in §1 was **the low end of a gradient**,
+> read through a metric that saturates at 15/15 and cannot resolve the rest of it. §3's
+> mechanism-constraining argument is withdrawn — a gradient is what the overfitting explanation
+> predicts. **What survives:** the attacker-cost observation (20–30 steps, §3 bullet 1) and the
+> absence of entrenchment at the lowest budgets.
+
 **Date:** 2026-10-23 · **Arm:** `frp_church_r3_l05` (FRP port), church, lr 1e-5, seed 0, 16 images
 **Evidence:** `outputs/atk_DOSE_frp_church_s*.json`, `outputs/redundancy_dose_s*_church.json`
 **Scope:** ONE arm. The replication on a second arm is **running**, and this finding is deliberately
