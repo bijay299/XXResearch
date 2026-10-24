@@ -119,10 +119,38 @@ is the part contingent on the bridge.
 > reproducible from explicitly recorded settings, and **§2 and §3 stand as written: the TV parity is
 > real and the +0.141 retain advantage is no longer provisional.**
 >
-> One check remains, now running: whether `afc_s3..s7` themselves reproduce under those same
-> recorded settings (labels `afc_l1_sN_rec`). The seed-0 bridge validates the *protocol*; it does not
-> prove the five extension seeds were built with it — exactly the distinction that caught the MDU
-> column. If they do not reproduce, AFC's n=8 column has its own confound and §2's AFC figures move.
+> ✅ **AND THE EXTENSION SEEDS REPRODUCE EXACTLY.** `afc_l1_s{3,4,5,6}_rec`, rebuilt under those
+> recorded settings, match `afc_s{3,4,5,6}` to four decimals on all four coordinates (s7 running):
+>
+> | seed | original `afc_sN` (TV / retain / DISC / DEG) | rebuilt `afc_l1_sN_rec` |
+> |---|---|---|
+> | s3 | 0.5871 / 0.4998 / 0.1083 / 0.5083 | **identical** |
+> | s4 | 0.3122 / 0.5265 / 0.1167 / 0.2250 | **identical** |
+> | s5 | 0.3371 / 0.4563 / 0.2917 / 0.0750 | **identical** |
+> | s6 | 0.3089 / 0.5636 / 0.0750 / 0.0167 | **identical** |
+>
+> So **the AFC column has no confound**: `afc_s3..s7` were in fact built at `--mode none
+> --lam-forget 1` with the defaults. **The provenance failure was one-sided — in the baseline only.**
+> I applied the identical instrument to my own method's arms and they passed, which is what makes the
+> corrected conclusion in §2–§3 safe to rely on rather than merely convenient.
+
+## 5a. ⚠ Every historical arm checkpoint has been deleted from disk
+
+Discovered while trying to re-attack the RTT control: of 42 adapter directories, **only the 12 built
+today retain a usable `ckpt_300`**. `mdu_pub`, `h16_none_f1`, `ll_mdu_f3`, `seed_afc_s1/s2`,
+`afc_s3..s7`, `mdu_s3..s7` — the weights behind every published number in `RESULTS.md` — are gone.
+
+Consequences, stated plainly:
+
+- **No published arm can be re-verified at the weight level**, only re-derived. Both bridge controls
+  and the four exact seed reproductions above are metric-level agreement between an original
+  measurement and a fresh build, which is strong but is not a weight comparison.
+- **The rebuild instrument is now the only recourse**, which is precisely why its two bridges were
+  worth running before trusting it. They passed, and the four exact seed reproductions are further
+  evidence that it is faithful.
+- The RTT control could not be re-attacked on its original weights at all; its arm is being rebuilt
+  at explicit λ_f=8 under a new label (`mdu_l8_s0_rebuild`), to be checked against `mdu_pub`'s
+  published row before the gated attack is believed.
 
 ## 6. Scope
 

@@ -1,0 +1,73 @@
+{
+  "label": "afc_l1_s4_rec",
+  "stack": [
+    "base",
+    "theta0_tofu",
+    "afc_l1_s4_rec/ckpt_300(merged)"
+  ],
+  "adapter": "adapters/afc_l1_s4_rec/ckpt_300",
+  "decoder": {
+    "steps": 64,
+    "gen_length": 64,
+    "block_length": 64,
+    "temperature": 0.0,
+    "cfg_scale": 0.0,
+    "remasking": "low_confidence",
+    "mask_id": 126336
+  },
+  "forget_profile": {
+    "DISCLOSE": 0.1167,
+    "DEGENERATE": 0.225,
+    "ABSTAIN": 0.0,
+    "REPLACE": 0.3833,
+    "IGNORANT": 0.275,
+    "UNCLASSIFIED": 0.0
+  },
+  "retain_profile": {
+    "DISCLOSE": 0.5875,
+    "DEGENERATE": 0.1125,
+    "ABSTAIN": 0.0,
+    "REPLACE": 0.05,
+    "IGNORANT": 0.25,
+    "UNCLASSIFIED": 0.0
+  },
+  "forget_ASCR_mean": 0.171,
+  "retain_ASCR_mean": 0.5265,
+  "TV_forget_to": {
+    "theta0_tofu": 0.5503,
+    "ordering_oracle": 0.342,
+    "pristine_base": 0.3122
+  },
+  "reference_profiles": {
+    "theta0_tofu": {
+      "DISCLOSE": 0.667,
+      "DEGENERATE": 0.0,
+      "ABSTAIN": 0.0,
+      "REPLACE": 0.125,
+      "IGNORANT": 0.208,
+      "UNCLASSIFIED": 0.0
+    },
+    "ordering_oracle": {
+      "DISCLOSE": 0.108,
+      "DEGENERATE": 0.017,
+      "ABSTAIN": 0.0,
+      "REPLACE": 0.258,
+      "IGNORANT": 0.617,
+      "UNCLASSIFIED": 0.0
+    },
+    "pristine_base": {
+      "DISCLOSE": 0.03,
+      "DEGENERATE": 0.0,
+      "ABSTAIN": 0.113,
+      "REPLACE": 0.47,
+      "IGNORANT": 0.388,
+      "UNCLASSIFIED": 0.0
+    }
+  },
+  "n_forget": 120,
+  "n_retain": 80,
+  "measured": {
+    "wall_s": 380.4,
+    "peak_gpu_gib": 15.628
+  }
+}
