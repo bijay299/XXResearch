@@ -9,8 +9,10 @@
 > defensible claim is *"indistinguishable TV at matched disclosure, with substantially more capability
 > retained"* — a narrower contribution on a different axis than §1 asserts. AFC also remains ~2× more
 > variable on TV and is **no better** on DEGENERATE (0.152 vs 0.128; the n=3 figures inverted). A
-> symmetric control is running on AFC's own unrecorded hyperparameters; if its bridge fails, the
-> retain claim is provisional too. See `docs/FINDING_afc_tv_advantage_does_not_survive.md`.
+> symmetric control on AFC's own unrecorded hyperparameters has since **PASSED** — `afc_l1_s0_bridge`
+> reproduces `h16_none_f1` exactly on all four coordinates — so **both columns are verified
+> reproducible and the retain claim is NOT provisional.** Whether AFC's extension seeds `afc_s3..s7`
+> were themselves built with those settings is still being checked. See `docs/FINDING_afc_tv_advantage_does_not_survive.md`.
 
 > ⚠ **BASELINE CONFOUND, 2026-10-24 — the retraction below has a problem of its own.** The MDU
 > extension seeds `mdu_s3..s7` it relies on have **no recorded λ_f anywhere** (not the logs, not

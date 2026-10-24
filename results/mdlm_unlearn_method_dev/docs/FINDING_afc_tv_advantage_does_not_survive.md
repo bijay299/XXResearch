@@ -112,6 +112,18 @@ Published now rather than held, because the correction to the published comparat
 established by §1–§2 and should not sit unreported while the symmetric half runs. §3's retain claim
 is the part contingent on the bridge.
 
+> ✅ **THE AFC BRIDGE PASSED (2026-10-24).** `afc_l1_s0_bridge`, rebuilt at explicit
+> `--mode none --lam-forget 1 --lam-retain 1` with `train_h16.py` defaults, reproduces
+> `h16_none_f1` **exactly on all four coordinates** — TV 0.2288, retain 0.5328, DISCLOSE 0.2083,
+> DEGENERATE 0.0500 — on a separate run (wall 380.4 s). So **both** columns are now verified
+> reproducible from explicitly recorded settings, and **§2 and §3 stand as written: the TV parity is
+> real and the +0.141 retain advantage is no longer provisional.**
+>
+> One check remains, now running: whether `afc_s3..s7` themselves reproduce under those same
+> recorded settings (labels `afc_l1_sN_rec`). The seed-0 bridge validates the *protocol*; it does not
+> prove the five extension seeds were built with it — exactly the distinction that caught the MDU
+> column. If they do not reproduce, AFC's n=8 column has its own confound and §2's AFC figures move.
+
 ## 6. Scope
 
 n=8 paired seeds, one dataset (TOFU/LLaDA-8B-Instruct, backbone rev
