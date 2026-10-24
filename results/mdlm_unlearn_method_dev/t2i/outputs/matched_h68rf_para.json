@@ -1,0 +1,29 @@
+{
+ "study": "matched_removal",
+ "arm": "h68v2_rf_a0.3_parachute",
+ "attacked": "attacked/KEEP_h68rf_parachute_sd0_lr1e-5/unet.pt",
+ "concept": "parachute",
+ "target_retain": 0.45,
+ "tol": 0.04,
+ "history": [
+  {
+   "iter": 0,
+   "frac": 0.3,
+   "retain8": 0.03333333333333333,
+   "target": 0.4
+  },
+  {
+   "iter": 1,
+   "frac": 0.15,
+   "retain8": 0.45,
+   "target": 1.0
+  }
+ ],
+ "matched": {
+  "iter": 1,
+  "frac": 0.15,
+  "retain8": 0.45,
+  "target": 1.0
+ },
+ "method": "bisection on removal fraction to hit a TARGET retain8, replacing the guess-the-bracket approach that inverted a conclusion twice (FINDING50 S3)"
+}

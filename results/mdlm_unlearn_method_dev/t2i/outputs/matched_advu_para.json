@@ -1,0 +1,35 @@
+{
+ "study": "matched_removal",
+ "arm": "_base_ref",
+ "attacked": "attacked/KEEP_advunlearn_parachute_sd0_lr1e-5/unet.pt",
+ "concept": "parachute",
+ "target_retain": 0.45,
+ "tol": 0.04,
+ "history": [
+  {
+   "iter": 0,
+   "frac": 0.3,
+   "retain8": 0.25,
+   "target": 0.4666666666666667
+  },
+  {
+   "iter": 1,
+   "frac": 0.15,
+   "retain8": 0.8416666666666667,
+   "target": 1.0
+  },
+  {
+   "iter": 2,
+   "frac": 0.22499999999999998,
+   "retain8": 0.4583333333333333,
+   "target": 0.8666666666666667
+  }
+ ],
+ "matched": {
+  "iter": 2,
+  "frac": 0.22499999999999998,
+  "retain8": 0.4583333333333333,
+  "target": 0.8666666666666667
+ },
+ "method": "bisection on removal fraction to hit a TARGET retain8, replacing the guess-the-bracket approach that inverted a conclusion twice (FINDING50 S3)"
+}
