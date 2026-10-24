@@ -81,6 +81,15 @@ re-measure the target.** If the concept survives that, the surviving weights alo
 conclusion is direct. It costs one weight mask and one evaluation — roughly 5 GPU-minutes — and is
 the obvious next measurement. It is recorded here as **planned, not done**, rather than asserted.
 
+> ✅ **DONE — see `FINDING57`.** The "planned, not done" sentence above is **stale**. The test ran on
+> both arms: re-applying FRP's mask to the attacked model leaves church at target **1.000** with
+> retain **0.9667** (parachute 1.000 / 0.9583). The concept survives, so §3's mechanism is now
+> **directly confirmed**. ⚠ But a **matched random mask** — the same number of feed-forward entries
+> at arbitrary positions — gives **identical** results (1.000 / 0.9667), so §3's phrasing *"weights
+> that the forget-critical scoring did not select"* claims more than the evidence supports: **any**
+> 3 % of these layers is equally redundant. The surviving-weights conclusion holds; the implied
+> contrast with FRP's scoring does not. `FINDING57` §3 states the narrowed claim.
+
 ## 5. Corrections this forces
 
 - **`FINDING43` §2** says *"the mask is an initial condition, not a constraint"* and calls the

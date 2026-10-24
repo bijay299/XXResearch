@@ -23,7 +23,7 @@ the primary is pre-declared at 0.05 and the full sweep is always reported.
 Run: python scripts/erase_frp.py --concept church --rho 0.03 --beta 0.05 --lmbda 0.05 \
          --label frp_church_r3
 """
-import argparse, json, os, time
+import argparse, json, os, time, zlib
 import numpy as np
 import torch
 
@@ -89,8 +89,15 @@ def rank_within_rows(x):
     return r
 
 
-def frp_prune(layers, xf, xr, rho, beta, lmbda):
-    """Algorithm 1 lines 3-7. Returns a per-layer audit so the edit is inspectable, not asserted."""
+def frp_prune(layers, xf, xr, rho, beta, lmbda, random_mask=False, rand_seed=0):
+    """Algorithm 1 lines 3-7. Returns a per-layer audit so the edit is inspectable, not asserted.
+
+    random_mask replaces line 6's TopK selection with a uniform random choice of the SAME k columns
+    per row, leaving every other step identical. This is FINDING57 S4's named missing control: it
+    isolates how much of FRP's erasure comes from its forget-critical RANKING versus from removing
+    rho of feed-forward capacity at all. The scoring is still computed (so the arms differ in
+    selection only, not in code path), and is simply not used to select.
+    """
     audit = []
     for n, m in layers.items():
         W = m.weight.data
@@ -103,7 +110,16 @@ def frp_prune(layers, xf, xr, rho, beta, lmbda):
         if k < 1:
             audit.append({"layer": n, "d_in": W.shape[1], "k": 0, "skipped": "rho*d_i < 1"})
             continue
-        P = S.topk(k, dim=1).indices
+        if random_mask:
+            # explicit generator on W's device: this control must be reproducible from its seed
+            # alone, not from the global stream provenance.py flags at 28 of 41 sites.
+            # zlib.crc32, NOT hash(): Python's string hash is salted per process unless
+            # PYTHONHASHSEED is set, so hash() here would make this control irreproducible.
+            g = torch.Generator(device=W.device)
+            g.manual_seed(rand_seed * 1_000_003 + zlib.crc32(n.encode()))
+            P = torch.rand(W.shape, device=W.device, generator=g).topk(k, dim=1).indices
+        else:
+            P = S.topk(k, dim=1).indices
         before = float(W.norm())
         mask = torch.zeros_like(W, dtype=torch.bool)
         mask.scatter_(1, P, True)
@@ -126,6 +142,11 @@ def main():
     ap.add_argument("--n-retain", type=int, default=32)
     ap.add_argument("--n-timesteps", type=int, default=8)
     ap.add_argument("--seed", type=int, default=42, help="paper Table 4: 42")
+    ap.add_argument("--random-mask", action="store_true",
+                    help="FINDING57 S4 CONTROL: select the same k columns per row UNIFORMLY AT "
+                         "RANDOM instead of by Algorithm 1's TopK. Isolates FRP's ranking from the "
+                         "effect of removing rho of feed-forward capacity at all. NOT FRP.")
+    ap.add_argument("--rand-seed", type=int, default=0, help="seed for --random-mask selection")
     ap.add_argument("--label", required=True)
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
@@ -166,7 +187,8 @@ def main():
     print(f"[frp] calibration positions per layer: forget={pos_f} retain={pos_r} "
           f"(paper's budget was 400x256 = 102400 per side)", flush=True)
 
-    audit = frp_prune(layers, xf, xr, a.rho, a.beta, a.lmbda)
+    audit = frp_prune(layers, xf, xr, a.rho, a.beta, a.lmbda,
+                      random_mask=a.random_mask, rand_seed=a.rand_seed)
     kept = [x for x in audit if x.get("k", 0) > 0]
     tot_pruned = sum(x["k"] * x["d_out"] for x in kept)
     print(f"[frp] pruned {tot_pruned/1e6:.2f}M of {n_par/1e6:.1f}M FF weights "

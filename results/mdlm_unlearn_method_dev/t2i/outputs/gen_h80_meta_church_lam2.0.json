@@ -1,0 +1,96 @@
+{
+ "study": "t2i_gen_eval",
+ "label": "h80_meta_church_lam2.0",
+ "unet": "adapters/h80_meta_church_lam2.0/unet.pt",
+ "text_encoder": null,
+ "hparams": {
+  "label": "h80_meta_church_lam2.0",
+  "unet": "adapters/h80_meta_church_lam2.0/unet.pt",
+  "text_encoder": null,
+  "n_per_prompt": 5,
+  "steps": 25,
+  "guidance": 7.5,
+  "seed": 0,
+  "concepts": null,
+  "save_grid": false,
+  "target": "church"
+ },
+ "per_concept": {
+  "church": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.17587890625
+  },
+  "parachute": {
+   "n": 15,
+   "clip_acc": 0.06666666666666667,
+   "clip_align": 0.218603515625
+  },
+  "garbage_truck": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.20023600260416666
+  },
+  "van_gogh": {
+   "n": 15,
+   "clip_acc": 0.3333333333333333,
+   "clip_align": 0.21621907552083333
+  },
+  "cassette_player": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.17791341145833334
+  },
+  "chain_saw": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.1740234375
+  },
+  "english_springer": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.13643391927083334
+  },
+  "french_horn": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.17064615885416667
+  },
+  "gas_pump": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.17763671875
+  },
+  "golf_ball": {
+   "n": 15,
+   "clip_acc": 0.9333333333333333,
+   "clip_align": 0.2265869140625
+  },
+  "tench": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.15604654947916666
+  },
+  "monet": {
+   "n": 15,
+   "clip_acc": 0.0,
+   "clip_align": 0.18408203125
+  }
+ },
+ "active_target_metrics": {
+  "active_target": "church",
+  "target_suppression_acc": 0.0,
+  "target_align": 0.17587890625,
+  "utility_all_nontarget": 0.1212121212121212,
+  "n_nontarget": 11,
+  "utility_legacy_common_subset": 0.11666666666666667,
+  "n_legacy_common": 8,
+  "legacy_retain8": 0.11666666666666667,
+  "n_legacy_retain": 8,
+  "denominator_warning": "utility_all_nontarget, utility_legacy_common_subset and legacy_retain8 use DIFFERENT denominators and are NOT interchangeable. legacy_retain8 is the historical figure; it includes the active target whenever that target is not one of the four legacy forget concepts."
+ },
+ "forget_mean_acc_LEGACY": 0.09999999999999999,
+ "retain_mean_acc_LEGACY": 0.11666666666666667,
+ "legacy_denominator_note": "forget_mean_acc_LEGACY averages the four hard-coded legacy forget concepts and does NOT measure the active target; retain_mean_acc_LEGACY is the historical retain8. Both are retained verbatim for comparability with published tables.",
+ "minutes": 1.3681761662165324
+}

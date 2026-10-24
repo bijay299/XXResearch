@@ -1,5 +1,20 @@
 # Results — AFC against MDU, EMDU and ATWU on TOFU/LLaDA
 
+> ⚠ **BASELINE CONFOUND, 2026-10-24 — the retraction below has a problem of its own.** The MDU
+> extension seeds `mdu_s3..s7` it relies on have **no recorded λ_f anywhere** (not the logs, not
+> ATTEMPTS.tsv, not the arm JSONs), and `train_lam.py --lam-forget` **defaults to 8.0**. Rebuilding
+> those seeds at an **explicit λ_f=3** does **not** reproduce them on any coordinate (TV 0.10–0.23
+> lower, retain 0.09–0.25 lower, DISCLOSE 0.05–0.32 lower), so **they were not λ=3**. Their profile
+> matches published **MDU λ_f=1** instead, and the "MDU 0.424" figure below is MDU λ=1's own
+> published TV of 0.423 to three decimals. **The stability refutation below stands** — it rests on
+> AFC's seeds, whose λ is not in question — but its *comparative* claim ("0.314 vs 0.424, wins 4 of
+> 5") is against the wrong baseline arm, not the matched-disclosure λ=3 comparison §1 rests on.
+> On the four rebuilt seeds MDU λ=3 has **lower TV than AFC on all four**, though at markedly worse
+> retain (0.30–0.37 vs 0.46–0.56), so this is a different operating point and **not** a clean
+> inversion. A bridge control (seed 0 at explicit λ=3 vs `ll_mdu_f3`) is running to establish
+> whether the rebuilds are comparable to the λ=3 seeds 0–2 at all. See
+> `docs/FINDING_lambda_provenance_confound.md`. No existing measurement was altered.
+
 > **RETRACTION, 2026-10-21 (n=5 seeds).** The stability claim in §2 below is **REFUTED by our own
 > data** and is retained only as a record of the error. At n=3 AFC's TV sd was 0.005; at n=5 it is
 > **0.158 against MDU's 0.033** — AFC is roughly **5x MORE variable**, not 9-16x less. Seed 3
