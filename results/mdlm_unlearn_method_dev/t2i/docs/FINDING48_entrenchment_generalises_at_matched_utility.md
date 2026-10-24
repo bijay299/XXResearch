@@ -16,12 +16,18 @@ not done.
 
 It is now done. Each arm swept until its retain8 crosses **0.45**, reading the target there:
 
-| arm | removal fraction at retain8 = 0.45 | **target accuracy there** |
-|---|---|---|
-| **base model** | 0.250 | **0.333** |
-| FRP-attacked | 0.270 | **0.995** |
-| official AdvUnlearn-attacked | 0.283 | **0.867** |
-| damage+distil-attacked | 0.170 | **0.800** |
+| arm | removal fraction | retain8 there | **target accuracy there** |
+|---|---|---|---|
+| **base model** | 0.250 | **0.450** | **0.333** |
+| FRP-attacked | 0.260 / 0.270 | 0.483 / 0.425 | **1.000 / 0.867** |
+| official AdvUnlearn-attacked | 0.270 / 0.280 | 0.483 / 0.400 | **0.867 / 0.933** |
+| damage+distil-attacked | 0.170 | 0.425 | **0.867** |
+
+These are **direct measurements** at the bracketing fractions, not interpolations. An earlier
+interpolated version of this table gave FRP-attacked as **0.995**; measured directly it brackets
+**0.867–1.000** around retain8 = 0.45, so that figure was slightly optimistic and is corrected here.
+The conclusion is unchanged: every attacked arm sits at **0.867–1.000** where the base model sits at
+**0.333**.
 
 > **At matched utility, all three attacked arms retain the concept at 0.80–1.00 while the base model
 > retains it at 0.333.** Entrenchment generalises.

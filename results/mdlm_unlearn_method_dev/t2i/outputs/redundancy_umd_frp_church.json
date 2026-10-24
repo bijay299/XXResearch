@@ -1,0 +1,26 @@
+{
+ "study": "redundancy_sweep",
+ "state": "umd_frp",
+ "arm": "frp_church_r3_l05",
+ "attacked": "attacked/DIAG_H66_frp_church_sd0_lr1e-5_keepckpt/unet.pt",
+ "concept": "church",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.26,
+   "n_zeroed": 38658048,
+   "target": 1.0,
+   "retain8": 0.4833333333333333,
+   "utility": 0.49696969696969706
+  },
+  {
+   "mode": "random",
+   "frac": 0.27,
+   "n_zeroed": 40144896,
+   "target": 0.8666666666666667,
+   "retain8": 0.425,
+   "utility": 0.47272727272727266
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is."
+}
