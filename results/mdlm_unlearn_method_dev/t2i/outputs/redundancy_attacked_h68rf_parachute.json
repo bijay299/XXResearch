@@ -1,0 +1,42 @@
+{
+ "study": "redundancy_sweep",
+ "state": "attacked_h68rf",
+ "arm": "h68v2_rf_a0.3_parachute",
+ "attacked": "attacked/KEEP_h68rf_parachute_sd0_lr1e-5/unet.pt",
+ "concept": "parachute",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.1,
+   "n_zeroed": 14868480,
+   "target": 1.0,
+   "retain8": 0.725,
+   "utility": 0.7454545454545454
+  },
+  {
+   "mode": "random",
+   "frac": 0.17,
+   "n_zeroed": 25276416,
+   "target": 1.0,
+   "retain8": 0.275,
+   "utility": 0.3575757575757576
+  },
+  {
+   "mode": "random",
+   "frac": 0.25,
+   "n_zeroed": 37171200,
+   "target": 0.4,
+   "retain8": 0.05,
+   "utility": 0.12727272727272726
+  },
+  {
+   "mode": "random",
+   "frac": 0.35,
+   "n_zeroed": 52039680,
+   "target": 0.06666666666666667,
+   "retain8": 0.016666666666666666,
+   "utility": 0.10303030303030303
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is."
+}

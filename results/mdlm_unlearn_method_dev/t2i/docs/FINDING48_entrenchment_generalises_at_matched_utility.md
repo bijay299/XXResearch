@@ -36,6 +36,34 @@ The fixed-fraction picture inverted because the arms reach retain8 = 0.45 at ver
 fractions — the damage+distil arm at **17 %** against the base model's **25 %**. Comparing it to base
 at 25 % was comparing a model already past its collapse point to one just reaching it.
 
+
+## 1a. ✅ SECOND CONCEPT: replicated on parachute, 3 of 3 arms
+
+`§4` listed "a second concept" as the largest gap. It is now measured. Parachute, random removal,
+read at the rung where each arm's retain8 is nearest 0.45:
+
+| arm | fraction | retain8 there | **target there** |
+|---|---|---|---|
+| **base model** | 0.250 | 0.450 | **0.533** |
+| FRP-attacked | 0.180 | 0.442 | **1.000** |
+| official AdvUnlearn-attacked | 0.230 | 0.475 | **0.733** |
+| damage+distil-attacked | ~0.140 | ~0.45 | **1.000** |
+
+**All three attacked arms exceed base on parachute as well** (1.000 / 0.733 / 1.000 against 0.533),
+so entrenchment replicates across both concepts and all three defence families.
+
+Two honest notes:
+
+- **Base parachute starts higher** (0.533 at the matched point against church's 0.333), so the
+  headroom to demonstrate entrenchment is smaller on this concept and the AdvUnlearn margin
+  (0.733 vs 0.533) is correspondingly narrower than church's (0.867–0.933 vs 0.333).
+- ⚠ **I reported this as a partial replication one interval earlier, and that was wrong.** With the
+  AdvUnlearn parachute curve bracketed only between retain8 0.958 and 0.408, I *extrapolated* its
+  matched point to ≈ 0.60 and called the arm marginal. Measuring the bracket directly (r0.18, r0.21,
+  r0.23) puts it at **0.733**. The extrapolation was the error; the fill runs were already queued
+  for exactly that reason and they corrected it. The damage+distil arm's matched point remains
+  interpolated, but between two rungs that both read **1.000**, so no extrapolation is involved.
+
 ## 2. Where this leaves today's three findings
 
 | finding | claim | status |
@@ -74,8 +102,7 @@ attack leaves the concept markedly more resistant to feed-forward weight removal
 model's own representation of that concept, when compared at matched retain utility.
 
 **Not established:**
-- **a second concept.** All of §1 is church. Parachute has base and FRP-attacked curves but no
-  matched-utility points for the other two arms.
+- ~~**a second concept.**~~ **Now established** — see §1a: parachute replicates on all three arms.
 - **attack-seed replication for AdvUnlearn and damage+distil.** Those are single runs (seed 0); only
   the FRP arm has three seeds.
 - **the mechanism.** The likely cause remains the one `FINDING46` §3 gave — 300 steps on 16 images of

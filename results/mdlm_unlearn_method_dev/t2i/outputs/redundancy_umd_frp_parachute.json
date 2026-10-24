@@ -1,0 +1,34 @@
+{
+ "study": "redundancy_sweep",
+ "state": "umd_frp",
+ "arm": "frp_parachute_r5_l05",
+ "attacked": "attacked/DIAG_H66_frp_parachute_sd1_lr1e-5_keepckpt/unet.pt",
+ "concept": "parachute",
+ "rows": [
+  {
+   "mode": "random",
+   "frac": 0.18,
+   "n_zeroed": 26763264,
+   "target": 1.0,
+   "retain8": 0.44166666666666665,
+   "utility": 0.4303030303030303
+  },
+  {
+   "mode": "random",
+   "frac": 0.2,
+   "n_zeroed": 29736960,
+   "target": 1.0,
+   "retain8": 0.43333333333333335,
+   "utility": 0.40606060606060607
+  },
+  {
+   "mode": "random",
+   "frac": 0.22,
+   "n_zeroed": 32710656,
+   "target": 1.0,
+   "retain8": 0.31666666666666665,
+   "utility": 0.30909090909090914
+  }
+ ],
+ "meaning": "target accuracy of the ATTACKED model after removing a fraction of its feed-forward weights. Measures how distributed the recovered concept is."
+}
