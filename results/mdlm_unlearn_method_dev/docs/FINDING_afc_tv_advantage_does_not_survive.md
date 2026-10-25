@@ -128,6 +128,9 @@ is the part contingent on the bridge.
 > | s4 | 0.3122 / 0.5265 / 0.1167 / 0.2250 | **identical** |
 > | s5 | 0.3371 / 0.4563 / 0.2917 / 0.0750 | **identical** |
 > | s6 | 0.3089 / 0.5636 / 0.0750 / 0.0167 | **identical** |
+> | s7 | 0.1789 / 0.4945 / 0.1667 / 0.0417 | **identical** |
+>
+> **All five reproduce.**
 >
 > So **the AFC column has no confound**: `afc_s3..s7` were in fact built at `--mode none
 > --lam-forget 1` with the defaults. **The provenance failure was one-sided — in the baseline only.**
@@ -148,9 +151,15 @@ Consequences, stated plainly:
 - **The rebuild instrument is now the only recourse**, which is precisely why its two bridges were
   worth running before trusting it. They passed, and the four exact seed reproductions are further
   evidence that it is faithful.
-- The RTT control could not be re-attacked on its original weights at all; its arm is being rebuilt
-  at explicit λ_f=8 under a new label (`mdu_l8_s0_rebuild`), to be checked against `mdu_pub`'s
-  published row before the gated attack is believed.
+- The RTT control could not be re-attacked on its original weights at all; its arm was rebuilt at
+  explicit λ_f=8 under a new label (`mdu_l8_s0_rebuild`). ✅ **That rebuild reproduces `mdu_pub`'s
+  published row exactly** — TV 0.1908, retain 0.0911, DISCLOSE 0.0667, DEGENERATE 0.1500, all four
+  deltas +0.0000 — so the gated attack now running is on a faithful stand-in rather than a different
+  model wearing the old name.
+
+**Three independent bridges and five exact seed reproductions have now all passed.** That is the
+basis on which rebuilt arms are treated as substitutes for deleted ones anywhere in this line, and
+it is stated here rather than assumed.
 
 ## 6. Scope
 
