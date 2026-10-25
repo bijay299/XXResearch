@@ -1,4 +1,4 @@
-# Finding 63 — **UTRAP, the method we designed from all eleven prior failure modes, is also fully reversed: 6/6 valid attacks, every H = 1.000.** Prediction 1 is falsified by its own declared falsifier. Twelve of twelve.
+# Finding 63 — **UTRAP, the method we designed from all eleven prior failure modes, is fully reversed at every setting: three arms, 18/18 valid attacks, every H = 1.000** — including one that **cleared the mandate's retain floor** (0.8667) before being attacked. Prediction 1 is falsified by its own declared falsifier, and so is the hypothesis behind it: **unroll depth was not the missing ingredient.** Thirteen of thirteen.
 
 **Date:** 2026-10-25 · **Pre-registration:** `PREREG_H84_unrolled_trap.md`, predictions recorded
 before any arm existed
@@ -73,16 +73,48 @@ clearly defined forgetting–utility trade-off**, supported by real-model result
   depth nor weight-space proximity predicts resistance, and that even a defence trained against the
   real multi-step attacker over the full parameter set does not change the outcome.
 
+## 3a. ⚠ The two gaps §4 named are now closed — both as nulls, and one of them was the mandate's last chance
+
+**The complete λ × K sweep** (all five arms, every one at target **0.0000** as-is):
+
+| λ | K | retain8 | utility | valid attacks | **max-over-valid H** | post-attack utility |
+|---|---|---|---|---|---|---|
+| 0.3 | **4** | 0.6583 | 0.6545 | *(superseded by K=8/16)* | — | — |
+| 0.3 | **8** | 0.7333 | 0.7515 | **6/6** | **1.000** | 0.167–0.938 |
+| 0.3 | **16** | 0.7583 | 0.7818 | **6/6** | **1.000** | 0.417–0.917 |
+| **0.15** | **8** | **0.8667** | 0.8364 | **6/6** | **1.000** | 0.188–0.979 |
+| 1.0 | 8 | 0.0000 | 0.1091 | K1 fail — destroyed | — | — |
+
+**(a) K's effect is now measured, and it is a null for robustness.** Unroll depth buys **retention**
+monotonically — 0.6583 → 0.7333 → 0.7583 — at identical target suppression, and the gain is
+flattening (+0.075 then +0.025). It buys **no resistance whatever**: doubling K from 8 to 16 left
+max-over-valid H at **1.000**, unmoved by a single quantisation step. The core hypothesis of
+`PREREG_H84` — that the one-step inner approximation was what doomed IMMA — is **falsified on its
+own terms.** Depth was the thing I believed was missing, and it is not.
+
+**(b) The retain floor was cleared, and the robustness half still failed.** λ=0.15/K=8 reaches
+**retain8 0.8667 with the target fully suppressed at 0.0000** — the **first arm in this entire phase
+to clear the mandate's retain ≥ 0.85 requirement before any attack ran.** It was therefore the
+mandate's best and last chance. Its six attacks were **all gate-passing** (T 0.000 → 0.958–1.000)
+and **every one reached H = 1.000.**
+
+**So the bar is missed from the one side that was still open.** Across thirteen defences the pattern
+is now complete: the retain half of the bar is reachable, the robustness half is not, and clearing
+the first does nothing for the second.
+
+And the inversion holds here too: post-attack utility reaches **0.979** — the adversary recovered the
+concept completely *and left the model more capable than the immunized version it started from.*
+
 ## 4. What UTRAP does not establish, and two builds that died
 
-- **Not that the idea is unworkable in general.** `λ` is sharply bounded — 0.3 is usable, 1.0
-  **destroys** the model (retain8 0.0000) — so the usable window is narrow and was explored with one
-  arm, not a frontier. K was tested at **8 only**: the λ=1.0/**K=4** arm and the λ=3.0/K=8 arm both
-  **died mid-build when `/data` hit 100%**, and are logged as `BUILD FAILED — NOT a kill-rule
-  result` so they cannot be mistaken for utility failures. **K's effect is therefore unmeasured.**
-- **The retain floor was already missed before the attacks.** At retain8 0.7333 this arm could not
-  have met the mandate even with perfect resistance; a higher-retain variant is the obvious follow-up
-  and is **blocked on disk**, not on science.
+- **Not that the idea is unworkable in general**, though the window is now mapped: λ ∈ {0.15, 0.3}
+  usable, λ=1.0 **destroys** the model (retain8 0.0000), K ∈ {4, 8, 16} all usable. ✅ **Both gaps
+  this section originally recorded as blocked on disk are now closed — see §3a.** λ=3.0/K=8 remains
+  unbuilt and is not needed: λ=1.0 already destroys the model, so λ=3.0 can only be worse.
+- **The retain floor has since been cleared** by λ=0.15/K=8 (retain8 0.8667) **and the robustness
+  half still failed at H = 1.000**, which is the stronger version of this point: the mandate is not
+  missed because our arms were too damaged to qualify, it is missed because a fully-qualifying arm
+  was reversed anyway.
 - **The approximation stands as disclosed.** `PREREG_H84` §2 named the detached trajectory in advance
   as the limitation most likely to explain a failure. It remains a live alternative explanation: a
   fully-differentiated unroll might behave differently, and that is not what was run.

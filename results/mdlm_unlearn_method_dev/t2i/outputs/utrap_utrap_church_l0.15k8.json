@@ -1,0 +1,100 @@
+{
+ "study": "utrap",
+ "prereg": "PREREG_H84_unrolled_trap.md",
+ "is_ours": true,
+ "designed_from": [
+  "FINDING59 S0 (one-step inner)",
+  "FINDING58 S3a (5% scope)",
+  "FINDING57 S4 (subspace redundancy)",
+  "FINDING60/62 (proximity & depth orthogonal)",
+  "FINDING56 S5a (optimisation obstruction)"
+ ],
+ "approximation": "detached trajectory; grad L_target evaluated at theta_K and applied at theta. First-order class, K steps instead of one. Disclosed in PREREG_H84 S2 before any result.",
+ "label": "utrap_church_l0.15k8",
+ "concept": "church",
+ "teacher": "adapters/frp_church_r3_l05/unet.pt",
+ "scope": "full UNet",
+ "n_params": 859520964,
+ "hparams": {
+  "concept": "church",
+  "teacher": "adapters/frp_church_r3_l05/unet.pt",
+  "lam": 0.15,
+  "inner_k": 8,
+  "inner_lr": 1e-05,
+  "lr": 1e-06,
+  "steps": 400,
+  "n_images": 16,
+  "n_retain": 32,
+  "batch": 2,
+  "seed": 0,
+  "log_every": 50,
+  "label": "utrap_church_l0.15k8",
+  "out": "adapters/utrap_church_l0.15k8"
+ },
+ "history": [
+  {
+   "step": 0,
+   "L_retain": 0.3249383866786957,
+   "L_attack_step0": 0.09914097189903259,
+   "L_attack_stepK": 0.11428554356098175,
+   "L_target_at_thetaK": 0.18237489461898804
+  },
+  {
+   "step": 50,
+   "L_retain": 0.1427510380744934,
+   "L_attack_step0": 0.09007494896650314,
+   "L_attack_stepK": 0.1250932812690735,
+   "L_target_at_thetaK": 0.017480498179793358
+  },
+  {
+   "step": 100,
+   "L_retain": 0.07389029860496521,
+   "L_attack_step0": 0.30960017442703247,
+   "L_attack_stepK": 0.13812530040740967,
+   "L_target_at_thetaK": 0.2552326023578644
+  },
+  {
+   "step": 150,
+   "L_retain": 0.017176812514662743,
+   "L_attack_step0": 0.14876428246498108,
+   "L_attack_stepK": 0.20504817366600037,
+   "L_target_at_thetaK": 0.061493780463933945
+  },
+  {
+   "step": 200,
+   "L_retain": 0.14285796880722046,
+   "L_attack_step0": 0.10479730367660522,
+   "L_attack_stepK": 0.05227005481719971,
+   "L_target_at_thetaK": 0.01252998597919941
+  },
+  {
+   "step": 250,
+   "L_retain": 0.014044132083654404,
+   "L_attack_step0": 0.025163698941469193,
+   "L_attack_stepK": 0.20486631989479065,
+   "L_target_at_thetaK": 0.629986047744751
+  },
+  {
+   "step": 300,
+   "L_retain": 0.11914372444152832,
+   "L_attack_step0": 1.1988226175308228,
+   "L_attack_stepK": 1.6109579801559448,
+   "L_target_at_thetaK": 0.6652690172195435
+  },
+  {
+   "step": 350,
+   "L_retain": 0.3879697024822235,
+   "L_attack_step0": 0.998420238494873,
+   "L_attack_stepK": 2.171630620956421,
+   "L_target_at_thetaK": 0.8501168489456177
+  },
+  {
+   "step": 399,
+   "L_retain": 0.29771313071250916,
+   "L_attack_step0": 1.1098694801330566,
+   "L_attack_stepK": 0.5315977931022644,
+   "L_target_at_thetaK": 1.6554051637649536
+  }
+ ],
+ "minutes": 18.544264845053355
+}
