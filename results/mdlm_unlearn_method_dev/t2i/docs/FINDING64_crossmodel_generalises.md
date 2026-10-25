@@ -55,9 +55,22 @@ is no longer "true of SD-1.4" — it is **true across checkpoints and across a h
 token), so those were unavailable and the test used what was reachable rather than stalling. A
 latent-space change of that size is the obvious remaining generalisation question.
 
-**Does not re-test the other twelve defences cross-model.** Only FRP — our best published port and
-the deepest published-method arm — was run on the new models. The other defences' cross-model
-behaviour is **inferred, not measured.**
+> ✅ **GIFT WAS ALSO RUN CROSS-MODEL (2026-10-25), and the subspace half of the argument survives.**
+> GIFT edits **cross-attention**, which is a *different fraction* of a pruned UNet, so it tests the
+> subspace claim on genuinely new ground:
+>
+> | model | as-is target / retain8 | valid | **max-over-valid H** |
+> |---|---|---|---|
+> | GIFT on SD-1.4 (prior) | 0.4667 / 0.7833 | 22 | **1.000** |
+> | **GIFT on SD-1.5** | **0.4000 / 0.8167** | **3/3** | **1.000** |
+> | **GIFT on BK-SDM-small** | **0.3333 / 0.7417** | **3/3** | **1.000** |
+>
+> T rose +0.500…+0.708 and +0.750…+0.833, so all six are valid. **Two methods — one pruning-based
+> (FRP), one cross-attention-editing (GIFT) — both reversed on both new models.** The subspace
+> explanation holds across an architecture change; the parameter-abundance one does not (§2).
+
+**Does not re-test the other ten defences cross-model.** FRP and GIFT were run on the new models;
+the remaining ten are **inferred, not measured.**
 
 **One concept (church), one seed per build, lr 1e-5 only** on the new models: three attacks each
 rather than the full six-point grid, because the three lr 1e-5 points already reached the ceiling and
