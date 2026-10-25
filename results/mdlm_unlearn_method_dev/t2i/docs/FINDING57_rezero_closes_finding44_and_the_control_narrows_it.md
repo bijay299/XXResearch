@@ -70,11 +70,39 @@ So the finding is not "pruning never mattered". It is that **the adversary does 
 pruned route; it relocates the function**, leaving the defence's intervention intact and inert. The
 erasure is undone without being reversed.
 
-**The control that would complete this and was not run:** a random-mask ρ = 3 % prune of the *clean*
-model. Pre-attack, FRP's selection plainly mattered (0.1333 vs 1.000 for the unpruned model), but
-without a random-prune arm at matched sparsity on the clean model I cannot quantify *how much* of
-that erasure came from FRP's ranking versus from removing 3 % of feed-forward capacity at all. That
-is a real gap and is recorded as not done rather than glossed.
+**The control that would complete this** — a random-mask ρ = 3 % prune of the *clean* model — **has
+now run, and it is decisive.**
+
+| arm | target (church/parachute) | retain8 | utility |
+|---|---|---|---|
+| **random mask, ρ=3 %, clean model, seed 0** | **1.0000** | 1.0000 | 1.0000 |
+| **random mask, ρ=3 %, clean model, seed 1** | **1.0000** | 1.0000 | 1.0000 |
+| **random mask, ρ=5 %, parachute, clean** | **1.0000** | 1.0000 | 1.0000 |
+| FRP's own mask, same sparsity (`FINDING43`) | **0.1333** | 0.9417 | — |
+| untouched base model | 1.000 | 1.000 | 1.000 |
+
+**Removing a random 3 % of the feed-forward weights does nothing whatsoever** — the concept is fully
+intact, retention and utility are untouched, the model is indistinguishable from base on every
+measured axis. FRP's mask at identical sparsity drives church to **0.1333**.
+
+**So FRP's forget-critical ranking does essentially all of the work.** The erasure is not an artifact
+of removing capacity; it is attributable to *which* weights are chosen. This is the clean version of
+the claim §3 above had to withdraw, and it sharpens the finding rather than softening it:
+
+| | does the choice of mask matter? |
+|---|---|
+| **before the attack** | **Decisively.** FRP's mask → 0.1333; a random mask of the same size → 1.0000. |
+| **after 300 attack steps** | **Not at all.** Re-zeroing FRP's mask → 1.000; re-zeroing a random mask → 1.000. |
+
+**The adversary does not merely undo the erasure — it renders the defence's weight selection
+irrelevant.** Which 3 % you remove is the entire ballgame beforehand and makes no measurable
+difference afterwards. That is a stronger and more precise statement than either §2 or §3 alone, and
+it is the mechanistic core of this phase's negative result.
+
+⚠ What §3's narrowing still holds onto: *post-attack*, FRP's positions are no more special than
+random ones. The random control does not rescue the §3 phrasing about scoring; it establishes that
+the scoring mattered **at erasure time** and stopped mattering **after the attack**. Those are two
+different claims and both are now measured.
 
 ## 5. Bearing on `ERRATUM_r2` C17, which still stands
 
