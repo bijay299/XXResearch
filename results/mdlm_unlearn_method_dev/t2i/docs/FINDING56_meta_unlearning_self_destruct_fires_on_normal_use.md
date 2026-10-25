@@ -130,11 +130,46 @@ would be exactly the error the gate exists to catch. They are listed because omi
 is how a ratchet gets quietly stopped early.
 
 That said, TI failing to climb *at all* on this arm while full-UNet relearning trivially reaches
-1.000 is an anomaly worth a stronger attempt rather than a footnote, so **a push is running**:
-2000–3000 steps at lr 1e-2 and 2e-2 across three seeds, **with the same configurations on the
-λ = 0.0 ablation as a control** — if TI gate-fails on the ablation too, the failure belongs to the
-arm or the attack budget and not to the meta trigger. Until one of those passes the gate, this phase
-has **no valid TI measurement on the meta arm**, and that is the accurate statement.
+1.000 is an anomaly worth a stronger attempt rather than a footnote, so a push was run: 2000–3000
+steps at lr 1e-2 and 2e-2 across three seeds, **with the same configurations on the λ = 0.0 ablation
+as a matched control.**
+
+### 5a. The push is done, and the asymmetry is real and reproducible
+
+| arm | steps | lr | seed | T before → after | rise | gate | H |
+|---|---|---|---|---|---|---|---|
+| **ablation** λ=0.0 | 2000 | 1e-2 | 0 | 0.250 → 0.458 | **+0.208** | ✅ **PASS** | 0.067 → **0.400** |
+| **ablation** λ=0.0 | 3000 | 1e-2 | 1 | 0.250 → 0.792 | **+0.542** | ✅ **PASS** | 0.267 → **0.733** |
+| meta λ=0.5 | 2000 | 1e-2 | 0 | 0.208 → 0.000 | **−0.208** | ❌ FAIL | 0.067 |
+| meta λ=0.5 | 3000 | 1e-2 | 1 | 0.083 → 0.000 | **−0.083** | ❌ FAIL | 0.000 |
+| meta λ=0.5 | 3000 | 2e-2 | 6 | 0.125 → 0.000 | **−0.125** | ❌ FAIL | 0.000 |
+
+**The control settles it: the budget is not the problem.** Textual Inversion is comfortably valid on
+the no-meta ablation at these budgets and recovers the concept to **0.733**. On the meta arm the same
+budgets fail the gate **three times out of three**, across two step counts, two learning rates and
+three seeds, with T going **down** every time.
+
+**So the meta trigger does do something — but only to the embedding-space adversary.** This is the
+first measured effect of the meta objective anywhere in `H80`: at the same λ=0.5 where it bought
+**zero** robustness against full-UNet relearning (§3), it makes a Textual Inversion attack
+**untrainable** — the placeholder embedding cannot even fit the prompts it is optimised on.
+
+⚠ **This is still not a robustness claim, and `FINDING20` is why.** A failed gate means the attack
+did not work, and "the attack did not work" is not the same statement as "the defence held". Two
+readings remain open and these data do not separate them:
+
+1. the trigger genuinely obstructs embedding-space optimisation (the interesting reading), or
+2. the λ=0.5 arm's loss surface is simply hostile to TI optimisation for reasons unrelated to the
+   trap — note the arm is *not* degenerate (retain8 0.6333, target 0.0667), which weakens but does
+   not eliminate this.
+
+Distinguishing them needs a TI attack on a **non-meta arm at matched utility** — the ablation sits at
+retain 0.9417, far above λ=0.5's 0.6333, so the present control is not utility-matched and part of
+the asymmetry could be a utility effect rather than a trap effect. That is the honest next
+measurement and it is recorded here as **not done**.
+
+**The accurate summary: this phase still has no valid TI measurement on the meta arm, and now has
+strong evidence that no attainable TI budget will produce one.**
 
 ## 6. What this closes and does not close
 
