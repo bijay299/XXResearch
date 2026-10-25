@@ -1,5 +1,17 @@
 # Results — AFC against MDU, EMDU and ATWU on TOFU/LLaDA
 
+> ✅ **MATCHED-RETENTION SLICE, 2026-10-24 — the first claim here to survive every control.** At
+> retention matched almost exactly (AFC 0.5153 vs MDU λ=1 0.5235, t=−0.32), AFC forgets clearly
+> better: **TV −0.1417 (t=−4.06, 11/12 seeds)** and **DISCLOSE −0.1757 (t=−5.54, 11/12)**. With the
+> matched-disclosure slice below, AFC beats MDU λ=1 on forgetting at equal retention *and* MDU λ=3 on
+> retention at tied forgetting — i.e. **outside** the MDU λ∈{1,3} frontier, not on it. The
+> pre-registered negative outcome ("if MDU λ=1 lands near TV 0.30, AFC is merely on MDU's frontier")
+> **did not occur**. ⚠ **Provisional**: a two-point frontier cannot support "above it", and a
+> single-seed MDU λ=4 point (TV 0.2325 at retain 0.4565) would overturn the dominance claim if it
+> holds at n=12 — λ=4 and λ=2 are running. AFC still loses on DEGENERATE (0.149 vs 0.095) at every n,
+> is still ~2× more variable on TV, and is still **not** relearning-robust (recovers up to 62.7%).
+> See `docs/FINDING_matched_retention_slice.md`.
+
 > 📌 **n=12 VERDICT, 2026-10-24 — read this instead of §1.** Both columns are now complete at 12
 > paired seeds under explicitly recorded settings. **Retention survives: +0.1096 retain ASCR
 > (0.5153 vs 0.4057), 11 of 12 paired seeds, t=+3.15.** **TV does not: −0.0240 (0.2983 vs 0.3223),
