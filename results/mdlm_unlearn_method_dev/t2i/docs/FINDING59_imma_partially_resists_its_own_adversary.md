@@ -1,4 +1,52 @@
-# Finding 59 — IMMA **partially resists the adversary it was trained against**: max-over-valid H = 0.867, the first non-ceiling number in this phase. It does **not** meet the mandate's bar, and it does **not** transfer.
+# Finding 59 — ❌ **RETRACTED HEADLINE.** I published "IMMA partially resists its own adversary, max-over-valid H = 0.867, the first non-ceiling number in this phase". **My own ratchet refuted it within the hour: tripling the LoRA budget takes it to 1.000.** IMMA's max-over-valid H is **1.000** and it joins the other nine. What survives is an *attacker-cost* result, not a robustness one.
+
+> ## ⚠ RETRACTION, same day
+>
+> `FINDING35` §4's ratchet rule says a sub-ceiling number is provisional until the adversary has
+> been pushed. §5 of this finding flagged 0.867 as provisional and named the escalation. **The
+> escalation ran and the number moved to the ceiling:**
+>
+> | adversary | budget | max-over-valid H |
+> |---|---|---|
+> | LoRA | 300 steps (as published in §2) | 0.867 |
+> | **LoRA** | **900 steps — 3× the budget** | **1.000** |
+> | full-UNet relearning | frozen grid, **8 / 8 valid** | **1.000** |
+> | DreamBooth | 300 steps | **1.000** |
+> | Textual Inversion | 2000 steps | 0.400 |
+>
+> **Arm `imma_church_frp_a1e-6_s1500`: 15 valid attacks, max-over-valid H = 1.000.**
+>
+> So "the first non-ceiling number in this phase" is **withdrawn**, and `PREREG_H82` prediction 1 —
+> *"H strictly below 1.000 under LoRA"* — is **falsified by its own declared falsifier** (H = 1.000
+> under LoRA). Prediction 2 (no transfer) stands and is now overwhelming: 8/8 full-UNet points at
+> 1.000.
+>
+> **Why this happened, and it is not bad luck.** IMMA's inner loop approximates the adversary with a
+> **single gradient step** (its own Implementation-details paragraph). The immunization is therefore
+> tuned against a one-step attacker, and a 3×-longer attacker walks straight past it. The defence
+> shapes the first step of the loss surface, not the basin.
+>
+> **This is the ratchet doing exactly the job it exists for**, on my own published claim, one hour
+> after I published it. Everything below is left intact as the record of what the 300-step
+> measurement showed; read §2 as "LoRA at 300 steps", not as IMMA's robustness.
+
+---
+
+## 0. What actually survives: an attacker-cost result
+
+The 300-step numbers are real measurements, they are just not a robustness claim. Stated correctly:
+
+| LoRA budget | per-seed target H | max-over-valid |
+|---|---|---|
+| 300 steps | 0.267, 0.467, 0.533, 0.600, 0.667, 0.800, 0.867 | 0.867 |
+| 900 steps | 1.000, 1.000 | **1.000** |
+
+**IMMA raises the attacker's cost; it does not cap the attacker's outcome.** At 300 steps the
+adversary gets a partial, highly seed-dependent recovery — one seed got **nothing** (0.267 → 0.267).
+At 900 steps it gets everything. That is the same shape as this phase's attacker-cost curves
+(`FINDING37`, `FINDING52`): a defence can make recovery slower without making it bounded.
+
+That is a weaker claim than the retracted one and it is the one the data supports.
 
 **Date:** 2026-10-25 · **Pre-registration:** `PREREG_H82_imma_port.md`, predictions 1–3 recorded
 before any arm existed
