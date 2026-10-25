@@ -44,7 +44,23 @@ Seeds 3–7 rebuilt with an **explicit** `--lam-forget 3 --lam-retain 1`, under 
 **Not one coordinate is close.** TV is 0.10–0.23 lower, retain 0.09–0.25 lower, DISCLOSE 0.05–0.32
 lower. `mdu_s3..s7` were not built at λ_f=3.
 
-**What they almost certainly were:** their means (TV 0.427, DISCLOSE 0.347, retain 0.526) match the
+> ✅ **PROVEN, 2026-10-24 (later the same day): they were λ_f=1.** The matched-retention sweep
+> rebuilt MDU λ=1 at every seed, and those rebuilds reproduce `mdu_s3`, `mdu_s4`, `mdu_s6` and
+> `mdu_s7` **exactly, 4 of 4, on all four coordinates** (s5 pending):
+>
+> | seed | `mdu_sN` (TV / retain / DISC / DEG) | explicit λ=1 rebuild |
+> |---|---|---|
+> | s3 | 0.4158 / 0.4617 / 0.3583 / 0.0167 | **identical** |
+> | s4 | 0.4371 / 0.5793 / 0.4583 / 0.0083 | **identical** |
+> | s6 | 0.4825 / 0.5155 / 0.3250 / 0.0333 | **identical** |
+> | s7 | 0.4325 / 0.5265 / 0.3250 / 0.0917 | **identical** |
+>
+> So the λ attribution below is **no longer an inference from profile agreement — it is recovered by
+> reproduction.** The n=5/n=8 extension was run at **λ_f=1** while the headline baseline is λ_f=3,
+> and the retraction's "MDU 0.424" was MDU λ=1's TV. This was the weakest link in the confound
+> argument and it is now closed.
+
+**What they almost certainly were** (written before the proof above, and superseded by it)**:** their means (TV 0.427, DISCLOSE 0.347, retain 0.526) match the
 published **MDU λ_f=1** arm's n=3 figures (TV 0.423, DISCLOSE 0.233, retain 0.557) far better than
 λ=3's (TV 0.352, DISCLOSE 0.133, retain 0.445). And the retraction's own baseline number — **MDU
 0.424 at n=5** — is MDU **λ=1**'s published TV of 0.423 to three decimals. That is consistent with
