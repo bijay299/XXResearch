@@ -4,8 +4,9 @@
 `133a221b8aa7292a167afc5127cb63fb5005638b`), unrelated to the RECE/FLUX and MDLM lines on other
 branches of this repository.
 
-**Read this first:** [`docs/T2I_REPORT_r3.md`](docs/T2I_REPORT_r3.md) — the current report.
-`T2I_REPORT_r2.md` carries a SUPERSEDED banner and is kept for history, not as current fact.
+**Read this first:** [`docs/T2I_REPORT_r4.md`](docs/T2I_REPORT_r4.md) — the current and final report
+for this phase. `T2I_REPORT_r2.md` and `r3.md` both carry SUPERSEDED banners and are kept for
+history, not as current fact.
 [`docs/ERRATUM_r2_claim_corrections.md`](docs/ERRATUM_r2_claim_corrections.md) (C1–C19) lists every
 claim this line has had to correct or withdraw, and
 [`docs/AUDIT_CLOSURE_r2.md`](docs/AUDIT_CLOSURE_r2.md) records the 12-issue audit remediation.
@@ -50,7 +51,7 @@ Headline findings:
 | [`FINDING54`](docs/FINDING54_three_adversary_classes.md) | the four-adversary × three-defence × five-concept matrix (full-UNet, LoRA, Textual Inversion, DreamBooth) |
 | [`FINDING56`](docs/FINDING56_meta_unlearning_self_destruct_fires_on_normal_use.md) | Meta-Unlearning (2410.12777): the self-destruct trigger fires on *normal use* and buys **zero** robustness over its own ablation |
 
-**Eight claims of mine dissolved under their own controls** and are listed in `T2I_REPORT_r3` §6.
+**Eleven claims of mine were corrected or withdrawn** and are listed in `T2I_REPORT_r3` §6.
 That section, the erratum, and `FINDING44` are the honest spine of this line.
 
 ## Scope limits that apply to everything here

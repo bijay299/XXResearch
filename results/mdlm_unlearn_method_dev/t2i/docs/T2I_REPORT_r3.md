@@ -1,3 +1,10 @@
+> ❌ **SUPERSEDED BY `T2I_REPORT_r4.md` (2026-10-25).** r4 adds the three remaining
+> competitors (GIFT, IMMA, the 2505.22310 mechanism), two methods of our own, and the
+> result r3 could not yet state: a defence that **cleared the mandate's retain floor**
+> (retain8 0.8667 at target 0.0000) was reversed anyway, so the bar is not missed for want
+> of a qualifying arm. r3's count of eight self-corrections is now eleven. Kept as history,
+> not as current fact.
+
 # Text-to-image concept erasure — phase report, revision 3
 
 **Date:** 2026-10-24 · **Identifier:** `T2I_REPORT_r3` · **Supersedes:** `T2I_REPORT_r2`
