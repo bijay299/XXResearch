@@ -69,14 +69,40 @@ so.** What the gate result changes is the *reason* the claim fails. It is no lon
 invalid so nothing can be said"; it is "the control is valid at this budget, the budget is weak, and
 at every stronger valid budget AFC recovers as much as the baseline."
 
-## 4. What is still open
+## 4. AFC at the same budget, now gated — and why it is **not** a robustness result
 
-AFC's own run at this exact budget (`afc_l1_lr1e5_gated`) is in flight, on the `afc_l1_s0_bridge`
-arm — necessary because AFC's original checkpoint is among those deleted, and legitimate because that
-bridge reproduces `h16_none_f1` exactly. Until it lands, **AFC's 0% at this budget still has no
-measured gate**, and the honest statement about *that specific number* is unchanged: it is
-unvalidated. §3's conclusion does not depend on it, since it rests on the stronger budgets where both
-arms are gated and both recover.
+`afc_l1_lr1e5_gated` has landed, on the `afc_l1_s0_bridge` arm (necessary because AFC's original
+checkpoint is among those deleted, legitimate because that bridge reproduces `h16_none_f1` exactly):
+
+| | MDU λ=8 (control) | **AFC λ=1** |
+|---|---|---|
+| T before → after | 0.0500 → 0.2833 | 0.0833 → 0.2833 |
+| T rise | +0.2333 | **+0.2000** |
+| gate (≥ 0.20) | ✅ pass | ⚠ **pass, exactly at the threshold** |
+| T as fraction of θ₀ | 0.314 | 0.282 |
+| H before → after | 0.0500 → 0.1167 | 0.2667 → **0.2167** |
+| recovery on H | **+8.99%** | **−9.52%** |
+
+So with a valid attack at this budget, AFC's held-out disclosure went **down**, while the control's
+went up. Three reasons that is **not** a robustness claim:
+
+1. **The gate passes at exactly +0.2000**, the threshold value. A single probe either way flips
+   validity. This is the most marginal valid attack in the project.
+2. **The effects are near measurement granularity.** `n_eval = 60`, so one fact is 0.0167; AFC's
+   −0.05 is **three facts**, and the control's +0.0667 is four. Neither is distinguishable from
+   noise at this n, and a negative "recovery" is on its face a noise reading, not evidence of
+   hardening.
+3. **⚠ The two arms are not at matched disclosure, so the comparison is apples-to-oranges.** The
+   control is MDU **λ=8** — a far deeper erasure, sitting at H 0.0500 before the attack — while AFC
+   λ=1 sits at **0.2667**, five times higher. AFC has far less headroom to "recover" toward θ₀'s
+   0.792 because it is already disclosing a quarter of the held-out facts at rest. A recovery
+   *fraction* computed against a common θ₀ reference is not comparable between arms whose starting
+   points differ by 0.22. **The control's job is to validate the attack, which it does; it is not a
+   matched baseline for AFC.**
+
+§3's conclusion is unchanged and does not rest on any of this: at the stronger budgets, where both
+arms are gated and the attack reaches 62% of θ₀ on T rather than 28%, **AFC recovers 35.3% and up to
+62.7%** — inside the baseline's 51–68%. **AFC is not relearning-robust.**
 
 Two things this does **not** establish: that 8.99% is a meaningful level of residual memory (no
 never-trained oracle exists here, the same limitation the t2i line records as `ERRATUM_r2` C17), and
