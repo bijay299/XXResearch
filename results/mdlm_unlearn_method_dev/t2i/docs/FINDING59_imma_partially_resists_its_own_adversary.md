@@ -66,9 +66,10 @@ full-UNet), `outputs/gen_imma_church_frp_a*.json`, `scripts/erase_imma.py`
 >
 > **(2) Secondary (transfer):** *"**no** transfer — full-UNet relearning reaches 1.000 regardless."*
 
-**Both hold.** This is the first pre-registered positive prediction in this phase to survive its own
-test, and it is worth being clear that the prediction was *modest*: partial resistance, nowhere near
-the bar.
+❌ **Superseded by the retraction above.** At the time §2 was written both appeared to hold. With the
+ratchet run, **prediction 1 is FALSIFIED by its own declared falsifier** (H = 1.000 under LoRA at
+900 steps) and only prediction 2 survives. This section is kept as written because the
+pre-registration is the point: it named the falsifier in advance, and the falsifier fired.
 
 ## 2. The primary measurement: LoRA, the adversary IMMA is immunized against
 
@@ -124,15 +125,19 @@ UNet.** An 859.5M-parameter adversary is not constrained by a defence that only 
 > *"If (1) and (2) both hold, the phase's conclusion sharpens from 'every defence is reversed' to
 > 'defences can resist the adversary they were trained against and none resists a stronger one'."*
 
-That is now the accurate statement, and it is **more useful** than nine flat reversals:
+❌ **That reading required prediction 1, which is falsified.** Since LoRA at 900 steps also reaches
+1.000, IMMA does **not** resist the adversary it was trained against — it merely slows it. The
+sharpened conclusion is therefore **not** available. What the data supports instead:
 
-- **Adversary-specific defence partially works.** IMMA trains against the real LoRA adversary,
-  warm-started, inside its own loop — and LoRA then underperforms against it. Of the three bi-level
-  defences tested (Meta-Unlearning, GIFT, IMMA), the one whose inner loop runs the *actual* attack is
-  the only one that moved the number at all.
-- **It does not generalise one step.** The same arm falls to a bigger adversary immediately.
-- **So the phase's negative result is not "defences cannot work"** — it is **"defences work only
-  against the exact adversary they were optimised against, and the threat model does not hold still."**
+- **Adversary-specific defence raises cost, not ceilings.** Of the three bi-level defences tested,
+  the one whose inner loop runs the *actual* attack (IMMA) is the only one that slowed any adversary
+  at all — but only at a budget 3× below what the adversary can trivially spend. Its inner loop
+  approximates the attacker with **one gradient step**, and that is the whole extent of what it
+  constrains.
+- **It does not generalise one step.** 8/8 full-UNet points at 1.000, DreamBooth at 1.000.
+- **So the phase's conclusion is unchanged, not sharpened:** every defence tested is reversed to the
+  base model's ceiling by an adversary willing to spend a little more. **Ten of ten.** The only
+  thing IMMA adds is a measurement of *how much more* — about 3× the LoRA budget.
 
 ## 5. What is NOT claimed
 
