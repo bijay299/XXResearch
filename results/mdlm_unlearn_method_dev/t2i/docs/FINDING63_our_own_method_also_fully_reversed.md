@@ -122,6 +122,29 @@ concept completely *and left the model more capable than the immunized version i
   is the one small mercy: unlike `FINDING59` and `FINDING62`, there is no sub-ceiling number here to
   be provisional about.
 
+## 4a. ✅ No longer checkpoint-specific — and the phase's best operating point is here
+
+`FINDING64`'s cross-model override was applied to UTRAP, using the FRP arms built on each new model
+as teachers, at λ=0.15/K=8 — the setting that cleared the retain floor on SD-1.4:
+
+| model | as-is target / retain8 | valid | **max-over-valid H** | post-attack utility |
+|---|---|---|---|---|
+| SD-1.4 (§1–§3a) | 0.0000 / 0.8667 | 6/6 | **1.000** | 0.188–0.979 |
+| **SD-1.5** | **0.0000 / 0.9583** | **3/3** (T **+1.000** ×3) | **1.000** | 0.896–0.958 |
+| **BK-SDM-small** (half-size) | 0.0000 / 0.7917 | **3/3** (T +0.958…+1.000) | **1.000** | **0.979–1.000** |
+
+**UTRAP on SD-1.5 — target 0.0000 at retain8 0.9583 — is the best as-is operating point measured
+anywhere in this phase.** Full target suppression at retention *above* our FRP port's 0.9417, and
+0.108 clear of the mandate's floor. It is reversed on 3/3 with T = +1.000 every time.
+
+So §2's statement is now architecture-independent: **our own method, at its best operating point on
+any model tested, is reversed on all three checkpoints and both architectures.** And §2's logic
+holds a third time — the arm *qualified* on retention and failed on robustness, so the bar is not
+missed for want of a good enough defence.
+
+On BK-SDM the attacker left a **half-size** model at post-attack utility **0.979–1.000**: the
+concept fully restored and the model essentially undamaged.
+
 ## 5. Scope
 
 One concept (church), one teacher (`frp_church_r3_l05`, shared with the H80/H82/H83 arms for

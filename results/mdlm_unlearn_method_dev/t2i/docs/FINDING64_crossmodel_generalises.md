@@ -69,8 +69,24 @@ latent-space change of that size is the obvious remaining generalisation questio
 > (FRP), one cross-attention-editing (GIFT) — both reversed on both new models.** The subspace
 > explanation holds across an architecture change; the parameter-abundance one does not (§2).
 
-**Does not re-test the other ten defences cross-model.** FRP and GIFT were run on the new models;
-the remaining ten are **inferred, not measured.**
+> ✅ **UTRAP WAS ALSO RUN CROSS-MODEL (2026-10-25) — a third, independent method family.**
+> UTRAP is *ours*, trained against the real multi-step attacker over the full parameter set, so it
+> shares no mechanism with FRP (pruning) or GIFT (cross-attention editing):
+>
+> | model | as-is target / retain8 | valid | **max-over-valid H** |
+> |---|---|---|---|
+> | UTRAP on SD-1.4 (prior) | 0.0000 / 0.8667 | 6/6 | **1.000** |
+> | **UTRAP on SD-1.5** | **0.0000 / 0.9583** | **3/3** | **1.000** |
+> | **UTRAP on BK-SDM-small** | 0.0000 / 0.7917 | **3/3** | **1.000** |
+>
+> **Three method families × three checkpoints × two architectures = 18 cross-model attacks, every
+> one valid, every one at H = 1.000.** The families differ in *what* they constrain — a weight
+> subset, a cross-attention subspace, and the attacker's own trajectory — and the outcome is
+> identical, which is the strongest available evidence that the result is a property of the setting
+> rather than of any one defence design.
+
+**Does not re-test the other nine defences cross-model.** FRP, GIFT and UTRAP were run on the new
+models; the remaining nine are **inferred, not measured.**
 
 **One concept (church), one seed per build, lr 1e-5 only** on the new models: three attacks each
 rather than the full six-point grid, because the three lr 1e-5 points already reached the ceiling and
