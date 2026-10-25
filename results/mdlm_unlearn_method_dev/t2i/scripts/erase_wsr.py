@@ -38,6 +38,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--concept", required=True)
     ap.add_argument("--lam-reg", type=float, default=1.0, help="weight-space anchor strength")
+    ap.add_argument("--teacher", default=None,
+                    help="FINDING61 S4: an ALREADY-ERASED unet to distil from. With it, L_erase "
+                         "becomes a BOUNDED distillation to the teacher instead of an unbounded "
+                         "negated diffusion loss -- which is what made the from-scratch sweep fail. "
+                         "Omit to reproduce the original (unbounded) from-scratch behaviour.")
     ap.add_argument("--lr", type=float, default=1e-5)
     ap.add_argument("--steps", type=int, default=1500)
     ap.add_argument("--n-images", type=int, default=16)
@@ -103,6 +108,17 @@ def main():
     del f_imgs, r_imgs
     torch.cuda.empty_cache()
 
+    # FINDING61 S4's correction: distil from an already-erased teacher so every term is bounded.
+    teacher = None
+    if a.teacher:
+        from diffusers import UNet2DConditionModel
+        tsd = torch.load(a.teacher, map_location="cpu"); tsd = tsd.get("unet", tsd)
+        teacher = UNet2DConditionModel.from_config(unet.config)
+        teacher.load_state_dict({k: v.float() for k, v in tsd.items()})
+        teacher = teacher.to(dev).eval().requires_grad_(False)
+        unet.load_state_dict({k: v.float() for k, v in tsd.items()})   # start AT the teacher
+        print(f"[wsr] bounded mode: distilling from {a.teacher}, anchoring to base", flush=True)
+
     unet.requires_grad_(True)
     params = [(n, p) for n, p in unet.named_parameters() if p.requires_grad]
     opt = torch.optim.Adam([p for _, p in params], lr=a.lr)
@@ -115,14 +131,29 @@ def main():
         return F.mse_loss(unet(sched.add_noise(z0, noise, t), t,
                                encoder_hidden_states=embv[idx]).sample, noise)
 
+    def distil(latv, embv, idx):
+        """Bounded term: match the teacher's noise prediction. Finite optimum by construction."""
+        z0 = latv[idx]
+        noise = torch.randn(z0.shape, device=dev, generator=g)
+        t = torch.randint(0, sched.config.num_train_timesteps, (z0.shape[0],), device=dev,
+                          generator=g).long()
+        zt = sched.add_noise(z0, noise, t)
+        with torch.no_grad():
+            tgt = teacher(zt, t, encoder_hidden_states=embv[idx]).sample
+        return F.mse_loss(unet(zt, t, encoder_hidden_states=embv[idx]).sample, tgt)
+
     hist = []
     nf, nr = f_lat.shape[0], r_lat.shape[0]
     for step in range(a.steps):
         opt.zero_grad(set_to_none=True)
         fi = torch.randint(0, nf, (a.batch,), device=dev, generator=g)
         ri = torch.randint(0, nr, (a.batch,), device=dev, generator=g)
-        l_erase = -dloss(f_lat, f_emb, fi)
-        l_retain = dloss(r_lat, r_emb, ri)
+        if teacher is None:
+            l_erase = -dloss(f_lat, f_emb, fi)            # UNBOUNDED (the FINDING61 failure mode)
+            l_retain = dloss(r_lat, r_emb, ri)
+        else:
+            l_erase = distil(f_lat, f_emb, fi)            # bounded: hold the teacher's erasure
+            l_retain = distil(r_lat, r_emb, ri)           # bounded: hold the teacher's retention
         # the weight-space anchor, normalised so lam_reg is scale-free
         reg = 0.0
         for n, p in params:
