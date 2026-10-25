@@ -115,6 +115,19 @@ What the result *does* establish independent of that caveat: the trigger demonst
 (the 60× benign-loss gap at θ′), and the utility cost at λ ≥ 1.0 is a property of the objective as
 written, not of the approximation.
 
+> ⚠ **UPDATE 2026-10-25 — this caveat is no longer the leading explanation. See `FINDING58`.**
+> `PREREG_H81` §6 prediction 3 pre-committed to settling it with GIFT (2507.13598), whose bi-level
+> defence obtains the same second-order curvature term **for free via alternating updates**, with no
+> Hessian anywhere in its Algorithm 1 — and whose authors call that term *"crucial for our
+> approach."* Our GIFT port implements that alternation faithfully, in plain SGD, as the derivation
+> requires. **The term is present there, and that arm is reversed on 6 of 6 valid attacks,
+> max-over-valid H = 1.000.**
+>
+> So a faithful second-order-equivalent bi-level defence is reversed just as completely as this
+> first-order one. The approximation above remains a real infidelity of **my port** and stays
+> disclosed — it is simply **no longer available as the explanation** for why the trap bought zero
+> robustness.
+
 ## 5. The TI runs are reported as attacks that did not work, not as resistance
 
 Textual Inversion on the λ = 0.5 arm, both runs:
