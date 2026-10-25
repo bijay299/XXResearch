@@ -1,4 +1,4 @@
-# Finding 57 — the decisive re-zero test is done: putting FRP's pruning mask *back* into the attacked model removes nothing. The matched random control shows this is about **redundancy, not about FRP's mask**.
+# Finding 57 — FRP's pruning mask is **decisive before the attack and irrelevant after it**. Putting the mask back into the attacked model removes nothing; a random mask of the same size erases nothing on the clean model. The adversary does not just undo the erasure — it makes the defence's weight selection stop mattering.
 
 **Date:** 2026-10-24 · **Closes:** the follow-up `FINDING44` §4 recorded as *planned, not done*
 **Evidence:** `outputs/rezero_church_r3.json`, `outputs/rezeroctl_church_r3.json`,
@@ -41,7 +41,10 @@ attack, the surviving 97 % of feed-forward weights carry the concept on their ow
 post-attack, **functionally irrelevant** — you can put the entire mask back and lose nothing, on
 either concept.
 
-## 3. ⚠ But the control narrows the claim, and it narrows my own framing
+## 3. ⚠ The *post-attack* random control narrows the claim, and it narrows my own framing
+
+(Read with §4: the random control on the **clean** model, run later, shows the mask was decisive
+*before* the attack. This section concerns only the **post-attack** comparison.)
 
 `FINDING44` §3 phrased the mechanism as the concept being *"re-encodable in weights that the
 forget-critical scoring did not select"* — a sentence whose force comes from an implied contrast
@@ -55,10 +58,16 @@ supports:
 - ❌ anything specific about FRP's mask, its forget-critical ranking, or its choice of positions —
   **not supported**. Any 3 % of feed-forward weights is this redundant at this scale.
 
-The honest statement is the weaker one: **this is a redundancy result about SD-1.4's feed-forward
-layers, not a critique of FRP's scoring.** I am recording that explicitly because the stronger
-phrasing was mine, it was more interesting, and the control I ran does not support it. `FINDING44`
-§3 should be read against this section.
+The honest statement, **scoped to the post-attack model**, is the weaker one: once the attack has
+run, this is a redundancy result about SD-1.4's feed-forward layers, not a critique of FRP's
+scoring. I am recording that explicitly because the stronger phrasing was mine, it was more
+interesting, and this control does not support it. `FINDING44` §3 should be read against this
+section.
+
+⚠ **Do not generalise this sentence past the attacked model.** §4's clean-model control shows the
+opposite holds pre-attack: a random mask erases *nothing* (target 1.0000) where FRP's erases to
+0.1333. "Any 3 % is equally redundant" is true of the **attacked** network and false of the
+**clean** one.
 
 ## 4. The timing is the substantive point
 
