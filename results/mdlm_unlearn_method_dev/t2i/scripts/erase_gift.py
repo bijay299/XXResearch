@@ -90,10 +90,13 @@ def main():
     t0 = time.time()
 
     from diffusers import StableDiffusionPipeline, DDPMScheduler
-    rev = open(f"{P}/MODEL_PIN.txt").read().strip().split()[0]
+    # MODEL_PIN.txt is a key=value file; an earlier version of this line took split()[0], which is
+    # the MODEL NAME, and passed it as the revision -- every build then died on a Hub metadata
+    # fetch. Parse it the way every working script in this phase does.
+    pin = dict(l.split("=", 1) for l in open(f"{P}/MODEL_PIN.txt").read().split("\n") if "=" in l)
     pipe = StableDiffusionPipeline.from_pretrained(
-        "CompVis/stable-diffusion-v1-4", revision=rev, torch_dtype=torch.float32,
-        safety_checker=None, requires_safety_checker=False).to(dev)
+        "CompVis/stable-diffusion-v1-4", revision=pin["revision"], torch_dtype=torch.float32,
+        variant="fp16", safety_checker=None, requires_safety_checker=False).to(dev)
     unet, vae, te, tok = pipe.unet, pipe.vae, pipe.text_encoder, pipe.tokenizer
     sched = DDPMScheduler.from_config(pipe.scheduler.config)
     for m in (vae, te):

@@ -1,0 +1,74 @@
+{
+ "study": "meta_unlearning_port",
+ "source": "arXiv 2410.12777",
+ "provenance": "OUR PORT from the paper; first-order meta gradient (stated deviation). Not the authors' code.",
+ "prereg": "docs/PREREG_H80_meta_unlearning.md",
+ "label": "h80_meta_church_lam0.7",
+ "hparams": {
+  "teacher": "adapters/frp_church_r3_l05/unet.pt",
+  "concept": "church",
+  "steps": 1500,
+  "lr": 1e-05,
+  "inner_alpha": 1e-05,
+  "lam_meta": 0.7,
+  "n_images": 64,
+  "seed": 0,
+  "log_every": 250,
+  "label": "h80_meta_church_lam0.7",
+  "out": "adapters/h80_meta_church_lam0.7"
+ },
+ "forget_pool": [
+  "a church",
+  "an old stone church",
+  "a church steeple",
+  "a chapel with a bell tower"
+ ],
+ "n_benign_prompts": 24,
+ "pool_recipe": "pools_v2",
+ "train_log": [
+  {
+   "step": 0,
+   "l_erase": 0.0,
+   "l_retain": 0.0,
+   "l_benign_at_theta_prime": 0.017467517405748367
+  },
+  {
+   "step": 250,
+   "l_erase": 0.00020795827731490135,
+   "l_retain": 0.006470667198300362,
+   "l_benign_at_theta_prime": 0.290901243686676
+  },
+  {
+   "step": 500,
+   "l_erase": 0.00013278851110953838,
+   "l_retain": 0.0002984516613651067,
+   "l_benign_at_theta_prime": 0.08680535852909088
+  },
+  {
+   "step": 750,
+   "l_erase": 0.0003854343667626381,
+   "l_retain": 0.024048538878560066,
+   "l_benign_at_theta_prime": 0.2964262366294861
+  },
+  {
+   "step": 1000,
+   "l_erase": 0.0032842070795595646,
+   "l_retain": 0.08391857147216797,
+   "l_benign_at_theta_prime": 0.1589023470878601
+  },
+  {
+   "step": 1250,
+   "l_erase": 0.001840133685618639,
+   "l_retain": 0.002238592365756631,
+   "l_benign_at_theta_prime": 0.1384429931640625
+  },
+  {
+   "step": 1499,
+   "l_erase": 0.0005341229261830449,
+   "l_retain": 0.011975503526628017,
+   "l_benign_at_theta_prime": 0.668999433517456
+  }
+ ],
+ "objective": "L = distil_erase(theta) + distil_retain(theta) - lam * L_benign(theta - alpha*grad L_forget(theta))",
+ "minutes": 22.234223333994546
+}

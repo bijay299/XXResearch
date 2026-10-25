@@ -152,6 +152,33 @@ approximation would be a second-order implementation, which is the honest follow
 finer λ sweep between 0.5 and 1.0 — the only interval where a trigger that is both usable and live
 could exist, given K2 fails at 1.0 and the trap bought nothing at 0.5.
 
+> ⚠ **THE FINER SWEEP RAN, AND IT CONTRADICTS WHAT I EXPECTED (2026-10-25).** I predicted nothing
+> usable would be in that interval. **Two arms in it clear K2 with the target fully suppressed:**
+>
+> | λ_meta | target | retain8 | utility | K2 (≥0.60) |
+> |---|---|---|---|---|
+> | 0.0 (ablation) | 0.1333 | 0.9417 | 0.9212 | ✔ |
+> | 0.5 | 0.0667 | 0.6333 | 0.6727 | ✔ |
+> | **0.6** | **0.0000** | **0.6250** | 0.6727 | **✔** |
+> | **0.7** | **0.0000** | **0.7000** | 0.6848 | **✔** |
+> | 0.8 | 0.0000 | 0.4750 | 0.5697 | ❌ |
+> | 0.9 | 0.0000 | 0.0000 | 0.0788 | ❌ |
+> | 1.0 | 0.0000 | 0.1167 | 0.0909 | ❌ |
+> | 2.0 | 0.0000 | 0.1167 | 0.1212 | ❌ |
+>
+> **λ=0.7 reaches target 0.0000 at retain8 0.7000** — full suppression at the best retention of any
+> trap-bearing arm, and *better* retention than λ=0.6 and λ=0.5 below it. **Retention is NOT
+> monotone in λ_meta**: 0.6333 → 0.6250 → **0.7000** → 0.4750 → 0.0000. A coarse four-point grid
+> would have missed this entirely, which is the argument for running the finer sweep rather than
+> reasoning about it.
+>
+> **This does not yet rescue the method.** Full target suppression at retain 0.70 is still below the
+> mandate's 0.85 floor, and §3's finding — that the trap bought **zero** robustness over its own
+> ablation at λ=0.5 — is about *robustness*, which these as-is numbers do not address. The frozen-grid
+> attacks on λ=0.6 and λ=0.7 are running; until they land, **no robustness claim is made for any arm
+> in this interval.** What is now wrong is only my §6 expectation that the interval held nothing
+> usable.
+
 ## 7. Scope
 
 Our port from the paper, not the authors' code. First-order meta gradient (§4). Single simulated
