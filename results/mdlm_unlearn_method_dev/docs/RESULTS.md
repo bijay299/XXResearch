@@ -1,5 +1,17 @@
 # Results — AFC against MDU, EMDU and ATWU on TOFU/LLaDA
 
+> 📌 **n=12 VERDICT, 2026-10-24 — read this instead of §1.** Both columns are now complete at 12
+> paired seeds under explicitly recorded settings. **Retention survives: +0.1096 retain ASCR
+> (0.5153 vs 0.4057), 11 of 12 paired seeds, t=+3.15.** **TV does not: −0.0240 (0.2983 vs 0.3223),
+> 6 of 12 — exactly even, t=−0.53.** DEGENERATE goes the other way (AFC 0.149 vs 0.127, worse on 8 of
+> 12), and AFC's TV sd is ~1.5× MDU's, so the n=3 lower-variance claim is also gone. The one
+> defensible claim is **"at matched disclosure, substantially more capability retained at
+> indistinguishable distance-to-pristine"** — one axis, with the forgetting axis a tie. That is short
+> of beating the baseline on a forgetting–utility trade-off. A matched-RETENTION slice (MDU λ=1 at
+> n=12) is running and could remove even this: if MDU λ=1 reaches TV ≈ 0.30 at comparable retain,
+> AFC is *on* MDU's frontier rather than above it and has no advantage on either slice.
+> See `docs/FINDING_n12_verdict_retain_survives.md`.
+
 > ❌ **SUPERSEDED, 2026-10-24 — the comparative claim in §1 below is REFUTED.** With the baseline
 > confound fixed (λ=3 rebuilds, bridge control reproducing `ll_mdu_f3` exactly on all seven reported
 > numbers) and n=8 seeds, **AFC's TV advantage is gone: 0.2993 ± 0.1290 vs MDU λ=3's
