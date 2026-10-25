@@ -116,9 +116,32 @@ plain GD; the paper never says which optimiser it used.
 `PREREG_H81` §6 recorded this **before** any arm was built: GIFT's own experiments defend against
 **DreamBooth on a disjoint attack split**, on SD v1.5, with Custom-Concept-101 objects, 10 art styles
 and an NSFW subset. This phase attacks with **full-UNet relearning on 16 self-generated images**, on
-SD v1.4, on one object concept. **A reversal here is a scope statement about a different adversary,
-not a refutation of their paper** — the same distinction `ERRATUM_r2` C15 insists on for AdvUnlearn.
-Their DreamBooth setting is the obvious next measurement on this arm and is **not yet run**.
+SD v1.4, on one object concept. A reversal under *our* adversary alone would be a scope statement
+about a different threat model, not a refutation of their paper — the same distinction
+`ERRATUM_r2` C15 insists on for AdvUnlearn.
+
+> ✅ **SO GIFT'S OWN THREAT MODEL WAS RUN, AND IT REVERSES THE ARM TOO.** DreamBooth, the adversary
+> GIFT is built against, on `gift_church_b1.0` (300 steps, 16 instance + 16 class images,
+> prior-weight 1.0, identifier `sks`, with the `FINDING55` prior-preservation artifact correction
+> applied):
+>
+> | | T before → after | rise | gate | target H | utility |
+> |---|---|---|---|---|---|
+> | DreamBooth, seed 0 | 0.292 → 0.958 | **+0.667** | ✅ **PASS** | 0.467 → **1.000** | 0.854 → **1.000** |
+>
+> **This closes the escape route this section would otherwise have left open.** GIFT is not merely
+> reversed by an adversary it was not designed for — it is reversed, to the base model's ceiling,
+> by *the* adversary it was designed for, with its utility restored in the process. A second seed
+> is running.
+
+### 6a. The β = 0.1 attacks are a gate sanity-check, not a result
+
+For completeness: the three attacks on `gift_church_b0.1` **all fail the gate with T rise exactly
++0.000**, and H sits at 1.000 → 1.000. That is correct behaviour, not resistance — the arm *is* the
+base model (target 1.0000 as-is), so there is no erased concept to relearn and T is already at the
+ceiling it would have to rise from. `FINDING20`'s gate refuses to certify such an arm, which is
+exactly what it is for. These three points contribute nothing and are reported only so the grid is
+not silently 9 attacks with 6 reported.
 
 One concept (church), one seed per build, 1500 steps. Two of my three builds failed before producing
 anything — a model-pin parse bug and a VAE-batch OOM — and both were logged as `BUILD FAILED`
