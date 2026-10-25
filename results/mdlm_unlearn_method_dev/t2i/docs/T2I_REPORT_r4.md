@@ -150,6 +150,15 @@ defined forgetting–utility trade-off, supported by real-model results.
   weights; `torchvision`, `scipy`, `torchmetrics` and `cleanfid` are all absent from the venv and
   COCO is not on disk. A CLIP-feature substitute would not be comparable to the literature, so none
   was computed. **Declared gap with a price tag, not an omission.**
+- ✅ **No longer SD-1.4-only.** `FINDING64` ran the identical pipeline on **SD-1.5** (0.1333/0.9333)
+  and **BK-SDM-small**, a *half-size pruned* UNet (0.4667/0.9250): both reversed to **H = 1.000** on
+  3/3 valid attacks each. The conclusion now holds **across three checkpoints and two
+  architectures.** SD-2.x/SDXL remain untested (`stabilityai/*` returns 401 on this host), and only
+  FRP was re-run cross-model — the other twelve defences' cross-model behaviour is inferred, not
+  measured.
+- ⚠ **§4's parameter-ratio reasoning is narrowed by that result.** Halving the UNet does not change
+  the outcome, so **parameter abundance is not the operative variable**; `FINDING57`'s redundancy
+  account is the better explanation. A correction to our reasoning, not to any measurement.
 - **One concept carries most of the weight** (church), with parachute, van_gogh, garbage_truck and
   tench on subsets. **28 of 41 RNG sites use the global stream** (`provenance.py`). The CLIP
   evaluation classifier's revision is **unpinned**.

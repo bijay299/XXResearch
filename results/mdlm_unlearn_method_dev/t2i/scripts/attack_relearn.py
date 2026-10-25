@@ -25,6 +25,15 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+# CROSS-MODEL OVERRIDE (added 2026-10-25 for the generalisation test in PREREG_H85).
+# Defaults reproduce the pinned SD-1.4 exactly when BASE_MODEL/BASE_REV are unset, so no existing
+# result changes. Set both to run the identical pipeline on another checkpoint/architecture.
+import os as _os
+BASE_MODEL = _os.environ.get("BASE_MODEL", "CompVis/stable-diffusion-v1-4")
+BASE_REV_ENV = _os.environ.get("BASE_REV")
+BASE_VARIANT = _os.environ.get("BASE_VARIANT", "fp16") or None
+
+
 PIN = "/data/bijaypandey/t2i_unlearn/MODEL_PIN.txt"
 OUT = "/data/bijaypandey/t2i_unlearn/outputs"
 
@@ -116,8 +125,8 @@ def build_pipe(dtype, unet_path=None, dev="cuda", te_path=None):
     from diffusers import StableDiffusionPipeline
     pin = dict(l.split("=", 1) for l in open(PIN).read().split("\n") if "=" in l)
     pipe = StableDiffusionPipeline.from_pretrained(
-        "CompVis/stable-diffusion-v1-4", revision=pin["revision"], torch_dtype=dtype,
-        variant="fp16", safety_checker=None, requires_safety_checker=False)
+        BASE_MODEL, revision=(BASE_REV_ENV or pin["revision"]), torch_dtype=dtype,
+        variant=BASE_VARIANT, safety_checker=None, requires_safety_checker=False)
     if unet_path:
         sd = torch.load(unet_path, map_location="cpu")
         pipe.unet.load_state_dict({k: v.to(dtype) for k, v in sd.get("unet", sd).items()})
