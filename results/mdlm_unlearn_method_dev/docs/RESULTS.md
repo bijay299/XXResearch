@@ -1,5 +1,17 @@
 # Results — AFC against MDU, EMDU and ATWU on TOFU/LLaDA
 
+> 🏁 **FOUR-POINT FRONTIER, 2026-10-25 — the frontier claim is no longer provisional.** MDU λ=4, the
+> pre-registered threat, regressed to **TV 0.3104 ± 0.0892 at retain 0.3869 ± 0.1002** at n=12 (its
+> single-seed 0.2325/0.4565 was the most favourable of twelve; seed 0 reproduced it exactly). The
+> frontier, n=12 each: **AFC λ=1 0.2983 / 0.5153** · MDU λ=1 0.4400 / 0.5235 · MDU λ=3 0.3223 /
+> 0.4057 · MDU λ=4 0.3104 / 0.3869. **AFC has the lowest TV of all four and, within noise, the
+> highest retention — no λ of MDU reaches that combination.** λ=1 matches retention but forgets
+> +0.142 worse (t=−4.06, 11/12); λ=3 and λ=4 match forgetting but retain 0.110 and 0.128 less
+> (t=+3.15, +3.92, 11/12 each). ⚠ **λ=2 is a declared gap** — queued then cancelled on instruction,
+> not for lack of value. ⚠ And this is a **trade-off** result, **not** a robustness result: AFC still
+> recovers up to 62.7% under the strongest valid attack, inside the baseline's 51–68%; it is also the
+> highest-variance of the four arms. See `docs/FINDING_four_point_frontier.md`.
+
 > ✅ **MATCHED-RETENTION SLICE, 2026-10-24 — the first claim here to survive every control.** At
 > retention matched almost exactly (AFC 0.5153 vs MDU λ=1 0.5235, t=−0.32), AFC forgets clearly
 > better: **TV −0.1417 (t=−4.06, 11/12 seeds)** and **DISCLOSE −0.1757 (t=−5.54, 11/12)**. With the
