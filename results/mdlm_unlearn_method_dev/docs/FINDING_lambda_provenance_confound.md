@@ -2,8 +2,9 @@
 
 **Date:** 2026-10-24
 **Status:** ⚠ this invalidates the baseline column of the **already-published retraction** at the top
-of `docs/RESULTS.md`. Correction in progress; a bridge control is running before any number here is
-treated as final.
+of `docs/RESULTS.md`. **All controls have since passed** — see §4 — and the λ attribution is now
+proven by reproduction, not inferred (§2).
+**Superseded by:** `FINDING_n12_verdict_retain_survives.md`, which carries the corrected n=12 result.
 **Evidence:** `outputs/arm_mdu_l3_s{3,4,5,6}.json` (new, λ_f=3 explicit) against
 `outputs/arm_mdu_s{3,4,5,6}.json` (existing, λ_f **unrecorded**)
 
@@ -39,7 +40,7 @@ Seeds 3–7 rebuilt with an **explicit** `--lam-forget 3 --lam-retain 1`, under 
 | s6 | `mdu_s6` | 0.4825 | 0.5155 | 0.3250 | 0.0333 |
 | | **`mdu_l3_s6`** | **0.2575** | **0.3510** | **0.0833** | **0.1500** |
 | s7 | `mdu_s7` | 0.4325 | 0.5265 | 0.3250 | 0.0917 |
-| | `mdu_l3_s7` | *pending* | | | |
+| | **`mdu_l3_s7`** | **0.2824** | **0.4569** | **0.1583** | **0.0833** |
 
 **Not one coordinate is close.** TV is 0.10–0.23 lower, retain 0.09–0.25 lower, DISCLOSE 0.05–0.32
 lower. `mdu_s3..s7` were not built at λ_f=3.
@@ -100,21 +101,19 @@ The rebuilds used `train_lam.py` **defaults** for everything except λ: lr 1e-4,
 unrecorded too.** So a mismatch between my rebuilds and `mdu_s3..s7` proves the originals were not
 λ=3, but it does **not** yet license comparing the rebuilds against seeds 0–2 or against AFC.
 
-`run_mdu_l3_bridge.sh` is running now: seed 0 at explicit λ=3 with the same defaults, against
-`ll_mdu_f3` (TV 0.2825, retain 0.4042, DISC 0.2333, DEG 0.0500).
+✅ **The bridge passed.** Seed 0 at explicit λ=3 with the same defaults reproduces `ll_mdu_f3`
+**exactly on all seven reported numbers** (TV→θ₀ 0.4337, →oracle 0.2003, →pristine 0.2825, retain
+0.4042, forget 0.2748, DISCLOSE 0.2333, DEGEN 0.0500). Two further bridges also passed — AFC λ=1
+against `h16_none_f1`, and MDU λ=8 against `mdu_pub` — so the rebuild protocol is established as
+faithful and the MDU column is on one footing. §3's table is a real comparison.
 
-- **reproduces** → the rebuild protocol matches the λ=3 family, the whole MDU n=8 column can be put
-  on one footing, and §3's table becomes a real comparison;
-- **does not reproduce** → the seeds 0–2 arms differ in some further unrecorded hyperparameter, and
-  **no cross-seed MDU comparison in this project is currently sound** — a larger problem than the λ
-  hole alone.
-
-Notably, the rebuilt seeds 3–6 (TV 0.229–0.291) are *better* than the λ=3 seeds 0–2 (0.283–0.441),
-which is either ordinary seed variation or a second protocol difference. The bridge discriminates.
+The rebuilt seeds 3–6 (TV 0.229–0.291) being *better* than the λ=3 seeds 0–2 (0.283–0.441) is
+therefore ordinary seed variation, not a second protocol difference.
 
 ## 5. Scope and what is preserved
 
 Nothing existing was modified, overwritten or relabelled. `mdu_s3..s7` stand exactly as measured;
-the rebuilds are new arms under new identifiers. Four of five rebuild seeds are complete and s7 is
-running. The λ attribution in §2 is an inference from profile agreement, not recovered provenance —
-the original invocations are not in the record and may not be recoverable.
+the rebuilds are new arms under new identifiers. All five λ=3 rebuild seeds are complete. The λ
+attribution in §2 is **no longer an inference** — it is proven by exact reproduction against explicit
+λ=1 rebuilds (4 of 4 seeds, all four coordinates). The original *invocations* are still absent from
+the record and remain unrecoverable; what is recovered is the λ value they used.
