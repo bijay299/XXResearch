@@ -118,6 +118,30 @@ with the concept fully restored *and* a model more capable than the immunized on
 risk here of mistaking self-destruction for robustness. **K4 does not bind either** — the ratchet
 applies to sub-ceiling numbers, and H is already at the ceiling, so no LoRA or TI push can raise it.
 
+### 3a. Three adversary families, 17 valid attacks, every one at the ceiling
+
+`FINDING54` built the four-adversary matrix for three earlier defences. GIFT now has three of the
+four filled in, across every usable β:
+
+| adversary | trainable params | arm | valid attacks | **max-over-valid H** |
+|---|---|---|---|---|
+| **full-UNet relearning** | 859.5M | β=1.0 | 6/6 | **1.000** |
+| | | β=1.2 | 3/3 | **1.000** |
+| | | β=1.3 | 3/3 | **1.000** |
+| **DreamBooth** (GIFT's own threat model) | 859.5M + prior | β=1.0 | 2/2 | **1.000** |
+| **LoRA rank-16** | **0.399M = 0.046%** | β=1.0 | 2/2 | **1.000** |
+| Textual Inversion | 768 scalars | β=1.0 | *running* | — |
+
+**The LoRA result is the sharpest of the three.** A rank-16 adapter training **0.399M parameters —
+0.046% of the model** — takes GIFT's immunized arm from target 0.467 to **1.000**, and leaves
+utility at 0.958–1.000. GIFT's immunization edits 44.0M cross-attention parameters; an adapter
+roughly 110× smaller undoes it completely. Whatever the bi-level objective shapes, it does not
+constrain the function a tiny low-rank update can reach.
+
+β=1.3 — the deepest usable arm, starting at target 0.2667 — is also **3/3 at 1.000**, with utility
+restored to 1.000 in all three. Across the frontier and the adversary families alike, **starting
+deeper changes nothing about where the attack ends.**
+
 ## 4. ⚠ This settles a question I left open about my own earlier port
 
 `FINDING56` §4 recorded the **first-order approximation** in my Meta-Unlearning port as a live
