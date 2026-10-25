@@ -130,7 +130,7 @@ four filled in, across every usable β:
 | | | β=1.3 | 3/3 | **1.000** |
 | **DreamBooth** (GIFT's own threat model) | 859.5M + prior | β=1.0 | 2/2 | **1.000** |
 | **LoRA rank-16** | **0.399M = 0.046%** | β=1.0 | 2/2 | **1.000** |
-| Textual Inversion | 768 scalars | β=1.0 | *running* | — |
+| **Textual Inversion** | **768 scalars** | β=1.0 | **2/2** | **1.000** |
 
 **The LoRA result is the sharpest of the three.** A rank-16 adapter training **0.399M parameters —
 0.046% of the model** — takes GIFT's immunized arm from target 0.467 to **1.000**, and leaves
@@ -141,6 +141,31 @@ constrain the function a tiny low-rank update can reach.
 β=1.3 — the deepest usable arm, starting at target 0.2667 — is also **3/3 at 1.000**, with utility
 restored to 1.000 in all three. Across the frontier and the adversary families alike, **starting
 deeper changes nothing about where the attack ends.**
+
+**β = 1.35 completes the frontier**: target 0.2000 at retain8 **0.6000**, exactly on the K1 floor,
+and **3/3 valid attacks → 1.000**. So there are **four** usable arms, not three, and every one is
+reversed.
+
+**The matrix is now complete — GIFT is the first defence in this phase measured against all four
+adversary families, and all four reach the ceiling.** Twenty-two valid attacks in total, every one
+at H = 1.000, including the 768-scalar Textual Inversion attack (T 0.333 → 1.000 on both runs).
+
+### 3b. ⚠ And the TI result answers a question `FINDING56` left open
+
+`FINDING56` §5a found Textual Inversion **could not be made valid at all** on the Meta-Unlearning
+λ=0.5 arm — 3/3 gate failures with T *falling* — and left two readings open, naming the missing
+control explicitly: *"a TI attack on a non-meta arm at matched utility."*
+
+**TI is comfortably valid on GIFT**: T 0.333 → 1.000 (+0.667) on both runs, H → 1.000. So the TI
+failure on the meta arm is **not** a property of this phase's TI implementation, budget, or of
+bi-level cross-attention-editing defences in general — GIFT is also bi-level, also edits
+cross-attention, and TI works on it.
+
+That favours `FINDING56` §5a's **first** reading (the meta trigger genuinely obstructs
+embedding-space optimisation) but does not yet establish it, because GIFT β=1.0 sits at retain
+0.7833 against the meta arm's 0.6333 — still not utility-matched. **GIFT β=1.3 sits at 0.6083, a
+gap of 0.025**, and TI is now running on it as the properly matched control. That measurement, not
+this one, settles §5a.
 
 ## 4. ⚠ This settles a question I left open about my own earlier port
 
