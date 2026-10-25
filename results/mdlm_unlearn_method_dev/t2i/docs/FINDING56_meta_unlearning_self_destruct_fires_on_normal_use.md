@@ -225,11 +225,22 @@ could exist, given K2 fails at 1.0 and the trap bought nothing at 0.5.
 > An arm at target 0.0000 before the attack is at 1.000 after it, with *more* benign capability than
 > it started with.
 >
-> So the conclusion of §3 extends across the **entire usable λ window**: 0.5, 0.6 and (pending) 0.7
-> all reach max-over-valid H = 1.000. The finer sweep bought better as-is numbers and **no
-> robustness whatsoever.** What was wrong was only my §6 expectation that the interval held nothing
-> usable; the robustness verdict is unchanged and now rests on more arms, not fewer. λ=0.7's grid is
-> in flight and will be reported whichever way it lands.
+> **λ = 0.7 — the sweep's best arm — completed, 3 / 3 gate-passing, and is also fully reversed:**
+>
+> | seed | T rise | gate | target H | post-attack utility |
+> |---|---|---|---|---|
+> | 0 | +1.000 | ✅ | 0.000 → **1.000** | 0.667 → **0.854** |
+> | 1 | +0.958 | ✅ | 0.000 → **1.000** | 0.708 → **0.938** |
+> | 6 | +0.958 | ✅ | 0.000 → **1.000** | 0.625 → **0.854** |
+>
+> **CLOSED.** The conclusion of §3 holds across the **entire usable λ window**: λ = 0.5, 0.6 and 0.7
+> every one reach max-over-valid **H = 1.000**, on 9 of 9 gate-passing attacks, and in all nine the
+> attack *also* repaired the trap's utility damage. The finer sweep bought better as-is numbers and
+> **no robustness whatsoever.**
+>
+> What was wrong was only my §6 expectation that the interval held nothing *usable*. The robustness
+> verdict is unchanged and now rests on **three arms and nine valid attacks** instead of one arm and
+> six. Meta-Unlearning, as ported, has no usable setting that survives this adversary.
 
 ## 7. Scope
 
