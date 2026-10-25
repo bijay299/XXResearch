@@ -96,9 +96,32 @@ not.** A predictor cannot be falsified against a degenerate outcome; what is fal
 *transfer* to this domain. Their own framing would likely agree: with every defence here reversed to
 the ceiling, there is nothing for weight-space proximity to discriminate.
 
-**Does not test their LMC component.** Linear mode connectivity needs evaluations at interpolated
-weights. It is **not computed** and not approximated by a cheaper proxy — recorded as the obvious
-follow-up. L2 was the component that could be measured on existing checkpoints.
+> ✅ **LMC IS NOW COMPUTED TOO, AND IT ALSO HAS NO POWER OVER THE OUTCOME (2026-10-25).**
+> `scripts/lmc_probe.py` evaluates θ_base + t(θ_arm − θ_base) at t ∈ {0.25, 0.5, 0.75} on four arms
+> spanning the whole distance range. **retain8 along the path:**
+>
+> | arm | L2 | t=0 | 0.25 | 0.50 | 0.75 | t=1 | path |
+> |---|---|---|---|---|---|---|---|
+> | `gift_church_b1.0` | 0.18 | 1.000 | 1.000 | 0.992 | 0.925 | 0.783 | **barrier-free** (monotone) |
+> | `frp_church_r3_l05` | 264.53 | 1.000 | 1.000 | 0.983 | 0.967 | 0.942 | **barrier-free** (monotone) |
+> | `h68v2_rf_a0.3_church` | 314.50 | 1.000 | 0.983 | **0.625** | **0.358** | 0.800 | ❌ **BARRIER** — interior min 0.358 far below the 0.800 endpoint |
+> | `h64v2_frag_a0.3_parachute` | 483.14 | 1.000 | **0.067** | 0.008 | 0.000 | 0.083 | ❌ destroyed along the entire path |
+>
+> **LMC does discriminate — just not on the axis that matters.** It cleanly separates well-conditioned
+> arms (GIFT, FRP: monotone, no barrier) from damaged ones (the other two: interior collapse). But
+> **all three usable arms sit at max-over-valid H = 1.000 regardless of whether their path to base is
+> barrier-free or barriered.** `h68v2_rf` is genuinely *outside* the base model's linearly-connected
+> basin — interior retain 0.358 against an 0.800 endpoint — and it is reversed just as completely as
+> GIFT, which is barrier-free and 1470× closer in L2.
+>
+> So **both halves of 2505.22310's predictor are now measured on this phase's arms, and neither has
+> explanatory power for relearning resistance here.** Like L2, LMC tracks **model health**, not
+> tamper-resistance. §5's conclusion is complete rather than partial.
+>
+> Two details worth keeping: target suppression is **non-monotone** along the path for both damaged
+> arms (h68v2_rf dips to 0.0667 at t=0.75 then rises to 0.3333 at the endpoint), which is the
+> degenerate-image signature again rather than erasure; and interpolated checkpoints were deleted
+> after evaluation, so this measurement cost no net storage.
 
 **Does not test their method**, only their predictor. Weight-space-regularised erasure in SD is a
 buildable arm and is **not run**.
