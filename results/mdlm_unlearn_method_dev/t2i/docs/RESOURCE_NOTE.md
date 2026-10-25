@@ -1,5 +1,12 @@
 # Resource note — two accounting failures, both mine, and where things stand
 
+> ✅ **STORAGE AUTHORIZATION RAISED TO 300 GB (2026-10-25, by the user), and nothing is to be
+> deleted.** The overage described below is therefore closed as an issue: t2i currently sits at
+> **133 GB** against a 300 GB allowance. The proposed ~30 GiB cut is **withdrawn and will not be
+> applied** — the instruction is explicit that nothing is deleted now, which also preserves the
+> ability to re-attack every arm (the `FINDING35` §4 ratchet depends on exactly that). The
+> ledger-accounting half of this note still stands and is unchanged.
+
 **Date:** 2026-10-24
 
 ## 1. This phase had no resource accounting at all
