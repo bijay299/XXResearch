@@ -1,0 +1,67 @@
+{
+ "study": "wsr_erase",
+ "adapts_idea_of": "arXiv 2505.22310",
+ "is_adaptation_not_reproduction": true,
+ "domain_caveat": "that paper is example-level unlearning in vision classifiers; this adapts its weight-space-anchor idea to T2I concept erasure",
+ "tests_what_FINDING60_left_untested": "their METHOD, not their predictor",
+ "label": "wsr_church_lr10",
+ "concept": "church",
+ "hparams": {
+  "concept": "church",
+  "lam_reg": 10.0,
+  "lr": 1e-05,
+  "steps": 1500,
+  "n_images": 16,
+  "n_retain": 32,
+  "batch": 2,
+  "seed": 0,
+  "log_every": 250,
+  "label": "wsr_church_lr10",
+  "out": "adapters/wsr_church_lr10"
+ },
+ "history": [
+  {
+   "step": 0,
+   "L_erase": -0.22470280528068542,
+   "L_retain": 0.09852468222379684,
+   "reg_rel": 0.0
+  },
+  {
+   "step": 250,
+   "L_erase": -14.403614044189453,
+   "L_retain": 0.08711846172809601,
+   "reg_rel": 3.533108247211203e-05
+  },
+  {
+   "step": 500,
+   "L_erase": -55.54777908325195,
+   "L_retain": 0.328085720539093,
+   "reg_rel": 7.451826240867376e-05
+  },
+  {
+   "step": 750,
+   "L_erase": -101.13713073730469,
+   "L_retain": 0.14034178853034973,
+   "reg_rel": 8.693039853824303e-05
+  },
+  {
+   "step": 1000,
+   "L_erase": -158.552734375,
+   "L_retain": 0.10554032772779465,
+   "reg_rel": 9.814219083636999e-05
+  },
+  {
+   "step": 1250,
+   "L_erase": -228.6089630126953,
+   "L_retain": 0.027108242735266685,
+   "reg_rel": 0.00010780337470350787
+  },
+  {
+   "step": 1499,
+   "L_erase": -312.0212707519531,
+   "L_retain": 0.040638454258441925,
+   "reg_rel": 0.00015584890206810087
+  }
+ ],
+ "minutes": 16.427204398314156
+}
