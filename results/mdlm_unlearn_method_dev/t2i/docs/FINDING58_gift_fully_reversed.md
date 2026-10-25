@@ -47,6 +47,28 @@ So the entire usable window is **β = 1.0**, at target 0.4667 / retain 0.7833 �
 official AdvUnlearn's 0.400 but at materially lower retention, and **below the mandate's 0.85 retain
 floor before any attack runs.**
 
+> ✅ **A FINER SWEEP CONFIRMS THIS, unlike the H80 case (2026-10-25).** `H80`'s finer λ sweep found a
+> *better* arm the coarse grid had missed (λ=0.7 at target 0.0000 / retain 0.7000, with retention
+> **non-monotone** in λ), so GIFT was given the same chance before this section was treated as
+> settled. It found nothing:
+>
+> | β | target | retain8 | utility | K1 (≥0.60) |
+> |---|---|---|---|---|
+> | 0.1 | 1.0000 | 1.0000 | 1.0000 | ✔ (no effect) |
+> | **1.0** | **0.4667** | **0.7833** | 0.7818 | **✔** |
+> | 2.0 | 0.0000 | **0.2750** | 0.2909 | ❌ |
+> | 3.0 | 0.0000 | **0.0917** | 0.1091 | ❌ |
+> | 10.0 | 0.0000 | **0.0333** | 0.0848 | ❌ |
+>
+> **β = 2.0 already collapses retention from 0.7833 to 0.2750.** The trade-off has a **cliff**
+> between β = 1 and β = 2, not a gradient: one step past the primary and the model is unusable, with
+> every larger β worse. Unlike λ_meta, retention here is **monotone decreasing** in β across every
+> point measured.
+>
+> So no new arm needed attacking — nothing beyond β = 1.0 clears K1. β = 1.2 and 1.5 are running to
+> locate the cliff itself, and any arm of theirs clearing K1 will be attacked on the grid. Until
+> those land, "the usable window is one point" is supported by five β values rather than three.
+
 ## 3. The result: reversed on every configuration
 
 All six grid points passed the `FINDING20` validity gate (T rises +0.542 to +0.583, all ≥ 0.20):
