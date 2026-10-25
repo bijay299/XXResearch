@@ -1,0 +1,96 @@
+{
+ "study": "t2i_gen_eval",
+ "label": "REDUN_dose_s300_church_random_27",
+ "unet": "/data/bijaypandey/t2i_unlearn/adapters/_redun_REDUN_dose_s300_church_random_27/unet.pt",
+ "text_encoder": null,
+ "hparams": {
+  "label": "REDUN_dose_s300_church_random_27",
+  "unet": "/data/bijaypandey/t2i_unlearn/adapters/_redun_REDUN_dose_s300_church_random_27/unet.pt",
+  "text_encoder": null,
+  "n_per_prompt": 5,
+  "steps": 25,
+  "guidance": 7.5,
+  "seed": 0,
+  "concepts": null,
+  "save_grid": false,
+  "target": "church"
+ },
+ "per_concept": {
+  "church": {
+   "n": 15,
+   "clip_acc": 0.8666666666666667,
+   "clip_align": 0.22188313802083334
+  },
+  "parachute": {
+   "n": 15,
+   "clip_acc": 0.4,
+   "clip_align": 0.20008138020833333
+  },
+  "garbage_truck": {
+   "n": 15,
+   "clip_acc": 0.4666666666666667,
+   "clip_align": 0.19589029947916667
+  },
+  "van_gogh": {
+   "n": 15,
+   "clip_acc": 0.8666666666666667,
+   "clip_align": 0.19549967447916666
+  },
+  "cassette_player": {
+   "n": 15,
+   "clip_acc": 0.8,
+   "clip_align": 0.21484375
+  },
+  "chain_saw": {
+   "n": 15,
+   "clip_acc": 0.3333333333333333,
+   "clip_align": 0.16587727864583332
+  },
+  "english_springer": {
+   "n": 15,
+   "clip_acc": 0.06666666666666667,
+   "clip_align": 0.1664794921875
+  },
+  "french_horn": {
+   "n": 15,
+   "clip_acc": 0.6666666666666666,
+   "clip_align": 0.20577799479166667
+  },
+  "gas_pump": {
+   "n": 15,
+   "clip_acc": 0.6666666666666666,
+   "clip_align": 0.21131998697916668
+  },
+  "golf_ball": {
+   "n": 15,
+   "clip_acc": 0.6,
+   "clip_align": 0.21114095052083334
+  },
+  "tench": {
+   "n": 15,
+   "clip_acc": 0.13333333333333333,
+   "clip_align": 0.16564534505208334
+  },
+  "monet": {
+   "n": 15,
+   "clip_acc": 0.26666666666666666,
+   "clip_align": 0.19651692708333332
+  }
+ },
+ "active_target_metrics": {
+  "active_target": "church",
+  "target_suppression_acc": 0.8666666666666667,
+  "target_align": 0.22188313802083334,
+  "utility_all_nontarget": 0.47878787878787876,
+  "n_nontarget": 11,
+  "utility_legacy_common_subset": 0.44166666666666665,
+  "n_legacy_common": 8,
+  "legacy_retain8": 0.44166666666666665,
+  "n_legacy_retain": 8,
+  "denominator_warning": "utility_all_nontarget, utility_legacy_common_subset and legacy_retain8 use DIFFERENT denominators and are NOT interchangeable. legacy_retain8 is the historical figure; it includes the active target whenever that target is not one of the four legacy forget concepts."
+ },
+ "forget_mean_acc_LEGACY": 0.65,
+ "retain_mean_acc_LEGACY": 0.44166666666666665,
+ "legacy_denominator_note": "forget_mean_acc_LEGACY averages the four hard-coded legacy forget concepts and does NOT measure the active target; retain_mean_acc_LEGACY is the historical retain8. Both are retained verbatim for comparability with published tables.",
+ "minutes": 1.3620133837064108
+}

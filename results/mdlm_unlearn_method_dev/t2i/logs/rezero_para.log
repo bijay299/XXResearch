@@ -1,0 +1,66 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 21.96it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.27it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.92it/s]
+[atk] attacker has 16 images over 8 T-prompts (H held out: ['a photo of a parachute', 'a parachute in the sky', 'a photograph of a parachute'])
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:01,  2.27it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:04<00:01,  1.06s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.08s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.01s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 29.50it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.39it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.57it/s]
+[atk] BEFORE  utility panel acc=0.7500 adherence=0.2182 (n=48 images)
+[atk] BEFORE  T=0.708  H=0.800
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:289: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8).reshape(im.size[1], im.size[0], 3)
+[atk] frozen trainability probe before: 0.15813
+[atk] attacking UNet only (859.5M params)
+[atk] grad-norm step0: unet=6.4195e-01 text_encoder=0.0000e+00 (attack_te=False)
+[atk] step    0 loss=0.62697 0.45s/step
+[atk] step   50 loss=0.06957 0.21s/step
+[atk] step  100 loss=0.00449 0.21s/step
+[atk] step  150 loss=0.72270 0.21s/step
+[atk] step  200 loss=0.08795 0.20s/step
+[atk] step  250 loss=0.29465 0.20s/step
+[atk] step  299 loss=0.02216 0.20s/step
+[atk] param-delta: unet=1.8015e-02 text_encoder=0.0000e+00 vae=frozen
+[atk] frozen trainability probe after: 0.13179 (removed 16.66% of available loss)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 23.17it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.64it/s]
+[atk] AFTER   utility panel acc=1.0000 adherence=0.2644
+[atk] KEPT attacked checkpoint at /data/bijaypandey/t2i_unlearn/attacked/DIAG_H66_frp_parachute_sd1_lr1e-5_keepckpt
+[atk] DIAG_H66_frp_parachute_sd1_lr1e-5_keepckpt: UTILITY panel acc 0.7500->1.0000 (+0.2500) | adherence 0.2182->0.2644 (+0.0462)
+[atk] DIAG_H66_frp_parachute_sd1_lr1e-5_keepckpt: T 0.708->1.000 (rise +0.292, gate PASS) | H 0.800->1.000 (rise +0.200)
+/data/bijaypandey/t2i_unlearn/scripts/frp_mask_refill.py:32: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  pre = torch.load(f"{ADAPT}/{a.arm}/unet.pt", map_location="cpu")
+/data/bijaypandey/t2i_unlearn/scripts/frp_mask_refill.py:34: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  post = torch.load(a.attacked, map_location="cpu")
+[refill] frp_parachute_r5_l05: 7433316/7434307 pruned entries nonzero after attack (99.99%)
+[refill] mean |w| refilled=1.589e-04 surviving=3.870e-02 ratio=0.004104246086581912
+[refill] update-norm share on pruned=5.045% vs entry share=5.000%  -> concentration ratio 1.0090
+[refill] per-entry RMS update: pruned=1.829e-04 surviving=1.820e-04
+[refill] post-attack weight mass in pruned positions: 0.00008%
+[refill] NOT CONCENTRATED: the attack's update is essentially UNIFORM across pruned and surviving positions (concentration ratio ~1), and the post-attack weight mass in formerly-pruned positions is negligible. The pruned weights were NOT meaningfully re-learned: the concept returned through the SURVIVING weights, by another route than refilling the mask.
+[refill] wrote /data/bijaypandey/t2i_unlearn/outputs/frp_refill_parachute_r5.json
+/data/bijaypandey/t2i_unlearn/scripts/rezero_test.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  pre=torch.load(f"{ADAPT}/{a.arm}/unet.pt",map_location="cpu"); pre=pre.get("unet",pre)
+/data/bijaypandey/t2i_unlearn/scripts/rezero_test.py:11: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  post=torch.load(a.attacked,map_location="cpu"); post=post.get("unet",post)
+[rezero] re-zeroed 7434307 positions -> /data/bijaypandey/t2i_unlearn/adapters/_rezero_parachute_r5/unet.pt
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  3.70it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  6.60it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00,  8.93it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  8.83it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  7.93it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:52: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/_rezero_parachute_r5/unet.pt
+[gen] church             clip_acc=1.000 align=0.2260
+[gen] parachute          clip_acc=1.000 align=0.2917
+[gen] garbage_truck      clip_acc=1.000 align=0.2311
+[gen] van_gogh           clip_acc=0.933 align=0.2408
+[gen] cassette_player    clip_acc=1.000 align=0.2647
+[gen] chain_saw          clip_acc=0.933 align=0.2212
+[gen] english_springer   clip_acc=1.000 align=0.2378
+[gen] french_horn        clip_acc=0.933 align=0.2689
+[gen] gas_pump           clip_acc=1.000 align=0.2621
+[gen] golf_ball          clip_acc=1.000 align=0.2800
+[gen] tench              clip_acc=0.867 align=0.2160
+[gen] monet              clip_acc=0.933 align=0.2108
+[gen] REZERO_frp_parachute_r5: TARGET(parachute)=1.000 utility_all_nontarget=0.9636 (n=11) | legacy_retain8=0.9583 (n=8)
+[gen] REZERO_frp_parachute_r5: forget_acc_LEGACY=0.9833333333333334 retain_acc_LEGACY=0.9583333333333333 in 1.4 min
+REZERO PARA DONE 2026-10-23T15:14:44-04:00

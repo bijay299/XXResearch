@@ -1,0 +1,53 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  4.76it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  8.84it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00,  8.58it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:01<00:00,  3.18it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:01<00:00,  4.10it/s]
+[frag] scope: 160 linears inside transformer blocks (242.2M params)
+[frag] calibrating FORGET side (16 prompts x 8 timesteps)
+[frag]   calib prompt 1/16
+[frag]   calib prompt 2/16
+[frag]   calib prompt 3/16
+[frag]   calib prompt 4/16
+[frag]   calib prompt 5/16
+[frag]   calib prompt 6/16
+[frag]   calib prompt 7/16
+[frag]   calib prompt 8/16
+[frag]   calib prompt 9/16
+[frag]   calib prompt 10/16
+[frag]   calib prompt 11/16
+[frag]   calib prompt 12/16
+[frag]   calib prompt 13/16
+[frag]   calib prompt 14/16
+[frag]   calib prompt 15/16
+[frag]   calib prompt 16/16
+[frag] calibrating RETAIN side (16 prompts x 8 timesteps)
+[frag]   calib prompt 1/16
+[frag]   calib prompt 2/16
+[frag]   calib prompt 3/16
+[frag]   calib prompt 4/16
+[frag]   calib prompt 5/16
+[frag]   calib prompt 6/16
+[frag]   calib prompt 7/16
+[frag]   calib prompt 8/16
+[frag]   calib prompt 9/16
+[frag]   calib prompt 10/16
+[frag]   calib prompt 11/16
+[frag]   calib prompt 12/16
+[frag]   calib prompt 13/16
+[frag]   calib prompt 14/16
+[frag]   calib prompt 15/16
+[frag]   calib prompt 16/16
+[frag] positions per layer: forget=8192 retain=8192 (paper: 128x256 = 32768 per side)
+[frag] base importance tensors built (||F||=8.1151e+02 ||R||=1.2725e+03)
+/data/bijaypandey/t2i_unlearn/scripts/frag_predictor.py:135: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(ck, map_location="cpu")
+[frag] adv_church                         A_f=0.1178 A_r=0.1039 FRAG=+0.0139 l2=1.859e+00
+[frag] esd_church                         A_f=0.3943 A_r=0.2704 FRAG=+0.1239 l2=2.923e+00
+[frag] h48_adv_a0.3                       A_f=0.8402 A_r=0.5799 FRAG=+0.2603 l2=2.339e+02
+[frag] h50_adv_a0.5                       A_f=0.8402 A_r=0.5796 FRAG=+0.2606 l2=3.908e+02
+[frag] h64v2_frag_a0.3_church             A_f=0.4130 A_r=0.2790 FRAG=+0.1341 l2=3.143e+02
+[frag] h64v2_frag_a0.3_parachute          A_f=0.4141 A_r=0.2832 FRAG=+0.1309 l2=3.131e+02
+[frag] uce_church                         A_f=0.0836 A_r=0.0702 FRAG=+0.0133 l2=5.390e+01
+[frag] undo_a0.5_big                      A_f=0.8397 A_r=0.5797 FRAG=+0.2599 l2=3.924e+02
+
+[frag] scored 8 arms; 0 have a bit-identical UNet (FRAG undefined); 0 errors
+[frag] wrote /data/bijaypandey/t2i_unlearn/outputs/frag_scores_church.json in 13.5 min

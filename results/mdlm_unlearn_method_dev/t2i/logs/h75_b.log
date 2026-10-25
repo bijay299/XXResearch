@@ -1,0 +1,43 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 19.07it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 19.08it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.19it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 23.21it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.30it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:01<00:01,  1.97it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:06<00:01,  1.43s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:07<00:00,  1.36s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:07<00:00,  1.25s/it]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 28.75it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.29it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.44it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 28.24it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 10.81it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.90it/s]
+[db] BEFORE (identifier prompts) T=0.250 H=0.133 util=0.9792
+/data/bijaypandey/t2i_unlearn/scripts/attack_dreambooth.py:118: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[db] step    0 inst=0.28494 prior=0.01712 0.57s/step
+[db] step   50 inst=0.36347 prior=0.85907 0.36s/step
+[db] step  100 inst=0.26260 prior=0.00683 0.36s/step
+[db] step  150 inst=0.00524 prior=0.01478 0.36s/step
+[db] step  200 inst=0.00353 prior=0.13573 0.36s/step
+[db] step  250 inst=0.04260 prior=0.09446 0.36s/step
+[db] step  299 inst=0.01373 prior=0.04755 0.36s/step
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 22.79it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.24it/s]
+[db] H75_dbutil_frp_church_pw0_sd0: T 0.250->1.000 (gate PASS) | H 0.133->1.000
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 22.48it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.18it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.00it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 13.29it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 11.62it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.52it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:01<00:01,  2.64it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:02<00:01,  1.85it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:05<00:01,  1.62s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.01s/it]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 17.60it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 14.81it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.85it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  8.78it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 10.28it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 10.82it/s]
+[db] BEFORE (identifier prompts) T=0.250 H=0.333 util=0.9583
+/data/bijaypandey/t2i_unlearn/scripts/attack_dreambooth.py:118: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[db] step    0 inst=0.10712 prior=0.17074 0.59s/step
+[db] step   50 inst=0.61715 prior=0.03498 0.36s/step
+[db] step  100 inst=0.01379 prior=0.05934 0.36s/step
+[db] step  150 inst=0.32573 prior=0.09730 0.36s/step
+[db] step  200 inst=0.20713 prior=0.07144 0.36s/step
+[db] step  250 inst=0.37821 prior=0.40726 0.36s/step
+[db] step  299 inst=0.16974 prior=0.03487 0.36s/step
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 16.01it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 13.94it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.57it/s]
+[db] H75_dbutil_frp_church_pw0_sd1: T 0.250->1.000 (gate PASS) | H 0.333->1.000
+U B DONE 2026-10-24T12:09:18-04:00

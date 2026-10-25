@@ -1,0 +1,11 @@
+/data/bijaypandey/t2i_unlearn/scripts/redundancy_sweep.py:23: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  post=torch.load(a.attacked,map_location="cpu"); post=post.get("unet",post)
+[redun] random    frac=0.03 n= 4,460,544 target=0.3333 retain8=0.6083
+[redun] random    frac=0.10 n=14,868,480 target=0.3333 retain8=0.2083
+[redun] random    frac=0.25 n=37,171,200 target=0.4000 retain8=0.0583
+[redun] random    frac=0.50 n=74,342,400 target=0.2000 retain8=0.0417
+[redun] magnitude frac=0.03 n= 4,460,544 target=0.6000 retain8=0.0917
+[redun] magnitude frac=0.10 n=14,868,480 target=0.4000 retain8=0.0417
+[redun] magnitude frac=0.25 n=37,171,200 target=0.2000 retain8=0.0167
+[redun] magnitude frac=0.50 n=74,342,400 target=0.1333 retain8=0.0167
+ERASED PARA DONE 2026-10-23T17:14:46-04:00

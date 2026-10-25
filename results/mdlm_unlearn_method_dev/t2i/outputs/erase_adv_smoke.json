@@ -1,0 +1,27 @@
+{
+ "study": "t2i_adv_erase_reimpl",
+ "label": "adv_smoke",
+ "concept": "church",
+ "hparams": {
+  "concept": "church",
+  "mode": "esd_x",
+  "eta": 1.0,
+  "steps": 15,
+  "lr": 1e-05,
+  "adv_steps": 3,
+  "adv_lr": 0.01,
+  "adv_eps": 0.5,
+  "lam_preserve": 1.0,
+  "ddim_steps": 50,
+  "guidance": 3.0,
+  "seed": 0,
+  "log_every": 5,
+  "label": "adv_smoke",
+  "out": "/data/bijaypandey/claude_tmp/claude-1011/-home-bijaypandey/33ead906-ab98-4350-9600-f0d55e1bc712/scratchpad/adv_smoke"
+ },
+ "erase_first50": 0.001259628053715763,
+ "erase_last50": 0.001259628053715763,
+ "pres_last50": 7.1062430265556035e-06,
+ "minutes": 0.7388355294863383,
+ "note": "OUR RE-IMPLEMENTATION in the spirit of Receler 2311.17717 / AdvUnlearn 2405.15234; adversarial embedding neighbourhood, not their exact adapters or text-encoder training. Published numbers not claimed."
+}

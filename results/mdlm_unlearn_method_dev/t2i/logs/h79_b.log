@@ -1,0 +1,39 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  8.82it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  8.71it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.44it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:03,  1.32it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:07<00:09,  3.02s/it]Loading pipeline components...:  67%|██████▋   | 4/6 [00:09<00:04,  2.47s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.54s/it]
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+[ti] placeholder <atk0> id=49408 init from 'photo'; trainable 768 scalars = 0.000089% of the UNet
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  7.98it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  7.60it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.64it/s]
+[ti] BEFORE (placeholder prompts) T=0.542 H=0.600
+/data/bijaypandey/t2i_unlearn/scripts/attack_ti.py:130: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[ti] step     0 loss=0.18158 0.283s/step
+[ti] step   200 loss=0.01345 0.119s/step
+[ti] step   400 loss=0.20568 0.119s/step
+[ti] step   600 loss=0.35203 0.119s/step
+[ti] step   800 loss=0.59781 0.119s/step
+[ti] step   999 loss=0.01017 0.119s/step
+[ti] ||delta placeholder embedding|| = 4.0674e+00
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  4.79it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  5.71it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 10.17it/s]
+[ti] H79_ti_advu_vangogh_sd6: T 0.542->1.000 (gate PASS) | H 0.600->1.000
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  7.96it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 12.45it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 13.61it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.41it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:01<00:08,  1.62s/it]Loading pipeline components...:  33%|███▎      | 2/6 [00:03<00:06,  1.52s/it]Loading pipeline components...:  83%|████████▎ | 5/6 [00:08<00:01,  1.83s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:08<00:00,  1.49s/it]
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+[ti] placeholder <atk0> id=49408 init from 'photo'; trainable 768 scalars = 0.000089% of the UNet
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.62it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 13.09it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.51it/s]
+[ti] BEFORE (placeholder prompts) T=0.417 H=0.067
+/data/bijaypandey/t2i_unlearn/scripts/attack_ti.py:130: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[ti] step     0 loss=0.06981 0.291s/step
+[ti] step   200 loss=0.00710 0.120s/step
+[ti] step   400 loss=0.09769 0.119s/step
+[ti] step   600 loss=0.31997 0.119s/step
+[ti] step   800 loss=0.64416 0.119s/step
+[ti] step   999 loss=0.01178 0.119s/step
+[ti] ||delta placeholder embedding|| = 3.8313e+00
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  2.84it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  7.53it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00,  9.67it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  9.74it/s]
+[ti] H79_ti_advu_parachute_sd6: T 0.417->1.000 (gate PASS) | H 0.067->1.000
+TIVG B DONE 2026-10-24T15:15:54-04:00

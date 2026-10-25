@@ -1,0 +1,45 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  8.92it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.94it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.54it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:02,  1.54it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:02<00:01,  1.39it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.90s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.57s/it]
+[lora] injected into 32 linears (scope=all_attn); trainable 0.799M of 859.5M UNet params = 0.093%
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  8.83it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.89it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.47it/s]
+[lora] BEFORE T=0.458 H=0.467 util=1.0000
+/data/bijaypandey/t2i_unlearn/scripts/attack_lora.py:156: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[lora] grad-norm step0 (LoRA only) = 1.2243e-02
+[lora] step    0 loss=0.14733 0.31s/step
+[lora] step   50 loss=0.77512 0.12s/step
+[lora] step  100 loss=0.38037 0.11s/step
+[lora] step  150 loss=0.09727 0.11s/step
+[lora] step  200 loss=0.78842 0.11s/step
+[lora] step  250 loss=0.03078 0.11s/step
+[lora] step  299 loss=0.22313 0.11s/step
+[lora] ||delta LoRA params|| = 1.6285e+01
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  8.94it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.99it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.58it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[lora] H71V_advu_sd0_lr1e-3_all_attn: T 0.458->0.958 (gate PASS) | H 0.467->1.000 | util 1.0000->0.8333
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 20.50it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.51it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.17it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:01<00:01,  1.91it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:03<00:00,  1.60it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:08<00:00,  2.00s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:08<00:00,  1.50s/it]
+[lora] injected into 32 linears (scope=all_attn); trainable 0.799M of 859.5M UNet params = 0.093%
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 17.17it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.07it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.34it/s]
+[lora] BEFORE T=0.417 H=0.533 util=1.0000
+/data/bijaypandey/t2i_unlearn/scripts/attack_lora.py:156: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[lora] grad-norm step0 (LoRA only) = 2.5328e-02
+[lora] step    0 loss=0.55448 0.29s/step
+[lora] step   50 loss=0.13808 0.12s/step
+[lora] step  100 loss=0.01071 0.11s/step
+[lora] step  150 loss=0.82008 0.11s/step
+[lora] step  200 loss=0.18548 0.11s/step
+[lora] step  250 loss=0.24775 0.11s/step
+[lora] step  299 loss=0.03236 0.11s/step
+[lora] ||delta LoRA params|| = 1.5158e+01
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 14.89it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 16.20it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.16it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[lora] H71V_advu_sd1_lr1e-3_all_attn: T 0.417->0.958 (gate PASS) | H 0.533->1.000 | util 1.0000->0.8333
+VG B DONE 2026-10-24T04:14:21-04:00

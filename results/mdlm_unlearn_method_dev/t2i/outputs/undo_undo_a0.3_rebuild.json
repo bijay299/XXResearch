@@ -1,0 +1,25 @@
+{
+ "study": "t2i_undo",
+ "label": "undo_a0.3_rebuild",
+ "teacher": "adapters/uce_church/unet.pt",
+ "hparams": {
+  "teacher": "adapters/uce_church/unet.pt",
+  "concept": "church",
+  "alpha": 0.3,
+  "beta": 0.1,
+  "protect": "retain_fisher",
+  "fisher_batches": 16,
+  "steps": 1500,
+  "lr": 1e-05,
+  "n_images": 48,
+  "forget_frac": 0.34,
+  "seed": 0,
+  "log_every": 1500,
+  "label": "undo_a0.3_rebuild",
+  "out": "adapters/undo_a0.3_rebuild"
+ },
+ "n_forget_in_pool": 16,
+ "distil_loss_first50": 0.11959669835865498,
+ "distil_loss_last50": 0.009125097672804259,
+ "minutes": 6.244020676612854
+}

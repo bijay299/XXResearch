@@ -1,0 +1,46 @@
+{
+ "study": "t2i_relearn_attack",
+ "label": "TRAIN_undo_a0.5_big_tench_s300_lr1e-5",
+ "unet": "adapters/undo_a0.5_big/unet.pt",
+ "concept": "tench",
+ "hparams": {
+  "unet": "adapters/undo_a0.5_big/unet.pt",
+  "concept": "tench",
+  "steps": 300,
+  "lr": 1e-05,
+  "n_images": 16,
+  "gate": 0.2,
+  "eval_n": 5,
+  "eval_steps": 25,
+  "seed": 0,
+  "label": "TRAIN_undo_a0.5_big_tench_s300_lr1e-5"
+ },
+ "T_prompts": [
+  "a tench",
+  "a tench held by an angler",
+  "a large tench fish",
+  "a tench in murky water",
+  "a freshwater tench",
+  "a tench on a riverbank",
+  "a green tench fish",
+  "a tench close up"
+ ],
+ "H_prompts": [
+  "a photo of a tench",
+  "a tench fish",
+  "a photograph of a tench fish"
+ ],
+ "attack_validity": {
+  "T_before": 0.0,
+  "T_after": 0.5416666666666666,
+  "T_rise": 0.5416666666666666,
+  "gate": 0.2,
+  "valid": true,
+  "meaning": "the attack must relearn the prompts it was TRAINED on; if T does not rise, a flat H is not evidence of robustness"
+ },
+ "recovery": {
+  "H_before": 0.0,
+  "H_after": 0.3333333333333333,
+  "absolute_rise": 0.3333333333333333
+ }
+}

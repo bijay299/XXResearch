@@ -1,0 +1,19 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  8.14it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 15.22it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.58it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:03<00:19,  3.95s/it]Loading pipeline components...:  67%|██████▋   | 4/6 [00:04<00:01,  1.01it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:05<00:01,  1.03s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.01s/it]
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+[ti] placeholder <atk0> id=49408 init from 'photo'; trainable 768 scalars = 0.000089% of the UNet
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  8.06it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 15.50it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.18it/s]
+[ti] BEFORE (placeholder prompts) T=0.125 H=0.067
+/data/bijaypandey/t2i_unlearn/scripts/attack_ti.py:130: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[ti] step     0 loss=0.10612 0.319s/step
+[ti] step   200 loss=0.00968 0.119s/step
+[ti] step   400 loss=0.13870 0.119s/step
+[ti] step   600 loss=0.29874 0.119s/step
+[ti] step   800 loss=0.50621 0.119s/step
+[ti] step   999 loss=0.00806 0.119s/step
+[ti] ||delta placeholder embedding|| = 3.7034e+00
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  8.13it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 11.71it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.97it/s]
+[ti] H76N_ti_advu_tench_sd6: T 0.125->1.000 (gate PASS) | H 0.067->1.000

@@ -1,0 +1,59 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  6.85it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 15.74it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.54it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.64it/s]
+[atk] attacker has 16 images over 8 T-prompts (H held out: ['a photo of a church', 'a church building', 'a photograph of a church exterior'])
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:01<00:09,  1.83s/it]Loading pipeline components...:  33%|███▎      | 2/6 [00:03<00:06,  1.56s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.62s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.62s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  2.53it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00,  9.42it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 10.85it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  9.09it/s]
+[atk] BEFORE  utility panel acc=0.7917 adherence=0.2521 (n=48 images)
+[atk] BEFORE  T=0.375  H=0.333
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:289: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8).reshape(im.size[1], im.size[0], 3)
+[atk] frozen trainability probe before: 0.16273
+[atk] attacking UNet only (859.5M params)
+[atk] grad-norm step0: unet=2.4537e-01 text_encoder=0.0000e+00 (attack_te=False)
+[atk] step    0 loss=0.10245 0.45s/step
+[atk] step    9 loss=0.01514 0.23s/step
+[atk] param-delta: unet=3.8970e-03 text_encoder=0.0000e+00 vae=frozen
+[atk] frozen trainability probe after: 0.16274 (removed -0.00% of available loss)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  3.89it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.29it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.60it/s]
+[atk] AFTER   utility panel acc=0.8125 adherence=0.2407
+[atk] KEPT attacked checkpoint at /data/bijaypandey/t2i_unlearn/attacked/DOSE2_h68rf_church_s10
+[atk] DOSE2_h68rf_church_s10: UTILITY panel acc 0.7917->0.8125 (+0.0208) | adherence 0.2521->0.2407 (-0.0113)
+[atk] DOSE2_h68rf_church_s10: T 0.375->0.875 (rise +0.500, gate PASS) | H 0.333->0.867 (rise +0.533)
+/data/bijaypandey/t2i_unlearn/scripts/redundancy_sweep.py:26: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  post=torch.load(a.attacked,map_location="cpu"); post=post.get("unet",post)
+[redun] random    frac=0.15 n=22,302,720 target=0.2667 retain8=0.2917
+[redun] random    frac=0.17 n=25,276,416 target=0.2000 retain8=0.1333
+[redun] random    frac=0.20 n=29,736,960 target=0.0000 retain8=0.0250
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  6.22it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 17.12it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.53it/s]
+[atk] attacker has 16 images over 8 T-prompts (H held out: ['a photo of a church', 'a church building', 'a photograph of a church exterior'])
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:01<00:05,  1.12s/it]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:03,  1.02it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.18s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.16s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.92it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 21.41it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.43it/s]
+[atk] BEFORE  utility panel acc=0.7917 adherence=0.2521 (n=48 images)
+[atk] BEFORE  T=0.375  H=0.333
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:289: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8).reshape(im.size[1], im.size[0], 3)
+[atk] frozen trainability probe before: 0.16273
+[atk] attacking UNet only (859.5M params)
+[atk] grad-norm step0: unet=2.4537e-01 text_encoder=0.0000e+00 (attack_te=False)
+[atk] step    0 loss=0.10245 0.46s/step
+[atk] step   19 loss=0.00325 0.22s/step
+[atk] param-delta: unet=5.2856e-03 text_encoder=0.0000e+00 vae=frozen
+[atk] frozen trainability probe after: 0.16205 (removed 0.42% of available loss)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  6.06it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.91it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.50it/s]
+[atk] AFTER   utility panel acc=0.8333 adherence=0.2498
+[atk] KEPT attacked checkpoint at /data/bijaypandey/t2i_unlearn/attacked/DOSE2_h68rf_church_s20
+[atk] DOSE2_h68rf_church_s20: UTILITY panel acc 0.7917->0.8333 (+0.0417) | adherence 0.2521->0.2498 (-0.0023)
+[atk] DOSE2_h68rf_church_s20: T 0.375->0.917 (rise +0.542, gate PASS) | H 0.333->0.867 (rise +0.533)
+/data/bijaypandey/t2i_unlearn/scripts/redundancy_sweep.py:26: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  post=torch.load(a.attacked,map_location="cpu"); post=post.get("unet",post)
+[redun] random    frac=0.15 n=22,302,720 target=0.1333 retain8=0.3583
+[redun] random    frac=0.17 n=25,276,416 target=0.1333 retain8=0.1500
+[redun] random    frac=0.20 n=29,736,960 target=0.0000 retain8=0.0500
+DOSE2 A DONE 2026-10-23T22:54:42-04:00

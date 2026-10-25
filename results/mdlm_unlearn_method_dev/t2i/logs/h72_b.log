@@ -1,0 +1,43 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  9.30it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 10.54it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.16it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:06<00:12,  3.22s/it]Loading pipeline components...:  50%|█████     | 3/6 [00:07<00:07,  2.44s/it]Loading pipeline components...:  67%|██████▋   | 4/6 [00:09<00:04,  2.17s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.58s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+[ti] placeholder <atk0> id=49408 init from 'photo'; trainable 768 scalars = 0.000089% of the UNet
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  9.23it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00,  8.45it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.76it/s]
+[ti] BEFORE (placeholder prompts) T=0.250 H=0.067
+/data/bijaypandey/t2i_unlearn/scripts/attack_ti.py:130: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[ti] step     0 loss=0.14812 0.276s/step
+[ti] step   200 loss=0.02618 0.119s/step
+[ti] step   400 loss=0.05858 0.119s/step
+[ti] step   600 loss=0.02736 0.119s/step
+[ti] step   800 loss=0.02336 0.119s/step
+[ti] step   999 loss=0.07819 0.119s/step
+[ti] ||delta placeholder embedding|| = 4.0211e+00
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  8.98it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00,  7.98it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.09it/s]
+[ti] H72_ti_frp_church_sd0: T 0.250->0.500 (gate PASS) | H 0.067->0.200
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 21.55it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.33it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.08it/s]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:01<00:07,  1.45s/it]Loading pipeline components...:  83%|████████▎ | 5/6 [00:03<00:00,  1.60it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:10<00:00,  2.06s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:10<00:00,  1.69s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+The new embeddings will be initialized from a multivariate normal distribution that has old embeddings' mean and covariance. As described in this article: https://nlp.stanford.edu/~johnhew/vocab-expansion.html. To disable this, use `mean_resizing=False`
+[ti] placeholder <atk0> id=49408 init from 'photo'; trainable 768 scalars = 0.000089% of the UNet
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 25.31it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.86it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.88it/s]
+[ti] BEFORE (placeholder prompts) T=0.250 H=0.267
+/data/bijaypandey/t2i_unlearn/scripts/attack_ti.py:130: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[ti] step     0 loss=0.31406 0.280s/step
+[ti] step   200 loss=0.28526 0.119s/step
+[ti] step   400 loss=0.03307 0.119s/step
+[ti] step   600 loss=0.21716 0.119s/step
+[ti] step   800 loss=0.11528 0.119s/step
+[ti] step   999 loss=0.12112 0.119s/step
+[ti] ||delta placeholder embedding|| = 3.7424e+00
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 21.99it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 10.62it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.50it/s]
+[ti] H72_ti_frp_church_sd1: T 0.250->0.625 (gate PASS) | H 0.267->0.667
+TI B DONE 2026-10-24T05:15:46-04:00
