@@ -1,4 +1,35 @@
-# Finding 62 — the bounded correction produced the **best erasure/utility point of the entire phase** — target 0.0667 at retain **0.9500**, beating FRP on *both* axes — and it is **still fully reversed to H = 1.000**.
+# Finding 62 — ❌ **HEADLINE CORRECTED.** I reported "the best erasure/utility point of the entire phase, beating FRP on both axes". **Seed replication refutes the both-axes claim**: target is 0.1778 ± 0.1018 at n=3, *worse* than FRP's 0.1333 on erasure depth. What survives is better **retention** (0.9639 ± 0.0127 vs 0.9417) — and the arm is **still fully reversed to H = 1.000**.
+
+> ## ⚠ CORRECTION, same day — the seeds I asked for arrived and refuted §1
+>
+> §4 of this finding flagged its own weakest point: *"the as-is claim rests on a single build per
+> λ_reg and would need seeds before being called a stable operating point."* Two more seeds at
+> λ_reg = 100:
+>
+> | seed | target | retain8 |
+> |---|---|---|
+> | 0 (the published build) | **0.0667** | 0.9500 |
+> | 1 | **0.2667** | 0.9750 |
+> | 2 | **0.2000** | 0.9667 |
+> | **n=3** | **0.1778 ± 0.1018** | **0.9639 ± 0.0127** |
+>
+> **Target scatters 4× across seeds (0.0667 → 0.2667) and seed 0 was the most favourable of the
+> three.** At n=3 the arm's mean target of 0.1778 is **worse** than the FRP teacher's 0.1333, so
+> **"beats FRP on both axes" is withdrawn.**
+>
+> **What survives, and it is narrower:** retention is both **high and stable** — 0.9639 ± 0.0127
+> against FRP's 0.9417 — while erasure depth is **unstable** and not better on average. So the
+> weight-space anchor buys *reliable retention*, not deeper erasure. That is a real but much smaller
+> claim than the one published.
+>
+> **This is the AFC pattern repeating, in the line where it was first measured.** The MDLM arm's TV
+> sd was 0.005 at n=3 and 0.158 at n=5 (`RESULTS.md` retraction); here a single build looked like the
+> phase's best point and three builds show it was a lucky draw. The lesson both times: **a
+> single-build operating point is not an operating point.**
+>
+> §2's robustness result is **unaffected** — H = 1.000 on 7 of 7 valid attacks across all three
+> λ_reg arms, and seed 0's arm is among them. Nothing about the reversal depended on the as-is
+> numbers.
 
 **Date:** 2026-10-25 · **Corrects and completes:** `FINDING61` (the from-scratch null)
 **Method:** weight-space-regularised erasure, our adaptation of the idea in arXiv 2505.22310, with
@@ -18,7 +49,7 @@ erasure with a **bounded** distillation term.
 |---|---|---|---|
 | `wsr2_church_lr1` | 0.1333 | 0.9417 | identical — the anchor is a **no-op** at λ_reg = 1 |
 | `wsr2_church_lr10` | **0.0667** | 0.9000 | 2× deeper erasure, 0.042 less retention |
-| **`wsr2_church_lr100`** | **0.0667** | **0.9500** | **2× deeper erasure AND higher retention** |
+| **`wsr2_church_lr100`** (seed 0) | **0.0667** | **0.9500** | ⚠ **single build — see the correction above; at n=3 this is 0.1778 ± 0.1018 / 0.9639 ± 0.0127** |
 
 **`wsr2_church_lr100` is the best erasure/utility operating point this phase has produced.** It
 beats our FRP port — itself the deepest published-method arm here (`FINDING43`) — on **both** axes
