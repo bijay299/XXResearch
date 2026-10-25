@@ -187,13 +187,17 @@ the asymmetry could be a utility effect rather than a trap effect.
 > | arm | retain8 | TI runs | T | gate |
 > |---|---|---|---|---|
 > | **Meta-Unlearning λ=0.5** | **0.6333** | 3 | **falls** every time (−0.083 to −0.208) | ❌ **0/3** |
-> | **GIFT β=1.3** | **0.6083** | 2 | 0.250 → 1.000 (+0.750); 0.417 → 1.000 (+0.583) | ✅ **2/2** |
+> | **GIFT β=1.35** | **0.6000** | 1 | 0.208 → 1.000 (**+0.792**) | ✅ **1/1** |
+> | **GIFT β=1.3** | **0.6083** | 3 | +0.750, +0.583, +0.833 | ✅ **3/3** |
 > | GIFT β=1.0 | 0.7833 | 2 | 0.333 → 1.000 (+0.667) ×2 | ✅ 2/2 |
 > | λ=0.0 ablation | 0.9417 | 2 | +0.208, +0.542 | ✅ 2/2 |
 >
 > **At essentially identical retained utility — 0.6083 vs 0.6333 — Textual Inversion trains to
 > completion on GIFT and cannot get off the ground on the meta arm.** Reading 2 (low utility breaks
-> TI) is **eliminated**: a *lower*-utility arm supports a perfectly valid TI attack. Reading 1 — the
+> TI) is **eliminated**, and GIFT β=1.35 makes the elimination airtight: at retain8 **0.6000**,
+> *below* this arm's 0.6333, TI is still valid with the **largest T rise of any run (+0.792)**. Four
+> of four matched runs valid, every one reaching H = 1.000. Lower utility than the meta arm does not
+> merely fail to break TI — it hosts the strongest TI attack measured. Reading 1 — the
 > meta trigger specifically obstructs embedding-space optimisation — now stands on a matched
 > control, and GIFT is the right comparator for it, being also bi-level and also editing
 > cross-attention.
