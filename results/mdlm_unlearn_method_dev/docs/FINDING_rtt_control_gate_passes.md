@@ -55,7 +55,7 @@ the other gated budgets:
 
 | budget | T rise | T as fraction of θ₀ | MDU/EMDU recovery on H | **AFC recovery on H** |
 |---|---|---|---|---|
-| **lr 1e-5, 200 steps (this one)** | +0.2333 | **0.314** | 8.99% | *running* |
+| **lr 1e-5, 200 steps (this one)** | +0.2333 | **0.314** | 8.99% | **−9.52%** (see §4) |
 | lr 3e-5, 300 steps (`*_v3`) | +0.475 | 0.619 | 45.6% | **35.3%** |
 | 600 steps (`h37_sup_*`) | +0.66 … +0.71 | — | 51–68% | **47–62.7%** |
 
