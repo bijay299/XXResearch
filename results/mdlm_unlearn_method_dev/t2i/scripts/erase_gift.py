@@ -112,13 +112,20 @@ def main():
     s_prompts = (undo.RETAIN_POOL * ((a.n_safe // max(len(undo.RETAIN_POOL), 1)) + 1))[:a.n_safe]
 
     g = torch.Generator(device=dev).manual_seed(a.seed)
-    print(f"[gift] generating D_M: {a.n_images} images of '{a.concept}'", flush=True)
-    with torch.no_grad():
-        m_imgs = pipe(m_prompts, num_inference_steps=25, guidance_scale=7.5,
-                      generator=g, output_type="pt").images
-        print(f"[gift] generating D_S: {a.n_safe} safe images", flush=True)
-        s_imgs = pipe(s_prompts, num_inference_steps=25, guidance_scale=7.5,
-                      generator=g, output_type="pt").images
+
+    def generate(prompts, tag, chunk=4):
+        """Generate in CHUNKS. Passing all prompts at once put a 64-image batch through the VAE
+        decoder's upsampling convs and OOM'd at a 16 GiB single allocation on a 40 GiB card."""
+        out = []
+        with torch.no_grad():
+            for i in range(0, len(prompts), chunk):
+                out.append(pipe(prompts[i:i + chunk], num_inference_steps=25, guidance_scale=7.5,
+                                generator=g, output_type="pt").images.cpu())
+                print(f"[gift] {tag}: {min(i+chunk, len(prompts))}/{len(prompts)}", flush=True)
+        return torch.cat(out)
+
+    m_imgs = generate(m_prompts, f"D_M '{a.concept}'")
+    s_imgs = generate(s_prompts, "D_S safe")
 
     def latents_of(imgs):
         z = []

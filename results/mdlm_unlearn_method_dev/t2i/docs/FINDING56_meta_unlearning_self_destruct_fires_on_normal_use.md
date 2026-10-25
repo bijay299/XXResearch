@@ -207,12 +207,29 @@ could exist, given K2 fails at 1.0 and the trap bought nothing at 0.5.
 > would have missed this entirely, which is the argument for running the finer sweep rather than
 > reasoning about it.
 >
-> **This does not yet rescue the method.** Full target suppression at retain 0.70 is still below the
-> mandate's 0.85 floor, and §3's finding — that the trap bought **zero** robustness over its own
-> ablation at λ=0.5 — is about *robustness*, which these as-is numbers do not address. The frozen-grid
-> attacks on λ=0.6 and λ=0.7 are running; until they land, **no robustness claim is made for any arm
-> in this interval.** What is now wrong is only my §6 expectation that the interval held nothing
-> usable.
+> **This does not rescue the method, and the attacks have now confirmed that.** Full target
+> suppression at retain 0.70 is still below the mandate's 0.85 floor, and §3's finding — that the
+> trap bought **zero** robustness over its own ablation — concerns *robustness*, which as-is numbers
+> cannot address.
+>
+> **λ = 0.6, frozen grid at lr 1e-5, 3 / 3 gate-passing:**
+>
+> | seed | T rise | gate | target H | post-attack utility |
+> |---|---|---|---|---|
+> | 0 | **+1.000** | ✅ | 0.000 → **1.000** | 0.708 → **0.979** |
+> | 1 | **+0.875** | ✅ | 0.000 → **1.000** | 0.667 → **1.000** |
+> | 6 | **+1.000** | ✅ | 0.000 → **1.000** | 0.667 → **1.000** |
+>
+> **Every attack reaches the ceiling, and every attack also *repairs* the trap's utility damage** —
+> the same inversion §3a documented at λ=0.5, now reproduced at the sweep's better operating point.
+> An arm at target 0.0000 before the attack is at 1.000 after it, with *more* benign capability than
+> it started with.
+>
+> So the conclusion of §3 extends across the **entire usable λ window**: 0.5, 0.6 and (pending) 0.7
+> all reach max-over-valid H = 1.000. The finer sweep bought better as-is numbers and **no
+> robustness whatsoever.** What was wrong was only my §6 expectation that the interval held nothing
+> usable; the robustness verdict is unchanged and now rests on more arms, not fewer. λ=0.7's grid is
+> in flight and will be reported whichever way it lands.
 
 ## 7. Scope
 
