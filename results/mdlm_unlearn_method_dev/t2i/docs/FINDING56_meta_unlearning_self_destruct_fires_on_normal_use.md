@@ -178,11 +178,40 @@ readings remain open and these data do not separate them:
 
 Distinguishing them needs a TI attack on a **non-meta arm at matched utility** — the ablation sits at
 retain 0.9417, far above λ=0.5's 0.6333, so the present control is not utility-matched and part of
-the asymmetry could be a utility effect rather than a trap effect. That is the honest next
-measurement and it is recorded here as **not done**.
+the asymmetry could be a utility effect rather than a trap effect.
 
-**The accurate summary: this phase still has no valid TI measurement on the meta arm, and now has
-strong evidence that no attainable TI budget will produce one.**
+> ✅ **THE MATCHED CONTROL RAN, AND IT ELIMINATES THE UTILITY EXPLANATION (2026-10-25).** GIFT
+> β=1.3 (`FINDING58`) sits at retain8 **0.6083** against this arm's **0.6333** — a gap of 0.025,
+> against the ablation's gap of 0.308. Identical TI budgets:
+>
+> | arm | retain8 | TI runs | T | gate |
+> |---|---|---|---|---|
+> | **Meta-Unlearning λ=0.5** | **0.6333** | 3 | **falls** every time (−0.083 to −0.208) | ❌ **0/3** |
+> | **GIFT β=1.3** | **0.6083** | 2 | 0.250 → 1.000 (+0.750); 0.417 → 1.000 (+0.583) | ✅ **2/2** |
+> | GIFT β=1.0 | 0.7833 | 2 | 0.333 → 1.000 (+0.667) ×2 | ✅ 2/2 |
+> | λ=0.0 ablation | 0.9417 | 2 | +0.208, +0.542 | ✅ 2/2 |
+>
+> **At essentially identical retained utility — 0.6083 vs 0.6333 — Textual Inversion trains to
+> completion on GIFT and cannot get off the ground on the meta arm.** Reading 2 (low utility breaks
+> TI) is **eliminated**: a *lower*-utility arm supports a perfectly valid TI attack. Reading 1 — the
+> meta trigger specifically obstructs embedding-space optimisation — now stands on a matched
+> control, and GIFT is the right comparator for it, being also bi-level and also editing
+> cross-attention.
+>
+> **So this is a real, isolated effect of the meta objective, and the only thing in this phase where
+> a defence demonstrably interfered with an adversary's optimisation** rather than merely delaying
+> the outcome.
+>
+> ⚠ **It is still not robustness, and `FINDING20` still says why.** A failed gate means the attack
+> did not work; it does not license "the defence held". And the effect is **adversary-specific and
+> narrow**: the same arm is reversed to H = 1.000 by full-UNet relearning on 6 of 6 valid attacks
+> (§3). The honest statement is that Meta-Unlearning's trigger blocks the 768-scalar embedding
+> attack and is irrelevant against the 859.5M-parameter weight-space one — which is the opposite of
+> the threat ordering a defender would want.
+
+**The accurate summary: this phase still has no valid TI measurement on the meta arm, has strong
+evidence that no attainable TI budget will produce one, and — per the matched control above — now
+knows that this is caused by the meta objective and not by the arm's reduced utility.**
 
 ## 6. What this closes and does not close
 
