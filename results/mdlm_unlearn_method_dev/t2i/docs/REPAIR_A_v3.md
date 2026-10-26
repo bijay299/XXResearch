@@ -777,9 +777,256 @@ the tests.
 | GPUs 2–3 unreachable, incl. copied-nvidia-smi test mode | **measured** (T33, §6.3) |
 | failures reach a non-zero final status | **measured** (T34) |
 | D-047 lockdir / knob validation / default-deny | **measured** (§6.2) |
-| the lock covers the real `accelerate launch` CUDA process | **sound by construction only** — `subprocess(close_fds=True)` gap is real (§1.4 M2); needs a lead-launched GPU run |
+| the lock alone covers the real `accelerate launch` CUDA process | **DISPROVED** — `subprocess(close_fds=True)` drops the descriptor (§1.4 M2, §7.1). Superseded by the row below. |
+| a `close_fds` survivor is refused at acquire time by the OCCUPANCY gate | **measured** (T35a: lock FREE, acquire still refuses) with the driver's compute-apps row mocked; the surviving process, its pid and its zero descriptors are real (§7.2, §7.4) |
+| upstream's `Popen` workers are actually VISIBLE to `--query-compute-apps` | **not verified** — the occupancy gate's one assumption; needs a lead-launched GPU run (§7.4 item 1) |
+| no cleanup path can prematurely release a shared-lifetime lock | **measured** (T35c, plus a source-level assertion that only fd 9 is ever `flock -u`'d) |
 | `GPU_RESERVE_CVD_STYLE=uuid` works on a real driver | **never executed**; index remains the default for that reason |
 | truncated-checkpoint reuse is refused | **measured** on the real 511 MB artifact (§2.3) |
 | malformed metric cannot pass the K1 gate | **measured**, all seven cases (§5.4) |
 | atomic publish | **measured** (§5.5); fsync/`os.replace` ordering itself is by construction |
+
+
+---
+
+## 7. The `close_fds` hole, and why the occupancy gate is the authoritative check
+
+### 7.1 Your measurement is right, and it matches mine
+
+Q1/Q2/Q3 reproduce exactly what §1.4 M2 found independently:
+
+| hop | descriptor | |
+| --- | --- | --- |
+| shell → `exec python` | **survives** | bash's `{FD}` redirection is not close-on-exec |
+| python → `subprocess.Popen` | **dropped** | Python defaults `close_fds=True` (3.2+) |
+| python → `os.fork` + `execv` | survives | DataLoader workers / `torch.multiprocessing` |
+| python → `Popen(pass_fds=…)` | survives | not available to us: we don't control upstream's calls |
+
+And I agree the consequence is live, not theoretical: SIGKILL a trainer whose `Popen` worker
+survives and the lock **is** free while the worker is still on the GPU. I under-rated this in
+§1.4 by calling it a "narrow residual"; it is the gate's own scenario.
+
+### 7.2 But the lock was never the only gate — and the other one already fires
+
+The thing Q3 measures is the **lock state**, which does not carry to the **acquire decision**.
+`_gr_do_acquire` runs two gates in series: the reservation-state gate, then `_gr_classify`, and
+only an explicit `FREE` from both permits a claim. The CUDA-occupancy arm of the first gate
+(`_gr_reservation_state`, the `_GR_APPS` loop) and `OURS_UNLOCKED`/`UNACCOUNTED` in the second
+both catch a survivor that holds no descriptor.
+
+I reproduced your Q3 shape precisely — dead owner, record present, hold file **free**, and a live
+process of ours that telemetry reports as holding CUDA on gpu0 and that holds **zero** descriptors:
+
+```
+survivor pid=2138619 (alive=yes), holds hold-fd? 0
+lock state: FREE                                  <- your Q3 observation, reproduced
+
+--- reservation state for gpu0 ---
+classify=OURS_UNLOCKED
+state=ORPHAN 999999 q3camp cuda-context-pid-2138619-still-on-gpu0
+
+--- the decision that matters: does acquire hand out gpu0? ---
+[gpu_reserve] gpu0 ORPHANED: owner pid 999999 is dead but work may still be running
+[gpu_reserve]         (q3camp cuda-context-pid-2138619-still-on-gpu0). The reservation is KEPT
+[gpu_reserve]         and gpu0 is REFUSED -- a dead runner does not mean its python child
+[gpu_reserve]         released CUDA.
+[gpu_reserve] gpu1 RESERVED for 'q3_next' ...
+acquire -> gpu'1' rc=0
+```
+
+So **no code change was needed** to close Q3 — the occupancy gate is already the authoritative
+acquire-time test and it already refuses. What was missing was a test pinning that, so it cannot
+quietly degrade into lock-only reasoning. Added as **T35a** (and T35b for the weaker variant where
+the survivor is absent from compute-apps but its memory is not: `UNACCOUNTED`, never `FREE`).
+
+Taking your instruction not to redesign: the three arms compose, and I am stating the division of
+labour rather than claiming any one of them is sufficient.
+
+| arm | covers | blind to |
+| --- | --- | --- |
+| liveness lock (flock on inherited fd) | the owner, and fork/exec descendants, **from before the record exists** — including before any CUDA context | `subprocess(close_fds=True)` grandchildren |
+| CUDA occupancy (compute-apps + memory) | anything with a context or attributable memory, descriptor or not | a process that has not yet initialised CUDA |
+| 900 s grace window | the early window where a process is spawned but not yet on the GPU | long gaps |
+
+The one shape none of them sees is a survivor that **simultaneously** holds no descriptor, has not
+yet created a CUDA context, and occupies under 512 MiB — i.e. a `Popen` grandchild in its first
+moments. The grace window is what covers that interval, which is the only thing I would still call
+a residual, and it is now a bounded one rather than the primary protection.
+
+### 7.3 An explicit unlock in a cleanup path WOULD break the shared lifetime — measured
+
+You asked me to confirm this, and it is a genuine hazard worth the measurement:
+
+```
+parent CLOSES its fd, child alive   -> LOCK STILL HELD (good)
+parent runs flock -u, child alive   -> LOCK FREE   <-- the hazard
+```
+
+An flock lives on the open file *description*, which `fork` and `execve` share. Closing one
+descriptor is per-descriptor and the lock survives; `flock -u` releases it **for every sharer at
+once**. `gpu_reserve_drop` therefore *closes* and never unlocks — that ordering is why it can tell
+"a child is still running" from "I am still running". The only `flock -u` in the file is on fd 9,
+the reservation mutex, whose lifetime is deliberately not shared. Documented as an invariant at
+`_gr_close_hold_fd` and pinned by a source-level assertion in **T35c**, so a future edit cannot
+reintroduce it.
+
+### 7.4 What the tests exercise, and what they do not
+
+Taking your calibration point: stating this plainly rather than hedging everything.
+
+**Exercised with the real launcher** (real `gpu_reserve_hold`, real runners under
+`set -euo pipefail`, real child and execed grandchild, real kernel locks, real `/proc`):
+
+* the descriptor arm, including fork+exec and re-parented survivors (T29, T30, M1, M2);
+* retain-vs-release on **SIGTERM and SIGKILL**, both arms of the invariant, with the trap actually
+  running in the interruptible case (§6.4, 8 cases, 8 correct verdicts);
+* cleanup completing and the GPU becoming available only after the last survivor exits, with a
+  following acquire confirming it (§6.4 drain lines, T30, T32);
+* shared-lifetime lock semantics, close vs unlock (T35c);
+* concurrency, env bypass, forged holdpath, GPUs 2–3, failure propagation (T28, T33, T34);
+* D-047 and D-048 against a **copied real nvidia-smi** (§6.2, §6.3).
+
+**Mocked, and precisely which part:** the occupancy gate is driven by a **real live process** whose
+pid is real and whose descriptor state is real — the only mocked element is the driver's *report*
+that this pid holds a CUDA context. The gate's logic, its inputs from `/proc`, and the resulting
+refusal are all genuine.
+
+**Needs a real CUDA context — please run these two; I cannot, and will not, launch GPU work:**
+
+1. **Does `nvidia-smi --query-compute-apps` actually list an upstream `Popen` worker?** The whole
+   Q3 mitigation rests on that survivor being *visible* to the occupancy gate. If upstream spawns a
+   worker that holds a context but is not reported (hidepid, MIG, a container boundary), the gate
+   cannot see it either and the grace window is all that remains. Concretely: start the r1 smoke
+   job, `SIGKILL` the `accelerate`/python parent, then run
+   `nvidia-smi --query-compute-apps=pid,gpu_uuid --format=csv,noheader` and
+   `bash scripts/gpu_reserve.sh holders <index>` and `bash scripts/gpu_reserve.sh status`.
+   Expected: the surviving worker appears in compute-apps, status shows gpu<N> ORPHAN, and an
+   acquire is refused.
+2. **SIGINT to a foreground runner** (§6.4 item 1). A backgrounded harness inherits SIGINT ignored
+   (`SigIgn=0000000000000006`) and bash cannot trap an inherited-ignored signal, so no amount of
+   CPU testing can deliver a meaningful Ctrl-C. SIGTERM and SIGKILL are measured and correct.
+
+
+---
+
+## 8. Full suite result
+
+`bash scripts/test_gpu_reserve.sh` — CPU only, synthetic nvidia-smi, no CUDA context, no GPU
+touched. The suite grew from 256 assertions (v2) to 318 as T28–T35 were added.
+
+Run sequence across this cycle, recorded because the intermediate numbers are the evidence that
+the tests can actually fail:
+
+| run | result | what the failures were |
+| --- | --- | --- |
+| first, after the liveness lock landed | 244 / **12 failed** | all 12 were one bug of mine: `exec {FD}>>file 2>/dev/null` silencing the shell's stderr (§2.5 item 1) |
+| after fixing the open site | 303 / **4 failed** | 2 were the *close* sites of the same bug (§6.5 item 4); 4 T32 assertions were wrong about bash signal semantics |
+| after rewriting T32 from the measurements | 317 / **1 failed** | my own source-level guard: `grep -n` prefixes line numbers, so its comment filter never matched and it counted this file's own comments (expected 0, got 4) |
+| final | **318 / 0 failed** | — |
+
+```
+RESULT: 317 passed, 1 failed      <- the run that found the guard bug
+...
+RESULT: 318 passed, 0 failed      <- final, after the guard was rewritten
+No GPU was accessed; nvidia-smi was the shim at /data/bijaypandey/tmp/gpu_reserve_test.*/fake_nvsmi
+```
+
+Final T35 block, as executed:
+
+```
+== T35a close_fds survivor: lock FREE but the GPU is still REFUSED (occupancy gate)
+  PASS precondition: the liveness lock IS FREE (the close_fds survivor holds no descriptor)
+  PASS precondition: the survivor holds ZERO liveness descriptors (= 0)
+  PASS classification sees the unreserved CUDA context (= OURS_UNLOCKED)
+  PASS state is ORPHAN via the CUDA-OCCUPANCY arm, not the lock
+       (ORPHAN 999999 q3camp cuda-context-pid-2170743-still-on-gpu0)
+  INFO acquire returned gpu'1' (rc=0)
+  PASS acquire REFUSED gpu0 and went elsewhere (gpu1) -- the hole is covered at the decision
+  PASS and gpu0's reservation record was KEPT, not reclaimed
+== T35b unattributable MEMORY alone also refuses, with no compute-apps row at all
+  PASS 2400 MiB we cannot attribute is UNACCOUNTED, never FREE (= UNACCOUNTED)
+  PASS acquire refused gpu0 on unattributable memory and took gpu1
+== T35c the lock's lifetime is shared: CLOSE preserves it, 'flock -u' would destroy it
+  PASS closing the owner's descriptor PRESERVES the lock while a child shares it
+  PASS an explicit 'flock -u' DOES release it for every sharer -- which is why we never call it
+  PASS no 'flock -u' in gpu_reserve.sh targets anything but the mutex (fd 9) (= 0)
+```
+
+The guard was rewritten in `awk`, applying the comment test to the code text rather than to
+`grep -n` output, and verified in isolation:
+
+```
+non-comment, non-mutex flock -u occurrences: 0
+--- all flock -u lines for the record ---
+  1168:  flock -u 9 || _gr_log "WARNING flock -u failed ..."     <- the mutex, lifetime not shared
+  1504:# CLOSE, NEVER `flock -u`. THIS IS AN INVARIANT ...        <- comments
+  1508:#     flock -u on that fd -> released FOR EVERY SHARER ...
+  1511:#     parent runs flock -u, child alive -> LOCK FREE ...
+  1512:# So no code path may ever `flock -u` the hold descriptor ...
+```
+
+### The sections added in this cycle, as executed
+
+```
+== T32 (d) NORMAL COMPLETION and INTERRUPTION both end ownership correctly
+  PASS normal completion REMOVED the reservation record
+  PASS normal completion also removed the hold file (no litter) (= 0)
+  INFO SIGINT is UNTESTABLE from this harness: a backgrounded non-interactive shell inherits
+  INFO        SIGINT ignored (measured SigIgn=0000000000000006) and bash cannot trap an
+  INFO        inherited-ignored signal. Needs a FOREGROUND terminal run.
+  INFO runner alive after SIGTERM: no
+  INFO liveness lock after every holder is gone: FREE
+  PASS SIGTERM with nothing surviving ends ownership (state=STALE 2152808 sigterm2)
+  INFO runner alive=no child alive=yes
+  INFO state after SIGTERM while a child still runs:
+       ORPHAN 2153279 sigkid liveness-lock-held-by-pids-[2153378,2153379]
+  PASS SIGTERM did NOT hand away a GPU whose work is still running (record kept)
+  PASS and the next acquirer is sent elsewhere (= 1)
+  INFO state right after SIGKILL: ORPHAN 2153763 k9camp liveness-lock-held-by-pids-[2153852]
+  PASS SIGKILL with a descendant still holding the lock KEEPS the reservation
+  INFO state after every lock holder has exited: STALE 2153763 k9camp
+  PASS SIGKILL becomes reclaimable once the kernel frees the lock
+
+== T33 (e,f) INHERITED ENVIRONMENT cannot bypass the reservation; GPUs 2-3 stay off limits
+  PASS acquire REFUSES a hold path whose flock the caller does not actually hold (rc=2)
+  PASS acquire REFUSES a hold path outside $LOCKDIR (rc=2)
+  PASS production refuses with GPU_RESERVE_GPUS='2 3' inherited (rc=6)
+  PASS production refuses with GPU_RESERVE_GPUS='0 1 2 3' inherited (rc=6)
+  PASS production refuses with GPU_RESERVE_GPUS='3' inherited (rc=6)
+  PASS production refuses with GPU_RESERVE_GPUS='2' inherited (rc=6)
+  PASS production refuses with GPU_RESERVE_LOCKDIR='...' inherited (rc=6)
+  PASS production refuses with GPU_RESERVE_NVSMI='...' inherited (rc=6)
+  PASS production refuses with GPU_RESERVE_FREEZE_FILE='...' inherited (rc=6)
+  PASS production refuses with GPU_RESERVE_OVERRIDE_LOG='/dev/null' inherited (rc=6)
+  PASS production refuses with CUDA_VISIBLE_DEVICES='2,3' inherited (rc=4)
+  PASS production refuses with CUDA_VISIBLE_DEVICES='2' inherited (rc=4)
+  PASS production refuses with ALLOW_FROZEN_RUN='1' inherited (rc=4)
+  PASS (f) after every env permutation, gpu2/gpu3 carry NO reservation record
+
+== T34 (g) FAILURES PROPAGATE to a non-successful final run status
+  INFO runner exit status under a freeze refusal: 4
+  PASS a refused reservation yields a NON-ZERO runner status (rc=4)
+  PASS no work ran after the refusal
+  PASS and the refusal was EXPLAINED, not silent
+  PASS SIGTERM terminated the runner instead of falling through to the next command
+== T34b run_guard.sh: existence is not completion
+  PASS rg_finish refuses DONE when a required artifact does not LOAD (= 1)
+  PASS the log says INCOMPLETE, never DONE
+
+== T35a close_fds survivor: lock FREE but the GPU is still REFUSED (occupancy gate)
+  PASS precondition: the liveness lock IS FREE (the close_fds survivor holds no descriptor)
+  PASS precondition: the survivor holds ZERO liveness descriptors (= 0)
+  PASS classification sees the unreserved CUDA context (= OURS_UNLOCKED)
+  PASS state is ORPHAN via the CUDA-OCCUPANCY arm, not the lock
+       (ORPHAN 999999 q3camp cuda-context-pid-2154870-still-on-gpu0)
+  INFO acquire returned gpu'1' (rc=0)
+  PASS acquire REFUSED gpu0 and went elsewhere (gpu1) -- the hole is covered at the decision
+  PASS and gpu0's reservation record was KEPT, not reclaimed
+== T35b unattributable MEMORY alone also refuses, with no compute-apps row at all
+  PASS 2400 MiB we cannot attribute is UNACCOUNTED, never FREE (= UNACCOUNTED)
+  PASS acquire refused gpu0 on unattributable memory and took gpu1
+== T35c the lock's lifetime is shared: CLOSE preserves it, 'flock -u' would destroy it
+  PASS closing the owner's descriptor PRESERVES the lock while a child shares it
+  PASS an explicit 'flock -u' DOES release it for every sharer -- which is why we never call it
+```
 

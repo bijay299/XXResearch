@@ -1483,9 +1483,36 @@ a general fix because we do not control upstream's own `Popen` calls.
 
 **Fix direction (simplest, not a third design):** keep the flock as the fast path for the owner's own
 lifetime, and make the **authoritative acquire-time test device occupancy** — refuse any candidate
-GPU carrying a compute process not attributable to a live held reservation. The Q3 survivor holds
-CUDA, so it is visible to `nvidia-smi` even while holding no descriptor. The file already has the
-pieces (`compute-apps`, `OURS_UNLOCKED`, `ORPHAN`).
+GPU carrying a compute process not attributable to a live held reservation.
+
+> **✅ THE COVERING ASSUMPTION IS NOW MEASURED, not assumed (lead, bounded GPU run).** The occupancy
+> gate only closes this hole if `nvidia-smi` can actually see a `Popen`-spawned worker that holds no
+> descriptor. Measured directly: a parent with **no** CUDA context spawned a child via
+> `subprocess.Popen` (default `close_fds`), the child allocated a tensor on GPU 0, and
+> `nvidia-smi --query-compute-apps` reported **`2174848, 492 MiB`** — the child's own pid.
+> **`CHILD LISTED BY nvidia-smi: True`.** So the survivor in Q3 is visible to the gate even though it
+> inherits no lock, and the gate genuinely covers the `close_fds` hole. Agent A had flagged this as
+> its one unverified assumption; it is now verified by measurement. Agent A also reports `acquire`
+> **already** refused that case (`OURS_UNLOCKED` / cuda-context attribution), with T35a/b added to
+> pin it — so **no redesign was needed**, which is the right outcome.
+>
+> **Related hazard, measured by Agent A:** merely *closing* the fd preserves the shared lock, but
+> `flock -u` **destroys it for every sharer**. Only fd 9 (the mutex) is ever unlocked, now with a
+> source-level guard.
+
+**D-053 release-on-interrupt — PARTIAL, and recorded as partial.** Agent A measured 8 cases
+(SIGTERM/SIGKILL with a child *and* an exec'd grandchild): all verdicts correct in both arms —
+retained iff work alive, released iff not. It reported SIGINT as unmeasurable from a backgrounded
+harness (such shells inherit SIGINT **ignored**, `SigIgn=…06`).
+
+I took that measurement myself under `setsid -w` with a handler installed, which does deliver SIGINT:
+**lock HELD while the grandchild was alive, FREE after descendants exited** — lifetime semantics
+correct. **But the cleanup flag came back `CLEAN=0`, so my test did NOT establish that the INT
+cleanup trap ran.** Lifetime: verified. Cleanup-on-SIGINT: **still unverified**, and stated that way
+rather than rounded up.
+
+**Nothing in Agent A's work is independently verified** — it wrote both the code and the tests and
+says so itself. That review is now running separately, and milestone 1 does not pass without it.
 
 **This is the sixth instance of the pattern Agent C named** (after D-013, D-040, D-053, D-055,
 D-057): a mechanism credited for its shape rather than the property it enforces. Five of the six are
@@ -1497,7 +1524,7 @@ Three separate milestones, previously conflated in my reporting:
 
 | # | milestone | current state |
 |---|---|---|
-| **1** | shared infrastructure safe enough to execute verification | **NOT PASSED** — D-047, D-048, D-059 open |
+| **1** | shared infrastructure safe enough to execute verification | **FAILED independent review 2026-10-26** — D-060 (`PROJECT` defeats every guard), D-061, D-062, D-063. D-047/D-048/D-059 confirmed closed |
 | **2** | a particular method's complete execution path verified | IMMA: pending (needs M1 + a real smoke run). **Meta: NOT verified** (D-055/D-057 — stage 9 was unreachable; instrumentation untested in a real run). UCE: records superseded, re-run pending |
 | **3** | that method produces interpretable research results | none yet |
 
@@ -1513,6 +1540,71 @@ the properties they genuinely exercise. The failure mode throughout this audit w
 assertions and unrealistic test conditions**, not testing itself. A test that kills a real launcher
 with a real grandchild and reads the real lock state is good evidence; a test that greps source, or
 runs with a working shim where production uses real telemetry, is not evidence about production.
+
+### D-060 — **one environment variable defeats every guard in the reservation.** Milestone 1 FAILED.
+
+**Severity:** blocking · **Owner:** Agent A (routed) · **Files:** `scripts/gpu_reserve.sh:133, 140-144`
+
+Found by the independent reviewer, **not** by the author and **not** by me. `gpu_reserve.sh:133`
+reads **`PROJECT`** from the environment, and `:140-144` derive all three "hard-wired production
+constants" **from it**. So every D-047 refusal compares a requested value against a constant the
+same environment has already moved.
+
+**Measured, with the project frozen:**
+
+```
+PROJECT=<scratch>/evil bash scripts/gpu_reserve.sh status
+  mode=production   lockdir=<scratch>/evil/.gpulocks
+  FREEZE: none (<scratch>/evil/FREEZE_ACTIVE absent)
+```
+
+and `acquire` then returns **rc=3, not rc=4** — the freeze gate is **passed outright**. With
+`FOREIGN_MIB` at its default it would have reserved gpu0; the reviewer forced `FOREIGN_MIB=1` to
+stop it completing.
+
+**One variable simultaneously:** defeats **D-013** (the freeze marker — my defect), **relocates the
+mutex** (reintroducing **D-001**, the original triple-booking), and **redirects the override audit
+log** so a freeze override goes unrecorded. It also directly contradicts the file's own
+`:155-156`, *"a sweep of EVERY variable the file reads."*
+
+**This is the root of the class.** D-042 (empty allowlist), D-047 (lockdir/nvsmi/override-log) and
+D-060 are not three defects but one: **the file validated the leaves while the root stayed
+environment-derivable.** Each previous fix hardened a value computed from `PROJECT`.
+
+### D-061 — `rg_manifest` reports success on failure, and `rg_finish` then writes DONE.
+
+**Severity:** blocking · **Owner:** Agent A (routed) ·
+**Files:** `scripts/run_guard.sh:421-437`, `run_r1c_eval.sh:389`
+
+It never captures its publish pipeline's status: it logs *"manifest published"* and returns 0 even
+when the publish failed. Called inside an `if` (which suppresses errexit), `rg_finish` proceeds to
+write **DONE with no manifest on disk**. The "publish a completion manifest only after all required
+artifacts validate" requirement, failing in the one primitive built to enforce it.
+
+### D-062 / D-063 — two launchers on the resumed path.
+
+**D-062** `run_v2_rescore_final.sh`: no `set -e`; **launches GPU work after its own precondition
+fails**; and `ls -1dt | head -1` can attest to a **previous** run's directory, so the manifest check
+can pass against an older artifact. **D-063** `run_r1_imma_official.sh:194`: dead `||`
+(`gpu_reserve_drop` always returns 0), and its retention branch leaves `_GR_HOLD_PATH` set so a
+second acquire **orphans the first hold file** — the two-acquires hazard surviving in the launcher
+that will run the next experiment.
+
+### What the independent review CONFIRMED
+
+Recorded because it is evidence, not courtesy. Suite re-run by the reviewer: **318 passed, 0 failed,
+exit 0**. **D-059's covering layer cannot be widened by configuration** — `compute-apps` is consulted
+**unconditionally** and the `OURS_UNLOCKED` arm has **no tunable threshold**; T35a/b pin it with real
+preconditions and a real `acquire` (compute-apps row mocked, and the doc says so). Only one
+`flock -u`, on fd 9. The K1 execution-gate fix is **complete**: zero `|| echo 0` and zero live `awk`
+in r1c. `_gr_holders` re-measured at **177 ms over 2,460 fds**. And §6.6's
+measured-vs-sound-by-construction separation was judged **honest, its only fault being that it
+understates what is now known** — the opposite of this project's usual failure.
+
+**SIGINT stays PARTIAL, with a sharper reason than mine.** The reviewer observed that
+lock HELD→FREE is **kernel-produced regardless** of whether the trap fires, so that observation
+**cannot discriminate** — my test could not have settled it even in principle, not merely by
+accident. `REVIEW_M1.md` §2 names the stderr line that would.
 
 ---
 

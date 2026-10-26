@@ -1710,6 +1710,148 @@ chk "rg_finish refuses DONE when a required artifact does not LOAD" "$(cat "$TMP
 if grep -q 'INCOMPLETE' "$TMP/rg.log" 2>/dev/null; then ok "the log says INCOMPLETE, never DONE"
 else bad "no INCOMPLETE marker in the guard log"; fi
 
+# ===========================================================================
+# T35  THE close_fds HOLE, AND WHY THE OCCUPANCY GATE IS THE AUTHORITATIVE CHECK.
+#
+# An independent measurement showed the liveness lock does NOT cover the whole descendant set:
+#   shell -> exec python           descriptor SURVIVES (bash's {FD} is not close-on-exec)
+#   python -> subprocess.Popen     descriptor is DROPPED (Python defaults close_fds=True)
+# so SIGKILLing a python trainer whose Popen worker survives leaves the lock FREE while the worker
+# is still on the GPU. Reproduced independently here (M2 in docs/REPAIR_A_v3.md) -- it is real, and
+# `pass_fds=` is not available to us because we do not control upstream's subprocess calls.
+#
+# The lock is therefore NOT the only gate and must not be treated as one. The authoritative
+# acquire-time test is DEVICE OCCUPANCY: a compute process on the candidate GPU that cannot be
+# attributed to a live held reservation refuses that GPU, whether or not it holds a descriptor.
+# These tests pin that behaviour so it cannot regress into lock-only reasoning.
+# ===========================================================================
+hdr "T35a close_fds survivor: lock FREE but the GPU is still REFUSED (occupancy gate)"
+NEWLOCKS q3; idle_state
+# A live process of ours that telemetry reports as holding CUDA on gpu0 and that holds NO liveness
+# descriptor -- exactly the Popen grandchild of a SIGKILLed trainer.
+SURV=$( ( exec -a gr_test_surv sleep 120 ) >/dev/null 2>&1 </dev/null & echo $! )
+cat > "$STATE" <<EOF
+gpu 0 GPU-aaaa 2400
+gpu 1 GPU-bbbb 10
+gpu 2 GPU-cccc 10
+gpu 3 GPU-dddd 10
+app $SURV GPU-aaaa
+EOF
+DEADOWNER=999999
+: > "$GPU_RESERVE_LOCKDIR/.hold.${DEADOWNER}.q3camp"
+cat > "$GPU_RESERVE_LOCKDIR/gpu0.owner" <<EOF
+pid=$DEADOWNER
+start=12345
+pgid=999998
+sid=999997
+holdpath=$GPU_RESERVE_LOCKDIR/.hold.${DEADOWNER}.q3camp
+campaign=q3camp
+gpu=0
+uuid=GPU-aaaa
+uid=$(id -u)
+host=$(hostname 2>/dev/null || echo unknown)
+acquired=old
+EOF
+touch -d '-1 hour' "$GPU_RESERVE_LOCKDIR/gpu0.owner" 2>/dev/null
+# precondition: the lock really is free, i.e. the descriptor arm genuinely cannot help here
+if flock -n -x "$GPU_RESERVE_LOCKDIR/.hold.${DEADOWNER}.q3camp" -c true 2>/dev/null; then
+  ok "precondition: the liveness lock IS FREE (the close_fds survivor holds no descriptor)"
+else
+  bad "precondition failed: something holds the hold file, so this is not the close_fds case"
+fi
+HOLDS=$(ls -l "/proc/$SURV/fd" 2>/dev/null | grep -c 'q3camp' || true)
+chk "precondition: the survivor holds ZERO liveness descriptors" "$HOLDS" "0"
+CLS=$( ( set +u; source "$RESERVE" >/dev/null 2>&1; _gr_probe >/dev/null 2>&1; _gr_classify 0 ) )
+chk "classification sees the unreserved CUDA context" "$CLS" "OURS_UNLOCKED"
+ST=$(RSTATE 0)
+case "$ST" in
+  ORPHAN*cuda-context-pid-*) ok "state is ORPHAN via the CUDA-OCCUPANCY arm, not the lock ($ST)" ;;
+  STALE*) bad "the record was judged reclaimable despite a live CUDA process: $ST" ;;
+  *) bad "unexpected state: $ST" ;;
+esac
+# THE DECISION THAT MATTERS: acquire must not hand out gpu0.
+H9=$(spawn_holder)
+OUT=$("$RESERVE" acquire q3_next "$H9" 2>/dev/null); rc=$?
+info "acquire returned gpu'$OUT' (rc=$rc)"
+if [ "$OUT" = "0" ]; then
+  bad "acquire HANDED OUT gpu0 while a close_fds survivor was still on it"
+else
+  ok "acquire REFUSED gpu0 and went elsewhere (gpu$OUT) -- the hole is covered at the decision"
+fi
+if [ -f "$GPU_RESERVE_LOCKDIR/gpu0.owner" ]; then
+  ok "and gpu0's reservation record was KEPT, not reclaimed"
+else
+  bad "gpu0's record was deleted while a CUDA process of ours was still on it"
+fi
+kill "$H9" 2>/dev/null; kill -9 "$SURV" 2>/dev/null
+pkill -9 -u "$(id -u)" -f '^gr_test_surv' 2>/dev/null
+idle_state
+
+hdr "T35b unattributable MEMORY alone also refuses, with no compute-apps row at all"
+# The weaker variant: the survivor is not listed in compute-apps (hidepid, MIG, driver quirk) but
+# its context still occupies memory. Nothing may read that as free.
+NEWLOCKS q3mem
+cat > "$STATE" <<EOF
+gpu 0 GPU-aaaa 2400
+gpu 1 GPU-bbbb 10
+gpu 2 GPU-cccc 10
+gpu 3 GPU-dddd 10
+EOF
+CLS=$( ( set +u; source "$RESERVE" >/dev/null 2>&1; _gr_probe >/dev/null 2>&1; _gr_classify 0 ) )
+chk "2400 MiB we cannot attribute is UNACCOUNTED, never FREE" "$CLS" "UNACCOUNTED"
+HA=$(spawn_holder)
+OUT=$("$RESERVE" acquire q3mem_next "$HA" 2>/dev/null)
+if [ "$OUT" = "0" ]; then bad "acquire took a GPU holding 2400 MiB it could not attribute"
+else ok "acquire refused gpu0 on unattributable memory and took gpu$OUT"; fi
+kill "$HA" 2>/dev/null; idle_state
+
+hdr "T35c the lock's lifetime is shared: CLOSE preserves it, 'flock -u' would destroy it"
+# This is the invariant _gr_close_hold_fd exists to hold. An flock lives on the open file
+# DESCRIPTION, which fork and execve share, so an explicit unlock in any cleanup path would
+# release the lock for every sharer at once. Measured both ways rather than asserted.
+Q3T="$TMP/lifetime"; mkdir -p "$Q3T"
+cat > "$Q3T/closer.sh" <<'LEOF'
+#!/bin/bash
+exec {FD}>>"$1"; flock -x "$FD"
+bash -c 'exec -a gr_test_share sleep 60' >/dev/null 2>&1 </dev/null &
+sleep 1; eval "exec ${FD}>&-"; sleep 30
+LEOF
+cat > "$Q3T/unlocker.sh" <<'LEOF'
+#!/bin/bash
+exec {FD}>>"$1"; flock -x "$FD"
+bash -c 'exec -a gr_test_share sleep 60' >/dev/null 2>&1 </dev/null &
+sleep 1; flock -u "$FD"; sleep 30
+LEOF
+chmod +x "$Q3T/closer.sh" "$Q3T/unlocker.sh"
+: > "$Q3T/h1"; bash "$Q3T/closer.sh" "$Q3T/h1" >/dev/null 2>&1 & C1=$!
+sleep 3
+if flock -n -x "$Q3T/h1" -c true 2>/dev/null; then
+  bad "closing the owner's descriptor RELEASED a lock its child still shares"
+else
+  ok "closing the owner's descriptor PRESERVES the lock while a child shares it"
+fi
+kill -9 "$C1" 2>/dev/null; pkill -9 -u "$(id -u)" -f '^gr_test_share' 2>/dev/null; sleep 1
+: > "$Q3T/h2"; bash "$Q3T/unlocker.sh" "$Q3T/h2" >/dev/null 2>&1 & C2=$!
+sleep 3
+if flock -n -x "$Q3T/h2" -c true 2>/dev/null; then
+  ok "an explicit 'flock -u' DOES release it for every sharer -- which is why we never call it"
+else
+  info "flock -u did not release it here; the invariant below is what actually matters"
+fi
+kill -9 "$C2" 2>/dev/null; pkill -9 -u "$(id -u)" -f '^gr_test_share' 2>/dev/null
+# SOURCE-LEVEL GUARD so a future edit cannot reintroduce it: the only flock -u may be on fd 9.
+# The filter has to strip the line-number prefix BEFORE testing for a comment, or `grep -n`'s
+# "123:" makes every comment look like code -- which is exactly what the first version did, and it
+# counted this file's own explanatory comments as violations (expected 0, got 4). awk, once, with
+# the comment test applied to the code text itself.
+BADUNLOCK=$(awk '/flock -u/ {
+                   line = $0; sub(/^[[:space:]]+/, "", line);
+                   if (line ~ /^#/)           next;   # a comment about flock -u is not a call
+                   if (line ~ /flock -u 9/)   next;   # the mutex: its lifetime is not shared
+                   n++
+                 } END { print n+0 }' "$RESERVE")
+chk "no 'flock -u' in gpu_reserve.sh targets anything but the mutex (fd 9)" "$BADUNLOCK" "0"
+
 # ---------------------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'RESULT: %s passed, %s failed\n' "$PASS" "$FAIL"

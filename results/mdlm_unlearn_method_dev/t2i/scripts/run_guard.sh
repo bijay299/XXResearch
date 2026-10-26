@@ -180,7 +180,23 @@ rg_abort() {
 # one, which is defect class (2) being manufactured by our own writer.
 # ===========================================================================
 
-RG_PY="${RG_PY:-venv_t2i/bin/python}"
+# The interpreter is resolved to an ABSOLUTE path, anchored to this file's own location.
+#
+# It used to be the relative `venv_t2i/bin/python`, which works only while the caller's working
+# directory happens to be the project root. Found while testing the run_v2 gates from a scratch
+# directory: every rg_require_loadable and every rg_metric failed with
+#     run_guard.sh: line 274: venv_t2i/bin/python: No such file or directory
+# and was recorded as "artifact exists but does NOT LOAD". The direction is safe -- it records
+# failures rather than passing -- but it is a FALSE failure that reads exactly like a real
+# truncated artifact, which is its own kind of untruthful reporting, and it would have made the
+# guard look broken the first time any runner was launched from elsewhere.
+_rg_self=$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null) || _rg_self="${BASH_SOURCE[0]}"
+_rg_root=$(cd "$(dirname "$_rg_self")/.." 2>/dev/null && pwd -P) || _rg_root="."
+RG_PY="${RG_PY:-$_rg_root/venv_t2i/bin/python}"
+if [ ! -x "$RG_PY" ]; then
+  printf '[run_guard] WARNING interpreter %s is not executable; loadability and metric checks\n' "$RG_PY" >&2
+  printf '[run_guard]         will FAIL CLOSED (recorded as failures), not be skipped.\n' >&2
+fi
 
 # rg_atomic_write <dest> -- reads the payload from STDIN and publishes it atomically.
 #
@@ -418,7 +434,26 @@ rg_manifest() {
     rm -f "$dest" 2>/dev/null
     return 1
   fi
-  "$RG_PY" - "$dest" "$RG_ID" $entries <<'RGPY' | rg_atomic_write "$dest"
+  # ---- PUBLISH, WITH THE STATUS ACTUALLY CHECKED. -------------------------------------------
+  # D-061. This was previously a pipeline --
+  #     "$RG_PY" - "$dest" "$RG_ID" $entries <<'RGPY' ... RGPY | rg_atomic_write "$dest"
+  #     echo "manifest published :: $dest" >>"$RG_LOG"
+  #     return 0
+  # -- whose exit status was never captured. Neither the generator's failure nor the publish's
+  # failure could be seen: it logged "manifest published" and returned 0 regardless. And because
+  # run_r1c_eval.sh calls it inside an `if`, which suppresses errexit, rg_finish then went on to
+  # write DONE with NO MANIFEST ON DISK. That is the one requirement this primitive exists to
+  # enforce -- "publish a completion manifest only after all required artifacts validate" --
+  # failing inside the enforcer.
+  #
+  # The pipeline is gone: the JSON is generated to a temp file whose status is checked, then
+  # published, then READ BACK AND PARSED. A manifest that cannot be re-read is not a manifest, and
+  # saying so costs one json.load.
+  local gen; gen=$(mktemp "${TMPDIR:-/tmp}/rg_manifest.XXXXXX") || {
+    _rg_record "manifest  $dest :: cannot create a temp file"
+    echo "FAIL manifest: cannot create a temp file for $dest" >>"$RG_LOG"; return 1; }
+  # shellcheck disable=SC2086
+  if ! "$RG_PY" - "$dest" "$RG_ID" $entries > "$gen" <<'RGPY'
 import datetime, hashlib, json, os, sys
 dest, rid = sys.argv[1], sys.argv[2]
 arts = []
@@ -433,7 +468,27 @@ json.dump({"campaign": rid,
            "validation": "every artifact below was opened and parsed, not merely stat()ed",
            "artifacts": arts}, sys.stdout, indent=1)
 RGPY
-  echo "manifest published :: $dest" >>"$RG_LOG"
+  then
+    rm -f "$gen" 2>/dev/null
+    _rg_record "manifest  $dest :: generator failed"
+    echo "FAIL manifest: the generator failed; nothing published to $dest" >>"$RG_LOG"
+    return 1
+  fi
+  if ! rg_atomic_write "$dest" < "$gen"; then
+    rm -f "$gen" 2>/dev/null
+    _rg_record "manifest  $dest :: atomic publish failed"
+    echo "FAIL manifest: the atomic publish failed; $dest was NOT written" >>"$RG_LOG"
+    return 1
+  fi
+  rm -f "$gen" 2>/dev/null
+  # Read it back. "I wrote it" and "it is there and parses" are different claims.
+  if ! rg_require_loadable "$dest" json >/dev/null 2>&1; then
+    _rg_record "manifest  $dest :: published but does not parse"
+    echo "FAIL manifest: $dest was published but does NOT parse -- withdrawing it" >>"$RG_LOG"
+    rm -f "$dest" 2>/dev/null
+    return 1
+  fi
+  echo "manifest published and re-read :: $dest" >>"$RG_LOG"
   return 0
 }
 

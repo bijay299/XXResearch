@@ -112,7 +112,7 @@
 #     marker PATH is hard-wired, so GPU_RESERVE_FREEZE_FILE cannot be used to fake a thaw.
 #
 # ENV (production ignores or refuses the ones marked TEST-ONLY)
-#   GPU_RESERVE_LOCKDIR        reservation directory      (default $PROJECT/.gpulocks)
+#   GPU_RESERVE_LOCKDIR        reservation directory      (TEST-ONLY; production is hard-wired)
 #   GPU_RESERVE_GPUS           TEST-ONLY allowed indices. Production is hard-wired to "0 1" and
 #                              REFUSES (rc=6) any other value. SET-BUT-EMPTY, whitespace-only,
 #                              non-numeric or duplicated is rc=7 in BOTH modes -- it is never
@@ -123,25 +123,51 @@
 #   GPU_RESERVE_UID            uid considered "ours"      (default: id -u)
 #   GPU_RESERVE_WAIT           seconds to wait for the mutex (default 30)
 #   GPU_RESERVE_ORPHAN_GRACE   seconds a record is protected after its owner dies (default 120)
-#   GPU_RESERVE_FREEZE_FILE    TEST-ONLY freeze marker path; production uses $PROJECT/FREEZE_ACTIVE
+#   GPU_RESERVE_FREEZE_FILE    TEST-ONLY freeze marker path; production path is hard-wired
 #   GPU_RESERVE_CVD_STYLE      "index" (default) or "uuid" -- what CUDA_VISIBLE_DEVICES is set to
 #   GPU_RESERVE_TEST_MODE=1    enable test mode; refused unless GPU_RESERVE_NVSMI is NOT a real
 #                              nvidia-smi and GPU_RESERVE_LOCKDIR is outside the production dir.
 
 set -u
 
-PROJECT="${PROJECT:-/data/bijaypandey/t2i_unlearn}"
+# ---------------------------------------------------------------------------
+# THE PROJECT ROOT IS A LITERAL. D-060, and it was the root of the whole class.
+#
+# This line used to read:
+#     PROJECT="${PROJECT:-/data/bijaypandey/t2i_unlearn}"
+# and the three "hard-wired production constants" below were derived FROM IT. So every one of the
+# D-047 production refusals -- which compare a requested value against _GR_PROD_* -- was comparing
+# the request against a constant the same environment had already moved. One variable defeated the
+# lot. Measured before this fix, with the project FROZEN:
+#     PROJECT=<scratch>/evil bash scripts/gpu_reserve.sh status
+#       mode=production   lockdir=<scratch>/evil/.gpulocks
+#       FREEZE: none (<scratch>/evil/FREEZE_ACTIVE absent)
+#   and acquire then returned rc=3 (no GPU free) instead of rc=4 (frozen) -- the freeze gate was
+#   passed outright, the mutex was relocated (reintroducing the D-001 triple-booking, because two
+#   runners with different PROJECT values take different mutexes and cannot exclude each other),
+#   and the freeze-override audit log was redirected so an override would go unrecorded.
+# It also falsified this file's own claim, below, to be "a sweep of EVERY variable the file reads":
+# the sweep covered the GPU_RESERVE_* knobs and missed the variable the knobs' baselines came from.
+#
+# The root is therefore a LITERAL with no environment fallback, and an attempt to set PROJECT is
+# REFUSED in _gr_mode_init with the same non-retryable code (6) as the other production overrides,
+# rather than ignored -- an ignored override is indistinguishable from an honoured one at the call
+# site, which is how this survived. Nothing in the project sets PROJECT; `grep -rn '^\s*\(export
+# \)\?PROJECT=' --include='*.sh'` matched only the old line itself.
+# ---------------------------------------------------------------------------
+_GR_PROD_ROOT="/data/bijaypandey/t2i_unlearn"
 
 # ---------------------------------------------------------------------------
-# HARD-WIRED PRODUCTION CONSTANTS. Not read from the environment, by design.
+# HARD-WIRED PRODUCTION CONSTANTS. Not read from the environment, by design, and now anchored to
+# _GR_PROD_ROOT (a literal) rather than to anything a caller can set.
 # GPUs 2 and 3 belong to other users of this shared host and are OFF LIMITS.
 # ---------------------------------------------------------------------------
 _GR_PROD_GPUS="0 1"
-_GR_PROD_LOCKDIR="$PROJECT/.gpulocks"
-_GR_PROD_FREEZE="$PROJECT/FREEZE_ACTIVE"
+_GR_PROD_LOCKDIR="$_GR_PROD_ROOT/.gpulocks"
+_GR_PROD_FREEZE="$_GR_PROD_ROOT/FREEZE_ACTIVE"
 
 _GR_PROD_NVSMI="nvidia-smi"
-_GR_PROD_OVERRIDE_LOG="$PROJECT/logs/frozen_override.log"
+_GR_PROD_OVERRIDE_LOG="$_GR_PROD_ROOT/logs/frozen_override.log"
 
 ALLOW_FROZEN_FLAG=0   # set only by an explicit --allow-frozen argument
 
@@ -415,6 +441,23 @@ _gr_mode_init() {
   FREEZE_FILE="$_GR_PROD_FREEZE"
   NVSMI="$_GR_PROD_NVSMI"
   OVERRIDE_LOG="$_GR_PROD_OVERRIDE_LOG"
+
+  # D-060: PROJECT is refused, in BOTH modes, before anything else.
+  # It is checked first because it used to be the SOURCE of the constants every other check in this
+  # function compares against -- so a PROJECT that reached those checks made all of them vacuous.
+  # Refused rather than ignored: the whole lesson of D-047 is that silently dropping an override
+  # looks identical to honouring it from the call site. Test mode is not exempt, because test mode
+  # has its own GPU_RESERVE_LOCKDIR/FREEZE_FILE/OVERRIDE_LOG knobs and never needs PROJECT.
+  if [ -n "${PROJECT+x}" ] && [ "${PROJECT:-}" != "$_GR_PROD_ROOT" ]; then
+    _gr_log "REFUSED: PROJECT='${PROJECT:-}' tried to move the project root. It is a LITERAL,"
+    _gr_log "         hard-wired to $_GR_PROD_ROOT, because the lockdir, the freeze marker and the"
+    _gr_log "         freeze-override audit log are all anchored to it. Setting it relocated the"
+    _gr_log "         mutex (two runners with different values cannot exclude each other -- the"
+    _gr_log "         D-001 triple-booking), moved the freeze marker so the project read as thawed,"
+    _gr_log "         and redirected the audit log so an override left no record. rc=6."
+    _gr_log "         Mocked harnesses set GPU_RESERVE_TEST_MODE=1 with GPU_RESERVE_LOCKDIR."
+    return 6
+  fi
 
   # Validate every scalar knob first (ranges, enums, set-but-empty). rc=7 is non-retryable.
   _gr_env_init || return 7
@@ -1500,6 +1543,17 @@ _gr_do_selftest_telemetry() {
 # the three CLOSE sites; a control that silences the diagnosis of its own failure is exactly the
 # shape this repair cycle is supposed to remove.
 # The fd is checked through /proc instead, so nothing needs to be suppressed.
+#
+# CLOSE, NEVER `flock -u`. THIS IS AN INVARIANT, not a style choice, and it is measured in
+# scripts/test_gpu_reserve.sh (T35). An flock lives on the OPEN FILE DESCRIPTION, which fork and
+# execve SHARE, so:
+#     closing our descriptor  -> the lock survives while any inheritor still holds one  (correct)
+#     flock -u on that fd     -> the lock is released FOR EVERY SHARER, instantly        (disaster)
+# Measured both ways on this host:
+#     parent CLOSES its fd, child alive  -> LOCK STILL HELD
+#     parent runs flock -u, child alive  -> LOCK FREE          <- another job could take the GPU
+# So no code path may ever `flock -u` the hold descriptor. The only `flock -u` in this file is on
+# fd 9, the reservation MUTEX, whose lifetime is deliberately NOT shared with anything.
 _gr_close_hold_fd() {
   [ -n "${_GR_HOLD_FD:-}" ] || return 0
   if [ -e "/proc/$$/fd/$_GR_HOLD_FD" ]; then
