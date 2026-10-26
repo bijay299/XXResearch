@@ -254,3 +254,55 @@ require **new builds**, which are disk-blocked.
 **Every cell of all four concepts fails the mandate's robustness half.** Nothing in this series
 moves any arm toward the bar; it establishes that the attacker is cheaper and more general than this
 project reported, across four concepts.
+
+## 9. The concept/arm confound, **resolved** (E11n) — and it did not need new builds after all
+
+§8a said concept and build were inseparable because each concept had exactly one arm, and that
+separating them "requires new builds, which are disk-blocked." **That was wrong.** A second
+well-suppressed `garbage_truck` arm was already on disk.
+
+| arm | as-is target | retain8 | **all three seeds = 1.000 at** | utility there |
+|---|---:|---:|---:|---:|
+| `frp_garbage_truck_r5_l05` | 0.0000 | 0.7750 | **25 steps** | 0.8681 |
+| **`frp_garbage_truck_r3_l05`** | **0.1333** | **0.9667** | **25 steps** | **0.9653** |
+
+**The speed replicates exactly across two arms that differ substantially on both confounds** —
+`H_before` 0.0000 vs 0.1333, retain8 0.7750 vs 0.9667. Both reach full recovery on all three seeds
+at **25 steps**. So garbage_truck's speed is a property of the **concept**, not of one build, and
+§8's framing is **confirmed** rather than narrowed.
+
+The second arm is also the strongest single counterexample in the project: **retain8 0.9667 — the
+highest-retention arm tested — fully reversed in 25 gradient steps while post-attack utility stays
+at 0.9653.** High retention bought nothing.
+
+### 9a. The comparison is now at matched starting suppression
+
+Three arms share `H_before` = **0.1333** exactly:
+
+| arm | concept | retain8 | all three seeds = 1.000 at |
+|---|---|---:|---:|
+| `frp_garbage_truck_r3_l05` | garbage_truck | 0.9667 | **25** |
+| `frp_church_r3_l05` | church | 0.9417 | > 25 |
+| `frp_tench_r3_l05` | tench | 0.7917 | **100** |
+
+**At identical starting suppression, identical method and identical learning rate, garbage_truck is
+still 4× faster than tench.** This is the "matched initial" comparison audit §8 asked for and which
+`FINDING72` §1 and §7b both recorded as unmet — it is now met on `H_before`, using only checkpoints
+that already existed.
+
+### 9b. What is still not separated
+
+- **Two arms for one concept, one arm for each of the other three.** The replication establishes
+  that garbage_truck's speed is build-independent; it does not establish the same for tench's
+  slowness, which still rests on a single arm.
+- retain8 still varies across the matched-`H_before` triple (0.9667 / 0.9417 / 0.7917), though §9's
+  within-concept pair shows a 0.19 retain8 difference produced **no** change in speed, which weakens
+  retain8 as a candidate explanation.
+- One defence family (FRP), one learning rate, three seeds, DEV prompts.
+
+### 9c. A methodological note I should have applied sooner
+
+I twice declared the disk-free work exhausted and was twice wrong — once for replication of my own
+claims, once here. The lesson is specific: **before claiming an experiment needs new builds, enumerate
+what the existing checkpoints can already answer.** `scripts/registry_v1.py` makes that a query, and
+I did not run it.
