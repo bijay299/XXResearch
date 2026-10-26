@@ -85,7 +85,15 @@ fi
 # exist before this run.
 V2_BEFORE=$(mktemp "${TMPDIR:-/tmp}/v2_before.XXXXXX")
 V2_AFTER=$(mktemp "${TMPDIR:-/tmp}/v2_after.XXXXXX")
-trap 'rm -f "$V2_BEFORE" "$V2_AFTER" 2>/dev/null' EXIT
+# NO `trap ... EXIT` HERE. This is my own bug, measured by an independent reviewer: the line used to
+# read `trap 'rm -f "$V2_BEFORE" "$V2_AFTER"' EXIT`, which REPLACED the EXIT trap that
+# gpu_reserve_hold installs at gpu_reserve.sh:1749 to release the reservation. Observed consequence:
+# the record and hold file SURVIVED a clean exit with no `released` line, and the next acquirer was
+# refused that GPU for up to 900 s. gpu_reserve.sh:86 documents exactly this hazard ("the second
+# REPLACES the first") and I walked into it in a file I wrote myself.
+# These two temp files live for a few lines and are removed inline, so no trap is needed at all --
+# which is also why chaining would be the wrong fix: the simplest repair is not to compete for the
+# trap slot.
 ls -1d outputs/rescore/*/ 2>/dev/null | sort > "$V2_BEFORE" || true
 
 rg_step venv_t2i/bin/python scripts/rescore_final_v2.py --run-tag d022 || true

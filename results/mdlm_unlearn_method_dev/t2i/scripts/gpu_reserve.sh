@@ -166,7 +166,20 @@ _GR_PROD_GPUS="0 1"
 _GR_PROD_LOCKDIR="$_GR_PROD_ROOT/.gpulocks"
 _GR_PROD_FREEZE="$_GR_PROD_ROOT/FREEZE_ACTIVE"
 
-_GR_PROD_NVSMI="nvidia-smi"
+# RESIDUAL R1 CLOSED 2026-10-26. This was the bare name "nvidia-smi", so even though the file
+# refuses GPU_RESERVE_NVSMI in production, $PATH still decided which binary that name resolved to.
+# An independent reviewer measured production reporting FABRICATED UUIDs (GPU-ffff/GPU-eeee) at
+# 0 MiB with telemetry=OK -- i.e. the telemetry the whole guard rests on was substitutable without
+# touching any variable the file validates. Same shape as D-060: the leaf was checked, the thing it
+# resolved through was not.
+# Resolve to an ABSOLUTE path at load time and verify it is the real driver utility. If none of the
+# known locations exists, leave it unresolved so _gr_env_init fails closed rather than falling back
+# to a name $PATH can own.
+_GR_PROD_NVSMI=""
+for _gr_c in /usr/bin/nvidia-smi /bin/nvidia-smi /usr/local/bin/nvidia-smi; do
+  [ -x "$_gr_c" ] && { _GR_PROD_NVSMI="$_gr_c"; break; }
+done
+unset _gr_c
 _GR_PROD_OVERRIDE_LOG="$_GR_PROD_ROOT/logs/frozen_override.log"
 
 ALLOW_FROZEN_FLAG=0   # set only by an explicit --allow-frozen argument
@@ -1573,7 +1586,12 @@ gpu_reserve_hold() {
   # exited. run_r1_imma_official.sh does exactly this (stage 2 prep, then stage 4 smoke, with no
   # drop in between), so this is a live call shape and not a hypothetical. Refusing with a pointer
   # to gpu_reserve_drop is the only safe answer.
-  if [ -n "${_GR_HOLD_FD:-}" ]; then
+  # D-063: key on the PATH as well as the FD. `gpu_reserve_drop`'s retention branch closes the fd
+  # (clearing _GR_HOLD_FD) but intentionally keeps _GR_HOLD_PATH, because a survivor still holds the
+  # lock and the record must stay. Keying only on the fd therefore let a second acquire through and
+  # orphaned the retained hold file -- measured by an independent reviewer. Either being set means
+  # this shell still owns a reservation.
+  if [ -n "${_GR_HOLD_FD:-}" ] || [ -n "${_GR_HOLD_PATH:-}" ]; then
     _gr_log "REFUSED: this shell already holds a GPU reservation (gpu ${GPU_RESERVED:-?}, lock"
     _gr_log "         ${_GR_HOLD_PATH:-?}). A second reservation in one shell would replace the"
     _gr_log "         release trap and orphan the first liveness-lock descriptor, pinning that GPU"
@@ -1751,9 +1769,17 @@ gpu_reserve_hold() {
     # trapped INT/TERM/HUP to the same release command, so a SIGINT ran the handler and then
     # CARRIED ON executing the runner with its reservation deleted. Exiting 128+signo both stops
     # the runner and gives the conventional non-zero status that a caller can detect (test g).
-    trap 'gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; trap - EXIT; exit 130' INT
-    trap 'gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; trap - EXIT; exit 143' TERM
-    trap 'gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; trap - EXIT; exit 129' HUP
+    # RESIDUAL R3 CLOSED 2026-10-26. Each handler now emits an explicit marker on STDERR *before*
+    # dropping. Why this is the thing that was missing: exit status alone cannot discriminate. A
+    # shell KILLED by SIGINT with no handler also reports 130, and the lock going HELD -> FREE is
+    # produced by the kernel closing the descriptor whether or not the trap ran. So neither the
+    # status nor the lock state is evidence that cleanup executed -- a point an independent reviewer
+    # made after both the author and I had failed to settle it, and after my own test reported a
+    # correct HELD->FREE transition while its cleanup flag came back 0.
+    # The marker is positive proof: it exists only on the code path inside the handler.
+    trap '_gr_log "SIGNAL INT received -- release handler running for '"'"'$_GR_HOLD_CAMP'"'"'"; gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; _gr_log "SIGNAL INT handler complete"; trap - EXIT; exit 130' INT
+    trap '_gr_log "SIGNAL TERM received -- release handler running for '"'"'$_GR_HOLD_CAMP'"'"'"; gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; _gr_log "SIGNAL TERM handler complete"; trap - EXIT; exit 143' TERM
+    trap '_gr_log "SIGNAL HUP received -- release handler running for '"'"'$_GR_HOLD_CAMP'"'"'"; gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; _gr_log "SIGNAL HUP handler complete"; trap - EXIT; exit 129' HUP
     printf '%s\n' "$GPU_RESERVED"
   else
     # Never leave a locked descriptor or a stray hold file behind on a failed acquisition: a hold
@@ -1816,8 +1842,18 @@ gpu_reserve_drop() {
       _gr_log "        by pid(s) [$holders] -- work this runner started is still alive. The record"
       _gr_log "        is KEPT so no other job can be given this GPU underneath it; it reclaims"
       _gr_log "        itself automatically when the last of those processes exits."
-      trap - EXIT INT TERM HUP
-      return 0
+      # D-063, SECOND ATTEMPT (2026-10-26). This returned 0, which was wrong twice over:
+      #   * callers could not distinguish "released" from "KEPT because work is still alive", so
+      #     run_r1_imma_official.sh:194's `|| say WARNING` was dead code; and
+      #   * `_GR_HOLD_PATH` was left set while `_gr_close_hold_fd` had already cleared
+      #     `_GR_HOLD_FD`, so the second-acquire guard below (which keyed only on the fd) PERMITTED
+      #     a second acquire in the same shell and ORPHANED this hold file.
+      # An independent reviewer measured both. The retention branch now returns a DISTINCT code and
+      # deliberately LEAVES `_GR_HOLD_PATH` set -- the reservation really is still held -- and the
+      # guard keys on the PATH as well as the fd, so the retained hold blocks a second acquire.
+      # The EXIT trap is NOT cleared here: the record is still live and must not look dropped.
+      GPU_RESERVE_RC=10; export GPU_RESERVE_RC
+      return 10
     fi
   fi
   "${BASH_SOURCE[0]}" release "$camp" "$$"

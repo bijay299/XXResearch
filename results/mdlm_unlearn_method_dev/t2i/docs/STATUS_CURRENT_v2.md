@@ -229,6 +229,36 @@ Open, real, and demonstrably off the critical path of the next queued run.
 | **`venv_imma` version** | documented at 0.31.0, actually 0.24.0 | Documentation disagrees with disk. The downgrade itself is **clean and necessary**. Affects no number |
 | **`upstream_manifest.json`** | two vacuous/incorrect provenance fields | `"pinned_as_requested": true` alongside `"requested_pin": null` for `unified-concept-editing` and FRAG is a vacuous truth; `vision_relearning`'s licence is given as `"NONE FOUND"` where the manifest markdown correctly says the README declares MIT. Reported, not owned here |
 
+### 1.9 ADDENDUM — issues opened after this document's second revision (lead, 2026-10-26)
+
+Added by the lead, not Agent C, and therefore **requiring independent review like any other lead
+edit**. This section exists because §1.7's standing coverage condition fired for a third time: the
+register moved past this document again.
+
+| id | disposition | basis |
+|---|---|---|
+| **D-059** flock lifetime lock did not cover shell→python→`Popen` | **Fixed and independently verified** | Lead measured all three hops: fd survives `exec python`, is **dropped** by `close_fds=True`, and killing the trainer with a survivor alive left the lock **FREE**. The covering layer is the acquire-time occupancy gate, whose own assumption the lead then measured: a `Popen`-spawned CUDA worker **is** listed by `nvidia-smi` (`2174848, 492 MiB`). Reviewer confirmed compute-apps is consulted unconditionally with **no tunable threshold** |
+| **D-060** `PROJECT` was environment-derivable, defeating every other guard | **Fixed and independently verified** | Found by the independent reviewer. Before: `PROJECT=<x>` gave `mode=production`, `lockdir=<x>/.gpulocks`, `FREEZE: none`, and `acquire` returned **rc=3 instead of rc=4** — freeze bypassed. After: refused **rc=6** on `status` **and** `acquire` (lead-measured; asserted by T36a) |
+| **D-061** `rg_manifest` returned 0 on failure, so `rg_finish` wrote DONE with no manifest | **Fixed and independently verified** | Lead exercised an unwritable destination: returns non-zero, `rg_finish` **refused DONE**. Reviewer additionally defeated the truncated-publish variant. Asserted by T36f |
+| **D-062** `run_v2` had no `set -e`, launched GPU work after its own precondition failed, and could attest to a **previous** run's directory | **Fixed** (not yet independently reviewed) | Reviewer verified 2 of 3 and found a **new** defect: `:88`'s `trap … EXIT` **replaced** the reservation's release trap, so record and hold file survived a *clean* exit and the next acquirer was refused that GPU for ≤900 s. That was the lead's own bug in a file the lead wrote; trap removed outright rather than chained |
+| **D-063** `gpu_reserve_drop` returned 0 on retention, leaving `_GR_HOLD_PATH` set so a second acquire was **permitted** and orphaned the first hold file | **Fixed** (not yet independently reviewed) | **The lead previously reported this fixed on the strength of a code comment**, and the reviewer measured that it was not. Now returns a distinct **rc=10**, and the guard keys on `_GR_HOLD_PATH` as well as the fd. Asserted by T36c/T36d |
+| **R1** `$PATH` could substitute production telemetry | **Fixed** (not yet independently reviewed) | `_GR_PROD_NVSMI` was a bare name; reviewer measured production reporting fabricated UUIDs `GPU-ffff`/`GPU-eeee` at 0 MiB with `telemetry=OK`. Now resolved absolute at load time, failing closed. Lead verified by attack: `via /usr/bin/nvidia-smi`, no fabricated UUID. Asserted by T36b |
+| **R2** `${BASH_SOURCE[0]}` self-reinvocation still relative | **Deferred — does not affect the next experiment** | Reviewer measured rc=127 after a `cd`: **fails closed**, and no launcher is exposed |
+| **R3** cleanup-on-SIGINT unverified | **Fixed and independently verified** | Both the author and the lead failed to settle this, and the reviewer explained why neither approach *could*: exit **130 is also produced by being killed with no handler**, and HELD→FREE is produced by the **kernel** closing the descriptor regardless. Handlers now emit a stderr marker existing only inside the handler path. Measured: 2 markers, lock FREE |
+| **T36** none of the five post-review fixes had a test (suite 318→318) | **Fixed** (result pending at time of writing) | Six assertions added, each exercising the real function or dispatch rather than a source grep |
+
+**A pattern this addendum is obliged to record, because it is the lead's own.** D-042 → D-047 →
+D-060, and then R1, are **one defect in four places**: a value was validated while the thing it
+*resolved through* was not. Each earlier fix hardened something computed from an unvalidated root.
+Separately, five of the six instances of "a control credited for its shape rather than the property
+it enforces" (REG/D-013, D-040, D-053, D-055, D-057, D-059) originate with the lead.
+
+**And a measurement-discipline note.** Four of the lead's own test harnesses in this round were
+wrong while the code was correct: three signalled the `setsid` wrapper instead of the runner shell
+(recording "handler did not fire" three times), and one let a backgrounded survivor inherit a
+command substitution's stdout, stalling the suite for ten minutes. A negative result from a harness
+that has not been shown to target the right process is not evidence.
+
 ### 1.7 Standing condition on this document's own coverage
 
 **This document has now gone stale twice in one day**, both times because the register grew after it

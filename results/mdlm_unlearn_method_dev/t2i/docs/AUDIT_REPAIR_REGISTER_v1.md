@@ -1606,6 +1606,55 @@ lock HELD→FREE is **kernel-produced regardless** of whether the trap fires, so
 **cannot discriminate** — my test could not have settled it even in principle, not merely by
 accident. `REVIEW_M1.md` §2 names the stderr line that would.
 
+### R1 CLOSED — `$PATH` could substitute production telemetry. Same shape as D-060, one level down.
+
+**Owner:** lead · **Files:** `scripts/gpu_reserve.sh:169`
+
+`_GR_PROD_NVSMI` was the **bare name** `"nvidia-smi"`. The file refuses `GPU_RESERVE_NVSMI` in
+production — but **`$PATH` still decided which binary that name resolved to**. The reviewer measured
+production reporting **fabricated UUIDs `GPU-ffff`/`GPU-eeee` at 0 MiB with `telemetry=OK`**: the
+telemetry the entire guard rests on was substitutable without touching any variable the file
+validates.
+
+**This is D-060's shape repeated one level down** — the leaf was checked, the thing it *resolved
+through* was not. Fixed by resolving to an absolute path at load time and failing closed if none of
+the known locations exists. **Verified by attack:** with a fake `nvidia-smi` first on `$PATH`, output
+reads `telemetry=OK gpus=[3 2 1 0] via /usr/bin/nvidia-smi` and **no fabricated UUID appears**.
+
+### R3 CLOSED — cleanup-on-SIGINT now has positive proof. It did not before.
+
+**Owner:** lead · **Files:** `scripts/gpu_reserve.sh:1772-1780`
+
+Both Agent A and I failed to settle this, and the reviewer explained why neither of our approaches
+could: **exit status 130 is also produced by being killed with no handler**, and the lock going
+HELD → FREE is produced by the **kernel** closing the descriptor whether or not the trap ran. So
+neither observation discriminates. My earlier "correct lifetime, `CLEAN=0`" result was not weak
+evidence — it was **evidence about the wrong thing**.
+
+**Fix:** each signal handler now emits an explicit marker on **stderr**, which exists only on the
+code path *inside* the handler. **Measured end-to-end on the real handler:**
+
+```
+[gpu_reserve] SIGNAL INT received -- release handler running for r3real
+[gpu_reserve] SIGNAL INT handler complete
+marker count: 2        lock after handler: FREE (released)
+```
+
+**Three of my own test harnesses were wrong before this worked**, and the code was correct every
+time: I signalled the `setsid` wrapper instead of the runner shell, so the trap never received
+SIGINT and I recorded "handler did not fire" three times. Signalling the actual shell pid: the trap
+fires. **The defect was in my measurement, not the implementation** — the same error class as the
+`pgrep` self-match I had just diagnosed in a stale process, and as the `case` pattern that matched
+its own shell and killed my cleanup loop mid-run.
+
+### T36 — one assertion per post-review fix (the reviewer's third blocker)
+
+Its finding was that **none of the five fixes had a test**: the suite went 318 → 318, so a green
+suite said nothing about them. Added `T36a`–`T36f`, each exercising the **real function or
+dispatch**, not a source grep: D-060 refusal on `status` **and** `acquire`; R1's `$PATH` substitution
+attempt; D-063's `rc=10` retention code; D-063's second-acquire refusal on a retained hold path;
+`RG_PY` absolute after a `cd`; and D-061's failed-manifest → DONE-refused chain.
+
 ---
 
 ## 2. Agent assignments (file ownership, no overlapping edits)

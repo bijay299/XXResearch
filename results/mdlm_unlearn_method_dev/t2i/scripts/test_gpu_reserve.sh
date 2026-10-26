@@ -1853,6 +1853,88 @@ BADUNLOCK=$(awk '/flock -u/ {
 chk "no 'flock -u' in gpu_reserve.sh targets anything but the mutex (fd 9)" "$BADUNLOCK" "0"
 
 # ---------------------------------------------------------------------------
+# T36 -- ONE ASSERTION PER POST-REVIEW FIX (2026-10-26).
+# The second independent review's third blocker was that NONE of the five fixes had a test: the
+# suite went 318 -> 318, so a green suite said nothing about them. These are those assertions.
+# Each one exercises the real function or the real dispatch, not a grep over the source.
+printf '\n== T36: assertions for the post-review fixes ==\n'
+
+# T36a  D-060: PROJECT must not relocate the project root. rc=6 = prohibited override.
+( PROJECT=/tmp/t36_evil bash "$RESERVE" status >/dev/null 2>&1 )
+chk "T36a D-060: PROJECT=/tmp/t36_evil refused by status (rc=6)" "$?" "6"
+( PROJECT=/tmp/t36_evil bash "$RESERVE" acquire t36 $$ >/dev/null 2>&1 )
+chk "T36a D-060: PROJECT refused by acquire too, not just status (rc=6)" "$?" "6"
+
+# T36b  R1: an absolute production nvidia-smi, so $PATH cannot substitute telemetry.
+T36_FAKE=$(mktemp -d)
+printf '#!/bin/bash\necho "0, GPU-ffff, 0"\n' > "$T36_FAKE/nvidia-smi"; chmod +x "$T36_FAKE/nvidia-smi"
+T36_OUT=$(PATH="$T36_FAKE:$PATH" bash "$RESERVE" status 2>&1 || true)
+case "$T36_OUT" in
+  *GPU-ffff*) bad "T36b R1: \$PATH still substituted production telemetry (fabricated UUID seen)" ;;
+  *)          ok  "T36b R1: \$PATH cannot substitute production telemetry" ;;
+esac
+case "$T36_OUT" in
+  *"via /"*) ok  "T36b R1: production telemetry resolved via an ABSOLUTE path" ;;
+  *)         bad "T36b R1: production telemetry source is not reported as an absolute path" ;;
+esac
+rm -rf "$T36_FAKE"
+
+# T36c  D-063: the retention branch must return a DISTINCT code (10), not 0, so a caller's
+# `|| handler` is live -- and it must leave _GR_HOLD_PATH set so a second acquire is refused.
+T36_RC=$(timeout 25 bash -c '
+  source '"$RESERVE"' 2>/dev/null || exit 99
+  # simulate a held reservation whose liveness lock is still held by a survivor
+  _GR_HOLD_CAMP=t36c
+  _GR_HOLD_PATH=$(mktemp "${TMPDIR:-/tmp}/t36c.XXXXXX")
+  exec {_GR_HOLD_FD}>>"$_GR_HOLD_PATH"
+  flock -x "$_GR_HOLD_FD"
+  # The survivor MUST NOT inherit the stdout of this command substitution: it waits for every writer
+  # of the pipe to close, so a backgrounded holder with stdout open stalls the whole suite. I hit
+  # exactly that here -- the suite sat at this test for ten minutes, alive and making no progress.
+  ( flock -x 9 ; sleep 3 ) 9>>"$_GR_HOLD_PATH" >/dev/null 2>&1 &   # survivor holds it
+  sleep 0.6
+  gpu_reserve_drop t36c >/dev/null 2>&1
+  echo $?
+' 2>/dev/null | tail -1)
+chk "T36c D-063: gpu_reserve_drop returns 10 (KEPT), not 0, when work survives" "$T36_RC" "10"
+
+# T36d  D-063: a second acquire in one shell is refused while a hold path is still set (rc=2).
+T36_RC2=$(timeout 25 bash -c '
+  source '"$RESERVE"' 2>/dev/null || exit 99
+  _GR_HOLD_PATH=/tmp/t36d.fake          # retained hold, fd already closed by a drop
+  unset _GR_HOLD_FD
+  gpu_reserve_hold t36d 1 >/dev/null 2>&1
+  echo $?
+' 2>/dev/null | tail -1)
+chk "T36d D-063: second acquire refused on a retained hold path (rc=2)" "$T36_RC2" "2"
+
+# T36e  RG_PY must be absolute, so a runner that cd's elsewhere cannot silently fail open.
+T36_RGPY=$(timeout 15 bash -c 'cd /; source '"$SELF_DIR"'/run_guard.sh 2>/dev/null; echo "${RG_PY:-unset}"' 2>/dev/null | tail -1)
+case "$T36_RGPY" in
+  /*) ok  "T36e RG_PY resolves to an absolute path after a cd ($T36_RGPY)" ;;
+  *)  bad "T36e RG_PY is not absolute after a cd: '$T36_RGPY' -- guard would fail open" ;;
+esac
+
+# T36f  D-061: rg_manifest must report failure, and rg_finish must then refuse DONE.
+T36_MAN=$(timeout 25 bash -c '
+  set -euo pipefail
+  cd '"$PROJ"'
+  source scripts/run_guard.sh
+  L=$(mktemp "${TMPDIR:-/tmp}/t36f.XXXXXX")
+  rg_init T36F "$L" >/dev/null 2>&1
+  if rg_manifest "/proc/cannot/write/m.json" "$L:text" >/dev/null 2>&1; then echo "MANIFEST_OK"; else echo "MANIFEST_FAILED"; fi
+  if rg_finish >/dev/null 2>&1; then echo "DONE_WRITTEN"; else echo "DONE_REFUSED"; fi
+' 2>/dev/null)
+case "$T36_MAN" in
+  *MANIFEST_FAILED*) ok  "T36f D-061: rg_manifest returns non-zero on a failed publish" ;;
+  *)                 bad "T36f D-061: rg_manifest reported success on a failed publish" ;;
+esac
+case "$T36_MAN" in
+  *DONE_REFUSED*) ok  "T36f D-061: rg_finish refuses DONE after a failed manifest" ;;
+  *)              bad "T36f D-061: rg_finish wrote DONE despite a failed manifest" ;;
+esac
+
+# ---------------------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'RESULT: %s passed, %s failed\n' "$PASS" "$FAIL"
 printf 'No GPU was accessed; nvidia-smi was the shim at %s\n' "$SHIM"
