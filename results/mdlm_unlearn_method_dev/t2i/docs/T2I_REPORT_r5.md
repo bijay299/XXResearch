@@ -1,5 +1,8 @@
 # T2I relearning-robust erasure — report r5 (post-audit)
 
+> **⚠ Corrections 2026-10-26:** `FINDING76` §3's probe mechanism check is **overstated** (n=7/3/1, within-arm spread 40×, ordering undetermined — see its §7). `FINDING77` §2's "B kills the accumulation-order hypothesis" is **wrong** — B holds accumulation order fixed and never varied it (see its §6).
+
+
 **Supersedes `T2I_REPORT_r4.md`.** r4's headline attribution, counts, protocol-compliance and
 mechanism claims were wrong in the specific ways listed in `CORRECTION_REGISTER_r5.md`; its text is
 preserved under a SUPERSEDED banner.

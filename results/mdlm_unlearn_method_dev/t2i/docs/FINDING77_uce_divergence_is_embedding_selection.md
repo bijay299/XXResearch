@@ -1,3 +1,12 @@
+> ### ⚠ §2's "B kills the accumulation-order hypothesis" IS WRONG — see §6 (added 2026-10-26)
+>
+> Column **B holds accumulation order FIXED**: `r4b_uce_upstream_vs_port.py:172-177` uses
+> **upstream's** order (`mat1 = lamb*W` first) on *both* sides, whereas our actual
+> `erase_uce.py:116-117` puts `lam*W` **last**. B therefore cannot test accumulation order — it
+> never varied it. The accumulation-order question remains **unmeasured**, not refuted. And the
+> "port" column is our port's *embedding selection* run through *upstream's* order, **not
+> `erase_uce.py`'s code path**. §6 states what each column does and does not establish.
+
 # FINDING 77 — Running the **actual upstream UCE**, our port diverges from it by **11–38%** of the edited weight norm. The cause is **embedding selection**, not accumulation order and not λ-conditioning. `FINDING75` had the mechanism wrong.
 
 **Date:** 2026-10-26 · **Experiment:** R4b · **Supersedes:** `FINDING75` (retracted)
@@ -75,3 +84,46 @@ selection itself.
 UCE remains a **project reimplementation**. R4b compared upstream's executed output against our
 port's computation on matched inputs; it did not run our full `erase_uce.py` end-to-end into a
 checkpoint, nor compare generations. Both remain open.
+
+---
+
+## 6. Correction (2026-10-26) — what columns A and B actually compare
+
+`r4b_uce_upstream_vs_port.py`'s `solve()` accumulates in **upstream's order** for every cell:
+
+```python
+mat1 = lamb * W ; mat2 = lamb * I          # lambda FIRST -- upstream's order
+mat1 = mat1 + es * (c_g_out.T @ c_e) ; ...
+```
+
+Our actual port, `erase_uce.py:116-117`, puts `lam * W` **last**:
+
+```python
+num = V_star.T @ c_e + preserve_scale * (W @ c_p.T) @ c_p + lam * W
+```
+
+**Consequences, stated precisely:**
+
+| column | what it really compares | what it does **not** establish |
+|---|---|---|
+| **A** | upstream's executed output vs **our port's embedding selection run through upstream's accumulation order** | not `erase_uce.py`'s code path; accumulation order is held at upstream's |
+| **B** | our solver vs upstream, **same selection, same order** | **nothing about accumulation order** — it was never varied |
+| **C** | float32 vs float64 on identical matrices | unchanged and correct |
+
+**So §2's heading "B kills the accumulation-order hypothesis" is wrong.** B holds that variable
+fixed. What B *does* establish, and it is still useful: **given identical embeddings and identical
+accumulation order, our solver reproduces upstream to 1.3e-07 at λ=1000** — i.e. there is no third,
+hidden discrepancy in the closed-form transcription.
+
+**A−B still isolates embedding selection**, because A and B differ *only* in the embedding
+selection — both use upstream's order. That inference survives, and §1's numbers stand as reported.
+What changes is the scope: A measures *our selection vs upstream's*, not *our port vs upstream*.
+
+**`FINDING75`'s accumulation-order claim is therefore neither confirmed nor refuted** — it was
+measured at ~1e-3–1e-7 on char-split inputs there, and not measured at all here. It remains open,
+and on the evidence of column C it is very likely a small effect, but that is an expectation rather
+than a measurement.
+
+**Still unrun, and needed to close this:** run `erase_uce.py` end-to-end into an actual checkpoint
+at matched settings, compare that checkpoint against upstream's, and compare **generations** at
+matched prompts and seeds. Weight differences remain not image differences.

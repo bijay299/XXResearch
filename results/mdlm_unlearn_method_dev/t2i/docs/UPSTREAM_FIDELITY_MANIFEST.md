@@ -1,5 +1,8 @@
 # Upstream source & fidelity manifest — official reference implementations
 
+> **⚠ Corrections 2026-10-26:** `FINDING76` §3's probe mechanism check is **overstated** (n=7/3/1, within-arm spread 40×, ordering undetermined — see its §7). `FINDING77` §2's "B kills the accumulation-order hypothesis" is **wrong** — B holds accumulation order fixed and never varied it (see its §6).
+
+
 **Date:** 2026-10-26 · **Clone root:** `/data/bijaypandey/t2i_unlearn/upstream/` (**git-ignored**, see
 §0.1) · **Machine-readable:** `outputs/upstream_manifest.json`
 

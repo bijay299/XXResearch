@@ -1,5 +1,8 @@
 # Upstream reference implementations — current status
 
+> **⚠ Corrections 2026-10-26:** `FINDING76` §3's probe mechanism check is **overstated** (n=7/3/1, within-arm spread 40×, ordering undetermined — see its §7). `FINDING77` §2's "B kills the accumulation-order hypothesis" is **wrong** — B holds accumulation order fixed and never varied it (see its §6).
+
+
 **Date:** 2026-10-26 · **Source/config commit:** `5e222fc26c43fae14294516db588f932c0394a65`
 **Companion:** `UPSTREAM_FIDELITY_MANIFEST.md` (the full ledger) ·
 `outputs/upstream_manifest.json`
