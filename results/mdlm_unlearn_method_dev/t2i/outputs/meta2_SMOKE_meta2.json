@@ -1,0 +1,96 @@
+{
+ "study": "meta_unlearning_v2",
+ "implementation_version": "meta/v2-full-eq8",
+ "source": "arXiv 2410.12777 Eq. 8",
+ "reference_code": "sail-sg/Meta-Unlearning@5a2a7600895a2885323cbbf599acaf3f74a96f64 src/meta.py L920-1030",
+ "supersedes_and_does_not_replace": "scripts/meta_unlearn.py (variant A), whose results stand as a distinct project variant",
+ "objective": "L = distil_F(theta) + distil_R(theta) + zeta*L_R(theta) - lam_target*L_F(theta') - zeta*L_R(theta')",
+ "terms_restored_vs_variantA": [
+  "-lam_target*L_F(theta'): post-attack TARGET diffusion loss",
+  "+zeta*L_R(theta): matching pre-attack retain DIFFUSION loss"
+ ],
+ "scopes": {
+  "meta": "xattn",
+  "meta_n_params": 43962560,
+  "attack": "full",
+  "attack_n_params": 859520964
+ },
+ "target_data_provenance": {
+  "source": "base",
+  "generator_unet": "BASE (unmodified)",
+  "target_classified_fraction": 1.0,
+  "n_checked": 8,
+  "threshold": 0.25,
+  "note": "variant A generated this pool through the already-erased teacher and never checked its content"
+ },
+ "gradient_order": "first_order",
+ "approximation": "first-order: grad of the theta' terms is taken at theta' and applied at theta. Separate from the objective repair, and deliberately not conflated with it.",
+ "split_version": "v2",
+ "label": "SMOKE_meta2",
+ "concept": "church",
+ "hparams": {
+  "teacher": "adapters/frp_church_r3_l05/unet.pt",
+  "concept": "church",
+  "steps": 12,
+  "lr": 1e-05,
+  "inner_alpha": 1e-05,
+  "zeta": 1.0,
+  "lam_target": 1.0,
+  "meta_scope": "xattn",
+  "attack_scope": "full",
+  "target_source": "base",
+  "require_target_acc": 0.25,
+  "order": "first_order",
+  "n_images": 8,
+  "seed": 0,
+  "log_every": 4,
+  "label": "SMOKE_meta2",
+  "out": "adapters/SMOKE_meta2"
+ },
+ "forget_pool": [
+  "a church",
+  "an old stone church",
+  "a church steeple",
+  "a chapel with a bell tower"
+ ],
+ "n_benign_prompts": 24,
+ "train_log": [
+  {
+   "step": 0,
+   "l_erase": 0.0,
+   "l_distil_retain_theta": 0.0,
+   "l_retain_theta": 0.03984631225466728,
+   "l_target_theta_prime": 0.00791161973029375,
+   "l_retain_theta_prime": 0.05386463552713394,
+   "retain_change": 0.01401832327246666
+  },
+  {
+   "step": 4,
+   "l_erase": 0.00018616447050590068,
+   "l_distil_retain_theta": 8.99389197002165e-05,
+   "l_retain_theta": 0.05408323556184769,
+   "l_target_theta_prime": 0.019682010635733604,
+   "l_retain_theta_prime": 0.05572385713458061,
+   "retain_change": 0.0016406215727329254
+  },
+  {
+   "step": 8,
+   "l_erase": 0.00033731028088368475,
+   "l_distil_retain_theta": 0.0001574740163050592,
+   "l_retain_theta": 0.09321920573711395,
+   "l_target_theta_prime": 0.028089351952075958,
+   "l_retain_theta_prime": 0.43266138434410095,
+   "retain_change": 0.339442178606987
+  },
+  {
+   "step": 11,
+   "l_erase": 0.0001528967113699764,
+   "l_distil_retain_theta": 0.0008746862295083702,
+   "l_retain_theta": 0.25060877203941345,
+   "l_target_theta_prime": 0.041974253952503204,
+   "l_retain_theta_prime": 0.16428938508033752,
+   "retain_change": -0.08631938695907593
+  }
+ ],
+ "minutes": 0.9096547444661458
+}
