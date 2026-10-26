@@ -3,6 +3,37 @@
 THIS IS A PUBLISHED METHOD, NOT OURS. Transcribed from Section 4.1, Eq. (3)-(5), Algorithm 1 and
 the Implementation-details paragraph. Port decisions are pre-declared in docs/PREREG_H82_imma_port.md.
 
+!! PROVENANCE CORRECTION (Agent-3 fidelity audit, 2026-10-26). This file and its artifact recorded
+`code_released: False`. THAT IS WRONG: the authors' code IS public and is now cloned at
+`upstream/IMMA` (github.com/amberyzheng/IMMA @2f55041141705031d503134dec22f674f09e21bf). This port
+was written from the PAPER and has NOT been reconciled against that code. Four divergences found by
+reading it, none of them repaired here (repairing them would change numerics):
+
+  1. SCOPE, 2.13x. The reference filters on `['to_q','to_v','to_k','to_out']` with NO attn2
+     restriction (`upstream/IMMA/train/defend_text_to_image_lora.py:561-567`, same code in
+     `defend_dreambooth.py:882-889`), so it immunizes SELF-attention (attn1) as well as
+     cross-attention (attn2) -- despite the authors naming the variable `xattn_layer_names`.
+     Reference scope = attn1 + attn2 to_q/k/v/out = 80 + 80 = 160 tensors, 93.5M params
+     (attn1 49.6M + attn2 44.0M). OURS = attn2 only, 80 tensors, 44.0M. Ratio 2.13x.
+     Our S follows the paper's TEXT ("cross-attention layers"); the released CODE is broader. Which
+     of the two is "IMMA" is genuinely ambiguous, and no result here may be read as a test of the
+     released code's scope.
+  2. NO OUTER GRADIENT CLIPPING here. The reference clips the upper-level update to
+     `--max_grad_norm` 1.0 (`defend_dreambooth.py:1297-1299`). This port clips neither level.
+  3. OPTIMIZER. The reference uses AdamW (weight_decay 1e-2); this port uses Adam (wd 0).
+  4. HYPERPARAMETERS. `alpha`/`inner_lr`/`I`/`rank` are recorded below as "unassigned_in_paper".
+     That is true of the paper but NOT of the code, which supplies them: outer lr 1e-6 (README 1e-5)
+     and LoRA lr 1e-4 (`defend_text_to_image_lora.py:213-224`), inner:outer = 1:1
+     (`:515-520`), batch 16 (README 1). Our inner_lr 1e-4 coincides; our alpha 1e-5 and batch 2
+     do not. Warm-starting phi matches (`--reinitialize_lora` default False, `:366`).
+
+The OBJECTIVE and its SIGNS do match the reference exactly: one unweighted diffusion MSE, descended
+on phi at the inner step and ASCENDED on S at the outer step (`accelerator.backward(loss)` vs
+`accelerator.backward(-loss)`, `defend_text_to_image_lora.py:944-960`), with two separate
+optimizers and no loss coefficients at all. The reference is also strictly FIRST-ORDER -- no
+`create_graph`, no `higher`, no `functional_call` anywhere in its tree -- so this port's
+alternating-step structure is faithful on the bi-level mechanics.
+
 Eq. (3), the bi-level program:
 
     max_{theta in S} L_A(x'_I, c'; theta, phi*)   s.t.  phi* = argmin_phi L_A(x'_A, c'; theta, phi)
@@ -121,8 +152,12 @@ def main():
                or ".B.weight" in n)]
     assert phi, "no LoRA parameters found after injection"
 
-    # S: cross-attention only, per the paper -- ALL attn2 projections (to_q/to_k/to_v/to_out), not
-    # just the ones LoRA happens to wrap. Matching on ".base." alone would have silently restricted
+    # S: cross-attention only, per the paper's TEXT -- ALL attn2 projections
+    # (to_q/to_k/to_v/to_out), not just the ones LoRA happens to wrap.
+    # NB (Agent-3 audit): the authors' RELEASED code omits the ".attn2." test and therefore also
+    # immunizes attn1 (93.5M, 2.13x this scope). See the module docstring item 1. Left unchanged so
+    # the historical IMMA arms stay reproducible; a matched-scope arm would be a new build.
+    # Matching on ".base." alone would have silently restricted
     # S to the 16 to_out projections LoRA injects (12.4M params) instead of the paper's full
     # cross-attention surface (44.0M), because inject_lora's scope is narrower than its name
     # suggests -- see the LoRA-scope correction in docs/.
@@ -196,12 +231,32 @@ def main():
     torch.save({k: v.half() for k, v in state.items()}, f"{a.out}/unet.pt")
 
     rec = {"study": "imma_port", "prereg": "PREREG_H82_imma_port.md",
-           "paper": "arXiv 2311.18815", "is_our_port": True, "code_released": False,
+           "paper": "arXiv 2311.18815", "is_our_port": True,
+           # CORRECTED 2026-10-26 (Agent-3 audit). This field read `False`, which was wrong.
+           "code_released": True,
+           "official_code": "github.com/amberyzheng/IMMA@2f55041141705031d503134dec22f674f09e21bf"
+                            " (cloned at upstream/IMMA)",
+           "reconciled_against_official_code": False,
+           "divergences_from_official_code": {
+               "scope": "reference filters to_q/to_v/to_k/to_out with NO attn2 restriction, so it "
+                        "covers attn1+attn2 = 93.5M (160 tensors); ours is attn2-only 44.0M "
+                        "(80 tensors). Ratio 2.13x. Ours follows the paper's text, not the code. "
+                        "Source: upstream/IMMA/train/defend_text_to_image_lora.py:561-567",
+               "grad_clipping": "reference clips the OUTER update to max_grad_norm=1.0 "
+                                "(defend_dreambooth.py:1297-1299); this port clips neither level",
+               "optimizer": "reference AdamW (wd 1e-2); this port Adam (wd 0)",
+               "hyperparameters": "the CODE supplies outer lr 1e-6 / README 1e-5 and LoRA lr 1e-4; "
+                                  "our inner_lr 1e-4 coincides, our alpha 1e-5 and batch 2 do not"},
+           "objective_matches_official_code": True,
+           "objective_match_note": "one unweighted diffusion MSE, descended on phi and ASCENDED on "
+                                   "S, two separate optimizers, no loss coefficients; reference is "
+                                   "strictly first-order (no create_graph/higher/functional_call)",
            "label": a.label, "concept": a.concept, "teacher": a.teacher,
            "hparams": vars(a),
            "specified_by_paper": ["S=cross_attention_only", "adam_upper_level",
                                   "one_inner_gradient_step", "overlap_variant_b"],
            "unassigned_in_paper": ["alpha", "inner_lr", "steps", "rank"],
+           "unassigned_in_paper_note": "true of the PAPER only; the released code assigns all four",
            "U_is_empty_for_lora": True,
            "n_S_params": n_S, "n_phi_params": n_phi, "S_names": S_names,
            "history": hist, "minutes": (time.time() - t0) / 60}

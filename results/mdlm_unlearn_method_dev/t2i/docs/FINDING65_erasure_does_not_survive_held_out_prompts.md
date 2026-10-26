@@ -1,5 +1,34 @@
 # FINDING 65 — On prompts never used for anything, erasure is **~3× shallower** than every reported figure. FRP is 54% undone, UCE 60% undone. And the cause is **not** the prompt leak: the leaked arm degraded least.
 
+> # ⚠ DO NOT QUOTE THE RATIOS. Audit defect D-022/D-022a, 2026-10-26.
+>
+> **Every FINAL number in this document was scored against the wrong label set, and the error runs
+> in the direction that produces this finding.**
+>
+> `gen_eval.py` defines `LABELS` (:48) — the English text CLIP should see — and `LAB_KEY` (:50) —
+> the underscored record keys. **Nine of the twelve differ.** `gen_eval_final.py:84` used
+> `list(ge.CONCEPTS)`, whose keys equal `LAB_KEY`, so CLIP was prompted with *"a photo of a
+> van_gogh"* and *"a photo of a english_springer"*.
+>
+> **Why that inflates this document's numbers.** `church`, `parachute` and `tench` are spelled
+> **identically** in both lists. Every experiment here erases **church** — so the *target* label's
+> text was correct while all nine competing distractors were degraded. Weaker distractors pull
+> images toward church, so **`target_hits` is biased upward**. Measured across the 180 FINAL images,
+> **37 still landed on a degraded label**, at median decision margins of **0.0027–0.0065** — far
+> below the perturbation a label rewrite causes.
+>
+> **And the ratios compare two different scorers.** The DEV figures come from `gen_eval.py`, which
+> uses `LABELS` **correctly**; the FINAL figures come from the defective path. FRP's "3.5×" is
+> DEV 0.1333 against FINAL 7/15 = 0.4667, with only the FINAL side inflated. The same applies to
+> UCE's "3×" and to §1's "54% undone" / "60% undone".
+>
+> **Status.** The 180 images were not saved, so correcting this requires regenerating them at the
+> same seeds (deterministic, so the *same* images — a pure re-score, not a second use of the FINAL
+> split) and re-scoring from `LABELS`. That run is queued as gate condition **G12**. Until it
+> completes, treat every ratio and percentage in this document as **unmeasured**. The qualitative
+> question — whether erasure is shallower on held-out prompts — remains open and may well survive;
+> the magnitudes do not currently stand. `FINDING66` inherits the same defect.
+
 **Date:** 2026-10-26 · **Experiment:** E6, the first and only use of the FINAL prompt set
 **Pre-committed:** arm list fixed in `scripts/gen_eval_final.py` before any FINAL number was seen;
 FINAL frozen 2026-10-25T23:30:00-04:00 and verified disjoint from DEF_TRAIN / ATK_TRAIN / DEV by

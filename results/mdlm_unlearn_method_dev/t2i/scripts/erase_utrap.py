@@ -2,9 +2,30 @@
 
     min_theta  L_retain(theta)  -  lam * L_target( A_K(theta) )
 
-A_K(theta) = K steps of the ACTUAL full-UNet relearning attack (the one attack_relearn.py runs, on
-16 self-generated target images) starting from theta. The outer objective maximises the attacker's
-target loss AT THE END of its trajectory, not at theta and not after one step.
+A_K(theta) = K steps of a full-UNet relearning SURROGATE on 16 self-generated target images,
+starting from theta. The outer objective maximises the attacker's target loss AT THE END of its
+trajectory, not at theta and not after one step.
+
+!! CORRECTED DOCSTRING (ERRATUM_utrap_inner_attacker.md; re-verified by the Agent-3 fidelity audit
+2026-10-26). This docstring previously called A_K "the ACTUAL full-UNet relearning attack (the one
+attack_relearn.py runs)". THAT CLAIM WAS FALSE and is withdrawn. The inner process below differs
+from the evaluation attacker on SEVEN axes simultaneously -- all seven re-confirmed from source:
+
+  | axis             | inner (this file)                     | evaluator (attack_relearn.py) |
+  |------------------|---------------------------------------|-------------------------------|
+  | optimizer        | SGD, rebuilt every outer step (:140)  | Adam                  (:333)  |
+  | optimizer state  | discarded every outer step    (:140)  | persistent over 300 steps     |
+  | grad clipping    | none                                  | global norm 1.0       (:362)  |
+  | batch size       | 2                             (:55)   | 1                     (:335)  |
+  | horizon          | K = 4 / 8 / 16                (:49)   | 300                   (:208)  |
+  | target images    | the ALREADY-ERASED teacher    (:75,:93) | the UNMODIFIED base (:261)  |
+  | target prompts   | ["a photo of a {concept}"]*16 (:80),  | the 8 disjoint `T` prompts    |
+  |                  | which is also evaluation prompt H[0]  |                               |
+
+Only the learning rate (1e-5) and the parameter scope (full UNet) match. NO NUMERICAL CHANGE has
+been made to this file: it is preserved exactly as it produced the historical UTRAP arms, and those
+arms remain reproducible. What is withdrawn is the DESCRIPTION, not the code. `erase_utrap_v2.py`
+is the reconciled implementation; it does not replace these results.
 
 DESIGNED FROM THIS PHASE'S FAILURE MODES, not from a paper:
   * FINDING59 S0 -- IMMA's inner loop approximates the attacker with ONE step and a 3x-longer
@@ -135,7 +156,10 @@ def main():
         l_retain.backward()
         g_retain = [p.grad.detach().clone() if p.grad is not None else None for p in params]
 
-        # ---- 2. unroll K steps of the REAL attack from theta, on a backup
+        # ---- 2. unroll K steps of the attack SURROGATE from theta, on a backup.
+        # NOT the evaluation attacker: SGD (not Adam), state discarded every outer step, no
+        # clipping, batch 2 (not 1), K steps (not 300). See the seven-axis table in the module
+        # docstring. Unchanged on purpose -- this is the code that produced the historical arms.
         backup = [p.detach().clone() for p in params]
         inner_opt = torch.optim.SGD(params, lr=a.inner_lr)
         l_att_first = l_att_last = None
@@ -192,6 +216,17 @@ def main():
                "approximation": "detached trajectory; grad L_target evaluated at theta_K and "
                                 "applied at theta. First-order class, K steps instead of one. "
                                 "Disclosed in PREREG_H84 S2 before any result.",
+               "inner_attacker_is_NOT_the_evaluation_attacker": {
+                   "status": "SHORT_HORIZON_SURROGATE, divergent on 7 axes",
+                   "erratum": "docs/ERRATUM_utrap_inner_attacker.md",
+                   "axes": ["optimizer: SGD vs Adam", "optimizer state: discarded vs persistent",
+                            "grad clipping: none vs 1.0", "batch: 2 vs 1",
+                            "horizon: K vs 300",
+                            "target images: erased teacher vs unmodified base",
+                            "target prompts: evaluation prompt H[0] vs disjoint T pool"],
+                   "matching_axes": ["lr 1e-5", "scope: full UNet"],
+                   "note": "metadata only; no numerical change to this script. See "
+                           "scripts/erase_utrap_v2.py for the reconciled implementation."},
                "label": a.label, "concept": a.concept, "teacher": a.teacher,
                "scope": "full UNet", "n_params": n_p, "hparams": vars(a),
                "history": hist, "minutes": (time.time() - t0) / 60},

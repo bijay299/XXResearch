@@ -108,11 +108,18 @@ Not part of the audit, but it finished the task in progress and is accounted for
 
 **The properly scaled UCE λ sweep on SD-1.5 completed**, bracketing the window from both sides by
 measurement (`T2I_REPORT_r5.md` §3.3). λ=1000 gives the first **usable** SD-1.5 UCE arm —
-**as-is target 0.2000 / retain8 0.9500** — and 2 of its 3 frozen-grid attacks are gate-valid at
-**H = 1.000**; the third (seed 0) had claimed a label without producing output and **is running
-now**. λ=10000 and λ=50000 both give target 1.0000 / retain8 1.0000 (`W_new → W_old`, no erasure),
-are flagged `vacuous_no_erasure`, and the λ=50000 attacks were independently caught by the validity
-gate.
+**as-is target 0.2000 / retain8 0.9500** — and **all three** frozen-grid seeds are now gate-valid at
+**H = 1.000** (6 records across duplicated labels). *The previous revision said "2 of 3 ... the
+third (seed 0) ... is running now"; it completed, and nothing is running.* λ=10000 and λ=50000 both
+give target 1.0000 / retain8 1.0000 (`W_new → W_old`, no erasure), are flagged
+`vacuous_no_erasure`, and the λ=50000 attacks were independently caught by the validity gate.
+
+**Work completed after this handoff was written**, and not described anywhere in §1–§3 above:
+E1 (faithful WDR, α ∈ {1.0, 4000}), E2 + E2g + E2h (Meta v2 full Eq. 8, 18-cell frozen grid plus an
+attacker-lr sweep), E4 + E4m + E4mg (UTRAP v2 K-sweep at matched compute), E6 (FINAL-prompt
+re-evaluation, which **consumed** the FINAL set), E11a–o and E12 (budget/lr/concept/method curves),
+**R1** (upstream IMMA trained 5000/5000 and scored) and **R4b–d** (upstream UCE executed). These
+produced `FINDING65`–`FINDING78`. §6 below is corrected accordingly.
 
 **Resource accounting, continued not reset:** `elapsed 77.8 h | gpu ≥34.71 device-h (FLOOR) |
 result JSONs 1196 | storage 174.2 GiB / 300 GiB authorised`. The GPU figure remains a reconstructed
@@ -129,7 +136,7 @@ total. Two GPUs at a time throughout; GPUs 2 and 3 were left to other users.
 | **2** | `stabilityai/*` returns **HTTP 401** | **E9** (SD-2.x / SDXL) impossible; the cross-model claim is confined to SD-1.x + one pruned derivative | a Hugging Face token |
 | **3** | FID dependencies absent and COCO not on disk | **E8** impossible; no claim about general image quality or global repair | authorisation for `pip install torchvision scipy` and a ~6 GB COCO val2014 download |
 | **4** | `gen_eval.py` cannot yet take the FINAL prompt pool | **E6** blocked; every target number stays a **development** measurement | a small flag in `gen_eval.py`; ~20 lines, not yet written because it should land with E6 rather than ahead of it |
-| **5** | The three released reference implementations need separate conda environments | **E7** blocked; "we reproduced it" remains unavailable, and "unusable" remains unsubstantiated | confirmation that building separate envs is acceptable and will not disturb `venv_t2i` |
+| **5** | ~~The three released reference implementations need separate conda environments~~ **DISCHARGED for two of three.** `venv_imma` and `venv_uce` were built as isolated **copies** (`venv_t2i` never modified); **upstream IMMA ran** (R1, 5000/5000 steps + eval) and **upstream UCE ran** (R4b–d, `executed: true`). `vision_relearning` (R3) is still unrun — it needs `wandb` and CIFAR-scale data | **E7 partially discharged.** "We reproduced it" is *still* unavailable, but for a different reason: both runs were scored on **our** benchmark, which is not a reproduction (`UPSTREAM_FIDELITY_MANIFEST.md` §6). "Unusable" remains unsubstantiated | R3 only: `wandb` + CIFAR data |
 | **6** | No never-trained oracle | reactivation vs relearning unresolvable **by construction** | a design decision: build a tractable never-trained reference, or narrow the paper to the operational relearning threat |
 
 ---
@@ -141,15 +148,28 @@ answer would be wrong:
 
 | axis | status |
 |---|---|
-| **Implementation** | **SUBSTANTIALLY RESOLVED, UNVALIDATED ON MODELS.** Three wrong objectives corrected and unit-tested; attacker definition shared and drift-proofed; split checker fails closed. **Not one corrected implementation has produced a model.** |
-| **Evaluation & provenance** | **PARTIALLY RESOLVED.** Leak detected and attributed, two more found, DEV/FINAL separated with FINAL frozen before inspection, RNG streams separated, gated+ungated and all three denominators reported, checkpoints identified by sha256. **No arm evaluated on FINAL**, so every target number remains a development measurement; CLIP classifier revision still unpinned. |
-| **Empirical comparison** | **NOT RESOLVED.** No corrected implementation run; the three released references not executed; the unroll-depth question untested with a faithful attacker. **No comparative claim about the published baselines is currently supported.** |
+| **Implementation** | **SUBSTANTIALLY RESOLVED, NOW VALIDATED ON MODELS.** Three wrong objectives corrected and unit-tested; attacker definition shared and drift-proofed; split checker fails closed. **All three corrected implementations have now produced models** — WDR v2 (E1, α ∈ {1.0, 4000}), Meta v2 (E2, λ ∈ {0.5, 1.0}) and UTRAP v2 (E4, K ∈ {0,1,8,32}). *The previous revision's "Not one corrected implementation has produced a model" was false.* Two new implementation defects were found in the process: `erase_wdr_v2.py` alternates where the reference **sums** (`D-016`), which entangles `FINDING67`'s α finding with our own schedule (`D-017`). |
+| **Evaluation & provenance** | **PARTIALLY RESOLVED.** Leak detected and attributed, two more found, DEV/FINAL separated with FINAL frozen before inspection, RNG streams separated, gated+ungated and all three denominators reported, checkpoints identified by sha256. **Still open:** E6 evaluated four arms on FINAL (`FINDING65`/`66`), which **consumed** that split — so a fresh final set must be frozen — **and those FINAL scores are defective** (`D-022`): `gen_eval_final.py` used `gen_eval.LAB_KEY` instead of `LABELS`, degrading nine of twelve distractor strings while leaving `church` (the erased target) correct, which biases target hits **upward**; `FINDING65`'s depth ratios are **unmeasured pending a CPU-only re-score**, while `FINDING66`'s ceiling conclusion survives as a within-scorer comparison. Every *other* target number remains a development measurement; the CLIP classifier revision is still unpinned; `FINDING72` measured the **validity gate's exclusion rate to be non-monotone in `T_before`**, so every "max-over-valid H" is computed over a biased sample; **234 of 335 builds have `ABSENT` checkpoints**; and **7 historical `gen_*.json` records do not identify the checkpoint they scored** (`unet: null`), five of which scored an *edited* model. |
+| **Empirical comparison** | **PARTIALLY RESOLVED — still no comparative claim about the published methods.** Corrected implementations **have** been run, two released references **have** been executed (upstream IMMA, upstream UCE), and the unroll-depth question **has** been tested at matched compute (`FINDING76`: flat). *The previous revision asserted the opposite of all three.* But **no comparative claim about the published baselines is supported even so**, and for a stronger reason than before: R1 and R4 used upstream code with **our** training data, scorer and prompts, which is not a reproduction of any paper's reported experiment. `vision_relearning` (R3) is still unrun. |
 | **Scientific interpretation** | **CORRECTED IN TEXT, STRUCTURALLY LIMITED.** Every saturated-endpoint, mechanism and capacity claim rewritten to what the data supports. The structural limits are **not** fixed by wording — E5, E6 and E10 are what would move them. |
 
-**The mandate remains unmet**: no arm reaches retain8 ≥ 0.85 with max-over-valid H ≤ 0.40. This
-remediation does not change that. It changes the **standing** of the negative result — it is now a
-statement about **our implementations** of three of the five baselines, not about the published
-methods, until E1, E2 and E7 run.
+**The mandate remains unmet**: no arm reaches retain8 ≥ 0.85 with max-over-valid H ≤ 0.40, at any
+budget. This remediation does not change that, and neither did E1, E2, E4 or R1/R4.
+
+The nearest approach is `meta2_church_lt0.5` (E2, full Eq. 8) at retain8 **0.9000** with as-is
+target **0.0000**. At 25 steps it clears the robustness half at attacker lr 1e-5 (**0.0667**) and
+lr 5e-5 (**0.2000**), and fails only at lr 1e-4 (**0.5333**, `logs/e2h_stronger.log`); since
+max-over-valid is a ratchet, the budget fails the bar. `FINDING78`'s companion claim to have
+produced "the first arm to meet both mandate halves" is **retracted** (`D-008`); its retention
+result — **+0.20 to +0.27** retain8 at identical suppression, attributable to Eq. 8's **pairing**
+rather than to ζ's weight — survives and is the first substantive gain any corrected baseline has
+produced.
+
+What the remediation changed is the **standing** of the negative result. It is now a statement about
+**our implementations plus two upstream-code runs scored on our own benchmark** — and still not
+about the published methods, because scoring upstream code on our benchmark is not a reproduction.
+E1, E2, E4 and E7's IMMA/UCE halves have run; **R3 is the cell that would still change this**, and
+it has not.
 
 ## 7. Reproducing this state
 
@@ -162,3 +182,35 @@ venv_t2i/bin/python scripts/registry_v1.py --tables                         # ~2
 
 The registry and tables are **regenerated**, never hand-edited. If a table disagrees with prose,
 the table is right and the prose is stale — that inversion is the point of §7 of the audit.
+
+---
+
+## 8. Change log — 2026-10-26 (Agent 6, provenance audit)
+
+This handoff described the state at the end of the audit remediation. Substantial GPU work ran
+afterwards (`FINDING65`–`FINDING78`), which falsified several of its status statements. Corrected
+below; full traceability in `AGENT6_PROVENANCE_FINDINGS.md`.
+
+| § | what changed | why |
+|---|---|---|
+| §4 | "2 of its 3 frozen-grid attacks are gate-valid ... the third (seed 0) ... **is running now**" → all three complete, 6/6 gate-valid | the run finished; `ps` shows no project process, and `FREEZE_ACTIVE` (12:43) now bars new GPU work |
+| §4 | added the list of campaigns that ran **after** this handoff was written (E1, E2/E2g/E2h, E4/E4m/E4mg, E6, E11a–o, E12, R1, R4b–d) | §1–§3 describe none of them, so a reader would take this document as current when it is not |
+| §5 blocker 5 | "**E7 blocked**" → discharged for two of three; R3 only | upstream IMMA ran 5000/5000 with eval; upstream UCE executed. The *conclusion* ("we reproduced it" unavailable) survives, for the better reason that both were scored on our benchmark |
+| §6 Implementation | "**Not one corrected implementation has produced a model**" → all three have | false. `gen_wdr2_church_a{1.0,4000}`, `gen_meta2_church_lt{0.5,1.0}`, 8 `utrap2*` builds |
+| §6 Implementation | added the two new implementation defects found since (`D-016` alternate-vs-sum, `D-017` shared-Adam) | they were found *by* running the corrected code, which is the point of validating on models |
+| §6 Evaluation | "**No arm evaluated on FINAL**" → four arms were, and that **consumed** the split; added `FINDING72`'s gate bias, the 234/335 `ABSENT` checkpoints, and the 7 `unet: null` records | the row understated what had been measured and omitted three provenance limits a successor needs |
+| §6 Empirical comparison | "NOT RESOLVED — no corrected implementation run; references not executed; unroll depth untested" → all three have happened, and the conclusion is **restated on stronger grounds** | three false sub-claims. The verdict "no comparative claim is supported" is kept, now because upstream-code-on-our-benchmark is not a reproduction, rather than because nothing ran |
+| §6 closing | mandate paragraph rewritten with the `meta2_church_lt0.5` near-miss, the `FINDING78` retraction (`D-008`), and R3 named as the remaining cell | the conclusion was right but rested on absence of measurement; it now rests on `logs/e2h_stronger.log` |
+
+### 8.1 Re-verified and found correct (unchanged)
+
+§1's file inventory and line counts; §2's **24 passed / 0 failed** and the two float64 test-bug
+fixes; §2's smoke-run outcomes including Meta v2's `L_F(θ')` rise 0.00791 → 0.01968 → 0.02809 and
+the `meta 'xattn': 44.0M | attack 'full': 859.5M` scope separation; §3's fp16/fp32 VAE bug and the
+`pkill` self-match incident; §5's blockers 1, 2, 3, 4 and 6.
+
+**Flagged, not repaired:** §4's resource accounting (`result JSONs 1196`, `storage 174.2 GiB`) is
+stale — there are now **1,424** JSON files under `outputs/`. §7's reproduction recipe still invokes
+`scripts/registry_v1.py`, which is correct but will **not** reproduce the current tables, since
+`outputs/registry_v1.json` predates 150 JSON files; regenerating it is a lead decision under the
+freeze.

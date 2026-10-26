@@ -8,7 +8,12 @@
 
 This is the fidelity ledger the implementation task requires: for each method, what upstream
 actually is, what our wrapper actually does, and **every departure between them**. It makes no
-performance claims. Nothing here is a reproduction until a run is recorded in §6.
+performance claims.
+
+**Nothing here is a reproduction, and recording a run in §6 does not make it one.** Two cells have
+now run upstream code (R1, R4) — both scored on **our** benchmark, which is §6's middle tier, not an
+official reproduction. The previous revision's "nothing here is a reproduction *until* a run is
+recorded in §6" wrongly implied that executing upstream code is sufficient; it is not.
 
 ---
 
@@ -133,6 +138,25 @@ Already reconciled in `ERRATUM_meta_objective.md`; restated as a ledger with the
 stipulates. It restores the objective's signed structure; it does not restore the pool structure or
 the timestep option.
 
+### 2.2 What E2 measured, and what the retention gain is actually attributable to
+
+E2 has now run (λ ∈ {0.5, 1.0}), plus an 18-cell frozen grid (E2g) and an attacker-lr sweep (E2h).
+`outputs/gen_meta2_church_lt0.5.json`: as-is target **0.0000**, retain8 **0.9000**, against variant
+A's **0.6250** (λ=0.6) and **0.7000** (λ=0.7) at the same 0.0000 suppression — **+0.20 to +0.27**
+(`outputs/gen_h80_meta_church_lam{0.6,0.7}.json`; variant A at λ=1.0 collapses to 0.1167).
+
+**Attribution, per `FINDING78` §1a:** the gain comes from restoring Eq. 8's **pairing** — the
+restored terms cancel variant A's retain-level penalty — and **not** from the weight of the ζ
+coefficient, which is **near-inert and has never been swept**. So the single-ζ collapse recorded in
+§2.1 as a departure is a departure in *structure*, and the retention result should not be read as
+evidence about ζ's value in either implementation. Nothing in this manifest credits the gain to ζ.
+
+**Robustness is unchanged.** The arm is fully reversed by 300 steps (max-over-valid H 1.0000), and
+`FINDING78`'s companion claim to have produced "the first arm to meet both mandate halves" is
+**retracted** (audit defect `D-008`): at 25 steps it clears 0.40 at attacker lr 1e-5 (0.0667) and
+5e-5 (0.2000) but reaches **0.5333** at lr 1e-4, and max-over-valid is a ratchet. **No arm has met
+both halves at any budget.** The retention result survives; the mandate claim does not.
+
 ---
 
 ## 3. Weight-space regularisation — fidelity reconciliation
@@ -157,15 +181,43 @@ Reconciled in `ERRATUM_wsr_direction.md` and `FINDING67`; the ledger entry:
 unlearning in vision classifiers; the retain objective must become the diffusion MSE. Any SD result
 is a **domain adaptation**, never a reproduction — including `erase_wdr_v2.py`.
 
-**Scale caveat carried forward (`FINDING67`):** at the reference's own α=1 the term's gradient norm
-is exactly **1/√N = 3.411e-5** against a retain gradient of ~0.137, i.e. **inert at 859.5M
-parameters**. Parity is α ≈ 4.0e3. **Gradient-norm parity is not a claim of optimality** — under
-Adam the update is preconditioned and per-coordinate normalised, so parity bounds where the term
-*can* act, not where it acts *best*. The α sweep remains open.
+**Scale caveat, corrected 2026-10-26 (audit defect `D-017`).** The derivation stands: at the
+reference's own α=1 the term's gradient norm is exactly **1/√N = 3.411e-5** against a retain
+gradient of ~0.137. **But that is not why α is inert in our port, and the "~4,000×" figure is an
+artifact.** Measured as the distance step's update magnitude as a fraction of `lr`: α=1 → **0.104**,
+α=10 → **0.537**, α=4000 → **0.998** — so α 1→4000 buys **≈9.6×**, not 4,000×.
+
+The real mechanism is **our optimiser plumbing**: both steps share **one Adam instance**, so the
+second-moment buffer `v` is an EMA over both terms and is dominated by the larger (retain) one,
+making the distance update ≈ `lr·|g_dist|/√v_retain`. α is therefore inert at **both** ends — below
+≈10 because `v` is retain-dominated, above ≈4e3 because **Adam saturates**. The useful window
+α ∈ (1, 4000) is real, but its upper bound is a **saturation point, not a frontier**.
+
+**This is a property of our two-step port, not of the published method.** The reference **sums** the
+forget and retain gradients into one `opt.step()` (`vision_unlearner.py:411,637-682`); under that
+summed schedule the gradient-norm framing *would* be apt. `erase_wdr_v2.py`'s docstring claiming it
+alternates "as the reference does" is itself inverted (audit defect `D-016`). So the faithfulness
+defect and the coefficient finding are **entangled**, and `wdr2_church_a4000`'s retain8 **0.5917**
+measures *our two-step shared-Adam schedule at saturation* — **not** "WDR at gradient parity". Any
+"at gradient parity" reading of that number is withdrawn.
+
+**Gradient-norm parity was never a claim of optimality** either — under Adam the update is
+preconditioned and per-coordinate normalised. The α sweep remains open, and so does a re-run under
+the reference's summed schedule. See `FINDING67` (header + §7) and
+`AGENT3_FIDELITY_FINDINGS.md` §4.2–4.3.
 
 **Native-domain sanity check is required** before the diffusion adaptation can be interpreted: the
 reference must be run on its own CIFAR-scale setting to confirm our reading of `weight_dist_reg`
-reproduces its published behaviour. Queued in §6 as **R3**, not yet run.
+reproduces its published behaviour. Queued in §6 as **R3**, **not yet run** — verified 2026-10-26:
+no `logs/r3*` and no `outputs/r3_*` exist. R3 is the one declared cell for which "blocked, not
+started" is still accurate.
+
+**The diffusion adaptation has since been run (E1), at two α values.** `outputs/gen_wdr2_church_a1.0.json`
+and `gen_wdr2_church_a4000.json`: α=1.0 gives target 0.5333 / retain8 0.9500 (the term is inert, so
+this is close to doing nothing); α=4000 gives target 0.2000 / retain8 **0.5917**, a K1 failure. The
+preregistered grid was α ∈ {0.3, 1.0, 3.0}; what ran was {1.0, 4000}, so **α ∈ (1, 4000) — where a
+usable arm would have to be — remains unmeasured.** None of this bears on the published method,
+which R3 has not checked.
 
 ---
 
@@ -179,12 +231,39 @@ Our port implements the closed form
 W_new = (Σ v* cᵀ + s·(W c_pᵀ)c_p + λW) (c_eᵀc_e + s·(c_pᵀc_p) + λI)⁻¹
 ```
 
-which was verified algebraically in `ERRATUM_uce_lambda_scale.md`. **Not yet reconciled against the
-official code** — that is task item 4's requirement and is queued as **R4** in §6. Until matched-input
-outputs are compared, our UCE numbers are a **project reimplementation**.
+which was verified algebraically in `ERRATUM_uce_lambda_scale.md`.
+
+**R4 has now run** (four phases, 2026-10-26 11:32→12:45) — the previous revision's "not yet
+reconciled against the official code ... queued as R4" is withdrawn. What it establishes, and what
+it does not:
+
+| phase | artifact | result |
+|---|---|---|
+| R4 | `r4_uce_*.json` | **`VOID: true` — DO NOT CITE.** Char-split inputs (`list('church')` → six single letters, recorded as `n_erase_prompts: 6`); an embedding selection matching **neither** implementation; and **no upstream code executed** — two local transcriptions were compared. `FINDING75` rested on it and is **retracted** |
+| R4b | `r4b_uce_lamb{0.1,0.5,1000.0}.json` | Upstream **executed** (`executed: true`; the shim binds only the module-level `device`/`torch_dtype` that upstream sets inside `__main__` at `uce_sd_erase.py:116-117`; the `UCE()` body is unmodified). **A** (full pipelines) max rel err **0.384 / 0.322 / 0.108**; **B** (our solver on **upstream's** embedding selection) **1.5e-3 / 3.0e-4 / 1.3e-7**; **C** (fp32 vs fp64, identical matrices) 1.0e-3 / 2.1e-4 / 3.7e-7 |
+| R4c / R4d | `r4c_uce_lamb{0.1,0.5}.json`, `r4d_…` | Checkpoints + generations, with and without `preserve_concepts`. λ=0.1 upstream-vs-port label agreement **0/15**; λ=0.5 **2/15**; per-matrix max 0.384 / 0.322 |
+
+**The divergence localises to embedding selection, not the solver** — B is three orders of magnitude
+below A at every λ. That is a measured confirmation of §7(d) below, which was read from source
+independently.
+
+**No port-fidelity conclusion is drawn from R4 yet.** At λ=0.1 the **upstream** arm scores target
+**15/15** (`r4c` `generations`: BASE 15/15, UPSTREAM 15/15, OUR_PORT 0/15), which is consistent with
+upstream's edit having been **inert** in that run — in which case the comparison measures nothing
+about fidelity. That is under verification. **R4's status is "executed; interpretation under
+verification."**
+
+Note also that `FINDING77` §2's claim that column B "kills the accumulation-order hypothesis" is
+**wrong** (its §6): B holds accumulation order **fixed** — it uses upstream's order (`mat1 = lamb*W`
+first) on both sides, whereas `erase_uce.py:116-117` puts `lam*W` last — so accumulation order was
+never varied and remains **unmeasured**.
+
+Until the inertness check returns, our UCE numbers remain a **project reimplementation** on their
+prior grounds (§7(d)'s source-level selection mismatch), **not** on R4's numbers.
 
 Known from our side: λ is measured inert below ~1e3 because `cᵀc` has max eigenvalue 85,850
-(`ERRATUM_uce_lambda_scale.md`); λ=1000 is the first usable SD-1.5 setting.
+(`ERRATUM_uce_lambda_scale.md` — **single-sourced to that document; no artifact under `outputs/`
+recomputes it**); λ=1000 is the first usable SD-1.5 setting.
 
 ---
 
@@ -249,16 +328,35 @@ Finite, bounded, with stopping rules. Labels and output directories keep the thr
 
 | prefix | category |
 |---|---|
-| `REF_*` | **official reproduction** — authors' code, authors' protocol |
+| `REF_*` | **upstream code, our benchmark** — the authors' released code executed faithfully, then measured by **our** `gen_eval`, **our** 12-label closed-set CLIP scorer and **our** prompt pools. **This is not an official reproduction** |
 | `ADAPT_*` | **domain adaptation** — authors' method, our domain, labelled as such |
 | existing names | **historical project variants** — unchanged |
+| *(no prefix exists for)* | **official reproduction** — authors' code **and** authors' protocol, metric and data. **Nothing in this project qualifies**, and nothing should be given a prefix implying it |
+
+**Corrected 2026-10-26.** The previous revision defined `REF_*` as "**official reproduction** —
+authors' code, authors' protocol". That is unearned and is withdrawn. `REF_imma_vangogh`, the only
+`REF_*` artifact that exists, used upstream's code and the authors' released ESD checkpoint — but
+its 100 training images were **self-generated** (`upstream_runs/imma/data/vangogh/`, 11:39–11:43),
+and it was scored by **our** `gen_eval` on **our** DEV prompts against **our** closed-set 12-label
+CLIP classifier (`logs/r1c_eval.log:20-33`). The code is the authors'; the **protocol is ours**.
+
+**The general rule, applied throughout this manifest:** an upstream-code run on our constructed
+benchmark is **not** a reproduction of the paper's reported experiment, and its outcome is **not**
+evidence for or against the published method. Three tiers are needed, not two.
 
 | id | method | what | arms | seeds | budget | primary outcome |
 |---|---|---|---:|---:|---:|---|
-| **R1** | IMMA | run `defend_text_to_image_lora.py` at an author-documented setting on SD-1.4, then attack the resulting checkpoint with **our** common protocol | 1 | 3 | ~4 GPU-h | author-protocol checkpoint + max-over-valid H |
-| **R2** | Meta-Unlearning | run `src/meta.py` with its own three-pool data | 1 | 3 | ~6 GPU-h | as above |
+| **R1** | IMMA | run `defend_text_to_image_lora.py` at an author-documented **training** setting on SD-1.4, then attack the resulting checkpoint with **our** common protocol | 1 | 3 | ~4 GPU-h | checkpoint + max-over-valid H |
+| **R2** | Meta-Unlearning | run `src/meta.py` with the three-pool **structure**, on pools **we** construct | 1 | 3 | ~6 GPU-h | as above |
 | **R3** | WDR | **native-domain** sanity check of `weight_dist_reg` on the reference's own classifier setting | 1 | 1 | ~2 GPU-h | does our reading reproduce its published behaviour |
-| **R4** | UCE | official code vs our port, **matched inputs and configuration**, compare edited weights and generations | 1 | — | ~1 GPU-h | discrepancy magnitude |
+| **R4** | UCE | upstream code vs our port, **matched inputs and configuration**, compare edited weights and generations | 1 | — | ~1 GPU-h | discrepancy magnitude |
+
+R1's and R2's descriptions were "author protocol" and "its own three-pool data" in the previous
+revision. Both are corrected above: the ESD checkpoint is the authors', but the **training images,
+the pools, the scorer and the prompts are ours**. `scripts/r2_build_meta_pools.py` builds the pools
+from our own prompt lists — `a photo of a church` (hrm); cathedral / chapel / basilica (tgt);
+fridge, door, firefly, oven, potted plant, coffee table (irt), 30 train + 30 test each. The
+three-pool *structure* is the paper's; the *data* is not.
 
 **Stopping rules.** R1/R2: three attack seeds at lr 1e-5, 300 steps, no escalation; arms failing
 K1 (retain8 ≥ 0.60) are not attacked and are reported as utility failures. R4: numerical comparison
@@ -269,12 +367,38 @@ only, no attack. **Total ≈ 13 GPU-h, ≤ 10 GB storage.**
 attacks reported with gate outcomes and **both gated and ungated** scores; per-seed values and
 denominators shown; bounded intermediate budgets (25/100) alongside the 300-step endpoint.
 
-**Final-prompt discipline.** The existing FINAL set **has been inspected** (`FINDING65`, `FINDING66`)
+**Final-prompt discipline.** The existing FINAL set **has been inspected, and its scores carry a
+defect** (`D-022`): `gen_eval_final.py` prompted CLIP with `gen_eval.LAB_KEY` rather than `LABELS`,
+degrading nine of twelve distractor strings while leaving `church` — the erased target in every E6
+arm — correct, which biases target hits **upward**. `FINDING65`'s depth figures are **unmeasured
+pending re-score**; `FINDING66`'s ceiling conclusion survives (within-scorer comparison). **R1–R4
+are unaffected** — they are scored by `gen_eval.py`, which uses `LABELS` correctly. The set is
+consumed regardless (`FINDING65`, `FINDING66`)
 and is therefore **development data from here on**. It will **not** be reused for tuning and then
 described as untouched. A **fresh** final set must be frozen before any new configuration is selected
 against it; none of R1–R4 selects a configuration, so none requires it yet.
 
-**Status: no R-experiment has been run.** §7 is written only when cells complete.
+### 6.1 Status — **two of the four cells have run** (corrected 2026-10-26)
+
+The previous revision said *"Status: no R-experiment has been run."* That was false when written.
+Verified from artifacts and mtimes:
+
+| id | status | evidence |
+|---|---|---|
+| **R1** | ✅ **RAN.** ESD checkpoint downloaded (`upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt`, 3,438,307,109 B, 11:36); 100 training images generated (11:39–11:43); `defend_text_to_image_lora.py` trained **5000/5000** (11:59→12:21), saving `REF_imma_vangogh/imma_unet_xatten_layer.pt`; eval composed base+ESD+IMMA (`overlaid 160/160 IMMA tensors`) and scored it (12:39→12:44). **The 3 attack seeds were never run.** | `logs/r1b_imma_train.log`, `logs/r1c_eval.log`, `outputs/gen_REF_imma_vangogh.json` |
+| **R2** | ⏸ **PARTIAL.** Three pools built 12:39→12:47 (`[r2pools] done`), 30 train + 30 test each. A first attempt failed `rc=1` — `ModuleNotFoundError: No module named 'pandas'` at `r2_build_meta_pools.py:9` (12:21). **`src/meta.py` has never been invoked.** | `logs/r2_meta.log`, `upstream_runs/meta/dataset/{hrm,irt,tgt}/{train,test}` |
+| **R3** | ❌ **NOT STARTED.** No `logs/r3*`, no `outputs/r3_*`. | — |
+| **R4** | ✅ **EXECUTED, four phases; interpretation under verification.** See §4. | `outputs/r4{,b,c,d}_uce_*.json` |
+
+**R1's recorded outcome, with interpretation withheld.** `outputs/gen_REF_imma_vangogh.json`: target
+(`van_gogh`) **0.8667**, all-non-target **0.0424** (n=11), legacy_retain8 **0.0333** (n=8); eleven of
+twelve concepts score ≤ 0.20. Three explanations are open — IMMA behaving as designed (it
+*immunises* against relearning rather than erasing, and here sits atop an ESD-erased UNet), an
+artifact of `r1c_eval`'s tensor composition, or a genuine failure — and **the attack seeds that
+would discriminate between them were never run.** This manifest asserts none of the three, and
+**no conclusion about IMMA-the-published-method follows from this cell**, in either direction.
+
+This is consistent with §0's standing rule: a fidelity ledger makes **no performance claims**.
 
 ---
 
@@ -318,3 +442,67 @@ LICENSE file nor a README licence declaration, and that remains accurate.
 nor effectiveness, and `FINDING63`/`FINDING74` record that every UTRAP arm tested was reversed.
 `erase_wsr.py` remains a **project variant with the opposite regularisation direction**;
 `erase_wdr_v2.py` remains a **diffusion-domain adaptation**.
+
+---
+
+## 8. Change log — 2026-10-26 (Agent 6, provenance audit)
+
+Every claim in this manifest was re-derived from `outputs/upstream_manifest.json`,
+`outputs/imma_scope_fidelity.json`, the `outputs/r4*` artifacts, the upstream READMEs and source, or
+file mtimes. Full traceability in `AGENT6_PROVENANCE_FINDINGS.md` §1.3. Banners were judged
+insufficient: the incorrect sentences were rewritten.
+
+### 8.1 Re-verified and found correct (unchanged)
+
+| § | claim | verified against |
+|---|---|---|
+| §0 | all five commits, dates and `python_files` counts; "three audited revisions resolved exactly as requested" | `outputs/upstream_manifest.json` — three non-null `requested_pin`, each equal to its `resolved_commit` |
+| §0 | `vision_relearning`: **README declares MIT, no standalone LICENSE file** | `ls -a upstream/vision_relearning` → no LICENSE/COPYING; `README.md:54-56` → `## License` / `MIT` |
+| §0.2 | FRAG: non-empty, **0 Python files** | `upstream_manifest.json` `FRAG.python_files: 0` |
+| §1.1 | every cited line number and mechanic of `defend_text_to_image_lora.py` | upstream source at `2f55041` |
+| §1.2 | 859.5M / 93.5M (10.88%) / 49.6M (5.77%) / 44.0M (5.11%) / **2.13×**, 160 and 80 tensors | `outputs/imma_scope_fidelity.json` — exact, including tensor counts |
+| §2 | `hrm` = unlearned concept, `irt` = **unrelated** retain, `tgt` = **related** retain | `upstream/Meta-Unlearning/README.md:18`, quoted verbatim and accurately |
+| §2 | the README states the paper used **`fix_timesteps = False`**, so our random-timestep v2 **matches** the paper and this is **not** a departure | `README.md:43` — accurate |
+| §5.1 | the verbatim first-attempt environment failures | `logs/upstream_envs.log` |
+| §7(a)(b)(c) | all three corrections | re-verified at source; all three hold |
+| §7(d) | upstream selects **one** embedding at `attention_mask.sum()-2`; ours selects `sum()-2 .. 76` | source, **and now independently corroborated by measurement**: R4b column B drops to 1.5e-3 when upstream's selection is used on both sides |
+| §7(e) | UTRAP labelled "our proposed method", authorship ≠ novelty or effectiveness | holds |
+
+### 8.2 Corrected
+
+| § | what changed | why |
+|---|---|---|
+| header | "Nothing here is a reproduction **until a run is recorded in §6**" rewritten | it implied that executing upstream code suffices. R1 and R4 have run and are still not reproductions |
+| §2.2 | **new** — E2's measured outcome, with the retention gain attributed to Eq. 8's **pairing** rather than to ζ's weight, and `FINDING78`'s mandate claim recorded as **retracted** (`D-008`) | §2 described v2's objective but recorded no result; and the gain must not be read as evidence about ζ, which is near-inert and never swept (`FINDING78` §1a) |
+| §3 | R3 confirmed not started; the **E1 results added** (α ∈ {1.0, 4000}, K1 FAIL at 0.5917, α ∈ (1,4000) unmeasured) | the section implied no WDR adaptation had been measured |
+| §3 | **scale caveat rewritten** (`D-017`): the ~4,000× factor withdrawn (measured ≈**9.6×**), the mechanism reattributed to our **shared-Adam two-step schedule**, the window's upper bound relabelled a **saturation point**, and "WDR at gradient parity" withdrawn as a reading of retain8 0.5917 | the derivation ‖∇L‖ = α/√N is correct but was **not** the cause. The reference **sums** both terms into one step, so this is a defect in our port (entangled with `D-016`), not a coefficient-scale property of "From Dormant to Deleted" |
+| §4 | "**Not yet reconciled against the official code** ... queued as R4" → the four R4 phases, with A/B/C magnitudes | R4 ran 11:32→12:45 |
+| §4 | **R4 phase 1 marked `VOID`**, with its three defects named, and `FINDING75`'s retraction recorded | the artifact self-flags `VOID: true` / "DO NOT CITE"; citing it would propagate a retracted number |
+| §4 | **"no port-fidelity conclusion drawn"** paragraph added | upstream's λ=0.1 arm scores target 15/15, consistent with an inert edit, which would invalidate the comparison |
+| §4 | `FINDING77` §2's accumulation-order error recorded inline | the banner named it; the body did not, and §4 is where a reader would act on it |
+| §4 | the 85,850 eigenvalue marked **single-sourced** | no artifact under `outputs/` recomputes it |
+| §6 | `REF_*` redefined from "**official reproduction** — authors' code, authors' protocol" to "**upstream code, our benchmark**", with a fourth row stating that nothing qualifies as an official reproduction | unearned. `REF_imma_vangogh` used self-generated training images and our scorer and prompts (`logs/r1c_eval.log:20-33`) |
+| §6 | R1 relabelled off "author protocol"; R2 off "its **own** three-pool data", with the actual prompt lists given | the images, pools, scorer and prompts are all ours |
+| §6.1 | "**Status: no R-experiment has been run**" → per-cell status table with evidence | false when written: R1 complete, R4 four phases, R2 pools built |
+| §6.1 | R1's outcome recorded **with interpretation explicitly withheld** | the number should be visible, but its three candidate explanations are untested and the attack seeds were never run |
+
+### 8.3 Defects in artifacts this document depends on — reported, not fixed
+
+1. **`outputs/upstream_manifest.json` contradicts this manifest on the WDR licence.** The JSON says
+   `vision_relearning.license: "NONE FOUND"`; §0 and §7(c) say *README declares MIT, no standalone
+   LICENSE file*. **The markdown is right** (verified at source). The JSON is the machine-readable
+   companion this document advertises, so the two must be reconciled — by whoever owns the JSON.
+2. **`outputs/upstream_manifest.json` records `"pinned_as_requested": true` alongside
+   `"requested_pin": null`** for `unified-concept-editing` and `FRAG`. Nothing was requested for
+   either, so the flag asserts a vacuous truth and would mislead an automated consumer. §0's prose
+   handles it correctly ("UCE and FRAG had no revision specified"); the schema does not.
+3. **`outputs/registry_v1.json` is stale by 150 JSON files** (112 attack records, ≥11 defence
+   builds), so `TABLES_v1_generated.md` is too. Not regenerated here: `scripts/registry_v1.py`
+   sha256s many GB and `FREEZE_ACTIVE` is in force.
+
+**Not changed, deliberately:** the `FINDING76`/`FINDING77` correction banner, independently
+re-verified against `r4b_uce_lamb*.json` column B and found accurate; §0.1's non-redistribution
+policy, which §7(c) already states rests on consistency rather than on a legal finding; every
+fidelity verdict (IMMA reimplementation, Meta v2 ours, WDR adaptation, UCE reimplementation, GIFT
+unsubstituted), all of which verified correct and all of which R1/R4 **strengthen** rather than
+weaken.

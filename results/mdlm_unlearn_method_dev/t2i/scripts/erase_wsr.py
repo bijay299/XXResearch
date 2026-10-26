@@ -1,5 +1,30 @@
-"""Weight-space-regularised erasure -- OUR implementation of the METHOD CLASS proposed by
-'From Dormant to Deleted' (arXiv 2505.22310), adapted to T2I concept erasure.
+"""WSR-anchor -- OUR OWN METHOD: erasure regularised TOWARD the original weights.
+
+!! DIRECTION ERRATUM, RE-CONFIRMED (ERRATUM_wsr_direction.md; independently re-verified by the
+Agent-3 fidelity audit 2026-10-26 against the authors' released code). This file was described as
+"OUR implementation of the METHOD CLASS proposed by 'From Dormant to Deleted' (arXiv 2505.22310)".
+IT IMPLEMENTS THE OPPOSITE DIRECTION. The reference reads:
+
+    upstream/vision_relearning/vision_unlearner.py:366-373
+        param_diff       = flatten_param_dict(pretrained.parameters()).detach()
+                           - flatten_param_dict(model.parameters())
+        weight_dist_loss = - torch.sqrt(torch.mean(torch.square(param_diff)) + eps)
+        loss             = unlearning_alpha * weight_dist_loss
+
+i.e. a NEGATED root-mean-square distance, minimised => distance MAXIMISED. The term below is
+`+lam_reg * ||theta - theta_base||^2 / ||theta_base||^2`, minimised => distance MINIMISED. Those
+are different algorithms, not one algorithm with a sign typo (four further differences: RMS vs sum
+of squares; no division by ||theta_base||; the reference's distance term REPLACES the forget
+objective rather than being a third term; the reference's retain term is unscaled).
+
+CLASSIFICATION: OUR OWN DESIGN. This file is a legitimate method -- anchored erasure -- and keeps
+its FINDING61/62 results under the name `WSR-anchor (ours)`. What is withdrawn is any claim that it
+tests, reproduces or discharges arXiv 2505.22310. NO NUMERICAL CHANGE is made here; the faithful
+direction lives in `scripts/erase_wdr_v2.py` and `objectives.wdr_forget_loss`.
+
+Historical description retained below for the record:
+  "OUR implementation of the METHOD CLASS proposed by 'From Dormant to Deleted', adapted to T2I
+   concept erasure" -- WITHDRAWN, see above.
 
 DECLARED UP FRONT, because it matters for how this is read: that paper's experiments are
 EXAMPLE-LEVEL unlearning in VISION CLASSIFIERS. It is not portable as-is (FINDING60 S1). What IS
@@ -18,7 +43,9 @@ Objective:
 
   L_erase  = -E[ ||eps_theta(x_f, c_f, t) - eps||^2 ]     (push the target concept away)
   L_retain =  E[ ||eps_theta(x_r, c_r, t) - eps||^2 ]     (hold the retain set)
-  the third term is the paper's contribution: an explicit anchor to the ORIGINAL weights.
+  the third term is OURS: an explicit anchor TOWARD the original weights. (This line previously
+  read "the paper's contribution"; the paper's contribution is the OPPOSITE sign -- see the
+  direction erratum at the top of this file.)
 
 A SANITY NOTE ON WHAT THIS CAN SHOW. FINDING60 already found that GIFT sits at L2 = 0.18 -- all but
 identical to base -- and is still reversed on 22 valid attacks. So weight-space proximity alone is
@@ -172,11 +199,24 @@ def main():
 
     os.makedirs(a.out, exist_ok=True)
     torch.save({k: v.half() for k, v in unet.state_dict().items()}, f"{a.out}/unet.pt")
-    json.dump({"study": "wsr_erase", "adapts_idea_of": "arXiv 2505.22310",
+    json.dump({"study": "wsr_erase",
+               # CORRECTED 2026-10-26 (Agent-3 audit). These fields claimed this arm adapts and
+               # tests arXiv 2505.22310. It implements the OPPOSITE DIRECTION; see
+               # docs/ERRATUM_wsr_direction.md and the module docstring.
+               "classification": "OUR OWN DESIGN (WSR-anchor): erasure anchored TOWARD the base "
+                                 "weights. NOT an implementation of arXiv 2505.22310, whose term "
+                                 "MAXIMISES distance from base "
+                                 "(vision_unlearner.py:366-373, verified).",
+               "direction": "minimises ||theta - theta_base||^2 (pulls TOWARD base)",
+               "reference_direction": "maximises RMS(theta_pre - theta) (pushes AWAY from base)",
+               "adapts_idea_of": None,
                "is_adaptation_not_reproduction": True,
-               "domain_caveat": "that paper is example-level unlearning in vision classifiers; "
-                                "this adapts its weight-space-anchor idea to T2I concept erasure",
-               "tests_what_FINDING60_left_untested": "their METHOD, not their predictor",
+               "tests_what_FINDING60_left_untested": False,
+               "withdrawn_claims": ["adapts_idea_of arXiv 2505.22310",
+                                    "tests their METHOD rather than their predictor"],
+               "faithful_direction_lives_in": "scripts/erase_wdr_v2.py",
+               "domain_caveat": "arXiv 2505.22310 is example-level unlearning in vision "
+                                "classifiers; in any case this file does not implement it",
                "label": a.label, "concept": a.concept, "hparams": vars(a),
                "history": hist, "minutes": (time.time() - t0) / 60},
               open(f"{OUT}/wsr_{a.label}.json", "w"), indent=1)

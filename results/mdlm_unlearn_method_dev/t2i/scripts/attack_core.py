@@ -1,5 +1,24 @@
-"""ATTACK CORE -- ONE implementation of the full-UNet relearning attacker's update, shared by the
-EVALUATION attack (`attack_relearn.py`) and by any defence that simulates it (`erase_utrap_v2.py`).
+"""ATTACK CORE -- a SPECIFICATION of the full-UNet relearning attacker's update, plus one
+implementation of it used by defences that simulate the attacker (`erase_utrap_v2.py`).
+
+SCOPE CORRECTION (Agent-3 fidelity audit, 2026-10-26). An earlier version of this docstring said
+this file was "shared by the EVALUATION attack (`attack_relearn.py`)". IT IS NOT. `attack_relearn.py`
+does not import `attack_core` and never has (`grep -n attack_core scripts/attack_relearn.py` ->
+no match); it runs its own inline loop at `attack_relearn.py:333-362`. What this file provides is:
+
+  * `EVAL_FULL_UNET` -- a hand-transcribed MIRROR of that inline loop's configuration. Verified
+    line-by-line against it on 2026-10-26: Adam (`attack_relearn.py:333`), lr 1e-5 (`:209`),
+    300 steps (`:208`), batch 1 (`:335` samples a single index), clip_grad_norm 1.0 (`:362`),
+    full-UNet scope (`:332`), persistent optimizer state (`opt` built once outside the loop).
+    Because it is a mirror and not the same code object, it can DRIFT from the evaluator. Anyone
+    editing `attack_relearn.py`'s loop must re-check this dict by hand.
+  * `AttackSpec.divergence_from_eval()` -- an accurate divergence report AGAINST THAT MIRROR.
+  * `run_attack` -- the implementation that `erase_utrap_v2.py` (and only it) actually calls.
+
+Two axes the mirror does NOT capture, so `divergence_from_eval()` cannot report them:
+RNG provenance (`attack_relearn.py` draws noise/timesteps/indices from the GLOBAL torch stream;
+`diffusion_mse` below takes an explicit `generator`) and the attacker's DATA, which lives in
+`AttackData` rather than `AttackSpec`.
 
 WHY THIS FILE EXISTS (audit section 5). At the audited snapshot the two diverged on seven axes at
 once, while the code and `PREREG_H84` both called the inner process "the ACTUAL full-UNet relearning
@@ -133,8 +152,12 @@ def make_optimizer(spec: AttackSpec, params):
 
 
 def diffusion_mse(unet, sched, latents, embeddings, idx, generator, num_train_timesteps=None):
-    """The single definition of the relearning loss. Both the attacker and every defence that
-    simulates it call THIS, so the two cannot drift in the loss itself."""
+    """The relearning loss as used by defences that simulate the attacker.
+
+    CORRECTED (Agent-3 audit): this is NOT called by `attack_relearn.py`, which computes the same
+    algebraic loss inline at `attack_relearn.py:355-357` from its own global-RNG draws. The two are
+    algebraically identical (DDPM add_noise + MSE against the sampled noise) but are separate code,
+    so drift in the loss itself is possible and is not prevented by this file."""
     z0 = latents[idx]
     noise = torch.randn(z0.shape, device=z0.device, dtype=z0.dtype, generator=generator)
     nt = num_train_timesteps or sched.config.num_train_timesteps
@@ -147,8 +170,8 @@ def run_attack(unet, sched, data: AttackData, spec: AttackSpec, params=None, gen
                loss_fn: Callable = None, on_step: Callable = None, eval_steps: int = 300):
     """Run `spec.steps` relearning steps in place on `unet`. Returns a telemetry dict.
 
-    This is the ONLY place a relearning update is written. `attack_relearn.py` calls it for the
-    300-step evaluation; `erase_utrap_v2.py` calls it for its K-step inner surrogate. The audit's
+    CORRECTED (Agent-3 audit): the only caller is `erase_utrap_v2.py`'s K-step inner surrogate.
+    `attack_relearn.py` does NOT call this -- it runs its own inline 300-step loop. The audit's
     requirement that update norms, optimizer configuration and inner progress be logged is met by
     the returned record, which callers write into their artifact.
     """

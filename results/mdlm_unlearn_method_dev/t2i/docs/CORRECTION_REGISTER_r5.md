@@ -225,7 +225,25 @@ settings before outcomes.
 
 ### B.10 Experiments that remain necessary — configuration, cost, blocker
 
-None of these has been run. Each is specified precisely enough to execute.
+> **⚠ Corrected 2026-10-26.** The line that stood here — *"None of these has been run"* — was true
+> when written and is now **false for five of the ten**. Verified from artifacts:
+>
+> | id | state | evidence |
+> |---|---|---|
+> | **E1** | ✅ **RAN**, but at α ∈ {1.0, 4000}, **not** the preregistered {0.3, 1.0, 3.0} | `logs/e1_wdr.log`, `logs/e1b_wdr.log`, `outputs/gen_wdr2_church_a{1.0,4000}.json`; α=4000 fails K1 at retain8 **0.5917** (`FINDING67`, as corrected by `D-017`) |
+> | **E2** | ✅ **RAN** as specified, λ ∈ {0.5, 1.0}, plus an 18-cell frozen grid (E2g) and an attacker-lr sweep (E2h) | `logs/e2_meta_v2.log`, `e2g_grid.log`, `e2h_stronger.log`; `FINDING78` |
+> | **E4** | ✅ **RAN** as specified, K ∈ {0,1,8,32} at matched compute | `logs/e4_h90.log`, `e4m_matched.log`, `e4mg_grid.log`, 8 `utrap2*` builds; `FINDING76` |
+> | **E6** | ⚠ **RAN, CONSUMED THE SPLIT, AND MUST BE RE-SCORED** | `outputs/final_*.json` (18 records); `FINDING65`, `FINDING66`. All 18 were scored with `gen_eval.LAB_KEY` instead of `LABELS` (**`D-022`** below), so `FINDING65`'s depth figures are unmeasured and `FINDING66`'s absolute figures are unusable. A **fresh** final set must be frozen before any new configuration is selected, **and the existing records re-scored** — CPU-only, on retained artifacts |
+> | **E7** | ⏸ **PARTIALLY RAN** — upstream IMMA (R1, 5000/5000 + eval) and upstream UCE (R4b–d) executed; `vision_relearning` (R3) **not started** | `logs/r1b_imma_train.log`, `logs/r1c_eval.log`, `outputs/r4{b,c,d}_uce_*.json` |
+> | E3, E5, E8, E9, E10 | ❌ **still unrun**, blockers unchanged | — |
+>
+> **None of E7's completed halves is a reproduction.** R1 and R4 ran upstream code but used **our**
+> training images, **our** `gen_eval`, **our** 12-label closed-set CLIP scorer and **our** prompt
+> pools. So this register's repeated framing — that E7 would "replace *we ported it* with *we
+> reproduced it*" — is **not** discharged by them; see `UPSTREAM_FIDELITY_MANIFEST.md` §6, which now
+> defines three fidelity tiers instead of two.
+
+Each is specified precisely enough to execute.
 
 | # | experiment | why it is needed | configuration | est. cost | blocker |
 |---|---|---|---|---|---|
@@ -246,12 +264,28 @@ None of these has been run. Each is specified precisely enough to execute.
 
 The audit's closing instruction was not to call everything fixed because tests pass. So:
 
-**1. Implementation — SUBSTANTIALLY RESOLVED, UNVALIDATED ON MODELS.**
+**1. Implementation — SUBSTANTIALLY RESOLVED, AND NOW VALIDATED ON MODELS.**
 The three wrong objectives are now implemented correctly and unit-tested (24/24 passing), the
 attacker's definition is shared through one module that refuses to let a surrogate claim to be the
 evaluation attack, and the split checker covers every defence and fails closed on new ones.
-**Not one corrected implementation has produced a model.** The tests show the code computes what the
-references specify; they show nothing about whether the resulting defences work.
+
+**Corrected 2026-10-26:** the line that stood here — *"Not one corrected implementation has produced
+a model"* — is **false**. All three have: WDR v2 (E1, α ∈ {1.0, 4000}), Meta v2 (E2, λ ∈ {0.5, 1.0})
+and UTRAP v2 (E4, K ∈ {0,1,8,32}). The tests still show only that the code computes what the
+references specify; what the *runs* added is in §B.10 above.
+
+**Running them found two further implementation defects**, which is the argument for validating on
+models rather than on tests alone:
+
+- **`D-016`** — `erase_wdr_v2.py` **alternates** the forget and retain steps while its docstring
+  claims it does so "as the reference does". The reference **sums** both gradients into one
+  `opt.step()` (`vision_unlearner.py:411,637-682`). The docstring is inverted.
+- **`D-017`** — because both steps share **one Adam instance**, the second-moment buffer is
+  retain-dominated and α is inert at **both** ends of its range. `FINDING67`'s "~4,000×" is an
+  artifact (measured ≈**9.6×**), its 1/√N *mechanism* is withdrawn as the cause, its "third instance
+  of one scale pathology" framing no longer holds for the WDR member, and `wdr2_church_a4000`'s
+  retain8 0.5917 measures **our two-step shared-Adam schedule at saturation**, not "WDR at gradient
+  parity". The derivation ‖∇L‖ = α/√N itself stands.
 
 **2. Evaluation and provenance — PARTIALLY RESOLVED.**
 Resolved: the leak is detected and attributed; two further leaks found; DEV/FINAL separated with
@@ -262,13 +296,25 @@ the corpus remains a development measurement; the CLIP classifier revision is st
 remains a 15-image closed-set measure; per-image predictions are retained but not published for
 every historical run.
 
-**3. Empirical comparison — NOT RESOLVED.**
-No corrected implementation has been run. The three published methods with released code have not
-been executed. The unroll-depth question is untested with a faithful attacker. Consequently
-**no comparative claim about the published baselines is currently supported**, and the claim that
-all five were discharged is withdrawn. What survives is narrower and still substantial: on the
-builds actually measured, with the attacks actually run, every arm that cleared the utility floor
-was reversed to H = 1.000 — now excluding the six vacuous `gift_church_b0.1` records.
+**3. Empirical comparison — PARTIALLY RESOLVED; still no comparative claim about the published
+methods.**
+
+**Corrected 2026-10-26.** All three sentences that stood here were false: corrected implementations
+**have** been run (E1, E2, E4); two of the three released references **have** been executed
+(upstream IMMA via R1, upstream UCE via R4b–d; `vision_relearning`/R3 has not); and the unroll-depth
+question **has** been tested at matched compute with the evaluation attacker (`FINDING76`: flat —
+though its §3 probe-mechanism check is overstated, see its §7).
+
+The **verdict is unchanged**, but now rests on a stronger reason rather than on absence of
+measurement: **no comparative claim about the published baselines is supported**, because R1 and R4
+ran upstream code against **our** training data, **our** scorer and **our** prompt pools. That is
+`UPSTREAM_FIDELITY_MANIFEST.md` §6's middle tier — *upstream code, our benchmark* — and it is not a
+reproduction of any paper's reported experiment. The claim that all five baselines were discharged
+stays withdrawn.
+
+What survives is narrower and still substantial: on the builds actually measured, with the attacks
+actually run, every arm that cleared the utility floor was reversed to H = 1.000 — excluding the six
+vacuous `gift_church_b0.1` records. `FINDING74` extended this across **six** defence families.
 
 **4. Scientific interpretation — CORRECTED IN TEXT, STRUCTURALLY LIMITED.**
 Every saturated-endpoint, mechanism and capacity claim is rewritten to the weaker statement the
@@ -277,7 +323,67 @@ rank predictors; target-assisted recovery cannot separate reactivation from rele
 model contrast cannot isolate capacity. E5, E6 and E10 are the experiments that would move these,
 and they have not been run.
 
-**The mandate's bar is unmet, and this remediation does not change that.** No arm reaches
-retain8 ≥ 0.85 with max-over-valid H ≤ 0.40. What the register changes is the *standing* of the
-negative result: it is now a statement about **our implementations** of three of the baselines, not
-about the published methods, until E1, E2 and E7 run.
+**The mandate's bar is unmet, and neither this remediation nor the campaigns since change that.**
+No arm reaches retain8 ≥ 0.85 with max-over-valid H ≤ 0.40, **at any budget**.
+
+**This now rests on measurement, and it was a near miss.** `meta2_church_lt0.5` (E2, full Eq. 8)
+reaches retain8 **0.9000** at as-is target **0.0000**. At a 25-step budget it clears the robustness
+half at attacker lr 1e-5 (max-over-valid **0.0667**) *and* lr 5e-5 (**0.2000**), failing only at
+lr 1e-4 (**0.5333**, `logs/e2h_stronger.log`); since max-over-valid is a ratchet (`FINDING35` S4),
+the budget fails the bar. `FINDING78`'s companion claim to have produced "the first arm to meet both
+mandate halves at any budget" is **retracted** — registered as **`D-008`**, and the same failure
+mode as `FINDING63`'s "first arm ever" wording in §B.7 above: a conjunctive superlative published
+before its sweep was complete. Its retention result survives and is real: **+0.20 to +0.27** retain8
+at identical suppression against variant A's 0.6250 (λ=0.6) and 0.7000 (λ=0.7), attributable to
+Eq. 8's **pairing** rather than to the weight of ζ, which is near-inert and has never been swept.
+
+What the register changes is the *standing* of the negative result: it is now a statement about
+**our implementations plus two upstream-code runs scored on our own benchmark**, not about the
+published methods. **R3 is the one declared cell that would move this**, and it has not run.
+
+---
+
+## D. Change log — 2026-10-26 (Agent 6, provenance audit)
+
+This register was written at the end of the audit remediation, before E1/E2/E4/E6/R1/R4 ran. Its
+**claim-level corrections (§A, §B.1–B.9) were re-verified and stand**; its **status statements
+(§B.10, §C) had gone stale** and are corrected. Full traceability in
+`AGENT6_PROVENANCE_FINDINGS.md`.
+
+| § | what changed | why |
+|---|---|---|
+| §B.10 | "**None of these has been run**" → per-experiment state table; **five of ten have run** | false. E1 (α ∈ {1.0, 4000}, not the preregistered {0.3,1.0,3.0}), E2, E4, E6 (partial — and it **consumed** the FINAL split), E7 (partial — upstream IMMA and UCE only) |
+| §B.10 | added that E7's completed halves **do not** discharge "we reproduced it" | both ran upstream code on **our** benchmark, which is not a reproduction. The register's framing assumed executing upstream code was sufficient |
+| §C.1 | "**Not one corrected implementation has produced a model**" → all three have; the two new defects `D-016` and `D-017` recorded | false, and the defects are the substantive outcome of validating on models rather than on tests |
+| §C.2 | FINAL-set consumption, `FINDING72`'s gate bias, the 234/335 `ABSENT` checkpoints, and the 7 `unet: null` records added | "No arm evaluated on FINAL" was false, and three provenance limits were undocumented |
+| §C.3 | three false sub-claims corrected; the **verdict kept** and re-grounded | corrected implementations ran, two references executed, unroll depth tested. "No comparative claim is supported" survives for the better reason that upstream-code-on-our-benchmark is not a reproduction |
+| §C closing | mandate paragraph rewritten with the `meta2_church_lt0.5` near-miss and `D-008` | the conclusion was right but had been asserted ahead of the evidence that now supports it |
+
+### D.1 New defect rows
+
+| id | defect | status |
+|---|---|---|
+| **`D-008`** | `FINDING78` §3's "**first arm in this project to satisfy both halves of the mandate at any attack budget**" was measured at a **single attacker lr** (1e-5). Sweeping lr at the same 25-step budget gives 0.0667 (1e-5), 0.2000 (5e-5) and **0.5333 (1e-4)** — so the arm fails the robustness half, and **no arm has met both halves at any budget**. Same failure mode as `FINDING63`'s "first arm ever" (§B.7): a **conjunctive superlative published before its sweep closed**. | **CLAIM RETRACTED.** `FINDING78`'s title claim withdrawn; its §1 retention result (**+0.20 to +0.27** retain8 at identical 0.0000 suppression, vs variant A's 0.6250/0.7000) **re-verified from raw records and KEPT**. Propagated to `T2I_REPORT_r5.md` §6/§8, `UPSTREAM_STATUS_r1.md` §6, `UPSTREAM_FIDELITY_MANIFEST.md` §2.2, `HANDOFF_r5.md` §6. Independently confirmed that the retracted wording appears in **no** other document. |
+| **`D-016`** | `erase_wdr_v2.py` **alternates** the forget and retain steps while its docstring claims it does so "as the reference does". The reference **sums** both gradients into one `opt.step()` (`vision_unlearner.py:411,637-682`). | **CODE/DOC DEFECT, UNFIXED.** Recorded in `UPSTREAM_FIDELITY_MANIFEST.md` §3. Fixing it requires a re-run, which the freeze bars. |
+| **`D-017`** | `FINDING67`'s mechanism attribution. The derivation ‖∇L‖ = α/√N **stands**, but it is not why α is inert: both steps share **one Adam instance**, so `v` is retain-dominated and the distance update is ≈ `lr·|g_dist|/√v_retain`. Measured step size as a fraction of `lr` is α=1 → 0.104, α=10 → 0.537, α=4000 → 0.998, i.e. **≈9.6×, not ~4,000×**. α is inert at **both** ends, and the window's upper bound is a **saturation point, not a frontier**. | **CLAIM CORRECTED.** Three withdrawals: the ~4,000× factor, the "**third instance** of one scale pathology" framing (IMMA α and UCE λ are coefficient-scale findings about those *methods*; this one is about our schedule), and "WDR at gradient parity" as a reading of retain8 **0.5917** — which measures our two-step shared-Adam schedule at saturation. **Retained:** 0.5917, the K1 FAIL, and α ∈ (1, 4000) being unmeasured. Propagated to `T2I_REPORT_r5.md` §8 row 67 and §8b, `UPSTREAM_FIDELITY_MANIFEST.md` §3. |
+
+### D.2 Re-verified and found correct (unchanged)
+
+- **§A's four audit verdicts**, including §A.1's "one audit finding that does not hold" and the
+  line-cited evidence for the WSR direction, the two missing Meta terms and UTRAP's
+  seven-axis attacker mismatch.
+- **§A.3's vacuous-record finding** — exactly **9** records, six `gift_church_b0.1` and three
+  `uce_sd15_church_lam50000`, confirmed against `outputs/registry_v1.json` and
+  `TABLES_v1_generated.md` §3.
+- **§B.1–B.9's claim-level corrections**, including §B.7's `FINDING63` superlative row, which
+  `D-008` above now cites as precedent.
+- **"How to read this register"** and its five status words, which remain the right vocabulary —
+  `D-008` and `D-017` are both **CLAIM CORRECTED/RETRACTED**, not experiment failures.
+- **§C.4's structural limits** (a ceiling cannot rank predictors; target-assisted recovery cannot
+  separate reactivation from relearning; a two-point contrast cannot isolate capacity). E5, E6 and
+  E10 remain what would move them, and **E6 has only partially run**.
+
+**Known-stale and not repaired here:** `outputs/registry_v1.json` and
+`outputs/correction_register_r5.json`. The former predates 150 JSON files; the latter does not carry
+`D-008`, `D-016` or `D-017`. Regenerating the registry needs `scripts/registry_v1.py`, which sha256s
+many GB under an active freeze, so both are flagged for the lead rather than run.

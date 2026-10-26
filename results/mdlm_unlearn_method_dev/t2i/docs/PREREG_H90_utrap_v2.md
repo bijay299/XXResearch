@@ -142,8 +142,17 @@ was a different and much weaker process (`ERRATUM_utrap_inner_attacker.md`), so 
 authority for the corrected attacker.
 
 **Amendment:** the K ∈ {0, 1, 8, 32} series stays at λ = 0.15 for continuity with the historical
-arms, and **one additional arm at λ = 1.2, K = 8** is added, so the λ under-weighting is measured
-rather than assumed. Cost: +1 build +3 attacks ≈ 3.5 GPU-h on top of the 14 already priced.
+arms, and **one additional arm at λ = 1.2, K = 8** is added, so the effect of λ is measured rather
+than assumed. Cost: +1 build +3 attacks ≈ 3.5 GPU-h on top of the 14 already priced.
+
+> **CORRECTION 2026-10-26 (audit defect D-017).** This amendment originally read "so the λ
+> **under-weighting** is measured". That wording presumed λ=0.15 is too low, by treating
+> gradient-norm parity (λ≈1.2) as the correct target. It is not a target: UTRAP-v2 sums both
+> gradients into one `p.grad` before a single Adam step (`scripts/erase_utrap_v2.py:265-274`), so
+> the ratio sets the summed *direction* and parity is at most a directional heuristic — Adam
+> normalises the overall scale away, and nothing measured here shows ≈45° is optimal. The λ=1.2 arm
+> is therefore a **two-point comparison**, not a correction toward a known-better value, and the
+> prediction attached to it must not assume λ=1.2 wins. See `FINDING67` §7.
 
 This amendment is made **before any arm exists** and is recorded here rather than in the plan body,
 per `PREREG_PRECEDENCE.md` §4. It does not alter any prediction, falsifier or stopping rule above.

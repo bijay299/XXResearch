@@ -15,6 +15,17 @@ seeing a result, would destroy it. The list is the arms that clear K1 (retain8 >
 project's leading operating points. Any later addition must be justified in writing and labelled a
 second, contaminated use.
 
+CORRECTION 2026-10-26 (audit defects D-013, D-014; Agent 4). Two things above are now qualified:
+  * The header above is true of the FIRST FIVE arms only. `ARMS` has since grown by six, and three
+    of those are post-hoc by this file's own comments. `POST_HOC_ARMS` below names them and the
+    emitted record no longer asserts pre-commitment for them (D-014).
+  * "every historical record reproduces unchanged" was true of `gen_eval.py` and remains so, but
+    this script's own closed-set label TEXT was wrong (D-013) and has been corrected, so this
+    script no longer reproduces the 12 existing `outputs/final_*.json` byte-for-byte. Those
+    records stand as historical results that need re-scoring before comparison with any H number.
+  * FINAL has since been inspected (`FINDING65`, `FINDING66`). It is development data from here on.
+    Nothing in this file should be read as asserting FINAL is still untouched.
+
 Writes only a small JSON per arm — no checkpoints — so it is safe to run with /data near capacity.
 
 Run: python scripts/gen_eval_final.py            # all pre-committed arms
@@ -63,6 +74,21 @@ ARMS = [
      "attacked/E6C_uce_sd15_church_lam1000_sd0_lr1e-5/unet.pt",   "church", SD15),
 ]
 
+# ------------------------------------------------------------------ AGENT-4 REPAIR (D-014)
+# Every record emitted `"first_and_only_legitimate_use": True` unconditionally, including arms this
+# very file documents as added AFTER seeing earlier FINAL results (the E6c block above) and the E6d
+# extra seeds, which are not in ARMS at all. A post-hoc arm is by this file's own §12 docstring a
+# "second, contaminated use"; labelling it pre-committed is the error the docstring warns against.
+# Arms NOT pre-committed before the first FINAL number existed:
+POST_HOC_ARMS = {
+    "BASE_sd15_anchor",                 # calibration anchor, added after the first five were scored
+    "ATK_frp_church_r3_l05",            # E6c, added after seeing E6b
+    "ATK_uce_sd15_church_lam1000",      # E6c, added after seeing E6b
+}
+# Any label scored that is absent from ARMS (e.g. the E6d extra seeds
+# ATK_uce_sd15_church_lam1000_sd1/_sd6) is likewise post-hoc by construction.
+PRECOMMITTED_LABELS = {a[0] for a in ARMS} - POST_HOC_ARMS
+
 
 def mod(name):
     spec = iu.spec_from_file_location(f"_f_{name}", f"{P}/scripts/{name}.py")
@@ -81,12 +107,31 @@ def main():
     from diffusers import StableDiffusionPipeline
     from transformers import CLIPModel, CLIPProcessor
 
-    labels = list(ge.CONCEPTS)                      # same closed 12-label set as every H number
+    # ------------------------------------------------------------------ AGENT-4 REPAIR (D-013)
+    # WAS: `labels = list(ge.CONCEPTS)`, commented "same closed 12-label set as every H number".
+    # That was FALSE. `ge.CONCEPTS` keys are the project's *internal* keys (`LAB_KEY`), not the
+    # *CLIP text* labels (`LABELS`). Four of the twelve differ, so this script was prompting CLIP
+    # with "a photo of a garbage_truck" / "a photo of a van_gogh" / "a photo of a
+    # english_springer" / "a photo of a monet" where every H number in the corpus uses "a photo of
+    # a garbage truck" / "... van gogh painting" / "... english springer spaniel" / "... monet
+    # painting". The target string ("church") is identical in both sets, so the active target was
+    # never mis-spelled -- but the closed-set argmax it must win against was, which makes the
+    # decision boundary a different one from the rest of the project. All 12 `outputs/final_*.json`
+    # written before this repair predate the `label_text_set` field and therefore carry NO such
+    # field; their absence is the marker. Those records are NOT construction-comparable to any H
+    # number and must not be compared to one without re-scoring. 26 of their 180 images were
+    # classified as one of the four mis-spelled labels, concentrated in the four pre-attack
+    # defence arms (9/15, 7/15, 5/15, 4/15) at median winning margins of 0.0065-0.0131.
+    labels = list(ge.LAB_KEY)                       # identity keys: what a prediction *is*
+    label_text = list(ge.LABELS)                    # CLIP text: what CLIP is asked to choose among
+    assert list(ge.CONCEPTS) == labels, (
+        "gen_eval.CONCEPTS ordering no longer matches LAB_KEY; index alignment would be wrong")
+    assert len(label_text) == len(labels), "LABELS/LAB_KEY length mismatch"
     cm = CLIPModel.from_pretrained("openai/clip-vit-large-patch14",
                                    torch_dtype=torch.float16).to(dev).eval()
     cp = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
     with torch.no_grad():
-        ti = cp(text=[f"a photo of a {l}" for l in labels], return_tensors="pt",
+        ti = cp(text=[f"a photo of a {l}" for l in label_text], return_tensors="pt",
                 padding=True).to(dev)
         tf = cm.get_text_features(**ti); tf = tf / tf.norm(dim=-1, keepdim=True)
 
@@ -129,13 +174,31 @@ def main():
         rec = {"study": "t2i_gen_eval_FINAL", "experiment": "E6",
                "split_version": sr.SPLIT_VERSION, "split_role": "FINAL",
                "final_frozen_at": sr.FINAL_FROZEN_AT,
-               "first_and_only_legitimate_use": True,
-               "arm_list_precommitted_in": "scripts/gen_eval_final.py ARMS",
+               "arm_precommitted": label in PRECOMMITTED_LABELS,
+               "first_and_only_legitimate_use": label in PRECOMMITTED_LABELS,
+               "arm_list_precommitted_in": ("scripts/gen_eval_final.py ARMS"
+                                            if label in PRECOMMITTED_LABELS else None),
+               "precommitment_note": ("pre-committed before any FINAL number existed"
+                                      if label in PRECOMMITTED_LABELS else
+                                      "POST-HOC: added after FINAL results were seen; this is a "
+                                      "second, contaminated use of FINAL and must not be reported "
+                                      "as a held-out confirmation. All 12 records written before "
+                                      "the D-014 repair asserted first_and_only_legitimate_use="
+                                      "true unconditionally, which is false for this arm."),
                "label": label, "unet": unet_path or "BASE (unmodified)", "base_model": bm,
                "target": target, "final_prompts": finals,
                "target_hits": hits, "n_total": len(per_image),
                "target_acc_FINAL": hits / max(len(per_image), 1),
                "per_image_predictions": per_image,
+               "label_text_set": "SHARED_gen_eval_LABELS",
+               "label_text": label_text,
+               "label_text_note": "Records written before the D-013 repair carry no "
+                                  "label_text_set field; those used gen_eval.CONCEPTS KEYS as the "
+                                  "CLIP text, which differs from gen_eval.LABELS in 4 of 12 "
+                                  "strings (garbage_truck, van_gogh, english_springer, monet). "
+                                  "Pre-repair FINAL numbers are therefore NOT "
+                                  "construction-comparable to any H number and must be re-scored "
+                                  "before being compared.",
                "denominator_note": f"{len(finals)} FINAL prompts x {a.n_per} images = "
                                    f"{len(per_image)}; quantised to 1/{len(per_image)}. Closed-set "
                                    f"{len(labels)}-label CLIP argmax, no reject option. Comparable "

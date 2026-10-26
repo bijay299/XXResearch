@@ -1,4 +1,34 @@
-"""R4 — compare the OFFICIAL UCE closed form against our port on MATCHED inputs.
+"""R4 — VOID. DO NOT CITE ITS ARTIFACTS. Superseded by r4b (and then r4c).
+
+=========================== VOID BANNER (2026-10-26, AGENT1 P3) ===========================
+This script's results are withdrawn. Five confirmed defects, all verified in the saved artifacts:
+
+  1. CHAR-SPLIT INPUTS. `list(euce.FORGET_PROMPTS.get(a.concept, [a.concept]))` at L68 -- the dict
+     VALUES ARE STRINGS, so `list('church') == ['c','h','u','r','c','h']`. Six single letters were
+     embedded as six concepts. The artifacts record `n_erase_prompts: 6`, the bug visible in its
+     own output.
+  2. NEITHER PIPELINE REPRODUCED. `embed()` at L71-75 flattens ALL 77 positions. Upstream takes
+     ONE embedding (uce_sd_erase.py:34-42); our port takes positions [sum-2 .. 76]
+     (erase_uce.py:67-68). This used a third procedure belonging to neither.
+  3. NO UPSTREAM CODE RAN. Two local transcriptions were compared, so a divergence between our
+     port and the authors' implementation could not have been detected -- the title's whole claim.
+  4. FIXED OUTPUT FILENAME (AGENT1 D-150). L133 wrote `r4_uce_official_vs_port.json` with no
+     config tag, so the three configs OVERWROTE each other. On disk,
+     `r4_uce_official_vs_port.json` is a byte-equivalent duplicate of the erase_scale=2.0 run,
+     yet FINDING75 cited it for the lamb=0.5/erase_scale=1.0 row. REPAIRED below: the filename now
+     carries a tag.
+  5. UNSUPPORTED erase_scale SILENTLY COMPARED (AGENT1 D-150). `erase_uce.py` has NO erase_scale
+     coefficient. At `--erase-scale 2.0` L93-95 applies it to the "official" side and L99-100
+     omits it from "ours", so the two sides are DIFFERENT EQUATIONS and the resulting 5.3985e-02
+     was reported as a numerical-equivalence failure. REPAIRED below: erase_scale != 1 now refuses
+     to run.
+
+All four artifacts are correctly stamped `"VOID": true` with a `void_reason`. Kept for provenance.
+===========================================================================================
+
+Original docstring follows.
+
+R4 — compare the OFFICIAL UCE closed form against our port on MATCHED inputs.
 
 Official reference: unified-concept-editing @ 7c724d9, `trainscripts/uce_sd_erase.py`:
 
@@ -52,7 +82,25 @@ def main():
     ap.add_argument("--lamb", type=float, default=0.5, help="official default")
     ap.add_argument("--erase-scale", type=float, default=1.0, help="official default")
     ap.add_argument("--preserve-scale", type=float, default=1.0, help="official default")
+    ap.add_argument("--tag", default="", help="appended to the output filename (D-150: without "
+                                             "this, configs overwrite each other)")
+    ap.add_argument("--i-understand-this-script-is-void", action="store_true",
+                    help="required: this script's results are withdrawn (see the VOID banner).")
     a = ap.parse_args()
+    if not a.i_understand_this_script_is_void:
+        raise SystemExit(
+            "REFUSED: r4_uce_official_vs_port.py is VOID (char-split inputs; neither pipeline "
+            "reproduced; no upstream code executed). Use scripts/r4b_uce_upstream_vs_port.py, "
+            "which executes the pinned upstream UCE(). Pass "
+            "--i-understand-this-script-is-void only to re-derive the void artifacts.")
+    # D-150: our port carries no erase_scale, so any value but 1.0 compares two DIFFERENT equations
+    # and reports the difference as a fidelity gap. Refuse rather than mislead.
+    if abs(a.erase_scale - 1.0) > 0:
+        raise SystemExit(
+            f"REFUSED: --erase-scale {a.erase_scale} != 1.0. scripts/erase_uce.py implements no "
+            "erase_scale coefficient, so the two sides would be different equations and the "
+            "reported difference would not measure transcription fidelity (AGENT1 D-150). "
+            "erase_scale can only be compared against a port that implements it.")
     dev = "cuda"
     from diffusers import StableDiffusionPipeline
     pin = dict(l.split("=", 1) for l in open(f"{P}/MODEL_PIN.txt").read().split("\n") if "=" in l)
@@ -130,7 +178,13 @@ def main():
                             "This run tests that directly.",
         "per_module": rows[:8],
     }
-    json.dump(rec, open(f"{OUT}/r4_uce_official_vs_port.json", "w"), indent=1)
+    rec["VOID"] = True
+    rec["void_reason"] = ("VOID -- DO NOT CITE. See the VOID banner at the top of "
+                          "scripts/r4_uce_official_vs_port.py and docs/AGENT1_UCE_FINDINGS.md "
+                          "D-150. Replaced by scripts/r4b_uce_upstream_vs_port.py.")
+    # D-150 REPAIR: the filename now encodes the config, so runs cannot overwrite one another.
+    tag = a.tag or f"lamb{a.lamb}_es{a.erase_scale}_ps{a.preserve_scale}"
+    json.dump(rec, open(f"{OUT}/r4_uce_{tag}.json", "w"), indent=1)
     print(f"[r4] max rel err = {worst:.3e}  mean = {rec['mean_relative_error']:.3e}  "
           f"equivalent={equal_at_1}", flush=True)
 

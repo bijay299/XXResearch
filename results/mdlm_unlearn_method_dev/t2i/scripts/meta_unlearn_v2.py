@@ -9,8 +9,15 @@ WHAT THE PAPER SPECIFIES (Eq. 8) AND WHAT THE RELEASED CODE DOES:
 
     L   = L_erase(theta) + [ - L_F(theta') - zeta * ( L_R(theta') - L_R(theta) ) ]
 
-Verified against the released implementation (sail-sg/Meta-Unlearning @5a2a760, src/meta.py
-L920-1030), which accumulates exactly this signed structure into `sum_grads`:
+Re-verified against the released implementation. CITATION CORRECTED (Agent-3 fidelity audit,
+2026-10-26): this file previously cited `src/meta.py L920-1030`. `src/meta.py` is a STALE,
+NON-RUNNABLE copy -- `train_step` returns 4 values at `src/meta.py:626` while every call site
+unpacks 3 (e.g. `:967`), and `:1045` reads an unassigned `train_loss`. The working reference, and
+what the authors' own `scripts/esd_meta.sh` invokes, is
+`sail-sg/Meta-Unlearning@5a2a7600895a2885323cbbf599acaf3f74a96f64 src/esd_meta.py:992-1058`.
+The signed structure is the same there, so the objective repair below stands; only the citation and
+the word "verified" were wrong. That reference accumulates exactly this signed structure into
+`sum_grads`:
 
     + gamma1_1 * grad L(irt @ theta)     pre-attack retain   (irrelevant pool)   POSITIVE
     + gamma1_2 * grad L(tgt @ theta)     pre-attack retain   (related pool)      POSITIVE
@@ -51,6 +58,83 @@ OTHER DIFFERENCES REPAIRED HERE, separately from the objective (audit section 3)
     tangled with the objective, so the two questions can be answered independently. Only
     `first_order` is implemented; `differentiated` raises, because claiming it without running it
     is exactly what the audit objected to.
+
+THREE DEFECTS FOUND BY THE AGENT-3 FIDELITY AUDIT (2026-10-26), ALL REQUIRING A BEHAVIOUR CHANGE
+AND THEREFORE NOT REPAIRED HERE. Any result already produced by this file must be read against them.
+
+  (A) THE SHARED `zeta` IS INERT AS A COEFFICIENT (the PAIRING it creates is NOT inert -- read on).
+      Eq. 8 as implemented below carries +zeta*L_R(theta) and -zeta*L_R(theta') with ONE shared
+      coefficient. Under the first-order unroll, theta' = theta - alpha*grad L_F(theta) with
+      alpha = 1e-5, so the pair's net expected gradient is
+          zeta * ( grad L_R(theta) - grad L_R(theta') )  ~  zeta * alpha * H_R * grad L_F
+      i.e. second order and ~1e-5 of either term alone.
+
+      WHAT THIS DOES AND DOES NOT MEAN -- keep two claims apart (corrected after coordinator
+      review 2026-10-26; an earlier draft of this note overreached and is withdrawn):
+        * `zeta` AS A WEIGHT is near-inert AND UNTESTED. Because the SAME zeta multiplies both
+          members, the cancellation is EXACT at every zeta > 0; what zeta scales is only the
+          second-order residual above. So zeta cannot be tuned to buy retention, and no zeta sweep
+          has been run. Do not expect a larger zeta to help.
+        * THE PAIRING ITSELF IS THE MECHANISM AND DOES WORK. Variant A carries -lam*L_R(theta')
+          ALONE (`meta_unlearn.py:159-161`) -- a negative coefficient on the retain LEVEL, i.e. a
+          large, BIASED gradient (~lam*0.04) rewarding worse benign capability everywhere, since
+          theta' ~= theta to within ~1e-6. That is FINDING56's self-destruct-on-normal-use. Adding
+          +zeta*L_R(theta) converts that LEVEL penalty into a CHANGE penalty and removes the
+          incentive. Going from "large biased damage gradient" to "~zero-mean" is a FIRST-ORDER
+          change in the optimisation even though the resulting term is second-order in size. Hence
+          lines 39-41 above -- "its role is cancellation" -- are correct, and FINDING78's measured
+          retention result STANDS: it is attributable to the restored pairing plus
+          -lam_target*L_F(theta'), not to zeta's magnitude.
+      The reference does NOT share the coefficient: `gamma1_1` and `gamma2_3` are independent
+      (`src/esd_meta.py:90-94`) and `scripts/esd_meta.sh` runs them ASYMMETRICALLY (gamma1_1 = 0.1
+      vs gamma2_3 = 1.0; gamma1_2 = 0.01 vs gamma2_2 = 1.0).
+      FIX: split `--zeta` into `--zeta-pre` / `--zeta-post` -- for TESTABILITY of the coefficient,
+      not because a retention gain should be expected from it. CHANGES NUMERICS: requires a new
+      `implementation_version` and a new arm label, or a flag defaulting to the shared zeta.
+      NOTE this also invalidates FINDING67 section 7's conclusion that "Meta-v2 needs no coefficient
+      correction": that diagnostic compared ||grad L_retain(theta)|| against
+      ||grad L_target(theta')|| as if they were independent terms. They are not -- the retain(theta)
+      term is paired against retain(theta') under the same zeta. (The same section also measured at
+      "xattn scope, 44.0M" while this file's `--meta-scope` default is `full`.)
+
+  (B) L_R(theta) AND L_R(theta') ARE DRAWN WITH INDEPENDENT NOISE AND TIMESTEPS.
+      `l_retain_theta` and `l_retain_prime` below both call `dmloss(..., g)` on the same shared
+      generator, which advances between them, so each gets its own noise tensor and its own `ts`.
+      Eq. 8's term is a PAIRED DIFFERENCE across a 1e-5-sized parameter step; with unpaired draws
+      the O(1e-7) signal sits under O(0.1) sampling noise, so the logged `retain_change` field is
+      essentially pure noise and the per-step estimator injects variance rather than signal. The
+      same applies to `l_att` vs `l_target_prime`.
+      NOTE the interaction with (A): defect (B) means the cancellation in (A) is exact only IN
+      EXPECTATION. Per step the pair is a difference of two INDEPENDENT O(0.04) gradients, so each
+      step injects ~zeta*sqrt(2)*0.04 of ZERO-MEAN noise rather than zero. Zero-mean noise does not
+      SYSTEMATICALLY damage benign capability the way variant A's biased term did, which is why the
+      retention gain survives this defect -- but the estimator is far noisier than Eq. 8 intends.
+      FIX: draw noise and timesteps ONCE and reuse them for both the theta and theta' evaluations
+      (COMMON RANDOM NUMBERS). This is the fix for the unpaired estimator -- NOT a larger zeta.
+      !! CHANGES NUMERICAL BEHAVIOUR: it alters every per-step gradient draw. It MUST NOT be applied
+      in place to this script, which has produced historical arms (FINDING78); introduce it under a
+      new `implementation_version` and a new arm label, or behind a flag defaulting to the current
+      independent draws. Expected effect is variance reduction, not a change in the mean objective.
+
+  (C) THE SIMULATED ATTACKER IS NOT THE REFERENCE'S AND NOT THE EVALUATOR'S, AND NOTHING RECORDS IT.
+      Here: ONE plain gradient step, `q.sub_(inner_alpha*gg)`, alpha 1e-5, no optimizer state, no
+      clipping, batch 1.
+      Reference (`src/esd_meta.py:963-977, 1005-1008, 617-622`): AdamW, lr 1e-5, clip_grad_norm 1.0,
+      a FULL EPOCH over `hrm_train_dataloader` (many steps, persistent moments), on a fresh
+      `deepcopy` of the UNet each meta-step, full-UNet scope.
+      Evaluator (`attack_relearn.py:333-362`): Adam, lr 1e-5, 300 steps, clip 1.0, batch 1,
+      persistent state, full UNet.
+      Unlike `erase_utrap_v2.py`, this file does NOT route its inner process through
+      `attack_core.AttackSpec`, so no `divergence_from_evaluation_attacker` record is written and
+      the gap is invisible in the artifact. FIX: build an `AttackSpec` with
+      `horizon_role="SHORT_HORIZON_SURROGATE"` and record it.
+
+ALSO NOT A MATCH, declared rather than repaired: the reference's at-theta unlearning term is an
+ACTIVE ESD objective (`src/esd_meta.py:578-582`, concept_scale 3.0), recomputed every step. Here it
+is `distil_F(theta) + distil_R(theta)`, a distillation anchor to an already-erased teacher, which is
+IDENTICALLY ZERO at initialisation (the student IS the teacher) -- FINDING67 section 7 measured both
+gradients at exactly 0.000000 and that is by construction, not a bug. The two are different
+functions with different minima.
 
 NO RESULT IS CLAIMED FROM THIS FILE until a build and a frozen-grid evaluation have run. It is
 listed as PENDING in docs/CORRECTION_REGISTER_r5.md.
@@ -225,10 +309,18 @@ def main():
         opt.zero_grad(set_to_none=True)
         l_erase = distil(unet, f_lat, f_emb, fi, g)
         l_distil_r = distil(unet, b_lat, b_emb, bi, g)
+        # DEFECT (B): this draw is INDEPENDENT of the l_retain_prime draw below (shared generator
+        # `g` advances between them), so Eq.8's paired difference is unpaired and `retain_change`
+        # is dominated by sampling noise. DEFECT (A): with one shared zeta this term cancels
+        # -zeta*l_retain_prime to second order, leaving zeta near-inert.
         l_retain_theta = dmloss(unet, b_lat, b_emb, bi, g)
         (l_erase + l_distil_r + a.zeta * l_retain_theta).backward()
 
-        # ---- simulated malicious fine-tuning step on the TARGET, on the ATTACK scope
+        # ---- simulated malicious fine-tuning step on the TARGET, on the ATTACK scope.
+        # DEFECT (C) in the module docstring: ONE plain gradient step, no optimizer state, no
+        # clipping. The reference runs a full AdamW epoch with clip 1.0 on a deepcopy; the
+        # evaluator runs 300 persistent Adam steps with clip 1.0. Not routed through
+        # attack_core.AttackSpec, so the artifact carries no divergence record.
         l_att = dmloss(unet, f_lat, f_emb, fi, g)
         gatt = torch.autograd.grad(l_att, atk_params, create_graph=False, retain_graph=False)
         backup = [q.detach().clone() for q in atk_params]
@@ -289,6 +381,30 @@ def main():
                    "note": "variant A generated this pool through the already-erased teacher and "
                            "never checked its content"},
                "gradient_order": a.order,
+               "agent3_audit_2026_10_26": {
+                   "reference_code_corrected": "src/esd_meta.py:992-1058 (src/meta.py, previously "
+                                               "cited, is a stale non-runnable copy)",
+                   "A_shared_zeta_inert_as_coefficient": "one zeta on both +L_R(theta) and "
+                       "-L_R(theta') makes the pair cancel EXACTLY at every zeta, so zeta cannot "
+                       "be tuned and is untested (no sweep run). This does NOT mean the pairing is "
+                       "ineffective: it converts variant A's biased retain-LEVEL penalty into a "
+                       "CHANGE penalty, removing the benign-damage incentive, which is a "
+                       "first-order improvement. The reference uses independent gamma1_*/gamma2_* "
+                       "and runs them asymmetrically.",
+                   "B_unpaired_noise": "L_R(theta) and L_R(theta') use independent noise and "
+                                       "timesteps, so the pairing holds only in expectation and "
+                                       "`retain_change` is sampling noise, not signal. Same for "
+                                       "l_att vs l_target_prime. Fix is common random numbers, not "
+                                       "a larger zeta.",
+                   "C_inner_attacker_unrecorded": "one plain GD step, no state, no clipping; "
+                                                  "reference = full AdamW epoch + clip 1.0; "
+                                                  "evaluator = 300 persistent Adam steps + clip "
+                                                  "1.0. Not routed through attack_core.AttackSpec, "
+                                                  "so no divergence record is written.",
+                   "at_theta_term_substituted": "reference uses an ACTIVE ESD objective; this uses "
+                                                "teacher distillation, zero at initialisation.",
+                   "status": "documented only; all three require a behaviour change and were NOT "
+                             "applied under the repair-first freeze"},
                "approximation": "first-order: grad of the theta' terms is taken at theta' and "
                                 "applied at theta. Separate from the objective repair, and "
                                 "deliberately not conflated with it.",

@@ -32,6 +32,7 @@ import glob
 import hashlib
 import json
 import os
+import time
 
 P = "/data/bijaypandey/t2i_unlearn"
 OUT = f"{P}/outputs"
@@ -95,6 +96,44 @@ def def_label(unet_path):
         return "BASE(unmodified)"
     parts = unet_path.strip("/").split("/")
     return parts[-2] if len(parts) >= 2 else unet_path
+
+
+# ------------------------------------------------------------------ AGENT-4 REPAIR (D-015)
+# `def_label()` keys identity on the UNet path ALONE. AdvUnlearn's defence lives in the TEXT
+# ENCODER, so its arms pass `--unet` unset and differ only in `hparams.text_encoder`. All of them
+# therefore collapse into the single bucket "BASE(unmodified)", together with genuine base-model
+# controls: 193 of 808 records at the time of this repair. Any aggregate keyed on `defence_label`
+# pools five distinct AdvUnlearn arms (church / parachute / tench / van_gogh / garbage_truck) and
+# the unmodified base into one row, and `max(H_valid)` over that row is a maximum over arms that
+# are not the same arm.
+#
+# `defence_label` is NOT changed -- every existing aggregate, table and test keys on it and the
+# ~700 historical records must stay reproducible. `defence_identity` is added ALONGSIDE it as the
+# correct identity, and `defence_label_collapses_text_encoder` marks the rows where the two differ.
+def def_identity(unet_path, te_path):
+    """Identity including the text encoder. The defence can live in either component."""
+    lab = def_label(unet_path)
+    if not te_path:
+        return lab
+    te = str(te_path).strip("/").split("/")[-1]
+    return f"{lab}+te:{te}"
+
+
+# Optional top-level blocks partition the corpus into harness-schema strata. There is NO code
+# version field in any attack record and `run_inventory.json.code_commit` is null for every entry,
+# so the presence/absence of these blocks is the only available proxy for which harness wrote a
+# record. Duplicate cells that disagree on H_after almost all straddle a stratum boundary, and the
+# older stratum systematically reports the HIGHER H_after -- so `max(H_valid)` prefers it.
+_STRATUM_BLOCKS = ("trainability", "grad_and_delta_evidence", "post_attack_utility")
+
+# Labels that are diagnostics, smoke tests or training-set probes, not production grid cells.
+# run_h69_diag.sh states DIAG records are "never pooled into the frozen grid"; nothing enforced it.
+_NONPROD_PREFIXES = ("TRAIN_", "KEEP_", "DIAG_", "ITEST", "SMOKE", "atk_smoke")
+
+
+def nonproduction(run_id, basename):
+    s = f"{run_id} {basename}"
+    return any(p in s for p in _NONPROD_PREFIXES)
 
 
 def def_family(label):
@@ -183,6 +222,25 @@ def build():
         # vacuous: nothing to reverse because the defence erased nothing.
         pre_t = asis.get("target_suppression_acc")
         vacuous = pre_t is not None and pre_t >= 0.95
+        # ------------------------------------------------------- AGENT-4 REPAIR (D-016)
+        # `vacuous` is False both when the arm demonstrably DID erase and when the as-is
+        # suppression is simply UNKNOWN (no matching gen_*.json). Those are different states and
+        # were indistinguishable: 356 of 696 indexed rows had `asis_target_suppression = null` and
+        # every one was admitted for recovery as if non-vacuity had been established. Concrete
+        # misses at the time of this repair: atk_adv_church_s300_lr1e-5.json (T_before 0.9167,
+        # H_before 1.0000 -- nothing to reverse) and atk_TRAIN_uce_church_tench_s300_lr1e-5.json
+        # (T_before 0.8750, H_before 0.9333). Both sit just under the 0.95 threshold OR have no
+        # as-is record at all, and neither is flagged.
+        # `vacuous_no_erasure` and the admissibility flags are UNCHANGED (historical aggregates
+        # must reproduce). Two reporting-only flags are added so the unknown state is visible, plus
+        # a record-local fallback that uses the attack's own pre-attack H when as-is is missing.
+        vacuity_determinable = pre_t is not None
+        h_before_local = rec.get("H_before")
+        t_before_local = av.get("T_before")
+        vacuous_suspect_from_record = (
+            not vacuous
+            and ((h_before_local is not None and h_before_local >= 0.90)
+                 or (t_before_local is not None and t_before_local >= 0.85)))
 
         ret = pau.get("retained_capability") or {}
         rows.append({
@@ -191,6 +249,11 @@ def build():
             "registry_version": REGISTRY_VERSION,
             # --- identity
             "defence_label": lab,
+            "defence_identity": def_identity(unet, hp.get("text_encoder")),       # D-015
+            "defence_label_collapses_text_encoder": bool(hp.get("text_encoder")),  # D-015
+            "schema_stratum": "".join(
+                "T" if d.get(b) else "F" for b in _STRATUM_BLOCKS),                # D-015
+            "nonproduction_label": nonproduction(d.get("label") or bn, bn),        # D-015
             "defence_family": def_family(lab),
             "base_model": base_model(lab),
             "checkpoint": sha(unet) if unet else {"sha256": None, "state": "BASE"},
@@ -220,16 +283,121 @@ def build():
             "quarantined": quarantined,
             "void_post_attack_utility": bn in void_files,
             "vacuous_no_erasure": vacuous,
+            "vacuity_determinable": vacuity_determinable,                 # D-016
+            "vacuous_suspect_from_record": vacuous_suspect_from_record,   # D-016
             "admissible_for_recovery": (not quarantined) and (not vacuous),
             "admissible_for_paired_utility": (not quarantined) and (not vacuous)
                                              and bn not in void_files
                                              and pau.get("status") == "MEASURED",
         })
 
+    # ------------------------------------------------------------------ AGENT-4 REPAIR (D-017)
+    # The registry indexed duplicate cells without noticing them. At the time of this repair, 68
+    # duplicate cells spanned 178 indexed rows and 30 of those cells DISAGREED on H_after -- up to
+    # 0.5333 apart (atk_H53T_advunlearn_tench_sd6_lr1e-5 = 1.0000 vs atk_H60_tench_sd6_s300 =
+    # 0.4667) on byte-identical hparams and identical T/H prompt lists. Every duplicate was
+    # admissible, so each double-counted in every `tested` and `gate-valid` column, and
+    # `arm_table()`'s `max(H_valid)` systematically selected the higher -- which is the OLDER
+    # schema stratum in 11 of the 13 strictest cases. They are computed and reported here so no
+    # consumer can pool them unknowingly. Admissibility is NOT changed: adjudicating which run is
+    # correct needs a code version the records do not carry.
+    def cell_key(r):
+        return (r["defence_identity"], r["target"], r["attack_family"],
+                r["attack_seed"], r["attack_lr"], r["attack_steps"])
+
+    by_cell = collections.defaultdict(list)
+    for r in rows:
+        by_cell[cell_key(r)].append(r)
+    dup_cells, disagreeing = [], []
+    for k, rs in sorted(by_cell.items(), key=lambda kv: str(kv[0])):
+        if len(rs) < 2:
+            continue
+        hs = [r["H_after"] for r in rs if r["H_after"] is not None]
+        spread = (max(hs) - min(hs)) if hs else None
+        entry = {
+            "cell": list(k), "n_records": len(rs),
+            "files": [r["file"] for r in rs],
+            "H_after": hs,
+            "H_after_spread": spread,
+            "schema_strata": sorted({r["schema_stratum"] for r in rs}),
+            "agrees": (spread == 0) if spread is not None else None,
+        }
+        dup_cells.append(entry)
+        if spread:
+            disagreeing.append(entry)
+
+    # Quarantine reachability: the glob below is the ONLY path by which a record becomes
+    # `quarantined`. If a CONTAMINATED_* directory exists but holds no atk_*.json, then
+    # `attack_records_quarantined: 0` means "the mechanism matched nothing", not "nothing is
+    # contaminated". At the time of this repair outputs/CONTAMINATED_label_collision/ held only
+    # redundancy_attacked_*.json, so the count was vacuously zero.
+    contaminated_dirs = sorted(os.path.basename(p)
+                               for p in glob.glob(f"{OUT}/CONTAMINATED_*") if os.path.isdir(p))
+    quarantine_glob_hits = len(glob.glob(f"{OUT}/CONTAMINATED_*/atk_*.json"))
+
+    # Staleness: the registry is a snapshot. If attack records are newer than the indexed set, any
+    # table generated from it is behind the corpus and will silently omit whole campaigns.
+    all_atk = glob.glob(f"{OUT}/atk_*.json")
+    newest = max((os.path.getmtime(p) for p in all_atk), default=0.0)
+    indexed = {r["file"] for r in rows}
+    unindexed = sorted(os.path.basename(p) for p in all_atk
+                       if os.path.basename(p) not in indexed)
+
     reg = {
         "study": "result_registry",
         "registry_version": REGISTRY_VERSION,
         "generated_by": "scripts/registry_v1.py",
+        "integrity": {                                                        # D-015/16/17
+            "duplicate_cells": len(dup_cells),
+            "duplicate_cell_records": sum(e["n_records"] for e in dup_cells),
+            "duplicate_cells_disagreeing_on_H_after": len(disagreeing),
+            "max_H_after_spread_within_a_cell": max(
+                (e["H_after_spread"] for e in disagreeing), default=0.0),
+            "duplicate_cell_detail": dup_cells,
+            "schema_strata_present": dict(collections.Counter(
+                r["schema_stratum"] for r in rows)),
+            "schema_stratum_note":
+                "Attack records carry NO code-version field and run_inventory.json.code_commit is "
+                "null for every entry, so these strata -- presence of (trainability, "
+                "grad_and_delta_evidence, post_attack_utility) -- are the only proxy for which "
+                "harness wrote a record. A duplicate cell spanning two strata cannot be "
+                "adjudicated from the records alone.",
+            "records_collapsed_into_BASE_by_text_encoder": sum(
+                r["defence_label_collapses_text_encoder"] for r in rows),
+            "nonproduction_records_admitted": sum(
+                r["nonproduction_label"] and r["admissible_for_recovery"] for r in rows),
+            "vacuity_undeterminable_but_admitted": sum(
+                (not r["vacuity_determinable"]) and r["admissible_for_recovery"]
+                for r in rows),
+            "vacuous_suspect_from_record_but_admitted": sum(
+                r["vacuous_suspect_from_record"] and r["admissible_for_recovery"]
+                for r in rows),
+            "contaminated_dirs_present": contaminated_dirs,
+            "quarantine_glob_matched_atk_files": quarantine_glob_hits,
+            "quarantine_mechanism_reachable": quarantine_glob_hits > 0,
+            "attack_json_on_disk": len(all_atk),
+            "attack_json_indexed": len(rows),
+            "attack_json_unindexed": len(unindexed),
+            "unindexed_files": unindexed,
+            "newest_attack_record_mtime": newest,
+            "generated_at": time.time(),
+            "staleness_check":
+                "This snapshot is current only at `generated_at`. A CONSUMER must compare "
+                "`generated_at` against the newest outputs/atk_*.json mtime on disk before "
+                "quoting any aggregate; if records are newer, whole campaigns are missing. This "
+                "registry cannot detect its own later staleness. (When this field was added, the "
+                "on-disk registry was 7.5 h behind the corpus and omitted 112 of 808 attack "
+                "records, including all of E12, E2G, E2H and E4MG.)",
+            "unindexed_cause":
+                "`attack_json_unindexed` counts files the family filter dropped because their "
+                "`study` is absent from FAMILY. These are silently excluded from every table.",
+            "integrity_note":
+                "These fields are REPORTING ONLY. No admissibility flag, aggregate or table "
+                "changed, so every historical number reproduces. They exist because the registry "
+                "previously reported duplicate, collapsed, non-production and "
+                "undeterminable-vacuity records without distinguishing them, and reported "
+                "attack_records_quarantined: 0 from a glob that matched nothing.",
+        },
         "counts": {
             "attack_records_total": len(rows),
             "attack_records_quarantined": sum(r["quarantined"] for r in rows),

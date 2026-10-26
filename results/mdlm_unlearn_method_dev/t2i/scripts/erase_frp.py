@@ -20,6 +20,25 @@ Paper settings (Table 4): rho = 3% MLP-only, beta = 0.05, damage mode = zero out
 400 seq x 256 tok, seed 42. LAMBDA IS NEVER ASSIGNED A VALUE IN THE PAPER -- see PREREG_H66 S3(c);
 the primary is pre-declared at 0.05 and the full sweep is always reported.
 
+PROVENANCE RE-VERIFIED (Agent-3 fidelity audit, 2026-10-26) and it HOLDS. `upstream/FRAG`
+(github.com/Yi1-Chen/FRAG @7fa3b5e8bcacd6b7711290843797c234d62eb64f) contains exactly three
+tracked files -- README.md and two PNGs -- and README.md:99 still reads "Code release is in
+preparation. This repository currently holds only this README". The arXiv id 2608.25429 matches
+README.md:105. So "OUR PORT from the paper, not their code" is an ACCURATE claim. Two further notes
+from the README that bound what this port can be: the paper's domain is LLM unlearning (TOFU,
+WMDP-cyber, LLaMA-3.2-1B/3B), not diffusion -- so the SD application is a DOMAIN ADAPTATION on top
+of the port; and FRAG proper is a training-free PREDICTOR while FRP (this file) is the pruning
+method derived from it. The two must not be conflated.
+
+OPEN QUESTION ON EQ. (6)'s THIRD TERM, unresolvable without the authors' code. The score below is
+    S_ij = rank_j(F_ij) - beta*rank_j(R_ij) + lmbda*rank_j(|W_ij|)
+and TopK(S) selects columns to ZERO. The `+lmbda` sign therefore makes the method prefer zeroing
+LARGE-magnitude weights, which is the opposite of standard magnitude pruning, and |W| already enters
+F and R multiplicatively so the term is partly redundant with them. The README's phrasing -- FRP
+"prunes weights that are forget-important, retain-unimportant, AND LARGE ENOUGH TO MATTER" -- reads
+as CONSISTENT with the positive sign, so this is recorded as an open question, not a defect, and the
+transcription is left exactly as it has always been. lmbda is swept in any case.
+
 Run: python scripts/erase_frp.py --concept church --rho 0.03 --beta 0.05 --lmbda 0.05 \
          --label frp_church_r3
 """

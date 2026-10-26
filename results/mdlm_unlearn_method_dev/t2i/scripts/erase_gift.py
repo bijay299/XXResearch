@@ -26,6 +26,19 @@ Hessian. So this port is faithful on exactly the point where our Meta-Unlearning
 (scripts/meta_unlearn.py) was not -- that one dropped the second-order term via a first-order
 approximation, which FINDING56 section 4 records as a live alternative explanation for its failure.
 
+TWO QUALIFICATIONS ON THAT LAST CLAIM (Agent-3 fidelity audit, 2026-10-26):
+  * "emergent second order via alternation" is NOT a GIFT distinctive. The IMMA authors' released
+    code is also purely alternating and strictly first-order (no create_graph / higher /
+    functional_call anywhere in `upstream/IMMA`), and so is the Meta-Unlearning reference
+    (`src/esd_meta.py` transplants `.grad` off a deepcopy). The contrast drawn above is between
+    THIS PORT and OUR Meta port, not between the two published methods.
+  * NO CODE IS AVAILABLE FOR GIFT. `upstream/` holds no clone of arXiv 2507.13598 and the audit
+    found no code link for it, so `code_released: False` below is recorded as UNVERIFIED rather
+    than verified, and every port decision here (psi granularity, z^(j) granularity, beta,
+    a_inner, a_outer, cadence, optimiser) is unreconciled against any reference implementation.
+    psi = 80 attn2 to_q/to_k/to_v/to_out.0 tensors = 44.0M params = 5.12% of the 859.5M UNet --
+    deliberately the same surface UCE edits and the same surface our IMMA port uses.
+
 Run: python scripts/erase_gift.py --concept church --beta 1.0 --label gift_church_b1
 """
 import argparse, json, os, time

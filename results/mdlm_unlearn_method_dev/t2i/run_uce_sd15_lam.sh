@@ -14,7 +14,7 @@ export HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0
 export BASE_MODEL=runwayml/stable-diffusion-v1-5 BASE_VARIANT=fp16
 export BASE_REV=451f4fe16113bff5a5d2269ed5ad43b0592e9a14
 mkdir -p .labels logs
-for cfg in "0.5 0" "1.0 1"; do
+for cfg in "1000 0" "10000 1" "50000 0"; do
   set -- $cfg; LAM=$1; G=$2
   L="uce_sd15_church_lam${LAM}"
   mkdir ".labels/$L" 2>/dev/null || continue

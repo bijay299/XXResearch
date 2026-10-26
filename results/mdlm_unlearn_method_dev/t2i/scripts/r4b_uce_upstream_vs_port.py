@@ -23,8 +23,32 @@ WHAT R4b DOES INSTEAD
   * separates per-matrix max, per-matrix mean, and aggregate error;
   * solves the same systems in **float64** to measure actual numerical error rather than inferring
     it from a condition number;
-  * isolates embedding-selection, accumulation-order and precision **one factor at a time**;
-  * reloads saved checkpoints so serialization precision is included.
+  * reloads UPSTREAM's saved `.safetensors`, so upstream's serialization precision is included.
+
+CORRECTIONS TO THIS DOCSTRING (2026-10-26, AGENT1 P5). Three claims it used to make are false:
+
+  (i)   "isolates embedding-selection, accumulation-order and precision ONE FACTOR AT A TIME."
+        IT DOES NOT ISOLATE ACCUMULATION ORDER. `solve()` below uses UPSTREAM's order
+        (lam*W first) for EVERY cell, so that factor is held fixed and never varied. Column B
+        establishes something narrower but still useful: given identical embeddings AND identical
+        accumulation order, our transcription of the closed form reproduces upstream, so there is
+        no third hidden discrepancy. Accumulation order is bounded elsewhere -- see
+        AGENT1_UCE_FINDINGS D-106/D-160 -- at <1.2e-04 on this GPU path but ~5.6e-02 on CPU, i.e.
+        it is BLAS-dependent and this script does not measure it.
+  (ii)  "reloads saved checkpoints so serialization precision is included." Only UPSTREAM's is
+        reloaded. The port column is computed in memory in float32 and NEVER touches
+        `adapters/.../unet.pt`, which `erase_uce.py` writes as FLOAT16. The port's serialization
+        floor is 2.07e-04 (AGENT1 D-140) -- ABOVE column B at lam>=0.5 and 1560x above it at
+        lam=1000, so column B says nothing about any checkpoint we ever shipped. Use r4c for
+        checkpoint-level comparison.
+  (iii) The "port" column is our port's EMBEDDING SELECTION run through upstream's accumulation
+        order at preserve_scale=1.0. It is NOT `erase_uce.py`'s code path, and preserve_scale=1.0
+        matches NO historical arm -- `erase_uce.py` defaults to 0.1 and every SD-1.5 lambda-sweep
+        arm, including `uce_sd15_church_lam1000`, used 0.1.
+
+Column C is a MEASURED REALISED float32 error on one realisation, NOT a bound: it is a lower
+estimate (the float64 solve carries its own error) and bounds nothing above (one input, one guide,
+one concept, one BLAS path). The word "bound" has been removed throughout.
 
 It makes NO robustness claim. Weight differences are not image differences and are not attack
 resistance.
@@ -188,10 +212,24 @@ def main():
             W = m.weight.data.float()
             Wn32 = solve(c_e, c_g @ W.T, c_p, c_p @ W.T, W, a.lamb, a.erase_scale, a.preserve_scale,
                          torch.float32)
-            Wn64 = solve(c_e.double(), (c_g @ W.T).double(), c_p.double(), (c_p @ W.T).double(),
-                         W.double(), a.lamb, a.erase_scale, a.preserve_scale, torch.float64)
+            # D-130 REPAIR. The previous form passed `(c_g @ W.T).double()` -- a FLOAT32 matmul
+            # cast up afterwards -- so the "float64 reference" inherited the float32 rounding of
+            # the very numerator products it was meant to measure, making the two errors
+            # correlated. Cast FIRST, multiply in float64.
+            Wd = W.double()
+            Wn64 = solve(c_e.double(), c_g.double() @ Wd.T, c_p.double(), c_p.double() @ Wd.T,
+                         Wd, a.lamb, a.erase_scale, a.preserve_scale, torch.float64)
+            # Retained so the historical column stays auditable: the OLD mixed-precision
+            # reference. Measured on CPU (AGENT1 S9b) at 3.48e-08 from a true float64 solve, i.e.
+            # four decades below the float32 errors below, so no previously published column C
+            # value needs revising -- but the code was wrong and is fixed.
+            Wn64_mixed = solve(c_e.double(), (c_g @ W.T).double(), c_p.double(),
+                               (c_p @ W.T).double(), Wd, a.lamb, a.erase_scale, a.preserve_scale,
+                               torch.float64)
             fp_err = float((Wn32.double() - Wn64).norm() / max(float(Wn64.norm()), 1e-30))
-            rec = {"module": name, "float32_vs_float64_rel": fp_err}
+            rec = {"module": name, "float32_vs_float64_rel": fp_err,
+                   "float64_ref_mixed_precision_rel":
+                       float((Wn64_mixed - Wn64).norm() / max(float(Wn64.norm()), 1e-30))}
             if style == "upstream_token":
                 Wup = up_sd[name + ".weight"].float().to(dev)
                 rec["vs_upstream_rel"] = float((Wn32 - Wup).norm() / max(float(Wup.norm()), 1e-30))
@@ -229,22 +267,57 @@ def main():
                    "n_edited_modules": len(mods),
                    "edited_module_names": [n for n, _ in mods]},
         "A_embedding_selection_upstream_vs_port":
-            agg([c["rel"] for c in cross]) | {"note": "FULL pipelines: upstream executed vs our "
-                "port's embedding selection. Confounds embedding selection with everything else."},
+            agg([c["rel"] for c in cross]) | {"note":
+                "||solve(OUR selection) - upstream_reloaded|| / ||upstream_reloaded||, all 32 "
+                "matrices. NOT erase_uce.py's code path: upstream's accumulation order is used "
+                "here, and preserve_scale is this run's value (NOT the port's historical 0.1)."},
         "B_same_selection_vs_upstream":
             agg([r["vs_upstream_rel"] for r in results["upstream_token"]]) | {"note":
-                "our solver using UPSTREAM's embedding selection, vs upstream's own output. "
-                "Isolates solver/accumulation from embedding selection."},
+                "||solve(UPSTREAM's selection) - upstream_reloaded|| / ||upstream_reloaded||. "
+                "Same selection AND same accumulation order as upstream, so it does NOT vary "
+                "accumulation order and establishes nothing about it. What it does establish: "
+                "given identical embeddings and identical order, our transcription of the closed "
+                "form reproduces upstream -- no third hidden discrepancy. NOTE: below the port's "
+                "own float16 serialization floor of 2.07e-04, so it says nothing about any "
+                "checkpoint we shipped."},
+        # A and B share the SAME reference (upstream_reloaded) and the SAME denominator, so the
+        # selection-induced difference is bounded two-sidedly by the triangle inequality. A-B is
+        # NOT a tensor difference and must not be quoted as one.
+        "selection_effect_triangle_bounds": {
+            "lower_A_minus_B": (agg([c["rel"] for c in cross])["per_matrix_mean"]
+                                - agg([r["vs_upstream_rel"]
+                                       for r in results["upstream_token"]])["per_matrix_mean"]),
+            "upper_A_plus_B": (agg([c["rel"] for c in cross])["per_matrix_mean"]
+                               + agg([r["vs_upstream_rel"]
+                                      for r in results["upstream_token"]])["per_matrix_mean"]),
+            "note": "||solve(our sel) - solve(upstream sel)|| / ||upstream|| lies in "
+                    "[A-B, A+B]. Valid because A and B are distances to a COMMON reference with a "
+                    "common denominator. The bound is tight only while B << A."},
         "C_float32_vs_float64_upstream_selection":
             agg([r["float32_vs_float64_rel"] for r in results["upstream_token"]]) | {"note":
-                "MEASURED numerical error of the float32 solve against a float64 solve on "
-                "IDENTICAL matrices. Not inferred from a condition number."},
+                "MEASURED REALISED numerical error of the float32 solve against a TRUE float64 "
+                "solve (all products in float64) on IDENTICAL inputs. Not inferred from a "
+                "condition number, and NOT a bound -- it is one realisation on one BLAS path."},
         "C_float32_vs_float64_port_selection":
             agg([r["float32_vs_float64_rel"] for r in results["port_last_to_76"]]),
+        "float64_reference_mixed_precision_check":
+            agg([r["float64_ref_mixed_precision_rel"] for r in results["upstream_token"]]) | {
+                "note": "How far the OLD (pre-D-130) mixed-precision reference sits from the "
+                        "corrected true-float64 one. Expect ~3e-08, i.e. four decades below "
+                        "column C, confirming no published column C value needs revising."},
         "per_matrix_all": cross,
         "caveats": ["Weight differences are NOT image differences and NOT attack resistance.",
-                    "This does not establish which implementation is more accurate; the float64 "
-                    "columns bound each one's own numerical error, nothing more."],
+                    "This does not establish which implementation is more accurate. Column C is a "
+                    "realised float32 error on one realisation -- a lower estimate, not a bound.",
+                    "Accumulation order is held at UPSTREAM's in every cell and is NOT measured "
+                    "here (AGENT1 D-106/D-160).",
+                    "Only upstream's serialization is included; the port column never touches "
+                    "erase_uce.py's float16 unet.pt (AGENT1 D-140).",
+                    "preserve_scale here is %r; erase_uce.py's historical default is 0.1, so this "
+                    "cell may match NO arm in our published tables." % a.preserve_scale,
+                    "Upstream at erase_scale=1 with one unexpanded object noun leaves church at "
+                    "15/15 CLIP accuracy (r4c/r4d). Weight-space agreement with it is therefore "
+                    "not evidence of a working erasure on either side (AGENT1 D-100..D-105)."],
         "minutes": (time.time() - t0) / 60,
     }
     out = f"{OUT}/r4b_uce_lamb{a.lamb}{a.tag}.json"

@@ -15,6 +15,17 @@ paper: the erasure is evaluated where the model currently puts the concept.
 
 ESD-u trains everything EXCEPT cross-attention (the paper's setting for objects); ESD-x trains only
 cross-attention (its setting for styles). Labelled a re-implementation throughout (PREREG_H38 S4).
+
+SCOPE NOTE (Agent-3 fidelity audit, 2026-10-26). The ESD authors' code is NOT pinned in this
+project (`upstream/` holds IMMA, Meta-Unlearning, vision_relearning, unified-concept-editing and
+FRAG only), so the scope below is UNVERIFIED against it and this remains a from-paper
+re-implementation. One known-suspect point: our `esd_u` filter is simply `not ("attn2" in n)`,
+which keeps `time_embed` and `conv_out` trainable. The official `noxattn` setting is generally
+reported as ALSO excluding the output block and the time embedding, which would make our esd_u
+scope slightly WIDER than the reference's. Numbers: esd_u = 859.5M - 44.0M = 815.5M params;
+esd_x = 44.0M (80 attn2 tensors). For contrast, `meta_unlearn_v2.py`'s SCOPES["noxattn"] DOES
+exclude `conv_out.` and `time_embed`, so the two files' "noxattn" are not the same set. Left
+unchanged: this file produced historical ESD arms and must stay reproducible.
 """
 import argparse, json, os, time
 import torch

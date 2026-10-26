@@ -1,5 +1,44 @@
 # FINDING 67 — The faithful Weight Dist Reg objective is **inert at the reference's own default α**, by a factor of **4,000×**, and the reason is structural: its RMS normalisation gives the term a gradient norm of exactly **1/√N**. Third instance of the same scale pathology.
 
+> **⚠ CORRECTION 2026-10-26 (audit defect D-017) — the headline's MECHANISM is wrong, and the
+> "third instance of one pathology" framing does not hold.**
+>
+> The *derivation* ‖∇L‖ = α/√N has been independently re-verified and **stands**. Three things
+> around it do not:
+>
+> 1. **The 4,000× factor is not the 1/√N structure.** Measured as the distance step's update
+>    magnitude as a fraction of `lr`: α=1 → **0.104**, α=10 → **0.537**, α=4000 → **0.998**. So
+>    α 1→4000 buys **≈9.6×**, not 4,000×.
+ 2. **The real mechanism is an optimiser-state artifact of *our* code, not of the method.** Both
+>    steps share **one Adam instance** (`scripts/erase_wdr_v2.py:200`), stepped **twice** per
+>    iteration — forget at `:206-210`, retain at `:212-227`. So the second-moment buffer `v` is an
+>    EMA mixing both terms and is dominated by the larger (retain) one; the distance step's update
+>    is then ≈ `lr·|g_dist|/√v_retain`, roughly linear in α. Two numbers make this concrete at
+>    α=1: the WDR term's **per-coordinate** RMS is α/N = **1.16e-9**, which is an order of magnitude
+>    *below Adam's own ε of 1e-8*, while the retain term's is **4.67e-6**. α is therefore **inert at
+>    both ends** — below ≈10 because `v` is retain-dominated (and the term is under ε), above ≈4e3
+>    because Adam **saturates** once the term dominates `v`. §6's "useful window α ∈ (1, 4000)" is
+>    right, but its upper bound is a *saturation point*, not a frontier.
+> 3. **The reference does not share this schedule.** It **sums** both terms into one step:
+>    alternation is gated on an `alternating_` name prefix that `weight_dist_reg` lacks
+>    (`upstream/vision_relearning/vision_unlearner.py:411`, applied at `:637-682`). Our port's
+>    docstring claim "ALTERNATING … as the reference does" is itself inverted — audit defect D-016.
+>    Under the reference's summed schedule the gradient-norm framing *would* be apt. So the
+>    faithfulness defect and the coefficient finding are **entangled**, and this instance is a
+>    property of our two-step port rather than of "From Dormant to Deleted".
+>
+> The identity itself, for the record: N = 859,520,964, giving ‖∇L‖ = α/√N = **3.411e-5** at α=1.
+> Re-verified on CPU — ratio to 1/√N = **1.000000** at N=1e4 and **0.999940** at N=1e6 (falling to
+> 0.995109 only when RMS ≈ 1e-3 and ε begins to bite). The observed ~285× RMS change at α=4000 is
+> the shared buffer, not the normalisation.
+>
+> **Consequences.** `wdr2_church_a4000`'s retain8 = 0.5917 measures **our two-step shared-Adam
+> schedule at saturation**, not "WDR at gradient parity"; §6's "at gradient parity" attribution is
+> withdrawn. And the headline's **"third instance of the same scale pathology"** (IMMA α, UCE λ,
+> WDR α) no longer holds for the WDR member: the other two are coefficient-scale findings about the
+> methods, this one is about our optimiser plumbing. The numbers stand; the unifying story does not.
+> §7's two sub-claims are corrected below.
+
 **Date:** 2026-10-26 · **Experiment:** E1 + `scripts/diag_wdr_scale.py`
 **Evidence:** `outputs/wdr2_wdr2_church_a1.0.json`, `outputs/gen_wdr2_church_a1.0.json`,
 `outputs/diag_wdr_scale.json`, `logs/e1_wdr.log`
@@ -175,9 +214,23 @@ it was also the only useful GPU work available at 3.5 GiB free).
 
 The two terms are intrinsically the same order — so unlike WDR, λ=0.15 is not inert, it is simply
 **~8× weaker than the retain term** rather than comparable to it. `PREREG_H90`'s arms are specified
-at λ=0.15 for continuity with the historical sweep; this says that choice systematically
-under-weights the adversarial term, and E4 should carry a λ≈1.2 arm alongside it. Recorded here so
-that is a declared design decision rather than a later rationalisation.
+at λ=0.15 for continuity with the historical sweep, and E4 should carry a λ≈1.2 arm alongside it.
+Recorded here so that is a declared design decision rather than a later rationalisation.
+
+> **CORRECTION 2026-10-26 (audit defect D-017).** The sentence that stood here said λ=0.15
+> "systematically under-weights the adversarial term". **Withdrawn** — it uses parity as a normative
+> reference point, which nothing establishes.
+>
+> The nuance matters and cuts partly the other way from the WDR case above. For UTRAP-v2 the two
+> gradients **are** summed into one `p.grad` before a single Adam step
+> (`scripts/erase_utrap_v2.py:265-274`), so unlike the WDR port the **ratio does** set the summed
+> direction — parity is a defensible *directional* heuristic, putting the resultant ≈45° between the
+> two terms. But Adam normalises the overall scale away regardless, and no measurement here shows
+> 45° is the best direction. So the supportable wording is: **λ=0.15 weights the adversarial term
+> ~8× below the retain term**, with no implied optimum, and λ=0.15 is not inert. Carrying a λ≈1.2
+> arm alongside remains the right design choice — as a **comparison**, not as a correction toward a
+> target. `PREREG_H90` §: the phrase "the λ under-weighting is measured" inherits the withdrawn
+> framing and is corrected there.
 
 ### Meta-v2: the pattern does **not** recur, and that is worth stating
 
@@ -187,10 +240,27 @@ that is a declared design decision rather than a later rationalisation.
 | ‖∇ L_target(θ′)‖ | **0.0927** |
 | ratio | **2.4×** |
 
-The two Eq. 8 terms that `zeta` and `lam_target` scale are **within 2.4× of each other**, so the
-inherited 1.0 defaults are already near parity. **E2 needs no coefficient correction.** Four
-instances checked, three pathological, one clean — which is the point of checking rather than
-assuming in either direction.
+The two Eq. 8 terms measured above are **within 2.4× of each other**.
+
+> **CORRECTION 2026-10-26 (audit defect D-014/D-017). "E2 needs no coefficient correction" is
+> WITHDRAWN — the diagnostic compared the wrong pair.** This table treats ‖∇L_retain(θ)‖ and
+> ‖∇L_target(θ′)‖ as two independent terms that ζ and `lam_target` separately scale. They are not.
+> Verified at `scripts/meta_unlearn_v2.py:288-306`: a **single shared ζ** multiplies `+L_R(θ)` **and**
+> `−L_R(θ′)`, so the quantity ζ actually weights is the **difference** L_R(θ) − L_R(θ′), not L_R(θ)
+> alone. With θ′ ≈ θ − α∇L_F that difference is ≈ α·∇L_R·∇L_F — second order, and far smaller than
+> either norm in the table. **ζ is therefore near-inert, which is the opposite of the conclusion
+> drawn here**, and no ζ sweep has been run to test it empirically.
+>
+> So the corrected tally is: four coefficient scales checked, and the Meta-v2 "clean" case was a
+> measurement artifact — it only looked clean because the pairing was not modelled. The lesson of §4
+> ("measure the scale before sweeping the knob") survives, but with an addition: **measure the
+> quantity the coefficient actually multiplies**, which for a paired meta-objective is a difference,
+> not a level. `FINDING78` §1a carries the consequence: that document's retention gain comes from
+> restoring the *pairing* (which cancels variant A's retain-level penalty), not from ζ's weight.
+>
+> A second defect in the same code compounds this: `L_R(θ)` and `L_R(θ′)` are drawn with
+> **independent noise and timesteps**, so the paired difference is unpaired and the logged
+> `retain_change` is dominated by sampling noise. The fix is common random numbers, not a larger ζ.
 
 ### One measurement came back exactly 0.0, and that is structural, not a failure
 

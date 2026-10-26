@@ -1,5 +1,28 @@
 # FINDING 66 — The H = 1.000 ceiling is **not** a DEV artifact. On prompts never used for anything, the attack restores the target to **15/15** — and on SD-1.4 that is **more reliable than the unmodified base model**, which scores 13/15.
 
+> # ⚠ Scored with the wrong label set. Audit defect D-022, 2026-10-26.
+>
+> Every FINAL number here came from `gen_eval_final.py:84`, which prompted CLIP with `LAB_KEY`
+> (`"a photo of a van_gogh"`, `"a photo of a english_springer"`) instead of `LABELS`. Nine of the
+> twelve labels differ; `church` is **not** one of them, so the target's text was correct while the
+> nine competing distractors were degraded — which biases `target_hits` **upward**.
+>
+> **This document is less confounded than `FINDING65`, and the distinction matters.** Its central
+> comparison — attacked arms against the base anchor — puts **both sides through the same scorer**,
+> so the *comparison* is internally consistent in a way FINDING65's cross-scorer DEV-vs-FINAL ratios
+> are not. The qualitative conclusion, that the ceiling is not a DEV artifact, is the more robust
+> for it: 15/15 means every image was called church, and strengthening the distractors can only
+> lower that, never raise it.
+>
+> **What does not stand:** the absolute figures. The base anchor's **13/15** is 13 church plus
+> **2 images that went to degraded labels** (`english_springer`, `golf_ball`) at a median margin of
+> **0.0189**; the attacked arms' 15/15 is an upper bound under a scorer with weakened competitors.
+> So "more reliable than the unmodified base model" rests on a 2-image gap measured with
+> systematically weakened distractors, and must not be quoted until re-scored.
+>
+> Re-score queued as gate condition **G12** — the 180 images regenerate deterministically at the
+> same seeds, so it is a pure re-score, not a second use of the FINAL split.
+
 **Date:** 2026-10-26 · **Experiment:** E6b
 **Adversary:** `attack_relearn.py` **unmodified** — bit-identical to all 642 historical attack
 records. Only `--keep-checkpoint` was added, so the attacked model could be scored on FINAL and then

@@ -29,8 +29,18 @@ WHAT IS FAITHFUL HERE, term by term (and why a sign flip alone would NOT have be
                        term at all. `erase_wsr.py` added its anchor as a third term alongside an
                        erase term and a retain term.
   4. RETAIN         -- unscaled (coefficient exactly 1.0) while the distance term carries alpha.
-  5. SCHEDULE       -- ALTERNATING forget and retain iterations, as the reference's training loop
-                       does, not a single summed step.
+  5. SCHEDULE       -- !! THIS POINT WAS WRONG AND IS WITHDRAWN (Agent-3 fidelity audit,
+                       2026-10-26). It claimed "ALTERNATING forget and retain iterations, as the
+                       reference's training loop does, not a single summed step." The reference
+                       does the OPPOSITE. Alternation there is gated on `current_cycle`, which is
+                       non-None only for method names carrying the `alternating_` prefix
+                       (`vision_unlearner.py:411`); `weight_dist_reg` has none, so BOTH branches
+                       run every iteration and both `.backward()` calls accumulate into the SAME
+                       grad buffer before ONE `optimizer.step()` (`vision_unlearner.py:637-682`).
+                       The reference SUMS. This file takes TWO separate Adam steps per iteration
+                       (see the loop below). That is a real divergence, it has NOT been repaired
+                       (repairing it changes numerics), and it has a direct consequence for
+                       FINDING67 -- see the ALPHA SCALING note below.
   6. SCOPE          -- all parameters, matching `flatten_param_dict(model.parameters())`.
   7. OPTIMISER      -- Adam (the reference's default `--optimizer-name adam`), alpha default 1.0
                        (`--unlearning-alpha` default 1), no gradient clipping
@@ -52,6 +62,42 @@ build). The reference bounds it in practice only through the retain loss and a s
 it, and the artifact records whether the stop fired. That is a disclosed deviation from the
 reference, added because the alternative is a predictable null, and it is recorded in the JSON as
 `trust_region_stop`.
+
+ALPHA SCALING -- FINDING67's DERIVATION IS CORRECT, ITS MECHANISM ATTRIBUTION IS NOT
+(Agent-3 fidelity audit, 2026-10-26).
+
+The closed form is confirmed analytically. With d = theta_pre - theta, S = mean(d^2),
+L = -alpha*sqrt(S + eps):
+    dL/dp_j = alpha * d_j / (N * sqrt(S + eps))
+    ||grad L|| = alpha*||d|| / (N*sqrt(S)) = alpha*sqrt(N*S)/(N*sqrt(S)) = alpha / sqrt(N)
+exactly, independent of distance, for S >> eps. At N = 859,520,964 that is 3.411e-5 at alpha = 1,
+matching the measured value to 4 s.f. FINDING67 section 3 is VALID as algebra.
+
+What does NOT follow is the reading that alpha=1 is inert "against a retain-term gradient of
+~0.137". The two gradients are never summed in this file -- they go into two separate Adam steps.
+Under Adam a step's size is set by g/(sqrt(v)+eps_adam), which is INVARIANT to scaling the loss, so
+a gradient-norm ratio between two separately-stepped terms is not the quantity that decides
+anything. The reason alpha nevertheless matters here is narrower and is an ARTIFACT of this file's
+construction: both steps share ONE Adam instance, so the second-moment buffer `v` is an EMA mixing
+both terms and is dominated by the larger (retain) one. The distance step's update is then
+~lr*|g_dist|/sqrt(v_retain), which IS linear in alpha until alpha is large enough for the distance
+term to dominate `v` itself -- past which alpha saturates and is genuinely inert again.
+
+Three consequences, stated rather than glossed:
+  * alpha is inert at BOTH ends -- below ~10 because `v` is retain-dominated, above ~4e3 because
+    Adam is scale-invariant once the term dominates `v`. FINDING67's "useful window alpha in
+    (1, 4000)" is right; the upper end is a saturation point, not a frontier.
+  * the "4000x" factor is a property of the shared-Adam-state two-step schedule, NOT of the
+    reference method (which sums into one step) and NOT of the 1/sqrt(N) parity it was attributed
+    to. Under the reference's summed schedule the gradient-norm ratio WOULD be the right frame.
+  * gradient-norm parity is a DIRECTIONAL HEURISTIC, not an optimum. Nothing establishes that equal
+    gradient norms are the best trade-off between two objectives, and under Adam the overall scale
+    is normalised away in any case. `--alpha 4000` should be read as "the point at which the term
+    starts moving the weights", not as a tuned or optimal value.
+
+SMALL LATENT ISSUE, no repair needed: with `--teacher` omitted, theta == theta_pre at step 0, so
+d = 0 and the forget gradient is exactly 0 (the eps guard makes it finite, and zero). The first
+forget iteration is a no-op; the term becomes live only after the first retain step moves theta.
 
 Run (no result is claimed from this file until a build and a frozen-grid evaluation have run):
   python scripts/erase_wdr_v2.py --concept church --alpha 1.0 --max-rms 0.02 \
@@ -163,7 +209,12 @@ def main():
         l_forget.backward()
         opt.step()
 
-        # ---- RETAIN iteration: unscaled diffusion loss, separate step (alternating, as reference)
+        # ---- RETAIN iteration: unscaled diffusion loss, SEPARATE Adam step.
+        # CORRECTED COMMENT (Agent-3 audit): this said "alternating, as reference". The reference
+        # SUMS both terms into one step (vision_unlearner.py:411,637-682); only method names with
+        # the `alternating_` prefix alternate there, and `weight_dist_reg` is not one. Two separate
+        # steps sharing ONE Adam instance is also what makes --alpha appear to matter; see the
+        # ALPHA SCALING note in the module docstring. Unchanged: fixing it changes numerics.
         opt.zero_grad(set_to_none=True)
         ri = torch.randint(0, nr, (a.batch,), device=dev, generator=gt)
         z0 = r_lat[ri]
@@ -205,9 +256,21 @@ def main():
                    "normalisation": "RMS over flattened params, eps=1e-8 (reference)",
                    "forget_data_term": "NONE -- the distance term IS the forget loss (reference)",
                    "retain_coefficient": 1.0,
-                   "schedule": "alternating forget/retain iterations (reference)",
-                   "scope": "all UNet parameters",
-                   "optimiser": "Adam, no grad clipping (reference defaults)",
+                   # CORRECTED 2026-10-26 (Agent-3 audit): this read "alternating forget/retain
+                   # iterations (reference)". It is a DIVERGENCE, not a match.
+                   "schedule": "DIVERGENT: two separate Adam steps per iteration. The reference "
+                               "SUMS both terms into a single optimizer.step() "
+                               "(vision_unlearner.py:411, 637-682); only `alternating_`-prefixed "
+                               "methods alternate there and weight_dist_reg is not one.",
+                   "schedule_consequence": "the two terms share one Adam instance, so --alpha acts "
+                                           "through the shared second-moment buffer rather than "
+                                           "through gradient-norm parity; see FINDING67 "
+                                           "reinterpretation in docs/AGENT3_FIDELITY_FINDINGS.md",
+                   "scope": "all UNet parameters (matches flatten_param_dict(model.parameters()); "
+                            "reference excludes buffers, as do we)",
+                   "optimiser": "Adam, no grad clipping (reference defaults VERIFIED: "
+                                "--optimizer-name default 'adam' vision_unlearner.py:1834, "
+                                "--clip-grad-norm default None :1832)",
                    "domain_adaptation": "retain objective is the diffusion MSE, not cross-entropy; "
                                         "the paper is example-level unlearning in vision "
                                         "classifiers",

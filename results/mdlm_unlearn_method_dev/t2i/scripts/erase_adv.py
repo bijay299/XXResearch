@@ -1,4 +1,23 @@
-"""Adversarial concept erasure (Receler / AdvUnlearn family). OUR RE-IMPLEMENTATION.
+"""Adversarial concept erasure, in the SPIRIT of the Receler / AdvUnlearn family. OUR OWN DESIGN.
+
+CLASSIFICATION CORRECTION (Agent-3 fidelity audit, 2026-10-26). "Re-implementation" overstates
+what this is. Neither cited method is reimplemented: Receler's mechanism is a lightweight ERASER
+ADAPTER with concept-localised regularisation, and AdvUnlearn's is adversarial training of the TEXT
+ENCODER with a utility-retaining prompt set. This file does neither. It is an ESD step hardened
+against a soft adversarial perturbation of the concept EMBEDDING -- closer in form to the
+UnlearnDiffAtk / P4D prompt-attack literature than to either cited defence. Correct classification:
+OUR OWN DESIGN, inspired by that family. Consequence: a reversal measured on THIS file is NOT
+evidence that Receler or AdvUnlearn fall, and PREREG_H38 S4's framing of it as "the real bar" does
+not hold. The pinned OPTML-Group/AdvUnlearn checkpoint in ADVUNLEARN_PIN.txt is the only artifact
+in this project that bears on the published AdvUnlearn.
+
+HISTORICAL-RESULT WARNING. The inner loop's sign was WRONG until the "ISSUE 3 REPAIR" below: it
+ascended NEGATIVE MSE, i.e. it DESCENDED the erasure loss, so the inner loop was making erasure
+EASIER and the arm was not adversarially trained at all. That repair CHANGED the numerics of this
+file. Artifacts written before it are therefore not reproducible from this code, and the output
+JSON carried no version field to tell the two apart. `IMPL_VERSION` below is written into every new
+artifact so the ambiguity cannot recur; any `outputs/erase_*.json` from this script WITHOUT an
+`implementation_version` key predates the sign repair and its adversarial-training claim is void.
 
 PREREG_H38 S4 called this family "the real bar": ESD and UCE are the standard baselines, but the
 methods designed for ROBUSTNESS are the adversarially-trained ones (Receler arXiv 2311.17717,
@@ -27,6 +46,9 @@ import torch
 import torch.nn.functional as F
 
 PIN = "/data/bijaypandey/t2i_unlearn/MODEL_PIN.txt"
+# Bumped when the numerics change. "adv/v2-inner-sign-repaired" is the code AFTER the ISSUE 3 sign
+# repair described in the module docstring. Artifacts lacking this key predate it.
+IMPL_VERSION = "adv/v2-inner-sign-repaired"
 PROMPTS = {"church": "church", "parachute": "parachute", "garbage_truck": "garbage truck",
            "van_gogh": "Van Gogh"}
 # concepts whose generation must survive; the erasure is penalised for drifting on them
@@ -153,7 +175,13 @@ def main():
 
     os.makedirs(a.out, exist_ok=True)
     torch.save({k: v.half() for k, v in unet.state_dict().items()}, f"{a.out}/unet.pt")
-    json.dump({"study": "t2i_adv_erase_reimpl", "label": a.label, "concept": a.concept,
+    json.dump({"study": "t2i_adv_erase_reimpl", "implementation_version": IMPL_VERSION,
+               "classification": "OUR OWN DESIGN, inspired by Receler 2311.17717 / AdvUnlearn "
+                                 "2405.15234. NOT a re-implementation of either: no eraser "
+                                 "adapter (Receler), no text-encoder adversarial training "
+                                 "(AdvUnlearn). A reversal here is not evidence about either "
+                                 "published method.",
+               "label": a.label, "concept": a.concept,
                "hparams": vars(a),
                "erase_first50": sum(x[0] for x in hist[:50]) / max(len(hist[:50]), 1),
                "erase_last50": sum(x[0] for x in hist[-50:]) / max(len(hist[-50:]), 1),

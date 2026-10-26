@@ -10,6 +10,24 @@ model erased and useful WHEN USED AS IS.
 First-order approximation (standard in MAML variants): the gradient of L_benign(theta') is taken at
 theta' and applied to theta, without the second-order term. This is a STATED deviation and a live
 alternative explanation if the method fails here.
+
+!! THIS IS "VARIANT A" AND IT OMITS TWO OF EQ. 8's THREE META TERMS (ERRATUM_meta_objective.md;
+independently re-confirmed by the Agent-3 fidelity audit 2026-10-26 against
+sail-sg/Meta-Unlearning@5a2a760 src/esd_meta.py:992-1058 -- note the reference's runnable file is
+esd_meta.py, NOT the src/meta.py cited elsewhere in this tree, which does not execute).
+
+Eq. 8's meta term is   -L_F(theta') - zeta*( L_R(theta') - L_R(theta) ), i.e. three components:
+    (i)   -L_F(theta')     post-attack TARGET      -> ABSENT here
+    (ii)  -zeta*L_R(theta') post-attack retain     -> PRESENT here as -lam_meta*L_benign(theta')
+    (iii) +zeta*L_R(theta) pre-attack retain       -> ABSENT here
+`distil_R(theta)` below is NOT component (iii): teacher-output distillation and the diffusion loss
+are different functions with different minima. Consequence recorded in ERRATUM_meta_objective.md:
+variant A's premature benign damage is CONSISTENT WITH ITS OWN OBJECTIVE (it penalises the LEVEL of
+benign loss at theta', not its CHANGE across the attack step), so FINDING56 is not evidence that
+the published method's trigger fires on normal use.
+
+NO NUMERICAL CHANGE has been made to this file. Variant A's results stand as a distinct project
+variant; `meta_unlearn_v2.py` implements the full Eq. 8 and does not replace them.
 """
 import argparse, copy, json, os, time
 import torch
