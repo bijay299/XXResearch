@@ -44,6 +44,14 @@ ARMS = [
     # control needed to read the DEV->FINAL gap at all. Without an SD-1.5 anchor the two SD-1.5 arms
     # cannot be normalised, and without a base-on-DEV number the gap cannot be attributed.
     ("BASE_sd15_anchor",          None,                                          "church", SD15),
+    # E6b: POST-ATTACK arms. These score FINAL-prompt generation on models that the UNMODIFIED
+    # attack_relearn.py has already attacked (kept via --keep-checkpoint). Every H in the corpus is
+    # DEV-prompt recovery; these are the FINAL-prompt counterpart, and they are the one remaining
+    # way the H=1.000 ceiling could be a DEV artifact. Pre-committed before any number was seen.
+    ("ATK_utrap_church_l0.15k8",
+     "attacked/E6B_utrap_church_l0.15k8_sd0_lr1e-5/unet.pt",      "church", SD14),
+    ("ATK_utrap_sd15_church_l0.15k8",
+     "attacked/E6B_utrap_sd15_church_l0.15k8_sd0_lr1e-5/unet.pt", "church", SD15),
 ]
 
 
