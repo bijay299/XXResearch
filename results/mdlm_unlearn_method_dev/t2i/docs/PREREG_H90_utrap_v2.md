@@ -130,3 +130,20 @@ authorisation. Storage: 4 checkpoints × 1.7 GB ≈ **6.8 GB**.
 checkpoints plus attack intermediates is too tight to start safely on a filesystem shared with
 another project. This plan is therefore **ready but not launched**, and the blocker is reported in
 `HANDOFF_r5.md` rather than worked around by deleting anything.
+
+---
+
+## 7. Amendment, 2026-10-26, **before any H90 arm has been built** — add a λ≈1.2 arm
+
+`scripts/diag_coeff_scale.py` measured, on the real model: ‖∇L_retain‖ = 0.1856 and
+‖∇L_target‖ = 0.1503 over the full scope, so **λ for parity is 1.23** while this plan specifies
+**λ = 0.15** throughout. λ=0.15 was inherited from the historical UTRAP sweep, whose inner attacker
+was a different and much weaker process (`ERRATUM_utrap_inner_attacker.md`), so it carries no
+authority for the corrected attacker.
+
+**Amendment:** the K ∈ {0, 1, 8, 32} series stays at λ = 0.15 for continuity with the historical
+arms, and **one additional arm at λ = 1.2, K = 8** is added, so the λ under-weighting is measured
+rather than assumed. Cost: +1 build +3 attacks ≈ 3.5 GPU-h on top of the 14 already priced.
+
+This amendment is made **before any arm exists** and is recorded here rather than in the plan body,
+per `PREREG_PRECEDENCE.md` §4. It does not alter any prediction, falsifier or stopping rule above.

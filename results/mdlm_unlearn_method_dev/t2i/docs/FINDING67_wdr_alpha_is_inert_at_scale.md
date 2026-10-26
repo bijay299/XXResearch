@@ -152,3 +152,65 @@ Also worth recording: the trust region not firing at `--max-rms 0.03` means the 
 catastrophic unbounded ascent (`FINDING61` §4) **did not occur** at α = 4000 in 1500 steps. The
 damage was gradual retention loss, not collapse. That is a more informative failure than the
 earlier unbounded-objective nulls.
+
+## 7. Addendum — I checked the next two experiments' coefficients *before* spending disk on them. The pattern does **not** recur for Meta-v2; UTRAP-v2's λ is ~8× below parity.
+
+§4 named a three-instance pattern and drew the lesson "measure the scale before sweeping the knob".
+The two experiments queued next both inherit coefficients the same way §4 warns about — E2's `zeta`
+and `lam_target` default to 1.0 from the paper's shared notation, and E4's `lambda` defaults to 0.15
+inherited from the **old** UTRAP runs, whose inner attacker was a different and much weaker process
+(`ERRATUM_utrap_inner_attacker.md`), so there is no reason it transfers to the corrected attacker.
+
+So this time the measurement came first (`scripts/diag_coeff_scale.py`, JSON only, no checkpoint —
+it was also the only useful GPU work available at 3.5 GiB free).
+
+### UTRAP-v2: λ = 0.15 is ~8× below parity
+
+| quantity (full 859.5M scope) | value |
+|---|---:|
+| ‖∇ L_retain‖ | **0.1856** |
+| ‖∇ L_target‖ | **0.1503** |
+| **λ for parity** | **1.23** |
+| inherited default | **0.15** |
+
+The two terms are intrinsically the same order — so unlike WDR, λ=0.15 is not inert, it is simply
+**~8× weaker than the retain term** rather than comparable to it. `PREREG_H90`'s arms are specified
+at λ=0.15 for continuity with the historical sweep; this says that choice systematically
+under-weights the adversarial term, and E4 should carry a λ≈1.2 arm alongside it. Recorded here so
+that is a declared design decision rather than a later rationalisation.
+
+### Meta-v2: the pattern does **not** recur, and that is worth stating
+
+| quantity (xattn scope, 44.0M) | value |
+|---|---:|
+| ‖∇ L_retain(θ)‖ | **0.0387** |
+| ‖∇ L_target(θ′)‖ | **0.0927** |
+| ratio | **2.4×** |
+
+The two Eq. 8 terms that `zeta` and `lam_target` scale are **within 2.4× of each other**, so the
+inherited 1.0 defaults are already near parity. **E2 needs no coefficient correction.** Four
+instances checked, three pathological, one clean — which is the point of checking rather than
+assuming in either direction.
+
+### One measurement came back exactly 0.0, and that is structural, not a failure
+
+‖∇ distil_erase(θ)‖ and ‖∇ distil_retain(θ)‖ both measured **exactly 0.000000**. The reason is by
+design in both `meta_unlearn.py` and `meta_unlearn_v2.py`: the student is initialised **at** the
+teacher (`teacher = deepcopy(unet)` after the teacher checkpoint is loaded), so at step 0 the
+distillation losses are identically zero and so are their gradients. They become non-zero only as
+the student drifts.
+
+Two consequences, stated rather than glossed:
+- the parity figures *relative to the distillation terms* in `outputs/diag_coeff_scale.json` are
+  **0.0 and meaningless**, and are not used for anything;
+- the distillation anchors' **effective weight is dynamic** — zero at initialisation, growing with
+  drift — so no static gradient ratio can set the coefficients against them. That is a real limit on
+  this kind of diagnostic and it applies to any objective that anchors a student to its own
+  initialisation.
+
+### Precision of these numbers
+
+n = 3 draws each, and the spread is large: ‖∇L_retain‖ over the full scope came out 0.146, 0.272,
+0.139 — a 2× range. So these ratios locate an order of magnitude, not a value. That is sufficient
+for the question being asked (is a coefficient orders of magnitude from parity?) and insufficient
+for tuning.

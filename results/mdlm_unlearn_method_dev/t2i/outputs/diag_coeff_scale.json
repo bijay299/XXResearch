@@ -1,0 +1,44 @@
+{
+ "study": "coefficient_scale_diagnostic",
+ "n_params": 859520964,
+ "n_params_xattn": 43962560,
+ "meta_v2": {
+  "grad_distil_erase_theta_full": 0.0,
+  "grad_distil_retain_theta_full": 0.0,
+  "grad_L_retain_theta_xattn": 0.03873596800502911,
+  "grad_L_target_xattn": 0.0926805122200111,
+  "zeta_for_parity_vs_distil_erase": 0.0,
+  "lam_target_for_parity_vs_distil_erase": 0.0,
+  "default_in_script": 1.0
+ },
+ "utrap_v2": {
+  "grad_L_retain_full": 0.18558494976368178,
+  "grad_L_target_full": 0.15034171139089733,
+  "lambda_for_parity": 1.2344208938871923,
+  "default_in_script": 0.15,
+  "note": "lambda=0.15 was inherited from the OLD UTRAP runs, whose inner attacker was a different and much weaker process (ERRATUM_utrap_inner_attacker.md). Parity here is the scale at which grad L_retain and lambda*grad L_target(theta_K) are comparable."
+ },
+ "trials": {
+  "L_retain_xattn": [
+   0.011431206882527183,
+   0.012651750674157932,
+   0.09212494645840222
+  ],
+  "L_target_xattn": [
+   0.11459888570084013,
+   0.10823374174626564,
+   0.05520890921292753
+  ],
+  "L_retain_full": [
+   0.14603778081750934,
+   0.27158413298502343,
+   0.1391329354885126
+  ],
+  "L_target_full": [
+   0.24471480821778765,
+   0.16927260478956643,
+   0.03703772116533788
+  ]
+ },
+ "caveat": "A gradient-norm ratio gives the scale at which two terms are COMPARABLE. It does not say parity is optimal -- only that a coefficient orders of magnitude from parity cannot be doing what its author intended (FINDING67)."
+}
