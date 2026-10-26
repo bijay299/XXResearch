@@ -6,6 +6,10 @@
 > ten gradient steps" and §3's "meets the mandate against a 5-step attacker" are **withdrawn**.
 > What survives is §1's curve, §2's gradedness and §4's gate result. See §7.
 >
+> **§2's "monotone" is also corrected by `FINDING70` §6b:** monotonicity holds only at lr 1e-5.
+> At lr 1e-4 recovery FALLS from 0.9555 (10 steps) to 0.6222 (25 steps) because the attack starts
+> destroying the model — post-attack utility collapses to 0.5278.
+>
 > **§8 then completed it at n=3 and the result is the opposite of §3's:** max-over-valid H at 5
 > steps is **0.5333**, so **no budget tested (5 → 300) leaves any arm meeting the mandate's
 > robustness half.** The defence buys fewer than five gradient steps.

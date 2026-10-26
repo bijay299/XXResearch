@@ -76,3 +76,79 @@ which it is missed grows with attacker strength rather than shrinking.
   nothing here says whether the lr/steps trade differs between methods.
 - **No published robustness verdict changes.** All of them were measured at 300 steps, in the
   zero-variance regime; this finding makes the attacker cheaper, never the defence stronger.
+
+## 6. Completion (E11g) — the full 3×3 factorial. **Five gradient steps suffice for complete recovery**, the budget axis is **non-monotone** at high lr, and the mechanism is damage.
+
+All 13 cells, `utrap_church_l0.15k8`, n = 3 wherever a cell was swept (the three `1e-5` cells above
+25 steps remain n = 1 and are marked):
+
+| lr | steps | valid | mean H | sd | **max-over-valid** | **post-attack utility (mean)** |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1e-5 | 5 | 3/3 | 0.3111 | 0.2775 | 0.5333 | 0.9514 |
+| 1e-5 | 10 | 3/3 | 0.4444 | 0.2776 | 0.6667 | 0.9375 |
+| 1e-5 | 15 | 3/3 | 0.7111 | 0.1924 | 0.9333 | 0.9583 |
+| 1e-5 | 25 | 3/3 | 0.8889 | 0.0385 | 0.9333 | 0.9236 |
+| 1e-5 | 50 | 1/1 | 0.9333 | — | 0.9333 | 0.9167 |
+| 1e-5 | 100 | 1/1 | 1.0000 | — | 1.0000 | 0.9167 |
+| 1e-5 | 200 | 1/1 | 1.0000 | — | 1.0000 | 0.9583 |
+| 5e-5 | 5 | 3/3 | 0.6000 | 0.1764 | 0.8000 | 0.8750 |
+| 5e-5 | 10 | 3/3 | 0.8444 | 0.2143 | 1.0000 | 0.8681 |
+| **5e-5** | **25** | 3/3 | **1.0000** | **0.0000** | **1.0000** | **0.9236** |
+| **1e-4** | **5** | 3/3 | 0.7111 | 0.2524 | **1.0000** | 0.8819 |
+| 1e-4 | 10 | 3/3 | 0.9555 | 0.0385 | **1.0000** | 0.8472 |
+| **1e-4** | **25** | 3/3 | **0.6222** | 0.2341 | 0.8667 | **0.5278** |
+
+**Every one of the 13 cells fails the mandate's robustness half.**
+
+### 6a. The cheapest complete recovery is **five** gradient steps
+
+At **lr 1e-4, 5 steps**, seed 6 reaches **H = 1.0000** — the full ceiling, 15/15, on a
+gate-valid attack. Against the published headline of **300 steps** that is a **60× overstatement**
+of the attacker's cost in the best case.
+
+The more defensible figure remains **lr 5e-5, 25 steps**: H = 1.0000 on **all three seeds**,
+sd = 0.0000, and post-attack utility **0.9236** — i.e. the adversary gets the concept back
+completely, reproducibly, and leaves the model essentially intact. That is the operating point an
+actual attacker would choose, and it is **12× cheaper than what we reported**.
+
+### 6b. The budget axis is **not monotone**, which corrects `FINDING69` §2
+
+`FINDING69` §2 described recovery as a monotone dose-response. **That was true only of lr 1e-5**,
+the single rate it swept. At **lr 1e-4** recovery **falls** from 0.9555 (10 steps) to **0.6222**
+(25 steps) — more attacker budget produces *less* target generation.
+
+**The mechanism is in the records already and needs no new run: post-attack utility collapses.**
+
+| lr 1e-4 | 5 steps | 10 steps | **25 steps** |
+|---|---:|---:|---:|
+| mean H | 0.7111 | 0.9555 | 0.6222 |
+| mean post-attack utility | 0.8819 | 0.8472 | **0.5278** |
+| per-seed utility | — | — | 0.8542 / **0.2917** / **0.4375** |
+
+So past ~10 steps at 1e-4 the attack stops relearning and starts **destroying the model**, and a
+destroyed model generates fewer recognisable churches too. By contrast **lr 1e-5 never damages
+anything** — utility stays 0.92–0.96 at every budget from 5 to 200 steps.
+
+This matters beyond bookkeeping: it means **H alone cannot order attacks**. A low H can indicate
+either a weak attack or an overpowered one, and only the paired utility distinguishes them. Every
+H-only comparison in this project is exposed to that ambiguity at high lr — including the frozen
+grid's own lr 1e-4 column, which `FINDING63` had already noted left utility at 0.167.
+
+### 6c. Variance is a property of attack power, in both directions
+
+sd runs 0.2775 (1e-5/5, under-powered) → 0.0385 (1e-5/25) → **0.0000** (5e-5/25, saturated) →
+0.2341 (1e-4/25, **over-powered and damaging**). Low variance marks a *well-matched* attack; both
+extremes are noisy. So the `FINDING69` §8 lesson generalises: single-seed numbers are
+uninterpretable at either end of the power range, not just the weak end.
+
+### 6d. Limits
+
+- **One arm, one concept, three seeds.** No method comparison; FRP was never swept on lr.
+- Three `1e-5` cells (50, 100, 200 steps) are still **n = 1**, inherited from E11. They sit at or
+  near the ceiling where variance is small, but they are not held to the n ≥ 3 standard.
+- **H quantised to 1/15**; sd 0.2341 is ≈ 3.5 images.
+- **DEV prompts** throughout.
+- The damage mechanism in §6b is inferred from **paired utility on the same 48-image panel**, which
+  is a closed-set CLIP measure, not an image-quality assessment. FID remains absent
+  (`ERRATUM_interpretations_r5.md` §10), so "destroying the model" means "losing the measured
+  non-target panel", nothing stronger.
