@@ -147,3 +147,60 @@ rather than assumed. Cost: +1 build +3 attacks ≈ 3.5 GPU-h on top of the 14 al
 
 This amendment is made **before any arm exists** and is recorded here rather than in the plan body,
 per `PREREG_PRECEDENCE.md` §4. It does not alter any prediction, falsifier or stopping rule above.
+
+---
+
+## 8. Amendment, 2026-10-26 — **§2a's matched-compute arithmetic is wrong**, and the built arms are not matched
+
+**Raised in review.** §2a stated each outer step costs "1 retain pass + K inner passes + 1 endpoint
+pass" — which is **K+2** — and then computed totals as if it were **K+1**. The error is in the
+arithmetic, not the description.
+
+`erase_utrap_v2.py` per outer step actually runs: **1 retain backward (batch 2) + K inner attack
+passes (batch 1) + 1 endpoint backward (batch 2)**, plus a fixed-noise probe every `--probe-every`
+steps.
+
+| arm | K | outer | §2a claimed (K+1) | **actual passes (K+2)** | **actual samples (K+4)** |
+|---|---:|---:|---:|---:|---:|
+| K=0 | 0 | 400 | 400 | **800** | **1600** |
+| K=1 | 1 | 200 | 400 | **600** | **1000** |
+| K=8 | 8 | 45 | 405 | **450** | **540** |
+| K=32 | 32 | 13 | 429 | **442** | **468** |
+
+**So the five arms built on 2026-10-26 are not compute-matched.** Worse, compute falls monotonically
+with K — 800 → 442 passes, 1600 → 468 samples — so the higher-K arms received **systematically
+less** training than K=0. That biases the comparison **against** unroll depth, which is the exact
+hypothesis this plan tests. Any K-ordering read off those arms would have been an artifact of the
+budget, not of depth.
+
+**Corrected outer steps.** Matching on **samples** is the stricter criterion and is adopted:
+
+| arm | K | outer for matched **passes** (800) | **outer for matched samples (1600) — ADOPTED** |
+|---|---:|---:|---:|
+| K=0 | 0 | 400 | **400** |
+| K=1 | 1 | 266 | **320** |
+| K=8 | 8 | 80 | **133** |
+| K=32 | 32 | 23 | **44** |
+
+**What happens to the arms already built.** They are **kept, not deleted**, and relabelled
+`utrap2_church_l0.15k{K}` → the **compute-UNMATCHED series**. They remain valid individual defence
+builds and their as-is measurements stand:
+
+| arm | as-is target | retain8 |
+|---|---:|---:|
+| `utrap2_church_l0.15k0` | 0.0000 | 0.8667 |
+| `utrap2_church_l0.15k32` | 0.1333 | 0.9583 |
+| `utrap2_church_l1.2k8` | 0.0667 | 0.9583 |
+
+A **second series** at the corrected outer steps is built under the label
+`utrap2m_church_l0.15k{K}` (`m` = matched). K=0 at 400 outer is already correct, so that arm is
+**shared** between the two series rather than rebuilt.
+
+**Probe overhead, declared:** the fixed-noise probe is 2 forward-only evaluations of batch 8 every
+`--probe-every` outer steps. At the corrected settings this is a different fraction of each arm's
+total (K=0: 8 probes over 400 outer; K=32: 1 probe over 44). It is forward-only and excluded from
+the pass/sample counts above; it is **not** matched across arms, and that residual is recorded here
+rather than claimed away.
+
+**Nothing is published from the unmatched series as a K-comparison.** §3's grid runs against the
+matched series.
