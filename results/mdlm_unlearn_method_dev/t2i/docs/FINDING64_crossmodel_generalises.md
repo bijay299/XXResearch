@@ -85,8 +85,31 @@ latent-space change of that size is the obvious remaining generalisation questio
 > identical, which is the strongest available evidence that the result is a property of the setting
 > rather than of any one defence design.
 
-**Does not re-test the other nine defences cross-model.** FRP, GIFT and UTRAP were run on the new
-models; the remaining nine are **inferred, not measured.**
+> ✅ **AND A CLOSED-FORM DEFENCE (2026-10-25) — a mechanistically distinct class.** The four families
+> above all train the defence with **gradient optimisation**. UCE does not: it is a closed-form
+> least-squares edit of the cross-attention K/V projections, with no optimiser, no loss surface and
+> no attacker model anywhere in its construction.
+>
+> | model | as-is target / retain8 | valid | **max-over-valid H** |
+> |---|---|---|---|
+> | **UCE on BK-SDM-small** | **0.0000 / 0.9333** | **3/3** (T +0.625…+0.875) | **1.000** |
+> | UCE on SD-1.5 | 0.0000 / **0.5333** | **K1 fail — not attacked** | — |
+>
+> **UCE on BK-SDM is 0.0000 at retain 0.9333** — full suppression at the *highest* retention of any
+> cross-model arm — and it is reversed 3/3. So the result covers **closed-form edits**, not only
+> gradient-trained defences, which is what the "property of the setting rather than of any defence
+> design" claim needs.
+>
+> ⚠ UCE's SD-1.5 arm fell to retain **0.5333**, below K1, and was correctly **not attacked**. UCE's
+> regularisation toward `W_old` is a fixed λ=0.1 tuned on SD-1.4; on a differently-trained checkpoint
+> the same λ costs more utility. That is a **hyperparameter-transfer failure, not a verdict on UCE** —
+> the same distinction `FINDING61` drew for my own objective and `FINDING56` for Meta-Unlearning's λ
+> on BK-SDM. A λ sweep is running to recover a usable SD-1.5 arm.
+
+**Does not re-test the remaining defences cross-model.** FRP, GIFT, UTRAP, Meta-Unlearning and UCE
+were run on the new models — **five families spanning pruning, subspace editing, trajectory
+constraint, loss-surface shaping and closed-form solving.** The rest are mechanistic duplicates of
+these and are **inferred, not measured.**
 
 **One concept (church), one seed per build, lr 1e-5 only** on the new models: three attacks each
 rather than the full six-point grid, because the three lr 1e-5 points already reached the ceiling and

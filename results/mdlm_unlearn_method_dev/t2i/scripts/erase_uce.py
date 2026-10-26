@@ -20,6 +20,14 @@ across every arm and baseline so comparisons are internally consistent.
 import argparse, json, os
 import torch
 
+# CROSS-MODEL OVERRIDE (PREREG_H85 / FINDING64). Defaults reproduce the pinned SD-1.4 exactly when
+# BASE_MODEL/BASE_REV are unset, so no existing result changes.
+import os as _os
+BASE_MODEL = _os.environ.get("BASE_MODEL", "CompVis/stable-diffusion-v1-4")
+BASE_REV_ENV = _os.environ.get("BASE_REV")
+BASE_VARIANT = _os.environ.get("BASE_VARIANT", "fp16") or None
+
+
 PIN = "/data/bijaypandey/t2i_unlearn/MODEL_PIN.txt"
 
 FORGET_PROMPTS = {
@@ -77,8 +85,8 @@ def main():
     from diffusers import StableDiffusionPipeline
     pin = dict(l.split("=", 1) for l in open(PIN).read().split("\n") if "=" in l)
     pipe = StableDiffusionPipeline.from_pretrained(
-        "CompVis/stable-diffusion-v1-4", revision=pin["revision"], torch_dtype=torch.float32,
-        variant="fp16", safety_checker=None, requires_safety_checker=False).to(dev)
+        BASE_MODEL, revision=(BASE_REV_ENV or pin["revision"]), torch_dtype=torch.float32,
+        variant=BASE_VARIANT, safety_checker=None, requires_safety_checker=False).to(dev)
 
     c_e, c_t = concept_dirs(pipe, [FORGET_PROMPTS[a.concept]], dev, paired=[a.target])
     c_p = concept_dirs(pipe, PRESERVE, dev)
