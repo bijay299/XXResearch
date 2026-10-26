@@ -1,5 +1,7 @@
 # Handoff — audit remediation r5
 
+> **Status pointer:** for the **one current verdict per issue**, read `STATUS_CURRENT_v2.md`. `AUDIT_REPAIR_REGISTER_v1.md` is chronological and records hypotheses that were later refuted — two of them ("IMMA composition unproven", "upstream UCE may have written an unedited model") are **refuted** and must not be quoted as live.
+
 **Audited snapshot:** `0b435427557e4fb984cc9acff26e6dacc0613cd2`
 **Parent commit at start:** `66ff9d3afec54f446d0750b53f1576a1f10e7ab7` (working tree clean)
 **Branch:** `canonwork` → `research/mdlm-unlearn-method-dev`
@@ -135,7 +137,7 @@ total. Two GPUs at a time throughout; GPUs 2 and 3 were left to other users.
 | **1** | **`/data` is at 100% capacity, ~14 GB free.** Shared with another project (`cuig_pilot`, ~386 GB); not a function of our 300 GB authorisation | **No multi-checkpoint campaign can start safely.** E1/E2/E4/E5 need 7–14 GB of checkpoints each | a decision about the other project's footprint, or more disk. **I have deleted nothing**, per instruction |
 | **2** | `stabilityai/*` returns **HTTP 401** | **E9** (SD-2.x / SDXL) impossible; the cross-model claim is confined to SD-1.x + one pruned derivative | a Hugging Face token |
 | **3** | FID dependencies absent and COCO not on disk | **E8** impossible; no claim about general image quality or global repair | authorisation for `pip install torchvision scipy` and a ~6 GB COCO val2014 download |
-| **4** | `gen_eval.py` cannot yet take the FINAL prompt pool | **E6** blocked; every target number stays a **development** measurement | a small flag in `gen_eval.py`; ~20 lines, not yet written because it should land with E6 rather than ahead of it |
+| **4** | ~~`gen_eval.py` cannot yet take the FINAL prompt pool~~ **SUPERSEDED. E6 ran** via `gen_eval_final.py` and **consumed** the FINAL split (`FINDING65`, `FINDING66`) — but it scored from `gen_eval.LAB_KEY` rather than `LABELS` (`D-022`). **The evaluator used inconsistent label text; the effect on scores and conclusions is unresolved pending corrected evaluation** | every target number still stays a **development** measurement, and a **fresh** FINAL split must be frozen before any new configuration is selected | a CPU-only re-score of the 18 retained records with `LABELS`, plus a newly frozen final set |
 | **5** | ~~The three released reference implementations need separate conda environments~~ **DISCHARGED for two of three.** `venv_imma` and `venv_uce` were built as isolated **copies** (`venv_t2i` never modified); **upstream IMMA ran** (R1, 5000/5000 steps + eval) and **upstream UCE ran** (R4b–d, `executed: true`). `vision_relearning` (R3) is still unrun — it needs `wandb` and CIFAR-scale data | **E7 partially discharged.** "We reproduced it" is *still* unavailable, but for a different reason: both runs were scored on **our** benchmark, which is not a reproduction (`UPSTREAM_FIDELITY_MANIFEST.md` §6). "Unusable" remains unsubstantiated | R3 only: `wandb` + CIFAR data |
 | **6** | No never-trained oracle | reactivation vs relearning unresolvable **by construction** | a design decision: build a tractable never-trained reference, or narrow the paper to the operational relearning threat |
 
@@ -149,7 +151,7 @@ answer would be wrong:
 | axis | status |
 |---|---|
 | **Implementation** | **SUBSTANTIALLY RESOLVED, NOW VALIDATED ON MODELS.** Three wrong objectives corrected and unit-tested; attacker definition shared and drift-proofed; split checker fails closed. **All three corrected implementations have now produced models** — WDR v2 (E1, α ∈ {1.0, 4000}), Meta v2 (E2, λ ∈ {0.5, 1.0}) and UTRAP v2 (E4, K ∈ {0,1,8,32}). *The previous revision's "Not one corrected implementation has produced a model" was false.* Two new implementation defects were found in the process: `erase_wdr_v2.py` alternates where the reference **sums** (`D-016`), which entangles `FINDING67`'s α finding with our own schedule (`D-017`). |
-| **Evaluation & provenance** | **PARTIALLY RESOLVED.** Leak detected and attributed, two more found, DEV/FINAL separated with FINAL frozen before inspection, RNG streams separated, gated+ungated and all three denominators reported, checkpoints identified by sha256. **Still open:** E6 evaluated four arms on FINAL (`FINDING65`/`66`), which **consumed** that split — so a fresh final set must be frozen — **and those FINAL scores are defective** (`D-022`): `gen_eval_final.py` used `gen_eval.LAB_KEY` instead of `LABELS`, degrading nine of twelve distractor strings while leaving `church` (the erased target) correct, which biases target hits **upward**; `FINDING65`'s depth ratios are **unmeasured pending a CPU-only re-score**, while `FINDING66`'s ceiling conclusion survives as a within-scorer comparison. Every *other* target number remains a development measurement; the CLIP classifier revision is still unpinned; `FINDING72` measured the **validity gate's exclusion rate to be non-monotone in `T_before`**, so every "max-over-valid H" is computed over a biased sample; **234 of 335 builds have `ABSENT` checkpoints**; and **7 historical `gen_*.json` records do not identify the checkpoint they scored** (`unet: null`), five of which scored an *edited* model. |
+| **Evaluation & provenance** | **PARTIALLY RESOLVED.** Leak detected and attributed, two more found, DEV/FINAL separated with FINAL frozen before inspection, RNG streams separated, gated+ungated and all three denominators reported, checkpoints identified by sha256. **Still open:** E6 evaluated four arms on FINAL (`FINDING65`/`66`), which **consumed** that split — so a fresh final set must be frozen — **and those FINAL scores are defective** (`D-022`): `gen_eval_final.py` scored from `gen_eval.LAB_KEY` (`:50`) instead of `LABELS` (`:48`), and **nine of the twelve label strings differ** (`church`, `parachute`, `tench` are identical). **The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved pending corrected evaluation** — for `FINDING65`'s depth ratios and `FINDING66`'s ceiling conclusion alike; neither the direction nor the size of the embedding effect is established, and a CPU-only re-score with `LABELS` is what would settle it. Every *other* target number remains a development measurement; the CLIP classifier revision is still unpinned; `FINDING72` measured the **validity gate's exclusion rate to be non-monotone in `T_before`**, so every "max-over-valid H" is computed over a biased sample; **234 of 335 builds have `ABSENT` checkpoints**; **7 historical `gen_*.json` records do not identify the checkpoint they scored** (`unet: null`), five of which scored an *edited* model **and also carry `target: null`, so neither their checkpoint nor their target is recoverable except from the filename** (`D-011`); and **30 duplicate `(arm, seed, lr, steps)` cells disagree by up to 8/15 images with no code-version field to attribute the disagreement to** (`D-025`) — **unresolved**. |
 | **Empirical comparison** | **PARTIALLY RESOLVED — still no comparative claim about the published methods.** Corrected implementations **have** been run, two released references **have** been executed (upstream IMMA, upstream UCE), and the unroll-depth question **has** been tested at matched compute (`FINDING76`: flat). *The previous revision asserted the opposite of all three.* But **no comparative claim about the published baselines is supported even so**, and for a stronger reason than before: R1 and R4 used upstream code with **our** training data, scorer and prompts, which is not a reproduction of any paper's reported experiment. `vision_relearning` (R3) is still unrun. |
 | **Scientific interpretation** | **CORRECTED IN TEXT, STRUCTURALLY LIMITED.** Every saturated-endpoint, mechanism and capacity claim rewritten to what the data supports. The structural limits are **not** fixed by wording — E5, E6 and E10 are what would move them. |
 
@@ -170,6 +172,15 @@ What the remediation changed is the **standing** of the negative result. It is n
 about the published methods, because scoring upstream code on our benchmark is not a reproduction.
 E1, E2, E4 and E7's IMMA/UCE halves have run; **R3 is the cell that would still change this**, and
 it has not.
+
+**The audit having concluded confers no standing on anything.** No result in this project is more
+defensible because a repair cycle ran over it. Each statement above rests on its own named artifact,
+and the open items are open: the **30 disagreeing duplicate `(arm, seed, lr, steps)` cells** (up to
+8/15 images apart, no code-version field — `D-025`), the **5 unattributable `gen_advunlearn_*`
+records** (`unet: null` and `target: null` — `D-011`), the **unresolved effect of the FINAL label-text
+mismatch** (`D-022`), the **required R4d re-run** (`D-026`) and **R4c's lost checkpoint** (`D-031`),
+the **outstanding ESD-alone control** (`D-019`), and the **absence of any retain axis in R4c/R4d**
+(`D-034`). The resume gate in `AUDIT_REPAIR_REGISTER_v1.md` §5 is **not passed**.
 
 ## 7. Reproducing this state
 
@@ -202,7 +213,16 @@ below; full traceability in `AGENT6_PROVENANCE_FINDINGS.md`.
 | §6 Empirical comparison | "NOT RESOLVED — no corrected implementation run; references not executed; unroll depth untested" → all three have happened, and the conclusion is **restated on stronger grounds** | three false sub-claims. The verdict "no comparative claim is supported" is kept, now because upstream-code-on-our-benchmark is not a reproduction, rather than because nothing ran |
 | §6 closing | mandate paragraph rewritten with the `meta2_church_lt0.5` near-miss, the `FINDING78` retraction (`D-008`), and R3 named as the remaining cell | the conclusion was right but rested on absence of measurement; it now rests on `logs/e2h_stronger.log` |
 
-### 8.1 Re-verified and found correct (unchanged)
+### 8.1 Documentation reconciliation, 2026-10-26 — second pass
+
+| § | what changed | why |
+|---|---|---|
+| §5 blocker 4 | "`gen_eval.py` cannot take the FINAL pool / **E6 blocked**" → **superseded; E6 ran and consumed the split**, with the label-text defect | the blocker had already been overtaken when the previous revision was written; §6 said so and §5 did not |
+| §6 Evaluation | every directional reading of `D-022` removed — "degraded distractor strings", "biases target hits upward", "`FINDING66`'s ceiling conclusion survives as a within-scorer comparison" | the label-text mismatch is **established** (nine of twelve strings differ); its **direction and size are not**, pending paired re-scoring. The replacement statement is: *the evaluator used inconsistent label text; the effect on scores and conclusions is unresolved pending corrected evaluation* |
+| §6 Evaluation | two open items added: the **5 unattributable `gen_advunlearn_*` records** (`unet: null` **and** `target: null`) and the **30 disagreeing duplicate cells** with no code-version field | the row named the `unet: null` count but not that five of those records also lack a target, and omitted `D-025` entirely. Both are **unresolved**, not closed |
+| §6 closing | a paragraph added stating that the audit's conclusion confers no standing on surviving results | the per-axis table could otherwise be read as a clean bill of health for everything it does not name |
+
+### 8.2 Re-verified and found correct (unchanged)
 
 §1's file inventory and line counts; §2's **24 passed / 0 failed** and the two float64 test-bug
 fixes; §2's smoke-run outcomes including Meta v2's `L_F(θ')` rise 0.00791 → 0.01968 → 0.02809 and

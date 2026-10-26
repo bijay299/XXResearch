@@ -167,26 +167,49 @@ the authors report. **It remains not citable as "IMMA destroys utility"** — bu
 and the configuration are inapt, not because the checkpoint is malformed.
 **Status: root cause corrected; quarantine stands; see D-019 for the live suspect.**
 
-### D-019 — the third-party "ESDx1" checkpoint is not a cross-attention-only erasure.
+### D-019 — the ESD checkpoint's training provenance is UNRESOLVED. Hypothesis, not a finding.
 
-**Severity:** high · **Owner:** lead · **Files:** `upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt`
+**Severity:** high · **Owner:** lead + Baselines agent ·
+**Files:** `upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt`
 
-**Evidence (Agent 2, SUSPECTED):** **all 686** tensors differ from pinned base SD-1.4, with resnet
-blocks reaching 0.20 relative — i.e. the whole UNet moved, not just cross-attention. "ESD-x1" should
-denote the cross-attention-only variant. By contrast IMMA's own delta is modest and targeted (global
-2.7%, max 23%, concentrated in `attn2.to_out`/`to_v`).
+**Provenance of the download is legitimate and documented.** The URL is explicitly supplied by
+IMMA's **pinned** README at commit `2f55041`
+(<https://github.com/amberyzheng/IMMA/blob/2f55041141705031d503134dec22f674f09e21bf/README.md>), so
+fetching it was the correct action. That does **not** establish the downloaded bytes' training
+provenance, which is a separate question.
 
-**Why this is now the leading explanation for D-009's numbers:** if the downloaded checkpoint is a
-full-UNet erasure, the composition's utility collapse is inherited from **ESD**, not produced by
-IMMA — and we have attributed nothing because we never evaluated the ESD checkpoint **alone**.
+**Observation:** **all 686** tensors differ from pinned base SD-1.4, with resnet blocks reaching
+0.20 relative. By contrast IMMA's own delta is modest and targeted (global 2.7%, max 23%,
+concentrated in `attn2.to_out`/`to_v`).
 
-**Decisive missing measurement (queued, not run):** score the ESD checkpoint by itself on the same
-12 DEV concepts, same scorer, same seeds — 180 images, ≈5 GPU-min. Until that control exists, no
-statement about where the utility loss comes from is supportable.
+**WITHDRAWN: my inference that it is therefore "not a cross-attention-only erasure" and the name
+is mislabelled.** "Every tensor differs from our base" does **not** establish whole-UNet training.
+At least four benign explanations produce the same observation and none has been ruled out:
+**EMA vs non-EMA** weights, a different **model variant** (fp16 variant vs main weights — my own
+comparison upcast the fp16 variant), a **format conversion** to diffusers layout, or a different
+base revision. Any of these perturbs every tensor while the erasure itself remained
+cross-attention-only.
 
-**Deliberately NOT launched now.** Both our GPUs are idle, but launching by hand is precisely the
-failure that produced D-001 (three runners, one GPU). This run is queued as the **first** job
-through Agent 5's reservation path once G1 passes. **Status: OPEN, queued behind G1.**
+**Required to resolve:** record the file's **sha256**; identify the originating checkpoint; compare
+against base under **each** variant and EMA/non-EMA choice; and document the conversion path. Until
+then this is an **unresolved hypothesis**, and the ESD-alone control is a **behavioural** control —
+it can show what the checkpoint *does*, never what it *was trained as*.
+
+**Missing measurement (queued, not run):** score the ESD checkpoint **by itself** on the same 12 DEV
+concepts, same scorer, same seeds — 180 images, ≈5 GPU-min. Until that control exists, no statement
+about where D-009's utility loss comes from is supportable in **either** direction: it is attributed
+neither to IMMA nor to ESD.
+
+**Interpretation limit, declared before the run:** this is a **behavioural control**. It can show
+what the uncomposed checkpoint *does* on this panel; it cannot establish provenance, and it inherits
+D-030's limitation — a closed-set argmax with no reject option cannot separate erasure from
+degradation, so a low number will itself need the saved images and an independent assessment before
+it supports the word "destroyed".
+
+**Deliberately NOT launched by hand.** Both our GPUs are idle, but launching outside the reservation
+path is precisely the failure that produced D-001 (three runners, one GPU). Queued as the first job
+through the reservation API once the infrastructure repairs pass review.
+**Status: OPEN, queued behind the infrastructure gate.**
 
 ### D-020 — upstream `src/meta.py` does not run at the pinned commit.
 
@@ -211,12 +234,26 @@ evaluates to **True** under `type=bool` — **only omitting the flag yields Fals
 
 **Severity:** high · **Owner:** Agent 2 · **Files:** `run_r1b_imma_train.sh`, `upstream_runs/imma/data/vangogh`
 
-**Evidence:** `--max_train_samples 20` was omitted, so training ran 5000 steps — **2500 ascent
-steps where the README specifies 500**. Separately **3 of 100** training images are NSFW-blanked
-**black** frames (`7.png`, `29.png`, `41.png`) and were trained on. Also: the 160-tensor trained
-scope includes **80 self-attention** tensors, so our "xatten" label is a misnomer (the manifest is
-correct; `PREREG_H82` quotes the paper rather than the code). LoRA warm-start, not reinitialised —
-our docs were already correct.
+**Evidence:** `--max_train_samples 20` was omitted from the pinned README command, so the completed
+run trained on **100 samples for 50 epochs** — roughly **5× the documented training budget**.
+Separately **3 of 100** training images are NSFW-blanked **black** frames (`7.png`, `29.png`,
+`41.png`) and were trained on; whether any falls inside the README's 20-sample subset is being
+checked. Also: the 160-tensor trained scope includes **80 self-attention** tensors, so our "xatten"
+label is a misnomer (the manifest is correct; `PREREG_H82` quotes the paper rather than the code).
+LoRA warm-start, not reinitialised — our docs were already correct.
+
+**Disposition — preserve, relabel honestly, do not discard.** The completed run is legitimate work
+and stays. It must be labelled to **record its 5× budget** and must **not** be described as a
+faithful reference reproduction. Before any replacement run, the resolved sample count, batch size,
+epochs, inner/outer steps and **total optimizer updates** must be documented on both sides (ours vs
+README).
+
+**Framing correction for what our IMMA numbers mean.** IMMA's claim concerns resistance to
+**re-learning**, and the authors evaluate **post-adaptation**. Our standalone utility evaluation of
+an immunised model is an **additional measurement we introduced**; the authors never evaluate an
+immunised model standalone. Assessing their robustness claim requires including their
+post-adaptation evaluation, and our standalone number must be reported as a separate, additional
+axis — not as a test of their claim.
 
 ### D-010 — pinned upstream UCE may be editing nothing; the whole R4 comparison is at risk.
 
@@ -437,18 +474,28 @@ that way rather than as new evidence. (Correction to my own first pass: the reco
 substring scan over truncated values and missed the field. The *images* are still absent, so the
 re-score cost stands.)
 
-#### D-022a — the defect's direction **manufactures FINDING65's headline**. Lead analysis.
+#### D-022a — RETRACTED AS WRITTEN. My directional analysis was unsupported.
 
-Reading the retained per-image predictions makes the bias direction unambiguous, and it is the worst
-possible one. Exactly **nine** of the twelve labels differ between the two lists; **`church`,
-`parachute` and `tench` are spelled identically**. So in every church experiment — which is all of
-FINDING65 — **the target label's text was correct while all nine competing distractors were
-degraded** (`"a photo of a van_gogh"`, `"a photo of a english_springer"`). Degraded distractors are
-weaker competitors, so images are pulled *toward* church: **`target_hits` is inflated**.
+**This entry originally claimed the defect's direction was established and "manufactures FINDING65's
+headline". That was wrong and is withdrawn.** I reasoned that degraded distractors must be weaker
+competitors, so `target_hits` must be inflated. That is a deduction I was not entitled to: an
+underscore-for-space substitution produces a **different token sequence**, and the sign of its
+effect on each of the nine text embeddings — and hence on the twelve-way argmax — is an **empirical
+question**. I also wrongly asserted that predictions landing on the three *unchanged* labels were
+unaffected; the argmax is over all twelve, so a change to any competitor can move them.
 
-Measured over all 180 FINAL images, **37 landed on one of the nine degraded labels**, at median
-decision margins of **0.0027–0.0065** — margins far smaller than the perturbation a label rewrite
-causes:
+**The sanctioned status, until the paired measurement exists:** *the evaluator used inconsistent
+label text; the effect on scores and conclusions is unresolved.* Neither direction nor magnitude is
+known.
+
+**What IS established.** Exactly **nine** of the twelve strings differ; `church`, `parachute` and
+`tench` are identical. FINAL numbers were scored with `LAB_KEY` as CLIP text while DEV numbers were
+scored with `LABELS`, so the DEV-vs-FINAL ratios in FINDING65 §1 were not produced on a common
+scale. That alone withdraws the ratios — no directional claim is needed to justify it.
+
+**Observations of record, carrying no directional claim.** 37 of the 180 FINAL images were assigned
+one of the nine differing labels, at median decision margins of 0.0027–0.0065. Small margins mean
+the outcomes are **sensitive** to label text; they do not indicate which way:
 
 | arm | target_hits | wins on degraded labels | median margin |
 |---|---:|---:|---:|
@@ -458,33 +505,69 @@ causes:
 | `utrap_sd15_church_l0.15k8` | 2/15 | 12 | 0.0065 |
 | `BASE_sd14_anchor` | 13/15 | 2 | 0.0189 |
 
-**Now the confound.** FINDING65's ratios compare a **DEV** number scored by `gen_eval.py` (which
-uses `LABELS` **correctly**) against a **FINAL** number scored by `gen_eval_final.py` (which used
-`LAB_KEY`). FRP: DEV 0.1333 vs FINAL 7/15 = 0.4667, ratio **3.5×**. The FINAL side of every such
-ratio is inflated by the defect, and inflating it is precisely what produces "erasure is ~3×
-shallower on held-out prompts".
+**The cross-scorer problem.** FINDING65's ratios compare a **DEV** number scored with `LABELS`
+against a **FINAL** number scored with `LAB_KEY`. FRP: DEV 0.1333 vs FINAL 7/15 = 0.4667, ratio
+3.5×. The two sides were not produced on a common scale, so the ratio is **unmeasured** — in both
+direction and magnitude. FINDING66 differs **structurally**, in that both sides of its central
+comparison went through the same scorer; that is a fact about the comparison's shape and **not** a
+claim that its conclusion holds, since a consistently-applied scorer can still be the wrong one.
 
-**So FINDING65's and FINDING66's headline ratios are not merely imprecise — they are confounded in
-the direction of their own conclusion, across two scorers that disagree.** The effect may survive
-re-scoring, or may shrink substantially; it cannot be called measured until then. G12 is therefore
-promoted from hygiene to a **finding-critical** gate condition, and FINDING65/66 carry a
-do-not-quote notice until it clears.
+G12 is therefore a **finding-critical** gate condition, and FINDING65/66 carry do-not-quote notices
+until it clears.
 
-**Counterweight, and it should be stated as plainly as the defect (Agent 6).** 37 images turning on
-margins of ~0.005 **cannot by themselves account for a 0.1333 → 0.4667 gap**. The split-leak and
-prompt-difficulty reasoning in FINDING65 is untouched by this defect, and the finding may well
-survive re-scoring. What is unknown is the **magnitude**, not the existence, of the effect. The
-notice on FINDING65 says "unmeasured", not "wrong", and that distinction is deliberate — overstating
-the retraction would be its own error.
+**Two further claims of mine, both withdrawn.** (1) I wrote that 37 images at ~0.005 margins
+"cannot by themselves account for a 0.1333 → 0.4667 gap", concluding the finding "may well survive".
+That is the same unsupported directional reasoning in reverse — it presumes the only effect is on
+those 37 images, when a label-text change alters the decision surface for **all 180**. (2) I cited
+base SD-1.4 scoring 1.000 on all twelve as proof that "the scorer is sound". It is not: it shows the
+scorer behaves correctly on **undamaged, in-distribution** outputs. It says nothing about its
+validity on damaged or unusual outputs, which is precisely the regime every erased arm sits in.
 
-**Count correction in the repair itself (lead, 2026-10-26).** Agent 4's repair comment at
-`gen_eval_final.py:112-115` and the emitted `label_text_note` at `:197` both said **"4 of 12"**
-differ, naming only the labels whose *wording* changes. Verified by parsing both arrays: **nine
-differ**; the comment omitted the five that differ by an **underscore alone** (`cassette_player`,
-`chain_saw`, `french_horn`, `gas_pump`, `golf_ball`). An underscore is a different token sequence
-and therefore a different text embedding, so those five are not harmless. The *code* was correctly
-fixed; only the documentation undercounted. Both corrected, so a later reader cannot conclude five
-degraded distractors were benign.
+**The honest position: the finding is neither confirmed nor refuted, and the measurement is designed
+rather than anticipated.** The corrected run scores **both** label sets on the **same** regenerated
+images, which is what isolates the label-text effect, and reproduces the old label set against the
+historical records to test the determinism assumption rather than assume it.
+
+**Count correction, in two stages — the second corrects my own first fix.** The original repair
+comment said **"4 of 12"** differ. I corrected that to **nine**, which is right, but I mis-split the
+nine: I described `garbage_truck` as a *wording* change. Re-derived programmatically:
+
+| class | n | members |
+|---|---:|---|
+| identical | 3 | `church`, `parachute`, `tench` |
+| **differ by an underscore alone** | **6** | `garbage_truck`, `cassette_player`, `chain_saw`, `french_horn`, `gas_pump`, `golf_ball` |
+| **genuinely reworded** | **3** | `van gogh painting`→`van_gogh`, `english springer spaniel`→`english_springer`, `monet painting`→`monet` |
+
+So the split is **6/3, not 5/4**, and the differing total is **nine** either way. The distinction
+matters only for describing the *kind* of perturbation; it carries **no implication about the
+direction** of any embedding change, and none is claimed.
+
+### D-022b — six of the twelve FINAL records can **never** be re-scored. Checkpoints are gone.
+
+**Severity:** high (permanent evidentiary loss) · **Owner:** lead ·
+**Files:** `attacked/E6B_*`, `attacked/E6C_*`, `attacked/E6D_*` — **absent**
+
+**Evidence, verified by the lead.** `ls attacked/E6B_* E6C_* E6D_*` → "No such file or directory".
+Only **8** `KEEP_*` directories survive in `attacked/`, none of them the E6 post-attack arms. The
+six `ATK_*` FINAL records therefore have **no checkpoint to regenerate from**, and the re-scoring
+pipeline marks them `missing_checkpoint` and forces `run_status: partial`.
+
+**Regenerable:** the four defence arms (`utrap_church_l0.15k8`, `frp_church_r3_l05`,
+`utrap_sd15_church_l0.15k8`, `uce_sd15_church_lam1000`) and the two base anchors — **6 of 12**.
+
+**Consequence for FINDING66, which is the document those six underwrite.** Its central comparison is
+attacked arms (15/15) against the base anchor (13/15). The **attacked side cannot be recovered**.
+Re-running the attack would produce a *different* checkpoint — relearning is stochastic — so it
+would be a **fresh analogue, not a reproduction**. FINDING66's post-attack numbers are therefore
+**permanently unverifiable under the corrected scorer**, which is a terminal state, not a pending
+one. The honest disposition is: withdrawn, and not recoverable by re-measurement of the same arms.
+A new, properly-instrumented post-attack FINAL experiment could address the *question*; it cannot
+validate these *records*.
+
+**Root cause** is the resume/cleanup pattern already recorded as D-005/D-028: runners `rm -rf` their
+transient attack checkpoints, and nothing distinguished "transient" from "load-bearing for a
+published finding". The fix is forward-only — artifacts that underwrite a finding must be retained
+or hashed at the time of use. **Status: CONFIRMED, loss is permanent, no rerun can close it.**
 
 ### D-023 — `FINDING73` compares a tench retain8 that includes tench against church arms that exclude theirs.
 
@@ -501,10 +584,35 @@ apples-to-oranges comparison across the very axis the finding is about.
 
 **Severity:** medium · **Owner:** Agent 4 · **Files:** `scripts/attack_relearn.py`, `docs/FINDING74…md`
 
-**Evidence:** the gate is `0.20` in all **808** records, but T is a 24-image panel, so the true
-decision boundary is **≥ 5/24 = 0.2083**. **13 records failed by exactly one image**, and **two of
-them are load-bearing in `FINDING74`**. A threshold quoted to two decimals on a 1/24-resolution
-measurement invites exactly this.
+**Evidence, re-verified independently by the lead from all 808 records.** The gate value is `0.20`
+in every record. T's panel denominator is **24** (956 of the T values divide exactly by 24). So the
+true decision boundary is **≥ 5/24 = 0.2083**, and a rise of 4/24 = **0.1667** fails. Of the **136**
+invalid records, **exactly 13** sit within one 1/24 step below the bar — all at precisely
+`T_rise = 0.1667`:
+
+`atk_H44_undo_a0.5_big_church_sd5_lr1e-5`, `atk_h53_tn_a0.3_tench_sd0_lr5e-5`,
+`atk_E11K_frp_tench_r3_l05_sd1_lr1e-5_s10`, `atk_E12_h80_meta_church_lam0.7_sd{0,1}_lr1e-5_s25`,
+`atk_h50_adv_a0.5_church_sd1_lr5e-5`, `atk_E2H_meta2_church_lt0.5_sd6_lr5e-5_s25`,
+`atk_E11C_frp_church_r3_l05_sd0_lr1e-5_s5`, and five more.
+
+A threshold quoted to two decimals against a 1/24-resolution measurement invites exactly this: 0.20
+is not representable on the panel, so "≥ 0.20" silently means "≥ 5/24", one image stricter than it
+reads.
+
+**Consequence for FINDING78 — checked, and the retraction holds.** One of the 13 is an E2h cell:
+seed 6 of `lr 5e-5 / 25 steps`, which FINDING78 records as gate-failed at H = 0.2667. Treating the
+boundary as 4/24 would make it **valid**, raising that cell's max-over-valid from 0.2000 to
+**0.2667** — still **below** the 0.40 bar. The cell that drives the retraction, `lr 1e-4 / 25 steps`
+at **0.5333**, is unaffected, and its two gate-failing seeds recorded H = 0.0000, so admitting them
+cannot lower a maximum. **So the gate-granularity defect does not rescue FINDING78; admitting more
+attacks only adds valid evidence for the same conclusion.** Worth stating explicitly, because a
+defect that moved the bar in the other direction would have required reopening the retraction.
+
+**Repair:** express the gate in panel units (`≥ 5/24`) wherever it is stated, and record both the
+fractional threshold and the integer image count in new records. Do **not** restate historical
+records — the gate was applied consistently at 0.20 throughout, so no past verdict changes; only the
+*wording* was finer-grained than the measurement. **Status: evidence confirmed; wording repair
+pending in the owning documents.**
 
 ### D-025 — 30 duplicate cells disagree, and no record says which code produced them.
 
@@ -512,8 +620,20 @@ measurement invites exactly this.
 
 **Evidence:** **30 duplicate (arm, seed, lr, steps) cells** disagree by up to **8/15 images**, and
 no record carries a code-version field, so the disagreements cannot be attributed to a known change.
-Separately the registry is **stale for 112 of 808** records, and its quarantine count is
-**vacuously zero**. Repaired additively by Agent 4 (no historical record rewritten).
+Separately the registry's coverage is incomplete, and its quarantine count is **vacuously zero**.
+Repaired additively by Agent 4 (no historical record rewritten).
+
+**Coverage figure corrected (my error).** I wrote "stale for 112 of 808 records", which inverts the
+statistic: **112 attack records are ABSENT**, so the registry **covers 696 of 808** attack records
+and **1,278 of 1,424** JSONs. The absent arms are concentrated in FINDING71–78, including
+`meta2_church_lt0.5` — i.e. the registry does not cover the arms behind the most recent findings,
+which is worse than a uniform staleness and is why `TABLES_v1_generated.md` cannot be used to check
+them. `registry_v1.py` was deliberately not re-run (it sha256s many GB under an active freeze).
+
+**The duplicate-cell disagreements remain UNRESOLVED and are not closable by argument.** Thirty
+cells with identical (arm, seed, lr, steps) disagree by up to 8/15 images with no code-version field
+to attribute the difference to. This is an open item, explicitly **not** covered by the audit having
+concluded.
 
 **Agent 4 also cleared the two main scorers:** `LABELS`, `LAB_KEY`, the classifier and the prompt
 text are **byte-identical** between `attack_relearn.py` and `gen_eval.py`, and neither file was
@@ -596,12 +716,27 @@ generalises to every arm in the table. It does **not** overturn the K1/K2 gating
 are defined on retain8 and were applied consistently — but the *prose* interpretation is stronger
 than the measurement supports.
 
-**Decisive test (cheap, queued):** `gen_eval.py` records only `clip_acc` and `clip_align` per
-concept — **no per-image predicted label** — so what those images were classified *as* is currently
-unrecoverable. Re-score with predicted labels logged, plus either an open-set margin or a reject
-option, on two or three of the arms above. ≈10 GPU-min. Until then, every "destroys the model"
-phrasing should read "retain accuracy collapsed to N/120 under the closed-set scorer".
-**Status: OPEN, queued behind G1.**
+**Diagnostic, queued — and a reject option is NOT a repair.** `gen_eval.py` records only `clip_acc`
+and `clip_align` per concept — **no per-image predicted label** — so what those images were
+classified *as* is currently unrecoverable. The first step is simply to log predicted labels and
+per-label scores.
+
+A reject option or open-set margin is a **potential additional diagnostic**, not a fix, and if
+introduced it must: be **calibrated independently of the arms being judged**; be **versioned** with
+its assumptions documented; **preserve the existing closed-set scores** alongside rather than
+replacing them; and have **no threshold tuned to make results look favourable**. A reject option
+chosen after seeing the arms it adjudicates would be worthless.
+
+**And it cannot settle the underlying question on its own.** Claims of "broad model destruction" or
+of "clean erasure" require **saved images** plus an **independent quality/semantic assessment** —
+not another variant of the same CLIP head that produced the number in doubt. This is also why
+D-034's "our port erases where upstream does not" remains unsupported: suppression measured by a
+closed-set argmax cannot distinguish erasure from degradation, and no retain axis was measured.
+
+Until that work exists, every "destroys the model" phrasing should read "retain accuracy collapsed
+to N/120 under the closed-set scorer", and the cause should be labelled an **unresolved hypothesis**.
+**Status: OPEN. Image/score logging queued behind G1; reject option not authorised as a metric
+change.**
 
 ### D-028 — no atomic writes anywhere; one checkpoint is silently truncated.
 
@@ -721,6 +856,338 @@ fp32 products (fixed — 3.48e-08 off, so column C stands);
 `venv_uce` violates every upstream pin, though diffusers 0.31's `encode_prompt` passes
 `attention_mask=None`, so the embeddings match anyway.
 
+### D-035 — a **passing test** was enforcing a false claim. Worst defect class found.
+
+**Severity:** high · **Owner:** lead · **Files:** `scripts/split_registry.py:191`,
+`scripts/test_audit_repairs.py::t_dev_is_labelled_as_used`
+
+**Evidence:** `split_registry.audit()` reported `FINAL: {"status": "FROZEN_UNINSPECTED"}`. That became
+**false** the moment `FINDING65` and `FINDING66` scored and interpreted those prompts. The literal
+was additionally asserted by a **passing test**: `assert rep["splits"]["FINAL"]["status"] ==
+"FROZEN_UNINSPECTED"`.
+
+**Why this class is worse than a stale document.** A stale doc is merely wrong. A *passing test*
+around a false claim **actively defends it**: anyone correcting `split_registry.py` alone would see
+the suite go red and read their own correct fix as a regression. The literal and the test had to
+move together, which is exactly why the previous cycle's agents each declined — each owned one side.
+
+**Repair (both sides, together).** `FINAL.status` → `INSPECTED_DEVELOPMENT_DATA`, with
+`inspected_at: 2026-10-26`, `inspected_by: [FINDING65, FINDING66]`, and a `status_note` recording
+that it is development data from here on, that a fresh final set must be frozen before any new
+configuration is selected against it, and that the D-022 label-text issue plus D-022b's permanent
+loss apply to its numbers. The test now asserts the **true** status and `inspected_by`, and adds a
+**regression guard** rejecting the strings "uninspected", "untouched", "held out", "held-out"
+anywhere in the FINAL record, so the claim cannot quietly return.
+
+**Verified:** `status=INSPECTED_DEVELOPMENT_DATA`, `inspected_by=['FINDING65','FINDING66']`,
+all three FINAL overlap sets still empty (disjointness preserved — the freeze and the computation
+behind it were never in doubt), and the banned-term guard passes.
+**Status: REPAIRED and verified.**
+
+**Systemic lesson for the gate.** Every other "protected by a test" claim in the suite needs the
+same scrutiny: a green suite is evidence the code matches the assertions, **not** that the
+assertions are true. Added as **G14**.
+
+### D-036 — the Meta reload guard would have certified a **no-op** as successful training.
+
+**Severity:** blocking · **Owner:** Baselines agent (repaired) · **Files:** `run_r2_meta_official.sh`
+
+**Evidence, re-measured independently by the lead.** The guard compared the reloaded checkpoint
+against base SD-1.4 loaded with `variant="fp16"`, while the trainer loaded the **main** weights, and
+asserted `rel > 1e-6` to conclude "training changed the weights". But main vs fp16-variant differ
+*by construction*:
+
+| measurement (pinned SD-1.4 UNet, fp32 upcast) | value |
+|---|---:|
+| tensors differing, main vs fp16-variant | **686 / 686** |
+| global relative difference | **2.074001e-04** |
+| fp16-variant == `main.half()`, bit-exact | **686 / 686** |
+| the guard's `1e-6` threshold, relative to that floor | **207× below it** |
+
+So the assertion would have **passed with zero training**. A variant mismatch alone clears it by two
+orders of magnitude. This is precisely the "model-variant difference mistaken for evidence that
+training changed weights" trap, and it was live in the launcher.
+
+**Repair:** compare against the **same revision and variant** the trainer loaded, compute the
+variant floor, and require `rel > 10× floor`. **Status: REPAIRED; lead re-verified the floor.**
+
+### D-037 — the IMMA blank-image filter never executed, and the header claimed it did.
+
+**Severity:** high (provenance), low (outcome) · **Owner:** Baselines agent (repaired) ·
+**Files:** `run_r1b_imma_train.sh`
+
+**Evidence:** the filter was nested inside `if [ ! -f metadata.csv ]`, and `metadata.csv` already
+existed — so the branch never ran. All three NSFW-blanked frames remain in `metadata.csv`, while
+`run_r1b`'s header asserted they had been filtered.
+
+**Outcome, which cuts the other way and is worth stating plainly:** selection is **not** "first N" —
+it is `shuffle(seed=42).select([20,40))`. The resolved 20-sample subset was reproduced twice and
+contains **no blank image**; `29.png` falls in the discarded `[0,20)` window. So a README-faithful
+run would not have trained on a blank frame. The defect is a **false provenance claim**, not a
+corrupted training set. Both halves belong in the record.
+
+### D-038 — the Meta trainer would have crashed *after* taking a GPU.
+
+**Severity:** high · **Owner:** Baselines agent (repaired) · **Files:** `run_r2_meta_official.sh`
+
+`upstream/Meta-Unlearning/src/esd_meta.py:669` imports `datasets` at module level; **`venv_t2i` has
+no `datasets`**. The previous launcher invoked the trainer there, so it would have reserved a GPU and
+then died with `ModuleNotFoundError`. Repaired to `venv_imma` (datasets 5.0.1) with a stage-2
+assertion, plus `HF_DATASETS_CACHE` redirected (the root filesystem is full; an unredirected run hit
+`PermissionError: '/datasets'`).
+
+### D-019 UPDATE — the benign explanations are now narrowed to **one**, by measurement.
+
+Against the hypotheses I listed when withdrawing the "mislabelled checkpoint" inference: **fp16
+variant, dtype round-trip, format conversion and an SD-1.5 base are all RULED OUT by measurement**.
+The variant floor is 2.07e-04 while the ESD checkpoint's resnet blocks reach **0.20** relative —
+roughly a thousand times larger, so the variant cannot account for the magnitude.
+
+**`EMA vs non-EMA survives and is untested** — the comparison weights are not cached and the host is
+offline. sha256 of the file: `8881d70b…`. H-A/H-B remain **labelled hypotheses**; the
+"whole-UNet training" reading is still **not** established.
+
+**Cheapest closing experiment, requiring no base model and no GPU:** diff two released `ESDx1`
+artist checkpoints **against each other**. Shared structure isolates what the ESD procedure touches,
+independent of any base-model or variant choice.
+
+### D-039 — two reservation-API gaps found by a non-owner, reported not edited.
+
+**Severity:** medium–high · **Owner:** Infrastructure agent · **Files:** `scripts/gpu_reserve.sh`
+
+Found by the Baselines agent while integrating: **`GPU_RESERVE_GPUS=""` cannot express "no GPUs"** —
+a `${:-}` default makes an empty allowlist fall back to the default set, and it **reserved GPU 0
+during a probe**. That is a fail-*open* default in a safety control and must become a hard refusal.
+Also: a two-GPU reservation is not expressible, though nothing currently needs one.
+
+**Capacity warning for the queued runs:** our cards are 40 GB; upstream assumes 80 GB, and
+`--devices 0 0` co-locates teacher and student at ≈34 GB before activations. The Meta smoke test is
+therefore pinned to `META_BATCH=1`, and an OOM at batch 10 is **expected**, not a defect.
+
+### D-040 — I declared G2 passed on a guard nothing called, and tested it under the wrong shell. **Third instance of my own recurring failure.**
+
+**Severity:** high (false gate verdict) · **Owner:** lead · **Files:** `scripts/run_guard.sh`
+
+**Two independent defects in my own repair, both found by the Infrastructure agent and both
+re-verified by me:**
+
+1. **No production caller.** `grep -rln run_guard --include="*.sh"` matched **only the file itself
+   and a test**. I built a guard, tested it, declared gate condition **G2 PASSED**, and nothing in
+   the project used it. A control that is cited but unread is exactly D-013 (my unenforced freeze
+   marker) and D-027 (error suppression manufacturing a zero). **This is the third time I have
+   committed the same error in this audit.**
+2. **Tested under non-production shell options.** Under `set -euo pipefail` — which real runners use
+   — errexit killed the runner at `"$@" >>"$RG_LOG" 2>&1` **before** `local rc=$?` could run, so the
+   FAIL line was never written and the header's promise that `rg_step` "records a failure and keeps
+   going" was **false under exactly the option set the runners use**. My 5/5 self-test passed
+   because I ran it with `set -u` only.
+
+**And the targeting is the worst case:** only **4 of 139** runners use `set -euo pipefail`, and they
+are precisely the four the Baselines agent had just hardened — `run_r1_imma_official.sh`,
+`run_r1b_imma_train.sh`, `run_r1c_eval.sh`, `run_r2_meta_official.sh`. So the bug bit the newest,
+most-reviewed launchers and nothing else.
+
+**Repair.** `rg_step` now shields the invocation and restores the caller's options; `rg_cell` always
+returns 0 so one bad cell cannot truncate a grid under `set -e`. Re-verified by me under
+`set -euo pipefail`: two failing cells survived, **2 FAIL lines recorded**, `rg_finish` refused DONE
+with rc=1. `run_v1_esd_alone_control.sh` is now the guard's **first production caller** (syntax
+checked; grep confirms three referencing files where there were two).
+
+**G2 is retracted as passed** and now requires every *active* runner to use the guard. The 104
+historical runners stay byte-frozen deliberately — they already ran, and their markers are declared
+non-evidence — so G2's scope is active launchers only.
+
+**Lesson, recorded because it keeps recurring:** I have now three times declared a control effective
+on the strength of its *existence* rather than its *use*. The test for any future control is: name
+the caller, and name the production conditions it was exercised under.
+
+### D-041 — my own review premise for the CVD/UUID defect was false.
+
+**Severity:** n/a (premise corrected) · **Owner:** Infrastructure agent
+
+I asserted that an inherited `CUDA_VISIBLE_DEVICES` could desynchronise `nvidia-smi` indices from
+physical devices. **Measured and false:** `nvidia-smi --query-gpu=index,uuid` output is
+**byte-identical** (same md5 `b43f627f9fcc`) with CVD unset, `1`, `2,3`, and `bogus`. Real
+`nvidia-smi` ignores CVD, so reserved indices were already physical.
+
+The agent then found the *actual* faults, which my premise had obscured: v1 never read, reported,
+validated or set CVD at all, and recorded no UUID. Fixed by auditing the inherited value, exporting
+CVD from the helper, recording `uuid=`, and adding a `MAPCHANGED` state. **Recorded because a wrong
+premise that gets "fixed" anyway is how a real defect stays hidden behind a plausible one.**
+
+### D-042 — the freeze was masking a fail-open allowlist and taking credit for it.
+
+**Severity:** high · **Owner:** Infrastructure agent (repaired) · **Files:** `scripts/gpu_reserve.sh`
+
+My D-039 report was **incomplete in the way that mattered**. I reported that
+`GPU_RESERVE_GPUS=""` falls back to the permissive default. The agent found that in production it
+returned **rc=4** — the freeze-refusal code — which *looks* like a correct refusal. It was not:
+`status`, which is not freeze-gated, showed `allowed=0 1`. **The freeze was masking the fallback and
+being credited as the guard.** Remove the freeze and the fallback would have been live.
+
+Worse, a whitespace-only value returned **rc=3**, the *retryable* code, so a waiter loop would sleep
+forever on a configuration error rather than fail fast.
+
+Repaired with `${VAR+set}` semantics, a new non-retryable **rc=7**, a mode-independent non-empty
+backstop, and `_GR_INIT_RC` so a sourced helper also refuses. The two-GPU limitation is documented
+rather than implemented.
+
+**This is the same class as D-040 and D-013:** a control appearing to work because something else
+was coincidentally blocking the path.
+
+### D-043 — the re-scoring pipeline's write isolation was defeatable by directory creation.
+
+**Severity:** blocking · **Owner:** Evaluation agent (routed) · **Files:** `scripts/rescore_final_v2.py:175-184`
+
+**Found by the independent reviewer, not the builder.** `_guard_path` protects **file** writes, but
+`make_run_dir` never calls it. The reviewer demonstrated in a sandbox mirror that
+`--run-tag '../../../attacked/PWNED'` creates `<P>/attacked/PWNED/{images,embeddings,arms}`, and the
+same reaches `adapters/`. So the single thing the guard exists to prevent — touching the protected
+historical tree — was reachable through directory creation rather than file writing.
+
+Related: `_guard_path` (:120) uses a **separator-less prefix test**, so `outputs/rescore_evil/x.json`
+is permitted. `T1b` passing is not proof; the comparison must be on path *components*.
+
+**Status: routed for repair, gate blocked on it.**
+
+### D-044 — an all-DISCREPANT re-scoring run would report `run_status: complete`.
+
+**Severity:** blocking (scientific) · **Owner:** Evaluation agent (routed) ·
+**Files:** `scripts/rescore_final_v2.py`
+
+The determinism probe correctly reports `EXACT_REPRODUCTION` / `DISCREPANT` **per arm**, but the
+verdicts are **never aggregated into run status**. A run in which *every* arm failed to reproduce
+history — i.e. one that cannot be compared to the historical records at all — would still be
+recorded as a complete, successful correction. `complete` must require a defensible determinism
+verdict, or a distinct status must exist for "produced, but not comparable to history".
+
+This is the most consequential of the review's findings, because the whole point of the paired
+design was to **test** the determinism assumption rather than assume it.
+
+### D-045 — the builder's own exposure figure was wrong, and a test designed to catch drift could not see it.
+
+**Severity:** high · **Owner:** Evaluation agent (routed) · **Files:** `scripts/gen_eval_final.py:176-179`
+
+The builder documented **26/180** images assigned a differing label. Recomputed independently by the
+reviewer **and** by me from all twelve records: **37/180**. Its per-arm figures `(9,7,5,4)` match
+nothing — actual are utrap_sd15 12/15, utrap_church 10/15, frp 7/15, uce 5/15, plus 2 in
+`BASE_sd14` and 1 in `ATK_uce` — so the exposure is also **not** "concentrated in the four defence
+arms", and 9+7+5+4 = 25, not 26. Median margins are 0.0027–0.0063, not 0.0065–0.0131.
+
+**And it carried a false claim:** that the count "bounds how many could move". It does not, and it
+contradicts the builder's own closed-set-coupling argument two sentences earlier — an image
+predicted `church`, an **unchanged** label, can flip when a competitor's text changes, because the
+argmax is over all twelve. *(My register and FINDING65 carry 37/180 with explicitly
+direction-neutral wording, so this error did not propagate into the published findings.)*
+
+**G14 instance, and a sharp one.** The guard test `T8f` greps for four verbatim **pre-repair
+strings**. A test that checks for the *absence* of known-bad text cannot detect a **wrong number
+that is present**. The repair must add a test that recomputes the figure from
+`outputs/final_*.json` and asserts the documented value equals it.
+
+### D-046 — two verification claims rest on weaker evidence than stated.
+
+**Severity:** medium · **Owner:** Evaluation agent (routed)
+
+(a) **`T3a_run_ids_unique` is flaky.** The run-id salt is 6 hex characters = 24 bits, so 2000 draws
+collide about 11% of the time; the reviewer observed **45/1 in two of seven runs** while the
+write-up pastes `2000/2000` as if deterministic. A flaky test reported as a clean pass is the same
+class of error as my own G2 claim.
+
+(b) **"`gen_eval.py` unmodified" rests on mtime alone.** The mtime (`2026-10-25 17:38:24`) is
+confirmed, but the only hash baseline (`provenance_manifest.json`, 10-23) **predates** it, so there
+is no hash to compare against. The claim must be scoped to what mtime supports, and sha256 baselines
+recorded now so it has a real basis going forward.
+
+### D-047 — **D-001 is reachable again through one environment variable.** Gate-blocking.
+
+**Severity:** blocking · **Owner:** Infrastructure agent (routed) · **Files:** `scripts/gpu_reserve.sh:287`
+
+Production honours `GPU_RESERVE_LOCKDIR` **without refusing it**. The reviewer measured
+`mode=production, lockdir=<their tmp>`. Two runners started with different values take **different
+mutexes** and therefore cannot exclude one another — which is precisely the triple-booking of GPU 0
+observed on 2026-10-26 that this entire file was written to prevent. **One env var re-opens D-001.**
+
+Two further fail-open thresholds of the same family: `GPU_RESERVE_FOREIGN_MIB` is unvalidated, so
+`abc` or `99999999` causes a GPU at **30000 MiB with no attributable process** to be handed out
+(rc=0, index 0) — i.e. another user's job trampled; and `GPU_RESERVE_ORPHAN_GRACE` accepts `abc` or
+`0`, silently deleting the grace window. And `_gr_do_acquire:819-843` has **no `*)` default**, so an
+unrecognised state is **claimable**.
+
+**The pattern is now unmistakable and is the real finding:** every env var this file reads defaults
+*permissive*. Fixing the empty allowlist (D-042) fixed one instance of a class. The repair must
+sweep **every** variable, not these three.
+
+### D-048 — the test-mode interlock can be defeated by copying a binary. Another user's GPUs reachable.
+
+**Severity:** blocking (affects a third party) · **Owner:** Infrastructure agent (routed)
+
+`_gr_nvsmi_is_real` is a **name-only** check: a `cp` of the real `nvidia-smi` passes it (a symlink
+does not). So `TEST_MODE=1` plus `GPU_RESERVE_GPUS="2 3"` hands out **index 2 against real
+telemetry**. GPUs 2–3 belong to another user and are in use at 4737 MiB right now. This is the one
+defect in the audit whose blast radius lands outside our project.
+
+### D-049 — three migrated runners still write `DONE` without checking anything.
+
+**Severity:** high · **Owner:** Infrastructure agent (routed)
+
+`run_r4b_queue.sh`, `run_r4c_queue.sh`, `run_r4d_upstream_defaults.sh` had their GPU selection
+migrated but **not** their failure handling: no exit status is inspected and `DONE` is written
+regardless. Separately `run_r1_imma_official.sh:240` gates its stage-4 reservation on inherited
+`CUDA_VISIBLE_DEVICES`, so a re-run with that variable set runs the smoke job **unreserved** —
+reservation must never be conditional on an inherited environment variable.
+
+### D-050 — my FINDING66 title asserted the claim its own notice withdrew. My error.
+
+**Severity:** high · **Owner:** lead · **Files:** `docs/FINDING66…md`
+
+The title read *"…and on SD-1.4 that is more reliable than the unmodified base model, which scores
+13/15"* while the notice I added **withdrew** exactly that sub-claim. **A banner under an asserting
+title is the pattern this audit was explicitly told not to use, and I used it.** The title also
+called the FINAL prompts "never used for anything", which stopped being true when this document
+scored them. Retitled; the former title is preserved verbatim for the record.
+
+Same document, §9: *"there is now no sub-ceiling number anywhere in the FINAL measurements"* is
+**false** — six sub-ceiling records are on disk (`ATK_uce_sd15` 14/15, `BASE_sd14` 13/15,
+`uce_sd15` 9/15, `frp` 7/15, `utrap_sd15` 2/15, `utrap_church` 1/15). The defensible statement is
+only that max-over-valid across post-attack seeds is 1.0000 — a maximum over a set, not the absence
+of sub-ceiling measurements. Corrected.
+
+### D-051 — the duplicate-cell disagreements are concentrated in **one control arm**. Previously undisclosed.
+
+**Severity:** medium, and it **reduces** the concern · **Owner:** lead
+
+My figure of "30 duplicate cells disagreeing by up to 8/15" was too crude. The reviewer recomputed:
+duplicates reproduce at **68/178**, maximum spread **0.7333 = 11/15** (my 8/15 was only the
+strict-key subset), and — the part nobody had stated — **all 29 disagreeing cells belong to the
+single arm `BASE(unmodified)`**, the attack-on-base control.
+
+That is materially better news than "30 cells disagree across the corpus": the disagreement is
+concentrated in the **unmodified-base control**, not spread through the defence arms. It still needs
+explaining (an unmodified base attacked twice should not diverge by 11/15), but it does not
+undermine the defence-arm comparisons. **Both the correction and the reassurance belong in the
+record; omitting either would misstate it.**
+
+### D-052 — the authoritative status document does not cover the newest thirteen defects.
+
+**Severity:** high · **Owner:** Documentation agent (routed) · **Files:** `docs/STATUS_CURRENT_v2.md`
+
+It scopes itself to `REG/D-001…D-034`, but the register now carries **D-035–D-052 plus D-022b** —
+so the "one authoritative current status per issue" document has **no verdict** for thirteen-plus
+issues, including D-035 (the passing test asserting a falsehood) and D-046. Partly a timing artifact
+of my adding entries after it ran, but it must be closed or the document is not authoritative.
+
+Also from the review: **D-022b's permanent loss is still sold as a cheap pending rerun** in
+`STATUS_CURRENT_v2.md:86,314`, `HANDOFF_r5.md:140,154` and `CORRECTION_REGISTER_r5.md:408`, which
+call it a "pure re-score", "deterministic" and "CPU-only" — directly contradicting FINDING65:34-38
+and FINDING66. D-022b appears in only **2 of 10** documents. Two wrong counts in the status
+document: "**18** FINAL records" (there are **12**; its own 180 = 12×15), and "post-attack arms have
+**zero** differing-label hits" (there is **one**, margin 0.0081 against 0.0063 — same order, not "an
+order of magnitude larger"). The eigenvalue 3.2420e5 is correct but **has no artifact** (sourced to
+an agent document and a help string) while **four live `outputs/r4_uce_*.json` still embed the
+withdrawn 85,850**. And the defect-ID collision table is itself wrong: `AGENT1_UCE_FINDINGS.md` uses
+D-100–D-160 and has **zero** `D-0NN` IDs; only Agent 4 and Agent 5 are genuine collisions.
+
 ---
 
 ## 2. Agent assignments (file ownership, no overlapping edits)
@@ -815,11 +1282,56 @@ written. Self-test, all five cases:
   markers written: 1 DONE, 4 INCOMPLETE
 ```
 
-**2026-10-26 — scorer control established.** `gen_base_sd14.json` and
-`gen_E6cal_BASE_sd14_on_DEV.json` both score **1.000 on all twelve DEV concepts**. The closed-set
-12-label CLIP scorer is sound and base utility is 1.000. Any arm's low utility is therefore a
-property of that arm or of its checkpoint composition, not of the metric. Used to refute a scorer
-explanation for D-009.
+**2026-10-26 — Baselines repair integrated, after independent lead verification.**
+
+Re-measured the governing number myself rather than taking the agent's word, because three separate
+items depend on it: main vs fp16-variant SD-1.4 UNet differs in **686/686** tensors at global
+relative **2.074001e-04**, and the fp16 variant is bit-exactly `main.half()` for **686/686**
+tensors. The old reload guard's `1e-6` threshold is **207×** below that floor — confirming D-036.
+
+Preservation verified (the instruction was to keep the completed run, not relabel it):
+`upstream_runs/imma/REF_imma_vangogh/imma_unet_xatten_layer.pt` **untouched** at its original mtime
+(12:21), with `BUDGET_5X.md` added **alongside** (14:25) rather than overwriting anything;
+`adapters/REF_imma_vangogh/unet.pt` and `outputs/gen_REF_imma_vangogh.json` intact at original
+mtimes; `metadata.csv` still contains **all three** blank frames, with `metadata_noblank.csv` and
+`blank_audit.json` added as **new** files. Every change additive; nothing destroyed.
+ESD checkpoint sha256 confirmed: `8881d70b1bd376c5532e…`.
+
+**2026-10-26 — Evaluation repair integrated, after independent lead verification.**
+
+Verified myself rather than from the agent's summary:
+- `scripts/gen_eval.py` and `scripts/attack_relearn.py` mtimes **unchanged** (2026-10-25 17:38), so
+  the ~800 historical records still reproduce. All **12** `outputs/final_*.json` intact.
+  `outputs/rescore/` **absent** — nothing was written pre-emptively.
+- Test suite: **46 passed / 0 failed**. *Interpreter note:* it must be run with
+  `venv_t2i/bin/python`; under system `python3` seven tests error on `ModuleNotFoundError: torch`
+  and the count reads 13/7. The agent's claim was accurate but omitted the interpreter — recorded so
+  a later reader does not mistake an environment problem for a regression.
+- Inspected the integrity-critical code paths directly: `_guard_path` refuses any realpath inside
+  the protected historical tree **or** outside `outputs/rescore/`; `atomic_write_json` uses a
+  same-directory temp + fsync + `os.replace`; the manifest is checkpointed after **every** arm;
+  `run_status: complete` requires every requested arm to be complete, and missing/failed arms are
+  named rather than skipped.
+- Paired scoring scores both label sets against **one** image-feature tensor, and its
+  `measurement_note` states the effect "was not predicted in advance in either direction" — the
+  direction-neutral framing is encoded in the artifact, not just the prose.
+- Determinism is **tested, not assumed**: `compare_with_history` returns `EXACT_REPRODUCTION` /
+  `DISCREPANT` per arm with disagreeing indices (test T10c exercises the discrepant path), and
+  T10d detects the pre-repair marker (historical records carry no `label_text_set` field).
+
+**2026-10-26 — base-model control, with its scope corrected.** `gen_base_sd14.json` and
+`gen_E6cal_BASE_sd14_on_DEV.json` both score **1.000 on all twelve DEV concepts**.
+
+**What that licenses:** the scorer behaves correctly on **undamaged, in-distribution** outputs, and
+base utility is 1.000 on this panel.
+
+**What I wrongly concluded from it, now withdrawn:** that "the closed-set 12-label CLIP scorer is
+sound" and therefore any arm's low utility must be a property of that arm rather than the metric.
+A control on undamaged outputs says **nothing** about the metric's validity on damaged or unusual
+outputs — which is exactly the regime every erased arm occupies, and exactly where D-030 says the
+closed set with no reject option is least trustworthy. So this control does **not** refute a
+metric-based explanation for D-009's numbers; it only rules out the metric being broken on normal
+images.
 
 ## 4. Quarantine
 
@@ -827,8 +1339,9 @@ explanation for D-009.
 
 | artifact | reason | status |
 |---|---|---|
-| `outputs/gen_REF_imma_vangogh.json` | D-009: internally contradictory; checkpoint composition unproven | **provisional quarantine** — not to be cited as an IMMA result pending Agent 2 |
-| `outputs/r4b_*`, `outputs/r4c_*`, `outputs/r4d_*` "UPSTREAM" arms | D-010: upstream edit may be inert; UPSTREAM-vs-BASE unmeasured | **interpretation suspended** — files retained, no fidelity claim may rest on them pending Agent 1 |
+| `outputs/gen_REF_imma_vangogh.json` | **Metric inapt + configuration not one the authors report.** The composition is **VALID** (`exact=160 fuzzy=0 reshaped=0 skipped=0`; 160/160 and 526/526 tensors byte-equal; ESD delta not inverted) — the earlier "composition unproven" reason is **REFUTED and withdrawn**. The arm also ran ~5× the README's training budget (D-021). | **quarantined** — not citable as an IMMA result. Not pending a composition check; that is settled |
+| `outputs/r4b_*`, `outputs/r4c_*`, `outputs/r4d_*` "UPSTREAM" arms | **Open question narrowed to `expand_prompts`, plus a confounded port side.** "Upstream's edit may be inert / weights possibly unchanged" is **REFUTED and withdrawn**: upstream changed all 32 attn2 K/V matrices by **5.36 % mean / 9.79 % max**, 0/32 identical to base, **43.4 %** change in K/V output. What remains open is whether our single-erase-prompt invocation should have used `expand_prompts` (unreachable through `UCE()`), and separately the **port** column is confounded by cached-checkpoint reuse (D-026). | **interpretation restricted** — files retained; no port-fidelity claim may rest on them. R4d needs re-running |
+| `outputs/final_ATK_*.json` (6 records) | **D-022b: checkpoints deleted.** `attacked/E6B_*`, `E6C_*`, `E6D_*` absent, so these cannot be re-scored under the corrected label text. | **withdrawn, not re-verifiable** — a rerun would be a fresh analogue, not a reproduction |
 | `outputs/atk_E2H_*_lr5e-5_s50.json` | D-007: undeclared post-hoc cell | **retained, labelled** — reportable only as a post-hoc diagnostic, never as preregistered |
 | `outputs/gen_advunlearn_{parachute,tench,vangogh,garbage_truck}.json` | D-011: evaluated checkpoint unrecorded | **retained, labelled** — numbers stand, attribution does not |
 
@@ -841,7 +1354,7 @@ passing test, never by an assurance.
 | # | condition | blocking defects | evidence required |
 |---|---|---|---|
 | G1 | Exclusive per-GPU reservation works and is proven to work | D-001 | `scripts/test_gpu_reserve.sh` output showing N racing processes yield exactly one winner per GPU, stale-lock reclamation after a simulated crash, release on crash, and that a GPU held by another user is never selected |
-| G2 | No runner reports success after a failure | D-012 + Agent 5 item 4 | **PASSED 2026-10-26** — see §3. `scripts/run_guard.sh` added and self-tested 5/5; the 104 historical markers measured non-load-bearing and declared non-evidence |
+| G2 | No runner reports success after a failure | D-012, D-040 | **NOT PASSED — my earlier "PASSED" is retracted.** The guard existed, was tested, and had **no production caller**; its self-test also ran under the wrong shell options. Now wired into `run_v1_esd_alone_control.sh` (first real caller) and its errexit bug fixed. Passes only when every **active** runner uses it |
 | G3 | The UCE comparison measures what it claims, or claims less | D-003, D-004, D-006, D-010 | UPSTREAM-vs-**BASE** per-matrix norms. If upstream's edit is inert, FINDING77 must say the comparison establishes nothing about port fidelity. Every FINDING77 ratio recomputed from raw JSON |
 | G4 | The IMMA artifact is proven valid or quarantined | D-009 | per-tensor comparison of `adapters/REF_imma_vangogh/unet.pt` against base and against the ESD checkpoint; key-match/reshape/skip counts from `r1_eval_imma.py` |
 | G5 | Meta R2 either runs the authors' trainer or stops being called R2 | D-002 | `src/meta.py` invoked with resolved hyperparameters recorded, the `type=bool` `fix_timesteps` hazard handled explicitly, and the forget-vs-related-retain semantic conflict resolved in writing |
@@ -852,12 +1365,34 @@ passing test, never by an assurance.
 | G10 | Artifacts are written atomically and verified before reuse | D-028 | `os.replace` on every artifact write; resume guards check a recorded fingerprint, not `[ -f ]`; the truncated `utrap_church_l1.0k4/unet.pt` quarantined |
 | G11 | No script can select another user's GPU | D-029 | `pick_gpus.sh` retired or bounded to 0–1; proven by test |
 | G12 | FINAL numbers re-scored with the correct label set | D-022 | 180 images regenerated at identical seeds and re-scored from `LABELS`; `FINDING65`'s ratios restated or withdrawn |
-| G13 | "Destroys the model" claims scoped to what the metric supports | D-030 | per-image predicted labels logged and a reject option or open-set margin measured on ≥2 collapsed arms; prose rephrased to "retain accuracy collapsed to N/120" |
+| G13 | "Destroys the model" claims scoped to what the metric supports | D-030 | per-image predicted labels logged on ≥2 collapsed arms; prose rephrased to "retain accuracy collapsed to N/120". A reject option is **not** accepted as the evidence — it needs independent calibration and versioning first |
+| G14 | No passing test asserts a false claim | D-035 | every assertion in `test_audit_repairs.py` and `test_rescore.py` checked against reality, not just against the code. A green suite shows code matches assertions, **not** that assertions are true |
+| G15 | Every method that built a published arm is registered | Agent 6 | `erase_utrap_v2.py` built all four FINDING76 arms and is **unregistered** in `split_registry`/provenance; `split_registry`'s advertised hard-fail is unimplemented. Register the builders or state the gap |
 
-**Queued bounded verification runs** (lead-launched, through `gpu_reserve.sh`, in this order once G1
-passes): ESD-checkpoint-alone control for D-019 (≈5 min) → FINAL re-score for D-022 (≈10 min) →
-reject-option re-score for D-030 (≈10 min) → R4d re-run with a corrected `port_dir` key for D-026.
-Total well under one GPU-hour. Each is a *verification* run, not a campaign cell.
+**Queued bounded verification runs** (lead-launched, through the reservation API, in this order once
+the infrastructure repairs pass independent review): ESD-alone behavioural control for D-019
+(≈5 min) → FINAL regeneration + paired corrected scoring for D-022 (≈10 min) → per-image
+label/score logging for D-030 (≈10 min) → R4d re-run with a corrected `port_dir` key for D-026.
+Total well under one GPU-hour, one GPU at a time, GPUs 0–1 only. Each is a *verification* run, not a
+campaign cell. A reject option is **not** among them: it is an unauthorised metric change until
+calibrated independently and versioned.
+
+### Tool-approval discipline (recorded, 2026-10-26)
+
+Tool-approval requirements apply **independently** of the research freeze, and an automatic
+rejection is not an obstacle to be engineered around. For the record, the following are **not**
+acceptable responses to a denial and will not be used: disguising or re-encoding a command,
+renaming a flag, removing or editing `FREEZE_ACTIVE` to avoid needing the override, requesting
+blanket shell access, or handing the user an unreviewed patch-and-launch one-liner to run on my
+behalf. **I did the last of these in the previous cycle and it was wrong** — it outsourced execution
+of an unreviewed edit, which defeats the point of the approval step.
+
+The correct sequence is: repair and inspect the verification runner first; if its execution still
+requires approval, request approval for **that exact bounded run**, stating its purpose, GPU limit,
+expected duration and output paths; and continue independent CPU repairs while waiting. A claim may
+remain **withdrawn pending a future experiment** — that is a legitimate terminal state and does not
+require inventing a result to close the issue. Equally, **documenting an execution defect is not
+repairing it**: an entry stays OPEN until a repair exists and is verified.
 
 **Standing constraints that survive the gate.** Two GPUs at a time, GPUs 0–1 only; GPUs 2–3 are
 another user's and stay untouched. Agents may not launch GPU work — only the lead may. No paid
@@ -883,25 +1418,51 @@ arm must be evaluated against an **attacker-lr sweep at matched budget**, not a 
 fixed lr. A defence tuned against one attacker lr is not robust; we have now demonstrated that on
 our own best arm.
 
-**(b) The evaluation-side contribution is weaker than hoped.** A novelty check on the three-part
-claim — static knowledge metrics being *anti-predictive* of relearning robustness (attack AUC 1.000
-vs. inverted probe 0.844, Spearman −0.50 over 16 arms); scoring *below* a retrain oracle being a
-warning sign rather than success; and the attack-validity gate — returned **"non-obvious combination,
-but weakly so."** No single paper assembles all three or reports the cross-arm statistics, but every
-part is anticipated in substance, and one preprint reportedly anticipates all three: *"Distance Is
-Not Enough: Forget-Retain Alignment Gap Predicts LLM Relearning Robustness"* (arXiv 2608.25429v1),
-whose Table 15 shows the same inversion against a retain-trained gold model and whose Table 11
-states the validity-gate principle. Also anticipating parts: MUSE (2407.06460) on over-unlearning
-past the retrained model; TOFU (2401.06121) on two-sided testing against the retain model; Łucki et
-al. (2409.18025) on ablatable directions; "Erase or Hide?" (2509.22263); Carlini et al.
-(1902.06705) §4.14 on attack validity generally.
+**(b) A prior-art overlap is confirmed — and my conclusion from it was wrong.**
 
-**These citations are UNVERIFIED by me and must be checked before anything is published against
-them.** The check could not run a citation-graph forward search (Semantic Scholar rate-limited), so
-its own caveat is that the oracle-inversion part "could still flip to already published." Treat the
-closest prior art as a live risk, not a settled fact.
+**Corrected 2026-10-26.** arXiv **2608.25429** is **FRAG**, which is **verified** and is **already
+the source of this project's own FRP reference**:
+<https://arxiv.org/abs/2608.25429> · <https://arxiv.org/html/2608.25429v1> ·
+<https://github.com/Yi1-Chen/FRAG>. I had recorded it as an unverified citation of a separate
+preprint and flagged it as a "live risk"; that was a bookkeeping error about a paper this project
+already builds on.
 
-**Consequence for the mandate.** The contribution cannot rest primarily on the evaluation
-methodology. It has to be a **method** that survives an attacker-lr sweep, with the evaluation
-protocol as supporting apparatus rather than the headline. That is a harder target than the position
-assumed before this freeze, and stating it now is cheaper than discovering it at write-up.
+**The overlap, recorded factually.** FRAG's **Table 11** and **Table 15** overlap with this
+project's **attack-validity** argument and its **initial-forgetting-versus-recovery** argument
+respectively. Table 15 shows an inversion against a retain-trained gold model; Table 11 states that
+an attack recovering nothing does not probe robustness. Related prior art on individual parts:
+MUSE (2407.06460) on over-unlearning past the retrained model; TOFU (2401.06121) on two-sided
+testing against the retain model; Łucki et al. (2409.18025) on ablatable directions; "Erase or
+Hide?" (2509.22263); Carlini et al. (1902.06705) §4.14 on attack validity generally.
+
+**WITHDRAWN: my conclusion that "the contribution cannot rest primarily on the evaluation
+methodology" and must instead be a new defence method.** That does not follow from an overlap on
+two tables. A contribution decision requires a **claim-by-claim literature comparison** — which
+specific claims are new, which are anticipated, and in what setting (FRAG's tables are LLM
+relearning; ours are T2I diffusion) — and that comparison **is not part of this repair gate** and
+has not been done. Nothing here forecloses either an evaluation-side or a method-side contribution.
+
+**What does survive, because it was measured here rather than inferred:** FINDING78's retraction
+means no arm in this project currently meets both mandate halves, and the mechanism is specific —
+at a fixed 25-step budget, max-over-valid H moved 0.0667 → 0.2000 → 0.5333 as attacker lr went
+1e-5 → 5e-5 → 1e-4. So any future arm must be evaluated against an **attacker-lr sweep at matched
+budget**, not a budget sweep at fixed lr. That is a protocol requirement, and it stands independently
+of any contribution decision.
+
+**Prior art consistent with that protocol requirement (pointers, UNVERIFIED by me).** Two existing
+results point the same way, which makes the sweep requirement conventional rather than novel: FRAG's
+Table 11 disqualifies attack configurations that recover nothing for any arm, and Deeb & Roger
+(arXiv **2410.08827**) reportedly conclude that fine-tuning-robustness defences fall to an extensive
+hyperparameter search. **I have not read or verified either claim about 2410.08827**; it is recorded
+as a pointer to check, not as support. It is an observation about existing evidence, not a new result
+of ours — and if it holds, our attacker-lr finding is a *confirmation* of known behaviour, not a
+discovery.
+
+**Open prior-art gap, which must be closed before any novelty claim is written.** The novelty check
+could not run a **forward citation sweep** (Semantic Scholar returned 429 without an API key; no
+general web search was available). Part (B) of its verdict — "scoring below a retrain oracle is a
+robustness warning sign" — could therefore still flip from *non-obvious combination* to *already
+published*. The specific search that would settle it: a forward citation sweep from **2608.25429**
+(FRAG), **2407.06460** (MUSE) and **2401.06121** (TOFU), looking for a stated
+below-oracle → robustness diagnostic. This needs an API key or restored web search and is **not**
+part of the repair gate.

@@ -36,9 +36,15 @@ export HF_HUB_CACHE=/data/bijaypandey/t2i_unlearn/hf_home/hub
 export HUGGINGFACE_HUB_CACHE=/data/bijaypandey/t2i_unlearn/hf_home/hub
 export TRANSFORMERS_CACHE=/data/bijaypandey/t2i_unlearn/hf_home/hub
 L=logs/e2h_stronger.log
-while :; do G=$(bash scripts/campaign_free.sh | head -1); [ -n "$G" ] && break; sleep 120; done
-export CUDA_VISIBLE_DEVICES=$G
-echo "=== E2h on GPU $G $(date -Is)" >>"$L"
+# Migrated 2026-10-26 off the retired scripts/campaign_free.sh (unlocked check-then-select) to the
+# exclusive reservation API. See docs/REPAIR_INFRA_v2.md.
+source scripts/gpu_reserve.sh
+gpu_reserve_hold "e2h_meta_v2_stronger" 120 >/dev/null || {
+  echo "E2h ABORT: no GPU reservation (rc=${GPU_RESERVE_RC:-?}); see stderr above" >&2
+  echo "E2H INCOMPLETE $(date -Is) -- no GPU reservation (rc=${GPU_RESERVE_RC:-?}); nothing ran" >>"$L"
+  exit 1; }
+G="$GPU_RESERVED"   # CUDA_VISIBLE_DEVICES is already exported; the release trap is installed
+echo "=== E2h on GPU $G (uuid ${GPU_RESERVED_UUID:-?}) $(date -Is)" >>"$L"
 A=meta2_church_lt0.5
 INCOMPLETE=0
 # "5e-5 50" is the UNDECLARED post-hoc cell (see CORRECTION above). Kept so the record stays

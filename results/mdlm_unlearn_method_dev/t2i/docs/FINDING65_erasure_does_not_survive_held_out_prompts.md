@@ -1,33 +1,45 @@
 # FINDING 65 — On prompts never used for anything, erasure is **~3× shallower** than every reported figure. FRP is 54% undone, UCE 60% undone. And the cause is **not** the prompt leak: the leaked arm degraded least.
 
-> # ⚠ DO NOT QUOTE THE RATIOS. Audit defect D-022/D-022a, 2026-10-26.
+> # ⚠ DO NOT QUOTE THE RATIOS. Audit defect D-022, 2026-10-26.
 >
-> **Every FINAL number in this document was scored against the wrong label set, and the error runs
-> in the direction that produces this finding.**
+> **The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved
+> pending corrected evaluation.**
 >
-> `gen_eval.py` defines `LABELS` (:48) — the English text CLIP should see — and `LAB_KEY` (:50) —
-> the underscored record keys. **Nine of the twelve differ.** `gen_eval_final.py:84` used
-> `list(ge.CONCEPTS)`, whose keys equal `LAB_KEY`, so CLIP was prompted with *"a photo of a
-> van_gogh"* and *"a photo of a english_springer"*.
+> `gen_eval.py` defines `LABELS` (:48) — the text intended for CLIP — and `LAB_KEY` (:50) — the
+> underscored record keys. **Nine of the twelve strings differ**; `church`, `parachute` and `tench`
+> are identical. `gen_eval_final.py:84` used `list(ge.CONCEPTS)`, whose keys equal `LAB_KEY`, so
+> every FINAL number in this document was scored with `LAB_KEY` as the CLIP text while every DEV
+> number in the corpus was scored with `LABELS`.
 >
-> **Why that inflates this document's numbers.** `church`, `parachute` and `tench` are spelled
-> **identically** in both lists. Every experiment here erases **church** — so the *target* label's
-> text was correct while all nine competing distractors were degraded. Weaker distractors pull
-> images toward church, so **`target_hits` is biased upward**. Measured across the 180 FINAL images,
-> **37 still landed on a degraded label**, at median decision margins of **0.0027–0.0065** — far
-> below the perturbation a label rewrite causes.
+> **What is established:** the two scorers used different label text, so the DEV and FINAL figures
+> compared in §1 were not produced on a common scale. That is enough to withdraw the ratios.
 >
-> **And the ratios compare two different scorers.** The DEV figures come from `gen_eval.py`, which
-> uses `LABELS` **correctly**; the FINAL figures come from the defective path. FRP's "3.5×" is
-> DEV 0.1333 against FINAL 7/15 = 0.4667, with only the FINAL side inflated. The same applies to
-> UCE's "3×" and to §1's "54% undone" / "60% undone".
+> **What is NOT established, and must not be asserted** (an earlier version of this notice asserted
+> all of it, and was wrong to):
+> * that changing a distractor's wording necessarily **weakens** it as a competitor — an underscore
+>   is a different token sequence, and the sign of the effect on each embedding is an empirical
+>   question, not a deduction;
+> * that `target_hits` was therefore **inflated**, or that this document's headline was
+>   **manufactured** by the scorer;
+> * that predictions which landed on the three **unchanged** labels are unaffected — the argmax is
+>   over all twelve, so a change to any competitor can move them;
+> * that the finding **survives** and only its magnitude is open.
 >
-> **Status.** The 180 images were not saved, so correcting this requires regenerating them at the
-> same seeds (deterministic, so the *same* images — a pure re-score, not a second use of the FINAL
-> split) and re-scoring from `LABELS`. That run is queued as gate condition **G12**. Until it
-> completes, treat every ratio and percentage in this document as **unmeasured**. The qualitative
-> question — whether erasure is shallower on held-out prompts — remains open and may well survive;
-> the magnitudes do not currently stand. `FINDING66` inherits the same defect.
+> The direction and the size are both unresolved until the paired measurement exists.
+>
+> **Observations of record, carrying no directional claim:** 37 of the 180 FINAL images were
+> assigned one of the nine differing labels, at median decision margins of 0.0027–0.0065 across the
+> four pre-attack arms. Small margins mean the outcomes are *sensitive* to the label text; they do
+> not say which way.
+>
+> **Status.** The images were not saved, so correction requires **regeneration plus corrected
+> scoring** — not a pure re-score, and not byte-identical merely because the seeds match.
+> Determinism is an assumption to be tested, by reproducing the old label set's scores on the
+> regenerated images and comparing against the historical records. The corrected run scores **both**
+> label sets on the **same** regenerated images, which is what isolates the label-text effect.
+> Queued as gate condition **G12**. It is a **corrective re-evaluation of an already-inspected
+> split**, not fresh held-out confirmation. Until it reports, treat every ratio and percentage here
+> as **unmeasured in both direction and magnitude**. `FINDING66` was scored by the same path.
 
 **Date:** 2026-10-26 · **Experiment:** E6, the first and only use of the FINAL prompt set
 **Pre-committed:** arm list fixed in `scripts/gen_eval_final.py` before any FINAL number was seen;

@@ -35,6 +35,30 @@ AUDIT REPAIRS 2026-10-26 (docs/AGENT2_BASELINES_FINDINGS.md B-6, B-7):
 3. FAIL-FAST. Blank (NSFW-filtered) frames are rejected and regenerated; counts are validated after
    writing; a pre-existing directory is no longer silently skipped (--resume is now explicit); any
    shortfall exits non-zero.
+
+REPAIR v2 2026-10-26 (docs/REPAIR_BASELINES_v2.md A-3, A-2):
+
+4. CONTENT validation, not just existence. Every split is now checked for
+     * count on disk == count in metadata.jsonl == the planned count;
+     * SPLIT ROLE: every caption must be one of THIS pool's declared prompts, and each prompt must
+       carry exactly `per_prompt` images. Previously a pool could hold the right NUMBER of images
+       of the WRONG CONCEPT and validate. That is the failure that matters here, because the whole
+       forget/retain claim rests on which prompt produced which pool.
+     * a stable CONTENT FINGERPRINT: sha256 over sorted (file_name, sha256(bytes), caption). It is
+       recorded per split in pools.json, so a later run can prove it trained on the same bytes.
+
+5. RESUME COMPATIBILITY. `--resume` used to validate only against the NEW plan's counts, so
+   resuming the historical pools (scheme=legacy, sizing=total_per_pool) under the new default
+   (sizing=per_prompt) died with a bare count error that read like corruption. The existing
+   pools.json is now compared field by field (scheme, sizing, per-pool prompts, per_prompt) and a
+   mismatch is reported as RESUME INCOMPATIBLE naming the exact field, with the fix.
+
+6. NO SILENT DEFAULT TO THE LEGACY POOLS. `--pool-scheme` is REQUIRED (it had default="legacy"),
+   and `legacy` additionally demands `--historical-reconstruction`, because that scheme cannot
+   support a concept-erasure claim (see SCHEMES["legacy"]["claim"]).
+
+7. `--verify-only` validates pools already on disk and exits. It imports no torch and touches no
+   GPU, so the complete pool contract is CPU-checkable before any GPU time is requested.
 """
 import argparse, csv, hashlib, json, os, sys
 
@@ -127,8 +151,35 @@ def save(data, d):
     return meta
 
 
-def validate(d, expect):
-    """Hard post-write validation: counts, metadata agreement, no blanks."""
+def sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for b in iter(lambda: f.read(1 << 20), b""):
+            h.update(b)
+    return h.hexdigest()
+
+
+def fingerprint(d, rows):
+    """Stable content digest over (file_name, sha256(bytes), caption), filename-sorted.
+
+    This is what lets a later run PROVE it trained on the same bytes. Counts and directory
+    existence cannot: a split can hold the right NUMBER of images of the WRONG CONCEPT.
+    """
+    h = hashlib.sha256()
+    for r in sorted(rows, key=lambda r: r["file_name"]):
+        h.update(r["file_name"].encode())
+        h.update(sha256_file(os.path.join(d, r["file_name"])).encode())
+        h.update(r["text"].encode())
+    return h.hexdigest()
+
+
+def validate(d, expect, prompts=None, per_prompt=None):
+    """Hard validation: counts, metadata agreement, no blanks, SPLIT ROLE, content fingerprint.
+
+    Returns (count, fingerprint). `prompts`/`per_prompt` enable the split-role check, which is the
+    one that actually protects the forget/retain claim: it asserts that this split's captions are
+    exactly this pool's declared prompts, in the declared proportion.
+    """
     import glob
     from PIL import Image
     files = sorted(glob.glob(os.path.join(d, "*.png")))
@@ -136,6 +187,9 @@ def validate(d, expect):
     if not os.path.isfile(mp):
         die(f"{d}: no metadata.jsonl")
     rows = [json.loads(l) for l in open(mp) if l.strip()]
+    missing_keys = [i for i, r in enumerate(rows) if "file_name" not in r or "text" not in r]
+    if missing_keys:
+        die(f"{d}: {len(missing_keys)} metadata rows lack file_name/text (rows {missing_keys[:5]})")
     names = set(r["file_name"] for r in rows)
     disk = set(os.path.basename(f) for f in files)
     if len(files) != expect:
@@ -147,15 +201,87 @@ def validate(d, expect):
     blank = [os.path.basename(f) for f in files if is_blank(Image.open(f))]
     if blank:
         die(f"{d}: {len(blank)} blank image(s) survived: {blank[:5]}")
-    return len(files)
+
+    # ---- SPLIT ROLE: the captions must be this pool's prompts, in the declared proportion.
+    if prompts is not None:
+        texts = [r["text"] for r in rows]
+        unknown = sorted(set(texts) - set(prompts))
+        if unknown:
+            die(f"{d}: {len(unknown)} caption(s) do not belong to this pool's declared prompts. "
+                f"This split is holding the WRONG CONCEPT, which invalidates the forget/retain "
+                f"assignment. unexpected={unknown[:3]} declared={list(prompts)[:3]}")
+        absent = [t for t in prompts if t not in set(texts)]
+        if absent:
+            die(f"{d}: declared prompt(s) contribute no images: {absent[:3]}")
+        if per_prompt is not None:
+            skew = {t: texts.count(t) for t in prompts if texts.count(t) != per_prompt}
+            if skew:
+                die(f"{d}: per-prompt counts != {per_prompt}: {dict(list(skew.items())[:5])}")
+    return len(files), fingerprint(d, rows)
+
+
+def check_resume_compat(root, scheme_name, sizing, plan):
+    """Compare the on-disk manifest against the requested plan, field by field.
+
+    `--resume` used to validate only the new plan's COUNTS, so resuming the historical pools
+    (legacy / total_per_pool) under a different sizing died with a bare count error that read like
+    data corruption. Name the actual mismatch instead, and say how to proceed.
+    """
+    mp = os.path.join(root, "pools.json")
+    if not os.path.isfile(mp):
+        return None
+    try:
+        old = json.load(open(mp))
+    except Exception as e:
+        die(f"{mp} exists but is not readable JSON ({e}); move it aside to rebuild")
+    probs = []
+    if old.get("pool_scheme") != scheme_name:
+        probs.append(f"pool_scheme on disk={old.get('pool_scheme')!r} requested={scheme_name!r}")
+    if old.get("sizing") != sizing:
+        probs.append(f"sizing on disk={old.get('sizing')!r} requested={sizing!r}")
+    for name, p in plan.items():
+        o = (old.get("pools") or {}).get(name)
+        if o is None:
+            probs.append(f"pool {name!r} is absent from the existing manifest")
+            continue
+        if list(o.get("prompts") or []) != list(p["prompts"]):
+            probs.append(f"pool {name!r} prompts differ: on disk={list(o.get('prompts') or [])} "
+                         f"requested={p['prompts']}")
+        if o.get("per_prompt") != p["per_prompt"]:
+            probs.append(f"pool {name!r} per_prompt on disk={o.get('per_prompt')} "
+                         f"requested={p['per_prompt']}")
+    if probs:
+        die("RESUME INCOMPATIBLE -- the pools on disk were built to a DIFFERENT definition:\n    "
+            + "\n    ".join(probs)
+            + f"\n  The existing pools are NOT deleted. Either match the on-disk definition "
+              f"(--pool-scheme {old.get('pool_scheme')} "
+              f"--{'per-prompt' if old.get('sizing') == 'per_prompt' else 'total-per-pool'} ...), "
+              f"or build the new definition under a DIFFERENT --root so both survive.")
+    return old
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", required=True, help="pool root; esd_meta.py expects it as ./dataset")
-    ap.add_argument("--pool-scheme", choices=sorted(SCHEMES), default="legacy",
-                    help="legacy = the historical church/cathedral pools (token suppression); "
+    ap.add_argument("--pool-scheme", choices=sorted(SCHEMES), required=True,
+                    help="REQUIRED, no default. legacy = the historical church/cathedral pools "
+                         "(token suppression; additionally requires --historical-reconstruction); "
                          "coherent = the recommended forget/forget-generalisation/related split")
+    ap.add_argument("--historical-reconstruction", action="store_true",
+                    help="acknowledge that --pool-scheme legacy reproduces a HISTORICAL setup "
+                         "whose forget/retain split cannot support a concept-erasure claim")
+    ap.add_argument("--verify-only", action="store_true",
+                    help="validate the pools already on disk against this plan and exit. Imports "
+                         "no torch and touches no GPU; use it to check the pool contract first.")
+    ap.add_argument("--backfill-fingerprints", action="store_true",
+                    help="validate the pools on disk and WRITE their content fingerprints into the "
+                         "existing pools.json, leaving every other field untouched. Without this, "
+                         "a manifest written before REPAIR v2 can never acquire fingerprints, so "
+                         "the drift check can never bind. Regenerates no images; needs no GPU.")
+    ap.add_argument("--allow-missing-fingerprints", action="store_true",
+                    help="downgrade a missing fingerprint from an error to a warning during "
+                         "--verify-only. Use once, to inspect a pre-REPAIR-v2 manifest before "
+                         "running --backfill-fingerprints.")
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--per-prompt", type=int, default=None,
                    help=f"images per PROMPT per split, upstream semantics "
@@ -172,6 +298,13 @@ if __name__ == "__main__":
     if a.per_prompt is None and a.total_per_pool is None:
         a.per_prompt = UPSTREAM_PER_PROMPT
     sizing = "per_prompt" if a.per_prompt is not None else "total_per_pool"
+
+    if a.pool_scheme == "legacy" and not a.historical_reconstruction:
+        die("--pool-scheme legacy is a HISTORICAL RECONSTRUCTION, not a scientific setup: "
+            "cathedral/chapel/basilica are hyponyms of church and sit in the RELATED-RETAIN pool, "
+            "so the objective is satisfied by suppressing the TOKEN 'church' rather than erasing "
+            "the concept. Pass --historical-reconstruction to acknowledge that, or use "
+            "--pool-scheme coherent for a run intended to support a concept-erasure claim.")
 
     scheme = SCHEMES[a.pool_scheme]
     coco_path = f"{P}/upstream/Meta-Unlearning/data/coco_object_retain.csv"
@@ -199,6 +332,72 @@ if __name__ == "__main__":
         print(f"  {name}: {len(p['prompts'])} prompt(s) x {p['per_prompt']} "
               f"= {p['per_split']}/split{flag}", flush=True)
 
+    # ---- resume compatibility BEFORE any per-split work, so a definition mismatch is named as
+    #      such instead of surfacing as a count error on the first split.
+    prior = check_resume_compat(a.root, a.pool_scheme, sizing, plan)
+    if prior is not None:
+        print(f"  existing manifest at {a.root}/pools.json is COMPATIBLE "
+              f"(scheme={prior.get('pool_scheme')} sizing={prior.get('sizing')})", flush=True)
+
+    if a.verify_only or a.backfill_fingerprints:
+        what = ("--backfill-fingerprints: validating pools and RECORDING fingerprints"
+                if a.backfill_fingerprints
+                else "--verify-only: validating pools on disk, writing nothing")
+        print(f"[r2pools] {what}", flush=True)
+        if a.backfill_fingerprints and prior is None:
+            die(f"{a.root}/pools.json does not exist; there is no manifest to backfill. Build the "
+                f"pools first.")
+        drift, missing, computed = 0, 0, {}
+        for name, p in plan.items():
+            computed[name] = {}
+            for split in ("train", "test"):
+                d = os.path.join(a.root, name, split)
+                if not os.path.isfile(os.path.join(d, "metadata.jsonl")):
+                    die(f"{d}: absent, nothing to verify")
+                n, fp = validate(d, p["per_split"], p["prompts"], p["per_prompt"])
+                computed[name][split] = fp
+                rec = (((prior or {}).get("pools") or {}).get(name) or {}).get("fingerprints") or {}
+                was = rec.get(split)
+                if was is None:
+                    tag = ("no fingerprint recorded -> RECORDING" if a.backfill_fingerprints
+                           else "NO FINGERPRINT RECORDED (manifest predates REPAIR v2)")
+                    missing += 0 if a.backfill_fingerprints else 1
+                elif was == fp:
+                    tag = "fingerprint MATCHES manifest"
+                else:
+                    tag = f"fingerprint DRIFT: manifest={was[:16]}"
+                    drift += 1
+                print(f"  {name}/{split}: n={n} prompts={len(p['prompts'])} "
+                      f"per_prompt={p['per_prompt']} sha={fp[:16]} -- {tag}", flush=True)
+        print(f"[r2pools] CLAIM SCOPE: {scheme['claim']}", flush=True)
+        if drift:
+            die(f"{drift} split(s) no longer match the recorded fingerprint; the bytes on disk "
+                f"are not the bytes the manifest describes")
+        if a.backfill_fingerprints:
+            # Update ONLY the fingerprints field of each pool; everything else is left verbatim.
+            for name, fps in computed.items():
+                prior.setdefault("pools", {}).setdefault(name, {})["fingerprints"] = fps
+            prior["fingerprints_backfilled_by"] = "scripts/r2_build_meta_pools.py " \
+                                                  "--backfill-fingerprints"
+            mp = os.path.join(a.root, "pools.json")
+            with open(mp, "w") as f:
+                json.dump(prior, f, indent=1)
+            print(f"[r2pools] recorded fingerprints for {sum(len(v) for v in computed.values())} "
+                  f"split(s) -> {mp}", flush=True)
+            sys.exit(0)
+        # A fingerprint that is never recorded is a check that can never bind, so a MISSING
+        # fingerprint is an ERROR by default -- not a tolerated note.
+        if missing and not a.allow_missing_fingerprints:
+            die(f"{missing} split(s) carry no recorded fingerprint, so the drift check cannot "
+                f"bind and these pools are NOT provably the ones any earlier run used. Run "
+                f"`--backfill-fingerprints` (validates and records, no GPU, no regeneration), or "
+                f"pass --allow-missing-fingerprints to inspect without binding.")
+        if missing:
+            print(f"[r2pools] WARNING: {missing} split(s) unfingerprinted and the check is "
+                  f"NOT BINDING (--allow-missing-fingerprints)", flush=True)
+        print("[r2pools] verify-only: OK", flush=True)
+        sys.exit(0)
+
     todo = []
     for name, p in plan.items():
         for split in ("train", "test"):
@@ -206,7 +405,7 @@ if __name__ == "__main__":
             if os.path.isfile(os.path.join(d, "metadata.jsonl")):
                 if not a.resume:
                     die(f"{d} already exists; pass --resume to keep it or remove it first")
-                validate(d, p["per_split"])
+                validate(d, p["per_split"], p["prompts"], p["per_prompt"])
                 print(f"  {name}/{split} exists and validates, keeping", flush=True)
                 continue
             todo.append((name, split, d, p))
@@ -215,6 +414,7 @@ if __name__ == "__main__":
         "script": "scripts/r2_build_meta_pools.py",
         "root": os.path.abspath(a.root),
         "pool_scheme": a.pool_scheme,
+        "historical_reconstruction_ack": bool(a.historical_reconstruction),
         "scheme_claim": scheme["claim"],
         "forget_side_pools": scheme["forget_side"],
         "sizing": sizing,
@@ -245,17 +445,19 @@ if __name__ == "__main__":
                 data += got
                 rejects += rej
             save(data, d)
-            n = validate(d, p["per_split"])
+            n, _ = validate(d, p["per_split"], p["prompts"], p["per_prompt"])
             print(f"  {name}/{split}: {n} images, {rejects} blank rejected, from {p['prompts']}",
                   flush=True)
 
     for name, p in plan.items():
-        counts = {}
+        counts, fps = {}, {}
         for split in ("train", "test"):
-            counts[split] = validate(os.path.join(a.root, name, split), p["per_split"])
+            counts[split], fps[split] = validate(os.path.join(a.root, name, split),
+                                                 p["per_split"], p["prompts"], p["per_prompt"])
         manifest["pools"][name] = {
             "prompts": p["prompts"], "per_prompt": p["per_prompt"],
             "counts": counts,
+            "fingerprints": fps,
             "scored_as": "forget" if name in scheme["forget_side"] else "retain",
             "consumed_by_trainer": name in ("hrm", "irt", "tgt"),
         }

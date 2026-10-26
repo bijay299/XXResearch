@@ -188,8 +188,26 @@ def audit():
                             "repeatedly chosen while watching H, so H is a DEVELOPMENT set. It is "
                             "NOT relabelled untouched; every historical number stands as a "
                             "development measurement."},
-            "FINAL": {"n": len(final), "status": "FROZEN_UNINSPECTED",
+            # STATUS CORRECTED 2026-10-26 (audit). This read "FROZEN_UNINSPECTED", which became
+            # FALSE the moment FINDING65 and FINDING66 scored and interpreted these prompts. The
+            # literal was additionally protected by a PASSING test
+            # (test_audit_repairs.py::t_dev_is_labelled_as_used), so the false claim was enforced
+            # rather than merely stale -- the test and the literal had to move together, which is
+            # why neither could be fixed in isolation.
+            "FINAL": {"n": len(final), "status": "INSPECTED_DEVELOPMENT_DATA",
                       "frozen_at": FINAL_FROZEN_AT, "note": FINAL_FREEZE_NOTE,
+                      "inspected_at": "2026-10-26",
+                      "inspected_by": ["FINDING65", "FINDING66"],
+                      "status_note":
+                          "Frozen 2026-10-25T23:30 and verified disjoint by computation, then "
+                          "SCORED AND INTERPRETED by FINDING65/FINDING66. It is development data "
+                          "from here on and must not be described as untouched or held out. A "
+                          "fresh final set must be frozen before any new configuration is selected "
+                          "against it. Separately, every FINAL number produced so far was scored "
+                          "with inconsistent label text (audit defect D-022); the effect on scores "
+                          "and conclusions is unresolved pending corrected evaluation, and six of "
+                          "the twelve records can never be re-scored because their attacked "
+                          "checkpoints were deleted (D-022b).",
                       "prompts": FINAL_PROMPTS},
             "EVAL_UTILITY": {"n": len(eval_util), "status": "UTILITY_PANEL"},
         },

@@ -7,20 +7,33 @@
 > **Added 2026-10-26 by the provenance audit. The generated rows below were NOT edited; only this
 > banner and the change log at the end were added.**
 >
-> `outputs/registry_v1.json` was generated at **2026-10-26 05:11:25**. Since then **150 JSON files**
-> have landed under `outputs/`, including **112 attack records** and **≥11 new defence builds**:
+> `outputs/registry_v1.json` was generated at **2026-10-26 05:11:25**. Since then about **150 JSON
+> files** have landed under `outputs/`, including **112 attack records** and **≥11 new defence
+> builds**. Stated as coverage rather than as a delta:
 >
-> | | registry (05:11) | actual on disk (12:45) |
-> |---|---:|---:|
-> | JSON files under `outputs/` | 1,278 | **1,424** |
-> | attack records (`atk_*.json`) | 696 | **808** |
-> | defence builds | 335 | **≥346** |
+> | | registry (05:11) | actual on disk (12:45) | registry coverage |
+> |---|---:|---:|---|
+> | JSON files under `outputs/` | 1,278 | **1,424** | 1,278 of 1,424 — **146 absent** |
+> | attack records (`atk_*.json`) | 696 | **808** | **696 of 808 — 112 absent** |
+> | defence builds | 335 | **≥346** | 335 of ≥346 — **≥11 absent** |
 >
-> The missing attack records are `E12` (24), `E2G` (18), `E4MG` (12), `E2H` (12), `E11J` (9),
-> `E11M` (9), `E11K`/`E11L`/`E11N` (6 each), `E11H` (5), `E11I` (3), `E11O` (2). The missing builds
-> include `meta2_church_lt{0.5,1.0}`, eight `utrap2*` arms and `REF_imma_vangogh` — so **the arms
-> behind `FINDING71`–`FINDING78` are absent from every table below**, including E2's
-> `meta2_church_lt0.5`, which is the project's closest approach to the mandate.
+> The absent attack records are `E12` (24), `E2G` (18), `E4MG` (12), `E2H` (12), `E11J` (9),
+> `E11M` (9), `E11K`/`E11L`/`E11N` (6 each), `E11H` (5), `E11I` (3), `E11O` (2).
+>
+> **Which findings' arms are absent.** The absent builds include `meta2_church_lt{0.5,1.0}`, eight
+> `utrap2*` arms and `REF_imma_vangogh`, so **no table below contains any arm behind
+> `FINDING71`–`FINDING78`**. Specifically absent:
+>
+> | finding | arms absent from these tables |
+> |---|---|
+> | `FINDING71` (damage generalises) | the lr-sweep attack records (`E11*`, `E12`) the n=229 corpus statistic is computed over |
+> | `FINDING72` (matched lr; gate bias) | `E11*`/`E12` matched-lr cells; the n=520 gate sample |
+> | `FINDING73` (cost correction beyond church) | the `garbage_truck`/`tench` budget cells (`E11J`–`E11O`) |
+> | `FINDING74` (no family buys >100 steps) | derived by registry query over 36 church arms **at the 05:11 snapshot**; its inputs are present, its conclusion is not tabulated here |
+> | `FINDING75` / `FINDING77` (UCE port numerics) | `r4b`/`r4c`/`r4d` are **not attack records** and appear in no table below |
+> | `FINDING76` (unroll depth) | all eight `utrap2*` builds and the `E4MG` (12) attack records |
+> | `FINDING78` (full Eq. 8 Meta) | `meta2_church_lt{0.5,1.0}` and the `E2G` (18) + `E2H` (12) records — **including the project's closest approach to the mandate** |
+> | `FINDING65` / `FINDING66` (FINAL prompts) | the 18 `final_*.json` records — and those are **separately unusable** pending corrected evaluation (`D-022`) |
 >
 > **So "every number below is computed from the raw records" is true of the registry and false of
 > the repository.** These tables remain correct as a snapshot of 05:11 and are the authority for
@@ -48,8 +61,18 @@
 >   gate's exclusion rate is non-monotone in `T_before` (n = 520), so max-over-valid is computed
 >   over a sample whose filtering correlates with how well-erased the arm is.
 > - **Base utility is 1.000 on all twelve DEV concepts**, independently confirmed from both
->   `gen_base_sd14.json` and `gen_E6cal_BASE_sd14_on_DEV.json`. That is the control denominator, and
->   it confirms the closed-set scorer is sound.
+>   `gen_base_sd14.json` and `gen_E6cal_BASE_sd14_on_DEV.json`. That is the control denominator. It
+>   establishes that the scorer behaves correctly on **undamaged base outputs**; it does **not**
+>   establish its validity on damaged or unusual outputs, where a closed-set 12-way argmax with no
+>   reject option can score a degraded model as perfectly generating one surviving label (`D-030`).
+> - **Several `max H (valid)` and utility figures below come from arms whose closed-set panel
+>   collapsed.** "Retain accuracy collapsed to N/120 under the closed-set scorer" is what those rows
+>   support; "the model is destroyed" is not, and no saved images or independent quality assessment
+>   exist for any of them (`D-030`, `D-034`).
+> - **Thirty duplicate `(arm, seed, lr, steps)` cells in the underlying records disagree by up to
+>   8/15 images, with no code-version field** (`D-025`). Any row below that aggregates over duplicate
+>   cells inherits an **unresolved** discrepancy. The registry's `attack_records_quarantined: 0` is
+>   **vacuously zero**, not a verified absence of quarantine.
 
 ## 0. Record counts, with admissibility separated
 
@@ -584,7 +607,9 @@ attack_records_total is a count of FILES, not of admissible independent experime
 ## 3. Excluded records, named
 
 
-**quarantined** (0): none
+**quarantined** (0): none — **this zero is vacuous.** The generator had no quarantine input to read,
+so it records an absence of flags rather than a verified absence of quarantined records (`D-025`). The
+live quarantine list is in `AUDIT_REPAIR_REGISTER_v1.md` §4 and is **not** empty.
 
 **vacuous_no_erasure** (9): `H81_gift_church_b0.1_sd0_lr1e-4`, `H81_gift_church_b0.1_sd0_lr1e-5`, `H81_gift_church_b0.1_sd0_lr5e-5`, `H81_gift_church_b0.1_sd1_lr1e-5`, `H81_gift_church_b0.1_sd1_lr5e-5`, `H81_gift_church_b0.1_sd6_lr1e-5`, `H89L_uce_sd15_church_lam50000_sd0_lr1e-5`, `H89L_uce_sd15_church_lam50000_sd1_lr1e-5`, `H89L_uce_sd15_church_lam50000_sd6_lr1e-5`
 
@@ -604,6 +629,9 @@ generated content:
 | **A `⚠ STALE` banner at the top**, quantifying the registry/repository gap and listing the missing records and builds | the header asserted "every number below is computed from the raw records". That is true of `outputs/registry_v1.json` and **false of `outputs/`**, which has gained 150 JSON files since the registry was built — including every arm behind `FINDING71`–`FINDING78`. A reader citing these tables as a current inventory would be wrong, and `T2I_REPORT_r5.md` §2 had already transcribed the stale counts into prose |
 | **A provenance-limits subsection** in that banner | §2's six `—/—/—` rows looked like missing data; they are actually records whose scored checkpoint was never identified (`unet: null`, `target: null`), five of which scored an edited model. §1's two `h63_*_a0.3` rows are the one place numbers *are* attributed to such a build. Neither fact was documented, and neither is visible from the rows themselves |
 | **This change log** | so the additions are attributable and so a regeneration run knows exactly what to drop |
+| **Second pass, 2026-10-26 (documentation reconciliation):** the staleness block restated as **coverage** (696 of 808 attack records; 112 absent) with a per-finding table of which arms are absent | "stale by 150 files" told a reader the size of the gap but not what they would fail to find. The per-finding table does |
+| **Same pass:** "the control denominator … confirms the closed-set scorer is sound" **qualified** | base accuracy 1.000 shows the scorer is correct on **undamaged** outputs only. It is not evidence about damaged or unusual outputs, which is exactly where the collapsed-retain rows live (`D-030`) |
+| **Same pass:** two open items added to the provenance limits — the **30 disagreeing duplicate cells** with no code-version field (`D-025`), and the vacuity of `attack_records_quarantined: 0` | both are properties of the underlying records that no row below discloses, and neither is resolved |
 
 ### What was verified and found correct
 

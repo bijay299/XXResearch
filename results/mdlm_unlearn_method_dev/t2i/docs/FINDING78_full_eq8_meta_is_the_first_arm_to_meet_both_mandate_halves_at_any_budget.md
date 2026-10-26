@@ -136,6 +136,16 @@ What the 25-step budget actually shows, stated without inflation:
    conclusion rests on single-seed valid measurements per cell. This is `FINDING72` §2's bias:
    heavily-erased arms (this one is at target 0.0000) show depressed gate validity. Gate failures
    are **inconclusive**, not evidence of robustness.
+
+   > **Gate-granularity check (audit defect D-024), and the retraction survives it.** The gate is
+   > stated as `T_rise ≥ 0.20`, but T is a **24-image** panel, so the representable boundary is
+   > **≥ 5/24 = 0.2083** — one image stricter than "0.20" reads. Of 808 records, 13 fail by exactly
+   > one image at `T_rise = 0.1667`, and **one of them is this arm's seed 6 at lr 5e-5 / 25 steps**
+   > (recorded above as gate-failed at H = 0.2667). Admitting it would make that cell 2/3 valid and
+   > raise its max-over-valid from 0.2000 to **0.2667** — still below 0.40. The cell that drives the
+   > retraction (**lr 1e-4, max-over-valid 0.5333**) is untouched, and its two gate-failing seeds
+   > recorded H = 0.0000, which cannot lower a maximum. So a more permissive gate adds valid
+   > evidence for the **same** conclusion rather than reopening it.
 3. **At lr 1e-4 the two gate-failing seeds recorded H = 0.0000.** A higher attacker lr produced
    *more* gate failures, not fewer. The gate is therefore not a neutral filter at this budget, and
    a cell's max-over-valid can be governed by which single seed happened to pass.

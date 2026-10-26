@@ -45,9 +45,24 @@ rg_init() {
 }
 
 # Run a command; on non-zero exit, record it and continue.
+#
+# ERREXIT NOTE (found while repairing gpu_reserve.sh, 2026-10-26). Real runners use
+# `set -euo pipefail`. Without the shield below, `"$@" >>"$RG_LOG" 2>&1` is itself the failing
+# command, so errexit killed the runner BEFORE `local rc=$?` ran -- the FAIL line was never
+# written and the header's promise that rg_step "records a failure and KEEPS GOING" was false
+# under exactly the option set the runners use. The shield guarantees the recording happens.
+# rg_step still RETURNS the command's rc, so a caller under set -e that wants to continue must
+# write `rg_step ... || true` (or use rg_cell, below). rg_finish is what refuses to say DONE.
 rg_step() {
+  local _rg_had_e=0 _rg_had_pf=0
+  case $- in *e*) _rg_had_e=1 ;; esac
+  if shopt -qo pipefail 2>/dev/null; then _rg_had_pf=1; fi
+  set +e
+  set +o pipefail 2>/dev/null || true
   "$@" >>"$RG_LOG" 2>&1
   local rc=$?
+  if [ "$_rg_had_pf" = 1 ]; then set -o pipefail 2>/dev/null || true; fi
+  if [ "$_rg_had_e" = 1 ]; then set -e; fi
   if [ "$rc" -ne 0 ]; then
     RG_FAILS=$((RG_FAILS + 1))
     RG_FAIL_LIST="${RG_FAIL_LIST}
@@ -55,6 +70,13 @@ rg_step() {
     echo "FAIL rc=$rc :: $*" >>"$RG_LOG"
   fi
   return "$rc"
+}
+
+# Grid-safe variant: records the failure and ALWAYS returns 0, so one bad cell cannot truncate a
+# grid even when the runner uses `set -e`. rg_finish still refuses to write DONE.
+rg_cell() {
+  rg_step "$@" || true
+  return 0
 }
 
 # Assert an artifact the cell was supposed to produce. Catches "exit 0 but wrote nothing",
@@ -68,6 +90,34 @@ rg_require_file() {
     echo "FAIL missing-or-empty artifact :: $f" >>"$RG_LOG"
     return 1
   fi
+  return 0
+}
+
+# Like rg_require_file, but takes a GLOB and requires at least one NON-EMPTY match.
+#
+# WHY THIS EXISTS. Several runners cannot predict their artifact's exact filename, because the
+# python side formats it. scripts/r4b_uce_upstream_vs_port.py builds
+# `outputs/r4b_uce_lamb{a.lamb}.json` where a.lamb is a FLOAT, so the shell loop value `1000`
+# becomes the file `r4b_uce_lamb1000.0.json`. A hard-coded rg_require_file would have reported
+# INCOMPLETE on a cell that actually succeeded -- a guard that cries wolf gets switched off, which
+# is how guards die. r4c/r4d are worse: their config tag changed shape between versions
+# (`r4c_uce_lamb0.5.json` then `r4c_uce_church_lam0.5_es1.0_ps1.0.json`), so only a glob is stable.
+#
+# A glob that matches nothing is still a FAILURE. That is the safe direction: if the artifact name
+# drifts again the runner says INCOMPLETE rather than DONE, and someone looks.
+rg_require_glob() {
+  local pat="${1:?rg_require_glob <glob>}" f hit=0
+  for f in $pat; do
+    [ -s "$f" ] && hit=1 && break
+  done
+  if [ "$hit" = 0 ]; then
+    RG_FAILS=$((RG_FAILS + 1))
+    RG_FAIL_LIST="${RG_FAIL_LIST}
+  no-match-or-empty  $pat"
+    echo "FAIL no non-empty artifact matches :: $pat" >>"$RG_LOG"
+    return 1
+  fi
+  echo "ok artifact :: $f" >>"$RG_LOG"
   return 0
 }
 

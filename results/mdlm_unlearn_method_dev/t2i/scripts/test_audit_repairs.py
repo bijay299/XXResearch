@@ -388,7 +388,19 @@ def t_dev_is_labelled_as_used():
     sr = mod("split_registry")
     rep = sr.audit()
     assert rep["splits"]["DEV"]["status"] == "USED_FOR_SELECTION", rep["splits"]["DEV"]
-    assert rep["splits"]["FINAL"]["status"] == "FROZEN_UNINSPECTED", rep["splits"]["FINAL"]
+    # CORRECTED 2026-10-26 (audit). This previously asserted FINAL == "FROZEN_UNINSPECTED".
+    # That assertion became FALSE when FINDING65/FINDING66 scored and interpreted the FINAL
+    # prompts, and because the test PASSED it actively enforced the false claim: any attempt to
+    # correct split_registry.py alone would have been reported as a regression. The test and the
+    # literal are therefore corrected together. FINAL is inspected development data.
+    assert rep["splits"]["FINAL"]["status"] == "INSPECTED_DEVELOPMENT_DATA", rep["splits"]["FINAL"]
+    assert rep["splits"]["FINAL"]["inspected_by"] == ["FINDING65", "FINDING66"], \
+        rep["splits"]["FINAL"]
+    # Guard against the claim coming back: nothing in the record may call FINAL untouched/held-out.
+    blob = json.dumps(rep["splits"]["FINAL"]).lower()
+    for banned in ("uninspected", "untouched", "held out", "held-out"):
+        assert banned not in blob.replace("must not be described as untouched or held out", ""), \
+            f"FINAL record reasserts {banned!r}: {rep['splits']['FINAL']}"
 
 
 if __name__ == "__main__":

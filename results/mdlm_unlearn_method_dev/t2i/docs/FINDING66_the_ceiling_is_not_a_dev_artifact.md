@@ -1,27 +1,67 @@
-# FINDING 66 — The H = 1.000 ceiling is **not** a DEV artifact. On prompts never used for anything, the attack restores the target to **15/15** — and on SD-1.4 that is **more reliable than the unmodified base model**, which scores 13/15.
+# FINDING 66 — [WITHDRAWN / NOT RE-VERIFIABLE] Post-attack FINAL recovery, scored with inconsistent label text on checkpoints that no longer exist
 
-> # ⚠ Scored with the wrong label set. Audit defect D-022, 2026-10-26.
+> **Former title, preserved for the record:** *"The H = 1.000 ceiling is **not** a DEV artifact. On
+> prompts never used for anything, the attack restores the target to 15/15 — and on SD-1.4 that is
+> more reliable than the unmodified base model, which scores 13/15."*
+>
+> **Retitled 2026-10-26.** The old title asserted the "more reliable than the unmodified base model"
+> claim that this document's own notice below **withdraws** — a banner under an asserting title is
+> precisely the pattern the audit was told not to use, and I had left it in place. It also described
+> the FINAL prompts as "never used for anything", which stopped being true the moment this document
+> scored them. Both are fixed in the title rather than only in a notice.
+
+> # ⚠ Scored with inconsistent label text. Audit defect D-022, 2026-10-26.
+>
+> **The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved
+> pending corrected evaluation.**
 >
 > Every FINAL number here came from `gen_eval_final.py:84`, which prompted CLIP with `LAB_KEY`
-> (`"a photo of a van_gogh"`, `"a photo of a english_springer"`) instead of `LABELS`. Nine of the
-> twelve labels differ; `church` is **not** one of them, so the target's text was correct while the
-> nine competing distractors were degraded — which biases `target_hits` **upward**.
+> (`"a photo of a van_gogh"`, `"a photo of a english_springer"`) instead of `LABELS`. **Nine of the
+> twelve strings differ**; `church`, `parachute` and `tench` are identical.
 >
-> **This document is less confounded than `FINDING65`, and the distinction matters.** Its central
-> comparison — attacked arms against the base anchor — puts **both sides through the same scorer**,
-> so the *comparison* is internally consistent in a way FINDING65's cross-scorer DEV-vs-FINAL ratios
-> are not. The qualitative conclusion, that the ceiling is not a DEV artifact, is the more robust
-> for it: 15/15 means every image was called church, and strengthening the distractors can only
-> lower that, never raise it.
+> **One structural difference from `FINDING65` that is worth keeping:** this document's central
+> comparison — attacked arms against the base anchor — runs **both sides through the same scorer**,
+> whereas FINDING65's ratios compare a `LABELS`-scored DEV number against a `LAB_KEY`-scored FINAL
+> one. So the two documents are affected differently. That is a statement about the comparison's
+> *structure*, not a claim that this document's conclusion holds: a single scorer applied
+> consistently can still be the wrong scorer, and the same label text sits on both sides of a
+> comparison that may be distorted in either direction.
 >
-> **What does not stand:** the absolute figures. The base anchor's **13/15** is 13 church plus
-> **2 images that went to degraded labels** (`english_springer`, `golf_ball`) at a median margin of
-> **0.0189**; the attacked arms' 15/15 is an upper bound under a scorer with weakened competitors.
-> So "more reliable than the unmodified base model" rests on a 2-image gap measured with
-> systematically weakened distractors, and must not be quoted until re-scored.
+> **What must NOT be asserted** (an earlier version of this notice asserted it, and was wrong):
+> that degrading the distractors necessarily weakens them and so biases `target_hits` upward; that
+> 15/15 is therefore an *upper* bound that "can only fall"; or that the qualitative conclusion is
+> "the more robust for it". The sign of each label's embedding change is unmeasured, so neither the
+> direction nor the size of the effect on 15/15 or on the base anchor's 13/15 is known.
 >
-> Re-score queued as gate condition **G12** — the 180 images regenerate deterministically at the
-> same seeds, so it is a pure re-score, not a second use of the FINAL split.
+> **Observations of record, carrying no directional claim:** the base anchor's 13/15 comprises 13
+> church plus 2 images assigned differing labels (`english_springer`, `golf_ball`) at a median
+> margin of 0.0189. The "more reliable than the unmodified base model" sub-claim rests on a
+> **2-image gap**, which is within the sensitivity the label text introduces, and is **withdrawn
+> pending measurement** on that ground alone.
+>
+> Queued as gate condition **G12**, as **regeneration plus corrected scoring** — not a pure
+> re-score, and not byte-identical merely because seeds match. It is a corrective re-evaluation of
+> an already-inspected split, not fresh held-out confirmation.
+>
+> ### ⚠ And for this document specifically, the correction **cannot be completed** (D-022b)
+>
+> Verified 2026-10-26: the attacked checkpoints behind every `ATK_*` record — `attacked/E6B_*`,
+> `attacked/E6C_*`, `attacked/E6D_*` — are **absent from disk**. Only eight unrelated `KEEP_*`
+> directories survive in `attacked/`. Of the twelve FINAL records, only the four defence arms and
+> the two base anchors can be regenerated; **the six post-attack arms cannot**.
+>
+> **The attacked side of this document's central comparison is unrecoverable.** Re-running the
+> attack would yield a *different* checkpoint — relearning is stochastic — so it would be a **fresh
+> analogue, not a reproduction** of these records. The post-attack 15/15 figures are therefore
+> **permanently unverifiable under a corrected scorer**. That is a terminal state, not a pending
+> one: no rerun of these arms can close it.
+>
+> What remains possible is a **new, properly instrumented post-attack FINAL experiment**, which
+> could address the underlying question — is the H = 1.000 ceiling a DEV artifact? — without
+> validating the numbers in this document. Until such an experiment exists, this document's
+> conclusion should be read as **unverified and not re-verifiable**, and its figures should not be
+> cited. Cause of the loss: the transient-checkpoint cleanup recorded as audit defects D-005/D-028,
+> which did not distinguish throwaway artifacts from ones underwriting a published finding.
 
 **Date:** 2026-10-26 · **Experiment:** E6b
 **Adversary:** `attack_relearn.py` **unmodified** — bit-identical to all 642 historical attack
@@ -138,8 +178,27 @@ for exactly that reason:
 | **6** | T 0.625→1.000 | 1.000 | **1.0000** (15/15) |
 
 **max-over-valid FINAL recovery = 1.0000.** The 14/15 was one seed's variance, not a property of the
-arm. So there is now **no sub-ceiling number anywhere in the FINAL measurements**: all four arms,
-both architectures, reach 15/15 on prompts used for nothing.
+arm.
+
+> **CORRECTION 2026-10-26 (independent review).** The sentence that followed — *"there is now no
+> sub-ceiling number anywhere in the FINAL measurements: all four arms, both architectures, reach
+> 15/15 on prompts used for nothing"* — is **false**, and is withdrawn. Six sub-ceiling FINAL records
+> are on disk right now:
+>
+> | record | hits |
+> |---|---:|
+> | `final_ATK_uce_sd15_church_lam1000.json` | **14/15** |
+> | `final_BASE_sd14_anchor.json` | 13/15 |
+> | `final_uce_sd15_church_lam1000.json` | 9/15 |
+> | `final_frp_church_r3_l05.json` | 7/15 |
+> | `final_utrap_sd15_church_l0.15k8.json` | 2/15 |
+> | `final_utrap_church_l0.15k8.json` | 1/15 |
+>
+> What is true is the narrower statement that **max-over-valid across the post-attack seeds is
+> 1.0000**. That is a statement about a maximum over a set, not about the absence of sub-ceiling
+> measurements — and the 14/15 record it is explaining away still exists. "Prompts used for nothing"
+> is also wrong: these prompts were used by this document. The ratchet reasoning in the next
+> paragraph stands; the overreach above it does not.
 
 This is the ratchet behaving as designed rather than a new result — adding attacks cannot lower a
 maximum, which is why §5 called the 14/15 provisional instead of reporting it as partial robustness.

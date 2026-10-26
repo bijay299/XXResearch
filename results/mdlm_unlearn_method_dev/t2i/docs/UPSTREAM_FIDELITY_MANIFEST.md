@@ -1,5 +1,7 @@
 # Upstream source & fidelity manifest — official reference implementations
 
+> **Status pointer:** for the **one current verdict per issue**, read `STATUS_CURRENT_v2.md`. `AUDIT_REPAIR_REGISTER_v1.md` is chronological and records hypotheses that were later refuted — two of them ("IMMA composition unproven", "upstream UCE may have written an unedited model") are **refuted** and must not be quoted as live.
+
 > **⚠ Corrections 2026-10-26:** `FINDING76` §3's probe mechanism check is **overstated** (n=7/3/1, within-arm spread 40×, ordering undetermined — see its §7). `FINDING77` §2's "B kills the accumulation-order hypothesis" is **wrong** — B holds accumulation order fixed and never varied it (see its §6).
 
 
@@ -247,23 +249,51 @@ it does not:
 below A at every λ. That is a measured confirmation of §7(d) below, which was read from source
 independently.
 
-**No port-fidelity conclusion is drawn from R4 yet.** At λ=0.1 the **upstream** arm scores target
-**15/15** (`r4c` `generations`: BASE 15/15, UPSTREAM 15/15, OUR_PORT 0/15), which is consistent with
-upstream's edit having been **inert** in that run — in which case the comparison measures nothing
-about fidelity. That is under verification. **R4's status is "executed; interpretation under
-verification."**
+**The "upstream UCE may have written an unedited model" explanation is REFUTED.** At λ=0.1 the
+**upstream** arm scores target **15/15** (`r4c` `generations`: BASE 15/15, UPSTREAM 15/15,
+OUR_PORT 0/15), and an earlier revision read that as consistent with upstream's edit having been
+**inert**. Measured against the pinned base across all **32** `attn2` K/V matrices, it was not:
+
+| checkpoint | vs BASE max | vs BASE mean | bitwise identical to base |
+|---|---:|---:|---:|
+| `upstream_church_lamb0.1` | 9.7948e-02 | **5.3620e-02** | **0 / 32** |
+| `upstream_church_lamb0.5` | 9.7899e-02 | **5.3593e-02** | **0 / 32** |
+
+Upstream changed **every** matrix — **5.36 % mean / 9.79 % max** of weight norm, **0 of 32** identical
+to base — and cross-attention K/V **output** for `"a photo of a church"` moves **43.4 %** (against
+58.7 % for our port). **No "upstream" number in R4b/R4c/R4d measures the base model.** A **1.35×**
+activation-space gap separates 15/15 from 0/15 in CLIP label, so **behaviour is not proportional to
+the numerical gap**, which limits every weight-norm-based behavioural inference in `FINDING75` and
+`FINDING77`.
+
+**What is still open is narrower.** `erase_scale` 1→10 is inert to four digits (0.0536 → 0.0536), as
+are `lamb` and the guide string (`''` ≡ `' '`); the one effective lever is `expand_prompts=true`
+(6 erase prompts), which raises dW/W to **0.0925**. So the live invocation question is whether
+upstream should have been given an **expanded erase-prompt set**, not whether it wrote anything.
+Independently, the **port** side of R4c-vs-R4d is confounded — the port checkpoint was cached on an
+incomplete key, so R4d re-used R4c's 10-preserve build and its recorded `"n_preserve": 0` is false for
+that arm (`D-026`) — and R4d **overwrote** R4c's upstream checkpoint, so R4c is no longer reproducible
+from disk (`D-031`). **R4d is a required re-run.** R4's status is therefore **"executed; upstream's
+edit confirmed real; port-side comparison confounded pending a re-run."**
 
 Note also that `FINDING77` §2's claim that column B "kills the accumulation-order hypothesis" is
 **wrong** (its §6): B holds accumulation order **fixed** — it uses upstream's order (`mat1 = lamb*W`
 first) on both sides, whereas `erase_uce.py:116-117` puts `lam*W` last — so accumulation order was
 never varied and remains **unmeasured**.
 
-Until the inertness check returns, our UCE numbers remain a **project reimplementation** on their
-prior grounds (§7(d)'s source-level selection mismatch), **not** on R4's numbers.
+Our UCE numbers remain a **project reimplementation** on their prior grounds (§7(d)'s source-level
+selection mismatch), **not** on R4's numbers. Note also `D-034`: our port's 0/15 **scatters across
+five different classes at 4× the edit size**, and **no retain axis was measured in R4c or R4d at
+all**, so "our port erases and upstream does not" does **not** establish that our port erases *well*
+— it is equally consistent with broad damage. No superiority claim may rest on R4 without a utility
+panel.
 
-Known from our side: λ is measured inert below ~1e3 because `cᵀc` has max eigenvalue 85,850
-(`ERRATUM_uce_lambda_scale.md` — **single-sourced to that document; no artifact under `outputs/`
-recomputes it**); λ=1000 is the first usable SD-1.5 setting.
+Known from our side: λ is measured inert below ~1e3 because `cᵀc` is ill-conditioned. **Measured
+(`D-033`):** max eigenvalue **3.2420e+05** for our port's 826-row system (rank 136 in 768 dims) and
+**2.2171e+03** for upstream's 11-row system. The **85,850** figure previously carried here traces only
+to `ERRATUM_uce_lambda_scale.md` and was never measured; the measurement is **3.8× larger**, so the
+erratum's qualitative point is **strengthened**, not weakened. λ=1000 is the first usable SD-1.5
+setting.
 
 ---
 
@@ -368,11 +398,16 @@ attacks reported with gate outcomes and **both gated and ungated** scores; per-s
 denominators shown; bounded intermediate budgets (25/100) alongside the 300-step endpoint.
 
 **Final-prompt discipline.** The existing FINAL set **has been inspected, and its scores carry a
-defect** (`D-022`): `gen_eval_final.py` prompted CLIP with `gen_eval.LAB_KEY` rather than `LABELS`,
-degrading nine of twelve distractor strings while leaving `church` — the erased target in every E6
-arm — correct, which biases target hits **upward**. `FINDING65`'s depth figures are **unmeasured
-pending re-score**; `FINDING66`'s ceiling conclusion survives (within-scorer comparison). **R1–R4
-are unaffected** — they are scored by `gen_eval.py`, which uses `LABELS` correctly. The set is
+defect** (`D-022`): `gen_eval_final.py` prompted CLIP with `gen_eval.LAB_KEY` (`:50`) rather than
+`LABELS` (`:48`). **Nine of the twelve label strings differ; `church`, `parachute` and `tench` are
+spelled identically.** **The evaluator used inconsistent label text. The effect on scores and
+conclusions is unresolved pending corrected evaluation** — for `FINDING65`'s depth figures and
+`FINDING66`'s ceiling conclusion alike; neither the direction nor the size of the embedding effect is
+established. **R1–R4 were scored through `gen_eval.py`'s `LABELS` path**, so no R-cell number was
+scored with the inconsistent text. *(`r4c`/`r4d` are a separate case: they scored with
+`list(ge.CONCEPTS)`, whose keys equal `LAB_KEY` — `D-006` — so their target accuracies are not
+comparable to any other H number in this project, and the same unresolved-effect statement applies to
+them.)* The set is
 consumed regardless (`FINDING65`, `FINDING66`)
 and is therefore **development data from here on**. It will **not** be reused for tuning and then
 described as untouched. A **fresh** final set must be frozen before any new configuration is selected
@@ -388,15 +423,38 @@ Verified from artifacts and mtimes:
 | **R1** | ✅ **RAN.** ESD checkpoint downloaded (`upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt`, 3,438,307,109 B, 11:36); 100 training images generated (11:39–11:43); `defend_text_to_image_lora.py` trained **5000/5000** (11:59→12:21), saving `REF_imma_vangogh/imma_unet_xatten_layer.pt`; eval composed base+ESD+IMMA (`overlaid 160/160 IMMA tensors`) and scored it (12:39→12:44). **The 3 attack seeds were never run.** | `logs/r1b_imma_train.log`, `logs/r1c_eval.log`, `outputs/gen_REF_imma_vangogh.json` |
 | **R2** | ⏸ **PARTIAL.** Three pools built 12:39→12:47 (`[r2pools] done`), 30 train + 30 test each. A first attempt failed `rc=1` — `ModuleNotFoundError: No module named 'pandas'` at `r2_build_meta_pools.py:9` (12:21). **`src/meta.py` has never been invoked.** | `logs/r2_meta.log`, `upstream_runs/meta/dataset/{hrm,irt,tgt}/{train,test}` |
 | **R3** | ❌ **NOT STARTED.** No `logs/r3*`, no `outputs/r3_*`. | — |
-| **R4** | ✅ **EXECUTED, four phases; interpretation under verification.** See §4. | `outputs/r4{,b,c,d}_uce_*.json` |
+| **R4** | ✅ **EXECUTED, four phases. Upstream's edit confirmed real; the port-side comparison is confounded and R4d is a required re-run** (`D-026`, `D-031`). See §4. | `outputs/r4{,b,c,d}_uce_*.json` |
 
 **R1's recorded outcome, with interpretation withheld.** `outputs/gen_REF_imma_vangogh.json`: target
 (`van_gogh`) **0.8667**, all-non-target **0.0424** (n=11), legacy_retain8 **0.0333** (n=8); eleven of
-twelve concepts score ≤ 0.20. Three explanations are open — IMMA behaving as designed (it
-*immunises* against relearning rather than erasing, and here sits atop an ESD-erased UNet), an
-artifact of `r1c_eval`'s tensor composition, or a genuine failure — and **the attack seeds that
-would discriminate between them were never run.** This manifest asserts none of the three, and
-**no conclusion about IMMA-the-published-method follows from this cell**, in either direction.
+twelve concepts score ≤ 0.20.
+
+**The "checkpoint composition unproven" explanation is REFUTED. The composition is valid.**
+Replicating `r1_eval_imma.py`'s matching loop offline gives **exact=160, fuzzy=0, reshaped=0,
+skipped=0**. Auditing `adapters/REF_imma_vangogh/unet.pt`: **160/160** IMMA tensors byte-equal to
+`half(IMMA)`, **526/526** others byte-equal to `half(ESD)`, 0 unexplained, 0 non-finite, exactly 160
+tensors differing from ESD (80 `attn1` + 80 `attn2`, IMMA's own trained scope), and the **ESD delta
+is not inverted**. The composition is byte-semantically identical to upstream's own
+(`eval/text2image.py:65-69`, `train_text_to_image_lora.py:458-462`).
+
+**`outputs/gen_REF_imma_vangogh.json` stays quarantined on different grounds:** the closed-set 12-way
+CLIP argmax is **inapt** here — eight non-targets at *exactly* 0.000 with the target at 0.867 is a
+single-label collapse of the metric, not a spread around the 1/12 chance line — and **the
+configuration is not one the authors report** (IMMA never evaluates an immunised model standalone,
+`upstream/IMMA/README.md:146-151`). It must **not** be cited as an IMMA result, and specifically not
+as "IMMA destroys utility" — because the measure and the configuration are inapt, **not** because the
+checkpoint is malformed.
+
+Two remaining explanations are live and neither has been tested: IMMA behaving as designed (it
+*immunises* against relearning rather than erasing, and here sits atop an ESD-erased UNet), and
+inheritance from the **ESD checkpoint** — all **686** tensors of
+`upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt` differ from pinned base SD-1.4, resnet blocks
+reaching 0.20 relative, so it is not the cross-attention-only erasure "ESD-x1" denotes (`D-019`). The
+decisive control — the ESD checkpoint scored **alone** on the same 12 DEV concepts — **has not been
+run**, and the attack seeds were never run either. **No conclusion about IMMA-the-published-method
+follows from this cell**, in either direction. Two further limits on the cell: it ran **5000** steps
+rather than the documented 1000 (2500 ascent steps against the README's 500) and 3 of its 100 training
+images are NSFW-blanked black frames (`D-021`).
 
 This is consistent with §0's standing rule: a fidelity ledger makes **no performance claims**.
 
@@ -478,9 +536,9 @@ insufficient: the incorrect sentences were rewritten.
 | §3 | **scale caveat rewritten** (`D-017`): the ~4,000× factor withdrawn (measured ≈**9.6×**), the mechanism reattributed to our **shared-Adam two-step schedule**, the window's upper bound relabelled a **saturation point**, and "WDR at gradient parity" withdrawn as a reading of retain8 0.5917 | the derivation ‖∇L‖ = α/√N is correct but was **not** the cause. The reference **sums** both terms into one step, so this is a defect in our port (entangled with `D-016`), not a coefficient-scale property of "From Dormant to Deleted" |
 | §4 | "**Not yet reconciled against the official code** ... queued as R4" → the four R4 phases, with A/B/C magnitudes | R4 ran 11:32→12:45 |
 | §4 | **R4 phase 1 marked `VOID`**, with its three defects named, and `FINDING75`'s retraction recorded | the artifact self-flags `VOID: true` / "DO NOT CITE"; citing it would propagate a retracted number |
-| §4 | **"no port-fidelity conclusion drawn"** paragraph added | upstream's λ=0.1 arm scores target 15/15, consistent with an inert edit, which would invalidate the comparison |
+| §4 | **"no port-fidelity conclusion drawn"** paragraph added | upstream's λ=0.1 arm scores target 15/15, read at the time as consistent with an inert edit. **That reading has since been refuted by measurement and the paragraph is replaced** — see §8.1 |
 | §4 | `FINDING77` §2's accumulation-order error recorded inline | the banner named it; the body did not, and §4 is where a reader would act on it |
-| §4 | the 85,850 eigenvalue marked **single-sourced** | no artifact under `outputs/` recomputes it |
+| §4 | the 85,850 eigenvalue marked **single-sourced** | no artifact under `outputs/` recomputed it. **It has since been measured at 3.2420e+05** (`D-033`) and §4 now carries the measurement — see §8.1 |
 | §6 | `REF_*` redefined from "**official reproduction** — authors' code, authors' protocol" to "**upstream code, our benchmark**", with a fourth row stating that nothing qualifies as an official reproduction | unearned. `REF_imma_vangogh` used self-generated training images and our scorer and prompts (`logs/r1c_eval.log:20-33`) |
 | §6 | R1 relabelled off "author protocol"; R2 off "its **own** three-pool data", with the actual prompt lists given | the images, pools, scorer and prompts are all ours |
 | §6.1 | "**Status: no R-experiment has been run**" → per-cell status table with evidence | false when written: R1 complete, R4 four phases, R2 pools built |
@@ -496,13 +554,25 @@ insufficient: the incorrect sentences were rewritten.
    `"requested_pin": null`** for `unified-concept-editing` and `FRAG`. Nothing was requested for
    either, so the flag asserts a vacuous truth and would mislead an automated consumer. §0's prose
    handles it correctly ("UCE and FRAG had no revision specified"); the schema does not.
-3. **`outputs/registry_v1.json` is stale by 150 JSON files** (112 attack records, ≥11 defence
-   builds), so `TABLES_v1_generated.md` is too. Not regenerated here: `scripts/registry_v1.py`
-   sha256s many GB and `FREEZE_ACTIVE` is in force.
+3. **`outputs/registry_v1.json` is stale by ~150 JSON files**, so `TABLES_v1_generated.md` is too.
+   The registry covers **696 of the 808** attack records now on disk (**112 absent**) and 1,278 of
+   1,424 JSON files; **≥11 defence builds are missing**, so **the arms behind `FINDING71`–`FINDING78`
+   appear in no generated table**, including `meta2_church_lt0.5`, the project's closest approach to
+   the mandate. Not regenerated here: `scripts/registry_v1.py` sha256s many GB and `FREEZE_ACTIVE` is
+   in force.
 
 **Not changed, deliberately:** the `FINDING76`/`FINDING77` correction banner, independently
 re-verified against `r4b_uce_lamb*.json` column B and found accurate; §0.1's non-redistribution
 policy, which §7(c) already states rests on consistency rather than on a legal finding; every
 fidelity verdict (IMMA reimplementation, Meta v2 ours, WDR adaptation, UCE reimplementation, GIFT
-unsubstituted), all of which verified correct and all of which R1/R4 **strengthen** rather than
-weaken.
+unsubstituted), all of which verified correct and none of which R1/R4 overturn.
+
+### 8.1 Documentation reconciliation, 2026-10-26 — two refuted explanations removed
+
+| what changed | why |
+|---|---|
+| §4's **"upstream's edit may have been inert"** paragraph **replaced with the refutation** | **REFUTED by measurement:** all **32** `attn2` K/V matrices changed, **5.36 % mean / 9.79 % max**, **0/32** identical to base, **43.4 %** change in K/V output. The open questions are erase-prompt expansion and the **confounded port side** (`D-026` re-run, `D-031` lost checkpoint) |
+| §6's **"artifact of `r1c_eval`'s tensor composition"** removed as a live explanation; the composition recorded as **valid** | **REFUTED by direct audit:** `exact=160 fuzzy=0 reshaped=0 skipped=0`; 160/160 and 526/526 tensors byte-equal to their sources; ESD delta **not** inverted. `gen_REF_imma_vangogh.json` stays quarantined because the closed-set metric is **inapt** and the configuration is **not one the authors report** (`D-009`); `D-019`'s ESD checkpoint is the live candidate and **its control run is outstanding** |
+| §4's λ-inertness eigenvalue **corrected to the measured 3.2420e+05** | the 85,850 figure was single-sourced to `ERRATUM_uce_lambda_scale.md` and never measured; the measurement is **3.8× larger** (`D-033`) |
+| §4 and §6's **`D-022` statements de-directionalised** | the label-text mismatch is **established** (nine of twelve strings differ; `church`/`parachute`/`tench` identical); its **direction and size are not**, pending paired re-scoring. "Degraded distractors" and "target hits biased upward" are withdrawn as inferences |
+| §7's staleness item given exact coverage, and the absent findings named | "stale by 150 files" did not say **which** arms a reader would not find |

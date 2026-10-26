@@ -1,5 +1,7 @@
 # T2I relearning-robust erasure — report r5 (post-audit)
 
+> **Status pointer:** for the **one current verdict per issue**, read `STATUS_CURRENT_v2.md`. `AUDIT_REPAIR_REGISTER_v1.md` is chronological and records hypotheses that were later refuted — two of them ("IMMA composition unproven", "upstream UCE may have written an unedited model") are **refuted** and must not be quoted as live.
+
 > **⚠ Corrections 2026-10-26:** `FINDING76` §3's probe mechanism check is **overstated** (n=7/3/1, within-arm spread 40×, ordering undetermined — see its §7). `FINDING77` §2's "B kills the accumulation-order hypothesis" is **wrong** — B holds accumulation order fixed and never varied it (see its §6).
 
 
@@ -92,10 +94,13 @@ gate** on their own (T could not rise, already 1.000), which is the gate working
 Six 300-step attacks (7 records, one duplicated label), all gate-valid, T 0.000 → 0.958–1.000.
 **Five of the six reach H = 1.000.** The sixth —
 `H84M_utrap_church_l0.15k8_sd0_lr1e-4` — reaches **H = 0.9333** at T 0.9583, and its paired utility
-**collapses 0.8333 → 0.1875**: that attack destroyed the model, so its lower H is not evidence of
-robustness (`FINDING70`, `FINDING71`). Restricted to the five non-destructive attacks, T rises to
-exactly **1.000** in every case, so the quoted 0.958 lower bound belongs to the destructive run
-alone.
+**collapses 0.8333 → 0.1875** under the closed-set scorer, so its lower H is not evidence of
+robustness (`FINDING70`, `FINDING71`). *"Collapsed closed-set panel accuracy" is what was measured;
+"destroyed the model" is not — see §5 and `D-030`. No images from this attack were saved and no
+independent quality or semantic assessment exists.* Restricted to the five attacks whose panel
+accuracy did not collapse, T rises to
+exactly **1.000** in every case, so the quoted 0.958 lower bound belongs to the one run whose
+panel accuracy collapsed.
 
 *(The previous revision read "all six reaching H = 1.000" while quoting a T range whose lower bound
 was the one record that did not. The sentence was self-inconsistent and is rewritten, not
@@ -154,8 +159,10 @@ UCE on SD-1.5, after the λ-scale correction (`ERRATUM_uce_lambda_scale.md`):
 | **1000** | **0.2000** | **0.9500** | **usable; clears K1** |
 | 10000 / 50000 | 1.0000 | 1.0000 | `W_new → W_old` — **no erasure at all** |
 
-`cᵀc` has max eigenvalue **85,850** for SD's 768-dim CLIP embeddings, which is why values of order 1
-do nothing. The window is now bracketed from both sides **by measurement**. The λ=10000/50000 arms
+`cᵀc`'s max eigenvalue for SD's 768-dim CLIP embeddings is **3.24e5**, measured (`D-033`), which is
+why values of order 1 do nothing. *(The figure stated here previously was **85,850**, carried from
+`ERRATUM_uce_lambda_scale.md` and never measured; the measurement is **3.8× larger**, so the
+qualitative point — λ ≤ 1e3 is inert against this spectrum — is strengthened, not weakened.)* The window is now bracketed from both sides **by measurement**. The λ=10000/50000 arms
 are vacuous and excluded; the λ=50000 attacks were correctly caught by the **validity gate** (T
 could not rise, already 1.000), which is the gate working as designed.
 
@@ -189,18 +196,22 @@ And three corrections of my own, not the audit's:
   absent. An exact binomial interval for 15/15 bottoms out near 0.782, and even that model is
   inadequate given prompt clustering and adaptive selection.
 - **The closed-set scorer has two label arrays, and the FINAL path used the wrong one.**
-  `gen_eval.py` defines `LABELS` (CLIP text, e.g. `"van gogh painting"`) and `LAB_KEY` (internal
-  identity keys, e.g. `"van_gogh"`). **Nine of the twelve differ.** `gen_eval_final.py` prompted CLIP
-  with `LAB_KEY`, so every FINAL number was computed against nine degraded distractor strings
-  (`D-022`). The three labels that are spelled **identically** are `church`, `parachute` and
-  `tench` — and `church` is the erased target in every E6 arm, so the artifact **inflates target
-  hits** rather than adding symmetric noise. **Every DEV number in this report is unaffected** (the
-  DEV path uses `LABELS` correctly); only `outputs/final_*.json` is implicated. The defect is now
-  repaired in `gen_eval_final.py`, but the 18 FINAL records predate the repair and **have not been
-  re-scored**. Re-scoring is CPU-only.
+  `gen_eval.py` defines `LABELS` (`:48`, the CLIP text, e.g. `"van gogh painting"`) and `LAB_KEY`
+  (`:50`, the internal record keys, e.g. `"van_gogh"`). **Nine of the twelve label strings differ;
+  `church`, `parachute` and `tench` are spelled identically.** `gen_eval_final.py` prompted CLIP with
+  `LAB_KEY`, so every FINAL number was computed against a label set that is not the one the scorer
+  was designed around (`D-022`). **The evaluator used inconsistent label text. The effect on scores
+  and conclusions is unresolved pending corrected evaluation.** No direction or magnitude of the
+  embedding effect is established here: whether the substitution raised, lowered or left unchanged
+  any particular arm's score is a question for paired re-scoring, not for inference from the
+  substitution itself. Only `outputs/final_*.json` is implicated; the DEV path calls `LABELS`
+  correctly. The defect is now repaired in `gen_eval_final.py`, but the 18 FINAL records predate the
+  repair and **have not been re-scored**. Re-scoring is CPU-only.
 - **Every target number is a DEVELOPMENT measurement.** One of three evaluation prompts was a
   defence-training prompt for GIFT/IMMA/WSR/UTRAP, and λ/β/K were repeatedly selected while watching
-  H. A frozen **FINAL** set now exists and **nothing has been evaluated on it** (experiment E6).
+  H. A frozen **FINAL** set exists but has been **consumed**: experiment E6 evaluated four arms on it
+  (`FINDING65`, `FINDING66`), with the label-text defect above. *(The previous revision of this bullet
+  said nothing had been evaluated on it; that was already false when written.)*
 - **AdvUnlearn utility figures are partly in-sample** (six panel prompts).
 - **Three utility denominators** (retain8 n=8, all-non-target n=11, 48-image paired panel) are
   reported separately and are not interchangeable.
@@ -216,7 +227,9 @@ And three corrections of my own, not the audit's:
 - **Seven historical `gen_*.json` records do not record which checkpoint they scored.** Their `unet`
   field is `null`, which is ambiguous: in `gen_base_sd14.json` and
   `gen_E6cal_BASE_sd14_on_DEV.json` it means the unmodified base (both score **1.000 on all twelve**
-  DEV concepts, which is the control denominator and confirms the closed-set scorer is sound), but
+  DEV concepts, which is the control denominator; that establishes the scorer behaves correctly on
+  **undamaged** base outputs and **does not** establish its validity on damaged or unusual outputs —
+  see `D-030`), but
   in `gen_advunlearn_{official,parachute,tench,vangogh,garbage_truck}.json` it accompanies results
   that demonstrably came from an **edited** model (e.g. parachute 0.1333, garbage_truck 0.1333,
   van_gogh 0.4667) whose identity was never written down. Those five also carry `target: null`, so
@@ -250,18 +263,34 @@ have been reported as mandate-clearing had the attacker sweep stopped one cell e
 retain half of the bar is not merely reachable but reachable **at zero target suppression**, which
 makes the robustness half the whole of the remaining problem.
 
-The defensible contribution is the **negative result plus the audited methodology**, stated at the
-scope §3 supports: on the builds measured, with the attacks run, concept erasure in SD-1.x was
-reversible by 300 gradient steps on 16 self-generated images, across four adversary families down to
-768 trainable scalars, and reapplying the original pruning mask to an attacked model does not
-eliminate target generation. The mechanism is **not** established — neither the geometry story, nor
-the capacity story, nor the reactivation story survives its controls.
+What the project has measured, stated at the scope §3 supports: on the builds measured, with the
+attacks run, concept erasure in SD-1.x was reversible by 300 gradient steps on 16 self-generated
+images, across four adversary families down to 768 trainable scalars, and reapplying the original
+pruning mask to an attacked model does not eliminate target generation. The mechanism is **not**
+established — neither the geometry story, nor the capacity story, nor the reactivation story survives
+its controls.
+
+**Prior-art overlap, recorded factually, and no contribution decision taken here.** arXiv
+**2608.25429** is **FRAG** — verified, and already the source of this project's own FRP reference
+(<https://arxiv.org/abs/2608.25429>, <https://arxiv.org/html/2608.25429v1>,
+<https://github.com/Yi1-Chen/FRAG>). Its **Table 11** overlaps this project's **attack-validity**
+argument (an attack that recovers nothing does not probe robustness) and its **Table 15** overlaps
+the **initial-forgetting-versus-recovery** argument (an inversion against a retain-trained gold
+model). FRAG's tables are LLM relearning; this project's are T2I diffusion. **That overlap does not
+determine where a contribution can lie.** A contribution decision requires a **claim-by-claim
+literature comparison** — which specific claims are new, which are anticipated, and in what setting —
+and **that comparison is not part of this repair gate and has not been done.** Nothing here
+forecloses either an evaluation-side or a method-side contribution. *(An earlier reading concluded
+from this overlap that publication would require a new defence method and that the evaluation-side
+contribution was foreclosed. That does not follow from an overlap on two tables and is withdrawn.)*
 
 **The most promising direction**, unchanged from the audit's assessment and now better supported by
 the repaired tooling: a carefully controlled study of **adaptation vulnerability and final-mask
 necessity** (experiment E5), with the three released reference implementations actually run
-(E7), evaluated on the frozen FINAL split (E6). That is a defensible paper. A new unlearning method
-is not something this project currently has.
+(E7), evaluated on a **freshly frozen** FINAL split (E6's was consumed). Whether that, an
+evaluation-side contribution, or a method-side one is the right target is **not settled by this
+report** — see the claim-by-claim comparison requirement above. What is settled is that **a new
+unlearning method is not something this project currently has.**
 
 ## 7. What is pending, with prices
 
@@ -274,7 +303,7 @@ framing is withdrawn:
 | **E1** faithful WDR | ✅ **RAN** at α ∈ {1.0, 4000} — *not* the preregistered {0.3, 1.0, 3.0}. `logs/e1_wdr.log`, `logs/e1b_wdr.log`, `outputs/gen_wdr2_church_a{1.0,4000}.json`. `FINDING67`: α=1 inert, α=4000 fails K1 at 0.5917. **α ∈ (1, 4000) is still unmeasured** |
 | **E2** Meta v2 full Eq. 8 | ✅ **RAN**, λ ∈ {0.5, 1.0} as specified, plus an 18-cell frozen grid (E2g) and an attacker-lr sweep (E2h). `FINDING78` |
 | **E4** UTRAP v2 K-sweep | ✅ **RAN**, K ∈ {0,1,8,32}. `logs/e4_h90.log`, `e4m_matched.log`, `e4mg_grid.log`, 8 `utrap2*` builds. `FINDING76` (whose §3 mechanism check is overstated — see its §7) |
-| **E6** FINAL-prompt re-evaluation | ⚠ **RAN BUT MUST BE RE-SCORED** — `outputs/final_*.json` (18 records, which **consumed** the FINAL set) were scored with `LAB_KEY` instead of `LABELS` (`D-022`), degrading nine of twelve distractor strings while leaving `church` correct. `FINDING65`'s depth figures are unmeasured; `FINDING66`'s ceiling conclusion survives (within-scorer). **Re-scoring is CPU-only on retained artifacts** and is the cheapest outstanding repair in this table |
+| **E6** FINAL-prompt re-evaluation | ⚠ **RAN BUT MUST BE RE-SCORED** — `outputs/final_*.json` (18 records, which **consumed** the FINAL set) were scored with `LAB_KEY` instead of `LABELS` (`D-022`); nine of the twelve label strings differ. **The evaluator used inconsistent label text; the effect on scores and conclusions is unresolved pending corrected evaluation.** That applies to `FINDING65` and `FINDING66` alike. **Re-scoring is CPU-only on retained artifacts** and is the cheapest outstanding repair in this table |
 | **E7** the three released implementations | ⏸ **PARTIALLY RAN** — upstream IMMA (R1, 5000/5000 + eval) and upstream UCE (R4b–d) executed. `vision_relearning` (R3) **not started** |
 | **E5** persistent-mask | ❌ not run |
 | **E3** variant A vs v2 at matched retain8 | ❌ not run |
@@ -303,19 +332,19 @@ generalises 68–73, 75 retracts a number §3 of this report once relied on. §8
 
 | # | finding | effect on r5 |
 |---|---|---|
-| **65** | ⚠ **DO NOT QUOTE — confounded in the direction of its own conclusion (audit defect `D-022`).** The claim was: on **FINAL** prompts erasure is **~3× shallower** than every reported figure (FRP 0.1333 → 0.4667, UCE 0.2000 → 0.6000, UTRAP 0.0000 → 0.0667), with base calibration bounding prompt difficulty at ≤13%. **But every FINAL number was scored with `LAB_KEY` instead of `LABELS`**, so CLIP was asked to choose among *"a photo of a van_gogh"*, *"a photo of a english_springer"* and seven other degraded strings. **Nine of the twelve labels differ; `church`, `parachute` and `tench` are spelled identically** — and these experiments erase **church**, so the **target** string was correct while **all nine competing distractors were degraded**. Weaker distractors pull images toward the target, so `target_hits` is biased **upward**. **37 of 180 FINAL images landed on a degraded label**, at per-arm median margins **0.0027–0.0063**: frp 7/15 with **7** degraded wins, uce_sd15_lam1000 9/15 with **5**, utrap 1/15 with **10**, utrap_sd15 2/15 with **12**. Worse, the ratios compare a DEV number scored **correctly** by `gen_eval.py` against a FINAL number scored by the **defective** path — only the FINAL side is inflated | **the "~3×", "~3.5×", "54% undone" and "60% undone" figures are UNMEASURED pending re-score**, not merely imprecise. §3's target-suppression numbers may still be optimistic — the leak and prompt-difficulty reasoning is untouched — but **the magnitude is unknown** and the direction of the artifact is the same as the direction of the conclusion |
-| **66** | ⚠ **Do not quote its absolute figures (`D-022a`) — but its qualitative conclusion is the more robust of the two.** The **H = 1.000 ceiling is not a DEV artifact**: on FINAL prompts the attack reaches **15/15** on all four arms. It shares `FINDING65`'s scorer defect, **but its central comparison runs both sides through the same scorer** (attacked arms vs the base anchor), so it is **internally consistent** — and 15/15 means every image was called church, which **strengthening** the distractors can only **lower**. So the ceiling conclusion survives the defect by construction | §3's robustness results remain **confirmed** under held-out prompts. What falls is the **absolute** FINAL figures and the subsidiary claim that the attacked SD-1.4 model (15/15) **beats the unmodified base** (13/15) — a **2-image gap** on n=15, whose 2 base misses were themselves degraded-label wins (median margin 0.0110). Treat that comparison as unmeasured |
+| **65** | ⚠ **DO NOT QUOTE (audit defect `D-022`).** The claim was: on **FINAL** prompts erasure is **~3× shallower** than every reported figure (FRP 0.1333 → 0.4667, UCE 0.2000 → 0.6000, UTRAP 0.0000 → 0.0667), with base calibration bounding prompt difficulty at ≤13%. **But every FINAL number was scored with `LAB_KEY` instead of `LABELS`** (`gen_eval.py:48` vs `:50`). **Nine of the twelve label strings differ; `church`, `parachute` and `tench` are spelled identically.** **The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved pending corrected evaluation.** Retained per-image facts, recorded without a directional reading: **37 of 180 FINAL images landed on one of the nine labels whose text differs**, at per-arm median margins **0.0027–0.0063** (frp 7/15 with 7 such wins; uce_sd15_lam1000 9/15 with 5; utrap 1/15 with 10; utrap_sd15 2/15 with 12). A further axis is that the ratios compare a DEV number scored from `LABELS` against a FINAL number scored from `LAB_KEY`, so the two sides of each ratio did not use the same label text at all | **the "~3×", "~3.5×", "54% undone" and "60% undone" figures are UNMEASURED pending corrected evaluation.** Neither the size nor the sign of the scorer's effect on them is established, so the finding is neither confirmed nor refuted here. The split-leak and prompt-difficulty reasoning is a separate argument and is untouched by this defect |
+| **66** | ⚠ **Do not quote its figures (`D-022a`) — the same label-text defect applies.** The claim was that the **H = 1.000 ceiling is not a DEV artifact**: on FINAL prompts the attack reaches **15/15** on all four arms. **The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved pending corrected evaluation** — including for the within-scorer comparison, because consistency between two arms scored the same wrong way does not establish what either score would be under the correct label text. *(The previous revision argued the ceiling conclusion "survives the defect by construction" because strengthening distractors could only lower a 15/15. That inference assumes a direction for the embedding effect, which is not established, and is withdrawn.)* | §3's robustness results are **DEV-scored and stand on the DEV evidence**; `FINDING66` neither adds to nor subtracts from them until E6 is re-scored. Also unresolved: the subsidiary claim that the attacked SD-1.4 model (15/15) **beats the unmodified base** (13/15) — a **2-image gap** on n=15 |
 | **67** | **α is inert at the reference's default in our port**, and at α=4000 the arm **costs 0.35 of retention without improving on the teacher's erasure** (K1 FAIL at **retain8 0.5917**). *(Corrected — audit defect **D-017**.* The derivation ‖∇L‖ = α/√N stands, but **it is not the cause**: measured step size as a fraction of `lr` is α=1 → 0.104, α=10 → 0.537, α=4000 → 0.998, so α 1→4000 buys **≈9.6×, not ~4,000×**. The mechanism is **our optimiser plumbing, not the method** — both steps share **one Adam instance**, so `v` is retain-dominated and the distance update is ≈ `lr·|g_dist|/√v_retain`; α is inert at **both** ends, below ≈10 because `v` is retain-dominated and above ≈4e3 because **Adam saturates**. The reference **sums** both terms into one step, so our two-step schedule is the defect, not the published method. The **"third instance of one scale pathology"** framing is **withdrawn** for the WDR member: IMMA α and UCE λ are coefficient-scale findings about those *methods*, this one is about our schedule.* | `'From Dormant to Deleted'` has **one** measured point here, not zero — a utility failure at one α. **0.5917 measures our two-step shared-Adam schedule at saturation, not "WDR at gradient parity"**; that attribution is withdrawn. α ∈ (1, 4000) is unmeasured, and its upper bound is a **saturation point, not a frontier**. See `FINDING67` (header + §7) and `AGENT3_FIDELITY_FINDINGS.md` §4.2–4.3 |
 | **68** | The attacker's real cost is **≤100 steps, not 300**; at 25 steps the mandate-qualifying arm is already at 13/15. Reproduced on FRP (ceiling by 50) | r5's "300 gradient steps" **overstates the attack cost 3–6×** |
 | **69** | Resolved to 5 steps, recovery is **graded** — the project's first non-saturated outcome variable. **Its headline threshold was retracted the same day** by seed replication (sd 0.2776 at 10 steps, H spanning 0.1333–0.6667). Completed at n=3: **no budget from 5 to 300 leaves any arm meeting the mandate's robustness half** | the mandate is missed at **every** budget, not just at 300 |
-| **70** | **lr substitutes for budget.** lr 5e-5 / 25 steps gives H = 1.0000 on **all three seeds, sd = 0**, utility 0.9236 — **12× cheaper** than reported. lr 1e-4 / 5 steps reaches 1.0000 on one seed — **60×** cheaper. At lr 1e-4 the budget axis is **non-monotone** on this arm (H falls 0.9555 → 0.6222) while the attack **destroys** the model (utility 0.8472 → **0.5278**) — **but see 71: the non-monotonicity is arm-specific and the causal link is withdrawn** | r5's cost figure is superseded; and **H alone cannot order attacks** — a low H may mean a weak *or* an overpowered attack, distinguishable only by paired utility |
+| **70** | **lr substitutes for budget.** lr 5e-5 / 25 steps gives H = 1.0000 on **all three seeds, sd = 0**, utility 0.9236 — **12× cheaper** than reported. lr 1e-4 / 5 steps reaches 1.0000 on one seed — **60×** cheaper. At lr 1e-4 the budget axis is **non-monotone** on this arm (H falls 0.9555 → 0.6222) while the attack drives the paired closed-set panel down (utility 0.8472 → **0.5278**; "collapsed panel accuracy", not "destroyed the model" — `D-030`) — **but see 71: the non-monotonicity is arm-specific and the causal link is withdrawn** | r5's cost figure is superseded; and **H alone cannot order attacks** — a low H may mean a weak *or* an overpowered attack, distinguishable only by paired utility |
 
 ### 8.2 The eight findings the previous revision omitted (FINDING71–78)
 
 | # | finding | effect on r5 and on this table |
 |---|---|---|
 | **71** | **Half of 70's story failed replication.** The *damage* at lr 1e-4 is real and corpus-wide (mean post-attack utility **0.93 → 0.75 → 0.50** by lr, n = 229). The *non-monotone H* that 70 explained with it **did not reproduce** on a second arm and is **specific to one arm** | row **70**'s causal clause is withdrawn. The damage finding stands and is what justifies discounting the destructive attack in §3.1 |
-| **72** | At matched, non-destructive lr, **UTRAP is recovered as fast or faster than FRP**, reversing `FINDING68` §6's coarse-grid impression. Separately, the **validity gate's exclusion rate is non-monotone in `T_before`** (n = 520) | row **68**'s arm ordering is withdrawn. The second half is **structural**: "max-over-valid H" — the mandate's own metric, used in §3.2, §3.3 and §6 — is computed over a sample whose filtering **correlates with how well-erased the arm is**. Every max-over-valid figure in this report inherits that bias |
+| **72** | At matched lr with no panel collapse, **UTRAP is recovered as fast or faster than FRP**, reversing `FINDING68` §6's coarse-grid impression. Separately, the **validity gate's exclusion rate is non-monotone in `T_before`** (n = 520) | row **68**'s arm ordering is withdrawn. The second half is **structural**: "max-over-valid H" — the mandate's own metric, used in §3.2, §3.3 and §6 — is computed over a sample whose filtering **correlates with how well-erased the arm is**. Every max-over-valid figure in this report inherits that bias |
 | **73** | The budget correction **generalises to further concepts**, but **not uniformly**: `garbage_truck` saturates in 25 steps, `church` is slower, and a third concept, `tench`, is **slowest**. Its own §6 retracts the "and gets worse" over-read | row **68** generalises beyond one concept, but the *budget needed varies substantially by concept*, so no single step-count is the attacker's cost |
 | **74** | Across **six defence families**, not one buys the attacker more than **100 gradient steps**. Found by registry query over 36 existing church arms, not new builds | closes the "two families only" limit implicit in rows 68–70. One cell (Meta variant A at 25 steps) is the project's only sub-0.40 number and **fails the mandate's retention half anyway** at 0.7000 |
 | **75** | **RETRACTED in full.** Its central number came from `r4_uce_official_vs_port.py`, which had three verified defects: char-split inputs (`list('church')`), an embedding selection matching neither implementation, and **no upstream code executed** | the λ-scale and port-fidelity claims this report makes about UCE must rest on `ERRATUM_uce_lambda_scale.md` and on R4b–d, **never** on the VOID `r4_uce_*.json` artifacts |
@@ -325,21 +354,21 @@ generalises 68–73, 75 retracts a number §3 of this report once relied on. §8
 
 ### 8a. The net effect on the project's standing
 
-**One half moved against the defences; the other is now unmeasured.** The attacker is cheaper than
-reported (68, 70 — both DEV-scored and unaffected by the FINAL scorer defect), and the robustness
-result survived the one test that could have softened it (66, whose comparison is within-scorer and
-therefore still sound). So r5 §6's conclusion holds and is **stronger** on the cost axis: on the
-builds measured, concept erasure in SD-1.x is reversible by **25 gradient steps at lr 5e-5** —
-reproducibly, on all seeds, leaving the model intact.
+**One half moved against the defences; the other is unresolved.** The attacker is cheaper than
+reported (68, 70 — both DEV-scored, through `gen_eval.py`'s `LABELS` path). So r5 §6's conclusion
+holds and is **stronger** on the cost axis: on the builds measured, concept erasure in SD-1.x is
+reversible by **25 gradient steps at lr 5e-5** — reproducibly, on all seeds, leaving the model
+intact. That statement rests on DEV measurements alone; **no FINAL-split result currently supports or
+undercuts it**, in either direction.
 
-**The depth axis is withdrawn pending re-score.** The previous revision of this paragraph said "the
-suppression it provides is ~3× weaker on prompts it was not tuned around". That rested on
-`FINDING65`, whose FINAL numbers were scored with degraded distractor strings in the direction that
-inflates target hits (`D-022`). Erasure may well be shallower on held-out prompts — the split-leak
-and prompt-difficulty arguments are untouched, and 37 of 180 images turning on margins of ~0.005
-cannot explain the whole of a 0.1333 → 0.4667 gap — but **no multiplier is currently supported**,
-and the honest statement is that the held-out depth of erasure is **unknown until E6 is re-scored
-with `LABELS`**.
+**The depth axis is withdrawn pending corrected evaluation.** The previous revision of this paragraph
+said "the suppression it provides is ~3× weaker on prompts it was not tuned around". That rested on
+`FINDING65`. **The evaluator used inconsistent label text. The effect on scores and conclusions is
+unresolved pending corrected evaluation.** So **no multiplier is currently supported**, and the
+held-out depth of erasure is **unknown until E6 is re-scored with `LABELS`**. *(The previous revision
+also asserted that 37 of 180 images turning on margins of ~0.005 "cannot explain the whole of" the
+0.1333 → 0.4667 gap. That is an estimate of the artifact's size derived from the artifact's assumed
+direction, and both are unestablished; it is withdrawn.)*
 
 ### 8b. What has been corrected about my own process, twice over
 
@@ -374,13 +403,25 @@ with `LABELS`**.
 - **Every max-over-valid figure in this report carries the gate bias `FINDING72` measured** — the
   validity gate's exclusion rate is non-monotone in `T_before`, so the metric is computed over a
   sample whose filtering correlates with erasure depth.
-- **Every target number is a DEV measurement, and the FINAL numbers are worse than that** — they
-  exist, but were scored with degraded distractor labels (`D-022`), so `FINDING65`'s depth figures
-  are **unmeasured pending re-score**. The FINAL set has also been **consumed** by E6, so a fresh
-  final split must be frozen before any new configuration is selected. `FINDING66`'s ceiling
-  conclusion is the one FINAL result that survives, because its comparison is within-scorer.
+- **Every target number is a DEV measurement, and no FINAL number is currently usable** — the FINAL
+  records exist, but were scored from `LAB_KEY` rather than `LABELS` (`D-022`). **The evaluator used
+  inconsistent label text. The effect on scores and conclusions is unresolved pending corrected
+  evaluation** — for `FINDING65` and `FINDING66` alike. The FINAL set has also been **consumed** by
+  E6, so a fresh final split must be frozen before any new configuration is selected.
 - **The count block in §2 is stale**; `outputs/registry_v1.json` predates 150 JSON files.
 - **FID is still absent**, so no claim about global image quality.
+- **Thirty duplicate `(arm, seed, lr, steps)` cells disagree with each other by up to 8/15 images,
+  and no record carries a code-version field** (`D-025`), so the disagreements cannot be attributed
+  to any known change. **This is unresolved, not closed.** Any aggregate that pools duplicate cells
+  inherits it.
+- **Five `gen_advunlearn_*` records are unattributable** — `gen_advunlearn_{official,parachute,tench,`
+  `vangogh,garbage_truck}.json` carry both `unet: null` and `target: null` (`D-011`), so the
+  checkpoint they scored and the concept they targeted are recoverable only from the filename. The
+  numbers are retained as historical results; **their attribution is not available and has not been
+  recovered.**
+- **The audit concluding is not itself evidence that the surviving results are sound.** Each
+  statement above stands or falls on its own named artifact. No result in this report gains standing
+  from the fact that a repair cycle ran.
 - **Seven historical `gen_*.json` records do not identify the checkpoint they scored** (`unet: null`),
   five of which demonstrably scored an *edited* model — see §5's provenance note.
 
@@ -411,11 +452,12 @@ historical number was deleted.
 | §8 | row 70's causal clause for the non-monotone H withdrawn | `FINDING71` replicated the damage (n=229) but **not** the non-monotonicity, which is arm-specific |
 | §8 | **row 67 rewritten** (`D-017`): the "~4,000×" withdrawn (measured ≈**9.6×**), the 1/√N mechanism withdrawn as the *cause*, the real mechanism named as our **shared-Adam two-step schedule**, "**third instance** of one scale pathology" dropped, and "at gradient parity" withdrawn as a reading of retain8 0.5917 | the derivation stands but is not the cause; the reference **sums** both terms into one step, so this is our port's defect (entangled with `D-016`), not a property of the published method. Retained: 0.5917, K1 FAIL, α ∈ (1,4000) unmeasured — now with its upper bound labelled a **saturation point** |
 | §8b | the **three-instance** scale-pathology generalisation withdrawn, with the sharper lesson stated | the lesson ("measure the scale before sweeping the knob") survives and was genuinely applied; the pattern it generalised from was one instance short. Diagnosing a shared knob is not diagnosing a shared cause |
-| §8 | **rows 65 and 66 rewritten** under `D-022`/`D-022a`, with the two findings' standings **separated** | `gen_eval_final.py` scored every FINAL number with `LAB_KEY` instead of `LABELS`. **Nine of twelve labels differ; `church`, `parachute` and `tench` are identical** — and `church` is the erased target, so the nine *distractors* were degraded and `target_hits` is biased **upward**. 37 of 180 images turned on a degraded label at median margins 0.0027–0.0063. `FINDING65` is **confounded in the direction of its own conclusion**; `FINDING66` shares the defect but its comparison is **within-scorer**, so its ceiling conclusion survives |
-| §8a | the "~3× weaker on held-out prompts" conclusion **withdrawn pending re-score** | it rested entirely on `FINDING65`'s ratios, which compare a correctly-scored DEV number against a defectively-scored FINAL one — only the FINAL side inflated |
+| §8 | **rows 65 and 66 rewritten** under `D-022`/`D-022a` | `gen_eval_final.py` scored every FINAL number with `LAB_KEY` instead of `LABELS`. **Nine of twelve label strings differ; `church`, `parachute` and `tench` are identical.** 37 of 180 images turned on one of the nine, at median margins 0.0027–0.0063. **The evaluator used inconsistent label text; the effect on scores and conclusions is unresolved pending corrected evaluation** — for both findings |
+| §5, §7, §8, §8a, §8c, §9 | **second pass, 2026-10-26 (documentation reconciliation):** every directional reading of `D-022` removed — "degraded distractors", "`target_hits` biased upward", "confounded in the direction of its own conclusion", "`FINDING66`'s ceiling conclusion survives by construction", "37 images cannot explain the gap", and "the base control confirms the scorer is sound" | the label-text mismatch is **established**; its **direction and size are not**, pending paired re-scoring. Each of those sentences inferred a sign or a magnitude from the substitution itself. The mismatch count **nine** is retained throughout and is the one established quantity |
+| §8a | the "~3× weaker on held-out prompts" conclusion **withdrawn pending corrected evaluation** | it rested entirely on `FINDING65`'s ratios, whose two sides were scored from different label text (DEV from `LABELS`, FINAL from `LAB_KEY`) |
 | §7 | E6 relabelled "RAN BUT MUST BE RE-SCORED" | the records exist and consumed the FINAL split, but their numbers are not usable as they stand. Re-scoring is CPU-only on retained artifacts |
 | §5 | new caveat documenting the two label arrays and which numbers are implicated | a reader had no way to tell that DEV numbers are unaffected while FINAL ones are not |
-| §8c | "Every target number except FINDING65/66's is a DEV measurement" → the FINAL numbers are **worse** than DEV measurements until re-scored | the sentence treated the FINAL figures as the one trustworthy class; they are currently the least trustworthy |
+| §8c | "Every target number except FINDING65/66's is a DEV measurement" → no FINAL number is currently usable | the sentence treated the FINAL figures as the one trustworthy class; their label text was inconsistent and their standing is unresolved |
 | §8c | "Meta-v2 and UTRAP-v2 remain unrun, released references unexecuted" → all corrected, with `FINDING72`'s gate bias and the FINAL-set consumption added | three false sub-claims in one sentence |
 
 **Not changed, deliberately:** every historical number, including the five unattributable
@@ -427,7 +469,8 @@ table, both of which verified clean.
 `TABLES_v1_generated.md`. Regeneration requires `scripts/registry_v1.py`, which sha256s many GB; the
 project is frozen, so this is flagged for the lead rather than run.
 
-**Single-sourced and unverified:** §3.3's `cᵀc` max eigenvalue of **85,850** traces only to
-`ERRATUM_uce_lambda_scale.md`; no raw artifact under `outputs/` recomputes it. §4's GIFT
+**Single-sourced and unverified:** §3.3's `cᵀc` max eigenvalue **has since been measured at 3.24e5**
+(`D-033`), superseding the 85,850 figure that traced only to `ERRATUM_uce_lambda_scale.md`; §3.3 is
+updated. §4's GIFT
 β range 0.2000–0.4667 could not be reproduced from the two cross-model `b1.0` builds alone. Both are
 CPU-cheap to settle and are listed in `AGENT6_PROVENANCE_FINDINGS.md` §6.
