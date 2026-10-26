@@ -190,6 +190,11 @@ Every one of the six documents I own carried the same two-clause banner (`FINDIN
 | B4 | `T2I_REPORT_r5.md` §3.1 | "all six reaching H = 1.000" (Q8) | **5 REPAIRED** |
 | B5 | `T2I_REPORT_r5.md` §3.2 | "2/2, third running" (Q12) | **5 REPAIRED** |
 | B6 | `T2I_REPORT_r5.md` §6, §8c | "the mandate is unmet at any budget or learning rate tested" — **conclusion kept**, but it was asserted ahead of the evidence that now supports it (Q18) | **5 REPAIRED** — re-evidenced to `logs/e2h_stronger.log`, with the near-miss stated |
+| B17 | `T2I_REPORT_r5.md` §8 row 65, §8a | `FINDING65`'s "~3× / ~3.5× shallower on FINAL prompts" and the 54%/60% figures, standing under a banner that did not mention the scorer defect | **5 REPAIRED** — marked **unmeasured pending re-score** (`D-022`), not merely imprecise; §8a's "~3× weaker" conclusion withdrawn |
+| B18 | `T2I_REPORT_r5.md` §8 row 66 | `FINDING66`'s absolute FINAL figures and "beats the unmodified base" | **5 REPAIRED** — absolutes withdrawn, the 2-image sub-claim withdrawn, and the **qualitative ceiling conclusion explicitly upheld** as within-scorer (`D-022a`) |
+| B19 | `T2I_REPORT_r5.md` §8c | "Every target number **except FINDING65/66's** is a DEV measurement" — it named the FINAL figures as the trustworthy class | **5 REPAIRED** — they are currently the *least* trustworthy class |
+| B20 | `UPSTREAM_STATUS_r1.md` §4, `UPSTREAM_FIDELITY_MANIFEST.md` §6, `HANDOFF_r5.md` §6 | "the existing FINAL set **has been inspected**" — true but incomplete; the scores are also defective | **5 REPAIRED** in all three, each noting that **R1–R4 are unaffected** because `gen_eval.py` uses `LABELS` correctly |
+| B21 | `CORRECTION_REGISTER_r5.md` §B.10 | E6 listed as cleanly "PARTIALLY RAN" | **5 REPAIRED** — "RAN, CONSUMED THE SPLIT, AND MUST BE RE-SCORED", with `D-022`/`D-022a` added to §D.1 and G12 cross-referenced |
 | B7 | `T2I_REPORT_r5.md` §8c | "E2/E4 remain unrun; the three released references remain unexecuted" (Q23) | **5 REPAIRED** |
 | B8 | `T2I_REPORT_r5.md` §2 | stale counts presented as current (Q1, Q2, Q6) | **5 REPAIRED** |
 | B9 | `UPSTREAM_FIDELITY_MANIFEST.md` §6 | "Status: no R-experiment has been run" (F8) | **5 REPAIRED** |
@@ -254,7 +259,15 @@ exist, not two: *official reproduction* (nothing qualifies), *upstream code / ou
    decision, with `TABLES_v1_generated.md` regenerated in the same step.
 7. **R2 is mid-flight-but-idle**: pools are built and `[r2pools] done`, but `src/meta.py` was never
    invoked and no process is running. Someone should decide whether R2 resumes under the freeze.
-8. **`FINDING78` (lead-repaired, D-008)**: I independently confirmed both halves of the lead's
+8. **`gen_eval_final.py`'s own repair comment undercounts the defect.** The inline `AGENT-4 REPAIR`
+   block at `scripts/gen_eval_final.py:112-115` says *"Four of the twelve differ"* and names
+   `garbage_truck`, `van_gogh`, `english_springer`, `monet`. **Nine of the twelve differ** — the four
+   named plus `cassette_player`, `chain_saw`, `french_horn`, `gas_pump`, `golf_ball`. The emitted
+   record field at `:197` repeats "differs from `gen_eval.LABELS` in 4 of 12". The *code* is fixed
+   and correct (`:125-126,134` use `LABELS` for text and `LAB_KEY` for identity); only the comment
+   and the emitted provenance string undercount. Worth correcting so the next reader does not
+   conclude that five degraded distractors were harmless. **Agent 4's file, not mine — reported.**
+9. **`FINDING78` (lead-repaired, D-008)**: I independently confirmed both halves of the lead's
    correction — `logs/e2h_stronger.log` gives 0.5333 at lr 1e-4/25 steps, and the "first arm / both
    halves" wording appears in **no** document I own (grep over `docs/` and `*.md`; the only other
    hits are `FINDING63`, `PREREG_H64` and `CORRECTION_REGISTER_r5.md:183`, all pre-existing and
@@ -284,6 +297,8 @@ which is a process defect rather than a factual one.
 | **`D-008`** | `FINDING78` §3's "first arm to meet both mandate halves at any budget" | **CONFIRMED retracted.** `logs/e2h_stronger.log` gives **0.5333** at lr 1e-4 / 25 steps; max-over-valid is a ratchet. The wording appears in **no** document I own. §1's retention figures (0.9000 vs 0.6250 / 0.7000 / 0.1167) are artifact-exact and citable |
 | **`D-016`** | `erase_wdr_v2.py` alternates where the reference **sums** | **CONFIRMED** against `vision_unlearner.py:411,637-682`; recorded in manifest §3 |
 | **`D-017`** | `FINDING67`'s mechanism attribution, the ~4,000×, the "third instance" framing, and "at gradient parity" | **CONFIRMED.** Measured step fractions 0.104 / 0.537 / 0.998 give ≈**9.6×**. The derivation ‖∇L‖ = α/√N stands; retain8 **0.5917** and the K1 FAIL stand; the unifying three-instance story does not |
+| **`D-022`** | `gen_eval_final.py` scored all FINAL numbers with `LAB_KEY` instead of `LABELS` | **CONFIRMED, and the direction is as stated.** Parsed both arrays from `gen_eval.py:48,50`: **9 of 12 differ**; the identical three are **`church`, `parachute`, `tench`** — and `church` is the erased target in every E6 arm, so the nine *distractors* were degraded and target hits are biased **upward**. Recomputed from the retained `per_image_predictions` across all 12 `outputs/final_*.json`: **37 of 180** images won by a degraded label, overall median margin **0.0051**. Per-arm, exactly as reported: frp **7/15** with 7 degraded wins (median 0.0051); uce_sd15_lam1000 **9/15** with 5 (0.0027); utrap **1/15** with 10 (0.0044); utrap_sd15 **2/15** with 12 (0.0063); BASE_sd14_anchor **13/15** with 2 |
+| **`D-022a`** | `FINDING66` shares the defect but its comparison is within-scorer | **CONFIRMED.** Both sides of its central comparison (attacked arms at 15/15 and 14/15 vs `BASE_sd14_anchor` at 13/15) come from the same defective path, so the comparison is internally consistent, and 15/15 cannot rise if distractors are strengthened. The "beats the base" sub-claim rests on **2 images**, and both base misses were degraded-label wins — correctly withdrawn |
 
 ---
 

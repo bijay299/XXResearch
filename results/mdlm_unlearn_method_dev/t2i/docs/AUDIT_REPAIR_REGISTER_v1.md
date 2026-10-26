@@ -470,6 +470,22 @@ re-scoring, or may shrink substantially; it cannot be called measured until then
 promoted from hygiene to a **finding-critical** gate condition, and FINDING65/66 carry a
 do-not-quote notice until it clears.
 
+**Counterweight, and it should be stated as plainly as the defect (Agent 6).** 37 images turning on
+margins of ~0.005 **cannot by themselves account for a 0.1333 → 0.4667 gap**. The split-leak and
+prompt-difficulty reasoning in FINDING65 is untouched by this defect, and the finding may well
+survive re-scoring. What is unknown is the **magnitude**, not the existence, of the effect. The
+notice on FINDING65 says "unmeasured", not "wrong", and that distinction is deliberate — overstating
+the retraction would be its own error.
+
+**Count correction in the repair itself (lead, 2026-10-26).** Agent 4's repair comment at
+`gen_eval_final.py:112-115` and the emitted `label_text_note` at `:197` both said **"4 of 12"**
+differ, naming only the labels whose *wording* changes. Verified by parsing both arrays: **nine
+differ**; the comment omitted the five that differ by an **underscore alone** (`cassette_player`,
+`chain_saw`, `french_horn`, `gas_pump`, `golf_ball`). An underscore is a different token sequence
+and therefore a different text embedding, so those five are not harmless. The *code* was correctly
+fixed; only the documentation undercounted. Both corrected, so a later reader cannot conclude five
+degraded distractors were benign.
+
 ### D-023 — `FINDING73` compares a tench retain8 that includes tench against church arms that exclude theirs.
 
 **Severity:** high · **Owner:** Agent 4 · **Files:** `docs/FINDING73…md:71,87`

@@ -110,12 +110,23 @@ def main():
     # ------------------------------------------------------------------ AGENT-4 REPAIR (D-013)
     # WAS: `labels = list(ge.CONCEPTS)`, commented "same closed 12-label set as every H number".
     # That was FALSE. `ge.CONCEPTS` keys are the project's *internal* keys (`LAB_KEY`), not the
-    # *CLIP text* labels (`LABELS`). Four of the twelve differ, so this script was prompting CLIP
-    # with "a photo of a garbage_truck" / "a photo of a van_gogh" / "a photo of a
-    # english_springer" / "a photo of a monet" where every H number in the corpus uses "a photo of
-    # a garbage truck" / "... van gogh painting" / "... english springer spaniel" / "... monet
-    # painting". The target string ("church") is identical in both sets, so the active target was
-    # never mis-spelled -- but the closed-set argmax it must win against was, which makes the
+    # *CLIP text* labels (`LABELS`).
+    #
+    # COUNT CORRECTED 2026-10-26 (lead, after Agent 6 flagged it): **NINE of the twelve differ**,
+    # not four. This comment originally named only the four whose wording changes
+    # (garbage_truck, van_gogh, english_springer, monet) and silently omitted the five that differ
+    # by an underscore alone -- cassette_player, chain_saw, french_horn, gas_pump, golf_ball.
+    # An underscore is not harmless: it is a different token sequence and so a different text
+    # embedding. Only `church`, `parachute` and `tench` are byte-identical across the two lists.
+    #
+    # So this script was prompting CLIP with "a photo of a garbage_truck" / "... van_gogh" /
+    # "... english_springer" / "... monet" / "... cassette_player" / "... chain_saw" /
+    # "... french_horn" / "... gas_pump" / "... golf_ball", where every H number in the corpus uses
+    # "a photo of a garbage truck" / "... van gogh painting" / "... english springer spaniel" /
+    # "... monet painting" / "... cassette player" / "... chain saw" / "... french horn" /
+    # "... gas pump" / "... golf ball". The target string ("church") is identical in both sets, so
+    # the active target was never mis-spelled -- but the closed-set argmax it must win against was,
+    # and nine weakened competitors bias the target's hit count UPWARD. Which makes the
     # decision boundary a different one from the rest of the project. All 12 `outputs/final_*.json`
     # written before this repair predate the `label_text_set` field and therefore carry NO such
     # field; their absence is the marker. Those records are NOT construction-comparable to any H
@@ -194,9 +205,13 @@ def main():
                "label_text": label_text,
                "label_text_note": "Records written before the D-013 repair carry no "
                                   "label_text_set field; those used gen_eval.CONCEPTS KEYS as the "
-                                  "CLIP text, which differs from gen_eval.LABELS in 4 of 12 "
-                                  "strings (garbage_truck, van_gogh, english_springer, monet). "
-                                  "Pre-repair FINAL numbers are therefore NOT "
+                                  "CLIP text, which differs from gen_eval.LABELS in 9 of 12 "
+                                  "strings (garbage_truck, van_gogh, cassette_player, chain_saw, "
+                                  "english_springer, french_horn, gas_pump, golf_ball, monet). "
+                                  "Only church, parachute and tench are identical. Since church "
+                                  "is the erased target in every E6 arm, the target text was "
+                                  "correct while all nine competitors were degraded, biasing "
+                                  "target_hits UPWARD. Pre-repair FINAL numbers are therefore NOT "
                                   "construction-comparable to any H number and must be re-scored "
                                   "before being compared.",
                "denominator_note": f"{len(finals)} FINAL prompts x {a.n_per} images = "
