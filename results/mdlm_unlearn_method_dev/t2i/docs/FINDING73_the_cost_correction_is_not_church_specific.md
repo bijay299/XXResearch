@@ -131,3 +131,57 @@ This is the third consecutive cycle in which the new measurement amended the pre
 came from a replication or extension **I chose to run against my own claim**, which is the intended
 behaviour — but it also means `FINDING68`–`FINDING73` should be read as one young, self-correcting
 block, and the generalising clauses in each are the parts most likely to move next.
+
+## 7. Completion (E11l) — three concepts, full curves at n = 3. **Every concept is fully reversed within 100 steps at lr 1e-5.** Concept varies the required budget by ~4×, not by an order of magnitude.
+
+`frp_tench_r3_l05`, lr 1e-5, complete:
+
+| steps | valid | mean H | max-over-valid | utility | per-seed H |
+|---:|---:|---:|---:|---:|---|
+| 10 | **2/3** | 0.4667 | 0.5333 | 0.9861 | 0.4000, *0.6667*, 0.5333 |
+| 25 | 3/3 | 0.6889 | 0.7333 | 0.9861 | 0.7333, 0.6667, 0.6667 |
+| **50** | 3/3 | 0.9556 | **1.0000** | 0.9722 | 1.0000, 1.0000, 0.8667 |
+| **100** | 3/3 | **1.0000** | **1.0000** | 0.9722 | 1.0000, 1.0000, 1.0000 |
+
+**The three-concept table, matched method (FRP) and lr (1e-5), n = 3:**
+
+| concept | arm | H_before | max-over-valid first = 1.000 | **all three seeds = 1.000** | utility there |
+|---|---|---:|---:|---:|---:|
+| garbage_truck | `frp_garbage_truck_r5_l05` | 0.0000 | **25** | **25** | 0.8681 |
+| tench | `frp_tench_r3_l05` | 0.1333 | **50** | **100** | 0.9722 |
+| church | `frp_church_r3_l05` | 0.1333 | 50 *(n = 1)* | — | 0.9722 |
+
+### 7a. What the completed series supports
+
+1. **Every concept tested is fully reversed within 100 steps at lr 1e-5**, against this project's
+   reported **300**. The cost correction of `FINDING68`/`FINDING70` holds on **three** concepts and
+   is not church-specific — §6's amendment stands, and the ordering it reported is confirmed with
+   tench's curve complete.
+2. **Concept varies the budget by ~4× for reproducible recovery** (25 steps for garbage_truck,
+   100 for tench) and ~2× for max-over-valid (25 vs 50). So concept matters, and it matters *less*
+   than the 12× the 300-step figure was wrong by. "Slowest concept" means 100 steps, not 300.
+3. **tench is the cleanest recovery measured anywhere in this project**: complete restoration on all
+   three seeds while post-attack utility stays **0.9722–0.9861**, the highest band of any arm. Full
+   concept recovery with essentially no collateral damage, on a concept the defence had suppressed
+   to 0.1333.
+4. **Every cell across all three concepts fails the mandate's robustness half.** There is no
+   (concept, budget) combination at which any arm reaches max-over-valid H ≤ 0.40 while holding
+   retain8 ≥ 0.85.
+
+### 7b. What it still does not support
+
+- **One defence family in the matched comparison** (FRP), **one learning rate**, **three seeds**,
+  **three concepts**, and the arms still differ in `H_before` (0.0000 vs 0.1333) and retain8
+  (0.7750 / 0.7917 / 0.9417). Concept, arm quality and starting suppression remain **confounded**;
+  separating them needs builds matched on pre-attack suppression, which is disk-blocked.
+- **The concept ordering is not explained.** Why garbage_truck is 4× cheaper than tench is unknown;
+  frequency in the pretraining distribution, visual distinctiveness and the CLIP classifier's own
+  per-class behaviour are all candidates and none is tested.
+- **The classifier is the measuring instrument for all of this.** A 12-label closed-set CLIP argmax
+  may simply be more willing to call an image a garbage truck than a tench. That alone could produce
+  the ordering, and it is **not** controlled for. This is the single most likely alternative
+  explanation and it needs an independent detector to rule out (`ERRATUM_interpretations_r5.md` §8).
+- **DEV prompts** throughout.
+
+**E11m is running a fourth concept** (`frp_parachute_r5_l05`, target 0.2000 / retain8 0.7417) to see
+whether the ~4× spread holds or widens.
