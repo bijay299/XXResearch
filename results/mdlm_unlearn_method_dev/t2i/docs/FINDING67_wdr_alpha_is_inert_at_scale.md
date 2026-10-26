@@ -97,3 +97,58 @@ ratio, not inherit it. `erase_wdr_v2.py`'s `--alpha` help text now carries this,
 **One arm, one α, one concept, one seed.** The α sweep the correction register prices at 6 GPU-h
 stays blocked by disk (5.1 GiB free), so E1b will produce a single point, not a curve. That limits
 what it can conclude and is stated here rather than discovered later.
+
+## 6. Addendum (E1b) — at the measured α the objective works as designed, and **'From Dormant to Deleted' now has its first real measurement here: a utility failure, not a robustness result**
+
+E1b ran the same arm at the **measured** α = 4000 instead of the reference's inherited 1.0.
+`--max-rms 0.03`; the trust region **did not fire**, so all 1500 steps ran.
+
+**The objective became active, exactly as §3 predicted it would at parity:**
+
+| step | 0 | 700 | 1100 | 1499 |
+|---|---|---|---|---|
+| RMS distance from base | 0.009024 | 0.014211 | 0.019048 | **0.023839** |
+| forget term (α × −RMS) | — | −56.80 | −76.15 | −95.31 |
+
+RMS reached **2.6× the teacher's own distance**, against +5.2 × 10⁻⁵ of movement at α = 1. So the
+α correction was the whole difference between an inert term and a working one.
+
+**The outcome, placed against the teacher it started from:**
+
+| arm | target | retain8 | all-non-target | verdict |
+|---|---:|---:|---:|---|
+| `frp_church_r3_l05` (the teacher) | 0.1333 | 0.9417 | — | — |
+| `wdr2_church_a1.0` (α inert) | 0.5333 | 0.9500 | 0.9455 | retain-fine-tuning control |
+| **`wdr2_church_a4000`** (α effective) | **0.2000** | **0.5917** | **0.5333** | **K1 FAIL — not attacked** |
+
+So the faithful mechanism, at an effective coefficient, **cost 0.35 of retention (0.9417 → 0.5917)
+while not improving on the teacher's erasure** (0.2000 vs 0.1333). It falls below the K1 utility
+floor of 0.60 and was therefore **not attacked** — correctly, since a robustness number from a
+model this damaged would not be interpretable.
+
+**This is the first genuine measurement of 2505.22310's mechanism in this project**, and
+`ERRATUM_wsr_direction.md`'s "untested" status is now one point of evidence rather than zero. The
+honest statement of it:
+
+> Ported to a 859.5M-parameter diffusion UNet at gradient parity, Weight Dist Reg's distance-
+> maximisation drives the model 2.6× further from base and costs more retention than it buys
+> erasure, failing the utility floor at the one α tested.
+
+**It is one point, and the α that matters is bracketed but not resolved.** retain8 = **0.5917 is
+0.0083 below the 0.60 threshold** — close enough that a modestly smaller α plausibly clears it. The
+useful window is now bracketed from both sides by measurement, exactly as the UCE λ case was:
+
+| α | distance term | retain8 | reading |
+|---:|---|---:|---|
+| 1 | inert (+5.2e-5 RMS) | 0.9500 | not the method |
+| **4000** | active (2.6× RMS) | **0.5917** | method active, utility floor missed by 0.008 |
+
+**α ∈ (1, 4000) is unmeasured, and that interval is where a usable arm would be if one exists.**
+That is the α sweep the correction register prices at ~6 GPU-h and that disk has blocked throughout;
+a single intermediate point (α ≈ 1000) would likely settle it. Until then the method's standing here
+is **"one α tested, utility floor missed narrowly"** — not refuted, and certainly not discharged.
+
+Also worth recording: the trust region not firing at `--max-rms 0.03` means the predicted
+catastrophic unbounded ascent (`FINDING61` §4) **did not occur** at α = 4000 in 1500 steps. The
+damage was gradual retention loss, not collapse. That is a more informative failure than the
+earlier unbounded-objective nulls.

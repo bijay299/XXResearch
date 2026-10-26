@@ -1,0 +1,143 @@
+{
+ "study": "wdr_erase_v2",
+ "implementation_version": "wdr/v2-faithful-direction",
+ "reproduces": "arXiv 2505.22310 section 6.1 'Weight Dist Reg'",
+ "reference_code": "shoaibahmed/vision_relearning@7b9a1ccada35a4059604c2688d2822567b3cf40d vision_unlearner.py L366-373",
+ "supersedes_and_does_not_replace": "scripts/erase_wsr.py, which implements the OPPOSITE direction and keeps its own results as an anchoring-to-base arm",
+ "objective": "alternating: (a) alpha * ( -sqrt(mean((theta_pre-theta)^2)+1e-8) ) ; (b) diffusion MSE on retain data, coefficient 1.0",
+ "faithfulness": {
+  "direction": "MAXIMISES distance (reference)",
+  "normalisation": "RMS over flattened params, eps=1e-8 (reference)",
+  "forget_data_term": "NONE -- the distance term IS the forget loss (reference)",
+  "retain_coefficient": 1.0,
+  "schedule": "alternating forget/retain iterations (reference)",
+  "scope": "all UNet parameters",
+  "optimiser": "Adam, no grad clipping (reference defaults)",
+  "domain_adaptation": "retain objective is the diffusion MSE, not cross-entropy; the paper is example-level unlearning in vision classifiers",
+  "disclosed_deviation": "--max-rms trust-region stop; the reference has none"
+ },
+ "trust_region_stop": {
+  "fired": false
+ },
+ "split_version": "v2",
+ "rng_streams": {
+  "data_generation": 2000000,
+  "defence_build": 0
+ },
+ "label": "wdr2_church_a4000",
+ "concept": "church",
+ "hparams": {
+  "concept": "church",
+  "alpha": 4000.0,
+  "teacher": "adapters/frp_church_r3_l05/unet.pt",
+  "lr": 1e-05,
+  "steps": 1500,
+  "max_rms": 0.03,
+  "n_retain": 32,
+  "batch": 2,
+  "seed": 0,
+  "log_every": 100,
+  "label": "wdr2_church_a4000",
+  "out": "adapters/wdr2_church_a4000"
+ },
+ "n_params": 859520964,
+ "history": [
+  {
+   "step": 0,
+   "l_forget": -36.093353271484375,
+   "l_retain": 0.05209582298994064,
+   "rms_distance": 0.009024493396282196
+  },
+  {
+   "step": 100,
+   "l_forget": -36.597190856933594,
+   "l_retain": 0.008074140176177025,
+   "rms_distance": 0.009151197969913483
+  },
+  {
+   "step": 200,
+   "l_forget": -37.854007720947266,
+   "l_retain": 0.04214898496866226,
+   "rms_distance": 0.0094680767506361
+  },
+  {
+   "step": 300,
+   "l_forget": -40.25479507446289,
+   "l_retain": 0.24064289033412933,
+   "rms_distance": 0.010071049444377422
+  },
+  {
+   "step": 400,
+   "l_forget": -43.628448486328125,
+   "l_retain": 0.004985272418707609,
+   "rms_distance": 0.0109165133908391
+  },
+  {
+   "step": 500,
+   "l_forget": -47.67024230957031,
+   "l_retain": 0.22372934222221375,
+   "rms_distance": 0.011928278021514416
+  },
+  {
+   "step": 600,
+   "l_forget": -52.11990737915039,
+   "l_retain": 0.12521404027938843,
+   "rms_distance": 0.013041442260146141
+  },
+  {
+   "step": 700,
+   "l_forget": -56.7982177734375,
+   "l_retain": 0.038202591240406036,
+   "rms_distance": 0.014211432076990604
+  },
+  {
+   "step": 800,
+   "l_forget": -61.59230041503906,
+   "l_retain": 0.5235703587532043,
+   "rms_distance": 0.015410134568810463
+  },
+  {
+   "step": 900,
+   "l_forget": -66.43403625488281,
+   "l_retain": 0.25689107179641724,
+   "rms_distance": 0.016620635986328125
+  },
+  {
+   "step": 1000,
+   "l_forget": -71.29114532470703,
+   "l_retain": 0.06964607536792755,
+   "rms_distance": 0.01783492974936962
+  },
+  {
+   "step": 1100,
+   "l_forget": -76.14534759521484,
+   "l_retain": 0.1056097224354744,
+   "rms_distance": 0.019048457965254784
+  },
+  {
+   "step": 1200,
+   "l_forget": -80.98622131347656,
+   "l_retain": 0.1550799310207367,
+   "rms_distance": 0.02025863341987133
+  },
+  {
+   "step": 1300,
+   "l_forget": -85.79814147949219,
+   "l_retain": 0.1586759388446808,
+   "rms_distance": 0.02146153710782528
+  },
+  {
+   "step": 1400,
+   "l_forget": -90.58782196044922,
+   "l_retain": 0.017286429181694984,
+   "rms_distance": 0.022658908739686012
+  },
+  {
+   "step": 1499,
+   "l_forget": -95.30799865722656,
+   "l_retain": 0.032350197434425354,
+   "rms_distance": 0.023838894441723824
+  }
+ ],
+ "minutes": 11.369858284791311
+}
