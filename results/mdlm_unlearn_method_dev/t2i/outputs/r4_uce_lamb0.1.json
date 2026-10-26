@@ -1,0 +1,78 @@
+{
+ "study": "r4_uce_official_vs_port",
+ "upstream": "unified-concept-editing@7c724d9d7d19190e9bd33fe62fb656f1df87cd8e trainscripts/uce_sd_erase.py",
+ "ours": "scripts/erase_uce.py",
+ "config": {
+  "concept": "church",
+  "guide": " ",
+  "lamb": 0.1,
+  "erase_scale": 1.0,
+  "preserve_scale": 1.0,
+  "n_erase_prompts": 6,
+  "n_preserve_prompts": 10
+ },
+ "n_modules": 32,
+ "max_relative_error": 0.15895941853523254,
+ "mean_relative_error": 0.09474847698584199,
+ "numerically_equivalent_at_this_config": false,
+ "default_mismatch_note": "official --lamb default is 0.5; erase_uce.py default is 0.1. Every historical arm of ours used 0.1, so 'UCE at defaults' denotes different edits in the two codebases. Separately, ERRATUM_uce_lambda_scale.md measured lambda inert below ~1e3 against c^T c's max eigenvalue of 85,850.",
+ "erase_scale_note": "our port carries no erase_scale coefficient; it is equivalent to the official form only when erase_scale == 1 (the official default). This run tests that directly.",
+ "per_module": [
+  {
+   "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel_err": 0.11626381427049637,
+   "norm_official": 28.78993034362793,
+   "norm_ours": 28.795137405395508,
+   "norm_W_old": 28.485191345214844
+  },
+  {
+   "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel_err": 0.12941858172416687,
+   "norm_official": 10.840510368347168,
+   "norm_ours": 10.842138290405273,
+   "norm_W_old": 10.766531944274902
+  },
+  {
+   "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel_err": 0.10712768882513046,
+   "norm_official": 22.61883544921875,
+   "norm_ours": 22.62649154663086,
+   "norm_W_old": 22.506980895996094
+  },
+  {
+   "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel_err": 0.13236288726329803,
+   "norm_official": 7.584725856781006,
+   "norm_ours": 7.580170631408691,
+   "norm_W_old": 7.550899982452393
+  },
+  {
+   "module": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel_err": 0.08526758849620819,
+   "norm_official": 38.77848434448242,
+   "norm_ours": 38.79301071166992,
+   "norm_W_old": 38.62750244140625
+  },
+  {
+   "module": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel_err": 0.09000997990369797,
+   "norm_official": 16.281185150146484,
+   "norm_ours": 16.28508758544922,
+   "norm_W_old": 16.28993797302246
+  },
+  {
+   "module": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel_err": 0.10120077431201935,
+   "norm_official": 31.939674377441406,
+   "norm_ours": 31.947532653808594,
+   "norm_W_old": 31.75819969177246
+  },
+  {
+   "module": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel_err": 0.13648809492588043,
+   "norm_official": 12.958573341369629,
+   "norm_ours": 12.959405899047852,
+   "norm_W_old": 12.876693725585938
+  }
+ ]
+}
