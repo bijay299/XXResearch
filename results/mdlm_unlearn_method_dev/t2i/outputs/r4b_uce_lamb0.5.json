@@ -1,0 +1,295 @@
+{
+ "study": "r4b_uce_upstream_vs_port",
+ "supersedes": "outputs/r4_uce_official_vs_port.json (VOID: char-split inputs, neither pipeline reproduced, no upstream code executed)",
+ "upstream": {
+  "repo": "rohitgandikota/unified-concept-editing",
+  "commit": "7c724d9d7d19190e9bd33fe62fb656f1df87cd8e",
+  "file": "/data/bijaypandey/t2i_unlearn/upstream/unified-concept-editing/trainscripts/uce_sd_erase.py",
+  "executed": true,
+  "shim": "set module-level `device` and `torch_dtype=torch.float32` (both are bound only inside upstream's __main__ block, at uce_sd_erase.py:116-117); UCE() body unmodified"
+ },
+ "config": {
+  "model": "CompVis/stable-diffusion-v1-4",
+  "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+  "concept": "church",
+  "edit_concepts": [
+   "church"
+  ],
+  "guide_concepts": [
+   ""
+  ],
+  "preserve_concepts": [
+   "cassette player",
+   "chain saw",
+   "english springer spaniel",
+   "french horn",
+   "gas pump",
+   "golf ball",
+   "tench",
+   "Monet",
+   "a photo",
+   "a painting"
+  ],
+  "lamb": 0.5,
+  "erase_scale": 1.0,
+  "preserve_scale": 1.0,
+  "dtype": "float32 compute, float64 reference",
+  "n_edited_modules": 32,
+  "edited_module_names": [
+   "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k",
+   "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v",
+   "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k",
+   "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v",
+   "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k",
+   "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v",
+   "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k",
+   "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v",
+   "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k",
+   "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v",
+   "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k",
+   "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v",
+   "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k",
+   "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v",
+   "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k",
+   "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v",
+   "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k",
+   "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v",
+   "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k",
+   "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v",
+   "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k",
+   "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v",
+   "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k",
+   "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v",
+   "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k",
+   "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v",
+   "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k",
+   "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v",
+   "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k",
+   "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v",
+   "mid_block.attentions.0.transformer_blocks.0.attn2.to_k",
+   "mid_block.attentions.0.transformer_blocks.0.attn2.to_v"
+  ]
+ },
+ "A_embedding_selection_upstream_vs_port": {
+  "per_matrix_max": 0.32190436124801636,
+  "per_matrix_mean": 0.2173323044553399,
+  "n": 32,
+  "note": "FULL pipelines: upstream executed vs our port's embedding selection. Confounds embedding selection with everything else."
+ },
+ "B_same_selection_vs_upstream": {
+  "per_matrix_max": 0.0003046353522222489,
+  "per_matrix_mean": 0.0001620324944724416,
+  "n": 32,
+  "note": "our solver using UPSTREAM's embedding selection, vs upstream's own output. Isolates solver/accumulation from embedding selection."
+ },
+ "C_float32_vs_float64_upstream_selection": {
+  "per_matrix_max": 0.00021434524823557712,
+  "per_matrix_mean": 0.00011743711883606144,
+  "n": 32,
+  "note": "MEASURED numerical error of the float32 solve against a float64 solve on IDENTICAL matrices. Not inferred from a condition number."
+ },
+ "C_float32_vs_float64_port_selection": {
+  "per_matrix_max": 0.013554224991423596,
+  "per_matrix_mean": 0.008575910682938628,
+  "n": 32
+ },
+ "per_matrix_all": [
+  {
+   "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel": 0.2526487112045288,
+   "norm_upstream": 28.52142333984375,
+   "norm_port": 28.91827392578125
+  },
+  {
+   "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel": 0.2250867336988449,
+   "norm_upstream": 10.761425971984863,
+   "norm_port": 10.885176658630371
+  },
+  {
+   "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel": 0.23869529366493225,
+   "norm_upstream": 22.569103240966797,
+   "norm_port": 22.725900650024414
+  },
+  {
+   "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel": 0.2221444845199585,
+   "norm_upstream": 7.549144268035889,
+   "norm_port": 7.6275739669799805
+  },
+  {
+   "module": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel": 0.2368762344121933,
+   "norm_upstream": 38.63032150268555,
+   "norm_port": 39.12886047363281
+  },
+  {
+   "module": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel": 0.21465334296226501,
+   "norm_upstream": 16.279621124267578,
+   "norm_port": 16.423982620239258
+  },
+  {
+   "module": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel": 0.23290550708770752,
+   "norm_upstream": 31.78338050842285,
+   "norm_port": 32.11370086669922
+  },
+  {
+   "module": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel": 0.2237606942653656,
+   "norm_upstream": 12.870460510253906,
+   "norm_port": 13.007034301757812
+  },
+  {
+   "module": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel": 0.23742543160915375,
+   "norm_upstream": 42.91041564941406,
+   "norm_port": 43.499237060546875
+  },
+  {
+   "module": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel": 0.18369005620479584,
+   "norm_upstream": 30.128387451171875,
+   "norm_port": 30.258169174194336
+  },
+  {
+   "module": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel": 0.205698162317276,
+   "norm_upstream": 47.350276947021484,
+   "norm_port": 47.69655227661133
+  },
+  {
+   "module": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel": 0.17637424170970917,
+   "norm_upstream": 31.24828338623047,
+   "norm_port": 31.35076904296875
+  },
+  {
+   "module": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel": 0.19110704958438873,
+   "norm_upstream": 51.192317962646484,
+   "norm_port": 51.44931411743164
+  },
+  {
+   "module": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel": 0.17368045449256897,
+   "norm_upstream": 39.64092254638672,
+   "norm_port": 39.77338409423828
+  },
+  {
+   "module": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel": 0.19066429138183594,
+   "norm_upstream": 53.53533935546875,
+   "norm_port": 53.794342041015625
+  },
+  {
+   "module": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel": 0.17160478234291077,
+   "norm_upstream": 44.794952392578125,
+   "norm_port": 44.92060852050781
+  },
+  {
+   "module": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k",
+   "rel": 0.18729287385940552,
+   "norm_upstream": 52.84345245361328,
+   "norm_port": 53.08116912841797
+  },
+  {
+   "module": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v",
+   "rel": 0.1745947301387787,
+   "norm_upstream": 40.812767028808594,
+   "norm_port": 40.944217681884766
+  },
+  {
+   "module": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel": 0.1952298879623413,
+   "norm_upstream": 40.82653045654297,
+   "norm_port": 41.028228759765625
+  },
+  {
+   "module": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel": 0.18700647354125977,
+   "norm_upstream": 38.109642028808594,
+   "norm_port": 38.30010986328125
+  },
+  {
+   "module": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel": 0.21132175624370575,
+   "norm_upstream": 35.55295944213867,
+   "norm_port": 35.79939651489258
+  },
+  {
+   "module": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel": 0.1885642558336258,
+   "norm_upstream": 25.866945266723633,
+   "norm_port": 25.984445571899414
+  },
+  {
+   "module": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k",
+   "rel": 0.20903562009334564,
+   "norm_upstream": 35.47540283203125,
+   "norm_port": 35.74802780151367
+  },
+  {
+   "module": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v",
+   "rel": 0.1989859789609909,
+   "norm_upstream": 22.281368255615234,
+   "norm_port": 22.424530029296875
+  },
+  {
+   "module": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel": 0.29092198610305786,
+   "norm_upstream": 23.317157745361328,
+   "norm_port": 23.804012298583984
+  },
+  {
+   "module": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel": 0.2432217299938202,
+   "norm_upstream": 7.495072364807129,
+   "norm_port": 7.594830513000488
+  },
+  {
+   "module": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k",
+   "rel": 0.32190436124801636,
+   "norm_upstream": 23.986833572387695,
+   "norm_port": 24.664764404296875
+  },
+  {
+   "module": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v",
+   "rel": 0.27472570538520813,
+   "norm_upstream": 9.391563415527344,
+   "norm_port": 9.59533405303955
+  },
+  {
+   "module": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k",
+   "rel": 0.2682992219924927,
+   "norm_upstream": 22.181734085083008,
+   "norm_port": 22.5236873626709
+  },
+  {
+   "module": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v",
+   "rel": 0.24184028804302216,
+   "norm_upstream": 8.661434173583984,
+   "norm_port": 8.783358573913574
+  },
+  {
+   "module": "mid_block.attentions.0.transformer_blocks.0.attn2.to_k",
+   "rel": 0.20455561578273773,
+   "norm_upstream": 39.08266830444336,
+   "norm_port": 39.347618103027344
+  },
+  {
+   "module": "mid_block.attentions.0.transformer_blocks.0.attn2.to_v",
+   "rel": 0.18011778593063354,
+   "norm_upstream": 39.53767395019531,
+   "norm_port": 39.68977737426758
+  }
+ ],
+ "caveats": [
+  "Weight differences are NOT image differences and NOT attack resistance.",
+  "This does not establish which implementation is more accurate; the float64 columns bound each one's own numerical error, nothing more."
+ ],
+ "minutes": 0.1215168039004008
+}

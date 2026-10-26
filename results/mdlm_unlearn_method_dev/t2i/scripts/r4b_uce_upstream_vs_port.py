@@ -77,8 +77,11 @@ def load_upstream_uce(device):
     mod = iu.module_from_spec(spec)
     sys.modules["upstream_uce_sd_erase"] = mod
     spec.loader.exec_module(mod)
-    mod.device = device                      # <-- the only shim
-    return mod, {"shim": "set module-level `device`; UCE() body unmodified",
+    mod.device = device                      # <-- shim 1
+    mod.torch_dtype = torch.float32          # <-- shim 2: upstream binds this only in __main__
+    return mod, {"shim": "set module-level `device` and `torch_dtype=torch.float32` (both are "
+                         "bound only inside upstream's __main__ block, at uce_sd_erase.py:116-117); "
+                         "UCE() body unmodified",
                  "file": path, "commit": UPSTREAM_COMMIT}
 
 
@@ -142,15 +145,24 @@ def main():
                 out.append(emb[0, n, :].float())
         return torch.stack(out)
 
-    def embed_port_style(prompts):
-        """positions [attention_mask.sum()-2 .. 76] (our erase_uce.py)."""
+    def embed_port_style(prompts, pair_with=None):
+        """positions [attention_mask.sum()-2 .. 76] (our erase_uce.py).
+
+        BUGFIX: the position count VARIES with token length, so an erase prompt and its guide
+        yield different row counts and the closed form will not multiply. erase_uce.py handles this
+        with its `paired` path, taking the SAME positions of the paired prompt. `pair_with` supplies
+        the prompt whose indices govern; without it a guide/erase pair mismatches (77 vs 76).
+        """
         out = []
-        for p in prompts:
+        for i, p in enumerate(prompts):
+            gov = p if pair_with is None else pair_with[i]
             with torch.no_grad():
+                tg = tok([gov], padding="max_length", max_length=77, truncation=True,
+                         return_tensors="pt").to(dev)
+                last = max(int(tg.attention_mask[0].sum().item()) - 2, 0)
                 ti = tok([p], padding="max_length", max_length=77, truncation=True,
                          return_tensors="pt").to(dev)
                 h = te(ti.input_ids)[0]
-                last = max(int(ti.attention_mask[0].sum().item()) - 2, 0)
                 out.append(h[0, torch.arange(last, h.shape[1], device=dev)].float())
         return torch.cat(out)
 
@@ -166,7 +178,11 @@ def main():
 
     results = {}
     for style, embfn in (("upstream_token", embed_upstream_style), ("port_last_to_76", embed_port_style)):
-        c_e = embfn(edit_concepts); c_g = embfn(guide_concepts); c_p = embfn(preserve_concepts)
+        if style == 'port_last_to_76':
+            c_e = embfn(edit_concepts); c_g = embfn(guide_concepts, pair_with=edit_concepts)
+            c_p = embfn(preserve_concepts)
+        else:
+            c_e = embfn(edit_concepts); c_g = embfn(guide_concepts); c_p = embfn(preserve_concepts)
         per = []
         for (name, m) in mods:
             W = m.weight.data.float()
@@ -184,7 +200,8 @@ def main():
 
     # upstream (reloaded) vs our-port-selection, every matrix
     cross = []
-    c_e_p = embed_port_style(edit_concepts); c_g_p = embed_port_style(guide_concepts)
+    c_e_p = embed_port_style(edit_concepts)
+    c_g_p = embed_port_style(guide_concepts, pair_with=edit_concepts)
     c_p_p = embed_port_style(preserve_concepts)
     for (name, m) in mods:
         W = m.weight.data.float()
