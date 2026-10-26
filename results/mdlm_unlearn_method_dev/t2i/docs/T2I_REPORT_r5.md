@@ -34,16 +34,20 @@ From the registry, current branch:
 
 | quantity | value |
 |---|---:|
-| JSON files under `outputs/` | **1,200** |
-| attack **records** | **642** |
+| JSON files under `outputs/` | **1,278** |
+| attack **records** | **696** |
 | — quarantined | 0 |
 | — **vacuous** (defence erased nothing; `H_after` measures the base model) | **9** |
 | — VOID post-attack **utility** half (text encoder omitted; T/H unaffected) | **136** |
-| **admissible for recovery** | **633** |
-| **admissible for paired utility** | **270** |
-| defence builds evaluated | 332 |
+| **admissible for recovery** | **687** |
+| **admissible for paired utility** | **324** |
+| defence builds evaluated | 335 |
 
-**642 is a count of files, not of admissible independent experiments**, and even 633 pools
+*(Counts regenerated 2026-10-26 after FINDING65–70 added ~54 attack records. The growth is entirely
+budget/lr-curve attacks on two existing arms — no new defence builds — so it does not change any
+per-arm verdict.)*
+
+**696 is a count of files, not of admissible independent experiments**, and even 687 pools
 fixed-grid confirmatory runs with adaptive escalation. The generated tables split every arm by
 **budget** so the two are never pooled. r4's "609 attacks / 1,088 JSONs" was stale.
 
@@ -191,3 +195,52 @@ Unblocked and cheap: **E1** (faithful WDR, 6 GPU-h), **E2** (Meta v2 full Eq. 8,
 not authorised), **E9** SD-2.x/SDXL (needs a Hugging Face token — `stabilityai/*` returns 401).
 **Immediate operational blocker:** `/data` is at 100% with ~14 GB free, shared with another
 project, so no multi-checkpoint campaign can start safely.
+
+---
+
+## 8. Addendum — findings since r5 was written (FINDING65–70)
+
+r5's body above predates six findings produced during and after the audit remediation. They do not
+change its §6 conclusion — the mandate is unmet — but three of them change figures r5 quotes, and
+one is a correction r5's own numbers depend on. Summarised here so the current report is not stale
+against its own repository.
+
+| # | finding | effect on r5 |
+|---|---|---|
+| **65** | On **FINAL** prompts (never used for anything), erasure is **~3× shallower** than every reported figure: FRP 0.1333 → **0.4667**, UCE 0.2000 → **0.6000**. UTRAP holds best (0.0000 → 0.0667). Base calibration: SD-1.4 scores 1.0000 on DEV, 0.8667 on FINAL; SD-1.5 scores 1.0000 on FINAL — so prompt difficulty explains ≤13% and 0% respectively. **The cause is not the split leak**: the two *leaked* UTRAP arms degraded **least**, the two unleaked arms most | every target-suppression number in §3 is **optimistic**, by ~1.1× for UTRAP-class and ~3–3.5× for FRP/UCE-class arms |
+| **66** | The **H = 1.000 ceiling is not a DEV artifact**: on FINAL prompts the attack reaches **15/15** on all four arms (one at 14/15 at one seed, resolved to 15/15 by two more). On SD-1.4 the attacked model (15/15) **beats the unmodified base** (13/15) | §3's robustness results are **confirmed**, not weakened, under held-out prompts |
+| **67** | The faithful WDR objective is **inert at the reference's default α**, by ~4,000×, because its RMS normalisation gives the term a gradient norm of exactly **1/√N** — constant in distance, shrinking with model size. At the measured α=4000 it works (RMS 2.6× the teacher's) and **costs 0.35 of retention while not improving on the teacher's erasure** (K1 FAIL at 0.5917). **Third instance** of one scale pathology (IMMA α, UCE λ, WDR α) | `'From Dormant to Deleted'` now has **one** measured point here, not zero — a utility failure at one α. α ∈ (1, 4000) is unmeasured and is where a usable arm would be |
+| **68** | The attacker's real cost is **≤100 steps, not 300**; at 25 steps the mandate-qualifying arm is already at 13/15. Reproduced on FRP (ceiling by 50) | r5's "300 gradient steps" **overstates the attack cost 3–6×** |
+| **69** | Resolved to 5 steps, recovery is **graded** — the project's first non-saturated outcome variable. **Its headline threshold was retracted the same day** by seed replication (sd 0.2776 at 10 steps, H spanning 0.1333–0.6667). Completed at n=3: **no budget from 5 to 300 leaves any arm meeting the mandate's robustness half** | the mandate is missed at **every** budget, not just at 300 |
+| **70** | **lr substitutes for budget.** lr 5e-5 / 25 steps gives H = 1.0000 on **all three seeds, sd = 0**, utility 0.9236 — **12× cheaper** than reported. lr 1e-4 / 5 steps reaches 1.0000 on one seed — **60×** cheaper. The budget axis is **non-monotone** at lr 1e-4 (H falls 0.9555 → 0.6222) because the attack starts **destroying** the model (utility 0.8472 → **0.5278**) | r5's cost figure is superseded; and **H alone cannot order attacks** — a low H may mean a weak *or* an overpowered attack, distinguishable only by paired utility |
+
+### 8a. The net effect on the project's standing
+
+**Both halves moved against the defences.** Erasure was shallower than reported (65) and the
+attacker is cheaper than reported (68, 70), while the robustness result survived the one test that
+could have softened it (66). So r5 §6's conclusion holds and is **stronger**: on the builds
+measured, concept erasure in SD-1.x is reversible by **25 gradient steps at lr 5e-5** — reproducibly,
+on all seeds, leaving the model intact — and the suppression it provides is ~3× weaker on prompts it
+was not tuned around.
+
+### 8b. What has been corrected about my own process, twice over
+
+- `FINDING67` §4 named a **three-instance** scale pathology and drew the lesson *"measure the scale
+  before sweeping the knob."* It was then applied **before** the next two experiments
+  (`diag_coeff_scale.py`): UTRAP-v2's λ is ~8× below parity, and **Meta-v2's coefficients are
+  already near parity** — so the pattern does not always recur, which is why checking beats
+  assuming in either direction.
+- `FINDING69` §7 recorded the **fourth** retraction of a headline published before a declared
+  escalation returned, and the rule that followed: *a sub-ceiling number is not publishable as a
+  headline until its declared escalation has returned.* `FINDING69` §8 and `FINDING70` were both
+  held to n = 3 before publication under that rule.
+
+### 8c. Still true, and still the limiting facts
+
+- **The mandate is unmet.** No arm reaches retain8 ≥ 0.85 with max-over-valid H ≤ 0.40, at any
+  budget or learning rate tested.
+- **No corrected baseline implementation has been validated on a model** beyond WDR's single α
+  point: Meta-v2 (E2) and UTRAP-v2 (E4) remain unrun, and the three **released** reference
+  implementations remain unexecuted (E7).
+- **Every target number except FINDING65/66's is a DEV measurement.**
+- **FID is still absent**, so no claim about global image quality.

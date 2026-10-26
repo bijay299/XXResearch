@@ -6,14 +6,14 @@
 
 | quantity | value |
 |---|---:|
-| `json_files_under_outputs` | 1200 |
-| `attack_records_total` | 642 |
+| `json_files_under_outputs` | 1278 |
+| `attack_records_total` | 696 |
 | `attack_records_quarantined` | 0 |
 | `attack_records_void_post_attack_utility` | 136 |
 | `attack_records_vacuous_no_erasure` | 9 |
-| `attack_records_admissible_for_recovery` | 633 |
-| `attack_records_admissible_for_paired_utility` | 270 |
-| `defence_builds_evaluated` | 332 |
+| `attack_records_admissible_for_recovery` | 687 |
+| `attack_records_admissible_for_paired_utility` | 324 |
+| `defence_builds_evaluated` | 335 |
 | `run_inventory_entries` | 234 |
 | `parse_errors` | 0 |
 
@@ -49,14 +49,18 @@ attack_records_total is a count of FILES, not of admissible independent experime
 | `esd_church` | ESD | stable-diffusion-v1-4 | full_unet | 300 | 2 | 2 | 1.0000 | 1.0000 |
 | `frp_bksdm_church_r3_l05` | FRP/FRAG port (2608.25429) | bk-sdm-small | full_unet | 300 | 3 | 3 | 1.0000 | 1.0000 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | dreambooth | 300 | 6 | 6 | 1.0000 | 1.0000 |
-| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 5 | 1 | 0 | — | 0.3333 |
-| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 10 | 1 | 1 | 0.4667 | 0.4667 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 5 | 4 | 1 | 0.5333 | 0.5333 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 10 | 5 | 4 | 0.9333 | 0.9333 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 15 | 3 | 3 | 0.6667 | 0.6667 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 20 | 1 | 1 | 0.8667 | 0.8667 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 25 | 1 | 1 | 0.9333 | 0.9333 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 30 | 1 | 1 | 1.0000 | 1.0000 |
-| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 50 | 1 | 1 | 1.0000 | 1.0000 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 50 | 2 | 2 | 1.0000 | 1.0000 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 75 | 1 | 1 | 1.0000 | 1.0000 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 100 | 1 | 1 | 1.0000 | 1.0000 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 150 | 1 | 1 | 1.0000 | 1.0000 |
-| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 300 | 10 | 10 | 1.0000 | 1.0000 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 200 | 1 | 1 | 1.0000 | 1.0000 |
+| `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 300 | 11 | 11 | 1.0000 | 1.0000 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | full_unet | 600 | 1 | 1 | 1.0000 | 1.0000 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | lora | 300 | 8 | 8 | 1.0000 | 1.0000 |
 | `frp_church_r3_l05` | FRP/FRAG port (2608.25429) | stable-diffusion-v1-4 | textual_inversion | 1000 | 3 | 3 | 0.6667 | 0.6667 |
@@ -158,7 +162,7 @@ attack_records_total is a count of FILES, not of admissible independent experime
 | `uce_church` | UCE closed-form (2308.14761) | stable-diffusion-v1-4 | full_unet | 150 | 1 | 1 | 1.0000 | 1.0000 |
 | `uce_church` | UCE closed-form (2308.14761) | stable-diffusion-v1-4 | full_unet | 300 | 8 | 6 | 1.0000 | 1.0000 |
 | `uce_matched` | UCE closed-form (2308.14761) | stable-diffusion-v1-4 | full_unet | 300 | 4 | 4 | 1.0000 | 1.0000 |
-| `uce_sd15_church_lam1000` | UCE closed-form (2308.14761) | stable-diffusion-v1-5 | full_unet | 300 | 2 | 2 | 1.0000 | 1.0000 |
+| `uce_sd15_church_lam1000` | UCE closed-form (2308.14761) | stable-diffusion-v1-5 | full_unet | 300 | 6 | 6 | 1.0000 | 1.0000 |
 | `undo_a0.0_retain_fisher` | undo/damage composite (ours) | stable-diffusion-v1-4 | full_unet | 150 | 1 | 1 | 1.0000 | 1.0000 |
 | `undo_a0.0_retain_fisher` | undo/damage composite (ours) | stable-diffusion-v1-4 | full_unet | 300 | 2 | 2 | 1.0000 | 1.0000 |
 | `undo_a0.3_rebuild` | undo/damage composite (ours) | stable-diffusion-v1-4 | full_unet | 300 | 2 | 2 | 1.0000 | 1.0000 |
@@ -173,10 +177,17 @@ attack_records_total is a count of FILES, not of admissible independent experime
 | `undo_a0.7_retain_fisher` | undo/damage composite (ours) | stable-diffusion-v1-4 | full_unet | 150 | 1 | 0 | — | 0.0000 |
 | `undo_a0.7_retain_fisher` | undo/damage composite (ours) | stable-diffusion-v1-4 | full_unet | 300 | 2 | 0 | — | 0.0000 |
 | `utrap_bksdm_church_l0.15k8` | UTRAP (ours) | bk-sdm-small | full_unet | 300 | 3 | 3 | 1.0000 | 1.0000 |
-| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 300 | 6 | 6 | 1.0000 | 1.0000 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 5 | 9 | 9 | 1.0000 | 1.0000 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 10 | 9 | 9 | 1.0000 | 1.0000 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 15 | 3 | 3 | 0.9333 | 0.9333 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 25 | 9 | 9 | 1.0000 | 1.0000 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 50 | 1 | 1 | 0.9333 | 0.9333 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 100 | 1 | 1 | 1.0000 | 1.0000 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 200 | 1 | 1 | 1.0000 | 1.0000 |
+| `utrap_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 300 | 7 | 7 | 1.0000 | 1.0000 |
 | `utrap_church_l0.3k16` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 300 | 6 | 6 | 1.0000 | 1.0000 |
 | `utrap_church_l0.3k8` | UTRAP (ours) | stable-diffusion-v1-4 | full_unet | 300 | 6 | 6 | 1.0000 | 1.0000 |
-| `utrap_sd15_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-5 | full_unet | 300 | 3 | 3 | 1.0000 | 1.0000 |
+| `utrap_sd15_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-5 | full_unet | 300 | 4 | 4 | 1.0000 | 1.0000 |
 | `wsr2_church_lr1` | WSR-anchor (ours, adapts 2505.22310's idea with REVERSED direction -- see ERRATUM_wsr_direction.md) | stable-diffusion-v1-4 | full_unet | 300 | 3 | 3 | 1.0000 | 1.0000 |
 | `wsr2_church_lr10` | WSR-anchor (ours, adapts 2505.22310's idea with REVERSED direction -- see ERRATUM_wsr_direction.md) | stable-diffusion-v1-4 | full_unet | 300 | 3 | 3 | 1.0000 | 1.0000 |
 | `wsr2_church_lr100` | WSR-anchor (ours, adapts 2505.22310's idea with REVERSED direction -- see ERRATUM_wsr_direction.md) | stable-diffusion-v1-4 | full_unet | 300 | 3 | 3 | 1.0000 | 1.0000 |
@@ -185,6 +196,7 @@ attack_records_total is a count of FILES, not of admissible independent experime
 
 | build | family | base model | target suppression | retain8 (n=8) | all-non-target (n=11) |
 |---|---|---|---:|---:|---:|
+| `E6cal_BASE_sd14_on_DEV` | unclassified | stable-diffusion-v1-4 | 1.0000 | 1.0000 | 1.0000 |
 | `F57rand_church_r3_rs0` | unclassified | stable-diffusion-v1-4 | 1.0000 | 1.0000 | 1.0000 |
 | `F57rand_church_r3_rs1` | unclassified | stable-diffusion-v1-4 | 1.0000 | 1.0000 | 1.0000 |
 | `F57rand_parachute_r5_rs0` | unclassified | stable-diffusion-v1-4 | 1.0000 | 1.0000 | 1.0000 |
@@ -508,6 +520,8 @@ attack_records_total is a count of FILES, not of admissible independent experime
 | `utrap_church_l0.3k8` | UTRAP (ours) | stable-diffusion-v1-4 | 0.0000 | 0.7333 | 0.7515 |
 | `utrap_church_l1.0k8` | UTRAP (ours) | stable-diffusion-v1-4 | 0.0000 | 0.0000 | 0.1091 |
 | `utrap_sd15_church_l0.15k8` | UTRAP (ours) | stable-diffusion-v1-5 | 0.0000 | 0.9583 | 0.9515 |
+| `wdr2_church_a1.0` | unclassified | stable-diffusion-v1-4 | 0.5333 | 0.9500 | 0.9455 |
+| `wdr2_church_a4000` | unclassified | stable-diffusion-v1-4 | 0.2000 | 0.5917 | 0.5333 |
 | `wsr2_church_lr1` | WSR-anchor (ours, adapts 2505.22310's idea with REVERSED direction -- see ERRATUM_wsr_direction.md) | stable-diffusion-v1-4 | 0.1333 | 0.9417 | 0.8909 |
 | `wsr2_church_lr10` | WSR-anchor (ours, adapts 2505.22310's idea with REVERSED direction -- see ERRATUM_wsr_direction.md) | stable-diffusion-v1-4 | 0.0667 | 0.9000 | 0.8667 |
 | `wsr2_church_lr100` | WSR-anchor (ours, adapts 2505.22310's idea with REVERSED direction -- see ERRATUM_wsr_direction.md) | stable-diffusion-v1-4 | 0.0667 | 0.9500 | 0.9394 |
