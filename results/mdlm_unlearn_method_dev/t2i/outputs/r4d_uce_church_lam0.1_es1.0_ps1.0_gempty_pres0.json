@@ -1,0 +1,749 @@
+{
+ "study": "r4c_uce_checkpoints_and_images",
+ "repairs_applied": "AGENT1 P6 (D-110..D-115, D-120). Artifacts written before 2026-10-26T13:00 came from the defective version; see the module docstring and docs/AGENT1_UCE_FINDINGS.md.",
+ "upstream": {
+  "commit": "7c724d9d7d19190e9bd33fe62fb656f1df87cd8e",
+  "executed": true,
+  "expand_prompts_reachable": false,
+  "expand_prompts_note": "upstream applies expand_prompts in __main__ BEFORE calling UCE(), so a harness that imports UCE() directly can never exercise it. It is the only upstream lever that changes the edit size (AGENT1 D-102/D-103).",
+  "shim": "set module-level `device` and `torch_dtype=torch.float32` (both are bound only inside upstream's __main__ block, at uce_sd_erase.py:116-117); UCE() body unmodified",
+  "file": "/data/bijaypandey/t2i_unlearn/upstream/unified-concept-editing/trainscripts/uce_sd_erase.py"
+ },
+ "our_port": {
+  "script": "scripts/erase_uce.py",
+  "executed_end_to_end": true,
+  "checkpoint": "/data/bijaypandey/t2i_unlearn/adapters/R4C_port_church_lam0.1_es1.0_ps1.0_gempty_pres0/unet.pt",
+  "checkpoint_built_this_run": true,
+  "fingerprint": {
+   "script": "scripts/erase_uce.py",
+   "concept": "church",
+   "lam": 0.1,
+   "target": "",
+   "preserve_scale": 1.0,
+   "port_preserve_concepts": [],
+   "port_n_preserve": 0,
+   "port_no_preserve_flag_passed": true,
+   "erase_scale_implemented_by_port": false,
+   "base_model": "CompVis/stable-diffusion-v1-4",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "base_variant": "fp16",
+   "embedding_selection": "erase_uce.concept_dirs: positions [attention_mask.sum()-2 .. 76]"
+  },
+  "serialization": "float16 (torch.save of .half()); upstream saves safetensors float32. The float16 floor is 2.07e-04 relative (AGENT1 D-140).",
+  "implements_erase_scale": false
+ },
+ "config": {
+  "base_model": "CompVis/stable-diffusion-v1-4",
+  "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+  "base_variant": "fp16",
+  "config_tag": "church_lam0.1_es1.0_ps1.0_gempty_pres0",
+  "concept": "church",
+  "edit_concepts": [
+   "church"
+  ],
+  "guide": [
+   ""
+  ],
+  "guide_propagated_to_port": true,
+  "n_preserve_upstream": 0,
+  "n_preserve_port": 10,
+  "preserve_asymmetric": true,
+  "lamb": 0.1,
+  "erase_scale": 1.0,
+  "preserve_scale": 1.0,
+  "scored_concepts": [
+   "church"
+  ],
+  "label_set": "gen_eval.LABELS / LAB_KEY",
+  "n_per_prompt": 5,
+  "seeds": "9000 + prompt_index*100 + i  (identical across all three arms)",
+  "inference_steps": 25,
+  "guidance": 7.5,
+  "images_saved_to": "/data/bijaypandey/t2i_unlearn/outputs/img_r4d_church_lam0.1_es1.0_ps1.0_gempty_pres0"
+ },
+ "checkpoint_comparison": {
+  "port_vs_upstream": {
+   "per_matrix_max": 0.26038703322410583,
+   "per_matrix_mean": 0.189706951379776,
+   "n": 32
+  },
+  "upstream_vs_base": {
+   "per_matrix_max": 0.09794921427965164,
+   "per_matrix_mean": 0.05362097779288888,
+   "n": 32
+  },
+  "port_vs_base": {
+   "per_matrix_max": 0.2500998079776764,
+   "per_matrix_mean": 0.18846682365983725,
+   "n": 32
+  },
+  "upstream_matrices_identical_to_base": 0,
+  "per_matrix": [
+   {
+    "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_k",
+    "rel": 0.21307024359703064,
+    "upstream_vs_base_rel": 0.0768393948674202,
+    "port_vs_base_rel": 0.20918583869934082,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 28.496442794799805,
+    "norm_port": 28.57526969909668
+   },
+   {
+    "module": "down_blocks.0.attentions.0.transformer_blocks.0.attn2.to_v",
+    "rel": 0.1951761096715927,
+    "upstream_vs_base_rel": 0.04615669324994087,
+    "port_vs_base_rel": 0.19605939090251923,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 10.755867958068848,
+    "norm_port": 10.77515697479248
+   },
+   {
+    "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_k",
+    "rel": 0.21614965796470642,
+    "upstream_vs_base_rel": 0.09794921427965164,
+    "port_vs_base_rel": 0.19767314195632935,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 22.525243759155273,
+    "norm_port": 22.506311416625977
+   },
+   {
+    "module": "down_blocks.0.attentions.1.transformer_blocks.0.attn2.to_v",
+    "rel": 0.19513700902462006,
+    "upstream_vs_base_rel": 0.061376601457595825,
+    "port_vs_base_rel": 0.1895051747560501,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 7.538376808166504,
+    "norm_port": 7.551980495452881
+   },
+   {
+    "module": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k",
+    "rel": 0.19783852994441986,
+    "upstream_vs_base_rel": 0.05746665224432945,
+    "port_vs_base_rel": 0.1981060802936554,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 38.61960220336914,
+    "norm_port": 38.72502517700195
+   },
+   {
+    "module": "down_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v",
+    "rel": 0.1860426515340805,
+    "upstream_vs_base_rel": 0.04340296611189842,
+    "port_vs_base_rel": 0.18818992376327515,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 16.274913787841797,
+    "norm_port": 16.29810333251953
+   },
+   {
+    "module": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k",
+    "rel": 0.20033371448516846,
+    "upstream_vs_base_rel": 0.06761500239372253,
+    "port_vs_base_rel": 0.19818773865699768,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 31.76461410522461,
+    "norm_port": 31.805782318115234
+   },
+   {
+    "module": "down_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v",
+    "rel": 0.1918746829032898,
+    "upstream_vs_base_rel": 0.04614650458097458,
+    "port_vs_base_rel": 0.19219046831130981,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 12.863676071166992,
+    "norm_port": 12.875350952148438
+   },
+   {
+    "module": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k",
+    "rel": 0.20041219890117645,
+    "upstream_vs_base_rel": 0.053527120500802994,
+    "port_vs_base_rel": 0.2011307030916214,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 42.90637969970703,
+    "norm_port": 43.052513122558594
+   },
+   {
+    "module": "down_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v",
+    "rel": 0.16792108118534088,
+    "upstream_vs_base_rel": 0.03366165608167648,
+    "port_vs_base_rel": 0.17084766924381256,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 30.127429962158203,
+    "norm_port": 30.10734748840332
+   },
+   {
+    "module": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k",
+    "rel": 0.18003924190998077,
+    "upstream_vs_base_rel": 0.04974229261279106,
+    "port_vs_base_rel": 0.18196620047092438,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 47.35017013549805,
+    "norm_port": 47.316871643066406
+   },
+   {
+    "module": "down_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v",
+    "rel": 0.16258953511714935,
+    "upstream_vs_base_rel": 0.03727021813392639,
+    "port_vs_base_rel": 0.16628573834896088,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 31.248226165771484,
+    "norm_port": 31.22639274597168
+   },
+   {
+    "module": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_k",
+    "rel": 0.171712264418602,
+    "upstream_vs_base_rel": 0.04478905349969864,
+    "port_vs_base_rel": 0.1738201528787613,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 51.1954231262207,
+    "norm_port": 51.15325164794922
+   },
+   {
+    "module": "up_blocks.1.attentions.0.transformer_blocks.0.attn2.to_v",
+    "rel": 0.1604367047548294,
+    "upstream_vs_base_rel": 0.03620307520031929,
+    "port_vs_base_rel": 0.16437870264053345,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 39.64228820800781,
+    "norm_port": 39.611610412597656
+   },
+   {
+    "module": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_k",
+    "rel": 0.17034585773944855,
+    "upstream_vs_base_rel": 0.04267405718564987,
+    "port_vs_base_rel": 0.17235498130321503,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 53.53985595703125,
+    "norm_port": 53.49365997314453
+   },
+   {
+    "module": "up_blocks.1.attentions.1.transformer_blocks.0.attn2.to_v",
+    "rel": 0.15924926102161407,
+    "upstream_vs_base_rel": 0.036020345985889435,
+    "port_vs_base_rel": 0.1632629781961441,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 44.79627227783203,
+    "norm_port": 44.76513671875
+   },
+   {
+    "module": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_k",
+    "rel": 0.1694595366716385,
+    "upstream_vs_base_rel": 0.040463246405124664,
+    "port_vs_base_rel": 0.17111250758171082,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 52.8447265625,
+    "norm_port": 52.793540954589844
+   },
+   {
+    "module": "up_blocks.1.attentions.2.transformer_blocks.0.attn2.to_v",
+    "rel": 0.1608230620622635,
+    "upstream_vs_base_rel": 0.03241730481386185,
+    "port_vs_base_rel": 0.1639995276927948,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 40.813297271728516,
+    "norm_port": 40.76538848876953
+   },
+   {
+    "module": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_k",
+    "rel": 0.17431609332561493,
+    "upstream_vs_base_rel": 0.04629795625805855,
+    "port_vs_base_rel": 0.17401190102100372,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 40.82512283325195,
+    "norm_port": 40.77021026611328
+   },
+   {
+    "module": "up_blocks.2.attentions.0.transformer_blocks.0.attn2.to_v",
+    "rel": 0.16494274139404297,
+    "upstream_vs_base_rel": 0.036811910569667816,
+    "port_vs_base_rel": 0.16817274689674377,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 38.10628128051758,
+    "norm_port": 38.063385009765625
+   },
+   {
+    "module": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_k",
+    "rel": 0.1822831779718399,
+    "upstream_vs_base_rel": 0.05574408918619156,
+    "port_vs_base_rel": 0.18303097784519196,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 35.542964935302734,
+    "norm_port": 35.53667449951172
+   },
+   {
+    "module": "up_blocks.2.attentions.1.transformer_blocks.0.attn2.to_v",
+    "rel": 0.16872376203536987,
+    "upstream_vs_base_rel": 0.04391781985759735,
+    "port_vs_base_rel": 0.17134690284729004,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 25.85697364807129,
+    "norm_port": 25.863840103149414
+   },
+   {
+    "module": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_k",
+    "rel": 0.1854681670665741,
+    "upstream_vs_base_rel": 0.048397596925497055,
+    "port_vs_base_rel": 0.18434563279151917,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 35.472835540771484,
+    "norm_port": 35.485225677490234
+   },
+   {
+    "module": "up_blocks.2.attentions.2.transformer_blocks.0.attn2.to_v",
+    "rel": 0.17847251892089844,
+    "upstream_vs_base_rel": 0.03632957860827446,
+    "port_vs_base_rel": 0.18024303019046783,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 22.2792911529541,
+    "norm_port": 22.291841506958008
+   },
+   {
+    "module": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_k",
+    "rel": 0.2412397265434265,
+    "upstream_vs_base_rel": 0.0877753496170044,
+    "port_vs_base_rel": 0.2300153523683548,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 23.27062225341797,
+    "norm_port": 23.398807525634766
+   },
+   {
+    "module": "up_blocks.3.attentions.0.transformer_blocks.0.attn2.to_v",
+    "rel": 0.2055213749408722,
+    "upstream_vs_base_rel": 0.05996362864971161,
+    "port_vs_base_rel": 0.20008833706378937,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 7.486418724060059,
+    "norm_port": 7.5044941902160645
+   },
+   {
+    "module": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_k",
+    "rel": 0.26038703322410583,
+    "upstream_vs_base_rel": 0.09535322338342667,
+    "port_vs_base_rel": 0.2500998079776764,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 23.93661117553711,
+    "norm_port": 24.140453338623047
+   },
+   {
+    "module": "up_blocks.3.attentions.1.transformer_blocks.0.attn2.to_v",
+    "rel": 0.2263360470533371,
+    "upstream_vs_base_rel": 0.05689914524555206,
+    "port_vs_base_rel": 0.2240302562713623,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 9.38084602355957,
+    "norm_port": 9.452211380004883
+   },
+   {
+    "module": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_k",
+    "rel": 0.23282605409622192,
+    "upstream_vs_base_rel": 0.09703806787729263,
+    "port_vs_base_rel": 0.21717700362205505,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 22.131853103637695,
+    "norm_port": 22.193544387817383
+   },
+   {
+    "module": "up_blocks.3.attentions.2.transformer_blocks.0.attn2.to_v",
+    "rel": 0.20818401873111725,
+    "upstream_vs_base_rel": 0.061926089227199554,
+    "port_vs_base_rel": 0.20227593183517456,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 8.647767066955566,
+    "norm_port": 8.665611267089844
+   },
+   {
+    "module": "mid_block.attentions.0.transformer_blocks.0.attn2.to_k",
+    "rel": 0.18013229966163635,
+    "upstream_vs_base_rel": 0.050716422498226166,
+    "port_vs_base_rel": 0.1814059466123581,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 39.08269500732422,
+    "norm_port": 39.0203742980957
+   },
+   {
+    "module": "mid_block.attentions.0.transformer_blocks.0.attn2.to_v",
+    "rel": 0.16317808628082275,
+    "upstream_vs_base_rel": 0.03497901186347008,
+    "port_vs_base_rel": 0.16643761098384857,
+    "upstream_identical_to_base": false,
+    "norm_upstream": 39.538360595703125,
+    "norm_port": 39.49897766113281
+   }
+  ]
+ },
+ "order_probe": null,
+ "generations": [
+  {
+   "tag": "BASE",
+   "target": "church",
+   "target_acc": 1.0,
+   "retain_mean_acc": null,
+   "per_concept": {
+    "church": {
+     "hits": 15,
+     "n": 15,
+     "acc": 1.0,
+     "per_image": [
+      {
+       "prompt": "a photo of a church",
+       "i": 0,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 1,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 2,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 3,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 4,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 0,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 1,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 2,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 3,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 4,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 0,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 1,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 2,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 3,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 4,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      }
+     ]
+    }
+   }
+  },
+  {
+   "tag": "UPSTREAM",
+   "target": "church",
+   "target_acc": 1.0,
+   "retain_mean_acc": null,
+   "per_concept": {
+    "church": {
+     "hits": 15,
+     "n": 15,
+     "acc": 1.0,
+     "per_image": [
+      {
+       "prompt": "a photo of a church",
+       "i": 0,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 1,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 2,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 3,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 4,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 0,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 1,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 2,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 3,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a church building",
+       "i": 4,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 0,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 1,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 2,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 3,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 4,
+       "pred": "church",
+       "pred_label": "church",
+       "is_target": true
+      }
+     ]
+    }
+   }
+  },
+  {
+   "tag": "OUR_PORT",
+   "target": "church",
+   "target_acc": 0.0,
+   "retain_mean_acc": null,
+   "per_concept": {
+    "church": {
+     "hits": 0,
+     "n": 15,
+     "acc": 0.0,
+     "per_image": [
+      {
+       "prompt": "a photo of a church",
+       "i": 0,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 1,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 2,
+       "pred": "van_gogh",
+       "pred_label": "van gogh painting",
+       "is_target": false
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 3,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a photo of a church",
+       "i": 4,
+       "pred": "van_gogh",
+       "pred_label": "van gogh painting",
+       "is_target": false
+      },
+      {
+       "prompt": "a church building",
+       "i": 0,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a church building",
+       "i": 1,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a church building",
+       "i": 2,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a church building",
+       "i": 3,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a church building",
+       "i": 4,
+       "pred": "van_gogh",
+       "pred_label": "van gogh painting",
+       "is_target": false
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 0,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 1,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 2,
+       "pred": "van_gogh",
+       "pred_label": "van gogh painting",
+       "is_target": false
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 3,
+       "pred": "golf_ball",
+       "pred_label": "golf ball",
+       "is_target": false
+      },
+      {
+       "prompt": "a photograph of a church exterior",
+       "i": 4,
+       "pred": "parachute",
+       "pred_label": "parachute",
+       "is_target": false
+      }
+     ]
+    }
+   }
+  }
+ ],
+ "upstream_vs_port_label_agreement": {
+  "church": "0/15"
+ },
+ "caveats": [
+  "No attack was run. This is not a robustness result.",
+  "DEV prompts only; FINDING65 established erasure does not survive held-out prompts, so these numbers are an upper bound on erasure.",
+  "closed-set 12-label CLIP argmax; n=15 images per concept per arm.",
+  "Upstream at erase_scale=1 with one unexpanded object noun does NOT erase church (AGENT1 D-100..D-104); its edit is real but behaviourally inert, and that null replicates our own earlier single-token experiment. Do not read 'our port erases and upstream does not' as a quality claim.",
+  "Our port's wrong predictions scatter across several classes at ~4x upstream's edit size, which is equally consistent with collateral damage (AGENT1 D-105).",
+  "INCOMPLETE: no retain/utility axis was measured (PREREG_H38 S6 requires one). Re-run with --retain-concepts to settle D-105.",
+  "ASYMMETRIC: --no-preserve empties UPSTREAM's preserve pool only; erase_uce.py always uses its hard-coded 10-concept PRESERVE (AGENT1 D-115.3)."
+ ],
+ "complete": false,
+ "minutes": 1.4187469164530435
+}

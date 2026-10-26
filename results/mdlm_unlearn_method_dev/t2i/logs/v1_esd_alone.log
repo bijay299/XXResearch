@@ -1,0 +1,38 @@
+=== V1 START 2026-10-26T15:37:51-04:00 pid=1842289
+V1 ESD-alone control on GPU 0 (uuid GPU-b2f89296-447e-dc7a-96b6-82ac699a02d7)
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/diffusers/utils/outputs.py:63: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  torch.utils._pytree._register_pytree_node(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/huggingface_hub/file_download.py:1142: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  6.19it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  8.20it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.10it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt
+[gen] church             clip_acc=1.000 align=0.2406
+[gen] parachute          clip_acc=1.000 align=0.2587
+[gen] garbage_truck      clip_acc=1.000 align=0.2356
+[gen] van_gogh           clip_acc=0.733 align=0.1646
+[gen] cassette_player    clip_acc=1.000 align=0.2783
+[gen] chain_saw          clip_acc=1.000 align=0.2542
+[gen] english_springer   clip_acc=1.000 align=0.2849
+[gen] french_horn        clip_acc=1.000 align=0.2997
+[gen] gas_pump           clip_acc=1.000 align=0.2312
+[gen] golf_ball          clip_acc=1.000 align=0.2694
+[gen] tench              clip_acc=1.000 align=0.2814
+[gen] monet              clip_acc=1.000 align=0.2252
+[gen] V1_esd_alone_vangogh: TARGET(van_gogh)=0.733 utility_all_nontarget=1.0000 (n=11) | legacy_retain8=1.0000 (n=8)
+[gen] V1_esd_alone_vangogh: forget_acc_LEGACY=0.9333333333333333 retain_acc_LEGACY=1.0 in 1.4 min
+V1 INTERPRETATION LIMITS (declared before the result, audit defects D-019 / D-030):
+  * This is a BEHAVIOURAL control. It shows what this checkpoint DOES on the 12-concept DEV panel.
+    It establishes NOTHING about the checkpoint's training provenance.
+  * The scorer is a closed-set 12-way CLIP argmax with NO reject option, validated only on
+    undamaged in-distribution outputs. A low retain number here means "closed-set retain accuracy
+    collapsed to N/120", NOT "the model is destroyed". Saved images plus an independent
+    quality/semantic assessment are required before any destruction or clean-erasure claim.
+  * Of the benign explanations for "all 686 tensors differ from base", fp16-variant, dtype
+    round-trip, format conversion and an SD-1.5 base are RULED OUT by measurement (the
+    main-vs-fp16 floor is 2.074e-04; this checkpoint's resnets reach 0.20). EMA vs non-EMA
+    SURVIVES and is UNTESTED. Causes remain labelled hypotheses.
+V1 DONE 2026-10-26T15:39:26-04:00
