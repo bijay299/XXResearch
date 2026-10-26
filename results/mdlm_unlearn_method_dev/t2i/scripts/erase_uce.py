@@ -76,7 +76,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--concept", required=True, choices=sorted(FORGET_PROMPTS))
     ap.add_argument("--target", default="", help="what the erased concept should map to")
-    ap.add_argument("--lam", type=float, default=0.1, help="regularisation toward W_old")
+    ap.add_argument("--lam", type=float, default=0.1,
+                    help="regularisation toward W_old. WARNING (ERRATUM_uce_lambda_scale.md): this "
+                         "is added to c^T c, whose max eigenvalue is ~8.6e4 for SD's 768-dim CLIP "
+                         "embeddings, so values of order 1 are INERT -- they change nothing. The "
+                         "usable range starts around 1e3-1e4. The 0.1 default is kept only so every "
+                         "previously published arm reproduces exactly.")
     ap.add_argument("--preserve-scale", type=float, default=0.1)
     ap.add_argument("--label", required=True)
     ap.add_argument("--out", required=True)

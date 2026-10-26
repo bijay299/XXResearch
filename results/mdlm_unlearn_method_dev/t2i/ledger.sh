@@ -31,4 +31,4 @@ printf "elapsed %.1f h | gpu >=%.2f device-h (FLOOR, see below) | result JSONs %
 printf "  gpu floor reconstructed from %d of %d records that carry a runtime field; the other %d do not,\n",
   rec, nj, nj-rec;
 printf "  so true consumption is higher by an unknown amount. No counter existed before 2026-10-24.\n"}'
-echo "  storage authorized: 60 GiB — see docs/RESOURCE_NOTE.md if the figure above exceeds it"
+echo "  storage authorized: 300 GiB (raised by user 2026-10-25; was 60) — currently within budget"
