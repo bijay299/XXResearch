@@ -217,6 +217,38 @@ the asymmetry could be a utility effect rather than a trap effect.
 evidence that no attainable TI budget will produce one, and — per the matched control above — now
 knows that this is caused by the meta objective and not by the arm's reduced utility.**
 
+> ⚠ **CROSS-MODEL (2026-10-25): the obstruction only PARTIALLY transfers, and the "no attainable TI
+> budget" clause above is now falsified off SD-1.4.** The arm was rebuilt on SD-1.5
+> (`meta_sd15_church_lam0.5`, target 0.0000 / retain8 **0.7667**) and attacked with both families:
+>
+> | model | adversary | budget | T before → after | gate | H |
+> |---|---|---|---|---|---|
+> | SD-1.4 | TI | 2000–3000, lr 1e-2/2e-2 | **falls** (−0.083…−0.208) | ❌ **0/3** | — |
+> | **SD-1.5** | TI | 2000, lr 1e-2 | 0.125 → 0.125 (**+0.000**) | ❌ FAIL | — |
+> | **SD-1.5** | **TI** | **3000, lr 2e-2** | 0.042 → 0.250 (**+0.208**) | ✅ **PASS** | **0.333** |
+> | **SD-1.5** | full-UNet | 300 steps, lr 1e-5 | 0.042 → 1.000 (+0.958) | ✅ | **1.000** |
+> | **SD-1.5** | full-UNet | 300 steps, lr 1e-5 | 0.000 → 0.958 (+0.958) | ✅ | 0.933 |
+>
+> **What transfers:** the *weaker* TI budget still fails outright (+0.000 — the attack cannot move its
+> own training accuracy at all), so the obstruction is real on SD-1.5 too and is not a quirk of one
+> checkpoint.
+>
+> **What does not:** the **3000-step / lr 2e-2 budget that gate-failed 3/3 on SD-1.4 passes on
+> SD-1.5** and recovers to H = 0.333. So the obstruction is **weaker on SD-1.5 than on SD-1.4** —
+> breachable by an attainable budget rather than apparently unbreachable. §5a's phrase *"strong
+> evidence that no attainable TI budget will produce one"* is **correct for SD-1.4 and false for
+> SD-1.5**, and is scoped to SD-1.4 from here on.
+>
+> **It remains not robustness, and the arm remains fully reversed.** TI's max-over-valid is 0.333,
+> but **full-UNet relearning takes the same arm to 1.000**, so the arm's max-over-valid across
+> families is **1.000**. Retain 0.7667 is also below the mandate's 0.85 floor. The one positive
+> signal in this phase is therefore: **real, reproducible on a second checkpoint, weaker there, and
+> irrelevant against the adversary that matters.**
+>
+> A BK-SDM-small arm is also running (λ=0.5 fell to retain **0.4833**, below K1 — a
+> hyperparameter-transfer failure, not a verdict on the method, so λ=0.3 was built instead at
+> target 0.2000 / retain 0.7667; its first TI point gate-failed at +0.125).
+
 ## 6. What this closes and does not close
 
 **Closes:** the competitive-baseline gap by one more. Of five published competitors,

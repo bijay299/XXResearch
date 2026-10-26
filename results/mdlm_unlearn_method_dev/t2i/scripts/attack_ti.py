@@ -25,6 +25,14 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+# CROSS-MODEL OVERRIDE (PREREG_H85 / FINDING64). Defaults reproduce the pinned SD-1.4 exactly when
+# BASE_MODEL/BASE_REV are unset, so no existing result changes.
+import os as _os
+BASE_MODEL = _os.environ.get("BASE_MODEL", "CompVis/stable-diffusion-v1-4")
+BASE_REV_ENV = _os.environ.get("BASE_REV")
+BASE_VARIANT = _os.environ.get("BASE_VARIANT", "fp16") or None
+
+
 OUT = "/data/bijaypandey/t2i_unlearn/outputs"
 
 
