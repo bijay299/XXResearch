@@ -1,0 +1,187 @@
+{
+ "study": "t2i_relearn_attack",
+ "label": "E11K_frp_tench_r3_l05_sd0_lr1e-5_s25",
+ "unet": "adapters/frp_tench_r3_l05/unet.pt",
+ "concept": "tench",
+ "hparams": {
+  "unet": "adapters/frp_tench_r3_l05/unet.pt",
+  "text_encoder": null,
+  "attack_te": false,
+  "concept": "tench",
+  "steps": 25,
+  "lr": 1e-05,
+  "n_images": 16,
+  "gate": 0.2,
+  "eval_n": 5,
+  "eval_steps": 25,
+  "seed": 0,
+  "label": "E11K_frp_tench_r3_l05_sd0_lr1e-5_s25",
+  "no_utility": false,
+  "utility_panel": "cassette_player,english_springer,french_horn,gas_pump,golf_ball,monet",
+  "utility_n_prompts": 2,
+  "utility_n_per": 4,
+  "keep_checkpoint": false,
+  "save_grids": false
+ },
+ "T_prompts": [
+  "a tench",
+  "a tench held by an angler",
+  "a large tench fish",
+  "a tench in murky water",
+  "a freshwater tench",
+  "a tench on a riverbank",
+  "a green tench fish",
+  "a tench close up"
+ ],
+ "H_prompts": [
+  "a photo of a tench",
+  "a tench fish",
+  "a photograph of a tench fish"
+ ],
+ "attack_validity": {
+  "T_before": 0.08333333333333333,
+  "T_after": 0.7916666666666666,
+  "T_rise": 0.7083333333333333,
+  "gate": 0.2,
+  "valid": true,
+  "meaning": "the attack must relearn the prompts it was TRAINED on; if T does not rise, a flat H is not evidence of robustness"
+ },
+ "grad_and_delta_evidence": {
+  "unet_grad_norm_step0": 0.6156876758874215,
+  "text_encoder_grad_norm_step0": 0.0,
+  "unet_param_delta": 0.007114428095519543,
+  "text_encoder_param_delta": 0.0,
+  "attack_te": false,
+  "note": "text_encoder_grad_norm_step0 is 0.0 for UNet-only attacks BY DESIGN. Before the ISSUE-2 repair it was also 0 with --attack-te set, because embeddings were cached under no_grad; those historical joint-attack labels were UNet-only in fact."
+ },
+ "trainability": {
+  "frozen_probe_before": 0.16249102354049683,
+  "frozen_probe_after": 0.1538887321949005,
+  "frac_loss_removed": 0.052940101909398136,
+  "meaning": "fraction of the loss on the attacker's OWN data that the attacker could remove, on a frozen fixed-noise probe. Same statistic as the MDLM phase's FINDING33, so the two phases are comparable; the audit flagged that they were not."
+ },
+ "recovery": {
+  "H_before": 0.13333333333333333,
+  "H_after": 0.7333333333333333,
+  "absolute_rise": 0.6,
+  "scope_warning": "H_after is TARGET REGENERATION on held-out prompts only. H_after = 1.000 means the classifier recognised the target in all 15 evaluated images; it does NOT mean the base model was restored. Read post_attack_utility for what else survived."
+ },
+ "post_attack_utility": {
+  "status": "MEASURED",
+  "retained_capability": {
+   "before": 0.9375,
+   "after": 0.9791666666666666,
+   "delta": 0.04166666666666663
+  },
+  "prompt_adherence": {
+   "before": 0.25401051839192706,
+   "after": 0.2597249348958333,
+   "delta": 0.00571441650390625
+  },
+  "before": {
+   "per_concept": {
+    "cassette_player": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.2661895751953125
+    },
+    "english_springer": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.2289276123046875
+    },
+    "french_horn": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.269073486328125
+    },
+    "gas_pump": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.248992919921875
+    },
+    "golf_ball": {
+     "n": 8,
+     "clip_acc": 0.875,
+     "prompt_adherence": 0.2556304931640625
+    },
+    "monet": {
+     "n": 8,
+     "clip_acc": 0.75,
+     "prompt_adherence": 0.2552490234375
+    }
+   },
+   "panel_mean_clip_acc": 0.9375,
+   "panel_mean_prompt_adherence": 0.25401051839192706,
+   "panel": [
+    "cassette_player",
+    "english_springer",
+    "french_horn",
+    "gas_pump",
+    "golf_ball",
+    "monet"
+   ],
+   "n_concepts": 6,
+   "n_prompts_per_concept": 2,
+   "n_images_per_prompt": 4,
+   "n_images_total": 48
+  },
+  "after": {
+   "per_concept": {
+    "cassette_player": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.27325439453125
+    },
+    "english_springer": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.2314300537109375
+    },
+    "french_horn": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.272430419921875
+    },
+    "gas_pump": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.2562408447265625
+    },
+    "golf_ball": {
+     "n": 8,
+     "clip_acc": 1.0,
+     "prompt_adherence": 0.2609710693359375
+    },
+    "monet": {
+     "n": 8,
+     "clip_acc": 0.875,
+     "prompt_adherence": 0.2640228271484375
+    }
+   },
+   "panel_mean_clip_acc": 0.9791666666666666,
+   "panel_mean_prompt_adherence": 0.2597249348958333,
+   "panel": [
+    "cassette_player",
+    "english_springer",
+    "french_horn",
+    "gas_pump",
+    "golf_ball",
+    "monet"
+   ],
+   "n_concepts": 6,
+   "n_prompts_per_concept": 2,
+   "n_images_per_prompt": 4,
+   "n_images_total": 48
+  },
+  "paired": "identical generator seeds before and after; the two panels differ only by the attacked weights",
+  "general_image_quality": {
+   "fid": null,
+   "status": "PENDING",
+   "why": "FID on 48 images is not a defensible estimate. prompt_adherence is reported instead as a per-image proxy, and the protocol that would make an FID number meaningful here is written up but NOT yet run.",
+   "protocol": "docs/FID_PROTOCOL.md"
+  },
+  "three_axes": "target regeneration = recovery.H_after; retained capability = retained_capability; general image quality = prompt_adherence now, FID pending. These are distinct and were conflated before this repair.",
+  "grids": null
+ }
+}

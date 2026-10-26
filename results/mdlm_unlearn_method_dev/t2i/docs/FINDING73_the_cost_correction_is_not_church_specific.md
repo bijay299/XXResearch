@@ -1,3 +1,10 @@
+> ### ⚠ §6 AMENDS THIS FINDING'S EMPHASIS (E11k, same day)
+>
+> A **third** concept, `tench`, is the **slowest** of the three, not the fastest. So "generalises
+> **and gets worse**" was an over-read from the one extra concept I happened to test — which turned
+> out to be the easiest. What generalises is that **all three saturate far below 300 steps**; the
+> budget needed **varies substantially by concept**. See §6.
+
 # FINDING 73 — The budget correction **generalises to a second concept and gets worse**. At a matched method and a matched learning rate, FRP on `garbage_truck` reaches the **ceiling on all three seeds in 25 steps**, where FRP on `church` is still at 0.8667 — and it does so from a *deeper* starting suppression.
 
 **Date:** 2026-10-26 · **Experiment:** E11j · **n = 3 at every cell, held until all cells returned**
@@ -74,3 +81,53 @@ evidence that the damage regime is a property of **high lr**, not of budget.
   panel, not an image-quality measure.
 - **No robustness verdict changes.** Both arms were already known to reverse to the ceiling at 300
   steps; this says only that the ceiling arrives much sooner, on a second concept too.
+
+## 6. Amendment (E11k) — a third concept is the **slowest**, so "gets worse" was an over-read. Concept is a substantial cost axis in its own right.
+
+`frp_tench_r3_l05` (target 0.1333 / retain8 0.7917), same FRP family, same lr 1e-5, n = 3:
+
+| steps | valid | mean H | max-over-valid | utility |
+|---:|---:|---:|---:|---:|
+| 10 | **2/3** | 0.4667 | 0.5333 | **0.9861** |
+| 25 | 3/3 | **0.6889** | **0.7333** | **0.9861** |
+
+**All three concepts, matched method (FRP) where possible, lr 1e-5, 25 steps, n = 3:**
+
+| arm | concept | H_before | mean H | **max-over-valid** | utility |
+|---|---|---:|---:|---:|---:|
+| `frp_tench_r3_l05` | tench | 0.1333 | **0.6889** | **0.7333** | 0.9861 |
+| `frp_church_r3_l05` | church | 0.1333 | 0.8667 | 0.9333 | 0.9722 |
+| `frp_garbage_truck_r5_l05` | garbage_truck | 0.0000 | **1.0000** | **1.0000** | 0.8681 |
+
+**Ordering: tench < church < garbage_truck**, spanning **0.6889 to 1.0000** in mean H at identical
+method, learning rate and budget. **tench has not reached the ceiling at 25 steps** (max 0.7333),
+where garbage_truck is fully recovered on every seed.
+
+**What this amends.** §2's matched-method comparison stands as a fact about those two arms, and §3's
+"25 steps at lr 1e-5" result for garbage_truck stands. What is withdrawn is the **generalising
+direction**: I wrote that the correction "generalises **and gets worse**" on the strength of one
+additional concept, and that concept turns out to be the **easiest** of the three. With tench in
+hand the defensible statement is narrower and more useful:
+
+> **All three concepts saturate far below the reported 300 steps, but the budget required varies
+> substantially by concept — roughly a 0.31 spread in mean H at 25 steps.**
+
+So `FINDING68`/`FINDING70`'s cost corrections are **not church-specific** (the original point, which
+holds), but neither is any single number from them transportable to a new concept.
+
+**Concept is now the largest between-condition cost spread the project has measured** that is *not*
+explained by the lr-damage mechanism of `FINDING71` — note tench's utility is **0.9861**, the highest
+of any arm here, so nothing about its slower recovery is a damage artifact. It is also consistent
+with `FINDING72` §2's gate bias: tench shares church's `H_before` of 0.1333 and shows the same 2/3
+validity at 10 steps.
+
+**E11l is running tench at 50 and 100 steps** to find where it does saturate; until then "tench is
+slower" is bounded only below.
+
+### 6a. Process
+
+This is the third consecutive cycle in which the new measurement amended the previous one
+(`FINDING71` narrowed 70, `FINDING72` corrected 68 §6, this narrows 73). In each case the amendment
+came from a replication or extension **I chose to run against my own claim**, which is the intended
+behaviour — but it also means `FINDING68`–`FINDING73` should be read as one young, self-correcting
+block, and the generalising clauses in each are the parts most likely to move next.
