@@ -74,5 +74,7 @@
    "norm_ours": 12.959405899047852,
    "norm_W_old": 12.876693725585938
   }
- ]
+ ],
+ "VOID": true,
+ "void_reason": "VOID -- DO NOT CITE. Three defects verified 2026-10-26: (1) inputs were char-split, list('church')==['c','h','u','r','c','h'], visible here as n_erase_prompts=6; (2) the embedding selection (all 77 positions flattened) matches NEITHER upstream (one token at attention_mask.sum()-2) NOR our port (positions last..76); (3) no upstream code was executed -- two LOCAL transcriptions were compared, so this could not detect a divergence from the authors' implementation. n_modules is 32, not 160. Superseded by outputs/r4b_uce_lamb*.json."
 }

@@ -13,7 +13,11 @@ Labelled as a re-implementation throughout (PREREG_H38 S4): the original authors
 reproduced, so published numbers are not claimed. There are 32 K/V matrices in SD v1.4.
 
 NOTE ON THE CONCEPT DIRECTION. We take the text-encoder hidden states from the concept's final
-content token through position 76, matching UCE's official implementation. See `concept_dirs` for
+content token through position 76. NOTE (2026-10-26): this does NOT match UCE's official
+implementation, contrary to what this line previously claimed -- upstream
+(unified-concept-editing@7c724d9 trainscripts/uce_sd_erase.py:34-42) selects exactly ONE
+embedding, at attention_mask.sum()-2. Behaviour here is unchanged so every historical arm
+reproduces; the deviation is recorded in UPSTREAM_FIDELITY_MANIFEST.md S7(d). See `concept_dirs` for
 why the single-token version measured earlier does not erase at all. This choice is held IDENTICAL
 across every arm and baseline so comparisons are internally consistent.
 """

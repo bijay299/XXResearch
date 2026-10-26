@@ -15,7 +15,7 @@ performance claims. Nothing here is a reproduction until a run is recorded in §
 |---|---|---|---|---|---:|
 | **IMMA** | `2f55041141705031d503134dec22f674f09e21bf` | 2025-01-17 | **Apache-2.0** | `train/defend_text_to_image_lora.py` | 11 |
 | **Meta-Unlearning** | `5a2a7600895a2885323cbbf599acaf3f74a96f64` | 2025-04-22 | **NONE** | `src/meta.py` | 6 |
-| **vision_relearning** | `7b9a1ccada35a4059604c2688d2822567b3cf40d` | 2025-05-30 | **NONE** | `vision_unlearner.py` | 8 |
+| **vision_relearning** | `7b9a1ccada35a4059604c2688d2822567b3cf40d` | 2025-05-30 | **README declares MIT** (no standalone LICENSE file) | `vision_unlearner.py` | 8 |
 | **unified-concept-editing** | `7c724d9d7d19190e9bd33fe62fb656f1df87cd8e` | 2025-12-07 | **MIT** | `trainscripts/` | 17 |
 | **FRAG** | `7fa3b5e8bcacd6b7711290843797c234d62eb64f` | 2026-08-27 | NONE | — | **0** |
 
@@ -114,8 +114,8 @@ Already reconciled in `ERRATUM_meta_objective.md`; restated as a ledger with the
 | data pools | **three**: `hrm` / `irt` / `tgt`, each its own γ | two (forget / benign) | two | 
 | meta-gradient scope | `gather_parameters` — selectable | full UNet, unrecorded | **xattn, recorded (44.0M)** |
 | attack-simulation scope | `gather_parameters_full` | full UNet | **full UNet, recorded (859.5M)** |
-| target data | `./dataset/tgt` imagefolder | **erased teacher's own output, unverified** | **base model, CLIP-checked 64/64 = 1.0000** |
-| fixed-timestep option | `--fix_timesteps` + `--fixed_time_steps` | absent | absent |
+| target (forget) data | `./dataset/**hrm**` imagefolder | **erased teacher's own output, unverified** | **base model, CLIP-checked 64/64 = 1.0000** |
+| fixed-timestep option | `--fix_timesteps`; **the README states the paper used `fix_timesteps=False`**, the True path being only a training accelerant | absent | absent — **and therefore NOT a mismatch with the published configuration** |
 
 ### 2.1 **Two departures that remain in v2**
 
@@ -272,3 +272,46 @@ described as untouched. A **fresh** final set must be frozen before any new conf
 against it; none of R1–R4 selects a configuration, so none requires it yet.
 
 **Status: no R-experiment has been run.** §7 is written only when cells complete.
+
+---
+
+## 7. Corrections to this manifest, 2026-10-26
+
+Verified against the upstream READMEs and source; the earlier entries were wrong.
+
+**(a) Meta-Unlearning pool meanings — I had `tgt` labelled as the forget pool. It is not.** The
+README states it verbatim:
+
+> *"the **hrm** dataset contains the unlearned concept, while both the **irt** and **target**
+> dataset contain retain concepts. **irt** dataset means the concept unrelated to unlearned
+> concept, and the **target** dataset means the concept related to unlearned concept."*
+
+So: **`hrm` = forget**, **`irt` = unrelated retain**, **`tgt` = related retain**. §2's data-pool row
+is corrected. The *equation* reading in `ERRATUM_meta_objective.md` was already right — `F` = `hrm`,
+`R` = `irt` ∪ `tgt` — so no objective conclusion changes; the manifest's pool table was the error.
+
+**(b) `--fix_timesteps` is NOT a departure from the published configuration.** The README says
+*"We use **fix_timesteps = False** in our paper, and the **fixed_timesteps = True** is just used for
+accelerating training."* Our v2 uses random timesteps, i.e. `False`, which **matches the paper**.
+Listing it as a mismatch was wrong. **The two-pool vs three-pool difference remains material** and
+is unchanged.
+
+**(c) WDR licence — a missing LICENSE file is not an absent licence.** `vision_relearning` has no
+standalone LICENSE file, but its **README contains `## License` / `MIT`**. The earlier entry said
+"NONE" and drew a redistribution conclusion from it. Corrected to: *README declares MIT; no
+standalone LICENSE file.* We continue not to vendor upstream source — for consistency and to keep
+upstream unmixed with ours, **not** because of a legal finding. **Meta-Unlearning** has neither a
+LICENSE file nor a README licence declaration, and that remains accurate.
+
+**(d) UCE embedding selection — our port does not match upstream, contrary to its own docstring.**
+`erase_uce.py` says its selection is *"matching UCE's official implementation."* Verified false:
+
+| | selection |
+|---|---|
+| upstream `uce_sd_erase.py:34-42` | **one** embedding at `attention_mask.sum()-2` |
+| our `erase_uce.py:63-65` | positions **`attention_mask.sum()-2 .. 76`** |
+
+**(e) UTRAP's label.** Described as **our proposed method**. Authorship establishes neither novelty
+nor effectiveness, and `FINDING63`/`FINDING74` record that every UTRAP arm tested was reversed.
+`erase_wsr.py` remains a **project variant with the opposite regularisation direction**;
+`erase_wdr_v2.py` remains a **diffusion-domain adaptation**.

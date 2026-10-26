@@ -1,3 +1,24 @@
+> # ⚠⚠ THIS FINDING IS RETRACTED. Its central number does not measure what it claims.
+>
+> **Verified 2026-10-26.** `r4_uce_official_vs_port.py` had three defects, each confirmed in the
+> saved artifacts:
+>
+> 1. **The inputs were character-split.** `list(euce.FORGET_PROMPTS.get(c,[c]))` — the dict values
+>    are **strings**, so `list('church')` gave `['c','h','u','r','c','h']`. R4 embedded **six single
+>    letters** as six concepts. The artifact records `n_erase_prompts: 6`, which is the bug visible
+>    in its own output.
+> 2. **Neither pipeline was reproduced.** Upstream selects **one** embedding at
+>    `attention_mask.sum()-2`; our port selects positions **`last..76`**; R4 flattened **all 77**.
+>    R4 used a third procedure belonging to neither.
+> 3. **No upstream code ever ran.** R4 compared **two local transcriptions**, so it could not
+>    detect a divergence between our port and the authors' implementation — which is the entire
+>    claim the title makes.
+>
+> **Every quantitative statement below is therefore withdrawn**, including "16%", "5.36e-03",
+> "858,510", and the §3 conclusions about which arms are trustworthy. Four further errors are
+> corrected in §6. The artifacts are preserved and marked `VOID`. The replacement is
+> `r4b_uce_upstream_vs_port.py`, which **executes the pinned upstream `UCE(...)`**.
+
 # FINDING 75 — Our UCE port is **not numerically equivalent** to the official implementation, and at our historical **λ = 0.1 the discrepancy is 16%** of the edited weight norm. The formula is right; the regime is not.
 
 **Date:** 2026-10-26 · **Experiment:** R4 (`UPSTREAM_FIDELITY_MANIFEST.md` §6)
@@ -83,3 +104,34 @@ of accuracy survives** — which is exactly the 16% discrepancy measured.
 UCE remains a **project reimplementation**, not an official reproduction. R4 was a numerical
 comparison, not a run of the authors' script end-to-end. Running `uce_sd_erase.py` itself, and
 comparing *generations* rather than weights, is the next step and has not been done.
+
+---
+
+## 6. Retraction detail — six specific errors
+
+| # | claim in §1–§5 | status |
+|---|---|---|
+| 1 | "160 `attn2` K/V projections" | **WRONG — 32.** The artifact records `n_modules: 32`. SD-1.4 has 16 cross-attention blocks × {to_k, to_v}. |
+| 2 | "**every** historical UCE arm of ours used λ = 0.1" | **WRONG.** The artifacts show **ten distinct λ values** across 22 arms — 0.1, 0.5, 1.0, 10, 30, 100, 300, 1000, 10000, 50000. 13 of 22 used 0.1; the λ sweep and the λ=1000 arm contradict the claim outright. |
+| 3 | "the implementations differ **only** in summation order" | **WRONG.** They also differ in **embedding selection** — one token vs `last..76` — which is a far larger difference than accumulation order and was not controlled. |
+| 4 | the conditioning analysis (cond ≈ 858,510 ⇒ "one digit survives") | **WITHDRAWN as evidence.** A condition number **bounds** error propagation; it does not measure it. The float64 reference needed to measure it was never run. R4b runs it. |
+| 5 | "`uce_sd15_church_lam1000` … **the one UCE arm whose weights are numerically trustworthy**" | **UNSUPPORTED.** That arm's own inputs were never measured; the claim was extrapolated from a synthetic reproduction at a different scale. |
+| 6 | implied: the discrepancy says something about our historical checkpoints | **NO.** Nothing was compared against a historical checkpoint. Zero checkpoints were loaded. |
+
+**Also wrong and corrected elsewhere:** our `erase_uce.py` docstring says its embedding selection
+is *"matching UCE's official implementation."* It is not — upstream takes one token, ours takes
+`last..76`. Corrected in `UPSTREAM_FIDELITY_MANIFEST.md` §4.
+
+## 7. What is actually known about UCE right now
+
+**Nothing quantitative.** The only surviving factual content from this document is structural, and
+it was verified by reading source, not by R4:
+
+- upstream edits **32** `attn2` `to_k`/`to_v` matrices;
+- upstream's `--lamb` default is **0.5**; our port's is **0.1**;
+- our port carries **no `erase_scale`** coefficient, where upstream applies it to both erase terms;
+- the two use **different embedding selections**.
+
+Whether any of that changes edited weights, generated images, or attack resistance is **unmeasured**
+until R4b completes. **A weight difference is not an image difference and is not attack
+resistance** — and R4b is a weights-and-panel comparison, not a robustness experiment.
