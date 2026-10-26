@@ -237,17 +237,37 @@ fi
 say "--- stage 4: minimal runtime check (2 steps)"
 PIN_REVISION=$(sed -n 's/^revision=//p' MODEL_PIN.txt | head -1)
 [ -n "$PIN_REVISION" ] || die "could not read revision= from MODEL_PIN.txt"
-if [ -z "${CUDA_VISIBLE_DEVICES:-}" ]; then
-  FROZEN_ARG=()
-  [ "${ALLOW_FROZEN_RUN:-0}" = "1" ] && FROZEN_ARG=(--allow-frozen)
-  # shellcheck source=scripts/gpu_reserve.sh
-  source scripts/gpu_reserve.sh
-  gpu_reserve_hold "r1_imma_smoke" 120 ${FROZEN_ARG[@]+"${FROZEN_ARG[@]}"} >/dev/null \
-    || die "no GPU reservation granted for the smoke check"
-  export CUDA_VISIBLE_DEVICES="$GPU_RESERVED"
-  export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-  say "    reserved GPU $GPU_RESERVED"
+# RESERVATION IS UNCONDITIONAL (fixed 2026-10-26, audit defect D-049).
+#
+# This block used to be wrapped in `if [ -z "${CUDA_VISIBLE_DEVICES:-}" ]`, which meant that on any
+# re-run in a shell where CUDA_VISIBLE_DEVICES was already exported -- including a shell left over
+# from an earlier stage of this very script -- the whole reservation was SKIPPED and the smoke job
+# ran UNRESERVED on whatever device the inherited value named. A reservation that an inherited
+# environment variable can switch off is not a reservation.
+#
+# An inherited CUDA_VISIBLE_DEVICES is treated as an ERROR rather than as a shortcut: it means
+# someone pre-selected a device outside the reservation system, which is exactly the condition
+# D-001 arose from (three runners each independently picking GPU 0). Clear it and re-run, or set
+# R1_ACK_INHERITED_CVD=1 to acknowledge deliberately -- and note that even then we reserve, and the
+# reservation's device wins over the inherited value.
+if [ -n "${CUDA_VISIBLE_DEVICES:-}" ]; then
+  if [ "${R1_ACK_INHERITED_CVD:-0}" != "1" ]; then
+    die "CUDA_VISIBLE_DEVICES is already set to '${CUDA_VISIBLE_DEVICES}'. Refusing: a pre-selected
+    device bypasses the reservation system. Unset it and re-run, or set R1_ACK_INHERITED_CVD=1 to
+    proceed (the reservation's device will still override it)."
+  fi
+  say "    WARNING: inherited CUDA_VISIBLE_DEVICES='${CUDA_VISIBLE_DEVICES}' acknowledged; it will"
+  say "             be OVERRIDDEN by the reservation below, not honoured."
 fi
+FROZEN_ARG=()
+[ "${ALLOW_FROZEN_RUN:-0}" = "1" ] && FROZEN_ARG=(--allow-frozen)
+# shellcheck source=scripts/gpu_reserve.sh
+source scripts/gpu_reserve.sh
+gpu_reserve_hold "r1_imma_smoke" 120 ${FROZEN_ARG[@]+"${FROZEN_ARG[@]}"} >/dev/null \
+  || die "no GPU reservation granted for the smoke check (rc=${GPU_RESERVE_RC:-?})"
+export CUDA_VISIBLE_DEVICES="$GPU_RESERVED"
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+say "    reserved GPU $GPU_RESERVED (uuid ${GPU_RESERVED_UUID:-?})"
 rm -rf "$R/smoke"
 rc=0
 ( cd "$U" && timeout 1800 $V -m accelerate.commands.launch --num_processes=1 --mixed_precision=no \

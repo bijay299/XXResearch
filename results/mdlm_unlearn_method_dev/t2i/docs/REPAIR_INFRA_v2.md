@@ -10,10 +10,11 @@ Files changed (all owned by this agent):
 
 | file | change |
 |---|---|
-| `scripts/gpu_reserve.sh` | 429 → 1195 lines. Nine defects fixed; new exit codes 5, 6 and 7; new `gpu_reserve_require`, `selftest-telemetry`. |
-| `scripts/test_gpu_reserve.sh` | 390 → 998 lines. T1–T17 preserved, T18–T27 added (plus T19b/T19c for defects 8–9). 50 → **215 assertions, 0 failures**. |
-| `scripts/run_guard.sh` | errexit shield in `rg_step`; new `rg_cell`. (Extra finding, §9.) |
-| `run_e2h_meta_v2_stronger.sh`, `run_r4b_queue.sh`, `run_r4c_queue.sh`, `run_r4d_upstream_defaults.sh` | migrated off `campaign_free.sh`. |
+| `scripts/gpu_reserve.sh` | 429 → 1500 lines. Fifteen defects fixed; new exit codes 5, 6 and 7; new `gpu_reserve_require`, `selftest-telemetry`. |
+| `scripts/test_gpu_reserve.sh` | 390 → 1243 lines. T1–T17 preserved; T18–T27 plus T19b–T19g and T21b added. 50 → **256 assertions, 0 failures**. |
+| `scripts/run_guard.sh` | errexit shield in `rg_step`; new `rg_cell`, `rg_require_glob`. (§9, §11d.) |
+| `run_e2h_meta_v2_stronger.sh` | migrated off `campaign_free.sh`. |
+| `run_r4b_queue.sh`, `run_r4c_queue.sh`, `run_r4d_upstream_defaults.sh` | migrated off `campaign_free.sh`; wired to `run_guard.sh` (§11d defect 13). |
 | `run_v1_esd_alone_control.sh` | migrated + the lead's `--allow-frozen` bug fixed. |
 | `docs/REPAIR_INFRA_v2.md` | this file. |
 
@@ -26,7 +27,7 @@ still exits 1 (asserted by T26).
 
 Partly, and it should be stated plainly.
 
-The 50 assertions were **real and are all still passing** — they are now T1–T17 of a 215-assertion
+The 50 assertions were **real and are all still passing** — they are now T1–T17 of a 256-assertion
 suite. They genuinely proved the lock algebra (mutual exclusion under a 12-way race, PID-reuse
 defeat, foreign-GPU refusal, memory-dip immunity) and the D-013 freeze gate. None of them was
 fraudulent.
@@ -575,7 +576,7 @@ ALLOW_FROZEN_RUN=1 bash run_v1_esd_alone_control.sh
 ## 8. What was tested with MOCKS vs. what needs a real bounded GPU run
 
 **Everything in this document was established with a mocked `nvidia-smi` and CPU-only placeholder
-processes, except the four read-only `nvidia-smi --query-gpu=index,uuid` calls in §4.** The 215
+processes, except the four read-only `nvidia-smi --query-gpu=index,uuid` calls in §4.** The 256
 assertions touch no GPU, import no CUDA, and are safe to run under the freeze.
 
 ### Guarantees fully established by mocks (no GPU run needed)
@@ -801,7 +802,7 @@ evidence rather than conjecture:
   PASS ...and exactly as documented, 1 record(s) LEAKED on exit (only the last trap ran)
 ```
 
-Suite total after defects 8 and 9: **215 passed, 0 failed.**
+Suite total after defects 8 and 9: 215 passed, 0 failed. After the reviewer round (§11d): **256 passed, 0 failed.**
 
 ---
 
@@ -849,13 +850,212 @@ two FAIL lines recorded, `rg_finish` refuses DONE.
 
 ---
 
+## 11d. Independent reviewer round — defects 10 to 15
+
+The reviewer re-ran the suite (215/0, confirmed) and then found four gate-blocking defects the
+suite could not see, plus a false claim of mine. **All verified present from source, all fixed.**
+Suite now **256 passed, 0 failed.**
+
+### Defect 10 (BLOCKING) — D-001 was reachable again through `GPU_RESERVE_LOCKDIR`
+
+The reviewer is right and this was the worst thing left in the file. I pinned the allowlist, the
+freeze marker and the GPU set, and then left the **lockdir** honoured in production with no refusal
+(`gpu_reserve.sh:287`, `if [ -n "${GPU_RESERVE_LOCKDIR:-}" ]; then LOCKDIR=...; fi`). Reproduced:
+
+```
+$ GPU_RESERVE_LOCKDIR=/tmp/evil_lockdir bash scripts/gpu_reserve.sh status
+mode=production
+allowed=0 1  off-limits=everything else  lockdir=/tmp/evil_lockdir
+```
+
+`MUTEX="$LOCKDIR/.reserve.mutex"`, so two runners started with different values take **different
+mutexes** and cannot exclude each other — and the reservation records live there too, so neither
+can even see the other's claim. That is precisely the 2026-10-26T12:39 triple-booking of GPU 0 this
+file exists to prevent. I had been auditing *which GPUs* the environment could reach and never
+asked whether it could move *the lock itself*. A lock at a caller-chosen path is not a lock.
+
+**Fix.** Production now refuses (rc=6) any attempt to redefine `GPU_RESERVE_LOCKDIR`,
+`GPU_RESERVE_NVSMI` (a fake telemetry source would make a busy GPU read as free and trample our own
+campaign) or `GPU_RESERVE_OVERRIDE_LOG` (redirecting the freeze-override audit log to `/dev/null`
+would let an override happen with no record) — alongside the existing refusals for
+`GPU_RESERVE_GPUS` and `GPU_RESERVE_FREEZE_FILE`. Verified:
+
+```
+GPU_RESERVE_LOCKDIR       rc=6
+GPU_RESERVE_NVSMI         rc=6
+GPU_RESERVE_OVERRIDE_LOG  rc=6
+GPU_RESERVE_FREEZE_FILE   rc=6
+GPU_RESERVE_GPUS          rc=6
+```
+
+T19d asserts all five, asserts that the mutex path is derived from `LOCKDIR`, and then
+**demonstrates the consequence** under test mode (where two lockdirs are permitted): two acquirers
+with different lockdirs both win index 0. The witness for D-001 is now in the suite.
+
+### Defect 11 (BLOCKING) — two more unvalidated thresholds, swept across every knob
+
+Verified, exactly as reported. With a GPU at 30000 MiB and no attributable process:
+
+```
+GPU_RESERVE_FOREIGN_MIB=512       -> rc=3  (correct: refused)
+GPU_RESERVE_FOREIGN_MIB=abc       -> rc=0, RESERVED gpu0
+GPU_RESERVE_FOREIGN_MIB=99999999  -> rc=0, RESERVED gpu0
+GPU_RESERVE_ORPHAN_GRACE=abc|0|-5 -> grace window deleted; orphan reclaimed
+```
+
+`abc` reached `[ "$mem" -ge "$FOREIGN_MIB" ]`, where bash treats a non-numeric operand as 0, so
+"30000 >= 0" became false and a busy GPU read as free. Numeric-but-absurd was equally bad: a
+threshold above board capacity can never trip.
+
+**Fix — swept, not patched per-variable** as the reviewer asked. New `_gr_env_init` /
+`_gr_need_int` validate **every** knob the file reads, with bounds on **both** sides, and refuse
+rc=7 (non-retryable) on anything unusable: `NVSMI_TIMEOUT` 1–600 (0 no longer "disables" — that
+re-opened the hang), `FOREIGN_MIB` 1–4096 (**our cards are 40 GB ≈ 40960 MiB**, so a threshold
+above 4096 could never trip), `WAIT` 1–3600, `ORPHAN_GRACE` 60–86400, `UID` numeric, `CVD_STYLE`
+∈ {index, uuid}, `TEST_MODE` ∈ {0,1}. Set-but-empty is distinguished from unset throughout. 18
+unusable values asserted at rc=7 in T19e, plus the behavioural core (a 30000 MiB unattributable GPU
+stays refused at the default) and a positive case (all knobs at valid non-defaults still acquire).
+
+One self-inflicted bug worth recording: `_gr_need_int` ran inside `$( )`, so `_GR_ENV_RC=7` set in
+the subshell was lost, and separately `"${VAR-}"` cannot carry set-ness into a function — which made
+every *unset* knob report itself as "SET BUT EMPTY". Both caught by re-running the probes before
+writing this.
+
+### Defect 12 (BLOCKING) — unrecognised state was claimable
+
+Verified: `_gr_do_acquire`'s `case "$st"` had arms for HELD/MAPCHANGED/ORPHAN/STALE and **no `*)`**,
+so an unrecognised state fell through to the claim. `case "$cls"` was the same — `FREE` was not even
+an explicit arm, it was the fall-through. In a file whose only job is exclusion, "I do not know what
+this record means" must never mean "take it".
+
+**Fix.** Both cases are now default-deny: `FREE) ;;` is the only arm that proceeds, and `*)`
+refuses with an explanation telling a future editor to handle the new state explicitly. T19g
+asserts both arms exist and drives a corrupt, unparsable record through `acquire` to confirm it does
+not yield the GPU.
+
+### Defect 13 (BLOCKING) — runners wrote DONE without checking anything
+
+Verified: `run_r4b_queue.sh`, `run_r4c_queue.sh`, `run_r4d_upstream_defaults.sh` inspected no exit
+status and ended with an unconditional `echo "R4x DONE"`. I migrated their GPU selection and left
+their failure handling alone — half a job.
+
+**Fix.** All three now `source scripts/run_guard.sh` and use `rg_init` / `rg_cell` /
+`rg_require_glob` / `rg_finish`, following the pattern the coordinator wired into
+`run_v1_esd_alone_control.sh`. `rg_finish` is the only writer of a DONE marker.
+
+I added **`rg_require_glob`** rather than use `rg_require_file`, because the artifact names are not
+predictable from the shell: `r4b_uce_upstream_vs_port.py` formats `lamb` as a **float**, so the loop
+value `1000` writes `r4b_uce_lamb1000.0.json`; and r4c/r4d's config tag changed shape between
+versions (`r4c_uce_lamb0.5.json` → `r4c_uce_church_lam0.5_es1.0_ps1.0.json`). Hard-coded paths would
+have reported INCOMPLETE on cells that succeeded, and a guard that cries wolf gets switched off. A
+glob matching nothing is still a failure, which is the safe direction.
+
+`run_e2h_meta_v2_stronger.sh` was left as-is: it already inspects every cell's `rc`, tracks
+`INCOMPLETE`, and exits non-zero.
+
+### Defect 14 (my false claim) — the test-mode interlock was name-only and forgeable
+
+**The reviewer is right and my §3 claim was overstated.** The interlock compared the resolved
+*basename* to `nvidia-smi`. A symlink was caught (`readlink -f`); a plain **copy** was not.
+Reproduced before the fix:
+
+```
+$ cp /usr/bin/nvidia-smi $TMP/copied_nvsmi
+$ GPU_RESERVE_TEST_MODE=1 GPU_RESERVE_GPUS="2 3" GPU_RESERVE_NVSMI=$TMP/copied_nvsmi … status
+mode=test (mocked nvidia-smi '…/copied_nvsmi', …)
+allowed=2 3
+```
+
+Test mode against **real telemetry** with GPUs 2-3 — another user's, in use right now — in the
+allowlist. I wrote that no env var could widen production onto 2-3; a `cp` could.
+
+**Fix — interlock on device identity, which copying cannot forge.** Test mode is now granted only
+if **no UUID reported by the configured telemetry source also appears in the real driver's
+enumeration**. A copied/renamed/wrapped nvidia-smi reports the real UUIDs and is refused; a shim
+reporting `GPU-aaaa` overlaps nothing and is allowed. This cannot be defeated by copying, renaming,
+or PATH games, because any source that can see the real devices is by definition describing them.
+The interlock deliberately reuses the `index,uuid` query the rest of the file already needs, so it
+cannot be dodged by a shim that simply omits a special query form. Production additionally pins
+`GPU_RESERVE_NVSMI` (defect 10), so production can never be pointed at a fake at all. Verified:
+
+```
+cp of real nvidia-smi + GPUS='2 3'  rc=6   (refusal cites "the REAL DRIVER also reports" that UUID)
+symlink to real nvidia-smi          rc=6
+genuinely synthetic shim            rc=0
+```
+
+One subtlety found while fixing: a source that *fails* to enumerate anything is now **allowed** into
+test mode rather than refused. Refusing masked every telemetry-failure path behind rc=6 and made the
+fail-closed behaviour untestable. Allowing is safe because acquisition still refuses with rc=5 on
+the same failed query.
+
+### Defect 15 — the pgid survivor check, and an honest partial fix
+
+Verified: `_gr_live_in_pgid` returned early when the acquirer shared the dead holder's pgid, so that
+configuration yielded STALE rather than ORPHAN with only the grace window protecting it.
+
+**Fix, part 1.** Do not skip the group — **exclude our own process tree** (ancestors by walking
+ppid, descendants by a walk down the children map, from one `/proc` pass).
+
+**Fix, part 2, and this is a limitation I am not going to paper over.** Part 1 alone made things
+*worse*, which the new tests caught: for an owner that merely **inherited** its parent's process
+group, that group also contains the parent and every unrelated sibling, so "a group member is alive"
+is not evidence of descent — and a GPU became **permanently unreclaimable** the moment any sibling
+outlived the record. After a dead owner is re-parented to init, there is no sound way to recover its
+children from `/proc`.
+
+So pgid is used as evidence of descent **only when the owner led its group** (`pgid == owner pid`),
+which is the only case where group membership really means "started by the owner". For a non-leader
+owner the code now **logs explicitly** that pgid evidence is unavailable and names its fallback (the
+CUDA-context check plus the grace window). The grace default is raised **120 s → 900 s** on the
+reviewer's point that a cold model load can exceed two minutes, and the floor is 60 s.
+
+**Residual, for the register:** a non-leader owner whose child holds CUDA but is not yet listed by
+`nvidia-smi`, more than 900 s after the owner died, would still be reclaimed. Closing that needs
+runners launched under `setsid` so they lead their own groups — a one-word change at each launch
+site, which I have documented but not applied, since launching is the lead's. T21 proves the leader
+case (ORPHAN, record kept, `reap` refuses to clear it); T21b proves the non-leader case reports its
+own blindness rather than hiding it, and that a genuinely stale leader record is still reclaimable
+(otherwise the fix would deadlock every GPU forever).
+
+### G14 — the four non-assertions
+
+All four confirmed and fixed. A new `info()` helper prints context **without** counting as a passing
+assertion, and anything that cannot fail now uses it.
+
+| reported | was | now |
+|---|---|---|
+| `:609-613` | `ok` in **both** branches — could not fail | `chk "exactly one record leaks" "$LEAKED" "1"`, asserting the documented trap-replacement behaviour |
+| `:320` | `if …; then ok; fi` — no `bad` arm, silently skipped | explicit `else bad "a 0 MiB reading leaked a HELD gpu0"` |
+| `:171` | `[ ! -f … ] || ok` — no `bad` arm, **and inverted** | proper if/else asserting the record survives its live holder |
+| T27 zero-callers | printed, no assertion | asserts `CF_N == 0`, plus a new per-runner assertion that each migrated runner gates its completion marker on an exit status |
+| T24 | greps over source only | source greps demoted to `INFO`; the assertions are now behavioural, including a shim that prints **perfectly valid rows and then exits non-zero** — the sharpest possible proof that the exit status is read rather than the text parsed |
+
+That last one found nothing new, but it is the test T24 should always have been: it fails if anyone
+reintroduces a status-losing construct, which a grep for `< <(` would not catch.
+
+### Items I did **not** fix, and why
+
+**`run_r1_imma_official.sh:240` — the stage-4 reservation gated on inherited
+`CUDA_VISIBLE_DEVICES`.** I did not touch it. That file is owned by the Baselines agent under the
+ownership split the coordinator set, and it is being actively edited; a concurrent edit is how work
+gets silently lost. The finding is real and should be fixed there — reservation must never be
+conditional on an inherited environment variable, because on a re-run with `CUDA_VISIBLE_DEVICES`
+already set the smoke job runs **unreserved**, which is a double-booking waiting to happen. Handing
+it over rather than reaching into another agent's file.
+
+**Multi-GPU reservation** remains unimplemented, as instructed — now documented rather than
+discoverable the hard way (§11a, defect 9).
+
+---
+
 ## 11. Full test-suite output
 
-`bash scripts/test_gpu_reserve.sh` — 215 passed, 0 failed, exit 0. No GPU accessed.
+`bash scripts/test_gpu_reserve.sh` — 256 passed, 0 failed, exit 0. No GPU accessed.
 
 ```
 CPU-ONLY test harness for /data/bijaypandey/t2i_unlearn/scripts/gpu_reserve.sh
-fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no GPU is touched, no CUDA is loaded)
+fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.rvwjgo/fake_nvsmi  (no GPU is touched, no CUDA is loaded)
 
 == T1/T2/T3  sequential acquire, distinct indices, then exhaustion
   PASS first acquire (= 0)
@@ -864,7 +1064,7 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
 
 == T5  release makes a GPU available again
   PASS reacquire after release (= 0)
-  PASS gpu1 record still present for the live holder
+  PASS gpu1 record still present for its live holder
 
 == T4  CONCURRENCY: 12 processes race for 2 GPUs
   12 racers -> 2 winner(s) [0 1], 10 refused
@@ -877,7 +1077,7 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
   PASS crashy reserved (= 0)
   PASS while owner lives, gpu0 is respected (= 1)
   PASS gpu0 handed to the next campaign after the crash (= 0)
-  PASS reclamation was explicit: gpu0 RECLAIMED stale reservation: owner pid 1758524 (crashy) is dead,
+  PASS reclamation was explicit: gpu0 RECLAIMED stale reservation: owner pid 1819645 (crashy) is dead,
 
 == T7  PID reuse does not resurrect a dead reservation
   PASS alive pid + mismatched start time => correctly judged stale (PID reuse defeated)
@@ -902,8 +1102,12 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
   PASS memory dip no longer leaks the GPU (campaign_free.sh defect (c), fixed)
 
 == T12 trap-based release when the holding shell dies
+[gpu_reserve] test-mode interlock: configured telemetry reports no UUID known to the real driver
+[gpu_reserve]         -> genuinely synthetic. Test mode allowed.
+[gpu_reserve] test-mode interlock: configured telemetry reports no UUID known to the real driver
+[gpu_reserve]         -> genuinely synthetic. Test mode allowed.
 [gpu_reserve] inherited CUDA_VISIBLE_DEVICES: <unset> (clean)
-[gpu_reserve] gpu0 RESERVED for 'trapped_campaign' by pid 1759151 (uuid GPU-aaaa)
+[gpu_reserve] gpu0 RESERVED for 'trapped_campaign' by pid 1820651 (uuid GPU-aaaa)
   PASS sourced helper reserved a gpu (= 0)
   PASS reservation record present while runner lives
   PASS EXIT/TERM trap released the reservation on shell death
@@ -929,8 +1133,8 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
   PASS override grants a GPU (= 0)
   PASS override exits 0 (= 0)
   PASS override is announced on stderr
-  PASS override log line written: 2026-10-26T14:45:47-04:00	override=ALLOW_FROZEN_RUN+--allow-frozen	pid=1760067	campaign=lead_verify	gpu=0	uuid=GPU-aaaa	marker=/data/bijaypandey/tmp/gpu_reserve_test.xG08jO/FREEZE_ACTIVE	uid=1011
-  PASS log records pid=1760067
+  PASS override log line written: 2026-10-26T15:27:43-04:00	override=ALLOW_FROZEN_RUN+--allow-frozen	pid=1822106	campaign=lead_verify	gpu=0	uuid=GPU-aaaa	marker=/data/bijaypandey/tmp/gpu_reserve_test.rvwjgo/FREEZE_ACTIVE	uid=1011
+  PASS log records pid=1822106
   PASS log records campaign=lead_verify
   PASS log records gpu=0
   PASS log records override=
@@ -944,9 +1148,9 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
   PASS gpu_reserve.sh is a reader of the freeze marker
 
 == T18 DEFECT 1: a telemetry failure is UNKNOWN, never 'free'
-  PASS nvidia-smi 'exit1' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi --query-gpu=index,u)
+  PASS nvidia-smi 'exit1' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.rvwjgo/fake_nvsmi --query-gpu=index,u)
   PASS   'exit1': no reservation record written
-  PASS nvidia-smi 'empty' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi --query-gpu=index,u)
+  PASS nvidia-smi 'empty' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.rvwjgo/fake_nvsmi --query-gpu=index,u)
   PASS   'empty': no reservation record written
   PASS nvidia-smi 'headeronly' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: malformed index,uuid row (index 'index' is not a number): header-only or garb)
   PASS   'headeronly': no reservation record written
@@ -956,9 +1160,9 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
   PASS   'short': no reservation record written
   PASS nvidia-smi 'na' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: gpu0 reported memory.used='[N/A]', which is not a number -- refusing to read )
   PASS   'na': no reservation record written
-  PASS nvidia-smi 'uuidonly' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi --query-gpu=index,m)
+  PASS nvidia-smi 'uuidonly' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.rvwjgo/fake_nvsmi --query-gpu=index,m)
   PASS   'uuidonly': no reservation record written
-  PASS nvidia-smi 'appsfail' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi --query-compute-app)
+  PASS nvidia-smi 'appsfail' => rc=5 TELEMETRY UNKNOWN, no index (TELEMETRY UNKNOWN: '/data/bijaypandey/tmp/gpu_reserve_test.rvwjgo/fake_nvsmi --query-compute-app)
   PASS   'appsfail': no reservation record written
   PASS nvidia-smi that HANGS => rc=5 after the timeout, no index
   PASS   timeout is named as the reason
@@ -1015,11 +1219,63 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
   PASS a sourced gpu_reserve_hold also refuses rc=7 on an empty allowlist
   PASS   and the refusal is announced at source time
 
+== T19d BLOCKING: production constants cannot be relocated by the environment (D-001 vector)
+  PASS production refuses to relocate the lockdir (the D-001 vector) (rc=6)
+  PASS production refuses to relocate the telemetry source (rc=6)
+  PASS production refuses to relocate the freeze-override audit log (rc=6)
+  PASS production refuses to relocate the freeze marker (rc=6)
+  PASS production refuses to relocate the allowlist (rc=6)
+  PASS the mutex path is derived from LOCKDIR (hence relocating LOCKDIR splits the lock)
+  PASS witness: two DIFFERENT lockdirs both hand out index 0 => split mutex = D-001 (now production-refused)
+
+== T19e BLOCKING: every numeric/enum knob is range-checked (fail-open sweep)
+  PASS GPU_RESERVE_FOREIGN_MIB=abc => rc=7, nothing reserved
+  PASS GPU_RESERVE_FOREIGN_MIB=99999999 => rc=7, nothing reserved
+  PASS GPU_RESERVE_FOREIGN_MIB=0 => rc=7, nothing reserved
+  PASS GPU_RESERVE_FOREIGN_MIB= => rc=7, nothing reserved
+  PASS GPU_RESERVE_ORPHAN_GRACE=abc => rc=7, nothing reserved
+  PASS GPU_RESERVE_ORPHAN_GRACE=0 => rc=7, nothing reserved
+  PASS GPU_RESERVE_ORPHAN_GRACE= => rc=7, nothing reserved
+  PASS GPU_RESERVE_ORPHAN_GRACE=5 => rc=7, nothing reserved
+  PASS GPU_RESERVE_NVSMI_TIMEOUT=abc => rc=7, nothing reserved
+  PASS GPU_RESERVE_NVSMI_TIMEOUT=0 => rc=7, nothing reserved
+  PASS GPU_RESERVE_NVSMI_TIMEOUT= => rc=7, nothing reserved
+  PASS GPU_RESERVE_WAIT=abc => rc=7, nothing reserved
+  PASS GPU_RESERVE_WAIT=0 => rc=7, nothing reserved
+  PASS GPU_RESERVE_WAIT= => rc=7, nothing reserved
+  PASS GPU_RESERVE_UID=abc => rc=7, nothing reserved
+  PASS GPU_RESERVE_CVD_STYLE=banana => rc=7, nothing reserved
+  PASS GPU_RESERVE_TEST_MODE=2 => rc=7, nothing reserved
+  PASS GPU_RESERVE_TEST_MODE=yes => rc=7, nothing reserved
+  PASS at the default threshold a 30000 MiB unattributable GPU is still refused (rc=3)
+  PASS valid non-default values for every knob still acquire (= 0)
+
+== T19f BLOCKING: the test-mode interlock cannot be forged by COPYING nvidia-smi
+  PASS a sym_nvsmi of the real nvidia-smi is REFUSED test mode (rc=6)
+  PASS a cp_nvsmi of the real nvidia-smi is REFUSED test mode (rc=6)
+  PASS no 'allowed=2 3' is ever printed for a copied binary (= 0)
+  PASS the refusal is on DEVICE IDENTITY, not on the filename
+  PASS a genuinely synthetic shim is still granted test mode (= 0)
+
+== T19g BLOCKING: an UNRECOGNISED reservation state is never claimable (default-deny)
+  PASS the state machine has an explicit default-deny arm
+  PASS the classifier has an explicit default-deny arm too
+  PASS a corrupt reservation record does NOT yield gpu0 (got [1])
+
+== T21b the pgid survivor check works even when the acquirer SHARES the dead holder's pgid
+  INFO acquirer pgid=1818470  holder pgid=1818470 (equal => the previously-skipped case)
+  PASS non-leader owner: the missing pgid evidence is REPORTED, not silently skipped
+  PASS   and the fallback (CUDA check + grace window) is named
+  INFO   with the record aged past the grace window and no CUDA context, gpu0 was reclaimed
+  INFO   (got [0]) -- correct for a non-leader owner; see T21 for the leader case
+scripts/test_gpu_reserve.sh: line 788: 1824134 Killed                  ( exec -a gr_test_child sleep 180 ) > /dev/null 2>&1 < /dev/null
+  PASS a group-leader owner with NO surviving member IS reclaimed (no self-false-positive)
+
 == T19c a two-GPU reservation is not expressible, and the limitation is documented
   PASS the usage block states the one-GPU-per-reservation limitation
   PASS and warns that calling acquire twice in one shell leaks a reservation (trap replacement)
   PASS two sequential holds do take two GPUs (0 then 1) in one shell
-  PASS ...and exactly as documented, 1 record(s) LEAKED on exit (only the last trap ran)
+  PASS exactly one record leaks, proving trap replacement (the documented hazard) (= 1)
 
 == T20 DEFECT 7: gpu_reserve_hold validates its arguments explicitly
   PASS wait_seconds='abc' is a usage error (= 2)
@@ -1037,9 +1293,9 @@ fake nvidia-smi = /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi  (no 
 
 == T21 DEFECT 5: a dead holder with a SURVIVING CHILD is ORPHANED, never reclaimed
   PASS campaign21 holds gpu0 (= 0)
-scripts/test_gpu_reserve.sh: line 705: 1761193 Killed                  setsid "$TMP/parent21.sh" "$TMP/child21" > /dev/null 2>&1
+scripts/test_gpu_reserve.sh: line 924: 1824907 Killed                  setsid "$TMP/parent21.sh" "$TMP/child21" > /dev/null 2>&1
   PASS holder is dead (SIGKILL, no trap could run)
-  PASS child 1761195 survived and still holds its slot
+  PASS child 1824909 survived and still holds its slot
   PASS gpu0 was NOT reclaimed; intruder got [1] (rc=0)
   PASS the state is reported as ORPHANED, with a reason
   PASS the surviving child is named in the reason
@@ -1084,14 +1340,16 @@ scripts/test_gpu_reserve.sh: line 705: 1761193 Killed                  setsid "$
   PASS the record was kept, not silently reused
   PASS witness: real nvidia-smi IGNORES CUDA_VISIBLE_DEVICES on this host, so reserved indices are physical
 
-== T24 DEFECT 2: no status-losing construct survives in the source
-  PASS process substitutions '< <(' remaining in code (= 0)
-  PASS parse loops read from plain file redirects (5 of them)
-  PASS nvidia-smi query sites (= 3)
-  PASS   each followed by an explicit rc capture (= 3)
-  PASS the record publish (mv) status is checked
-  PASS no awk/pipeline parsing of /proc remains; _gr_read_stat uses builtins only
-  PASS flock -u status is checked
+== T24 DEFECT 2: subprocess exit statuses are actually CHECKED (behavioural)
+  INFO source shape (not assertions):
+  INFO   '< <(' process substitutions in code : 0
+  INFO   plain-redirect parse loops          : 7
+  INFO   _gr_nvsmi_run call sites            : 3
+  INFO   awk occurrences in code             : 0
+  PASS valid stdout + NON-ZERO exit => rc=5 refused (the status is genuinely checked, not the text)
+  PASS   the refusal names the non-zero exit
+  PASS   no record written
+  PASS an unwritable lockdir refuses (rc=10) instead of claiming a GPU
   PASS an unwritable lockdir refuses (rc=10) instead of claiming a GPU
 
 == T25 RUNNER INTEGRATION: a real-shaped runner end to end, mocked nvidia-smi
@@ -1133,11 +1391,14 @@ scripts/test_gpu_reserve.sh: line 705: 1761193 Killed                  setsid "$
   PASS run_v1_esd_alone_control.sh no longer calls campaign_free.sh
   PASS run_v1_esd_alone_control.sh uses the reservation API
   PASS run_v1 no longer passes a flag in the wait_seconds position
-  remaining campaign_free.sh CALLERS in the project (comments excluded):
-  (these belong to the Baselines agent; they migrate against the API contract in the
-   header of scripts/gpu_reserve.sh)
+  PASS zero run_*.sh still INVOKE campaign_free.sh (all nine migrated)
+  PASS run_e2h_meta_v2_stronger.sh gates its completion marker on an exit status
+  PASS run_r4b_queue.sh gates its completion marker on an exit status
+  PASS run_r4c_queue.sh gates its completion marker on an exit status
+  PASS run_r4d_upstream_defaults.sh gates its completion marker on an exit status
+  PASS run_v1_esd_alone_control.sh gates its completion marker on an exit status
 
 ----------------------------------------
-RESULT: 215 passed, 0 failed
-No GPU was accessed; nvidia-smi was the shim at /data/bijaypandey/tmp/gpu_reserve_test.xG08jO/fake_nvsmi
+RESULT: 256 passed, 0 failed
+No GPU was accessed; nvidia-smi was the shim at /data/bijaypandey/tmp/gpu_reserve_test.rvwjgo/fake_nvsmi
 ```

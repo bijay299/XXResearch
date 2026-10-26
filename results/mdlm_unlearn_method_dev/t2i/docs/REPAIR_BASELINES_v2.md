@@ -698,8 +698,12 @@ the **same** initialisation with the variant-floor guard, and the evaluator-comp
 Outputs: `upstream_runs/meta/out/r2_esd_meta_church_legacy_smoke_<timestamp>/step=00000N/`
 (+ `reload_check.json`), `adapters/R2_r2_esd_meta_church_legacy_smoke/unet.pt`,
 `upstream_runs/meta/out/r2_esd_meta_church_legacy_smoke_config.json`, log `logs/r2_meta.log`.
-**Read `reload_check.json` before anything else:** `rel_delta_vs_same_init` must exceed
-`variant_only_floor` (~2.07e-04) by >10×, and `rel_delta_vs_other_variant` is calibration only.
+**Read `reload_check.json` before anything else.** Superseded by F-1: the guard no longer
+thresholds on the variant floor. It reports three independent checks and `"failures": []` on a pass:
+`A_above_noise`, `B_reference_identity` (`rel_vs_same_init < rel_vs_other_variant`, magnitude-free)
+and `C_training_consistency` (`rel` inside `[bound(1)/100, 2·bound(S)]`, `bound(S)=lr·S·√N/‖w‖`).
+At `META_SMOKE_STEPS=2`, `lr=1e-5` expect `rel ≈ 4.9e-04` or below, band `[2.44e-06, 9.76e-04]`;
+`variant_only_floor` (~2.07e-04) is reported for context and is **not** a threshold.
 
 ### E-2 R2 full run — **1 GPU, duration MUST be measured from E-1, not guessed**
 
@@ -785,6 +789,13 @@ under D-030 a closed-set argmax with no reject option cannot separate erasure fr
 | B-5 claim-vs-our-measurement framing | **DONE** |
 | C ESD provenance | **OPEN HYPOTHESIS**; 4 benign explanations ruled out, EMA survives |
 | D `gpu_reserve.sh` findings | **REPORTED, not edited**; item 1 fixed by its owner |
+
+**Round 2 (reviewer's gate blockers):** F-1 reload-guard false negative **FIXED** (derived bound,
+three separate checks, 7/7 unit cases); F-2 skipped stage reported as passed **FIXED** (rc=3 /
+rc=2, no record written); F-3 existence gates **FIXED** (provenance gates, 10/10 cases, pre-audit
+adapter quarantined); F-4 collapse detector **FIXED** (7 of 11 non-targets, threshold re-derived,
+now fires); F-5 inert fingerprints **FIXED** (backfilled, binding, drift fires). Also-flagged:
+`args.max` drift-guarded, dataset ordering asserted, ESD floor claim softened to its statistic.
 
 ---
 

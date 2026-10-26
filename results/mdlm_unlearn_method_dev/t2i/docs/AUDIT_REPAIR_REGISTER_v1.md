@@ -195,10 +195,39 @@ against base under **each** variant and EMA/non-EMA choice; and document the con
 then this is an **unresolved hypothesis**, and the ESD-alone control is a **behavioural** control —
 it can show what the checkpoint *does*, never what it *was trained as*.
 
-**Missing measurement (queued, not run):** score the ESD checkpoint **by itself** on the same 12 DEV
-concepts, same scorer, same seeds — 180 images, ≈5 GPU-min. Until that control exists, no statement
-about where D-009's utility loss comes from is supportable in **either** direction: it is attributed
-neither to IMMA nor to ESD.
+### ✅ RESOLVED 2026-10-26 by the V1 bounded control — and **my hypothesis was wrong**.
+
+Executed under the repaired reservation (GPU 0 reserved exclusively, override logged to
+`logs/frozen_override.log`, GPUs 2–3 untouched), ~95 s, 180 images.
+Artifact: `outputs/gen_V1_esd_alone_vangogh.json`.
+
+| arm | van_gogh | mean non-target (n=11) | concepts at exactly 0.000 |
+|---|---:|---:|---:|
+| **ESD checkpoint ALONE** | **0.7333** | **1.0000** | **0 / 11** |
+| ESD + IMMA composed | 0.8667 | 0.0424 | 7 / 11 |
+| BASE SD-1.4 | 1.0000 | 1.0000 | 0 / 11 |
+
+**The ESD checkpoint is exonerated.** By itself it is a clean, well-behaved erasure: van Gogh falls
+1.000 → 0.733 while **all eleven** other concepts stay at a perfect **1.000**, with healthy
+`clip_align` (0.165–0.300). The utility collapse in D-009 is **not inherited from ESD** — it is
+introduced by composing IMMA.
+
+**That is the opposite of what I argued.** I had named the downloaded checkpoint "the leading
+explanation for D-009's numbers". It is not an explanation at all.
+
+**Two consequences.** (1) D-019's provenance question is now largely moot behaviourally: whatever
+makes all 686 tensors differ from base (EMA vs non-EMA remains the live hypothesis) is
+**behaviourally benign** — a whole-UNet-retrained erasure would be unlikely to leave 11/11 concepts
+at 1.000. The "mislabelled" reading is weaker still. (2) The collapse therefore comes from IMMA's
+160 trained tensors applied on top — and that arm ran **5× the documented budget** (2500 ascent
+steps against the README's 500, D-021). **Over-training is now the leading hypothesis, and it is a
+hypothesis about our run, not about the published method.** This is exactly why the 5× label had to
+be preserved rather than the run relabelled as faithful.
+
+**Still not established, and not claimed:** that IMMA "destroys utility". The number is a closed-set
+argmax with no reject option (D-030), measured on a configuration the authors never evaluate
+(standalone, not post-adaptation). The replacement run at the README's 20-sample budget is what
+would separate over-training from method behaviour.
 
 **Interpretation limit, declared before the run:** this is a **behavioural control**. It can show
 what the uncomposed checkpoint *does* on this panel; it cannot establish provenance, and it inherits
@@ -908,8 +937,30 @@ So the assertion would have **passed with zero training**. A variant mismatch al
 orders of magnitude. This is precisely the "model-variant difference mistaken for evidence that
 training changed weights" trap, and it was live in the launcher.
 
-**Repair:** compare against the **same revision and variant** the trainer loaded, compute the
-variant floor, and require `rel > 10× floor`. **Status: REPAIRED; lead re-verified the floor.**
+**First repair, and why it was also wrong.** v2 compared against the same revision and variant and
+required `rel > 10× floor` = **2.074e-03**. An independent reviewer showed that threshold has a
+**guaranteed false negative**: AdamW's saturating update bounds `rel ≤ lr·S·√N/‖w‖`, which at
+N = 859,520,964, ‖w‖ = 1201.5273, lr = 1e-5 and S = 2 steps gives
+**bound(S=2) = 4.880054e-04** — I re-derived this myself. So v2's threshold sat **4.25× above the
+largest change genuine training could produce**, and `R2_MODE=smoke` — the only mode whose purpose
+is to prove the trainer *trains* rather than merely *runs* — **could not pass even on a correct
+update**. v1 passed a no-op; v2 failed real training.
+
+**The arithmetic explains why NO constant could have worked, and this is the real lesson.** The
+variant floor is 2.074e-04 and bound(S=2) is 4.880e-04 — the artifact and the genuine signal are
+**the same order of magnitude**, a factor of 2.4 apart. There is no magnitude threshold that
+separates "training happened" from "someone loaded the wrong variant" at smoke-test scale. Picking
+a better constant was never the fix.
+
+**Second repair — magnitude replaced by structure.** One constant became three derived checks:
+**(A)** noise (`rel > 1e-7`, not all-identical); **(B)** reference identity, **magnitude-free** —
+`rel_vs_same < rel_vs_other` — which catches the v1 trap at *any* update size, including sizes below
+the variant floor; **(C)** a consistency band `[bound(1)/100, 2·bound(S)]`. The variant floor is now
+**reported and never thresholded**. Unit-tested against the real pinned weights, **7/7 correct**,
+including the genuine 2-step saturating update (`rel = 4.880007e-04`) that v2 could not pass.
+
+**Status: REPAIRED on the second attempt. Verified against synthetic checkpoints only** — R2 stages
+7/9/10 have never run, so the guard has not yet seen a real trained checkpoint.
 
 ### D-037 — the IMMA blank-image filter never executed, and the header claimed it did.
 
