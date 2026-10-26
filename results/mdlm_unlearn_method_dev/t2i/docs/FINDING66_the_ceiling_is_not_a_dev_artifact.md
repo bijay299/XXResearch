@@ -101,3 +101,25 @@ max. Two further seeds on this arm are running for exactly that reason.
 Utility moved in both directions here, unlike E6b: FRP **0.9792 → 0.9167** (−0.0625) while UCE went
 **0.9167 → 0.9583** (+0.0417). So the "recovery without collateral damage" pattern is not universal
 even among arms that all reach the target ceiling.
+
+## 6. Addendum (E6d) — the sub-ceiling point was seed variance. The ratchet resolved it upward, as it must.
+
+§5 flagged `uce_sd15_church_lam1000`'s 14/15 as the only sub-ceiling post-attack FINAL number and
+therefore **provisional** under the `FINDING35` §4 ratchet. Two further seeds were run on that arm
+for exactly that reason:
+
+| seed | gate | DEV H after | **FINAL post-attack** |
+|---|---|---:|---:|
+| 0 (§5) | T 0.417→1.000 | 1.000 | 0.9333 (14/15) |
+| **1** | T 0.375→1.000 | 1.000 | **1.0000** (15/15) |
+| **6** | T 0.625→1.000 | 1.000 | **1.0000** (15/15) |
+
+**max-over-valid FINAL recovery = 1.0000.** The 14/15 was one seed's variance, not a property of the
+arm. So there is now **no sub-ceiling number anywhere in the FINAL measurements**: all four arms,
+both architectures, reach 15/15 on prompts used for nothing.
+
+This is the ratchet behaving as designed rather than a new result — adding attacks cannot lower a
+maximum, which is why §5 called the 14/15 provisional instead of reporting it as partial robustness.
+It is recorded because the escalation was declared necessary before it was run, and publishing the
+14/15 as a finding without running it would have repeated a mistake this project has made three
+times (`FINDING59`, `FINDING62`, `FINDING58` headlines, all retracted the same day).
