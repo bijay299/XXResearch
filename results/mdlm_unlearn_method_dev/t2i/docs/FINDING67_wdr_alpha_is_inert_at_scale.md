@@ -106,7 +106,7 @@ direction and formula.
 | # | hyperparameter | assumed | measured useful range | factor |
 |---|---|---|---|---|
 | 1 | IMMA `α` (`FINDING59` §0) | 1e-5 from the paper | destroyed the model | — |
-| 2 | UCE `λ` (`ERRATUM_uce_lambda_scale.md`) | 0.1–1.0 | ~1e3, vs `cᵀc` max eigenvalue 85,850 | **~10⁴×** |
+| 2 | UCE `λ` (`ERRATUM_uce_lambda_scale.md`) | 0.1–1.0 | ~1e3, vs `cᵀc` max eigenvalue **3.242e5** (corrected 2026-10-26 from 85,850 — D-033) | **~10⁴×** |
 | 3 | **WDR `α`** (here) | 1.0, the reference's default | **~4.0e3** | **~4 × 10³×** |
 
 Each time the fix was one cheap measurement of the quantity the hyperparameter is compared against,

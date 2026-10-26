@@ -68,7 +68,36 @@ evidence that the damage regime is a property of **high lr**, not of budget.
 ## 5. Limits
 
 - **Two concepts, one defence family in the matched comparison** (FRP), three seeds. E11k is running
-  a **third** concept (`frp_tench_r3_l05`, target 0.1333 / retain8 0.7917) in the same family.
+  a **third** concept (`frp_tench_r3_l05`, target 0.1333 / retain8 0.7917 — **see the denominator
+  correction below; the comparable figure is 0.8857**) in the same family.
+
+> **CORRECTION 2026-10-26 (audit defect D-023). The tench arm's retain8 is not comparable to the
+> church arms', and this document compares them directly.**
+>
+> `retain8`'s eight-concept panel is `{cassette_player, chain_saw, english_springer, french_horn,
+> gas_pump, golf_ball, tench, monet}`. **`tench` is a member of it.** So when the active target is
+> tench, retain8 averages the target's own suppressed accuracy into the utility figure; when the
+> target is church — which is **not** in the panel — retain8 excludes the target by construction.
+>
+> Re-derived from the raw records:
+>
+> | arm | target | recorded retain8 (n=8, **includes** target) | target's own acc | **excluding the target (n=7)** |
+> |---|---|---:|---:|---:|
+> | `frp_tench_r3_l05` | tench | 0.7917 | 0.1333 | **0.8857** |
+> | `frp_tench_r5_l05` | tench | 0.4583 | 0.0000 | **0.5238** |
+> | `frp_church_r3_l05` | church | 0.9417 | 0.1333 | 0.9417 (unchanged — church is not in the panel) |
+>
+> So the tench arm is penalised by **≈0.094** purely by the denominator, and every comparison here
+> that sets 0.7917 against a church arm's 0.9417 **overstates the gap by that amount**. The
+> like-for-like pair is **0.8857 vs 0.9417**.
+>
+> **What this does and does not change.** §6's conclusion — that tench is the *slowest* concept and
+> that "gets worse" was an over-read — rests on **H** and recovery speed, not on retain8, so it
+> **stands**. What must not be quoted is retain8 0.7917 as a cross-concept utility comparison. Note
+> also that `utility_all_nontarget` (n=11) is computed correctly and **does** exclude the active
+> target (tench: 0.8909), so it is the safe figure for cross-concept work; the defect is confined to
+> the legacy `retain8` panel. This is a reporting defect in this document, not a measurement error
+> in the records.
 - **The arms differ in retain8** — 0.7750 for garbage_truck against 0.9417 for FRP-church. A
   less-retentive arm may simply sit closer to a state the attacker can exploit, and that is not
   separated here. §2's claim is therefore about *these two arms*, not about the concepts in the
@@ -172,8 +201,10 @@ block, and the generalising clauses in each are the parts most likely to move ne
 
 - **One defence family in the matched comparison** (FRP), **one learning rate**, **three seeds**,
   **three concepts**, and the arms still differ in `H_before` (0.0000 vs 0.1333) and retain8
-  (0.7750 / 0.7917 / 0.9417). Concept, arm quality and starting suppression remain **confounded**;
-  separating them needs builds matched on pre-attack suppression, which is disk-blocked.
+  (0.7750 / 0.7917 / 0.9417 — the middle figure is the tench arm and becomes **0.8857** once its
+  own target is removed from its panel, per the D-023 correction). Concept, arm quality and starting
+  suppression remain **confounded**; separating them needs builds matched on pre-attack suppression,
+  which is disk-blocked.
 - **The concept ordering is not explained.** Why garbage_truck is 4× cheaper than tench is unknown;
   frequency in the pretraining distribution, visual distinctiveness and the CLIP classifier's own
   per-class behaviour are all candidates and none is tested.
@@ -215,6 +246,15 @@ concept is fully and reproducibly reversed **within 100 steps at lr 1e-5**, agai
   deeply each arm was suppressed before the attack.
 - **retain8 does not order them either**: 0.7750 (fastest), 0.7417 (middle), 0.7917 (slowest) — a
   0.05 range with no correspondence to speed.
+
+  > **D-023 correction.** The slowest arm is the **tench** arm, whose retain8 includes tench — the
+  > active target — in its own eight-concept panel. The target-free figure is **0.8857**, so the
+  > comparable triple is **0.7750 / 0.7417 / 0.8857** and the range is **0.14, not 0.05**. The
+  > conclusion is unchanged and in fact unaffected by the direction of the error: the sequence is
+  > still **non-monotone** in speed (0.7750 fastest > 0.7417 middle, then 0.8857 slowest), so
+  > retain8 does not order the concepts either way. Only the quoted spread was wrong. The other two
+  > arms target garbage_truck and church, **neither of which is in the retain8 panel**, so their
+  > figures need no correction — the defect touches the tench rows only, here and in §8, §10 and §11.
 
 That does **not** fully de-confound concept from arm — each concept still has exactly one arm, so
 "concept" and "this particular build" remain inseparable. What it removes is the two specific

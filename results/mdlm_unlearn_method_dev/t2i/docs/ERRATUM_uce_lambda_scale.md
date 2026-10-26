@@ -38,12 +38,27 @@ Measured on SD-1.5's text encoder, over the two prompts UCE conditions on (154 t
 |---|---|
 | mean per-token ‖c‖ | **28.45** |
 | trace(cᵀc) | **125,092** |
-| **max eigenvalue of cᵀc** | **85,850** |
+| **max eigenvalue of cᵀc** | **85,850** → **corrected: 3.242e5** (see below) |
 | mean eigenvalue | 162.9 |
 
+> **CORRECTION 2026-10-26 (audit defect D-033).** The 85,850 figure was **single-sourced to this
+> document** — Agent 6 found no artifact in `outputs/` that recomputes it. Agent 1 then measured it
+> directly on our port's own stack: the max eigenvalue of `cᵀc` is **3.2420e+05**, i.e. **3.8×
+> larger**, with `cᵀc` rank **136**.
+>
+> **The qualitative conclusion is unchanged and in fact strengthened** — a larger eigenvalue makes λ
+> *more* inert, not less. But two derived numbers must move with it:
+> * the usable range starts around **λ ≈ 3.2e4** (max eig / 10), not λ ≈ 8,600;
+> * at λ = 1.0 the regularisation term is ~**3e-6** of the matrix it is added to, not ~1e-5.
+>
+> `FINDING75` §2's derived `cond ≈ (85850+λ)/λ = 858,510 at λ=0.1` is correspondingly wrong; the
+> measured conditioning is **3.24e6** for our port against **2.22e4** for upstream — a 146× gap that
+> is itself a more informative number than the one this erratum originally reported.
+> `FINDING67` §table row 2 cites 85,850 and inherits this correction.
+
 **λ must be comparable to the eigenvalues of `cᵀc` to have any effect.** At λ = 1.0 against a
-largest eigenvalue of 85,850, the regularisation term is ~1e-5 of the matrix it is added to — it
-does nothing. The usable range starts around **λ ≈ 8,600** (max eig / 10).
+largest eigenvalue of 3.242e5, the regularisation term is ~3e-6 of the matrix it is added to — it
+does nothing. The usable range starts around **λ ≈ 3.2e4** (max eig / 10).
 
 So the three arms are **not a λ sweep at all**: they are three samples of effectively the same
 closed-form solution, and the 0.4167–0.5333 spread is run-to-run and evaluation noise at n = 1 each.
