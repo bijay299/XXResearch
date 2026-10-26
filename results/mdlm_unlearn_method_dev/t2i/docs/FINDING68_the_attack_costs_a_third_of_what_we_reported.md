@@ -76,3 +76,46 @@ not only at 300 (where it was 0.8333 → 0.9792). A **25-step** attack recovers 
   (`ERRATUM_split_leak.md`), as every H in the corpus is.
 - **It does not change any robustness verdict.** The ceiling was already reached at 300; this only
   shows it was reached sooner. No arm moves toward the mandate's bar, which stays unmet.
+
+## 6. Addendum (E11b) — the same curve on a second method. It saturates **faster**, but the two arms do not start from the same place, so this is not yet a clean method comparison.
+
+`frp_church_r3_l05` (target 0.1333 / retain8 0.9417), same adversary, same seed, same lr, only
+`--steps` varied:
+
+| steps | T after | gate | H before | **H after** |
+|---:|---|---|---:|---:|
+| **25** | 0.958 | PASS | 0.1333 | **0.9333** (14/15) |
+| **50** | 0.958 | PASS | 0.1333 | **1.0000** (15/15) |
+| 100 | 1.000 | PASS | 0.1333 | 1.0000 |
+| 200 | 1.000 | PASS | 0.1333 | 1.0000 |
+| 300 | 1.000 | PASS | 0.1333 | 1.0000 |
+
+**Both arms, side by side:**
+
+| arm | H before | 25 steps | 50 steps | 100 steps | first at ceiling |
+|---|---:|---:|---:|---:|---:|
+| `utrap_church_l0.15k8` | 0.0000 | 0.8667 | 0.9333 | 1.0000 | **≤100** |
+| `frp_church_r3_l05` | 0.1333 | 0.9333 | **1.0000** | 1.0000 | **≤50** |
+
+**§2's correction holds across two methods and tightens.** Neither arm needs anything close to 300
+steps; FRP is at the ceiling by 50. So "reversed by 300 gradient steps" overstates the attacker's
+cost by **3× for UTRAP and 6× for FRP**.
+
+**What this does NOT establish, and the reason is the audit's own point.** The two arms start from
+**different H_before** — 0.0000 vs 0.1333, i.e. FRP already produces the target in 2 of 15 images
+before any attack. FRP therefore has 13 images to gain and UTRAP has 15, so its faster saturation is
+partly or wholly a shorter climb, not a weaker defence. This is exactly the *"comparisons at matched
+initial utility"* requirement from audit §8, and it is **not met here**. So:
+
+- **Supported:** both methods are reversed far below the reported budget, and the budget axis was
+  being reported at least 3× too generously.
+- **Not supported:** that cost discriminates between these two methods. 50 vs 100 is one grid step
+  on a coarse grid, between arms with different starting points.
+
+Cost remains the only axis in this project that has shown *any* variation between arms — the H
+ceiling discriminates nothing — so it is worth measuring properly. That would need arms matched on
+H_before, a finer grid, and more than one seed, none of which this has.
+
+**Still unmeasured: the low end.** Both curves are already ≥ 0.87 at the smallest budget tried.
+Nothing below 25 steps has ever been run, so the true floor is unknown and could be far lower. E11c
+is running `--steps` ∈ {5, 10, 15} on both arms to find it.
