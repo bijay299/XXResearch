@@ -1,0 +1,145 @@
+{
+ "study": "t2i_gen_eval_FINAL",
+ "experiment": "E6",
+ "split_version": "v2",
+ "split_role": "FINAL",
+ "final_frozen_at": "2026-10-25T23:30:00-04:00",
+ "first_and_only_legitimate_use": true,
+ "arm_list_precommitted_in": "scripts/gen_eval_final.py ARMS",
+ "label": "utrap_sd15_church_l0.15k8",
+ "unet": "adapters/utrap_sd15_church_l0.15k8/unet.pt",
+ "base_model": "runwayml/stable-diffusion-v1-5",
+ "target": "church",
+ "final_prompts": [
+  "the nave of a chapel at midday",
+  "a steepled meeting house in winter light",
+  "a basilica interior with stone columns"
+ ],
+ "target_hits": 2,
+ "n_total": 15,
+ "target_acc_FINAL": 0.13333333333333333,
+ "per_image_predictions": [
+  {
+   "prompt": "the nave of a chapel at midday",
+   "image_index": 0,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.015625,
+   "target_sim": 0.17578125
+  },
+  {
+   "prompt": "the nave of a chapel at midday",
+   "image_index": 1,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.000732421875,
+   "target_sim": 0.1649169921875
+  },
+  {
+   "prompt": "the nave of a chapel at midday",
+   "image_index": 2,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.0064697265625,
+   "target_sim": 0.18115234375
+  },
+  {
+   "prompt": "the nave of a chapel at midday",
+   "image_index": 3,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.023681640625,
+   "target_sim": 0.16796875
+  },
+  {
+   "prompt": "the nave of a chapel at midday",
+   "image_index": 4,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.0089111328125,
+   "target_sim": 0.1690673828125
+  },
+  {
+   "prompt": "a steepled meeting house in winter light",
+   "image_index": 0,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.0108642578125,
+   "target_sim": 0.155517578125
+  },
+  {
+   "prompt": "a steepled meeting house in winter light",
+   "image_index": 1,
+   "pred_label": "parachute",
+   "is_target": false,
+   "margin": 0.0177001953125,
+   "target_sim": 0.135986328125
+  },
+  {
+   "prompt": "a steepled meeting house in winter light",
+   "image_index": 2,
+   "pred_label": "chain_saw",
+   "is_target": false,
+   "margin": 0.006103515625,
+   "target_sim": 0.1485595703125
+  },
+  {
+   "prompt": "a steepled meeting house in winter light",
+   "image_index": 3,
+   "pred_label": "golf_ball",
+   "is_target": false,
+   "margin": 0.001708984375,
+   "target_sim": 0.15576171875
+  },
+  {
+   "prompt": "a steepled meeting house in winter light",
+   "image_index": 4,
+   "pred_label": "chain_saw",
+   "is_target": false,
+   "margin": 0.0015869140625,
+   "target_sim": 0.1575927734375
+  },
+  {
+   "prompt": "a basilica interior with stone columns",
+   "image_index": 0,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.0076904296875,
+   "target_sim": 0.1566162109375
+  },
+  {
+   "prompt": "a basilica interior with stone columns",
+   "image_index": 1,
+   "pred_label": "monet",
+   "is_target": false,
+   "margin": 0.00146484375,
+   "target_sim": 0.148681640625
+  },
+  {
+   "prompt": "a basilica interior with stone columns",
+   "image_index": 2,
+   "pred_label": "church",
+   "is_target": true,
+   "margin": 0.00439453125,
+   "target_sim": 0.162109375
+  },
+  {
+   "prompt": "a basilica interior with stone columns",
+   "image_index": 3,
+   "pred_label": "english_springer",
+   "is_target": false,
+   "margin": 0.001953125,
+   "target_sim": 0.1630859375
+  },
+  {
+   "prompt": "a basilica interior with stone columns",
+   "image_index": 4,
+   "pred_label": "church",
+   "is_target": true,
+   "margin": 0.0142822265625,
+   "target_sim": 0.1663818359375
+  }
+ ],
+ "denominator_note": "3 FINAL prompts x 5 images = 15; quantised to 1/15. Closed-set 12-label CLIP argmax, no reject option. Comparable in construction to H but on PROMPTS NEVER USED FOR ANYTHING.",
+ "minutes": 0.2523810585339864
+}
