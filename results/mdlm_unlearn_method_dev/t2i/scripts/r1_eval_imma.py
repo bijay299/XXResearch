@@ -78,6 +78,21 @@ def cls_of(k):
     return "attn2" if ".attn2." in k else ("attn1" if ".attn1." in k else "other")
 
 
+# ---- IMPORT SAFETY (REPAIR v3 2026-10-26, AGENT B). This file is a SCRIPT: everything below runs
+# at MODULE LEVEL, so `import r1_eval_imma` previously called parse_args() on the IMPORTER's argv
+# and killed the process with a usage message and exit 2. That is how it behaved when
+# scripts/split_registry.py added it to its roster and tried to inspect its pools: the whole audit
+# died with `error: the following arguments are required: --esd, --out`, attributed to
+# split_registry rather than to this file. Any tool that inspects this directory hits the same
+# trap. Fail LOUDLY and specifically instead, so the cause is never misattributed again.
+if __name__ != "__main__":
+    raise ImportError(
+        "scripts/r1_eval_imma.py is a SCRIPT, not an importable module: its body parses argv, "
+        "loads SD-1.4 and composes a checkpoint at module level. Importing it would run all of "
+        "that against the importer's own argv. Run it as a subprocess "
+        "(`venv_t2i/bin/python scripts/r1_eval_imma.py --esd ... --out ...`). It defines no "
+        "prompt pools, so a split-registry inspection needs nothing from inside it.")
+
 ap = argparse.ArgumentParser()
 ap.add_argument("--esd", required=True, help="ESD-erased full UNet state dict (.pt)")
 ap.add_argument("--imma", default=None,

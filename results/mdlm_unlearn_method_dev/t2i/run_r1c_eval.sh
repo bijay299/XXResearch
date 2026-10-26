@@ -77,6 +77,21 @@ fi
 # An artifact is now reused only if its recorded provenance MATCHES the current inputs.
 sha() { sha256sum "$1" | cut -d' ' -f1; }
 
+# unet_loads <path> -- does this checkpoint actually OPEN? Returns 0 only if torch.load succeeds,
+# the result has tensors, and every tensor is finite. A readable file full of NaNs is not a
+# usable checkpoint, and neither is an empty state dict.
+unet_loads() {
+  venv_t2i/bin/python - "$1" >/dev/null 2>&1 <<'PYL'
+import sys, torch
+sd = torch.load(sys.argv[1], map_location="cpu")
+if not hasattr(sd, "keys") or len(sd) == 0:
+    raise SystemExit(1)
+for v in sd.values():
+    if hasattr(v, "isfinite") and not bool(v.isfinite().all()):
+        raise SystemExit(1)
+PYL
+}
+
 # compose_is_current <adapter_dir> <esd_sha> [imma_sha]
 # Requires compose.json to exist, to carry the REPAIR-v2 marker (fp16_variant_floor), and to record
 # exactly the input hashes we are about to use.
@@ -84,6 +99,16 @@ compose_is_current() {
   local dir="$1" esd_sha="$2" imma_sha="${3:-}"
   [ -f "$dir/unet.pt" ] || return 1
   [ -f "$dir/compose.json" ] || return 1
+  # LOADABILITY, not existence (repair A v3). `[ -f ]` and `[ -s ]` both accept a truncated
+  # checkpoint: adapters/utrap_church_l1.0k4/unet.pt is 511,229,952 bytes, non-empty, and
+  # torch.load raises "PytorchStreamReader failed reading zip archive: failed finding central
+  # directory" (measured 2026-10-26). compose.json's hashes describe the INPUTS to the
+  # composition, never the composed unet.pt itself, so a valid compose.json beside a half-written
+  # unet.pt previously read as "current" and the truncated file was reused for evaluation.
+  if ! unet_loads "$dir/unet.pt"; then
+    echo "    REFUSING to reuse $dir/unet.pt: it exists but does NOT load" >>"$L"
+    return 1
+  fi
   venv_t2i/bin/python - "$dir/compose.json" "$esd_sha" "$imma_sha" <<'PYX'
 import json, sys
 f, esd_sha, imma_sha = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -106,6 +131,12 @@ eval_is_current() {
   local lbl="$1" unet_sha="$2" side="outputs/gen_$1.provenance.json"
   [ -f "outputs/gen_$lbl.json" ] || return 1
   [ -f "$side" ] || return 1
+  # The RESULT file must parse too, not merely exist. A gen_*.json truncated by a killed scorer
+  # previously satisfied this guard and its half-written metrics were reused as a measurement.
+  venv_t2i/bin/python -c 'import json,sys; json.load(open(sys.argv[1]))' \
+    "outputs/gen_$lbl.json" >/dev/null 2>&1 || {
+      echo "    REFUSING to reuse outputs/gen_$lbl.json: it exists but is not valid JSON" >>"$L"
+      return 1; }
   venv_t2i/bin/python - "$side" "$unet_sha" <<'PYX'
 import json, sys
 try: d = json.load(open(sys.argv[1]))
@@ -289,8 +320,47 @@ else:
 print(f"[R1c] K1: {'CLEAR -> attack grid' if am['legacy_retain8']>=0.60 else 'FAIL -> not attacked'}")
 PY
 
-R8=$(venv_t2i/bin/python -c "import json;print(json.load(open('outputs/gen_$A_TAG.json'))['active_target_metrics']['legacy_retain8'])")
-awk -v r="$R8" 'BEGIN{exit !(r>=0.60)}' || { echo "K1 fail (retain8=$R8), not attacked" >>"$L"; exit 0; }
+# ---- K1 KILL-RULE GATE. ---------------------------------------------------------------------
+# MEASURED DEFECTS IN THE PREVIOUS VERSION OF THESE TWO LINES (2026-10-26, repair A v3):
+#   R8=$(python -c "...json.load(...)['active_target_metrics']['legacy_retain8']")
+#   awk -v r="$R8" 'BEGIN{exit !(r>=0.60)}' || { echo "K1 fail (retain8=$R8)..."; exit 0; }
+#
+# What `set -euo pipefail` DOES catch, verified: an absent file and a missing key both crash the
+# command substitution, errexit fires and the script exits 1 before awk runs. So the widely-cited
+# "a crashed json.load prints retain8=0.0000 ... destroys the model" does NOT reproduce here, and
+# this file is not one of the 17 gates with that shape -- those are all in the byte-frozen
+# historical runners. Stated plainly rather than inherited.
+#
+# What it does NOT catch, and this is the live bug, measured value by value:
+#   json null  -> R8="None" -> awk compares STRINGS ("None" >= "0.60" is lexically true) -> CLEARS
+#   json NaN   -> R8="NaN"  -> CLEARS
+#   json 1e400 -> R8="inf"  -> CLEARS
+# The gate therefore does not fail closed on a malformed measurement; it fails OPEN and launches
+# the three-seed attack grid on a metric that is not a number. awk's untyped comparison is the
+# whole mechanism: any non-numeric string beginning with a letter sorts above "0.60".
+#
+# The replacement reads the metric through rg_metric, which returns a value ONLY if the field is
+# present, numeric, finite and inside [0,1], and which records a FAILURE otherwise instead of
+# yielding a substitute number. The two outcomes are then kept apart, because they mean opposite
+# things and the old code gave both `exit 0`:
+#   * metric unusable      -> this run FAILED; rg_finish refuses DONE and we exit non-zero
+#   * metric fine but <K1  -> a real scientific result; stop cleanly, do not attack
+source scripts/run_guard.sh
+rg_init "R1C" "$L"
+R8=$(rg_metric "outputs/gen_$A_TAG.json" active_target_metrics.legacy_retain8 0 1) || {
+  echo "R1c ABORT: legacy_retain8 is not a usable measurement (see the FAIL line above)." >>"$L"
+  echo "  A missing, null, NaN, infinite or out-of-range metric is NOT a K1 failure and is NOT" >>"$L"
+  echo "  zero -- it means this arm was never measured. The attack grid is NOT run." >>"$L"
+  rg_finish || true
+  exit 1
+}
+# Numeric comparison only, on a value already proven numeric. -v is kept out of it deliberately.
+if ! venv_t2i/bin/python -c 'import sys; sys.exit(0 if float(sys.argv[1]) >= 0.60 else 1)' "$R8"; then
+  echo "K1 fail (retain8=$R8 < 0.60), not attacked -- this is a RESULT, not an error" >>"$L"
+  rg_finish
+  exit 0
+fi
+echo "K1 CLEAR (retain8=$R8 >= 0.60) -> attack grid" >>"$L"
 for SD in 0 1 6; do
   K="R1C_${A_TAG}_sd${SD}_lr1e-5_s300"
   if [ -f "outputs/atk_${K}.json" ]; then
@@ -307,4 +377,18 @@ for SD in 0 1 6; do
   mv "outputs/gen_${K}.provenance.json" "outputs/atk_${K}.provenance.json" 2>/dev/null || true
   rm -rf "adapters/_atk_$K" 2>/dev/null || true
 done
-echo "R1c DONE $(date -Is)" >>"$L"
+# ---- COMPLETION MANIFEST, published only after every required artifact VALIDATES. -------------
+# The bare `echo "R1c DONE"` that stood here is the marker-as-completion class: it said DONE
+# whatever happened to the artifacts. rg_manifest opens and parses each one first, and withholds
+# the manifest entirely if any failure was recorded during the run.
+R1C_ARTS="outputs/gen_$A_TAG.json:json outputs/gen_$C.json:json"
+for SD in 0 1 6; do
+  R1C_ARTS="$R1C_ARTS outputs/atk_R1C_${A_TAG}_sd${SD}_lr1e-5_s300.json:json"
+done
+# shellcheck disable=SC2086
+if rg_manifest "outputs/r1c_completion.json" $R1C_ARTS; then
+  echo "R1c manifest published: outputs/r1c_completion.json" >>"$L"
+else
+  echo "R1c NO MANIFEST: one or more required artifacts are missing or unreadable" >>"$L"
+fi
+rg_finish

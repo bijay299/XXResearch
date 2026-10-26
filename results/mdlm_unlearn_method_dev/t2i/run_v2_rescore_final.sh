@@ -25,17 +25,21 @@
 set -u
 cd /data/bijaypandey/t2i_unlearn
 
-# PROCESS-GROUP LEADERSHIP (closes the last reservation residual, REPAIR_INFRA_v2).
-# gpu_reserve.sh can only use pgid as evidence of descent when the reservation OWNER is a process
-# group leader. For a non-leader owner it must fall back to a 900 s grace, which leaves one hole: a
-# dead non-leader's CUDA-holding child, >900 s after death and not yet visible in nvidia-smi, could
-# have its GPU reclaimed underneath it. Re-exec'ing under setsid makes this script a group leader so
-# that fallback is never needed. Done HERE rather than at the call site so it holds however the
-# script is launched -- a safeguard that depends on the caller remembering is the class of defect
-# this audit kept finding.
-if [ "$$" != "$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')" ]; then
-  exec setsid "$0" "$@"
-fi
+# SETSID RE-EXEC REMOVED (repair A v3). This block used to read:
+#     if [ "$$" != "$(ps -o pgid= -p $$ ... )" ]; then exec setsid "$0" "$@"; fi
+# and was described as "closes the last reservation residual". It did not close it, and it cost
+# something real:
+#   * It made leadership the protection. Leadership is not a protection -- it only decides whether
+#     gpu_reserve.sh is ALLOWED to treat process-group membership as evidence of descent. The
+#     reclamation decision still came down to a timer for every other launch path, and nothing
+#     verified that this re-exec had happened.
+#   * `setsid` starts a NEW SESSION WITH NO CONTROLLING TERMINAL, so this script stopped being in
+#     the terminal's foreground process group. Ctrl-C from the lead's shell no longer reached it.
+#     A change justified by improving the interrupt path actively broke the interrupt path.
+#   * It changes the pid after launch, so the pid the lead sees is not the pid that reserves.
+# gpu_reserve_hold now holds an flock(2) on an inherited descriptor for the life of the run, which
+# covers every descendant through fork and execve regardless of group or session leadership, so
+# there is nothing left for this re-exec to buy. See docs/REPAIR_A_v3.md task 1.
 
 source scripts/gpu_reserve.sh
 gpu_reserve_hold "v2_rescore_final" 120 --allow-frozen >/dev/null || {
@@ -65,8 +69,16 @@ rg_cell venv_t2i/bin/python scripts/rescore_final_v2.py --run-tag d022
 # checkpoint) and is not a failure; an ABSENT manifest is.
 LATEST=$(ls -1dt outputs/rescore/*/ 2>/dev/null | head -1)
 if [ -n "$LATEST" ]; then
-  rg_require_file "${LATEST}run.json"
+  # LOADABLE, not merely non-empty (repair A v3). A run.json truncated by a killed scorer passes
+  # rg_require_file and then every downstream reader crashes on it -- or worse, a partial read is
+  # treated as a measurement. rg_require_loadable parses it.
+  rg_require_loadable "${LATEST}run.json" json
   echo "V2 manifest: ${LATEST}run.json" >>"$L"
+  # A completion manifest beside it, published only if run.json actually validates. `partial`
+  # run_status is expected and is NOT a failure (six arms have no checkpoint); an unreadable
+  # run.json is.
+  rg_manifest "${LATEST}v2_completion.json" "${LATEST}run.json:json" \
+    || echo "V2 completion manifest WITHHELD (see the FAIL lines above)" >>"$L"
 else
   rg_abort "no run directory under outputs/rescore/"
 fi

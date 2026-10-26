@@ -374,7 +374,13 @@ sleep 1
 SEEN=$(tr '\0' '\n' < "/proc/$W/environ" 2>/dev/null | sed -n 's/^CUDA_VISIBLE_DEVICES=//p' | head -1)
 if [ -z "$SEEN" ]; then
   ok "a runner that exports CUDA_VISIBLE_DEVICES after startup is INVISIBLE in /proc/<pid>/environ"
-  ok "=> campaign_free.sh clause (a) can never match any of its 8 callers"
+  # WORDING FIXED (repair A v3). This line used to say "any of its 8 callers", and
+  # scripts/test_gpu_reserve.sh:1252 said "all nine migrated" -- two different numbers for two
+  # different things, both called "callers". An independent reviewer read "8 callers" as 8 LIVE
+  # INVOCATIONS and raised a gate blocker for 8 unmigrated runners that do not exist. The code was
+  # right and the test file was what misled them, which makes the wording a defect in this file.
+  # The two quantities are now named separately and both are MEASURED below (T27), never recited.
+  ok "=> campaign_free.sh clause (a) can never match in any run_*.sh that REFERENCES it"
 else
   bad "environ unexpectedly showed CUDA_VISIBLE_DEVICES=$SEEN"
 fi
@@ -815,20 +821,47 @@ grep -q 'A TWO-GPU RESERVATION IS NOT EXPRESSIBLE' "$RESERVE" \
 grep -q 'the second REPLACES the first' "$RESERVE" \
   && ok "and warns that calling acquire twice in one shell leaks a reservation (trap replacement)" \
   || bad "the double-call trap hazard is not documented"
-# demonstrate the hazard the doc warns about, so the warning is evidence-backed rather than a guess
+# EXPECTATION CHANGED BY REPAIR A v3, deliberately, and recorded here rather than quietly edited.
+# This test used to ASSERT the hazard: two gpu_reserve_hold calls in one shell both succeeded, the
+# second EXIT trap replaced the first, and `chk ... "$LEAKED" "1"` demanded that exactly one record
+# LEAK. Documenting a leak and then asserting it is not a guard, and with a liveness lock the leak
+# got worse -- the second call would overwrite _GR_HOLD_FD, leaving the FIRST descriptor open for
+# the life of the shell, so that GPU would stay locked and unreclaimable even after the runner
+# exited. gpu_reserve_hold now REFUSES the second reservation (rc=2) and names gpu_reserve_drop.
+# run_r1_imma_official.sh had exactly this shape (stage 2 prep, then stage 4 smoke) and now drops
+# between stages. So the assertion is inverted: NOTHING may leak.
 NEWLOCKS twogpu; idle_state
 O=$(timeout 30 bash -c '
       set -u; source "$1"
       gpu_reserve_hold two_a 5 >/dev/null
-      gpu_reserve_hold two_b 5 >/dev/null
+      if gpu_reserve_hold two_b 5 >/dev/null 2>&1; then echo "second=GRANTED"
+      else echo "second=REFUSED rc=$GPU_RESERVE_RC"; fi
       echo "reserved=$GPU_RESERVED"' _ "$RESERVE" 2>/dev/null)
-case "$O" in *"reserved=1"*) ok "two sequential holds do take two GPUs (0 then 1) in one shell" ;;
-  *) bad "unexpected: $O" ;; esac
+case "$O" in *"second=REFUSED rc=2"*) ok "a SECOND reservation in one shell is refused with rc=2" ;;
+  *) bad "the second hold was not refused: $O" ;; esac
+case "$O" in *"reserved=0"*) ok "the first reservation is untouched by the refusal (still gpu0)" ;;
+  *) bad "the first reservation was disturbed: $O" ;; esac
 sleep 0.5
 LEAKED=$(ls "$GPU_RESERVE_LOCKDIR" 2>/dev/null | grep -c 'gpu[01].owner' || true)
-# A real assertion, not an ok-in-both-arms tautology (G14). The documented mechanism is that the
-# second gpu_reserve_hold REPLACES the first trap, so exactly ONE of the two records must survive.
-chk "exactly one record leaks, proving trap replacement (the documented hazard)" "$LEAKED" "1"
+chk "NOTHING leaks: the refusal means there is no second trap to replace the first" "$LEAKED" "0"
+HOLDLEAK=$(ls -a "$GPU_RESERVE_LOCKDIR" 2>/dev/null | grep -c '^\.hold\.' || true)
+chk "and no liveness-lock file is left behind either" "$HOLDLEAK" "0"
+# the refusal must still POINT AT THE FIX, not merely say no
+O2=$(timeout 30 bash -c '
+      set -u; source "$1"
+      gpu_reserve_hold two_c 5 >/dev/null 2>&1
+      gpu_reserve_hold two_d 5 2>&1 >/dev/null' _ "$RESERVE" 2>/dev/null)
+case "$O2" in *gpu_reserve_drop*) ok "the refusal names gpu_reserve_drop as the remedy" ;;
+  *) bad "the refusal does not say how to release the first reservation"; esac
+# and dropping first must then ALLOW a second reservation, or the refusal would be a dead end
+O3=$(timeout 30 bash -c '
+      set -u; source "$1"
+      gpu_reserve_hold two_e 5 >/dev/null 2>&1
+      gpu_reserve_drop two_e >/dev/null 2>&1
+      if gpu_reserve_hold two_f 5 >/dev/null 2>&1; then echo "after_drop=GRANTED gpu=$GPU_RESERVED"
+      else echo "after_drop=REFUSED rc=$GPU_RESERVE_RC"; fi' _ "$RESERVE" 2>/dev/null)
+case "$O3" in *"after_drop=GRANTED"*) ok "after gpu_reserve_drop a new reservation IS granted" ;;
+  *) bad "drop-then-acquire did not work: $O3" ;; esac
 
 hdr "T20 DEFECT 7: gpu_reserve_hold validates its arguments explicitly"
 # The lead's own bug: gpu_reserve_hold "name" --allow-frozen bound the FLAG to wait_seconds, so
@@ -1219,13 +1252,25 @@ else
 fi
 # G14: this is now an ASSERTION, not a print. Zero live callers is the migration's success
 # criterion, so it must be able to fail.
-CF_CALLERS=$(grep -rlE --include='run_*.sh' '^[^#]*(bash|sh|\.|source)[[:space:]]+[^ ]*campaign_free\.sh' "$PROJ" 2>/dev/null | sort || true)
+# REFERENCES vs LIVE INVOCATIONS are counted and reported SEPARATELY, because conflating them is
+# what produced a false gate blocker: a reviewer saw a "callers" count and read it as invocations.
+#   reference      = the string campaign_free appears in the file, comment or not
+#   live invocation = the file actually RUNS it (bash/sh/./source), outside a comment
+# Only the second number is the migration's success criterion, and it must be ZERO.
+CF_REFS=$(grep -rl --include='run_*.sh' 'campaign_free' "$PROJ" 2>/dev/null | sort || true)
+CF_REF_N=$(printf '%s' "$CF_REFS" | grep -c . || true)
+CF_CALLERS=$(grep -rlE --include='run_*.sh' '^[[:space:]]*[^#]*(bash|sh|\.|source)[[:space:]]+[^ ]*campaign_free\.sh' "$PROJ" 2>/dev/null | sort || true)
 CF_N=$(printf '%s' "$CF_CALLERS" | grep -c . || true)
+# Every reference that does exist must be a COMMENT. Asserted, not assumed.
+CF_CODE_LINES=$(grep -rn --include='run_*.sh' 'campaign_free' "$PROJ" 2>/dev/null \
+                | sed 's/^[^:]*:[0-9]*://' | sed 's/^[[:space:]]*//' | grep -vc '^#' || true)
+info "run_*.sh REFERENCING campaign_free.sh: $CF_REF_N file(s); non-comment reference lines: $CF_CODE_LINES"
 if [ "$CF_N" = 0 ]; then
-  ok "zero run_*.sh still INVOKE campaign_free.sh (all nine migrated)"
+  ok "zero run_*.sh LIVE-INVOKE campaign_free.sh ($CF_REF_N file(s) only mention it in comments)"
 else
   bad "$CF_N runner(s) still invoke campaign_free.sh: $(printf '%s' "$CF_CALLERS" | tr '\n' ' ')"
 fi
+chk "and every campaign_free reference in a run_*.sh is a COMMENT, not code" "$CF_CODE_LINES" "0"
 # every migrated runner must also HANDLE FAILURE, not just select a GPU (reviewer finding)
 for f in $MINE; do
   p="$PROJ/$f"
@@ -1235,6 +1280,435 @@ for f in $MINE; do
     bad "$f still writes DONE without inspecting any exit status"
   fi
 done
+
+
+# ===========================================================================
+# T28-T34  REPAIR A v3: THE LIVENESS LOCK.
+#
+# These tests exist because the previous closure of this defect was not one. The reservation
+# residual -- "the owner dies while descendants remain alive and the GPU is reclaimed underneath
+# them" -- had been addressed by raising the grace window to 900 s and adding `setsid` to two
+# launchers. Neither is a mechanism: the grace window is a timer that expires while real work is
+# still running, and `setsid` is a caller-side spelling that gpu_reserve.sh cannot verify, cannot
+# enforce, and that every other invocation path omits. gpu_reserve.sh:615 shows the consequence
+# directly -- _gr_live_in_pgid refuses to treat process-group membership as descent unless the
+# owner LED its group, so an ordinarily-launched runner falls through to the timer.
+#
+# The fix is an flock(2) held on an inherited file descriptor, so these tests are written to
+# distinguish the lock from the timer and from leadership. Every ORPHAN assertion below checks the
+# REASON STRING: "liveness-lock-held-by-pids-[...]" means the kernel refused the lock, whereas
+# "within-...s-grace-age-...s" would mean the timer saved us and the lock did nothing. A test that
+# accepted either would be the same non-fix wearing a test suite.
+#
+# All CPU. No CUDA is imported and nvidia-smi is the shim throughout.
+# ===========================================================================
+
+# A runner shaped like the real thing: PRODUCTION SHELL OPTIONS (set -euo pipefail), sourcing the
+# reservation API exactly as run_r1*/run_r2 do. Only 4 of the project's 139 runners use these
+# options and they are precisely the resumed path (r1, r1b, r1c, r2), so this is the option set
+# that matters and the one v1's suite never exercised.
+mk_runner() {
+  local path="$1" body="$2"
+  cat > "$path" <<RUNNER_EOF
+#!/bin/bash
+set -euo pipefail
+cd "$PROJ"
+# shellcheck source=scripts/gpu_reserve.sh
+source "$RESERVE"
+g=0
+gpu_reserve_hold "\$1" 5 >/dev/null || { echo "ACQUIRE_FAILED rc=\$GPU_RESERVE_RC"; exit \$GPU_RESERVE_RC; }
+echo "GOT \$GPU_RESERVED pid=\$\$ pgid=\$(cut -d' ' -f5 /proc/\$\$/stat) sid=\$(cut -d' ' -f6 /proc/\$\$/stat)"
+$body
+RUNNER_EOF
+  chmod +x "$path"
+}
+
+# Launch a runner so that it is NOT its process group's leader. The point is to reproduce the
+# ordinary production launch, which is the case _gr_live_in_pgid cannot reason about: an inner
+# non-interactive `bash -c` has job control OFF, so the backgrounded runner inherits the wrapper's
+# process group instead of getting one of its own.
+launch_nonleader() {
+  local script="$1" camp="$2" outfile="$3"
+  setsid bash -c "bash '$script' '$camp' > '$outfile' 2>&1 & echo \$! > '$outfile.pid'; wait" \
+    >/dev/null 2>&1 </dev/null &
+  local i=0
+  while [ ! -s "$outfile.pid" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+  cat "$outfile.pid" 2>/dev/null
+}
+
+RSTATE() {   # print the reservation state line for one gpu, via the module's own function
+  local i="$1"
+  ( set +u; source "$RESERVE" >/dev/null 2>&1; _gr_probe >/dev/null 2>&1; _gr_reservation_state "$i" )
+}
+
+# ---------------------------------------------------------------------------
+hdr "T28 (a) CONCURRENT LAUNCHERS cannot reserve the same GPU -- real gpu_reserve_hold path"
+NEWLOCKS liveconc; idle_state
+mk_runner "$TMP/r_conc.sh" 'sleep 12'
+CONC="$TMP/conc"; mkdir -p "$CONC"
+for k in 1 2 3 4 5 6 7 8; do
+  launch_nonleader "$TMP/r_conc.sh" "conc$k" "$CONC/out$k" >/dev/null &
+done
+wait 2>/dev/null
+sleep 4
+NWON=0; NWAIT=0
+for k in 1 2 3 4 5 6 7 8; do
+  if grep -q '^GOT ' "$CONC/out$k" 2>/dev/null; then NWON=$((NWON+1))
+  elif grep -q 'every allowed GPU is busy; retrying' "$CONC/out$k" 2>/dev/null; then NWAIT=$((NWAIT+1)); fi
+done
+UNIQ=$(for k in 1 2 3 4 5 6 7 8; do awk '/^GOT /{print $2}' "$CONC/out$k" 2>/dev/null; done | sort -u | tr '\n' ' ')
+UNIQN=$(printf '%s' "$UNIQ" | tr ' ' '\n' | grep -c . || true)
+info "winners=$NWON still-waiting=$NWAIT distinct GPUs won=[$UNIQ]"
+chk "exactly 2 of 8 concurrent launchers won a GPU" "$NWON" "2"
+chk "the winners hold DISTINCT indices (no double-booking)" "$UNIQN" "2"
+# The other six must be WAITING, not proceeding. rc=3 ("every allowed GPU is busy") is retryable
+# by design -- gpu_reserve_hold sleeps and re-asks -- so the right assertion is that none of them
+# got a GPU and each is visibly blocked in the retry loop. An earlier version of this test
+# demanded that the losers EXIT, which asserted the opposite of the documented behaviour.
+chk "the other six are blocked in the retry loop, none proceeded" "$NWAIT" "6"
+# the record must name a verified liveness lock, not merely a pid
+HL=$(grep -h '^holdpath=' "$GPU_RESERVE_LOCKDIR"/gpu*.owner 2>/dev/null | grep -c '\.hold\.' || true)
+chk "both winning records carry a liveness-lock path" "$HL" "2"
+pkill -9 -f 'r_conc.sh' 2>/dev/null; sleep 1
+
+# ---------------------------------------------------------------------------
+hdr "T29 (b) a surviving CHILD prevents premature reclamation"
+NEWLOCKS livechild; idle_state
+# the runner spawns a child and is then SIGKILLed; the child is a bash fork
+mk_runner "$TMP/r_child.sh" '( exec -a gr_test_child sleep 120 ) >/dev/null 2>&1 </dev/null &
+sleep 120'
+RP=$(launch_nonleader "$TMP/r_child.sh" "childcamp" "$TMP/child.out")
+sleep 3
+G=$(awk '/^GOT /{print $2}' "$TMP/child.out" 2>/dev/null)
+RPID=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pid=/){sub(/pid=/,"",$i);print $i}}' "$TMP/child.out")
+RPG=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pgid=/){sub(/pgid=/,"",$i);print $i}}' "$TMP/child.out")
+info "runner pid=$RPID pgid=$RPG  (group leader: $([ "$RPID" = "$RPG" ] && echo YES || echo NO))"
+if [ -n "$RPID" ] && [ "$RPID" != "$RPG" ]; then
+  ok "the runner is NOT its group's leader -- the pgid scan cannot help, as in production"
+else
+  info "runner happened to lead its group; the lock assertion below still holds"
+fi
+chk "the runner got a GPU" "$G" "0"
+kill -9 "$RPID" 2>/dev/null; sleep 2
+info "runner /proc present after SIGKILL: $([ -d "/proc/$RPID" ] && echo yes || echo no)"
+ST=$(RSTATE "$G")
+info "reservation state: $ST"
+case "$ST" in
+  ORPHAN*liveness-lock-held-by-pids*) ok "state is ORPHAN *because the KERNEL refused the lock*" ;;
+  ORPHAN*within-*grace*) bad "ORPHAN only via the GRACE TIMER -- the lock did not fire ($ST)" ;;
+  *) bad "expected ORPHAN via the liveness lock, got: $ST" ;;
+esac
+H3=$(spawn_holder)
+OUT=$("$RESERVE" acquire poacher "$H3" 2>/dev/null); rc=$?
+chk "a new acquirer is refused gpu0 and sent to gpu1" "$OUT" "1"
+pkill -9 -f '^gr_test_child' 2>/dev/null; kill "$H3" 2>/dev/null; sleep 1
+
+# ---------------------------------------------------------------------------
+hdr "T30 (b') a surviving GRANDCHILD -- through fork AND execve -- also prevents reclamation"
+NEWLOCKS livegc; idle_state
+# The surviving process is an EXECED BINARY two levels down. Nothing of the original bash remains
+# in it, so this is the case a /proc ancestry walk has no way to attribute to the dead owner.
+mk_runner "$TMP/r_gc.sh" 'bash -c "exec -a gr_test_gchild sleep 120" >/dev/null 2>&1 </dev/null &
+sleep 120'
+RP=$(launch_nonleader "$TMP/r_gc.sh" "gccamp" "$TMP/gc.out")
+sleep 3
+G=$(awk '/^GOT /{print $2}' "$TMP/gc.out" 2>/dev/null)
+RPID=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pid=/){sub(/pid=/,"",$i);print $i}}' "$TMP/gc.out")
+chk "the runner got a GPU" "$G" "0"
+# kill the runner AND every bash between it and the execed grandchild
+kill -9 "$RPID" 2>/dev/null; sleep 2
+GCPID=$(pgrep -u "$(id -u)" -f '^gr_test_gchild' | head -1)
+info "runner pid=$RPID dead=$([ -d "/proc/$RPID" ] && echo no || echo yes); execed grandchild pid=$GCPID alive=$([ -n "$GCPID" ] && echo yes || echo no)"
+if [ -n "$GCPID" ]; then
+  info "grandchild ppid=$(cut -d' ' -f4 /proc/$GCPID/stat 2>/dev/null) -- NOT the dead owner, so the"
+  info "       ppid chain back to the reservation owner no longer exists (re-parented)"
+fi
+ST=$(RSTATE "$G")
+info "reservation state: $ST"
+case "$ST" in
+  ORPHAN*liveness-lock-held-by-pids*)
+     ok "ORPHAN via the liveness lock, with the owner dead and ancestry destroyed" ;;
+  ORPHAN*within-*grace*) bad "ORPHAN only via the GRACE TIMER ($ST)" ;;
+  *) bad "expected ORPHAN via the liveness lock, got: $ST" ;;
+esac
+HOLDERS=$("$RESERVE" holders "$G" 2>/dev/null | tr '\n' ' ')
+info "holders: $HOLDERS"
+case "$HOLDERS" in *"lock=HELD"*) ok "the holders view names the live pid(s) holding the lock" ;;
+  *) bad "holders did not report a HELD lock: $HOLDERS" ;; esac
+# and it becomes reclaimable the moment that grandchild exits (record aged past the grace window
+# so that the TIMER is demonstrably not what is deciding either way)
+# EVERY holder must go, not just the one we gave a recognisable name. The lock is shared with
+# every process that inherited the descriptor -- which is the whole point of the mechanism -- so
+# killing one of two left the reservation correctly protected and an earlier version of this test
+# wrongly read that as a failure. Kill exactly the set the kernel says is holding it.
+HOLDPATH=$(grep '^holdpath=' "$GPU_RESERVE_LOCKDIR/gpu$G.owner" 2>/dev/null | cut -d= -f2-)
+for hp in $( ( set +u; source "$RESERVE" >/dev/null 2>&1; _gr_holders "$HOLDPATH" ) 2>/dev/null ); do
+  kill -9 "$hp" 2>/dev/null
+done
+pkill -9 -f '^gr_test_gchild' 2>/dev/null; sleep 2
+touch -d '-1 hour' "$GPU_RESERVE_LOCKDIR/gpu$G.owner" 2>/dev/null
+ST2=$(RSTATE "$G")
+info "state after the last descendant exits: $ST2"
+case "$ST2" in STALE*) ok "reclaimable ONLY after the last descendant exits -- self-healing, no manual step" ;;
+  *) bad "expected STALE once the lock was free, got: $ST2" ;; esac
+
+# ---------------------------------------------------------------------------
+hdr "T31 (c) DELAYED CUDA INITIALISATION does not make a live job look reclaimable"
+NEWLOCKS livedelay; idle_state
+# The shim reports NO compute apps at all and idle memory, which is exactly what a job that has
+# reserved a GPU but not yet created its CUDA context looks like (cold model load, dataset build).
+# So the CUDA-context arm of _gr_reservation_state CANNOT fire here. If the GPU is still protected
+# it is the liveness lock doing it.
+mk_runner "$TMP/r_delay.sh" 'bash -c "exec -a gr_test_precuda sleep 120" >/dev/null 2>&1 </dev/null &
+sleep 120'
+RP=$(launch_nonleader "$TMP/r_delay.sh" "delaycamp" "$TMP/delay.out")
+sleep 3
+G=$(awk '/^GOT /{print $2}' "$TMP/delay.out" 2>/dev/null)
+RPID=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pid=/){sub(/pid=/,"",$i);print $i}}' "$TMP/delay.out")
+chk "the runner got a GPU before any CUDA context existed" "$G" "0"
+APPN=$(awk '$1=="app"' "$STATE" | wc -l)
+chk "telemetry reports ZERO compute apps (pre-CUDA, as intended)" "$APPN" "0"
+kill -9 "$RPID" 2>/dev/null; sleep 2
+# age the record far past the grace window: the timer must not be able to protect it either
+touch -d '-1 hour' "$GPU_RESERVE_LOCKDIR/gpu$G.owner" 2>/dev/null
+ST=$(RSTATE "$G")
+info "state (owner dead, NO cuda context, record aged 1h > ${GPU_RESERVE_ORPHAN_GRACE:-900}s grace): $ST"
+case "$ST" in
+  ORPHAN*liveness-lock-held-by-pids*)
+     ok "still ORPHAN with BOTH the CUDA-context check and the grace timer unable to help" ;;
+  STALE*) bad "RECLAIMED a live pre-CUDA job -- this is the original defect ($ST)" ;;
+  *) bad "expected ORPHAN via the liveness lock, got: $ST" ;;
+esac
+pkill -9 -f '^gr_test_precuda' 2>/dev/null; sleep 1
+
+# ---------------------------------------------------------------------------
+hdr "T32 (d) NORMAL COMPLETION and INTERRUPTION both end ownership correctly"
+# (d1) normal completion, nothing left running -> the record is GONE
+NEWLOCKS liveexit; idle_state
+mk_runner "$TMP/r_exit.sh" 'true'
+RP=$(launch_nonleader "$TMP/r_exit.sh" "exitcamp" "$TMP/exit.out")
+sleep 3
+G=$(awk '/^GOT /{print $2}' "$TMP/exit.out" 2>/dev/null)
+chk "the runner acquired, then returned normally" "$G" "0"
+if [ ! -f "$GPU_RESERVE_LOCKDIR/gpu$G.owner" ]; then
+  ok "normal completion REMOVED the reservation record"
+else bad "the record survived a clean exit: $(RSTATE "$G")"; fi
+LEFT=$(ls "$GPU_RESERVE_LOCKDIR"/.hold.* 2>/dev/null | wc -l)
+chk "normal completion also removed the hold file (no litter)" "$LEFT" "0"
+
+# (d2)/(d3)/(d4) REWRITTEN AFTER MEASUREMENT (repair A v3). The first version of these three
+# cases asserted things that are false about BASH, not about the reservation, and all three
+# failed. They are rewritten to encode what was actually measured, and the measurement is recorded
+# here so the next reader does not re-derive it:
+#
+#   * SIGINT CANNOT BE DELIVERED to a runner this harness starts. A background job of a
+#     non-interactive shell inherits SIGINT **ignored**, and bash cannot trap a signal that was
+#     ignored on entry. Measured directly: /proc/<pid>/status showed SigIgn=0000000000000006
+#     (bits 2,3 = SIGINT, SIGQUIT) and the INT trap never ran. Any "SIGINT released/retained"
+#     assertion here would be testing nothing. It is reported as UNTESTABLE and flagged for a
+#     foreground terminal run by the lead, rather than quietly passing.
+#
+#   * A TRAPPED SIGNAL IS DEFERRED while bash blocks in a FOREGROUND command. A runner sitting in
+#     `python train.py` does not run its release trap when SIGTERMed -- it runs it when the
+#     foreground child returns. So the runner stays alive and the reservation stays HELD. That is
+#     the safe direction, but it means the teardown path is only exercised when the runner is
+#     interruptible, so these cases block in `wait` instead, which a trapped signal does interrupt.
+#
+#   * "NOTHING SURVIVED" MUST BE ESTABLISHED, NOT ASSUMED. The launch wrapper's own intermediate
+#     shell inherits the liveness descriptor too, so a case that kills only the processes it named
+#     still leaves a holder and the record is correctly retained. Survivors are now killed by the
+#     holder set the kernel reports.
+info "SIGINT is UNTESTABLE from this harness: a backgrounded non-interactive shell inherits"
+info "       SIGINT ignored (measured SigIgn=0000000000000006) and bash cannot trap an"
+info "       inherited-ignored signal. Needs a FOREGROUND terminal run -- see docs/REPAIR_A_v3.md 6.4."
+
+# (d2) SIGTERM, runner interruptible, NOTHING surviving -> the reservation must be RELEASED.
+NEWLOCKS livesigterm; idle_state
+mk_runner "$TMP/r_term.sh" 'sleep 120 & wait $!'
+RP=$(launch_nonleader "$TMP/r_term.sh" "sigterm2" "$TMP/sigterm2.out")
+sleep 3
+G=$(awk '/^GOT /{print $2}' "$TMP/sigterm2.out" 2>/dev/null)
+RPID=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pid=/){sub(/pid=/,"",$i);print $i}}' "$TMP/sigterm2.out")
+chk "SIGTERM/no-survivor case: runner acquired a GPU" "$G" "0"
+HP=$(grep '^holdpath=' "$GPU_RESERVE_LOCKDIR/gpu$G.owner" 2>/dev/null | cut -d= -f2-)
+kill -TERM "$RPID" 2>/dev/null; sleep 2
+# kill whatever else of the launch tree still holds the descriptor, so "nothing survived" is true
+for hp in $( ( set +u; source "$RESERVE" >/dev/null 2>&1; _gr_holders "$HP" ) 2>/dev/null ); do
+  kill -9 "$hp" 2>/dev/null
+done
+sleep 2
+info "runner alive after SIGTERM: $([ -d "/proc/$RPID" ] && echo yes || echo no)"
+LKS=$( ( set +u; source "$RESERVE" >/dev/null 2>&1; _gr_hold_free "$HP" && echo FREE || echo HELD ) 2>/dev/null)
+info "liveness lock after every holder is gone: $LKS"
+touch -d '-1 hour' "$GPU_RESERVE_LOCKDIR/gpu$G.owner" 2>/dev/null
+ST=$(RSTATE "$G")
+case "$ST" in
+  FREE|STALE*) ok "SIGTERM with nothing surviving ends ownership (state=$ST)" ;;
+  *) bad "SIGTERM with nothing surviving left: $ST" ;;
+esac
+
+# (d3) SIGTERM WITH A SURVIVING CHILD -> the record must be KEPT. This is the case v2's
+# unconditional `release` trap got wrong: it deleted the record while the python child was still
+# training. The invariant is "the record is still there and another job is sent elsewhere" -- NOT
+# a particular state name, so HELD and ORPHAN both satisfy it and the earlier version of this
+# assertion was wrong to demand ORPHAN specifically.
+NEWLOCKS livesigchild; idle_state
+mk_runner "$TMP/r_sigchild.sh" 'bash -c "exec -a gr_test_sigkid sleep 120" >/dev/null 2>&1 </dev/null &
+sleep 120 & wait $!'
+RP=$(launch_nonleader "$TMP/r_sigchild.sh" "sigkid" "$TMP/sigkid.out")
+sleep 3
+G=$(awk '/^GOT /{print $2}' "$TMP/sigkid.out" 2>/dev/null)
+RPID=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pid=/){sub(/pid=/,"",$i);print $i}}' "$TMP/sigkid.out")
+chk "SIGTERM-with-survivor case: runner acquired a GPU" "$G" "0"
+kill -TERM "$RPID" 2>/dev/null; sleep 3
+KID=$(pgrep -u "$(id -u)" -f '^gr_test_sigkid' | head -1)
+ST=$(RSTATE "$G")
+info "runner alive=$([ -d "/proc/$RPID" ] && echo yes || echo no) child alive=$([ -n "$KID" ] && echo yes || echo no)"
+info "state after SIGTERM while a child still runs: $ST"
+if [ -f "$GPU_RESERVE_LOCKDIR/gpu$G.owner" ]; then
+  ok "SIGTERM did NOT hand away a GPU whose work is still running (record kept)"
+else
+  bad "SIGTERM released a GPU with live work on it -- the v2 trap defect"
+fi
+H4=$(spawn_holder)
+OUT=$("$RESERVE" acquire poacher2 "$H4" 2>/dev/null)
+chk "and the next acquirer is sent elsewhere" "$OUT" "1"
+kill "$H4" 2>/dev/null
+pkill -9 -f '^gr_test_sigkid' 2>/dev/null; sleep 1
+
+# (d4) SIGKILL of the runner: no trap can run at all, so ONLY the kernel's accounting is left.
+NEWLOCKS livesigkill; idle_state
+mk_runner "$TMP/r_k9.sh" 'sleep 120'
+RP=$(launch_nonleader "$TMP/r_k9.sh" "k9camp" "$TMP/k9.out")
+sleep 3
+G=$(awk '/^GOT /{print $2}' "$TMP/k9.out" 2>/dev/null)
+RPID=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pid=/){sub(/pid=/,"",$i);print $i}}' "$TMP/k9.out")
+chk "SIGKILL case: runner acquired a GPU" "$G" "0"
+HP=$(grep '^holdpath=' "$GPU_RESERVE_LOCKDIR/gpu$G.owner" 2>/dev/null | cut -d= -f2-)
+kill -9 "$RPID" 2>/dev/null; sleep 1
+# while a holder remains the reservation must be KEPT ...
+ST=$(RSTATE "$G")
+info "state right after SIGKILL (launch tree still holds the lock): $ST"
+case "$ST" in
+  ORPHAN*liveness-lock-held-by-pids*|HELD*)
+     ok "SIGKILL with a descendant still holding the lock KEEPS the reservation" ;;
+  *) bad "SIGKILL released a reservation whose lock was still held: $ST" ;;
+esac
+# ... and once every holder is gone it must become reclaimable.
+for hp in $( ( set +u; source "$RESERVE" >/dev/null 2>&1; _gr_holders "$HP" ) 2>/dev/null ); do
+  kill -9 "$hp" 2>/dev/null
+done
+sleep 2
+touch -d '-1 hour' "$GPU_RESERVE_LOCKDIR/gpu$G.owner" 2>/dev/null
+ST2=$(RSTATE "$G")
+info "state after every lock holder has exited: $ST2"
+case "$ST2" in STALE*|FREE) ok "SIGKILL becomes reclaimable once the kernel frees the lock" ;;
+  *) bad "expected STALE/FREE after every holder exited, got: $ST2" ;; esac
+
+# ---------------------------------------------------------------------------
+hdr "T33 (e,f) INHERITED ENVIRONMENT cannot bypass the reservation; GPUs 2-3 stay off limits"
+NEWLOCKS liveenv; idle_state
+# (e1) A FORGED liveness-lock path is a bypass surface this repair ADDED, so it is tested. An
+# unlocked path would make every later reclamation check read "no descendant alive" for ever;
+# a path outside $LOCKDIR would let a caller aim the check at a file it controls.
+H5=$(spawn_holder)
+: > "$GPU_RESERVE_LOCKDIR/.hold.$H5.forged"
+OUT=$("$RESERVE" acquire forged "$H5" "$GPU_RESERVE_LOCKDIR/.hold.$H5.forged" 2>&1); rc=$?
+if [ "$rc" != 0 ] && printf '%s' "$OUT" | grep -q 'NOT LOCKED'; then
+  ok "acquire REFUSES a hold path whose flock the caller does not actually hold (rc=$rc)"
+else bad "an unlocked hold path was accepted (rc=$rc): $OUT"; fi
+OUT=$("$RESERVE" acquire forged2 "$H5" "/tmp/evil.hold" 2>&1); rc=$?
+if [ "$rc" != 0 ] && printf '%s' "$OUT" | grep -q 'not acceptable'; then
+  ok "acquire REFUSES a hold path outside \$LOCKDIR (rc=$rc)"
+else bad "a hold path outside LOCKDIR was accepted (rc=$rc): $OUT"; fi
+kill "$H5" 2>/dev/null
+
+# (e2/f) production mode: no inherited variable may widen the allowlist, relocate the mutex,
+# replace telemetry, redirect the freeze marker or the audit log. Each must REFUSE, not ignore.
+for perm in "GPU_RESERVE_GPUS=2 3" "GPU_RESERVE_GPUS=0 1 2 3" "GPU_RESERVE_GPUS=3" \
+            "GPU_RESERVE_GPUS=2" "GPU_RESERVE_LOCKDIR=$TMP/evil" "GPU_RESERVE_NVSMI=$SHIM" \
+            "GPU_RESERVE_FREEZE_FILE=$TMP/nofreeze" "GPU_RESERVE_OVERRIDE_LOG=/dev/null" \
+            "CUDA_VISIBLE_DEVICES=2,3" "CUDA_VISIBLE_DEVICES=2" "ALLOW_FROZEN_RUN=1"; do
+  k=${perm%%=*}; v=${perm#*=}
+  H6=$(spawn_holder)
+  OUT=$(env -u GPU_RESERVE_TEST_MODE -u GPU_RESERVE_GPUS -u GPU_RESERVE_LOCKDIR \
+            -u GPU_RESERVE_NVSMI -u GPU_RESERVE_FREEZE_FILE -u GPU_RESERVE_OVERRIDE_LOG \
+            "$k=$v" "$RESERVE" acquire envperm "$H6" 2>&1); rc=$?
+  # Production is FROZEN (FREEZE_ACTIVE exists) and GPUs 2-3 are never in the production set, so
+  # the ONLY acceptable outcomes are a refusal; a 0 here would mean the variable got through.
+  if [ "$rc" = 0 ]; then
+    bad "production acquire SUCCEEDED with $k='$v' inherited (rc=0) -- bypass"
+  else
+    ok "production refuses with $k='$v' inherited (rc=$rc)"
+  fi
+  # whatever happened, no record for gpu2 or gpu3 may ever exist
+  if [ -f "$PROJ/.gpulocks/gpu2.owner" ] || [ -f "$PROJ/.gpulocks/gpu3.owner" ]; then
+    bad "a reservation record was created for gpu2/gpu3 under $k='$v'"
+  fi
+  kill "$H6" 2>/dev/null
+done
+if [ ! -f "$PROJ/.gpulocks/gpu2.owner" ] && [ ! -f "$PROJ/.gpulocks/gpu3.owner" ]; then
+  ok "(f) after every env permutation, gpu2/gpu3 carry NO reservation record"
+else bad "gpu2/gpu3 acquired a record"; fi
+
+# ---------------------------------------------------------------------------
+hdr "T34 (g) FAILURES PROPAGATE to a non-successful final run status"
+NEWLOCKS liveprop; idle_state
+# (g1) a refused reservation under `set -euo pipefail` must leave a NON-ZERO exit status.
+#
+# The refusal has to be a NON-RETRYABLE one. "Every allowed GPU is busy" is rc=3, which
+# gpu_reserve_hold deliberately sleeps and retries, so a runner blocked that way never returns at
+# all -- an earlier version of this test wedged the whole suite for exactly that reason, which is
+# itself worth knowing: a (g) test built on busy GPUs tests nothing and hangs. A FREEZE refusal
+# (rc=4) is terminal and is the refusal the resumed path will actually meet while the project is
+# frozen.
+mk_runner "$TMP/r_prop.sh" 'echo UNREACHABLE_WORK_RAN'
+FREEZE_T="$TMP/TEST_FREEZE_ACTIVE"
+printf 'test freeze marker for T34\n' > "$FREEZE_T"
+rc=0
+GPU_RESERVE_FREEZE_FILE="$FREEZE_T" timeout 60 bash "$TMP/r_prop.sh" propcamp \
+  > "$TMP/prop.out" 2>&1 || rc=$?
+info "runner exit status under a freeze refusal: $rc"
+if [ "$rc" = 124 ]; then
+  bad "the runner never returned (timed out) -- the refusal was treated as retryable"
+elif [ "$rc" != 0 ]; then ok "a refused reservation yields a NON-ZERO runner status (rc=$rc)"
+else bad "the runner exited 0 despite never getting a GPU"; fi
+if grep -q UNREACHABLE_WORK_RAN "$TMP/prop.out"; then
+  bad "the runner RAN ITS WORK after the reservation was refused"
+else ok "no work ran after the refusal"; fi
+if grep -q 'the project is FROZEN' "$TMP/prop.out"; then
+  ok "and the refusal was EXPLAINED, not silent"
+else bad "the refusal printed no explanation: $(head -3 "$TMP/prop.out" | tr '\n' ' ')"; fi
+rm -f "$FREEZE_T"
+
+# (g2) the signal traps must TERMINATE the runner, not run a handler and fall through. v2 trapped
+# INT/TERM to the release command with no exit, so a SIGINT ran the handler and the runner CARRIED
+# ON -- doing GPU work with its reservation deleted, and still able to exit 0.
+NEWLOCKS liveprop2; idle_state
+mk_runner "$TMP/r_sigexit.sh" 'sleep 120
+echo CONTINUED_AFTER_SIGNAL'
+RP=$(launch_nonleader "$TMP/r_sigexit.sh" "sigexit" "$TMP/sigexit.out")
+sleep 3
+RPID=$(awk '/^GOT /{for(i=1;i<=NF;i++) if($i ~ /^pid=/){sub(/pid=/,"",$i);print $i}}' "$TMP/sigexit.out")
+kill -TERM "$RPID" 2>/dev/null; sleep 2
+if grep -q CONTINUED_AFTER_SIGNAL "$TMP/sigexit.out"; then
+  bad "the runner CONTINUED EXECUTING after SIGTERM (handler fell through)"
+else ok "SIGTERM terminated the runner instead of falling through to the next command"; fi
+
+# (g3) run_guard.sh must still refuse to say DONE when a required artifact is unloadable.
+hdr "T34b run_guard.sh: existence is not completion"
+( set +u
+  RG_LOG="$TMP/rg.log"; : > "$RG_LOG"
+  source "$SELF_DIR/run_guard.sh"
+  rg_init GTEST "$TMP/rg.log"
+  printf 'not a zip' > "$TMP/truncated.pt"
+  rg_require_loadable "$TMP/truncated.pt" torch >/dev/null 2>&1
+  rg_finish >/dev/null 2>&1
+  echo "$?" > "$TMP/rg.rc"
+) 2>/dev/null
+chk "rg_finish refuses DONE when a required artifact does not LOAD" "$(cat "$TMP/rg.rc" 2>/dev/null)" "1"
+if grep -q 'INCOMPLETE' "$TMP/rg.log" 2>/dev/null; then ok "the log says INCOMPLETE, never DONE"
+else bad "no INCOMPLETE marker in the guard log"; fi
 
 # ---------------------------------------------------------------------------
 printf '\n----------------------------------------\n'

@@ -4,6 +4,10 @@
 
 > **⚠ Corrections 2026-10-26:** `FINDING76` §3's probe mechanism check is **overstated** (n=7/3/1, within-arm spread 40×, ordering undetermined — see its §7). `FINDING77` §2's "B kills the accumulation-order hypothesis" is **wrong** — B holds accumulation order fixed and never varied it (see its §6).
 
+> **⚠ Corrections 2026-10-26, later pass (independent review).** Corrected in the body and tables below, not by banner: (1) **`REF_*` no longer claims "executed faithfully"** — §6's taxonomy row and §6.1's R1 row now carry the **5× ascent budget** (`D-021`) and the false filter-provenance claim (`D-037`); (2) **the ESD-alone control HAS RUN and refutes ESD inheritance**, with its interpretation restricted to the one supportable statement — §6.1; (3) the withdrawn inference that the checkpoint "is not the cross-attention-only erasure 'ESD-x1' denotes" is **removed**; (4) **the validity gate is not defective** and **no learning rate produced more gate failures** — §2.2.
+
+> **Reviewed revision:** `/data/bijaypandey/xxresearch_standalone` at **`cc778f2576ce1c6281f013fdc6ca9f118517f69d`**. `/data/bijaypandey/t2i_unlearn` is not a git repository, so artifacts are pinned by mtime; code-side statements are as of 2026-10-26 16:18, with agents editing concurrently.
+
 
 **Date:** 2026-10-26 · **Clone root:** `/data/bijaypandey/t2i_unlearn/upstream/` (**git-ignored**, see
 §0.1) · **Machine-readable:** `outputs/upstream_manifest.json`
@@ -158,6 +162,19 @@ evidence about ζ's value in either implementation. Nothing in this manifest cre
 **retracted** (audit defect `D-008`): at 25 steps it clears 0.40 at attacker lr 1e-5 (0.0667) and
 5e-5 (0.2000) but reaches **0.5333** at lr 1e-4, and max-over-valid is a ratchet. **No arm has met
 both halves at any budget.** The retention result survives; the mandate claim does not.
+
+**Two caveats on those three figures, added 2026-10-26 on independent review.**
+
+1. **Each is a maximum over ONE attack.** Every E2h 25-step learning-rate cell had exactly **1 of 3**
+   attacks gate-valid, and the gate-valid seed differs by cell (6, 1, 6), so the three values are
+   not a paired comparison. `0.0667 → 0.2000 → 0.5333` is a sequence of **n = 1** cells and supports
+   the protocol requirement (sweep attacker lr at matched budget) but **not** a dose relationship.
+2. **The gate is not defective, and no learning rate produced more gate failures than another.** On
+   a 24-image panel `T_rise ≥ 0.20` **correctly accepts 5/24 = 0.2083 and correctly rejects
+   4/24 = 0.1667**; admitting 4/24 would **change the rule** and belongs only in a separately
+   labelled sensitivity analysis. The retraction rests on **lr 1e-4, seed 6** at `T_rise = 0.2083`,
+   **correctly accepted** with H = 0.5333, so it needs no gate adjustment. The validity rate is
+   **1/3 at all three learning rates** — any claim of an lr-dependent gate-failure rate is false.
 
 ---
 
@@ -358,7 +375,7 @@ Finite, bounded, with stopping rules. Labels and output directories keep the thr
 
 | prefix | category |
 |---|---|
-| `REF_*` | **upstream code, our benchmark** — the authors' released code executed faithfully, then measured by **our** `gen_eval`, **our** 12-label closed-set CLIP scorer and **our** prompt pools. **This is not an official reproduction** |
+| `REF_*` | **upstream-code EXECUTION on our benchmark** — the authors' released code was *run*, then measured by **our** `gen_eval`, **our** 12-label closed-set CLIP scorer and **our** prompt pools. **This is not an official reproduction, and "executed" does not imply "faithfully".** The previous revision said "executed faithfully": **withdrawn.** The only `REF_*` artifact that exists ran at **5× the documented ascent budget** (`D-021`) and its header carried a filter claim that was false (`D-037`), so it is an **execution**, not a faithful one |
 | `ADAPT_*` | **domain adaptation** — authors' method, our domain, labelled as such |
 | existing names | **historical project variants** — unchanged |
 | *(no prefix exists for)* | **official reproduction** — authors' code **and** authors' protocol, metric and data. **Nothing in this project qualifies**, and nothing should be given a prefix implying it |
@@ -420,7 +437,7 @@ Verified from artifacts and mtimes:
 
 | id | status | evidence |
 |---|---|---|
-| **R1** | ✅ **RAN.** ESD checkpoint downloaded (`upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt`, 3,438,307,109 B, 11:36); 100 training images generated (11:39–11:43); `defend_text_to_image_lora.py` trained **5000/5000** (11:59→12:21), saving `REF_imma_vangogh/imma_unet_xatten_layer.pt`; eval composed base+ESD+IMMA (`overlaid 160/160 IMMA tensors`) and scored it (12:39→12:44). **The 3 attack seeds were never run.** | `logs/r1b_imma_train.log`, `logs/r1c_eval.log`, `outputs/gen_REF_imma_vangogh.json` |
+| **R1** | ✅ **EXECUTED — and NOT a faithful reference reproduction (`D-021`: 2500 ascent updates against the README's 500; `D-037`: a false filter-provenance claim in its header). Its 3 attack seeds were never run, so it is executed, not independently verified.** ESD checkpoint downloaded (`upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt`, 3,438,307,109 B, 11:36); 100 training images generated (11:39–11:43); `defend_text_to_image_lora.py` trained **5000/5000** (11:59→12:21), saving `REF_imma_vangogh/imma_unet_xatten_layer.pt`; eval composed base+ESD+IMMA (`overlaid 160/160 IMMA tensors`) and scored it (12:39→12:44). **The 3 attack seeds were never run.** | `logs/r1b_imma_train.log`, `logs/r1c_eval.log`, `outputs/gen_REF_imma_vangogh.json` |
 | **R2** | ⏸ **PARTIAL.** Three pools built 12:39→12:47 (`[r2pools] done`), 30 train + 30 test each. A first attempt failed `rc=1` — `ModuleNotFoundError: No module named 'pandas'` at `r2_build_meta_pools.py:9` (12:21). **`src/meta.py` has never been invoked.** | `logs/r2_meta.log`, `upstream_runs/meta/dataset/{hrm,irt,tgt}/{train,test}` |
 | **R3** | ❌ **NOT STARTED.** No `logs/r3*`, no `outputs/r3_*`. | — |
 | **R4** | ✅ **EXECUTED, four phases. Upstream's edit confirmed real; the port-side comparison is confounded and R4d is a required re-run** (`D-026`, `D-031`). See §4. | `outputs/r4{,b,c,d}_uce_*.json` |
@@ -445,13 +462,31 @@ configuration is not one the authors report** (IMMA never evaluates an immunised
 as "IMMA destroys utility" — because the measure and the configuration are inapt, **not** because the
 checkpoint is malformed.
 
-Two remaining explanations are live and neither has been tested: IMMA behaving as designed (it
-*immunises* against relearning rather than erasing, and here sits atop an ESD-erased UNet), and
-inheritance from the **ESD checkpoint** — all **686** tensors of
-`upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt` differ from pinned base SD-1.4, resnet blocks
-reaching 0.20 relative, so it is not the cross-attention-only erasure "ESD-x1" denotes (`D-019`). The
-decisive control — the ESD checkpoint scored **alone** on the same 12 DEV concepts — **has not been
-run**, and the attack seeds were never run either. **No conclusion about IMMA-the-published-method
+**ESD inheritance has since been TESTED and is REFUTED. Corrected 2026-10-26.** The previous
+revision said the decisive control "**has not been run**" and that the checkpoint "is not the
+cross-attention-only erasure 'ESD-x1' denotes". **Both statements are withdrawn.**
+
+The control **ran**: `outputs/gen_V1_esd_alone_vangogh.json` (15:39, 180 images, ~95 s, GPU 0
+reserved exclusively with the override logged). The ESD checkpoint **alone** scores van_gogh
+**0.7333** with **all eleven** non-target concepts at `clip_acc` **exactly 1.0000** (n=15 each) and
+`utility_all_nontarget` **1.0000** — against the composed ESD+IMMA arm's **0.0424** with 7 of 11
+concepts at exactly 0.000.
+
+> **THE ONLY SUPPORTABLE STATEMENT: the ESD-alone arm did NOT show the same closed-set utility
+> collapse on that panel.** It does **NOT** establish clean erasure (the target is still detected in
+> **11 of 15** images, and `D-030`'s no-reject-option limit bars "clean erasure" for the same reason
+> it bars "destroys the model"); **nor** the checkpoint's training provenance (this is a
+> **behavioural** control, declared as such before it ran — **EMA vs non-EMA remains live and
+> untested**, and the artifact's only provenance field is a `unet` path string, with no sha256);
+> **nor** that its weight changes are universally benign (one 12-concept panel, one target, n=15 per
+> concept — and all **686** tensors still differ from pinned base SD-1.4 with resnet blocks at 0.20
+> relative, which is unexplained, not exonerated); **nor** over-training as the cause of the IMMA
+> result (`D-021`'s 5× budget is a **labelled hypothesis about our run**, and nothing in this control
+> varies the budget, so nothing in it tests that hypothesis).
+
+So the collapse is **introduced by composing IMMA**, not inherited from ESD. The **one** live
+explanation that remains untested is IMMA behaving as designed — it *immunises* against relearning
+rather than erasing, and here sits atop an ESD-erased UNet. The attack seeds were never run either. **No conclusion about IMMA-the-published-method
 follows from this cell**, in either direction. Two further limits on the cell: it ran **5000** steps
 rather than the documented 1000 (2500 ascent steps against the README's 500) and 3 of its 100 training
 images are NSFW-blanked black frames (`D-021`).

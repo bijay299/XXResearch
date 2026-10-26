@@ -52,10 +52,13 @@ these caveats. Details and numbers: `docs/AGENT1_UCE_FINDINGS.md` D-110..D-115, 
  D-115  (1) `--guide` was never passed to the port (`erase_uce.py`'s equivalent is `--target`), so
         any non-default guide silently compared upstream erasing toward *g* against our port
         erasing toward "". NOW propagated. (2) `--erase-scale` has no port counterpart at all;
-        values != 1.0 compared two different equations. NOW refused. (3) `--no-preserve` was
-        one-sided: it emptied upstream's pool but `erase_uce.py` always uses its hard-coded
-        10-concept PRESERVE. The asymmetry is UNFIXABLE without changing `erase_uce.py`'s
-        behaviour, so it is now printed and recorded in the artifact. (4) No retain/utility axis,
+        values != 1.0 compared two different equations. NOW refused. (3) `--no-preserve` WAS
+        one-sided: it emptied upstream's pool but `erase_uce.py` always used its hard-coded
+        10-concept PRESERVE. RESOLVED 2026-10-26: `erase_uce.py` gained an OPT-IN `--no-preserve`
+        (default off, so every historical arm reproduces bit-identically), proven on CPU in float64
+        to be BIT-IDENTICAL to omitting the preserve terms -- max|A-B| = 0.0, torch.equal True --
+        which is exactly what upstream does with preserve_concepts=[]. It is now propagated, so
+        both sides receive the SAME preserve configuration, and the fingerprint records which. (4) No retain/utility axis,
         which PREREG_H38 §6 requires; now available opt-in via `--retain-concepts`.
  D-120  `BASE_MODEL`/`BASE_REV`/`BASE_VARIANT` OVERRODE THE PORT SIDE ONLY. This script hard-coded
         SD-1.4 while `erase_uce.py` reads those env vars, and it is invoked here as a subprocess
@@ -91,6 +94,20 @@ BASE_MODEL = os.environ.get("BASE_MODEL", "CompVis/stable-diffusion-v1-4")
 BASE_REV_ENV = os.environ.get("BASE_REV")
 BASE_VARIANT = os.environ.get("BASE_VARIANT", "fp16") or None
 
+#: THE RETAIN / UTILITY PANEL (AGENT B, 2026-10-26). PREREG_H38 S6 requires BOTH a target and a
+#: retain measurement; without the retain axis a 0/15 target accuracy cannot be distinguished from
+#: collateral damage (AGENT1 D-105), which is precisely the open question this script exists to
+#: settle. `--retain-concepts` previously defaulted to EMPTY, so every run measured the target
+#: alone and set `complete: False` -- and `run_r4c_queue.sh` passes no override, which is why the
+#: last run reported `complete: False`.
+#:
+#: These four are gen_eval.LAB_KEY entries that are NOT target concepts in attack_relearn.SPLIT
+#: (whose targets are church, garbage_truck, parachute, tench, van_gogh) and that are also in
+#: erase_uce.PRESERVE, so they are the neighbours the preserve term is supposed to protect:
+#: cassette player, chain saw, french horn, gas pump. Using the PRESERVED neighbours is the
+#: informative choice -- it measures the preserve term on its own targets.
+DEFAULT_RETAIN = ("cassette_player", "chain_saw", "french_horn", "gas_pump")
+
 
 def mod(name, path=None):
     spec = iu.spec_from_file_location(name, path or f"{P}/scripts/{name}.py")
@@ -107,24 +124,33 @@ def main():
     ap.add_argument("--preserve-scale", type=float, default=1.0)
     ap.add_argument("--no-preserve", action="store_true",
                     help="upstream default: preserve_concepts=[] (uce_sd_erase.py:148-149). "
-                         "ONE-SIDED (D-115.3): erase_uce.py has no way to disable its PRESERVE "
-                         "pool, so this makes the comparison asymmetric. Recorded in the "
-                         "artifact.")
+                         "NOW TWO-SIDED (2026-10-26): propagated to erase_uce.py's opt-in "
+                         "--no-preserve, so both sides receive the same preserve configuration. "
+                         "The port's actual preserve list is recorded in the fingerprint and in "
+                         "the artifact's n_preserve_port/preserve_asymmetric fields.")
     ap.add_argument("--order-probe", action="store_true",
                     help="D-110. Recompute our port's formula in UPSTREAM's accumulation order on "
                          "identical inputs, so the order effect is separated from the selection "
                          "effect. Default off. See also erase_uce.py --diag-order-probe.")
-    ap.add_argument("--retain-concepts", default="",
+    ap.add_argument("--retain-concepts", default=",".join(DEFAULT_RETAIN),
                     help="D-115.4. Comma-separated gen_eval.LAB_KEY names to ALSO generate and "
-                         "score, giving the retain/utility axis PREREG_H38 S6 requires. Default "
-                         "empty = target only (and the run is then marked incomplete).")
+                         "score, giving the retain/utility axis PREREG_H38 S6 requires. "
+                         "DEFAULT CHANGED 2026-10-26 (AGENT B): was empty, which made every run "
+                         "target-only and therefore `complete: False` -- the cause of the last "
+                         f"run's incomplete status. Now defaults to {DEFAULT_RETAIN}. Pass "
+                         "--retain-concepts '' to measure the target only, which is still "
+                         "recorded as INCOMPLETE.")
     ap.add_argument("--refresh-port", action="store_true",
                     help="D-112. Rebuild our port's checkpoint even if a cached one exists.")
     ap.add_argument("--n-per-prompt", type=int, default=5)
     ap.add_argument("--steps", type=int, default=25)
     ap.add_argument("--guidance", type=float, default=7.5)
-    ap.add_argument("--save-images", action="store_true", default=True,
-                    help="D-114. Save every generated image. On by default.")
+    # `action="store_true", default=True` made this flag unsettable: a.save_images was ALWAYS
+    # True, so `--save-images` was a no-op and the `images_saved_to: ... if a.save_images else
+    # None` branch was dead. Saving stays the default; it is now actually possible to turn off.
+    ap.add_argument("--no-save-images", dest="save_images", action="store_false", default=True,
+                    help="D-114. Images are SAVED by default. Pass this to discard them, which "
+                         "also records completeness.images_saved = false.")
     a = ap.parse_args()
 
     # ---------- D-115.2: our port implements no erase_scale. Refuse rather than mislead.
@@ -191,18 +217,22 @@ def main():
     # r4c/r4d port-side number may be cited as evidence about the preserve pool in either
     # direction.
     #
-    # NOTE, and this is a real remaining limitation: erase_uce.py offers NO flag to empty its
-    # PRESERVE pool, so `--no-preserve` STILL cannot be honoured on the port side. The fingerprint
-    # records what the port actually used, so the asymmetry can no longer be mistaken for a
-    # matched comparison; it cannot make the comparison matched.
+    # RESOLVED 2026-10-26: erase_uce.py now has an OPT-IN `--no-preserve` flag (default off, so
+    # every historical arm still reproduces bit-identically), so `--no-preserve` IS now honoured on
+    # the port side and the comparison can be genuinely matched. Proven on CPU in float64: an empty
+    # [0, 768] preserve tensor makes the port's result BIT-IDENTICAL to omitting the preserve terms
+    # altogether, which is exactly what upstream does with preserve_concepts=[] -- max|A-B| = 0.0,
+    # torch.equal = True. The fingerprint below records which side was actually used either way.
+    port_preserve = [] if a.no_preserve else list(euce.PRESERVE)
     fp_path = f"{port_dir}/fingerprint.json"
     fingerprint = {
         "script": "scripts/erase_uce.py",
         "concept": a.concept, "lam": a.lamb, "target": a.guide,
         "preserve_scale": a.preserve_scale,
-        # what the PORT actually uses -- not what --no-preserve asked for
-        "port_preserve_concepts": list(euce.PRESERVE),
-        "port_n_preserve": len(euce.PRESERVE),
+        # what the PORT actually uses -- now equal to the request, since --no-preserve is honoured
+        "port_preserve_concepts": port_preserve,
+        "port_n_preserve": len(port_preserve),
+        "port_no_preserve_flag_passed": bool(a.no_preserve),
         "erase_scale_implemented_by_port": False,
         "base_model": BASE_MODEL, "base_revision": revision, "base_variant": BASE_VARIANT,
         "embedding_selection": "erase_uce.concept_dirs: positions [attention_mask.sum()-2 .. 76]",
@@ -227,6 +257,11 @@ def main():
                "--concept", a.concept, "--lam", str(a.lamb),
                "--preserve-scale", str(a.preserve_scale), "--target", a.guide,
                "--label", f"R4C_port_{cfg_tag}", "--out", port_dir]
+        if a.no_preserve:
+            # Honoured on the port side as of 2026-10-26, so upstream and the port now receive the
+            # SAME preserve configuration. Without this the port silently used its default 10-concept
+            # pool while the artifact recorded n_preserve: 0 (D-026).
+            cmd.append("--no-preserve")
         if a.order_probe:
             cmd.append("--diag-order-probe")
         print("[r4c] running our port: " + " ".join(cmd), flush=True)
@@ -318,14 +353,38 @@ def main():
             W64 = n64 @ torch.linalg.inv(d64)
             f_rel.append(float((W_port.double() - W64).norm() / max(float(W64.norm()), 1e-30)))
         order = {
+            # THIS COLUMN IS A VALID ORDER MEASUREMENT: W, c_e, c_t, c_p, lam and preserve_scale
+            # are IDENTICAL between the two solves above and ONLY the accumulation order differs
+            # (lam*W last and fused GEMMs, vs lam*W first and per-concept rank-1 accumulation).
+            # That is the one condition under which an accumulation-order claim is admissible.
             "lam_last_vs_lam_first_rel": {"per_matrix_max": max(o_rel),
-                                          "per_matrix_mean": sum(o_rel) / len(o_rel)},
+                                          "per_matrix_mean": sum(o_rel) / len(o_rel),
+                                          "varies": "accumulation order ONLY",
+                                          "held_fixed": ["W", "c_e", "c_t", "c_p", "lam",
+                                                         "preserve_scale", "dtype (float32)",
+                                                         "device"]},
+            # THIS COLUMN IS A PRECISION MEASUREMENT, NOT AN ORDER MEASUREMENT. It varies dtype
+            # (fp32 vs fp64) at FIXED order, so it is a separate single-factor comparison.
             "fp32_vs_true_fp64_rel": {"per_matrix_max": max(f_rel),
-                                      "per_matrix_mean": sum(f_rel) / len(f_rel)},
+                                      "per_matrix_mean": sum(f_rel) / len(f_rel),
+                                      "varies": "dtype ONLY (float32 vs float64)",
+                                      "held_fixed": ["accumulation order (lam*W last)", "W",
+                                                     "c_e", "c_t", "c_p", "lam"]},
+            # EXPLICIT REFUSAL OF A DECOMPOSITION CLAIM (AGENT B, 2026-10-26).
+            "NOT_A_CAUSAL_DECOMPOSITION":
+                "These two numbers are SCALAR ERROR NORMS from two different single-factor "
+                "comparisons. Their difference, ratio or sum is NOT an attribution of W_new's "
+                "deviation to 'order' and 'precision' as separable causes, and must not be "
+                "presented as one. Both perturbations are amplified by the SAME ill-conditioned "
+                "inverse, so they are not independent contributions to a common total and do not "
+                "add. What each column licenses is only: 'changing this one factor alone moves "
+                "W_new by this relative amount.'",
             "note": "D-110. Both columns are the SAME size on CPU (~5.6e-02 and ~4.6e-02 at "
                     "lam=0.1), because cond(c^T c + lam I) ~ 3.2e6 there makes every O(eps) "
-                    "detail move W_new by ~5% of its norm. If that holds on GPU too, 'lambda "
-                    "first vs lambda last' is NOT a distinguished mechanism (AGENT1 D-160).",
+                    "detail move W_new by ~5% of its norm. If that holds on GPU too, the correct "
+                    "reading is that W_new is not determined to better than ~5% by the formula at "
+                    "this lambda -- NOT that 'lambda first vs lambda last' is a distinguished "
+                    "mechanism (AGENT1 D-160).",
         }
         print(f"[r4c][order] lam-last vs lam-first: max={max(o_rel):.4e} "
               f"mean={sum(o_rel)/len(o_rel):.4e}", flush=True)
@@ -428,8 +487,15 @@ def main():
                       "base_variant": BASE_VARIANT, "config_tag": cfg_tag,
                       "concept": a.concept, "edit_concepts": edit_concepts, "guide": guide,
                       "guide_propagated_to_port": True,
-                      "n_preserve_upstream": len(preserve), "n_preserve_port": len(euce.PRESERVE),
-                      "preserve_asymmetric": bool(a.no_preserve),
+                      # FIXED 2026-10-26: these two reported the PORT's preserve count from
+                      # len(euce.PRESERVE) regardless of what the port was actually given, so after
+                      # --no-preserve became honoured the artifact said n_preserve_port=10 and
+                      # preserve_asymmetric=True while the fingerprint and the rebuilt weights said
+                      # 0 and matched. Same metadata-vs-reality defect as D-026, inverted. Both now
+                      # derive from port_preserve, the list actually used.
+                      "n_preserve_upstream": len(preserve),
+                      "n_preserve_port": len(port_preserve),
+                      "preserve_asymmetric": len(preserve) != len(port_preserve),
                       "lamb": a.lamb, "erase_scale": a.erase_scale,
                       "preserve_scale": a.preserve_scale,
                       "scored_concepts": score_keys, "label_set": "gen_eval.LABELS / LAB_KEY",
@@ -462,11 +528,53 @@ def main():
                       + ([] if len(score_keys) > 1 else
                          ["INCOMPLETE: no retain/utility axis was measured (PREREG_H38 S6 "
                           "requires one). Re-run with --retain-concepts to settle D-105."])
-                      + ([] if not a.no_preserve else
-                         ["ASYMMETRIC: --no-preserve empties UPSTREAM's preserve pool only; "
-                          "erase_uce.py always uses its hard-coded %d-concept PRESERVE "
-                          "(AGENT1 D-115.3)." % len(euce.PRESERVE)]),
-           "complete": len(score_keys) > 1,
+                      # CAVEAT CORRECTED 2026-10-26 (AGENT B). This branch unconditionally
+                      # asserted "--no-preserve empties UPSTREAM's preserve pool only;
+                      # erase_uce.py always uses its hard-coded 10-concept PRESERVE". That became
+                      # FALSE when erase_uce.py gained its opt-in --no-preserve and this script
+                      # began propagating it: the two sides are now MATCHED, and the fingerprints
+                      # on disk confirm it (port_n_preserve: 0, port_no_preserve_flag_passed:
+                      # true). The config fields n_preserve_port/preserve_asymmetric were fixed in
+                      # the same repair but THIS STRING WAS NOT, so a repaired, symmetric run
+                      # still shipped an artifact declaring itself asymmetric. The caveat now
+                      # derives from the measured asymmetry rather than from the flag.
+                      + ([] if len(preserve) == len(port_preserve) else
+                         ["ASYMMETRIC PRESERVE POOL: upstream received %d preserve concept(s) and "
+                          "the port received %d. Any difference between the two arms is "
+                          "confounded with the preserve pool (AGENT1 D-115.3)."
+                          % (len(preserve), len(port_preserve))])
+                      + (["ACCUMULATION ORDER WAS NOT MEASURED in this run (--order-probe is "
+                          "off), so nothing here separates accumulation order from embedding "
+                          "selection. Do not attribute any port-vs-upstream difference to "
+                          "accumulation order from this artifact."] if order is None else []),
+           # `complete` was `len(score_keys) > 1` alone, so it answered only "was a retain axis
+           # measured". It now records EVERY completeness requirement separately, because a run
+           # can satisfy one and not another and a single boolean hid which.
+           "completeness": {
+               "target_measured": True,
+               "retain_measured": len(score_keys) > 1,
+               "retain_concepts": [k for k in score_keys if k != a.concept],
+               "images_saved": bool(a.save_images),
+               "per_image_scores_recorded": True,
+               "upstream_executed": True,
+               "port_executed_end_to_end": True,
+               "preserve_pools_matched": len(preserve) == len(port_preserve),
+               "accumulation_order_measured": order is not None,
+               "upstream_cli_path_exercised": False,
+               "upstream_cli_path_note":
+                   "This harness calls upstream's UCE() function directly, which IS upstream's "
+                   "edit code, but it is NOT upstream's __main__ CLI path: uce_sd_erase.py applies "
+                   "expand_prompts in __main__ BEFORE calling UCE(), so expand_prompts -- the only "
+                   "upstream lever measured to change the edit size -- is unreachable here "
+                   "(AGENT1 D-102/D-103). Treat the upstream arm as 'UCE() at erase_scale=1 with "
+                   "unexpanded prompts', not as 'upstream UCE as its authors run it'.",
+           },
+           "complete": bool(len(score_keys) > 1 and a.save_images
+                            and len(preserve) == len(port_preserve)),
+           "complete_criteria": "retain_measured AND images_saved AND preserve_pools_matched. "
+                                "accumulation_order_measured and upstream_cli_path_exercised are "
+                                "reported but NOT required, because neither is needed for the "
+                                "BASE/UPSTREAM/OUR_PORT comparison this script makes.",
            "minutes": (time.time() - t0) / 60}
     out = f"{OUT}/r4{'d' if a.no_preserve else 'c'}_uce_{cfg_tag}.json"
     json.dump(rec, open(out, "w"), indent=1)

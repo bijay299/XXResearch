@@ -84,8 +84,25 @@ SCHEMES = {
     },
     "coherent": {
         "pools": {
-            "hrm": ["a photo of a church", "a photo of a church building",
-                    "a photograph of a church exterior"],
+            # LEAK FIXED 2026-10-26 (AGENT B, REPAIR v3). This pool read
+            #   ["a photo of a church", "a photo of a church building",
+            #    "a photograph of a church exterior"]
+            # and TWO of those three are EXACTLY evaluation target prompts:
+            #   gen_eval.CONCEPTS["church"]        == ["a photo of a church", "a church building",
+            #                                         "a photograph of a church exterior"]
+            #   attack_relearn.SPLIT["church"]["H"] == the same three
+            # So the scheme recommended for "any run intended to support a concept-erasure claim"
+            # trained its FORGET pool on the prompts the claim is scored on. Found by
+            # scripts/split_registry.py v3 once r2_build_meta_pools was registered and its pools
+            # inspected (it was unregistered in v2, which is why this went unseen). The
+            # replacements below are church paraphrases verified DISJOINT from gen_eval.CONCEPTS,
+            # attack_relearn.SPLIT[*]["T"]/["H"] and split_registry.FINAL_PROMPTS by
+            # `check_split_disjointness()`, which now runs on every build and verify.
+            # NO POOL ON DISK IS RELABELLED: an existing coherent pool built to the old definition
+            # fails check_resume_compat with the exact field, as a definition mismatch should.
+            "hrm": ["a parish church on a quiet lane",
+                    "a church with a slate roof and tall windows",
+                    "a church courtyard under open sky"],
             "fgen": ["a photo of a cathedral", "a photo of a chapel", "a photo of a basilica"],
             "tgt": ["a photo of a mosque", "a photo of a synagogue", "a photo of a temple",
                     "a photo of a castle", "a photo of a town hall", "a photo of a stone building"],
@@ -220,6 +237,83 @@ def validate(d, expect, prompts=None, per_prompt=None):
     return len(files), fingerprint(d, rows)
 
 
+def check_split_disjointness(scheme_name, plan, historical):
+    """ENFORCE the split registry's verdict on THIS scheme's resolved pools (REPAIR v3, AGENT B).
+
+    Why this exists. r2_build_meta_pools was NOT in split_registry v2's roster, so its pools were
+    never inspected, and the `coherent` scheme's FORGET pool silently contained two of the three
+    evaluation target prompts (see SCHEMES["coherent"]). Registering the script is not enough on
+    its own: the registry reads source, while THIS function checks the pools the run has actually
+    RESOLVED -- including `irt`, which is sampled from coco_object_retain.csv at run time and
+    therefore appears in no source listing at all.
+
+    Returns a record. For a non-historical scheme an overlap with the evaluation target pool is a
+    HARD FAILURE; `legacy` is exempt because it is an acknowledged historical reconstruction whose
+    hrm pool IS an evaluation prompt by construction -- that is the defect it reproduces, and it is
+    reported, never silently passed.
+    """
+    import importlib.util as iu
+    def _m(n):
+        s = iu.spec_from_file_location(f"_r2p_{n}", f"{P}/scripts/{n}.py")
+        m = iu.module_from_spec(s); s.loader.exec_module(m); return m
+    try:
+        sr, ge, ar = _m("split_registry"), _m("gen_eval"), _m("attack_relearn")
+    except BaseException as e:
+        die(f"cannot load the split registry to check pool disjointness: {type(e).__name__}: {e}. "
+            f"A pool build that cannot be checked against the registry must NOT proceed.")
+    nz = sr.norm
+    eval_target, atk_train, final = {}, {}, {}
+    for c in sorted(ar.SPLIT):
+        for p in ar.SPLIT[c]["H"]:
+            eval_target[nz(p)] = f"attack_relearn.SPLIT[{c}]['H']"
+        for p in ar.SPLIT[c]["T"]:
+            atk_train[nz(p)] = f"attack_relearn.SPLIT[{c}]['T']"
+    for c, v in ge.CONCEPTS.items():
+        for p in v:
+            eval_target.setdefault(nz(p), f"gen_eval.CONCEPTS[{c}]")
+    for c, v in sr.FINAL_PROMPTS.items():
+        for p in v:
+            final[nz(p)] = f"split_registry.FINAL_PROMPTS[{c}]"
+
+    hits = {"vs_EVAL_TARGET": [], "vs_ATK_TRAIN": [], "vs_FINAL": []}
+    for pool, p in plan.items():
+        for s in p["prompts"]:
+            n = nz(s)
+            for key, ref in (("vs_EVAL_TARGET", eval_target), ("vs_ATK_TRAIN", atk_train),
+                             ("vs_FINAL", final)):
+                if n in ref:
+                    hits[key].append({"pool": pool, "prompt": s, "collides_with": ref[n]})
+    rec = {"split_version": sr.SPLIT_VERSION, "scheme": scheme_name, "overlaps": hits,
+           "n_prompts_checked": sum(len(p["prompts"]) for p in plan.values()),
+           "pools_checked": sorted(plan),
+           "note": "checked on the RESOLVED pools of this run, irt included (irt is sampled from "
+                   "coco_object_retain.csv at run time and appears in no source listing)."}
+    for key, v in hits.items():
+        if v:
+            print(f"[r2pools] SPLIT OVERLAP {key}: {len(v)} prompt(s)", flush=True)
+            for h in v[:6]:
+                print(f"    {h['pool']}: {h['prompt']!r} <- {h['collides_with']}", flush=True)
+    if hits["vs_EVAL_TARGET"] and not historical:
+        die("SPLIT LEAK: %d pool prompt(s) in scheme %r are ALSO evaluation target prompts, so a "
+            "model trained on these pools would be scored on prompts it was trained on. This is "
+            "an EXPLICIT FAILURE, not a note: a run built on these pools cannot support a clean "
+            "evaluation claim. Offenders: %s. Either change the pool definition or declare the "
+            "scheme a historical reconstruction (--historical-reconstruction), which records the "
+            "leak instead of removing it."
+            % (len(hits["vs_EVAL_TARGET"]), scheme_name,
+               [(h["pool"], h["prompt"]) for h in hits["vs_EVAL_TARGET"]]))
+    if hits["vs_FINAL"]:
+        die("SPLIT LEAK: %d pool prompt(s) collide with split_registry.FINAL_PROMPTS: %s. FINAL "
+            "must be reissued under a new version rather than quietly amended."
+            % (len(hits["vs_FINAL"]), [h["prompt"] for h in hits["vs_FINAL"]]))
+    if hits["vs_EVAL_TARGET"]:
+        print("[r2pools] the %d EVAL_TARGET overlap(s) above are PERMITTED ONLY because this is a "
+              "declared HISTORICAL RECONSTRUCTION. They are recorded in pools.json and any result "
+              "from these pools is a development measurement." % len(hits["vs_EVAL_TARGET"]),
+              flush=True)
+    return rec
+
+
 def check_resume_compat(root, scheme_name, sizing, plan):
     """Compare the on-disk manifest against the requested plan, field by field.
 
@@ -332,6 +426,11 @@ if __name__ == "__main__":
         print(f"  {name}: {len(p['prompts'])} prompt(s) x {p['per_prompt']} "
               f"= {p['per_split']}/split{flag}", flush=True)
 
+    # ---- SPLIT DISJOINTNESS, BEFORE any image is generated or validated (REPAIR v3). This is the
+    #      check that was missing: r2_build_meta_pools was absent from split_registry v2's roster,
+    #      so nothing ever compared these pools against the evaluation prompts.
+    split_rec = check_split_disjointness(a.pool_scheme, plan, a.historical_reconstruction)
+
     # ---- resume compatibility BEFORE any per-split work, so a definition mismatch is named as
     #      such instead of surfacing as a count error on the first split.
     prior = check_resume_compat(a.root, a.pool_scheme, sizing, plan)
@@ -426,6 +525,7 @@ if __name__ == "__main__":
         "guidance_scale": CFG,
         "seed_base": SEED_BASE,
         "trainer_pools": ["hrm", "irt", "tgt"],
+        "split_disjointness": split_rec,
         "pools": {},
     }
 

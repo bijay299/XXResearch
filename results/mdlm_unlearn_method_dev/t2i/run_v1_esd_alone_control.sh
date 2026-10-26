@@ -69,9 +69,29 @@ rg_cell venv_imma/bin/python scripts/gen_eval.py \
   --unet upstream_runs/imma/diffusers-VanGogh-ESDx1-UNET.pt \
   --target van_gogh
 
-# An artifact that merely EXISTS is not a result: rg_require_file rejects zero-byte and absent
-# files alike (audit defect D-028, where a 29.7%-truncated checkpoint passed every `[ -f ]` guard).
-rg_require_file outputs/gen_V1_esd_alone_vangogh.json
+# An artifact that merely EXISTS is not a result -- and neither is one that is merely NON-EMPTY.
+# D-028's checkpoint, adapters/utrap_church_l1.0k4/unet.pt, is 511,229,952 bytes and passes both
+# `[ -f ]` and `[ -s ]`; torch.load on it raises "PytorchStreamReader failed reading zip archive:
+# failed finding central directory" (measured 2026-10-26). rg_require_loadable PARSES the file.
+rg_require_loadable outputs/gen_V1_esd_alone_vangogh.json json
+
+# The metrics this control exists to produce must be PRESENT, NUMERIC, FINITE and in range before
+# anyone reads a number off them. rg_metric never substitutes a value it could not read: a missing
+# or malformed field records a failure, so rg_finish refuses DONE rather than letting a 0.0000
+# appear in the log as though it had been measured. The denominator is validated too -- a retain
+# rate over zero scored samples is undefined, not zero.
+V1_JSON=outputs/gen_V1_esd_alone_vangogh.json
+for F in active_target_metrics.target_suppression_acc \
+         active_target_metrics.legacy_retain8 \
+         active_target_metrics.utility_all_nontarget; do
+  V=$(rg_metric "$V1_JSON" "$F" 0 1) \
+    && echo "V1 metric $F = $V" >>"$L" \
+    || echo "V1 metric $F is UNUSABLE -- not substituting a number for it" >>"$L"
+done
+
+# Completion manifest: published only after the result file validates and only if nothing failed.
+rg_manifest outputs/v1_completion.json "$V1_JSON:json" \
+  || echo "V1 completion manifest WITHHELD (see the FAIL lines above)" >>"$L"
 
 # Interpretation limits, written into the log beside the number so they travel with it.
 cat >>"$L" <<'NOTE'

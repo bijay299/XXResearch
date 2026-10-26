@@ -108,6 +108,10 @@ def main():
                          "needs reconciliation by that document's owner; the INERTNESS conclusion "
                          "is unaffected and if anything strengthened.")
     ap.add_argument("--preserve-scale", type=float, default=0.1)
+    ap.add_argument("--no-preserve", action="store_true",
+                    help="empty the PRESERVE set, matching upstream UCE's documented default "
+                         "preserve_concepts=[]. OPT-IN: omitting it reproduces every historical "
+                         "arm bit-identically (audit defect D-026).")
     ap.add_argument("--label", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--diag-order-probe", action="store_true",
@@ -130,7 +134,23 @@ def main():
         variant=BASE_VARIANT, safety_checker=None, requires_safety_checker=False).to(dev)
 
     c_e, c_t = concept_dirs(pipe, [FORGET_PROMPTS[a.concept]], dev, paired=[a.target])
-    c_p = concept_dirs(pipe, PRESERVE, dev)
+    # OPT-IN, DEFAULT OFF (added 2026-10-26, audit defect D-026). Upstream UCE's documented default
+    # is preserve_concepts=[] (uce_sd_erase.py:148-149), but this port had no way to express that,
+    # so every R4c/R4d comparison ran upstream with 0 preserve concepts against the port with 10 --
+    # an asymmetry that could be recorded but not removed. With --no-preserve the preserve set is an
+    # EMPTY [0, 768] tensor, which makes `c_p.T @ c_p` a 768x768 zero matrix and `(W @ c_p.T) @ c_p`
+    # a zero matrix of W's shape, so both preserve terms drop out of the numerator and denominator
+    # exactly as they are absent upstream. No special-casing of the algebra is needed.
+    #
+    # The DEFAULT PATH IS UNCHANGED: without the flag this is the same call with the same PRESERVE
+    # list, so every historical arm reproduces bit-identically. The flag exists only so a genuinely
+    # matched upstream-vs-port comparison becomes possible.
+    if a.no_preserve:
+        c_p = c_e.new_zeros((0, c_e.shape[1]))
+        print("[uce] --no-preserve: preserve set EMPTY (0 directions), matching upstream's "
+              "documented default. Both preserve terms drop out.", flush=True)
+    else:
+        c_p = concept_dirs(pipe, PRESERVE, dev)
     print(f"[uce] erase directions: {tuple(c_e.shape)}  preserve directions: {tuple(c_p.shape)}",
           flush=True)
 

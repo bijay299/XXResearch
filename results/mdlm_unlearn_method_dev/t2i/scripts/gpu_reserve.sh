@@ -563,6 +563,121 @@ _gr_pgid() {
   printf '%s\n' "$v"
 }
 
+# /proc/<pid>/stat field 6 = session id; after cutting at the last ')' it is token 3 (index 3).
+_gr_sid() {
+  local v
+  _gr_read_stat "$1" || return 1
+  v=${_GR_STAT_TOK[3]}
+  case "$v" in ''|*[!0-9]*) return 1 ;; esac
+  printf '%s\n' "$v"
+}
+
+# ---------------------------------------------------------------------------
+# D-049/R3: THE LIVENESS LOCK -- the actual close for the reservation residual.
+#
+# What was wrong before. Ownership liveness was decided from /proc: owner pid + start time, and
+# for descendants a process-GROUP scan that _gr_live_in_pgid refuses to trust unless the owner
+# LED its group (gpu_reserve.sh:615, `return 2`). A runner started the ordinary way -- `bash
+# run_r1_imma_official.sh` from any non-interactive parent -- INHERITS its parent's group, so
+# pgid != pid, the scan returns 2, and the only remaining protection is the 900 s grace window.
+# Adding `setsid` to two launchers does not fix that: it is a CALLER-SIDE CONVENTION that the
+# reservation cannot verify, cannot enforce, and that any other invocation path silently omits.
+# A guarantee that depends on how the caller happened to spell the command is not a guarantee.
+#
+# What replaces it. A reservation now also owns an flock(2) on a dedicated hold file, taken by
+# the LONG-LIVED runner shell on a file descriptor. An flock lives on the open file description,
+# so it is shared with every process that inherits the fd -- across fork AND across execve -- and
+# the kernel releases it only when the LAST such descriptor is closed, i.e. when the owner and
+# every descendant holding it have exited. A would-be acquirer therefore does not have to infer
+# descent from /proc at all: it asks the kernel "can I take this lock?", and a refusal is positive
+# proof that something from that reservation is still alive.
+#
+# This is strictly stronger than the pgid scan on every axis that mattered:
+#   * independent of group/session leadership, so no `setsid` convention is required
+#   * survives re-parenting to init, which is what destroyed the ppid chain
+#   * survives SIGKILL of the owner (nothing runs in the owner; the kernel does the accounting)
+#   * holds from BEFORE the record is published until after the work exits, so a job that has not
+#     yet created a CUDA context is already protected (the delayed-init case)
+#   * cannot be forged by an env var: the path is validated to live inside $LOCKDIR
+#
+# MEASURED, on this host, before writing this code (bash 5.1.16, util-linux flock 2.37.2):
+#   owner took `exec {FD}>>hold; flock -x $FD`, spawned a child shell that did `exec sleep 300`
+#   (so the surviving process is an EXECED BINARY, not a bash fork), then the owner was SIGKILLed.
+#   With the owner's /proc entry gone and the grandchild alive, `flock -n -x hold -c true`
+#   returned 1 (BUSY). The lock had been inherited through fork and through execve and was still
+#   held by the grandchild. That is the guarantee the pgid scan could not give.
+#
+# Residual, stated plainly: the fd is inherited by EVERYTHING the runner spawns, so a process that
+# the runner deliberately leaves running (a stray `nohup`) keeps the reservation alive. That is the
+# safe direction -- it refuses a GPU rather than trampling one -- and `holders` names the pids so an
+# operator can see exactly why, with `release` as the deliberate override.
+# ---------------------------------------------------------------------------
+
+# The hold path is caller-supplied (the runner shell must own the fd), so it is VALIDATED, never
+# trusted: it must be $LOCKDIR/.hold.<digits>.<campaign-charset>. Otherwise a caller could name a
+# file that is permanently locked (GPU unreclaimable for ever) or never locked (no protection).
+_gr_hold_path_ok() {
+  local p="$1" camp="$2" base
+  [ -n "$p" ] && [ "$p" != "-" ] || return 1
+  case "$p" in "$LOCKDIR"/*) ;; *) return 1 ;; esac
+  base=${p#"$LOCKDIR"/}
+  case "$base" in */*) return 1 ;; esac            # no nesting, no traversal
+  case "$base" in .hold.*) ;; *) return 1 ;; esac
+  local rest=${base#.hold.}
+  local pidpart=${rest%%.*}
+  case "$pidpart" in ''|*[!0-9]*) return 1 ;; esac
+  [ "$rest" != "$pidpart" ] || return 1            # a campaign part must be present
+  local camppart=${rest#"$pidpart".}
+  case "$camppart" in ''|*[!A-Za-z0-9._-]*) return 1 ;; esac
+  [ -z "$camp" ] || [ "$camppart" = "$camp" ] || return 1
+  return 0
+}
+
+# Can we take the hold lock right now? 0 = free (nothing from that reservation is alive),
+# 1 = BUSY (a live owner or descendant holds it), 2 = cannot tell (no flock(1), missing file).
+# `flock -n -x <file> -c true` opens, tries, runs true, and closes -- it never leaves a lock behind.
+# The file is NOT created here: a missing hold file must read as "cannot tell", not as "free".
+_gr_hold_free() {
+  local p="$1" rc
+  [ -n "$p" ] && [ "$p" != "-" ] || return 2
+  [ -e "$p" ] || return 2
+  command -v flock >/dev/null 2>&1 || return 2
+  flock -n -x "$p" -c true >/dev/null 2>&1; rc=$?
+  case "$rc" in
+    0) return 0 ;;
+    1) return 1 ;;
+    *) return 2 ;;        # flock itself failed (permissions, ENOLCK): never call that "free"
+  esac
+}
+
+# Which pids currently hold the hold file open? DIAGNOSTIC ONLY -- the allow/refuse decision is
+# made by the kernel in _gr_hold_free, never by this scan.
+#
+# PERFORMANCE DEFECT I INTRODUCED AND THEN MEASURED (2026-10-26). The first version walked
+# /proc/<pid>/fd/* in bash and ran `readlink` per descriptor: on this host that is 2,247 forks,
+# and it is reached from _gr_reservation_state, which runs INSIDE the flock-held critical section
+# during acquire. It stalled a measurement run for tens of seconds per call while holding the
+# reservation mutex -- i.e. a diagnostic string was blocking the thing it was describing. A single
+# `find -lname` does the same job in ~149 ms with one fork, and is wrapped in `timeout` so a
+# pathological /proc can never hold the mutex either. If it cannot answer, the caller still has
+# the kernel's verdict; only the list of pids is lost, and it says so.
+_gr_holders() {
+  local p="$1" out=""
+  [ -n "$p" ] && [ -e "$p" ] || return 1
+  if command -v find >/dev/null 2>&1; then
+    if command -v timeout >/dev/null 2>&1; then
+      out=$(timeout 10 find /proc/[0-9]*/fd -lname "$p" -printf '%h\n' 2>/dev/null \
+            | sed 's#^/proc/##; s#/fd$##' | sort -un | tr '\n' ' ') || out=""
+    else
+      out=$(find /proc/[0-9]*/fd -lname "$p" -printf '%h\n' 2>/dev/null \
+            | sed 's#^/proc/##; s#/fd$##' | sort -un | tr '\n' ' ') || out=""
+    fi
+  fi
+  out=${out% }
+  [ -n "$out" ] || return 1
+  printf '%s\n' "$out"
+}
+
 _gr_proc_uid() { stat -c %u "/proc/$1" 2>/dev/null; }
 
 # is this pid alive AND the same process that took the reservation?
@@ -914,13 +1029,15 @@ _gr_classify() {
 # not even be listed by nvidia-smi yet. ORPHAN keeps the record and refuses the GPU.
 # ===========================================================================
 _gr_reservation_state() {
-  local i="$1" rec pid start camp pgid uuid age mtime nowts survivor
+  local i="$1" rec pid start camp pgid sid hold uuid age mtime nowts survivor
   rec=$(_gr_record "$i")
   [ -f "$rec" ] || { echo FREE; return; }
   pid=$(_gr_read_field "$rec" pid) || pid=""
   start=$(_gr_read_field "$rec" start) || start=""
   camp=$(_gr_read_field "$rec" campaign) || camp=""
   pgid=$(_gr_read_field "$rec" pgid) || pgid=""
+  sid=$(_gr_read_field "$rec" sid) || sid=""
+  hold=$(_gr_read_field "$rec" holdpath) || hold=""
   uuid=$(_gr_read_field "$rec" uuid) || uuid=""
 
   # DEFECT 4: an index is only a NAME for a device. If this record was taken against a different
@@ -935,18 +1052,43 @@ _gr_reservation_state() {
   if _gr_owner_alive "$pid" "$start"; then echo "HELD $pid $camp"; return; fi
 
   # ---- owner is gone. Is anything it started still running, or still on the GPU? ----
+  #
+  # FIRST and AUTHORITATIVE: the liveness lock. If the kernel will not give us the flock, a
+  # process holding an inherited descriptor from this reservation is still alive -- owner, child,
+  # grandchild or deeper, forked or execed, re-parented to init or not, CUDA context created or
+  # not yet. No /proc inference and no leadership precondition is involved, so this arm fires for
+  # the ordinary non-leader runner that _gr_live_in_pgid has to refuse (see its rc=2 at the
+  # `[ "$want" != "$owner" ]` guard). This is the arm that closes the residual.
+  local holdrc=2 holders=""
+  if _gr_hold_path_ok "$hold" "$camp"; then
+    _gr_hold_free "$hold"; holdrc=$?
+    if [ "$holdrc" = 1 ]; then
+      holders=$(_gr_holders "$hold") || holders="unreadable"
+      echo "ORPHAN $pid $camp liveness-lock-held-by-pids-[${holders// /,}]"; return
+    fi
+  elif [ -n "$hold" ] && [ "$hold" != "-" ]; then
+    # A record naming a hold path we refuse to accept is a record we cannot reason about.
+    # Default-deny: keep the reservation rather than reclaim on a path we would not honour.
+    echo "ORPHAN $pid $camp holdpath-rejected-'$hold'"; return
+  fi
+
   # Pass OUR OWN PID (we exclude our own process tree) and the OWNER pid (pgid counts as evidence
   # of descent only if the owner led its group). rc=2 means "no pgid evidence available".
+  # Retained as a SECOND line of defence for legacy records (holdpath=- , written before the
+  # liveness lock existed) and for the gap where flock(1) is unavailable.
   local pgrc
   survivor=$(_gr_live_in_pgid "$pgid" "$$" "$pid"); pgrc=$?
   if [ "$pgrc" = 0 ] && [ -n "$survivor" ]; then
     echo "ORPHAN $pid $camp surviving-pid-$survivor-in-pgid-$pgid"; return
   fi
-  if [ "$pgrc" = 2 ]; then
-    _gr_log "gpu$i: owner pid $pid did not lead its process group (pgid=$pgid), so its orphaned"
-    _gr_log "        children cannot be identified from /proc. Falling back to the CUDA-context"
-    _gr_log "        check and the ${ORPHAN_GRACE}s grace window. Launch runners under setsid for"
-    _gr_log "        the strong guarantee."
+  if [ "$pgrc" = 2 ] && [ "$holdrc" != 0 ]; then
+    # Only reachable for a record with NO usable liveness lock. With a lock present and free we
+    # have POSITIVE proof that owner and descendants are gone, so group leadership is irrelevant.
+    _gr_log "gpu$i: owner pid $pid did not lead its process group (pgid=$pgid, sid=${sid:--}) AND"
+    _gr_log "        this record carries no usable liveness lock (holdpath='${hold:--}'), so its"
+    _gr_log "        orphaned children cannot be identified. Falling back to the CUDA-context check"
+    _gr_log "        and the ${ORPHAN_GRACE}s grace window. This is the LEGACY path: records written"
+    _gr_log "        by gpu_reserve_hold now always carry a lock and do not reach it."
   fi
   if [ "$_GR_TELEMETRY" = OK ]; then
     local p u
@@ -974,17 +1116,21 @@ _gr_reservation_state() {
 }
 
 _gr_write_record() {
-  local i="$1" camp="$2" pid="$3" rec tmp start pgid uuid
+  local i="$1" camp="$2" pid="$3" hold="${4:-}" rec tmp start pgid sid uuid
   rec=$(_gr_record "$i"); tmp="$rec.tmp.$$"
   start=$(_gr_starttime "$pid") || start="-"
   pgid=$(_gr_pgid "$pid") || pgid="-"
+  sid=$(_gr_sid "$pid") || sid="-"
   uuid=${_GR_IDX2UUID[$i]:--}
+  [ -n "$hold" ] || hold="-"
   # DEFECT 2: the write and the publish are both checked. A full disk previously produced a
   # truncated or absent record that would read as FREE on the next pass.
   if ! {
     printf 'pid=%s\n'       "$pid"
     printf 'start=%s\n'     "${start:--}"
     printf 'pgid=%s\n'      "${pgid:--}"
+    printf 'sid=%s\n'       "${sid:--}"
+    printf 'holdpath=%s\n'  "$hold"
     printf 'campaign=%s\n'  "$camp"
     printf 'gpu=%s\n'       "$i"
     printf 'uuid=%s\n'      "$uuid"
@@ -1080,7 +1226,7 @@ _gr_log_override() {
 }
 
 _gr_do_acquire() {
-  local camp="$1" owner="$2" i st rest cls rc
+  local camp="$1" owner="$2" hold="${3:-}" i st rest cls rc
   _GR_OVERRIDE_USED=0
   # Guard against the classic caller error: an owner pid that is already dead. $BASHPID is
   # RE-EVALUATED inside $( ), so `G=$(gpu_reserve.sh acquire c "$BASHPID")` records the transient
@@ -1090,6 +1236,33 @@ _gr_do_acquire() {
     _gr_log "      runner's own pid: use \$\$ (not \$BASHPID, which \$( ) re-evaluates)."
     return 2
   fi
+  # ---- VERIFY the liveness lock rather than take the caller's word for it. ----------------
+  # gpu_reserve_hold flocks $hold in the long-lived runner shell BEFORE calling acquire, so by the
+  # time we get here the lock must already be HELD. We check that, because a record that merely
+  # NAMES a hold path would promise a protection that does not exist: every later reclamation
+  # decision trusts this field, so an unlocked path would read as "no descendant alive" for ever.
+  # Refusing here is what makes the guarantee auditable instead of aspirational.
+  local holdverified=0
+  if [ -n "$hold" ] && [ "$hold" != "-" ]; then
+    if ! _gr_hold_path_ok "$hold" "$camp"; then
+      _gr_log "FATAL liveness-lock path '$hold' is not acceptable. It must be"
+      _gr_log "      \$LOCKDIR/.hold.<ownerpid>.<campaign> inside $LOCKDIR, so that no caller can"
+      _gr_log "      point the reclamation check at a file it controls."
+      return 2
+    fi
+    _gr_hold_free "$hold"; local _hrc=$?
+    case "$_hrc" in
+      1) holdverified=1 ;;                     # BUSY = the caller really is holding it. Good.
+      0) _gr_log "FATAL the liveness-lock file '$hold' is NOT LOCKED. acquire was called with a"
+         _gr_log "      hold path whose flock the caller does not hold, so a surviving child could"
+         _gr_log "      not be detected later. Use gpu_reserve_hold, which takes the lock first."
+         return 2 ;;
+      *) _gr_log "FATAL cannot test the liveness lock '$hold' (flock(1) missing or unusable)."
+         _gr_log "      Refusing rather than recording a protection we cannot verify."
+         return 2 ;;
+    esac
+  fi
+
   # D-013 freeze gate, inside the mutex-held critical section.
   _gr_freeze_gate "$camp" "$owner" || return $?
 
@@ -1159,12 +1332,26 @@ _gr_do_acquire() {
       _gr_log "gpu$i has no UUID in telemetry -- REFUSED (an index with no device identity cannot"
       _gr_log "        be re-validated later)"; continue
     fi
-    _gr_write_record "$i" "$camp" "$owner"; rc=$?
+    _gr_write_record "$i" "$camp" "$owner" "$hold"; rc=$?
     if [ "$rc" != 0 ]; then
       _gr_log "gpu$i: reservation record could not be written -- NOT claiming it"
       return "$rc"
     fi
+    # Report the supervision regime that actually applies, verified from /proc rather than assumed
+    # from how the command was spelled. This is the line to read when judging whether a run was
+    # protected: "liveness-lock" is the strong regime and does not depend on leadership at all.
+    local _o_start _o_pgid _o_sid _regime
+    _o_start=$(_gr_starttime "$owner") || _o_start="?"
+    _o_pgid=$(_gr_pgid "$owner")       || _o_pgid="?"
+    _o_sid=$(_gr_sid "$owner")         || _o_sid="?"
+    if [ "$holdverified" = 1 ]; then _regime="liveness-lock (kernel-enforced; descendants covered)"
+    elif [ "$_o_pgid" = "$owner" ];  then _regime="pgid-leader scan + ${ORPHAN_GRACE}s grace (no liveness lock)"
+    else _regime="GRACE WINDOW ONLY (${ORPHAN_GRACE}s) -- owner leads neither its group nor a lock"
+    fi
     _gr_log "gpu$i RESERVED for '$camp' by pid $owner (uuid ${_GR_IDX2UUID[$i]:--})"
+    _gr_log "        owner identity: pid=$owner start=$_o_start pgid=$_o_pgid sid=$_o_sid"
+    _gr_log "        group-leader=$([ "$_o_pgid" = "$owner" ] && echo yes || echo no) session-leader=$([ "$_o_sid" = "$owner" ] && echo yes || echo no)"
+    _gr_log "        supervision: $_regime"
     [ "${_GR_OVERRIDE_USED:-0}" = 1 ] && _gr_log_override "$camp" "$owner" "$i"
     printf '%s\n' "$i"
     return 0
@@ -1174,14 +1361,24 @@ _gr_do_acquire() {
 }
 
 _gr_do_release() {
-  local camp="$1" owner="$2" i rec pid cp n=0
+  local camp="$1" owner="$2" i rec pid cp hp n=0
   for i in $ALLOWED_GPUS; do
     rec=$(_gr_record "$i"); [ -f "$rec" ] || continue
     pid=$(_gr_read_field "$rec" pid) || pid=""
     cp=$(_gr_read_field "$rec" campaign) || cp=""
+    hp=$(_gr_read_field "$rec" holdpath) || hp=""
     if { [ -z "$owner" ] || [ "$pid" = "$owner" ]; } && { [ -z "$camp" ] || [ "$cp" = "$camp" ]; }; then
+      # Warn, but still obey: an explicit `release` is the deliberate operator override, and the
+      # refusal-under-live-descendants policy lives in gpu_reserve_drop where the fd can be closed.
+      if _gr_hold_path_ok "$hp" "$cp"; then
+        _gr_hold_free "$hp" || _gr_log "WARNING gpu$i's liveness lock is still HELD by pid(s)" \
+          "[$(_gr_holders "$hp" || echo '?')] -- releasing anyway because release was asked for"
+      fi
       if rm -f "$rec"; then _gr_log "gpu$i released (campaign '$cp', pid $pid)"; n=$((n+1))
       else _gr_log "WARNING could not remove $rec"; fi
+      if _gr_hold_path_ok "$hp" "$cp" && _gr_hold_free "$hp"; then
+        rm -f "$hp" 2>/dev/null || _gr_log "WARNING could not remove the hold file $hp"
+      fi
     fi
   done
   [ "$n" -gt 0 ] || _gr_log "nothing to release for campaign='$camp' pid='$owner'"
@@ -1291,8 +1488,47 @@ _gr_do_selftest_telemetry() {
 # the lead hit in run_v1_esd_alone_control.sh. v2 parses flags position-free and requires
 # wait_seconds to be a positive integer.
 # ===========================================================================
+# Close the liveness-lock descriptor WITHOUT redirecting the shell.
+#
+# SECOND INSTANCE OF THE SAME BUG, and it is the reason this helper exists rather than an inline
+# close. `exec {FD}>&- 2>/dev/null` applies that `2>/dev/null` to the SHELL, not to the exec, so
+# every close site silenced the runner's stderr permanently. Measured: with it inline on the
+# FAILURE path, gpu_reserve_require printed its full freeze diagnosis and then NOTHING -- no
+# "ABORTING -- no GPU reservation", no explanation of rc=4 -- because stderr had been sent to
+# /dev/null by the close two lines earlier. Two suite assertions caught it
+# ("no abort explanation", "rc=4 not explained"). I had already fixed the OPEN site and missed
+# the three CLOSE sites; a control that silences the diagnosis of its own failure is exactly the
+# shape this repair cycle is supposed to remove.
+# The fd is checked through /proc instead, so nothing needs to be suppressed.
+_gr_close_hold_fd() {
+  [ -n "${_GR_HOLD_FD:-}" ] || return 0
+  if [ -e "/proc/$$/fd/$_GR_HOLD_FD" ]; then
+    eval "exec ${_GR_HOLD_FD}>&-"
+  fi
+  _GR_HOLD_FD=""
+  return 0
+}
+
 gpu_reserve_hold() {
   local _gr_rc=0 camp="" wait_s="" flag=0 a g
+  # ---- REFUSE a second reservation in the same shell. ---------------------------------------
+  # The header has warned since v2 that two acquires in one shell leak one of them, because the
+  # second EXIT trap replaces the first. It is no longer only a warning: with a liveness lock the
+  # second call would also overwrite _GR_HOLD_FD, leaving the FIRST descriptor open for the life
+  # of the shell -- so the first GPU would stay locked and unreclaimable even after the runner
+  # exited. run_r1_imma_official.sh does exactly this (stage 2 prep, then stage 4 smoke, with no
+  # drop in between), so this is a live call shape and not a hypothetical. Refusing with a pointer
+  # to gpu_reserve_drop is the only safe answer.
+  if [ -n "${_GR_HOLD_FD:-}" ]; then
+    _gr_log "REFUSED: this shell already holds a GPU reservation (gpu ${GPU_RESERVED:-?}, lock"
+    _gr_log "         ${_GR_HOLD_PATH:-?}). A second reservation in one shell would replace the"
+    _gr_log "         release trap and orphan the first liveness-lock descriptor, pinning that GPU"
+    _gr_log "         for the life of the shell. Release the first one explicitly:"
+    _gr_log "           gpu_reserve_drop '<campaign>'   # then acquire again"
+    GPU_RESERVE_RC=2; export GPU_RESERVE_RC
+    return 2
+  fi
+  _GR_HOLD_PATH=""
   # Save the caller's errexit/pipefail WITHOUT a command substitution: `shopt -po errexit pipefail`
   # exits non-zero whenever either option is off, and inside $( ) it reports the subshell's own
   # (already-cleared) errexit, so capturing it both lied and tripped the caller's set -e.
@@ -1372,13 +1608,50 @@ gpu_reserve_hold() {
     _gr_rc="$_GR_INIT_RC"
   fi
 
+  # ---- take the LIVENESS LOCK in THIS shell, before acquiring. ------------------------------
+  # Order is the whole point. The lock is held from before the reservation record exists until
+  # after the last descendant exits, so there is no window in which a published record promises a
+  # protection that is not yet in force. The fd lives in this long-lived shell, so every process
+  # the runner goes on to spawn -- child, grandchild, execed python -- inherits it automatically
+  # and the kernel keeps the GPU reserved for exactly as long as any of them lives.
+  #
+  # GPU_RESERVE_HOLD_FD is deliberately NOT exported as a number children are expected to act on;
+  # it is recorded only so gpu_reserve_drop can close the right descriptor.
+  if [ "$_gr_rc" = 0 ]; then
+    _GR_HOLD_PATH="$LOCKDIR/.hold.$$.$camp"
+    # NOTE, and it cost a full test run to find: `exec {FD}>>file 2>/dev/null` does NOT silence
+    # just this command. `exec` with redirections and no command applies them to the SHELL, so the
+    # `2>/dev/null` would redirect the runner's stderr PERMANENTLY -- swallowing the CVD audit, the
+    # RESERVED line, every freeze refusal and every diagnosis for the rest of the run. Measured:
+    # 12 assertions in scripts/test_gpu_reserve.sh went from pass to fail on exactly that, all of
+    # them "the explanation was not printed". So: no redirection on the exec, and the file is
+    # pre-created with a plain command whose failure can be caught normally.
+    if ! mkdir -p "$LOCKDIR" 2>/dev/null; then
+      _gr_log "FATAL cannot create $LOCKDIR for the liveness lock"
+      _gr_rc=10
+    elif ! : >>"$_GR_HOLD_PATH" 2>/dev/null; then
+      _gr_log "FATAL cannot create the liveness-lock file $_GR_HOLD_PATH (permissions? disk full?)"
+      _gr_rc=10
+    elif ! exec {_GR_HOLD_FD}>>"$_GR_HOLD_PATH"; then
+      _gr_log "FATAL cannot open the liveness-lock file $_GR_HOLD_PATH"
+      _gr_rc=10
+    elif ! flock -x -w 30 "$_GR_HOLD_FD"; then
+      # Our own pid + campaign names this file, so a conflict means a previous run with this very
+      # pid still has live descendants. Refusing is correct: we must not reuse its lock.
+      _gr_log "FATAL could not take the liveness lock $_GR_HOLD_PATH within 30s."
+      _gr_log "      Another process still holds it -- see: $0 holders <index>"
+      _gr_close_hold_fd
+      _gr_rc=11
+    fi
+  fi
+
   if [ "$_gr_rc" = 0 ]; then
     while :; do
       # $$ (not $BASHPID) is correct here: $$ is not re-evaluated inside $( ).
       if [ "$flag" = 1 ]; then
-        g=$("${BASH_SOURCE[0]}" acquire "$camp" "$$" --allow-frozen)
+        g=$("${BASH_SOURCE[0]}" acquire "$camp" "$$" "$_GR_HOLD_PATH" --allow-frozen)
       else
-        g=$("${BASH_SOURCE[0]}" acquire "$camp" "$$")
+        g=$("${BASH_SOURCE[0]}" acquire "$camp" "$$" "$_GR_HOLD_PATH")
       fi
       _gr_rc=$?
       [ "$_gr_rc" = 0 ] && break
@@ -1411,9 +1684,29 @@ gpu_reserve_hold() {
       *)    CUDA_VISIBLE_DEVICES="$GPU_RESERVED" ;;
     esac
     export CUDA_VISIBLE_DEVICES
-    # shellcheck disable=SC2064
-    trap "'${BASH_SOURCE[0]}' release '$camp' $$ >/dev/null 2>&1" EXIT INT TERM HUP
+    # The teardown goes through gpu_reserve_drop (a function IN THIS SHELL), not straight to the
+    # external `release`. It has to: only this shell can close the liveness-lock descriptor, and
+    # until that descriptor is closed we cannot test whether anything ELSE still holds it.
+    #
+    # v2's trap ran `release` unconditionally, which on SIGTERM deleted the record while the
+    # python child was still training -- handing the GPU to the next acquirer underneath live
+    # work, i.e. the very failure this file exists to prevent, reintroduced on the interrupt path.
+    _GR_HOLD_CAMP="$camp"
+    trap 'gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null' EXIT
+    # Signals must also TERMINATE, not just run a handler and fall through to the next line. v2
+    # trapped INT/TERM/HUP to the same release command, so a SIGINT ran the handler and then
+    # CARRIED ON executing the runner with its reservation deleted. Exiting 128+signo both stops
+    # the runner and gives the conventional non-zero status that a caller can detect (test g).
+    trap 'gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; trap - EXIT; exit 130' INT
+    trap 'gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; trap - EXIT; exit 143' TERM
+    trap 'gpu_reserve_drop "$_GR_HOLD_CAMP" >/dev/null; trap - EXIT; exit 129' HUP
     printf '%s\n' "$GPU_RESERVED"
+  else
+    # Never leave a locked descriptor or a stray hold file behind on a failed acquisition: a hold
+    # file that stays locked by this shell would make the NEXT attempt from the same pid refuse.
+    _gr_close_hold_fd
+    [ -n "${_GR_HOLD_PATH:-}" ] && rm -f "$_GR_HOLD_PATH" 2>/dev/null
+    _GR_HOLD_PATH=""
   fi
 
   GPU_RESERVE_RC="$_gr_rc"; export GPU_RESERVE_RC
@@ -1449,8 +1742,33 @@ gpu_reserve_require() {
   exit "$rc"
 }
 
+# Teardown. Correct order, and the order is load-bearing:
+#   1. close OUR liveness-lock descriptor -- while it is open every lock test says BUSY, so we
+#      cannot distinguish "a child is still running" from "I am still running";
+#   2. ask the kernel whether anything ELSE still holds the lock;
+#   3. only if nothing does, delete the reservation record and the hold file.
+# If descendants ARE still alive we deliberately leave the record in place. It then reads as
+# ORPHAN to every other acquirer (owner dead, lock held) and is reclaimed automatically once the
+# last descendant exits -- no grace window, no timer, no manual step. Normal completion and an
+# interrupted run therefore take the SAME path and differ only in what the kernel reports.
 gpu_reserve_drop() {
-  "${BASH_SOURCE[0]}" release "${1:-}" "$$"
+  local camp="${1:-${_GR_HOLD_CAMP:-}}" hold="${_GR_HOLD_PATH:-}" rc=0 holders=""
+  _gr_close_hold_fd
+  if [ -n "$hold" ]; then
+    _gr_hold_free "$hold"; rc=$?
+    if [ "$rc" = 1 ]; then
+      holders=$(_gr_holders "$hold") || holders="<not readable>"
+      _gr_log "NOT releasing the reservation for '$camp': the liveness lock $hold is STILL HELD"
+      _gr_log "        by pid(s) [$holders] -- work this runner started is still alive. The record"
+      _gr_log "        is KEPT so no other job can be given this GPU underneath it; it reclaims"
+      _gr_log "        itself automatically when the last of those processes exits."
+      trap - EXIT INT TERM HUP
+      return 0
+    fi
+  fi
+  "${BASH_SOURCE[0]}" release "$camp" "$$"
+  [ -n "$hold" ] && rm -f "$hold" 2>/dev/null
+  _GR_HOLD_PATH=""
   trap - EXIT INT TERM HUP
 }
 
@@ -1473,8 +1791,19 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
   _gr_mode_init || exit $?
 
   case "$cmd" in
-    acquire) _gr_with_mutex _gr_do_acquire "${1:?acquire <campaign> [owner_pid]}" "${2:-$PPID}" ;;
+    acquire) _gr_with_mutex _gr_do_acquire "${1:?acquire <campaign> [owner_pid] [hold_path]}" "${2:-$PPID}" "${3:-}" ;;
     release) _gr_with_mutex _gr_do_release "${1:-}" "${2:-$PPID}" ;;
+    holders)
+      _i="${1:?holders <index>}"
+      _h=$(_gr_read_field "$(_gr_record "$_i")" holdpath) || _h=""
+      if [ -z "$_h" ] || [ "$_h" = "-" ]; then printf 'gpu%s: no liveness lock recorded\n' "$_i"; exit 1; fi
+      _gr_hold_free "$_h"; _hr=$?
+      printf 'gpu%s holdpath=%s\n' "$_i" "$_h"
+      case "$_hr" in
+        0) printf 'lock=FREE (owner and all descendants have exited)\n' ;;
+        1) printf 'lock=HELD by pids: %s\n' "$(_gr_holders "$_h" || echo '<not readable>')" ;;
+        *) printf 'lock=UNTESTABLE\n' ;;
+      esac ;;
     reap)    _gr_with_mutex _gr_do_reap ;;
     adopt)   _gr_with_mutex _gr_do_adopt "${1:?adopt <index> <campaign> <pid>}" "${2:?}" "${3:?}" ;;
     status)  _gr_with_mutex _gr_do_status ;;
@@ -1485,7 +1814,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
       _u=$(_gr_read_field "$(_gr_record "$_i")" uuid) || _u=""
       [ -n "$_u" ] && [ "$_u" != "-" ] || exit 1
       printf '%s\n' "$_u" ;;
-    *) _gr_log "unknown subcommand '$cmd'; expected acquire|release|reap|adopt|status|selftest-telemetry"; exit 2 ;;
+    *) _gr_log "unknown subcommand '$cmd'; expected acquire|release|reap|adopt|status|holders|selftest-telemetry"; exit 2 ;;
   esac
 else
   # sourced: initialise the mode so LOCKDIR/ALLOWED_GPUS/FREEZE_FILE exist for the helpers.

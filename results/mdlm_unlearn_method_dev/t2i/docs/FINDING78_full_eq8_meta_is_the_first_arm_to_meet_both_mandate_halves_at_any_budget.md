@@ -137,18 +137,29 @@ What the 25-step budget actually shows, stated without inflation:
    heavily-erased arms (this one is at target 0.0000) show depressed gate validity. Gate failures
    are **inconclusive**, not evidence of robustness.
 
-   > **Gate-granularity check (audit defect D-024), and the retraction survives it.** The gate is
-   > stated as `T_rise ≥ 0.20`, but T is a **24-image** panel, so the representable boundary is
-   > **≥ 5/24 = 0.2083** — one image stricter than "0.20" reads. Of 808 records, 13 fail by exactly
-   > one image at `T_rise = 0.1667`, and **one of them is this arm's seed 6 at lr 5e-5 / 25 steps**
-   > (recorded above as gate-failed at H = 0.2667). Admitting it would make that cell 2/3 valid and
-   > raise its max-over-valid from 0.2000 to **0.2667** — still below 0.40. The cell that drives the
-   > retraction (**lr 1e-4, max-over-valid 0.5333**) is untouched, and its two gate-failing seeds
-   > recorded H = 0.0000, which cannot lower a maximum. So a more permissive gate adds valid
-   > evidence for the **same** conclusion rather than reopening it.
-3. **At lr 1e-4 the two gate-failing seeds recorded H = 0.0000.** A higher attacker lr produced
-   *more* gate failures, not fewer. The gate is therefore not a neutral filter at this budget, and
-   a cell's max-over-valid can be governed by which single seed happened to pass.
+   > **Gate check (D-024) — CORRECTED 2026-10-26. There is no gate defect, and no adjustment is
+   > needed for the retraction to stand.** On a 24-image panel `T_rise ≥ 0.20` **correctly accepts
+   > 5/24 = 0.2083 and correctly rejects 4/24 = 0.1667**. The rule is well-defined and was applied
+   > consistently. An earlier version of this note treated the rejections at 0.1667 as failing "by
+   > one image" to an unrepresentable threshold and speculated that admitting them would raise this
+   > cell's max-over-valid to 0.2667. **That reasoned from a false premise**: seed 6 at lr 5e-5 has
+   > `T_rise = 0.1667` and is *correctly rejected*; admitting it would change the rule, not fix a
+   > rounding error, and belongs only in a separately labelled sensitivity analysis.
+   >
+   > The retraction rests on **lr 1e-4, seed 6**, whose `T_rise = 0.2083 = 5/24` is **correctly
+   > accepted** with H = **0.5333 > 0.40**. Unaffected.
+   >
+   > **Also corrected: the per-lr validity counts are identical, not varying.** I had written that
+   > the stronger attacker "produced *more* gate failures". It did not. Re-derived from the records:
+   > lr 5e-5 → **1/3 valid** (seeds 0, 6 rejected at T_rise 0.0833 and 0.1667); lr 1e-4 → **1/3
+   > valid** (seeds 0, 1 rejected at T_rise 0.1250 and 0.0000). **Every 25-step cell had exactly one
+   > gate-valid attack of three**, at every learning rate. The gate-validity rate does not vary with
+   > attacker lr in this grid, and no claim should say it does.
+3. **A cell's max-over-valid is governed by which single seed happened to pass.** Every 25-step cell
+   had exactly **1 of 3** attacks gate-valid, at every learning rate — the validity rate does **not**
+   vary with attacker lr in this grid. *(An earlier version of this point claimed a higher lr
+   produced more gate failures. It did not: lr 5e-5 and lr 1e-4 both ran 1/3 valid. Corrected
+   2026-10-26.)*
 4. **n = 1 build.** Attack-seed replication is not defence-build replication.
 5. **One concept, one λ pair, DEV prompts, H quantised to 1/15.** 0.0667 is one image in fifteen;
    0.5333 is eight. Differences smaller than 1/15 ≈ 0.067 are not resolvable.

@@ -4,6 +4,14 @@
 
 > **⚠ Corrections 2026-10-26:** `FINDING76` §3's probe mechanism check is **overstated** (n=7/3/1, within-arm spread 40×, ordering undetermined — see its §7). `FINDING77` §2's "B kills the accumulation-order hypothesis" is **wrong** — B holds accumulation order fixed and never varied it (see its §6).
 
+> **⚠ Corrections 2026-10-26, later pass (independent review).** Four errors were corrected **in the body, tables and captions below, not by banner**:
+> 1. **The validity gate is NOT defective.** `T_rise ≥ 0.20` on a 24-image panel correctly accepts 5/24 = 0.2083 and correctly rejects 4/24 = 0.1667. No record was mis-gated. Admitting 4/24 would **change the rule**. Any earlier "granularity" or "rounding" framing is withdrawn — §6.
+> 2. **No learning rate produced more gate failures than another.** Every E2h 25-step cell had exactly **1 of 3** attacks gate-valid, at all three learning rates — §6.
+> 3. **The FINAL corpus is permanently withdrawn, not pending a cheap re-score.** The V2 run executed; all twelve records are unrecoverable — §7 (E6) and §8 rows 65/66.
+> 4. **"Implemented", "executed" and "independently verified" are three different states**, and a passing test suite is evidence of none of the last two — §1, §7.
+
+> **Reviewed revision.** This pass was made against `/data/bijaypandey/xxresearch_standalone` at **`cc778f2576ce1c6281f013fdc6ca9f118517f69d`**; `/data/bijaypandey/t2i_unlearn` is not a git repository, so artifacts are pinned by mtime. Agents were editing code concurrently; code-side statements are as of 2026-10-26 16:18.
+
 
 **Supersedes `T2I_REPORT_r4.md`.** r4's headline attribution, counts, protocol-compliance and
 mechanism claims were wrong in the specific ways listed in `CORRECTION_REGISTER_r5.md`; its text is
@@ -32,31 +40,49 @@ measured non-target panel. Following the external audit, three of those defences
 be **our variants rather than the published methods** (the weight-space regulariser runs in the
 opposite direction, the Meta-Unlearning port omits two of three objective terms, and UTRAP's inner
 attacker was not the evaluation attacker). **All three corrected implementations have since been
-run** — WDR v2 at α ∈ {1.0, 4000} (E1), Meta v2 at λ ∈ {0.5, 1.0} (E2/E2g/E2h), UTRAP v2 at
+executed** — WDR v2 at α ∈ {1.0, 4000} (E1), Meta v2 at λ ∈ {0.5, 1.0} (E2/E2g/E2h), UTRAP v2 at
 K ∈ {0,1,8,32} (E4/E4m) — and **upstream IMMA and upstream UCE have each been executed once**
 (R1, R4b–d), scored on our benchmark. None of that rescues any defence. So the negative result is
 now a statement about **our implementations, plus two upstream-code runs measured on our own
 benchmark** — and still not about any published method's reported experiment.
 
+**Three qualifications on the word "executed", which this report keeps distinct from "implemented"
+and from "independently verified".** (i) **Neither upstream run is a faithful reference
+reproduction.** IMMA ran at **5× the documented ascent budget** — 2500 ascent updates against the
+README's 500 (`D-021`) — and its three attack seeds were never run; UCE's **port** side is confounded
+by cached-checkpoint reuse (`D-026`), R4c is no longer reproducible (`D-031`), and `r4c`/`r4d` target
+accuracies are not comparable to any other H number here (`D-006`). (ii) **The official
+Meta-Unlearning pipeline (R2) is implemented and has NEVER executed** (`D-002`); upstream's own
+`src/meta.py` is unrunnable at the pinned commit (`D-020`), and the guard that would certify that a
+real training run occurred is **unsound on its third attempt** (`D-036`). (iii) **No passing test
+suite anywhere in this project is evidence that a training run completed.** Where this report cites
+test results, they establish that code matches its own assertions and nothing more.
+
 ## 2. What the records show, with admissibility separated
 
 > **⚠ These counts are STALE.** `outputs/registry_v1.json` was generated **2026-10-26 05:11:25**.
-> Since then **150 JSON files** have landed, including **112 attack records** and **≥11 new defence
-> builds**. The registry column below is exactly what the registry says; the **actual** column is a
+> Since then **170 JSON files** have landed (the previous revision said ~150, which was its own
+> arithmetic of 1,424 − 1,278 = 146 at an earlier count), including **112 attack records** and
+> **≥11 new defence builds**.
+>
+> **One distinction that was being blurred, and it matters:** "absent" below means **absent from the
+> registry snapshot**, *not* missing from the filesystem. Every artifact referenced by
+> `FINDING71`–`FINDING78` **is present on disk** — all 121 of them, checked individually. The gap is
+> an indexing gap, not data loss. The registry column below is exactly what the registry says; the **actual** column is a
 > direct count on disk. The registry has **not** been regenerated — `scripts/registry_v1.py` sha256s
 > many GB and the project is frozen (`FREEZE_ACTIVE`). **Regeneration is required before any of
 > these numbers is republished.**
 
-| quantity | registry (05:11) | actual on disk (12:45) |
-|---|---:|---:|
-| JSON files under `outputs/` | 1,278 | **1,424** (1,428 incl. subdirs) |
-| attack **records** (`atk_*.json`) | 696 | **808** |
-| — quarantined | 0 | not recomputed |
-| — **vacuous** (defence erased nothing; `H_after` measures the base model) | 9 | not recomputed |
-| — VOID post-attack **utility** half (text encoder omitted; T/H unaffected) | 136 | not recomputed |
-| **admissible for recovery** | 687 | not recomputed |
-| **admissible for paired utility** | 324 | not recomputed |
-| defence builds evaluated | 335 | **≥346** |
+| quantity | registry (05:11) | actual on disk (12:45) | **re-counted 16:14** |
+|---|---:|---:|---:|
+| JSON files under `outputs/` | 1,278 | 1,424 (1,428 incl. subdirs) | **1,429 root / 1,448 recursive** — registry covers 1,278 of **1,448**, so **170 absent**, not 146 |
+| attack **records** (`atk_*.json`) | 696 | **808** | **808** — unchanged; registry covers **696 of 808**, **112 absent** |
+| — quarantined | 0 | not recomputed | **vacuously zero** — the registry's only glob matches nothing, so this is not a verified absence |
+| — **vacuous** (defence erased nothing; `H_after` measures the base model) | 9 | not recomputed | not recomputed |
+| — VOID post-attack **utility** half (text encoder omitted; T/H unaffected) | 136 | not recomputed | not recomputed |
+| **admissible for recovery** | 687 | not recomputed | not recomputed. **Inflated by duplicates:** all 178 duplicate rows are `admissible_for_recovery = true`, so each double-counts (`D-025`) |
+| **admissible for paired utility** | 324 | not recomputed | not recomputed |
+| defence builds evaluated | 335 | **≥346** | **≥346** — a floor, not a computed figure; an exact count needs the registry builder's own classification logic, which was deliberately not run |
 
 The 112 new attack records are `E12` (24), `E2G` (18), `E4MG` (12), `E2H` (12), `E11J` (9),
 `E11M` (9), `E11K`/`E11L`/`E11N` (6 each), `E11H` (5), `E11I` (3), `E11O` (2). The new builds
@@ -250,7 +276,7 @@ clearing the first did nothing for the second.
 **This now rests on measurement rather than on absence of measurement, and it came close to
 failing.** The closest arm in the project is `meta2_church_lt0.5` (E2, full Eq. 8) at retain8
 **0.9000** with as-is target **0.0000**. At a 25-step budget it clears the robustness half at
-attacker lr 1e-5 (max-over-valid **0.0667**) *and* at lr 5e-5 (**0.2000**). It fails only when the
+attacker lr 1e-5 (max-over-valid **0.0667**) *and* at lr 5e-5 (**0.2000**). It fails when the
 attacker's learning rate is swept further: at lr 1e-4, same budget, max-over-valid is **0.5333**
 (`logs/e2h_stronger.log`). Because max-over-valid is a ratchet (`FINDING35` S4), that 0.5333 stands
 and can only rise, so the 25-step budget fails the bar. `FINDING78`'s companion claim to have
@@ -258,10 +284,35 @@ produced "the first arm to meet both mandate halves" is **retracted** on exactly
 its retention result — **+0.20 to +0.27** retain8 at identical suppression, against variant A's
 0.6250 (λ=0.6) and 0.7000 (λ=0.7) — survives and is the real finding there.
 
+**Each of those three figures is a maximum over ONE attack, and that must be read with them.**
+Re-derived from the twelve `atk_E2H_*` and three 25-step `atk_E2G_*` records:
+
+| attacker lr, 25 steps | per-seed `T_rise` (gate `≥ 0.20`) and H | gate-valid | max-over-valid H |
+|---|---|---:|---:|
+| **1e-5** | sd0 0.1250 ✗ (H 0.2000) · sd1 0.0417 ✗ (H 0.0667) · sd6 **0.2917 ✓** (H 0.0667) | **1 of 3** | **0.0667** |
+| **5e-5** | sd0 0.0833 ✗ (H 0.0667) · sd1 **0.5833 ✓** (H 0.2000) · sd6 0.1667 ✗ (H 0.2667) | **1 of 3** | **0.2000** |
+| **1e-4** | sd0 0.1250 ✗ (H 0.0000) · sd1 0.0000 ✗ (H 0.0000) · sd6 **0.2083 ✓** (H 0.5333) | **1 of 3** | **0.5333** |
+
+**Every reported E2h 25-step learning-rate cell had exactly ONE gate-valid attack out of three.** The
+gate-validity rate does **not** vary with attacker lr, and the gate-valid seed **differs by cell**
+(6, 1, 6), so the three values are not a paired comparison and `0.0667 → 0.2000 → 0.5333` is a
+sequence of **n = 1** cells.
+
+> **The gate is not defective, and the stronger attacker did not produce more gate failures.** On a
+> 24-image panel `T_rise ≥ 0.20` **correctly accepts 5/24 = 0.2083 and correctly rejects
+> 4/24 = 0.1667** — a well-defined rule, applied consistently to all 808 records, with **no record
+> mis-gated**. Admitting 4/24 would **change the rule** and belongs only in a separately labelled
+> sensitivity analysis. The retraction rests on **lr 1e-4, seed 6** at `T_rise = 0.2083`, which is
+> **correctly accepted** with H = 0.5333 > 0.40, so it needs **no** gate adjustment to stand. Any
+> claim that one learning rate produced more gate failures than another is **false**: all three cells
+> ran 1/3 valid. See `STATUS_CURRENT_v2.md` §1.6 for the authority.
+
 Two consequences worth stating. First, **single-lr robustness numbers are not safe**: this arm would
-have been reported as mandate-clearing had the attacker sweep stopped one cell earlier. Second, the
-retain half of the bar is not merely reachable but reachable **at zero target suppression**, which
-makes the robustness half the whole of the remaining problem.
+have been reported as mandate-clearing had the attacker sweep stopped one cell earlier — and that is
+the defensible lesson from these cells, not a dose relationship between lr and recoverability, which
+**n = 1 per cell cannot support**. Second, the retain half of the bar is not merely reachable but
+reachable **at zero target suppression**, which makes the robustness half the whole of the remaining
+problem.
 
 What the project has measured, stated at the scope §3 supports: on the builds measured, with the
 attacks run, concept erasure in SD-1.x was reversible by 300 gradient steps on 16 self-generated
@@ -303,8 +354,8 @@ framing is withdrawn:
 | **E1** faithful WDR | ✅ **RAN** at α ∈ {1.0, 4000} — *not* the preregistered {0.3, 1.0, 3.0}. `logs/e1_wdr.log`, `logs/e1b_wdr.log`, `outputs/gen_wdr2_church_a{1.0,4000}.json`. `FINDING67`: α=1 inert, α=4000 fails K1 at 0.5917. **α ∈ (1, 4000) is still unmeasured** |
 | **E2** Meta v2 full Eq. 8 | ✅ **RAN**, λ ∈ {0.5, 1.0} as specified, plus an 18-cell frozen grid (E2g) and an attacker-lr sweep (E2h). `FINDING78` |
 | **E4** UTRAP v2 K-sweep | ✅ **RAN**, K ∈ {0,1,8,32}. `logs/e4_h90.log`, `e4m_matched.log`, `e4mg_grid.log`, 8 `utrap2*` builds. `FINDING76` (whose §3 mechanism check is overstated — see its §7) |
-| **E6** FINAL-prompt re-evaluation | ⚠ **RAN BUT MUST BE RE-SCORED** — `outputs/final_*.json` (18 records, which **consumed** the FINAL set) were scored with `LAB_KEY` instead of `LABELS` (`D-022`); nine of the twelve label strings differ. **The evaluator used inconsistent label text; the effect on scores and conclusions is unresolved pending corrected evaluation.** That applies to `FINDING65` and `FINDING66` alike. **Re-scoring is CPU-only on retained artifacts** and is the cheapest outstanding repair in this table |
-| **E7** the three released implementations | ⏸ **PARTIALLY RAN** — upstream IMMA (R1, 5000/5000 + eval) and upstream UCE (R4b–d) executed. `vision_relearning` (R3) **not started** |
+| **E6** FINAL-prompt re-evaluation | ⛔ **RAN, RE-SCORING ATTEMPTED, AND NOW PERMANENTLY WITHDRAWN — not a pending repair.** `outputs/final_*.json` (**12** records — the previous revision's "18" was wrong; its own 180 = 12 × 15 — which **consumed** the FINAL set) were scored with `LAB_KEY` instead of `LABELS` (`D-022`); nine of the twelve label strings differ. The **V2 bounded run executed** and answered the direction question: **the label text matters, sometimes by up to −0.2000, and has NO consistent sign.** It also showed the records are unrecoverable: `history_comparability = none_exact`, **all six** regenerable arms DISCREPANT per-image, and the other **six have deleted checkpoints** (`D-022b`). **`FINDING65`'s ratios and `FINDING66`'s figures are withdrawn permanently, not pending — and no replacement run is owed.** The previous revision called this "CPU-only on retained artifacts … the cheapest outstanding repair": **that framing sold a permanent evidentiary loss as a cheap rerun and is withdrawn** |
+| **E7** the three released implementations | ⏸ **PARTIALLY RAN, AND NEITHER RUN IS A FAITHFUL REFERENCE REPRODUCTION.** Upstream IMMA (R1) **executed** — but at **5× the documented ascent budget** (2500 ascent updates against the README's 500, `D-021`), so it may **not** be described as faithful; and its **3 attack seeds were never run**. Upstream UCE (R4b–d) **executed**, but the **port side is confounded** by cached-checkpoint reuse (`D-026`), **R4c is no longer reproducible** (`D-031`), and `r4c`/`r4d` target accuracies are **not comparable to any other H number here** (`D-006`). `vision_relearning` (R3) **not started**. Separately, **R2 (official Meta) is implemented and has NEVER executed** (`D-002`) — `src/meta.py` is unrunnable upstream (`D-020`) and the reload guard that would certify training is **unsound on its third attempt** (`D-036`) |
 | **E5** persistent-mask | ❌ not run |
 | **E3** variant A vs v2 at matched retain8 | ❌ not run |
 | **E8** FID | ❌ blocked — two pip installs and a ~6 GB COCO download, not authorised |
@@ -332,12 +383,12 @@ generalises 68–73, 75 retracts a number §3 of this report once relied on. §8
 
 | # | finding | effect on r5 |
 |---|---|---|
-| **65** | ⚠ **DO NOT QUOTE (audit defect `D-022`).** The claim was: on **FINAL** prompts erasure is **~3× shallower** than every reported figure (FRP 0.1333 → 0.4667, UCE 0.2000 → 0.6000, UTRAP 0.0000 → 0.0667), with base calibration bounding prompt difficulty at ≤13%. **But every FINAL number was scored with `LAB_KEY` instead of `LABELS`** (`gen_eval.py:48` vs `:50`). **Nine of the twelve label strings differ; `church`, `parachute` and `tench` are spelled identically.** **The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved pending corrected evaluation.** Retained per-image facts, recorded without a directional reading: **37 of 180 FINAL images landed on one of the nine labels whose text differs**, at per-arm median margins **0.0027–0.0063** (frp 7/15 with 7 such wins; uce_sd15_lam1000 9/15 with 5; utrap 1/15 with 10; utrap_sd15 2/15 with 12). A further axis is that the ratios compare a DEV number scored from `LABELS` against a FINAL number scored from `LAB_KEY`, so the two sides of each ratio did not use the same label text at all | **the "~3×", "~3.5×", "54% undone" and "60% undone" figures are UNMEASURED pending corrected evaluation.** Neither the size nor the sign of the scorer's effect on them is established, so the finding is neither confirmed nor refuted here. The split-leak and prompt-difficulty reasoning is a separate argument and is untouched by this defect |
-| **66** | ⚠ **Do not quote its figures (`D-022a`) — the same label-text defect applies.** The claim was that the **H = 1.000 ceiling is not a DEV artifact**: on FINAL prompts the attack reaches **15/15** on all four arms. **The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved pending corrected evaluation** — including for the within-scorer comparison, because consistency between two arms scored the same wrong way does not establish what either score would be under the correct label text. *(The previous revision argued the ceiling conclusion "survives the defect by construction" because strengthening distractors could only lower a 15/15. That inference assumes a direction for the embedding effect, which is not established, and is withdrawn.)* | §3's robustness results are **DEV-scored and stand on the DEV evidence**; `FINDING66` neither adds to nor subtracts from them until E6 is re-scored. Also unresolved: the subsidiary claim that the attacked SD-1.4 model (15/15) **beats the unmodified base** (13/15) — a **2-image gap** on n=15 |
-| **67** | **α is inert at the reference's default in our port**, and at α=4000 the arm **costs 0.35 of retention without improving on the teacher's erasure** (K1 FAIL at **retain8 0.5917**). *(Corrected — audit defect **D-017**.* The derivation ‖∇L‖ = α/√N stands, but **it is not the cause**: measured step size as a fraction of `lr` is α=1 → 0.104, α=10 → 0.537, α=4000 → 0.998, so α 1→4000 buys **≈9.6×, not ~4,000×**. The mechanism is **our optimiser plumbing, not the method** — both steps share **one Adam instance**, so `v` is retain-dominated and the distance update is ≈ `lr·|g_dist|/√v_retain`; α is inert at **both** ends, below ≈10 because `v` is retain-dominated and above ≈4e3 because **Adam saturates**. The reference **sums** both terms into one step, so our two-step schedule is the defect, not the published method. The **"third instance of one scale pathology"** framing is **withdrawn** for the WDR member: IMMA α and UCE λ are coefficient-scale findings about those *methods*, this one is about our schedule.* | `'From Dormant to Deleted'` has **one** measured point here, not zero — a utility failure at one α. **0.5917 measures our two-step shared-Adam schedule at saturation, not "WDR at gradient parity"**; that attribution is withdrawn. α ∈ (1, 4000) is unmeasured, and its upper bound is a **saturation point, not a frontier**. See `FINDING67` (header + §7) and `AGENT3_FIDELITY_FINDINGS.md` §4.2–4.3 |
+| **65** | ⚠ **DO NOT QUOTE (audit defect `D-022`).** The claim was: on **FINAL** prompts erasure is **~3× shallower** than every reported figure (FRP 0.1333 → 0.4667, UCE 0.2000 → 0.6000, UTRAP 0.0000 → 0.0667), with base calibration bounding prompt difficulty at ≤13%. **But every FINAL number was scored with `LAB_KEY` instead of `LABELS`** (`gen_eval.py:48` vs `:50`). **Nine of the twelve label strings differ; `church`, `parachute` and `tench` are spelled identically.** **SUPERSEDED 2026-10-26: the V2 bounded run MEASURED this and the records are UNRECOVERABLE.** The label text matters — up to **−0.2000** on `frp_church_r3_l05` and **+0.0667** on `utrap_sd15_church_l0.15k8` — and it has **NO consistent sign**, so every directional claim in either direction is refuted by measurement. And `history_comparability = none_exact`: **all six** regenerable arms are DISCREPANT per-image against their records, and the other **six have deleted checkpoints** (`D-022b`). **These ratios are therefore WITHDRAWN PERMANENTLY, not pending — and no replacement run is owed.** Retained per-image facts, recorded without a directional reading: **37 of 180 FINAL images landed on one of the nine labels whose text differs**, at per-arm median margins **0.0027–0.0063** (frp 7/15 with 7 such wins; uce_sd15_lam1000 9/15 with 5; utrap 1/15 with 10; utrap_sd15 2/15 with 12). A further axis is that the ratios compare a DEV number scored from `LABELS` against a FINAL number scored from `LAB_KEY`, so the two sides of each ratio did not use the same label text at all | **the "~3×", "~3.5×", "54% undone" and "60% undone" figures are UNMEASURED pending corrected evaluation.** Neither the size nor the sign of the scorer's effect on them is established, so the finding is neither confirmed nor refuted here. The split-leak and prompt-difficulty reasoning is a separate argument and is untouched by this defect |
+| **66** | ⛔ **WITHDRAWN PERMANENTLY — do not quote its figures.** (`D-022a` is itself retracted *as written* and disproven.) The claim was that the **H = 1.000 ceiling is not a DEV artifact**: on FINAL prompts the attack reaches **15/15** on all four arms. **SUPERSEDED: WITHDRAWN PERMANENTLY, not pending.** The within-scorer argument fails anyway (consistency between two arms scored the same wrong way does not establish what either score would be under the correct text), but the decisive fact is evidentiary: `FINDING66`'s central comparison is attacked arms (15/15) against the base anchor (13/15), and **the attacked side cannot be recovered at all** — `attacked/E6B_*`, `E6C_*`, `E6D_*` are absent (`D-022b`). Re-running the attack would yield a *different* checkpoint, so it would be a **fresh analogue, not a reproduction**. **Taxonomy: a permanent loss needs no invented replacement to close.** *(The previous revision argued the ceiling conclusion "survives the defect by construction" because strengthening distractors could only lower a 15/15. That inference assumes a direction for the embedding effect, which is not established, and is withdrawn.)* | §3's robustness results are **DEV-scored and stand on the DEV evidence**; `FINDING66` neither adds to nor subtracts from them until E6 is re-scored. Also unresolved: the subsidiary claim that the attacked SD-1.4 model (15/15) **beats the unmodified base** (13/15) — a **2-image gap** on n=15 |
+| **67** | **α is inert at the reference's default in our port**, and at α=4000 the arm **costs 0.35 of retention without improving on the teacher's erasure** (K1 FAIL at **retain8 0.5917**). *(Corrected — audit defect **D-017**.* The derivation ‖∇L‖ = α/√N stands, but **it is not the cause**: measured step size as a fraction of `lr` is α=1 → 0.104, α=10 → 0.537, α=4000 → 0.998, so α 1→4000 buys **≈9.6×, not ~4,000×**. The mechanism is **our optimiser plumbing, not the method** — both steps share **one Adam instance**, so `v` is retain-dominated and the distance update is ≈ `lr·\|g_dist\|/√v_retain`; α is inert at **both** ends, below ≈10 because `v` is retain-dominated and above ≈4e3 because **Adam saturates**. The reference **sums** both terms into one step, so our two-step schedule is the defect, not the published method. The **"third instance of one scale pathology"** framing is **withdrawn** for the WDR member: IMMA α and UCE λ are coefficient-scale findings about those *methods*, this one is about our schedule.* | `'From Dormant to Deleted'` has **one** measured point here, not zero — a utility failure at one α. **0.5917 measures our two-step shared-Adam schedule at saturation, not "WDR at gradient parity"**; that attribution is withdrawn. α ∈ (1, 4000) is unmeasured, and its upper bound is a **saturation point, not a frontier**. See `FINDING67` (header + §7) and `AGENT3_FIDELITY_FINDINGS.md` §4.2–4.3 |
 | **68** | The attacker's real cost is **≤100 steps, not 300**; at 25 steps the mandate-qualifying arm is already at 13/15. Reproduced on FRP (ceiling by 50) | r5's "300 gradient steps" **overstates the attack cost 3–6×** |
 | **69** | Resolved to 5 steps, recovery is **graded** — the project's first non-saturated outcome variable. **Its headline threshold was retracted the same day** by seed replication (sd 0.2776 at 10 steps, H spanning 0.1333–0.6667). Completed at n=3: **no budget from 5 to 300 leaves any arm meeting the mandate's robustness half** | the mandate is missed at **every** budget, not just at 300 |
-| **70** | **lr substitutes for budget.** lr 5e-5 / 25 steps gives H = 1.0000 on **all three seeds, sd = 0**, utility 0.9236 — **12× cheaper** than reported. lr 1e-4 / 5 steps reaches 1.0000 on one seed — **60×** cheaper. At lr 1e-4 the budget axis is **non-monotone** on this arm (H falls 0.9555 → 0.6222) while the attack drives the paired closed-set panel down (utility 0.8472 → **0.5278**; "collapsed panel accuracy", not "destroyed the model" — `D-030`) — **but see 71: the non-monotonicity is arm-specific and the causal link is withdrawn** | r5's cost figure is superseded; and **H alone cannot order attacks** — a low H may mean a weak *or* an overpowered attack, distinguishable only by paired utility |
+| **70** | **lr substitutes for budget** — on a *different* arm, and at n = 3 seeds, so this row is **not** the E2h n = 1 progression and must not be merged with it (see §6).  lr 5e-5 / 25 steps gives H = 1.0000 on **all three seeds, sd = 0**, utility 0.9236 — **12× cheaper** than reported. lr 1e-4 / 5 steps reaches 1.0000 on one seed — **60×** cheaper. At lr 1e-4 the budget axis is **non-monotone** on this arm (H falls 0.9555 → 0.6222) while the attack drives the paired closed-set panel down (utility 0.8472 → **0.5278**; "collapsed panel accuracy", not "destroyed the model" — `D-030`) — **but see 71: the non-monotonicity is arm-specific and the causal link is withdrawn** | r5's cost figure is superseded; and **H alone cannot order attacks** — a low H may mean a weak *or* an overpowered attack, distinguishable only by paired utility |
 
 ### 8.2 The eight findings the previous revision omitted (FINDING71–78)
 
@@ -350,7 +401,7 @@ generalises 68–73, 75 retracts a number §3 of this report once relied on. §8
 | **75** | **RETRACTED in full.** Its central number came from `r4_uce_official_vs_port.py`, which had three verified defects: char-split inputs (`list('church')`), an embedding selection matching neither implementation, and **no upstream code executed** | the λ-scale and port-fidelity claims this report makes about UCE must rest on `ERRATUM_uce_lambda_scale.md` and on R4b–d, **never** on the VOID `r4_uce_*.json` artifacts |
 | **76** | Unroll depth (UTRAP v2, K ∈ {0,1,8,32}, E4 at matched compute) **buys nothing** once compute is controlled | answers the unroll-depth question r4 left open, and retires §4's "unroll depth does not predict resistance" row from "cannot be ranked" to "measured and flat". **Its §3 probe-mechanism check is overstated** — n = 7/3/1, 40× within-arm spread, ordering undetermined (its §7) |
 | **77** | The UCE upstream-vs-port divergence is **embedding selection**, not the solver: with upstream's own selection the discrepancy falls from 0.384 to **1.5e-3** | corroborates `UPSTREAM_FIDELITY_MANIFEST.md` §7(d) by measurement. **Its §2 claim that column B "kills the accumulation-order hypothesis" is wrong** — B holds accumulation order fixed and never varied it (its §6), so accumulation order remains **unmeasured** |
-| **78** | Restoring Meta-Unlearning's two missing Eq. 8 terms buys **+0.20 to +0.27 retain8 at identical (0.0000) suppression** — retain8 **0.9000** against variant A's 0.6250 (λ=0.6) / 0.7000 (λ=0.7). **Its companion claim to be "the first arm to meet both mandate halves" is RETRACTED**: at 25 steps the arm clears 0.40 at attacker lr 1e-5 and 5e-5 but reaches **0.5333** at lr 1e-4 | the **retention** result is the first substantive gain any corrected baseline has produced and is cited in §6. The **mandate** conclusion is unchanged — see §6, which now rests on this measurement rather than on its absence |
+| **78** | Restoring Meta-Unlearning's two missing Eq. 8 terms buys **+0.20 to +0.27 retain8 at identical (0.0000) suppression** — retain8 **0.9000** against variant A's 0.6250 (λ=0.6) / 0.7000 (λ=0.7). **Its companion claim to be "the first arm to meet both mandate halves" is RETRACTED**: at 25 steps the arm clears 0.40 at attacker lr 1e-5 and 5e-5 but reaches **0.5333** at lr 1e-4. **Each of those three cells had exactly 1 of 3 attacks gate-valid, and the gate-valid seed differs by cell (6, 1, 6), so they are n = 1 and NOT a paired comparison — the progression is not a mechanism and cannot carry a dose reading.** The retraction itself is unaffected: it rests on lr 1e-4 seed 6 at `T_rise` 0.2083, **correctly accepted** by a gate that is not defective | the **retention** result is the first substantive gain any corrected baseline has produced and is cited in §6. The **mandate** conclusion is unchanged — see §6, which now rests on this measurement rather than on its absence |
 
 ### 8a. The net effect on the project's standing
 
@@ -392,6 +443,10 @@ direction, and both are unestablished; it is withdrawn.)*
 - **The mandate is unmet.** No arm reaches retain8 ≥ 0.85 with max-over-valid H ≤ 0.40, at any
   budget. The nearest approach (`meta2_church_lt0.5`, retain8 0.9000) fails at 25 steps only because
   the attacker-lr sweep reached lr 1e-4 (**0.5333**) — see §6. It is a near miss, not a margin.
+  **And it is a near miss measured at n = 1 per lr cell**, with the gate-valid seed differing by cell
+  (6, 1, 6), so the three cells are unpaired. That is enough to refute the mandate claim — one
+  gate-valid attack above the bar refutes it — but **not** enough to describe lr as dosing
+  recoverability.
 - **All three corrected baseline implementations have now been validated on models** — WDR v2
   (E1, α ∈ {1.0, 4000}), Meta v2 (E2, λ ∈ {0.5, 1.0}) and UTRAP v2 (E4, K ∈ {0,1,8,32}) — and
   **two of the three released reference implementations have been executed** (upstream IMMA via R1,
@@ -446,7 +501,7 @@ historical number was deleted.
 | §3.2 | UTRAP SD-1.5 3/3 → 4/4; Meta variant A "—" → 2/2, max H 1.000 | registry record counts; the dash understated a measured result |
 | §3.2, §3.3 | all nine cross-model rows and all thirteen λ-curve values | **re-verified exact**. Unchanged |
 | §5 | provenance note added: 7 `gen_*.json` with `unet: null`, 5 of them edited models; `ABSENT` quantified at 234/335 | the ambiguity of `unet: null` was undocumented, and a reader could not tell an unattributable record from a base control |
-| §6 | mandate sentence **re-evidenced**, not weakened; the `meta2_church_lt0.5` near-miss stated with its three attacker-lr cells | the conclusion was right but had been asserted ahead of the evidence. At 25 steps the arm clears 0.40 at lr 1e-5 and 5e-5 and fails only at lr 1e-4 (0.5333, `logs/e2h_stronger.log`) |
+| §6 | mandate sentence **re-evidenced**, not weakened; the `meta2_church_lt0.5` near-miss stated with its three attacker-lr cells | the conclusion was right but had been asserted ahead of the evidence. At 25 steps the arm clears 0.40 at lr 1e-5 and 5e-5 and fails at lr 1e-4 (0.5333, `logs/e2h_stronger.log`). **Amended on independent review: each cell is n = 1 gate-valid of 3, the valid seed differs by cell (6, 1, 6), and the word "only" is dropped — it implied an lr-dependent gate-failure rate, which the records refute (1/3 at all three learning rates)** |
 | §7 | "unblocked and cheap, not yet run" replaced by a per-experiment state table | E1, E2, E4 ran; E6 and E7 partially ran; `FREEZE_ACTIVE` added as a blocker |
 | §8 | heading FINDING65–70 → **65–78**; new §8.2 covers the eight omitted findings | the section claimed the report was "not stale against its own repository" while eight findings sat on disk, four of which amend its own rows |
 | §8 | row 70's causal clause for the non-monotone H withdrawn | `FINDING71` replicated the damage (n=229) but **not** the non-monotonicity, which is arm-specific |

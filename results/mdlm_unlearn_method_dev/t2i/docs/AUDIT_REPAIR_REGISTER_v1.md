@@ -207,7 +207,25 @@ Artifact: `outputs/gen_V1_esd_alone_vangogh.json`.
 | ESD + IMMA composed | 0.8667 | 0.0424 | 7 / 11 |
 | BASE SD-1.4 | 1.0000 | 1.0000 | 0 / 11 |
 
-**The ESD checkpoint is exonerated.** By itself it is a clean, well-behaved erasure: van Gogh falls
+> **⚠ MY WORDING BELOW OVERREACHED. Corrected 2026-10-26 after independent review, which found it
+> making three of the four inferences this result explicitly cannot support.**
+>
+> **The only supportable statement is: the ESD-alone arm did not show the same closed-set utility
+> collapse on this panel.** That is it. In particular:
+> * **NOT "exonerated" and NOT "a clean, well-behaved erasure."** Target accuracy is **0.7333** —
+>   11 of 15 images still classified as van Gogh. And D-030's limitation cuts **both** ways: a
+>   closed-set argmax with no reject option cannot license "clean erasure" any more than it licenses
+>   "destroys the model". I applied that limit to the collapse and then ignored it for the control.
+> * **NOT "provenance largely moot."** EMA-vs-non-EMA is untested and the host is offline. A
+>   behavioural result on one panel says nothing about what the bytes were trained as.
+> * **NOT "over-training is the leading hypothesis."** **Nothing in V1 varies the budget.** It
+>   compares composed against uncomposed, not 500 updates against 2500. Over-training remains an
+>   untested hypothesis with no evidence from this run.
+> * Also corrected: this entry carried `Status: OPEN` below its own `RESOLVED` heading.
+>
+> The measured numbers below stand; the characterisation of them did not.
+
+**Measured result (the numbers, without the overreach).** By itself: van Gogh falls
 1.000 → 0.733 while **all eleven** other concepts stay at a perfect **1.000**, with healthy
 `clip_align` (0.165–0.300). The utility collapse in D-009 is **not inherited from ESD** — it is
 introduced by composing IMMA.
@@ -215,14 +233,12 @@ introduced by composing IMMA.
 **That is the opposite of what I argued.** I had named the downloaded checkpoint "the leading
 explanation for D-009's numbers". It is not an explanation at all.
 
-**Two consequences.** (1) D-019's provenance question is now largely moot behaviourally: whatever
-makes all 686 tensors differ from base (EMA vs non-EMA remains the live hypothesis) is
-**behaviourally benign** — a whole-UNet-retrained erasure would be unlikely to leave 11/11 concepts
-at 1.000. The "mislabelled" reading is weaker still. (2) The collapse therefore comes from IMMA's
-160 trained tensors applied on top — and that arm ran **5× the documented budget** (2500 ascent
-steps against the README's 500, D-021). **Over-training is now the leading hypothesis, and it is a
-hypothesis about our run, not about the published method.** This is exactly why the 5× label had to
-be preserved rather than the run relabelled as faithful.
+**What follows, stated narrowly.** The collapse in the composed arm is **not reproduced** by the
+uncomposed checkpoint on this panel. That localises the difference to the composition step — the
+ESD checkpoint plus IMMA's 160 trained tensors — and nothing further. It does **not** identify a
+cause. Candidate explanations, all untested and none preferred: the 5x training budget (D-021); the
+interaction of IMMA's tensors with this particular ESD checkpoint; or a metric artifact under
+D-030's no-reject-option limit. **V1 varies none of these**, so it cannot rank them.
 
 **Still not established, and not claimed:** that IMMA "destroys utility". The number is a closed-set
 argmax with no reject option (D-030), measured on a configuration the authors never evaluate
@@ -652,7 +668,31 @@ runtime-asserted. The live error is `FINDING73` quoting retain8 **0.7917** for a
 comparing it against church arms whose retain8 correctly excludes *their* target — an
 apples-to-oranges comparison across the very axis the finding is about.
 
-### D-024 — the validity gate's stated threshold is finer than its own resolution.
+### D-024 — WITHDRAWN. **There is no gate defect. My framing was wrong.**
+
+**Corrected 2026-10-26.** I recorded this as a "granularity defect": the gate reads `T_rise ≥ 0.20`
+on a 24-image panel, and I treated the 13 records at `T_rise = 0.1667` as failing "by one image" to
+a threshold that was unrepresentable.
+
+**That is not a defect.** On a 24-image panel, `≥ 0.20` **correctly accepts 5/24 = 0.2083 and
+correctly rejects 4/24 = 0.1667**. The rule is well-defined and was applied consistently to all 808
+records. Nothing is mis-stated and no record was mis-gated.
+
+**Admitting 4/24 would CHANGE the rule**, not repair a rounding error. If that variant is ever
+explored it belongs in a **separately labelled sensitivity analysis**, never folded into the
+headline gate. The "13 records failed by one image" observation is a *distributional* fact about how
+close the rejections sit to the boundary — it is not evidence of a flaw.
+
+**Consequence for FINDING78, restated correctly.** My earlier note said a corrected boundary would
+make an E2h cell valid and raise its max-over-valid to 0.2667. **That was reasoning from the wrong
+premise.** Under the actual rule, seed 6 at lr 5e-5 (`T_rise = 0.1667 = 4/24`) is **correctly
+rejected**, and the 25-step max-over-valid stays as reported. FINDING78's retraction rests on lr
+1e-4 seed 6, whose `T_rise = 0.2083 = 5/24` is **correctly accepted** with H = 0.5333 > 0.40. The
+retraction is unaffected and needs no gate adjustment to stand.
+
+**Status: WITHDRAWN — not a defect. The superseded analysis is kept below for the record.**
+
+### D-024 (superseded text) — "the validity gate's stated threshold is finer than its own resolution"
 
 **Severity:** medium · **Owner:** Agent 4 · **Files:** `scripts/attack_relearn.py`, `docs/FINDING74…md`
 
@@ -995,7 +1035,45 @@ variant floor is 2.074e-04 and bound(S=2) is 4.880e-04 — the artifact and the 
 separates "training happened" from "someone loaded the wrong variant" at smoke-test scale. Picking
 a better constant was never the fix.
 
-**Second repair — magnitude replaced by structure.** One constant became three derived checks:
+### ⛔ BOTH REPAIRS ARE UNSOUND. Third attempt required — and I endorsed the second one.
+
+**Corrected 2026-10-26 on review.** I called the second repair "magnitude replaced by structure" and
+singled out check **B** as elegant. **Its premises do not hold.** Four invalid assumptions underpin
+the stage-9 criteria:
+
+1. **Check B is false as a criterion.** Training need **not** leave a checkpoint closer to its own
+   initialization than to another base variant. Counterexample: init A = 1, alternative B = 1.01,
+   trained value 1.007 — closer to B despite starting from A. So `rel_vs_same < rel_vs_other` can
+   fail on a perfectly correct update. I praised it precisely because it was magnitude-free, and
+   missed that being magnitude-free does not make it *valid*.
+2. **The Pythagorean step assumes an orthogonal update**, which nothing justifies.
+3. **AdamW does not generally bound the per-coordinate update by the learning rate.** The bound
+   `rel ≤ lr·S·√N/‖w‖` that I re-derived to six digits is **not guaranteed** — I verified the
+   arithmetic and never questioned the premise. Confirming a calculation on an unsound assumption is
+   not verification.
+4. **There is no justified universal positive minimum parameter change** inferable from the lr, so
+   the lower end of the consistency band is unfounded too.
+
+**All four are removed as pass/fail criteria, and are NOT replaced by another norm threshold.** The
+replacement is a **direct evidence chain**, which is what the question actually requires: record the
+model state the trainer loaded before optimization (revision, variant, dtype, trainable parameter
+names, tensor fingerprints); record **executed** optimizer updates with actual learning rates,
+gradient diagnostics and observed parameter changes, distinguishing executed from configured and
+skipped steps; compare the checkpoint against the **actual in-memory state** at the save point;
+reload and verify keys, shapes, finiteness and tensor equality at the intended precision; verify any
+fp16 export against explicitly converted source tensors; and bind all of it to the run config and
+source revision. Instrumentation around the pinned upstream must be minimal, documented, and
+recorded as a patch.
+
+**And a status distinction I blurred:** the 7/7 unit result was **synthetic tensor perturbations**.
+That is a unit test, not evidence the upstream trainer ran. A passing suite is not an executed run.
+*Implemented*, *executed* and *independently verified* are three different states.
+
+**Status: UNSOUND — third attempt, owner Agent B.**
+
+### Superseded second repair, kept for the record
+
+One constant became three derived checks:
 **(A)** noise (`rel > 1e-7`, not all-identical); **(B)** reference identity, **magnitude-free** —
 `rel_vs_same < rel_vs_other` — which catches the v1 trap at *any* update size, including sizes below
 the variant floor; **(C)** a consistency band `[bound(1)/100, 2·bound(S)]`. The variant floor is now
@@ -1281,6 +1359,160 @@ order of magnitude larger"). The eigenvalue 3.2420e5 is correct but **has no art
 an agent document and a help string) while **four live `outputs/r4_uce_*.json` still embed the
 withdrawn 85,850**. And the defect-ID collision table is itself wrong: `AGENT1_UCE_FINDINGS.md` uses
 D-100–D-160 and has **zero** `D-0NN` IDs; only Agent 4 and Agent 5 are genuine collisions.
+
+### D-053 — my `setsid` "fix" did not close the residual **and broke the interrupt path**. Reverted.
+
+**Severity:** high · **Owner:** lead (error), Agent A (correct fix) ·
+**Files:** `run_v1_esd_alone_control.sh`, `run_v2_rescore_final.sh`, `run_r4d_upstream_defaults.sh`
+
+I added a `setsid` self-re-exec to three launchers and described it as "closing the last reservation
+residual". It did not, and it cost something real. Agent A's three objections, all correct:
+
+1. **Leadership is not a protection.** It only decides whether `gpu_reserve.sh` is *allowed* to treat
+   process-group membership as evidence of descent. The reclamation decision still came down to a
+   **timer** for every other launch path, and nothing verified the re-exec had even happened.
+2. **`setsid` starts a new session with no controlling terminal**, so the script left the terminal's
+   foreground process group and **Ctrl-C from the launching shell no longer reached it**. A change I
+   justified as improving crash/interrupt handling **actively broke the interrupt path** — one of the
+   very behaviours the gate requires ("normal completion and interrupted execution release ownership
+   correctly").
+3. It **changes the pid after launch**, so the pid the operator sees is not the pid that reserves.
+
+**The correct mechanism, which Agent A implemented:** `gpu_reserve_hold` holds an **`flock(2)` on an
+inherited file descriptor** for the life of the run. An inherited descriptor is retained by **every
+descendant through `fork` and `execve`**, regardless of group or session leadership — so the lock is
+released only when the last descendant exits. That covers children and grandchildren without
+depending on leadership, a timer, or the launcher remembering anything. The `setsid` blocks are
+removed with the reasoning recorded in place.
+
+**Lesson, and it is the same one as D-040:** I reached for a mechanism that *looked* like the right
+shape (group leadership) instead of one that actually carries the invariant (an inherited lock).
+"Appears in the launcher" was again standing in for "enforces the property".
+
+### D-054 — my inherited-`CUDA_VISIBLE_DEVICES` refusal aborted on a value the script itself had set.
+
+**Severity:** medium · **Owner:** lead (error), Agent A (fix) · **Files:** `run_r1_imma_official.sh`
+
+I made the stage-4 reservation unconditional and refused an inherited `CUDA_VISIBLE_DEVICES`. But I
+tested the variable **at stage 4**, by which point **this script had exported it itself at stage 2** —
+so `R1_MODE=prep` from a clean tree would **always abort**, complaining about a value it had just
+set. My own comment even anticipated "a shell left over from an earlier stage of this very script"
+without distinguishing that case.
+
+Second defect in the same check: I used `[ -n "${CUDA_VISIBLE_DEVICES:-}" ]`, which lets an
+**exported-but-empty** value through. An empty `CUDA_VISIBLE_DEVICES` hides every GPU from CUDA and
+is just as much a pre-selection as `"0"`.
+
+**Fix (Agent A):** snapshot the inherited value **at entry**, before any reservation exists, and test
+**set-ness** (`${VAR+x}`) rather than non-emptiness. Refuse once, at entry, rather than at each
+reservation site.
+
+### D-055 — the Meta smoke test **could never produce the checkpoint its guard was meant to check.**
+
+**Severity:** blocking · **Owner:** Agent B (fixed) · **Files:** `run_r2_meta_official.sh`,
+`upstream/Meta-Unlearning/src/esd_meta.py:1070`
+
+Found by Agent B, independent of everything I had assigned. Upstream nests the **periodic save
+inside the validation gate**, so with the launcher's `--eval_every $((SM_STEPS+1))` smoke mode
+**could never write a `step=*/` checkpoint** — and therefore could never reach stage 9 at all.
+
+So the entire two-round argument about stage 9's acceptance criteria was moot in a way none of us
+had noticed: the stage was **unreachable** in the only mode that was supposed to exercise it. A
+guard that cannot be reached is not a weak guard, it is an absent one. Fixed.
+
+### D-056 — the `coherent` pool scheme leaked 2 of the 3 evaluation target prompts into its **forget** pool.
+
+**Severity:** blocking (split contamination) · **Owner:** Agent B (fixed) ·
+**Files:** `scripts/r2_build_meta_pools.py`, `scripts/split_registry.py`
+
+The `coherent` scheme was introduced as the principled replacement for the incoherent
+church-vs-cathedral/chapel/basilica setup. Its **forget** pool contained **2 of the 3 prompts the
+target is scored on**. I had been treating it as the clean option while its own construction carried
+the contamination the split registry exists to catch. Fixed, with a **hard-failing disjointness gate
+on resolved runtime pools** — not on source regex, which is what missed it.
+
+### D-057 — the evidence chain's instrumentation silently recorded nothing (caught by its author's own tests).
+
+**Severity:** would-have-been-blocking · **Owner:** Agent B (fixed)
+
+`AdamW` defines its own `step`, so patching `Optimizer.step` **never fired** and the executed-update
+record would have been **silently empty** — an evidence chain that produced no evidence while
+reporting success. Now uses global optimizer step hooks. **10/10 unit tests pass**, and Agent B
+states plainly that these are unit tests on synthetic tensors, **not** an executed run.
+
+**Agent B also verified all four unsound criteria from source with CPU counterexamples**, which is
+stronger than my acceptance of them: check B fails a genuine update (rel_same **7.00e-03** >
+rel_other **2.97e-03**); the Pythagorean step needs orthogonality (1.22e-02 claimed vs **3.00e-03**
+actual); AdamW's `lr·S` bound is *attained* at S=1 and ignores `weight_decay=1e-4`; and a
+zero-gradient **executed** step moves exactly 0.0. All four removed with no substitute threshold,
+asserted structurally.
+
+### D-058 — my `--no-preserve` field fix was incomplete, and the published artifacts carry stale metadata.
+
+**Severity:** high · **Owner:** lead · **Files:** `outputs/r4d_uce_church_*.json`
+
+Agent B independently re-derived my `--no-preserve` equivalence and found it **stronger** than I
+claimed — bit-exact in **float32** too, numerator and denominator separately, not only in float64.
+
+But my fix was **incomplete in two ways**: a stale `ASYMMETRIC` caveat elsewhere in the file still
+contradicted it (fixed by Agent B), and — the part that matters — **the on-disk artifacts predate the
+fix** (written 16:13/16:14 against the fix at 16:18) and still read `n_preserve_port: 10` when the
+port used 0. **I published those artifacts in `cc778f2` with that wrong metadata.** They must be
+re-run, not re-labelled. Agent B correctly left them untouched.
+
+Also: `complete: False` on both artifacts was `--retain-concepts` defaulting to **empty**, so **no
+run could ever be complete**. Fixed with a documented retain panel and a structured `completeness`
+block — which also means the R4d re-run will finally carry the retain axis D-034 requires.
+
+### D-059 — the flock lifetime lock does **not** cover the real chain. Measured, exploitable.
+
+**Severity:** blocking (gate) · **Owner:** Agent A (routed) · **Files:** `scripts/gpu_reserve.sh`
+
+I claimed the inherited descriptor is "retained by every descendant through `fork` and `execve`".
+**That is false for our actual chain**, and I measured it rather than argue it:
+
+| hop | result |
+|---|---|
+| shell → `exec python` | **fd SURVIVES** (python holds fd 10). bash's `{FD}>>` is not close-on-exec. |
+| python → `subprocess.Popen` | **fd IS DROPPED.** Python defaults to `close_fds=True` (since 3.2); `/proc/<grandchild>/fd` shows no hold fd. |
+| consequence | SIGKILL the trainer with a worker alive → `flock -n -x hold -c true` **SUCCEEDS**: *"LOCK FREE while survivor alive"*, survivor confirmed running. |
+
+So the precise case the gate requires us to prevent — killing the parent must not let another job
+onto a GPU still in use by surviving descendants — **is live**. And `pass_fds=` is not available as
+a general fix because we do not control upstream's own `Popen` calls.
+
+**Fix direction (simplest, not a third design):** keep the flock as the fast path for the owner's own
+lifetime, and make the **authoritative acquire-time test device occupancy** — refuse any candidate
+GPU carrying a compute process not attributable to a live held reservation. The Q3 survivor holds
+CUDA, so it is visible to `nvidia-smi` even while holding no descriptor. The file already has the
+pieces (`compute-apps`, `OURS_UNLOCKED`, `ORPHAN`).
+
+**This is the sixth instance of the pattern Agent C named** (after D-013, D-040, D-053, D-055,
+D-057): a mechanism credited for its shape rather than the property it enforces. Five of the six are
+mine. The distinguishing feature here is that the measurement was cheap and I had not taken it.
+
+### Milestone framing — adopted 2026-10-26, and it changes what blocks what
+
+Three separate milestones, previously conflated in my reporting:
+
+| # | milestone | current state |
+|---|---|---|
+| **1** | shared infrastructure safe enough to execute verification | **NOT PASSED** — D-047, D-048, D-059 open |
+| **2** | a particular method's complete execution path verified | IMMA: pending (needs M1 + a real smoke run). **Meta: NOT verified** (D-055/D-057 — stage 9 was unreachable; instrumentation untested in a real run). UCE: records superseded, re-run pending |
+| **3** | that method produces interpretable research results | none yet |
+
+**M1 does not establish M2 or M3**, and I have been reporting as though a passing infrastructure
+test moved a method forward. Conversely — and this corrects a real error in how I sequenced work —
+**an unrelated method's unresolved problem must not block a verified path.** Meta's defects
+(D-055, D-056, D-057) do **not** block IMMA. They block *Meta*, which is excluded from scientific
+comparison until its smoke run passes, and that exclusion is the whole of their consequence for the
+next experiment.
+
+**Testing calibration, recorded because I over-corrected.** Passing tests **are** valid evidence for
+the properties they genuinely exercise. The failure mode throughout this audit was **misleading
+assertions and unrealistic test conditions**, not testing itself. A test that kills a real launcher
+with a real grandchild and reads the real lock state is good evidence; a test that greps source, or
+runs with a working shim where production uses real telemetry, is not evidence about production.
 
 ---
 

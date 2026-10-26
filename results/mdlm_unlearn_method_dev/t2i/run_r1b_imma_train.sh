@@ -312,7 +312,34 @@ ratio = (mine["imma_ascent_updates"] / readme["imma_ascent_updates"]
 print(f"    RATIO (ours / README, on ASCENT updates): {ratio:.2f}x")
 if mine_arg is not None and len(chosen) == mine_arg:
     print(f"    selected files: {' '.join(chosen)}")
-json.dump({"dataset_dir": d, "rows": n_all, "png_on_disk": len(files),
+
+# ---- ATOMIC PUBLISH (repair A v3). ----------------------------------------------------------
+# `json.dump(obj, open(path, "w"))` TRUNCATES path the instant it is opened, before a single byte
+# of the new content is written. A crash, an OOM kill or a full disk in that window leaves a
+# truncated or empty result file -- which is the same artifact class as the 29.7%-truncated
+# unet.pt that passed every `[ -f ]` guard, except that here WE manufacture it. Worse, line 415's
+# read-modify-write re-opens the very file it just parsed, so an interruption destroys the
+# original too and there is nothing to fall back to.
+# Same-directory temp + flush + fsync + os.replace: a reader sees the old file or the new one.
+def _atomic_json(obj, path, indent=1):
+    import json as _j, os as _o, tempfile as _t
+    d = _o.path.dirname(_o.path.abspath(path)) or "."
+    _o.makedirs(d, exist_ok=True)
+    fd, tmp = _t.mkstemp(dir=d, prefix=".tmp_r1b.")
+    try:
+        with _o.fdopen(fd, "w") as fh:
+            _j.dump(obj, fh, indent=indent)
+            fh.flush(); _o.fsync(fh.fileno())
+        _o.replace(tmp, path)
+        dfd = _o.open(d, _o.O_RDONLY)
+        try: _o.fsync(dfd)
+        finally: _o.close(dfd)
+    except BaseException:
+        try: _o.unlink(tmp)
+        except OSError: pass
+        raise
+
+_atomic_json({"dataset_dir": d, "rows": n_all, "png_on_disk": len(files),
            "blank_images_on_disk": blanks,
            "blank_filtering_in_trainer": "NONE -- no pixel/variance/NSFW check exists",
            "ours": mine, "readme_reference": readme,
@@ -323,7 +350,7 @@ json.dump({"dataset_dir": d, "rows": n_all, "png_on_disk": len(files),
                        "POST-ADAPTATION (README L146-151 compares generation w/o IMMA against "
                        "generation w/ IMMA, both after an adaptation). IMMA never evaluates an "
                        "immunised model standalone.")},
-          open(out, "w"), indent=1)
+          out)
 print(f"    budget record -> {out}")
 PY
 
@@ -409,10 +436,39 @@ w = sum(esd[k].float().pow(2).sum() for k in imma).sqrt()
 r = (d / w).item()
 print(f"    ||IMMA-ESD||/||ESD|| over the 160-tensor defence scope = {r:.6f}")
 assert r > 1e-5, "the defence scope did not move -- training was a no-op"
-b = json.load(open(budp)); b["artifact"] = {"path": ckp, "sha256": sha(ckp),
+
+# ---- ATOMIC PUBLISH (repair A v3). ----------------------------------------------------------
+# `json.dump(obj, open(path, "w"))` TRUNCATES path the instant it is opened, before a single byte
+# of the new content is written. A crash, an OOM kill or a full disk in that window leaves a
+# truncated or empty result file -- which is the same artifact class as the 29.7%-truncated
+# unet.pt that passed every `[ -f ]` guard, except that here WE manufacture it. Worse, line 415's
+# read-modify-write re-opens the very file it just parsed, so an interruption destroys the
+# original too and there is nothing to fall back to.
+# Same-directory temp + flush + fsync + os.replace: a reader sees the old file or the new one.
+def _atomic_json(obj, path, indent=1):
+    import json as _j, os as _o, tempfile as _t
+    d = _o.path.dirname(_o.path.abspath(path)) or "."
+    _o.makedirs(d, exist_ok=True)
+    fd, tmp = _t.mkstemp(dir=d, prefix=".tmp_r1b.")
+    try:
+        with _o.fdopen(fd, "w") as fh:
+            _j.dump(obj, fh, indent=indent)
+            fh.flush(); _o.fsync(fh.fileno())
+        _o.replace(tmp, path)
+        dfd = _o.open(d, _o.O_RDONLY)
+        try: _o.fsync(dfd)
+        finally: _o.close(dfd)
+    except BaseException:
+        try: _o.unlink(tmp)
+        except OSError: pass
+        raise
+
+with open(budp) as _fh:
+    b = json.load(_fh)
+b["artifact"] = {"path": ckp, "sha256": sha(ckp),
     "tensors": len(imma), "params": n, "attn1": a1, "attn2": a2,
     "rel_delta_vs_esd_init": r}
-json.dump(b, open(budp, "w"), indent=1)
+_atomic_json(b, budp)
 print(f"    budget+artifact record -> {budp}")
 PY
 say "R1b DONE $(date -Is) -> $R/$A  (budget: $BUDGET)"

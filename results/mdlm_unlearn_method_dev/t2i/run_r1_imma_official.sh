@@ -67,6 +67,36 @@ mkdir -p logs "$R"
 say() { printf '%s\n' "$*" | tee -a "$L"; }
 die() { printf 'R1 FAILED: %s\n' "$*" | tee -a "$L" >&2; exit 1; }
 
+# ---- INHERITED-ENVIRONMENT SNAPSHOT (repair A v3, review of the lead's D-049 fix) ---------------
+# The inherited-CUDA_VISIBLE_DEVICES refusal must be judged against what we inherited AT ENTRY,
+# captured here before any reservation exists. The lead's version tested $CUDA_VISIBLE_DEVICES at
+# stage 4, by which point THIS SCRIPT had exported it itself in stage 2 -- so `R1_MODE=prep` from a
+# clean working tree always aborted at stage 4 complaining about a value it had just set. The
+# stage-4 comment even anticipates "a shell left over from an earlier stage of this very script"
+# without distinguishing that case. Snapshotting at entry is what makes the check mean what it says.
+#
+# Set-ness, not emptiness: an exported but EMPTY CUDA_VISIBLE_DEVICES hides every GPU from CUDA and
+# is just as much a pre-selection as "0". The lead's `[ -n ... ]` test let it through silently.
+if [ -z "${CUDA_VISIBLE_DEVICES+x}" ]; then
+  R1_CVD_INHERITED=""
+  R1_CVD_WAS_SET=0
+else
+  R1_CVD_INHERITED="$CUDA_VISIBLE_DEVICES"
+  R1_CVD_WAS_SET=1
+fi
+
+# Refuse an inherited pre-selection ONCE, at entry, rather than at each reservation site.
+if [ "$R1_CVD_WAS_SET" = 1 ]; then
+  if [ "${R1_ACK_INHERITED_CVD:-0}" != "1" ]; then
+    die "CUDA_VISIBLE_DEVICES was already set to '${R1_CVD_INHERITED}' when this script started.
+    Refusing: a pre-selected device bypasses the reservation system, which is the condition D-001
+    arose from. Unset it and re-run, or set R1_ACK_INHERITED_CVD=1 to proceed deliberately (the
+    reservation's device will still override it)."
+  fi
+  say "    WARNING: inherited CUDA_VISIBLE_DEVICES='${R1_CVD_INHERITED}' acknowledged; it will be"
+  say "             OVERRIDDEN by each reservation below, not honoured."
+fi
+
 say "=== R1 $(date -Is) mode=$MODE"
 GOT_PIN=$(git -C "$U" rev-parse HEAD 2>/dev/null || echo NO-GIT)
 [ "$GOT_PIN" = "$UPSTREAM_PIN" ] || die "upstream/IMMA is at $GOT_PIN, expected $UPSTREAM_PIN"
@@ -144,15 +174,24 @@ if [ ! -d "$R/data/vangogh" ] || [ -z "$(ls -A "$R/data/vangogh"/*.png 2>/dev/nu
   gpu_reserve_hold "r1_imma_prep" 120 ${FROZEN_ARG[@]+"${FROZEN_ARG[@]}"} >/dev/null \
     || die "no GPU reservation granted (see gpu_reserve stderr above)"
   [ -n "${GPU_RESERVED:-}" ] || die "gpu_reserve_hold returned 0 but set no GPU_RESERVED"
-  export CUDA_VISIBLE_DEVICES="$GPU_RESERVED"
+  # NO `export CUDA_VISIBLE_DEVICES="$GPU_RESERVED"` here. gpu_reserve_hold has already exported
+  # it, and re-exporting the bare INDEX silently overwrites the UUID form that
+  # GPU_RESERVE_CVD_STYLE=uuid asks for -- so the one setting that is immune to driver
+  # renumbering was being undone by the line that looked like it was enforcing the reservation.
   export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-  say "    reserved GPU $GPU_RESERVED"
+  say "    reserved GPU $GPU_RESERVED (uuid ${GPU_RESERVED_UUID:-?}, CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES)"
   mkdir -p "$R/data/vangogh"
   rc=0
   ( cd "$U" && $V eval/text2image.py --prompt 'An artwork by Van Gogh' \
       --num_images "$NUM_IMAGES" \
       --output_dir "/data/bijaypandey/t2i_unlearn/$R/data/vangogh" ) >>"$L" 2>&1 || rc=$?
   say "    text2image rc=$rc"
+  # RELEASE before leaving the stage. Two reservations in one shell is unsupported: the second
+  # EXIT trap replaces the first, and (since repair A v3) the second would also orphan the first
+  # liveness-lock descriptor, pinning that GPU for the life of the shell. gpu_reserve.sh now
+  # REFUSES the second acquire outright, so without this drop `R1_MODE=prep` could not reach
+  # stage 4 at all. gpu_reserve_drop keeps the reservation if anything we started is still alive.
+  gpu_reserve_drop "r1_imma_prep" || say "    WARNING: releasing the prep reservation failed"
   [ "$rc" -eq 0 ] || die "data generation exited $rc"
 else
   say "--- stage 2: training images already present, not regenerating"
@@ -250,22 +289,17 @@ PIN_REVISION=$(sed -n 's/^revision=//p' MODEL_PIN.txt | head -1)
 # D-001 arose from (three runners each independently picking GPU 0). Clear it and re-run, or set
 # R1_ACK_INHERITED_CVD=1 to acknowledge deliberately -- and note that even then we reserve, and the
 # reservation's device wins over the inherited value.
-if [ -n "${CUDA_VISIBLE_DEVICES:-}" ]; then
-  if [ "${R1_ACK_INHERITED_CVD:-0}" != "1" ]; then
-    die "CUDA_VISIBLE_DEVICES is already set to '${CUDA_VISIBLE_DEVICES}'. Refusing: a pre-selected
-    device bypasses the reservation system. Unset it and re-run, or set R1_ACK_INHERITED_CVD=1 to
-    proceed (the reservation's device will still override it)."
-  fi
-  say "    WARNING: inherited CUDA_VISIBLE_DEVICES='${CUDA_VISIBLE_DEVICES}' acknowledged; it will"
-  say "             be OVERRIDDEN by the reservation below, not honoured."
-fi
+# The inherited-CVD refusal is enforced ONCE at entry (see the snapshot block near the top), where
+# it can still tell an inherited value apart from one this script exported in stage 2. Testing it
+# here, as the previous version did, made `R1_MODE=prep` abort on its own stage-2 export.
 FROZEN_ARG=()
 [ "${ALLOW_FROZEN_RUN:-0}" = "1" ] && FROZEN_ARG=(--allow-frozen)
 # shellcheck source=scripts/gpu_reserve.sh
 source scripts/gpu_reserve.sh
 gpu_reserve_hold "r1_imma_smoke" 120 ${FROZEN_ARG[@]+"${FROZEN_ARG[@]}"} >/dev/null \
   || die "no GPU reservation granted for the smoke check (rc=${GPU_RESERVE_RC:-?})"
-export CUDA_VISIBLE_DEVICES="$GPU_RESERVED"
+[ -n "${GPU_RESERVED:-}" ] || die "gpu_reserve_hold returned 0 but set no GPU_RESERVED"
+# Again: no re-export of the bare index. gpu_reserve_hold owns CUDA_VISIBLE_DEVICES.
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 say "    reserved GPU $GPU_RESERVED (uuid ${GPU_RESERVED_UUID:-?})"
 rm -rf "$R/smoke"
