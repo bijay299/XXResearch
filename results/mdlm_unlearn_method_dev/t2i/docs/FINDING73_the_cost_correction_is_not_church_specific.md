@@ -306,3 +306,33 @@ I twice declared the disk-free work exhausted and was twice wrong — once for r
 claims, once here. The lesson is specific: **before claiming an experiment needs new builds, enumerate
 what the existing checkpoints can already answer.** `scripts/registry_v1.py` makes that a query, and
 I did not run it.
+
+## 10. My alignment hypothesis is **refuted** (E11o)
+
+§8b offered, explicitly as a hypothesis, that base prompt alignment orders inversely with recovery
+speed. E11o completed church's 50-step cell to n = 3 to test it, because church has the **lowest**
+alignment of the four and the hypothesis therefore predicted it should be the **fastest**.
+
+| concept | base align | **saturation (all three seeds = 1.000)** | mean H at 25 | at 50 |
+|---|---:|---:|---:|---:|
+| **church** | **0.2406** (lowest) | **> 50** | 0.867 | 0.978 |
+| garbage_truck | 0.2456 | **25** | 1.000 | — |
+| parachute | 0.2702 | 50 | 0.867 | 1.000 |
+| tench | 0.2899 (highest) | 100 | 0.689 | 0.956 |
+
+**Church is among the slowest, not the fastest.** The predicted monotone relation breaks at its own
+extreme: alignment order is church < garbage_truck < parachute < tench, while speed order is
+garbage_truck < parachute < {tench, church}. **The hypothesis is refuted on four points** by the
+measurement designed to test it.
+
+So **no measured property of a concept yet explains the ordering.** Ruled out so far: `H_before`
+(§8a), retain8 (§8a, §9b), base classifier accuracy (§8b), and now base prompt alignment. The
+garbage_truck/tench 4× gap is real, replicated across two arms on the fast side (§9), and
+**unexplained**.
+
+That is the honest end state for this axis: a solid measurement with no mechanism. I would rather
+record it that way than keep proposing explanations at n = 4.
+
+**Also now complete:** church's own curve at n = 3 — 5:0.533, 10:0.500, 15:0.600, 25:0.867,
+**50:0.978** — so FRP-church does not reach all-three-seeds 1.000 even at 50 steps, where
+garbage_truck did so at 25. Its max-over-valid hits 1.000 at 50.
