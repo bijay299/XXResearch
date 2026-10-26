@@ -245,9 +245,36 @@ knows that this is caused by the meta objective and not by the arm's reduced uti
 > signal in this phase is therefore: **real, reproducible on a second checkpoint, weaker there, and
 > irrelevant against the adversary that matters.**
 >
-> A BK-SDM-small arm is also running (λ=0.5 fell to retain **0.4833**, below K1 — a
-> hyperparameter-transfer failure, not a verdict on the method, so λ=0.3 was built instead at
-> target 0.2000 / retain 0.7667; its first TI point gate-failed at +0.125).
+> ### The complete cross-model picture: the obstruction is **GRADED**, not binary
+>
+> BK-SDM-small completes it. (λ=0.5 fell to retain **0.4833**, below K1 — a hyperparameter-transfer
+> failure, not a verdict on the method, since the same pressure costs more utility on a half-size
+> UNet — so λ=0.3 was built instead at target 0.2000 / retain **0.7667**, matching SD-1.5's
+> retention exactly.)
+>
+> | model | retain8 | TI 2000/1e-2 | TI 3000/2e-2 | TI gate | **full-UNet** |
+> |---|---|---|---|---|---|
+> | SD-1.4 | 0.6333 | T **−0.208** | T **−0.083** | ❌ 0/3 | **1.000** (6/6) |
+> | **BK-SDM-small** | **0.7667** | T **+0.125** ❌ | T **+0.083** ❌ | ❌ 0/2 — **holds** | **1.000** (T +0.667, util 0.938) |
+> | **SD-1.5** | **0.7667** | T +0.000 ❌ | T **+0.208 ✅** | **breached** → H **0.333** | **1.000** (T +0.958) |
+>
+> **At matched retention (0.7667 on both new models) the obstruction holds on the pruned
+> architecture and is breached on SD-1.5.** Three distinct behaviours:
+>
+> 1. **SD-1.4** — T *falls*: the attack moves backwards on its own training prompts.
+> 2. **BK-SDM-small** — T *rises but stalls* below the 0.20 gate (+0.125, +0.083). ⚠ This is **not
+>    "almost resistance"** — it is an invalid attack, and the gate exists so it cannot be reported
+>    as anything else.
+> 3. **SD-1.5** — the stronger budget breaks through to H = 0.333.
+>
+> So the effect is neither checkpoint-specific nor universal: it is **graded across models, with
+> SD-1.5 the weakest case.** That is a sharper statement than "transfers" or "does not", and it is
+> not what I would have predicted.
+>
+> **And every arm is still fully reversed.** The full-UNet control reaches **H = 1.000 on all
+> three**, with post-attack utility 0.938 on BK-SDM — concept fully restored, half-size model
+> undamaged. The obstruction is real, reproducible, graded, and **irrelevant against the adversary
+> that matters.**
 
 ## 6. What this closes and does not close
 
