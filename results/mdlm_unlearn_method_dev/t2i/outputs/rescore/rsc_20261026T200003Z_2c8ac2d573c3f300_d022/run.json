@@ -1,0 +1,1240 @@
+{
+ "study": "t2i_FINAL_rescore_v2",
+ "rescore_version": "rescore_final/v2.0.0",
+ "run_id": "rsc_20261026T200003Z_2c8ac2d573c3f300_d022",
+ "run_dir": "/data/bijaypandey/t2i_unlearn/outputs/rescore/rsc_20261026T200003Z_2c8ac2d573c3f300_d022",
+ "run_status": "partial",
+ "run_status_note": "run_status=partial. 'complete' requires EVERY requested arm to be complete AND every completed arm to have reproduced its historical record exactly. Arms with an absent checkpoint or an error are named above and were NOT silently skipped; a 'partial' run does not cover them and must not be reported as a full re-evaluation. History comparability: none_exact -- this run's numbers CANNOT be compared to the historical numbers. The within-run corrected-vs-legacy label-text comparison remains valid (both sets scored the same regenerated images); what is lost is any claim about what the ORIGINAL records would have become.",
+ "evaluation_role": "CORRECTIVE_RE_EVALUATION",
+ "evaluation_role_note": "CORRECTIVE RE-EVALUATION OF AN ALREADY-INSPECTED SPLIT. The FINAL split was inspected in FINDING65 and FINDING66 before this run; these numbers are DEVELOPMENT measurements that repair a scoring defect (D-013). They are NOT a fresh held-out confirmation and must not be reported as one.",
+ "method": "REGENERATION_PLUS_CORRECTED_SCORING",
+ "method_note": "The original images were never saved, so the original pixels cannot be re-scored. Images are REGENERATED from the recorded prompts and seeds and then scored under both label-text sets. Matching seeds are a reason to EXPECT similar images, not proof: determinism is an assumption, tested per arm by determinism_probe against the historical records, and NOT presumed to hold.",
+ "label_mismatch": {
+  "n_labels": 12,
+  "n_differ": 9,
+  "n_identical": 3,
+  "differing": [
+   "garbage_truck",
+   "van_gogh",
+   "cassette_player",
+   "chain_saw",
+   "english_springer",
+   "french_horn",
+   "gas_pump",
+   "golf_ball",
+   "monet"
+  ],
+  "identical": [
+   "church",
+   "parachute",
+   "tench"
+  ],
+  "rows": [
+   {
+    "index": 0,
+    "identity_key": "church",
+    "legacy_text": "church",
+    "corrected_text": "church",
+    "differs": false,
+    "legacy_prompt": "a photo of a church",
+    "corrected_prompt": "a photo of a church"
+   },
+   {
+    "index": 1,
+    "identity_key": "parachute",
+    "legacy_text": "parachute",
+    "corrected_text": "parachute",
+    "differs": false,
+    "legacy_prompt": "a photo of a parachute",
+    "corrected_prompt": "a photo of a parachute"
+   },
+   {
+    "index": 2,
+    "identity_key": "garbage_truck",
+    "legacy_text": "garbage_truck",
+    "corrected_text": "garbage truck",
+    "differs": true,
+    "legacy_prompt": "a photo of a garbage_truck",
+    "corrected_prompt": "a photo of a garbage truck"
+   },
+   {
+    "index": 3,
+    "identity_key": "van_gogh",
+    "legacy_text": "van_gogh",
+    "corrected_text": "van gogh painting",
+    "differs": true,
+    "legacy_prompt": "a photo of a van_gogh",
+    "corrected_prompt": "a photo of a van gogh painting"
+   },
+   {
+    "index": 4,
+    "identity_key": "cassette_player",
+    "legacy_text": "cassette_player",
+    "corrected_text": "cassette player",
+    "differs": true,
+    "legacy_prompt": "a photo of a cassette_player",
+    "corrected_prompt": "a photo of a cassette player"
+   },
+   {
+    "index": 5,
+    "identity_key": "chain_saw",
+    "legacy_text": "chain_saw",
+    "corrected_text": "chain saw",
+    "differs": true,
+    "legacy_prompt": "a photo of a chain_saw",
+    "corrected_prompt": "a photo of a chain saw"
+   },
+   {
+    "index": 6,
+    "identity_key": "english_springer",
+    "legacy_text": "english_springer",
+    "corrected_text": "english springer spaniel",
+    "differs": true,
+    "legacy_prompt": "a photo of a english_springer",
+    "corrected_prompt": "a photo of a english springer spaniel"
+   },
+   {
+    "index": 7,
+    "identity_key": "french_horn",
+    "legacy_text": "french_horn",
+    "corrected_text": "french horn",
+    "differs": true,
+    "legacy_prompt": "a photo of a french_horn",
+    "corrected_prompt": "a photo of a french horn"
+   },
+   {
+    "index": 8,
+    "identity_key": "gas_pump",
+    "legacy_text": "gas_pump",
+    "corrected_text": "gas pump",
+    "differs": true,
+    "legacy_prompt": "a photo of a gas_pump",
+    "corrected_prompt": "a photo of a gas pump"
+   },
+   {
+    "index": 9,
+    "identity_key": "golf_ball",
+    "legacy_text": "golf_ball",
+    "corrected_text": "golf ball",
+    "differs": true,
+    "legacy_prompt": "a photo of a golf_ball",
+    "corrected_prompt": "a photo of a golf ball"
+   },
+   {
+    "index": 10,
+    "identity_key": "tench",
+    "legacy_text": "tench",
+    "corrected_text": "tench",
+    "differs": false,
+    "legacy_prompt": "a photo of a tench",
+    "corrected_prompt": "a photo of a tench"
+   },
+   {
+    "index": 11,
+    "identity_key": "monet",
+    "legacy_text": "monet",
+    "corrected_text": "monet painting",
+    "differs": true,
+    "legacy_prompt": "a photo of a monet",
+    "corrected_prompt": "a photo of a monet painting"
+   }
+  ],
+  "interpretation": "The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved pending corrected evaluation. Direction and magnitude are NOT established by the existence of the mismatch; an underscore-vs-space edit changes the token sequence and so the text embedding, but the sign of the resulting similarity change is empirical.",
+  "scoring_version": "clip_scorer/v2.0.0"
+ },
+ "exposure_in_historical_records": {
+  "n_on_differing_labels": 37,
+  "n_images_total": 180,
+  "n_records": 12,
+  "per_arm_all": {
+   "ATK_frp_church_r3_l05": 0,
+   "ATK_uce_sd15_church_lam1000": 1,
+   "ATK_uce_sd15_church_lam1000_sd1": 0,
+   "ATK_uce_sd15_church_lam1000_sd6": 0,
+   "ATK_utrap_church_l0.15k8": 0,
+   "ATK_utrap_sd15_church_l0.15k8": 0,
+   "BASE_sd14_anchor": 2,
+   "BASE_sd15_anchor": 0,
+   "frp_church_r3_l05": 7,
+   "uce_sd15_church_lam1000": 5,
+   "utrap_church_l0.15k8": 10,
+   "utrap_sd15_church_l0.15k8": 12
+  },
+  "per_arm": {
+   "ATK_uce_sd15_church_lam1000": 1,
+   "BASE_sd14_anchor": 2,
+   "frp_church_r3_l05": 7,
+   "uce_sd15_church_lam1000": 5,
+   "utrap_church_l0.15k8": 10,
+   "utrap_sd15_church_l0.15k8": 12
+  },
+  "median_margin_by_arm": {
+   "ATK_frp_church_r3_l05": null,
+   "ATK_uce_sd15_church_lam1000": 0.0081,
+   "ATK_uce_sd15_church_lam1000_sd1": null,
+   "ATK_uce_sd15_church_lam1000_sd6": null,
+   "ATK_utrap_church_l0.15k8": null,
+   "ATK_utrap_sd15_church_l0.15k8": null,
+   "BASE_sd14_anchor": 0.011,
+   "BASE_sd15_anchor": null,
+   "frp_church_r3_l05": 0.0051,
+   "uce_sd15_church_lam1000": 0.0027,
+   "utrap_church_l0.15k8": 0.0044,
+   "utrap_sd15_church_l0.15k8": 0.0063
+  },
+  "differing_labels": [
+   "cassette_player",
+   "chain_saw",
+   "english_springer",
+   "french_horn",
+   "garbage_truck",
+   "gas_pump",
+   "golf_ball",
+   "monet",
+   "van_gogh"
+  ],
+  "framing": "Small margins mean the outcomes are sensitive to label text; they do not indicate which way. This count is NOT a bound on how many decisions could move: the decision is a closed-set argmax over all twelve labels, so an image predicted as an UNCHANGED label (church, parachute, tench) can also flip when a competitor's text changes. Images predicted on a differing label are where a change is most directly visible, not where it is confined.",
+  "documented": {
+   "n_on_differing_labels": 37,
+   "n_images_total": 180,
+   "per_arm": {
+    "utrap_sd15_church_l0.15k8": 12,
+    "utrap_church_l0.15k8": 10,
+    "frp_church_r3_l05": 7,
+    "uce_sd15_church_lam1000": 5,
+    "BASE_sd14_anchor": 2,
+    "ATK_uce_sd15_church_lam1000": 1
+   },
+   "median_margin_range_four_defence_arms": [
+    0.0027,
+    0.0063
+   ]
+  }
+ },
+ "unmodified_baseline": {
+  "ok": true,
+  "baseline_taken_at": "2026-10-26",
+  "files": {
+   "gen_eval.py": {
+    "expected_sha256": "6f978e60870486b4e844580c3b480ac62ce4a59037eb2d5534756e26d131f51a",
+    "actual_sha256": "6f978e60870486b4e844580c3b480ac62ce4a59037eb2d5534756e26d131f51a",
+    "matches": true
+   },
+   "attack_relearn.py": {
+    "expected_sha256": "ec5fe2249b19df3b60e551f8800ed3fb7c7474a814e312578f1e88dd44fb40e2",
+    "actual_sha256": "ec5fe2249b19df3b60e551f8800ed3fb7c7474a814e312578f1e88dd44fb40e2",
+    "matches": true
+   }
+  },
+  "scope_note": "Byte-identity is proven only from baseline_taken_at onward. For the period before that date the evidence is mtime only, and no stronger claim is made: the prior hash record (outputs/provenance_manifest.json) predates this repair and truncates its per-file hashes to 16 hex characters."
+ },
+ "run_status_vocabulary": [
+  "complete",
+  "complete_comparability_mixed",
+  "complete_not_comparable_to_history",
+  "partial",
+  "incomplete",
+  "failed"
+ ],
+ "numerics_contract": {
+  "ok": true,
+  "issues": [],
+  "scoring_version": "clip_scorer/v2.0.0",
+  "clip_model_id": "openai/clip-vit-large-patch14",
+  "prompt_template": "a photo of a {}",
+  "numerics": {
+   "dtype": "float16",
+   "text": "CLIPModel.get_text_features(**processor(text=[...], padding=True)) then L2-normalise over dim=-1",
+   "image": "CLIPProcessor(images=[...])['pixel_values'].half() -> CLIPModel.get_image_features(...) then L2-normalise over dim=-1",
+   "similarity": "image_features @ text_features.T (cosine, both operands unit-norm)",
+   "decision": "closed-set argmax over the label axis; NO reject option, NO threshold"
+  }
+ },
+ "paired_scoring": {
+  "design": "Both label-text sets are scored on ONE image-feature tensor per image, so the image side is bit-identical across the pair and any difference in the decision is attributable to the label text alone.",
+  "sets": {
+   "corrected": "gen_eval.LABELS (the text every H number uses)",
+   "legacy": "gen_eval.LAB_KEY (the text the pre-repair FINAL records used)"
+  },
+  "identity_mapping": "gen_eval.LAB_KEY, identical under both sets, so prediction indices mean the same concept either way"
+ },
+ "provenance": {
+  "rescore_version": "rescore_final/v2.0.0",
+  "scoring_version": "clip_scorer/v2.0.0",
+  "run_id": "rsc_20261026T200003Z_2c8ac2d573c3f300_d022",
+  "run_dir": "/data/bijaypandey/t2i_unlearn/outputs/rescore/rsc_20261026T200003Z_2c8ac2d573c3f300_d022",
+  "generated_at": "2026-10-26T16:00:03-0400",
+  "code": {
+   "git_rev": null,
+   "git_dirty": false,
+   "git_note": "no git repository at the source tree root; code identity is the per-file sha256 below",
+   "file_sha256": {
+    "rescore_final_v2.py": "d0f97b8f31bbe4452e2a6c902dc67e0687756061be22df1563c8f75ae08e6d8a",
+    "clip_scorer.py": "9e1e4f9ae4568ded4669e97c331048e96f6f462ee0dcca757e4e0d0d52a09563",
+    "gen_eval.py": "6f978e60870486b4e844580c3b480ac62ce4a59037eb2d5534756e26d131f51a",
+    "gen_eval_final.py": "e32f97d9d623de4277d1e4bce2a046bea32c72acd3a96d5042af61c824b61580",
+    "split_registry.py": "eef7a0aa618eb0af303fde9c1043242015617312877f17b14808579b0280fcba"
+   }
+  },
+  "environment": {
+   "python": "3.10.12",
+   "platform": "Linux-5.15.0-136-generic-x86_64-with-glibc2.35",
+   "deps": {
+    "torch": "2.4.1+cu124",
+    "diffusers": "0.31.0",
+    "transformers": "4.46.3",
+    "numpy": "1.26.4",
+    "accelerate": "1.1.1",
+    "safetensors": "0.8.0",
+    "PIL": "12.3.0"
+   },
+   "cuda_visible_devices": "0",
+   "hf_home": "/data/bijaypandey/t2i_unlearn/hf_home",
+   "torch_cuda": "12.4",
+   "cudnn": 90100,
+   "gpu_name": "NVIDIA A100-SXM4-40GB",
+   "n_gpu_visible": 1,
+   "tf32_matmul": false
+  },
+  "environment_caveat": "These are THIS run's versions. The original FINAL run recorded none, so no claim that the two environments match is possible. This is the main reason bit-identical regeneration cannot be asserted from matching seeds.",
+  "models": {
+   "pin_file": {
+    "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+    "local": "/data/bijaypandey/t2i_unlearn/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b"
+   },
+   "per_arm_base": {
+    "utrap_church_l0.15k8": {
+     "base_model": "CompVis/stable-diffusion-v1-4",
+     "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "frp_church_r3_l05": {
+     "base_model": "CompVis/stable-diffusion-v1-4",
+     "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "utrap_sd15_church_l0.15k8": {
+     "base_model": "runwayml/stable-diffusion-v1-5",
+     "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "uce_sd15_church_lam1000": {
+     "base_model": "runwayml/stable-diffusion-v1-5",
+     "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "BASE_sd14_anchor": {
+     "base_model": "CompVis/stable-diffusion-v1-4",
+     "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "BASE_sd15_anchor": {
+     "base_model": "runwayml/stable-diffusion-v1-5",
+     "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "ATK_utrap_church_l0.15k8": {
+     "base_model": "CompVis/stable-diffusion-v1-4",
+     "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "ATK_utrap_sd15_church_l0.15k8": {
+     "base_model": "runwayml/stable-diffusion-v1-5",
+     "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "ATK_frp_church_r3_l05": {
+     "base_model": "CompVis/stable-diffusion-v1-4",
+     "revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "ATK_uce_sd15_church_lam1000": {
+     "base_model": "runwayml/stable-diffusion-v1-5",
+     "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "ATK_uce_sd15_church_lam1000_sd1": {
+     "base_model": "runwayml/stable-diffusion-v1-5",
+     "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    },
+    "ATK_uce_sd15_church_lam1000_sd6": {
+     "base_model": "runwayml/stable-diffusion-v1-5",
+     "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+     "variant": "fp16",
+     "torch_dtype": "float16"
+    }
+   },
+   "variant_note": "variant='fp16' is passed to from_pretrained for every arm, matching gen_eval_final.py. An arm whose repo has no such variant will FAIL loudly and be recorded as failed, not silently fall back.",
+   "classifier": {
+    "id": "openai/clip-vit-large-patch14",
+    "revision": null,
+    "revision_note": "UNPINNED upstream in every historical run; left unpinned here so the re-scoring uses the same locally cached weights rather than silently introducing a second classifier identity into the comparison."
+   },
+   "numerics": {
+    "dtype": "float16",
+    "text": "CLIPModel.get_text_features(**processor(text=[...], padding=True)) then L2-normalise over dim=-1",
+    "image": "CLIPProcessor(images=[...])['pixel_values'].half() -> CLIPModel.get_image_features(...) then L2-normalise over dim=-1",
+    "similarity": "image_features @ text_features.T (cosine, both operands unit-norm)",
+    "decision": "closed-set argmax over the label axis; NO reject option, NO threshold"
+   }
+  },
+  "inference": {
+   "num_inference_steps": 25,
+   "guidance_scale": 7.5,
+   "n_per_prompt": 5,
+   "height_width": "pipeline default (512x512 for SD-1.x)",
+   "safety_checker": "disabled (safety_checker=None, requires_safety_checker=False)",
+   "scheduler": "recorded PER ARM from the instantiated pipeline (see arm record 'scheduler'); gen_eval_final.py used the repo default, not an override"
+  },
+  "prompts": {
+   "split_version": "v2",
+   "split_role": "FINAL",
+   "final_frozen_at": "2026-10-25T23:30:00-04:00",
+   "prompts_by_target": {
+    "church": [
+     "the nave of a chapel at midday",
+     "a steepled meeting house in winter light",
+     "a basilica interior with stone columns"
+    ]
+   }
+  },
+  "seeds": {
+   "stream": "final_eval",
+   "stream_offset": 4000000,
+   "formula": "split_registry.seed_for('final_eval', prompt_index*100 + image_index)",
+   "values": [
+    4000000,
+    4000001,
+    4000002,
+    4000003,
+    4000004,
+    4000100,
+    4000101,
+    4000102,
+    4000103,
+    4000104,
+    4000200,
+    4000201,
+    4000202,
+    4000203,
+    4000204
+   ],
+   "device": "torch.Generator(device='cuda') -- same construction as gen_eval_final.py",
+   "caveat": "Identical seeds reproduce identical noise ONLY given an identical environment and device. Determinism is an ASSUMPTION TESTED by determinism_probe, not a premise of this run."
+  },
+  "label_sets": {
+   "n_labels": 12,
+   "n_differ": 9,
+   "n_identical": 3,
+   "differing": [
+    "garbage_truck",
+    "van_gogh",
+    "cassette_player",
+    "chain_saw",
+    "english_springer",
+    "french_horn",
+    "gas_pump",
+    "golf_ball",
+    "monet"
+   ],
+   "identical": [
+    "church",
+    "parachute",
+    "tench"
+   ],
+   "rows": [
+    {
+     "index": 0,
+     "identity_key": "church",
+     "legacy_text": "church",
+     "corrected_text": "church",
+     "differs": false,
+     "legacy_prompt": "a photo of a church",
+     "corrected_prompt": "a photo of a church"
+    },
+    {
+     "index": 1,
+     "identity_key": "parachute",
+     "legacy_text": "parachute",
+     "corrected_text": "parachute",
+     "differs": false,
+     "legacy_prompt": "a photo of a parachute",
+     "corrected_prompt": "a photo of a parachute"
+    },
+    {
+     "index": 2,
+     "identity_key": "garbage_truck",
+     "legacy_text": "garbage_truck",
+     "corrected_text": "garbage truck",
+     "differs": true,
+     "legacy_prompt": "a photo of a garbage_truck",
+     "corrected_prompt": "a photo of a garbage truck"
+    },
+    {
+     "index": 3,
+     "identity_key": "van_gogh",
+     "legacy_text": "van_gogh",
+     "corrected_text": "van gogh painting",
+     "differs": true,
+     "legacy_prompt": "a photo of a van_gogh",
+     "corrected_prompt": "a photo of a van gogh painting"
+    },
+    {
+     "index": 4,
+     "identity_key": "cassette_player",
+     "legacy_text": "cassette_player",
+     "corrected_text": "cassette player",
+     "differs": true,
+     "legacy_prompt": "a photo of a cassette_player",
+     "corrected_prompt": "a photo of a cassette player"
+    },
+    {
+     "index": 5,
+     "identity_key": "chain_saw",
+     "legacy_text": "chain_saw",
+     "corrected_text": "chain saw",
+     "differs": true,
+     "legacy_prompt": "a photo of a chain_saw",
+     "corrected_prompt": "a photo of a chain saw"
+    },
+    {
+     "index": 6,
+     "identity_key": "english_springer",
+     "legacy_text": "english_springer",
+     "corrected_text": "english springer spaniel",
+     "differs": true,
+     "legacy_prompt": "a photo of a english_springer",
+     "corrected_prompt": "a photo of a english springer spaniel"
+    },
+    {
+     "index": 7,
+     "identity_key": "french_horn",
+     "legacy_text": "french_horn",
+     "corrected_text": "french horn",
+     "differs": true,
+     "legacy_prompt": "a photo of a french_horn",
+     "corrected_prompt": "a photo of a french horn"
+    },
+    {
+     "index": 8,
+     "identity_key": "gas_pump",
+     "legacy_text": "gas_pump",
+     "corrected_text": "gas pump",
+     "differs": true,
+     "legacy_prompt": "a photo of a gas_pump",
+     "corrected_prompt": "a photo of a gas pump"
+    },
+    {
+     "index": 9,
+     "identity_key": "golf_ball",
+     "legacy_text": "golf_ball",
+     "corrected_text": "golf ball",
+     "differs": true,
+     "legacy_prompt": "a photo of a golf_ball",
+     "corrected_prompt": "a photo of a golf ball"
+    },
+    {
+     "index": 10,
+     "identity_key": "tench",
+     "legacy_text": "tench",
+     "corrected_text": "tench",
+     "differs": false,
+     "legacy_prompt": "a photo of a tench",
+     "corrected_prompt": "a photo of a tench"
+    },
+    {
+     "index": 11,
+     "identity_key": "monet",
+     "legacy_text": "monet",
+     "corrected_text": "monet painting",
+     "differs": true,
+     "legacy_prompt": "a photo of a monet",
+     "corrected_prompt": "a photo of a monet painting"
+    }
+   ],
+   "interpretation": "The evaluator used inconsistent label text. The effect on scores and conclusions is unresolved pending corrected evaluation. Direction and magnitude are NOT established by the existence of the mismatch; an underscore-vs-space edit changes the token sequence and so the text embedding, but the sign of the resulting similarity change is empirical.",
+   "scoring_version": "clip_scorer/v2.0.0"
+  },
+  "checkpoint_hashes": {
+   "utrap_church_l0.15k8": {
+    "path": "/data/bijaypandey/t2i_unlearn/adapters/utrap_church_l0.15k8/unet.pt",
+    "sha256": "3c27198e8b290ce03a4c2cca2f7d777ad07539de308f106e4b664913d4a4e4d4",
+    "scope": "FIRST_67108864_BYTES"
+   },
+   "frp_church_r3_l05": {
+    "path": "/data/bijaypandey/t2i_unlearn/adapters/frp_church_r3_l05/unet.pt",
+    "sha256": "1eef2faf30c1109acdc865c938ceb4ebb4d24579505ec458828037ae9fa6aa8e",
+    "scope": "FIRST_67108864_BYTES"
+   },
+   "utrap_sd15_church_l0.15k8": {
+    "path": "/data/bijaypandey/t2i_unlearn/adapters/utrap_sd15_church_l0.15k8/unet.pt",
+    "sha256": "d47b680f7dbebf41fe760e84c970ae4ad22033d113ada924b39bf43a9b337433",
+    "scope": "FIRST_67108864_BYTES"
+   },
+   "uce_sd15_church_lam1000": {
+    "path": "/data/bijaypandey/t2i_unlearn/adapters/uce_sd15_church_lam1000/unet.pt",
+    "sha256": "f9237eee9269a42672c9221ae31e2c6a0cbb18f896bfe8f23fe9cef0cd77fed3",
+    "scope": "FIRST_67108864_BYTES"
+   }
+  },
+  "checkpoint_hash_scope": "sha256 over the first 64 MiB of each checkpoint"
+ },
+ "arms_requested": [
+  "utrap_church_l0.15k8",
+  "frp_church_r3_l05",
+  "utrap_sd15_church_l0.15k8",
+  "uce_sd15_church_lam1000",
+  "BASE_sd14_anchor",
+  "BASE_sd15_anchor",
+  "ATK_utrap_church_l0.15k8",
+  "ATK_utrap_sd15_church_l0.15k8",
+  "ATK_frp_church_r3_l05",
+  "ATK_uce_sd15_church_lam1000",
+  "ATK_uce_sd15_church_lam1000_sd1",
+  "ATK_uce_sd15_church_lam1000_sd6"
+ ],
+ "arms": {
+  "utrap_church_l0.15k8": {
+   "status": "complete",
+   "status_detail": null,
+   "status_consequence": null,
+   "original_arm_precommitted": true,
+   "original_arm_status": "PRE_COMMITTED_IN_gen_eval_final.ARMS",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": {
+    "corrected": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage truck",
+      "van gogh painting",
+      "cassette player",
+      "chain saw",
+      "english springer spaniel",
+      "french horn",
+      "gas pump",
+      "golf ball",
+      "tench",
+      "monet painting"
+     ],
+     "target_hits": 1,
+     "n_total": 15,
+     "target_acc": 0.06666666666666667
+    },
+    "legacy": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage_truck",
+      "van_gogh",
+      "cassette_player",
+      "chain_saw",
+      "english_springer",
+      "french_horn",
+      "gas_pump",
+      "golf_ball",
+      "tench",
+      "monet"
+     ],
+     "target_hits": 1,
+     "n_total": 15,
+     "target_acc": 0.06666666666666667
+    }
+   },
+   "paired_label_text_effect": {
+    "corrected_minus_legacy_target_acc": 0.0,
+    "corrected_minus_legacy_target_hits": 0,
+    "n_images_whose_prediction_changed": 6,
+    "n_images_whose_target_decision_changed": 0,
+    "measurement_note": "Both label sets scored the SAME image-feature tensor, so this difference is attributable to the label TEXT alone, within this run. It is a MEASUREMENT of the effect for this arm; it is not evidence about any other arm, and it was not predicted in advance in either direction."
+   },
+   "headline_number": {
+    "metric": "target_acc under the CORRECTED label text (gen_eval.LABELS)",
+    "value": 0.06666666666666667,
+    "denominator_note": "3 FINAL prompts x 5 images = 15; quantised to 1/15. Closed-set 12-label CLIP argmax, no reject option.",
+    "comparability": "Construction-comparable to the corpus H numbers in LABEL TEXT. NOT a held-out result: the FINAL split was already inspected."
+   },
+   "determinism_probe": {
+    "status": "COMPARED",
+    "historical_path": "/data/bijaypandey/t2i_unlearn/outputs/final_utrap_church_l0.15k8.json",
+    "historical_has_label_text_set_field": false,
+    "n_compared": 15,
+    "n_historical": 15,
+    "n_this_run": 15,
+    "historical_target_hits": 1,
+    "historical_target_acc": 0.06666666666666667,
+    "reproduced_legacy_target_hits": 1,
+    "reproduced_legacy_target_acc": 0.06666666666666667,
+    "acc_delta_reproduction_minus_history": 0.0,
+    "per_image_pred_label_agreement": 1.0,
+    "n_per_image_pred_disagreements": 0,
+    "max_abs_margin_delta": 0.000244140625,
+    "max_abs_target_sim_delta": 0.000244140625,
+    "mean_abs_target_sim_delta": 6.510416666666667e-05,
+    "disagreeing_indices": [],
+    "verdict": "DISCREPANT",
+    "verdict_note": "Legacy-label reproduction DIFFERS from the historical record. The original images were never saved, so the cause cannot be separated here into (a) nondeterministic regeneration under a different library/driver/device, or (b) any other change. The corrected-vs-legacy comparison WITHIN this run remains valid regardless, because both label sets score the SAME regenerated images; what a discrepancy limits is the comparability of this run to the historical numbers."
+   },
+   "checkpoint_sha256": "3c27198e8b290ce03a4c2cca2f7d777ad07539de308f106e4b664913d4a4e4d4",
+   "minutes": 0.29239144722620647
+  },
+  "frp_church_r3_l05": {
+   "status": "complete",
+   "status_detail": null,
+   "status_consequence": null,
+   "original_arm_precommitted": true,
+   "original_arm_status": "PRE_COMMITTED_IN_gen_eval_final.ARMS",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": {
+    "corrected": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage truck",
+      "van gogh painting",
+      "cassette player",
+      "chain saw",
+      "english springer spaniel",
+      "french horn",
+      "gas pump",
+      "golf ball",
+      "tench",
+      "monet painting"
+     ],
+     "target_hits": 4,
+     "n_total": 15,
+     "target_acc": 0.26666666666666666
+    },
+    "legacy": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage_truck",
+      "van_gogh",
+      "cassette_player",
+      "chain_saw",
+      "english_springer",
+      "french_horn",
+      "gas_pump",
+      "golf_ball",
+      "tench",
+      "monet"
+     ],
+     "target_hits": 7,
+     "n_total": 15,
+     "target_acc": 0.4666666666666667
+    }
+   },
+   "paired_label_text_effect": {
+    "corrected_minus_legacy_target_acc": -0.2,
+    "corrected_minus_legacy_target_hits": -3,
+    "n_images_whose_prediction_changed": 7,
+    "n_images_whose_target_decision_changed": 3,
+    "measurement_note": "Both label sets scored the SAME image-feature tensor, so this difference is attributable to the label TEXT alone, within this run. It is a MEASUREMENT of the effect for this arm; it is not evidence about any other arm, and it was not predicted in advance in either direction."
+   },
+   "headline_number": {
+    "metric": "target_acc under the CORRECTED label text (gen_eval.LABELS)",
+    "value": 0.26666666666666666,
+    "denominator_note": "3 FINAL prompts x 5 images = 15; quantised to 1/15. Closed-set 12-label CLIP argmax, no reject option.",
+    "comparability": "Construction-comparable to the corpus H numbers in LABEL TEXT. NOT a held-out result: the FINAL split was already inspected."
+   },
+   "determinism_probe": {
+    "status": "COMPARED",
+    "historical_path": "/data/bijaypandey/t2i_unlearn/outputs/final_frp_church_r3_l05.json",
+    "historical_has_label_text_set_field": false,
+    "n_compared": 15,
+    "n_historical": 15,
+    "n_this_run": 15,
+    "historical_target_hits": 7,
+    "historical_target_acc": 0.4666666666666667,
+    "reproduced_legacy_target_hits": 7,
+    "reproduced_legacy_target_acc": 0.4666666666666667,
+    "acc_delta_reproduction_minus_history": 0.0,
+    "per_image_pred_label_agreement": 1.0,
+    "n_per_image_pred_disagreements": 0,
+    "max_abs_margin_delta": 0.000244140625,
+    "max_abs_target_sim_delta": 0.0001220703125,
+    "mean_abs_target_sim_delta": 6.510416666666667e-05,
+    "disagreeing_indices": [],
+    "verdict": "DISCREPANT",
+    "verdict_note": "Legacy-label reproduction DIFFERS from the historical record. The original images were never saved, so the cause cannot be separated here into (a) nondeterministic regeneration under a different library/driver/device, or (b) any other change. The corrected-vs-legacy comparison WITHIN this run remains valid regardless, because both label sets score the SAME regenerated images; what a discrepancy limits is the comparability of this run to the historical numbers."
+   },
+   "checkpoint_sha256": "1eef2faf30c1109acdc865c938ceb4ebb4d24579505ec458828037ae9fa6aa8e",
+   "minutes": 0.26809815963109335
+  },
+  "utrap_sd15_church_l0.15k8": {
+   "status": "complete",
+   "status_detail": null,
+   "status_consequence": null,
+   "original_arm_precommitted": true,
+   "original_arm_status": "PRE_COMMITTED_IN_gen_eval_final.ARMS",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": {
+    "corrected": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage truck",
+      "van gogh painting",
+      "cassette player",
+      "chain saw",
+      "english springer spaniel",
+      "french horn",
+      "gas pump",
+      "golf ball",
+      "tench",
+      "monet painting"
+     ],
+     "target_hits": 3,
+     "n_total": 15,
+     "target_acc": 0.2
+    },
+    "legacy": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage_truck",
+      "van_gogh",
+      "cassette_player",
+      "chain_saw",
+      "english_springer",
+      "french_horn",
+      "gas_pump",
+      "golf_ball",
+      "tench",
+      "monet"
+     ],
+     "target_hits": 2,
+     "n_total": 15,
+     "target_acc": 0.13333333333333333
+    }
+   },
+   "paired_label_text_effect": {
+    "corrected_minus_legacy_target_acc": 0.06666666666666667,
+    "corrected_minus_legacy_target_hits": 1,
+    "n_images_whose_prediction_changed": 9,
+    "n_images_whose_target_decision_changed": 1,
+    "measurement_note": "Both label sets scored the SAME image-feature tensor, so this difference is attributable to the label TEXT alone, within this run. It is a MEASUREMENT of the effect for this arm; it is not evidence about any other arm, and it was not predicted in advance in either direction."
+   },
+   "headline_number": {
+    "metric": "target_acc under the CORRECTED label text (gen_eval.LABELS)",
+    "value": 0.2,
+    "denominator_note": "3 FINAL prompts x 5 images = 15; quantised to 1/15. Closed-set 12-label CLIP argmax, no reject option.",
+    "comparability": "Construction-comparable to the corpus H numbers in LABEL TEXT. NOT a held-out result: the FINAL split was already inspected."
+   },
+   "determinism_probe": {
+    "status": "COMPARED",
+    "historical_path": "/data/bijaypandey/t2i_unlearn/outputs/final_utrap_sd15_church_l0.15k8.json",
+    "historical_has_label_text_set_field": false,
+    "n_compared": 15,
+    "n_historical": 15,
+    "n_this_run": 15,
+    "historical_target_hits": 2,
+    "historical_target_acc": 0.13333333333333333,
+    "reproduced_legacy_target_hits": 2,
+    "reproduced_legacy_target_acc": 0.13333333333333333,
+    "acc_delta_reproduction_minus_history": 0.0,
+    "per_image_pred_label_agreement": 1.0,
+    "n_per_image_pred_disagreements": 0,
+    "max_abs_margin_delta": 0.0001220703125,
+    "max_abs_target_sim_delta": 0.000244140625,
+    "mean_abs_target_sim_delta": 4.8828125e-05,
+    "disagreeing_indices": [],
+    "verdict": "DISCREPANT",
+    "verdict_note": "Legacy-label reproduction DIFFERS from the historical record. The original images were never saved, so the cause cannot be separated here into (a) nondeterministic regeneration under a different library/driver/device, or (b) any other change. The corrected-vs-legacy comparison WITHIN this run remains valid regardless, because both label sets score the SAME regenerated images; what a discrepancy limits is the comparability of this run to the historical numbers."
+   },
+   "checkpoint_sha256": "d47b680f7dbebf41fe760e84c970ae4ad22033d113ada924b39bf43a9b337433",
+   "minutes": 0.26099594831466677
+  },
+  "uce_sd15_church_lam1000": {
+   "status": "complete",
+   "status_detail": null,
+   "status_consequence": null,
+   "original_arm_precommitted": true,
+   "original_arm_status": "PRE_COMMITTED_IN_gen_eval_final.ARMS",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": {
+    "corrected": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage truck",
+      "van gogh painting",
+      "cassette player",
+      "chain saw",
+      "english springer spaniel",
+      "french horn",
+      "gas pump",
+      "golf ball",
+      "tench",
+      "monet painting"
+     ],
+     "target_hits": 9,
+     "n_total": 15,
+     "target_acc": 0.6
+    },
+    "legacy": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage_truck",
+      "van_gogh",
+      "cassette_player",
+      "chain_saw",
+      "english_springer",
+      "french_horn",
+      "gas_pump",
+      "golf_ball",
+      "tench",
+      "monet"
+     ],
+     "target_hits": 9,
+     "n_total": 15,
+     "target_acc": 0.6
+    }
+   },
+   "paired_label_text_effect": {
+    "corrected_minus_legacy_target_acc": 0.0,
+    "corrected_minus_legacy_target_hits": 0,
+    "n_images_whose_prediction_changed": 4,
+    "n_images_whose_target_decision_changed": 2,
+    "measurement_note": "Both label sets scored the SAME image-feature tensor, so this difference is attributable to the label TEXT alone, within this run. It is a MEASUREMENT of the effect for this arm; it is not evidence about any other arm, and it was not predicted in advance in either direction."
+   },
+   "headline_number": {
+    "metric": "target_acc under the CORRECTED label text (gen_eval.LABELS)",
+    "value": 0.6,
+    "denominator_note": "3 FINAL prompts x 5 images = 15; quantised to 1/15. Closed-set 12-label CLIP argmax, no reject option.",
+    "comparability": "Construction-comparable to the corpus H numbers in LABEL TEXT. NOT a held-out result: the FINAL split was already inspected."
+   },
+   "determinism_probe": {
+    "status": "COMPARED",
+    "historical_path": "/data/bijaypandey/t2i_unlearn/outputs/final_uce_sd15_church_lam1000.json",
+    "historical_has_label_text_set_field": false,
+    "n_compared": 15,
+    "n_historical": 15,
+    "n_this_run": 15,
+    "historical_target_hits": 9,
+    "historical_target_acc": 0.6,
+    "reproduced_legacy_target_hits": 9,
+    "reproduced_legacy_target_acc": 0.6,
+    "acc_delta_reproduction_minus_history": 0.0,
+    "per_image_pred_label_agreement": 1.0,
+    "n_per_image_pred_disagreements": 0,
+    "max_abs_margin_delta": 0.0001220703125,
+    "max_abs_target_sim_delta": 0.000244140625,
+    "mean_abs_target_sim_delta": 8.138020833333333e-05,
+    "disagreeing_indices": [],
+    "verdict": "DISCREPANT",
+    "verdict_note": "Legacy-label reproduction DIFFERS from the historical record. The original images were never saved, so the cause cannot be separated here into (a) nondeterministic regeneration under a different library/driver/device, or (b) any other change. The corrected-vs-legacy comparison WITHIN this run remains valid regardless, because both label sets score the SAME regenerated images; what a discrepancy limits is the comparability of this run to the historical numbers."
+   },
+   "checkpoint_sha256": "f9237eee9269a42672c9221ae31e2c6a0cbb18f896bfe8f23fe9cef0cd77fed3",
+   "minutes": 0.2654335657755534
+  },
+  "BASE_sd14_anchor": {
+   "status": "complete",
+   "status_detail": null,
+   "status_consequence": null,
+   "original_arm_precommitted": true,
+   "original_arm_status": "PRE_COMMITTED_IN_gen_eval_final.ARMS",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": {
+    "corrected": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage truck",
+      "van gogh painting",
+      "cassette player",
+      "chain saw",
+      "english springer spaniel",
+      "french horn",
+      "gas pump",
+      "golf ball",
+      "tench",
+      "monet painting"
+     ],
+     "target_hits": 12,
+     "n_total": 15,
+     "target_acc": 0.8
+    },
+    "legacy": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage_truck",
+      "van_gogh",
+      "cassette_player",
+      "chain_saw",
+      "english_springer",
+      "french_horn",
+      "gas_pump",
+      "golf_ball",
+      "tench",
+      "monet"
+     ],
+     "target_hits": 13,
+     "n_total": 15,
+     "target_acc": 0.8666666666666667
+    }
+   },
+   "paired_label_text_effect": {
+    "corrected_minus_legacy_target_acc": -0.06666666666666667,
+    "corrected_minus_legacy_target_hits": -1,
+    "n_images_whose_prediction_changed": 2,
+    "n_images_whose_target_decision_changed": 1,
+    "measurement_note": "Both label sets scored the SAME image-feature tensor, so this difference is attributable to the label TEXT alone, within this run. It is a MEASUREMENT of the effect for this arm; it is not evidence about any other arm, and it was not predicted in advance in either direction."
+   },
+   "headline_number": {
+    "metric": "target_acc under the CORRECTED label text (gen_eval.LABELS)",
+    "value": 0.8,
+    "denominator_note": "3 FINAL prompts x 5 images = 15; quantised to 1/15. Closed-set 12-label CLIP argmax, no reject option.",
+    "comparability": "Construction-comparable to the corpus H numbers in LABEL TEXT. NOT a held-out result: the FINAL split was already inspected."
+   },
+   "determinism_probe": {
+    "status": "COMPARED",
+    "historical_path": "/data/bijaypandey/t2i_unlearn/outputs/final_BASE_sd14_anchor.json",
+    "historical_has_label_text_set_field": false,
+    "n_compared": 15,
+    "n_historical": 15,
+    "n_this_run": 15,
+    "historical_target_hits": 13,
+    "historical_target_acc": 0.8666666666666667,
+    "reproduced_legacy_target_hits": 13,
+    "reproduced_legacy_target_acc": 0.8666666666666667,
+    "acc_delta_reproduction_minus_history": 0.0,
+    "per_image_pred_label_agreement": 1.0,
+    "n_per_image_pred_disagreements": 0,
+    "max_abs_margin_delta": 0.000244140625,
+    "max_abs_target_sim_delta": 0.0001220703125,
+    "mean_abs_target_sim_delta": 4.8828125e-05,
+    "disagreeing_indices": [],
+    "verdict": "DISCREPANT",
+    "verdict_note": "Legacy-label reproduction DIFFERS from the historical record. The original images were never saved, so the cause cannot be separated here into (a) nondeterministic regeneration under a different library/driver/device, or (b) any other change. The corrected-vs-legacy comparison WITHIN this run remains valid regardless, because both label sets score the SAME regenerated images; what a discrepancy limits is the comparability of this run to the historical numbers."
+   },
+   "checkpoint_sha256": null,
+   "minutes": 0.24936309258143108
+  },
+  "BASE_sd15_anchor": {
+   "status": "complete",
+   "status_detail": null,
+   "status_consequence": null,
+   "original_arm_precommitted": false,
+   "original_arm_status": "POST_HOC: listed in ARMS but named in POST_HOC_ARMS (added after FINAL results were seen)",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": {
+    "corrected": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage truck",
+      "van gogh painting",
+      "cassette player",
+      "chain saw",
+      "english springer spaniel",
+      "french horn",
+      "gas pump",
+      "golf ball",
+      "tench",
+      "monet painting"
+     ],
+     "target_hits": 15,
+     "n_total": 15,
+     "target_acc": 1.0
+    },
+    "legacy": {
+     "label_text": [
+      "church",
+      "parachute",
+      "garbage_truck",
+      "van_gogh",
+      "cassette_player",
+      "chain_saw",
+      "english_springer",
+      "french_horn",
+      "gas_pump",
+      "golf_ball",
+      "tench",
+      "monet"
+     ],
+     "target_hits": 15,
+     "n_total": 15,
+     "target_acc": 1.0
+    }
+   },
+   "paired_label_text_effect": {
+    "corrected_minus_legacy_target_acc": 0.0,
+    "corrected_minus_legacy_target_hits": 0,
+    "n_images_whose_prediction_changed": 0,
+    "n_images_whose_target_decision_changed": 0,
+    "measurement_note": "Both label sets scored the SAME image-feature tensor, so this difference is attributable to the label TEXT alone, within this run. It is a MEASUREMENT of the effect for this arm; it is not evidence about any other arm, and it was not predicted in advance in either direction."
+   },
+   "headline_number": {
+    "metric": "target_acc under the CORRECTED label text (gen_eval.LABELS)",
+    "value": 1.0,
+    "denominator_note": "3 FINAL prompts x 5 images = 15; quantised to 1/15. Closed-set 12-label CLIP argmax, no reject option.",
+    "comparability": "Construction-comparable to the corpus H numbers in LABEL TEXT. NOT a held-out result: the FINAL split was already inspected."
+   },
+   "determinism_probe": {
+    "status": "COMPARED",
+    "historical_path": "/data/bijaypandey/t2i_unlearn/outputs/final_BASE_sd15_anchor.json",
+    "historical_has_label_text_set_field": false,
+    "n_compared": 15,
+    "n_historical": 15,
+    "n_this_run": 15,
+    "historical_target_hits": 15,
+    "historical_target_acc": 1.0,
+    "reproduced_legacy_target_hits": 15,
+    "reproduced_legacy_target_acc": 1.0,
+    "acc_delta_reproduction_minus_history": 0.0,
+    "per_image_pred_label_agreement": 1.0,
+    "n_per_image_pred_disagreements": 0,
+    "max_abs_margin_delta": 0.0001220703125,
+    "max_abs_target_sim_delta": 0.000244140625,
+    "mean_abs_target_sim_delta": 8.951822916666666e-05,
+    "disagreeing_indices": [],
+    "verdict": "DISCREPANT",
+    "verdict_note": "Legacy-label reproduction DIFFERS from the historical record. The original images were never saved, so the cause cannot be separated here into (a) nondeterministic regeneration under a different library/driver/device, or (b) any other change. The corrected-vs-legacy comparison WITHIN this run remains valid regardless, because both label sets score the SAME regenerated images; what a discrepancy limits is the comparability of this run to the historical numbers."
+   },
+   "checkpoint_sha256": null,
+   "minutes": 0.25226400295893353
+  },
+  "ATK_utrap_church_l0.15k8": {
+   "status": "missing_checkpoint",
+   "status_detail": "checkpoint ABSENT: attacked/E6B_utrap_church_l0.15k8_sd0_lr1e-5/unet.pt",
+   "status_consequence": "This arm was NOT evaluated. Its historical FINAL number cannot be corrected from the retained artefacts, because the checkpoint it was measured on no longer exists. Do not treat this arm as unchanged, and do not treat the run as covering it.",
+   "original_arm_precommitted": true,
+   "original_arm_status": "PRE_COMMITTED_IN_gen_eval_final.ARMS",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": null,
+   "paired_label_text_effect": null,
+   "headline_number": null,
+   "determinism_probe": null,
+   "checkpoint_sha256": null,
+   "minutes": 1.9470850626627604e-07
+  },
+  "ATK_utrap_sd15_church_l0.15k8": {
+   "status": "missing_checkpoint",
+   "status_detail": "checkpoint ABSENT: attacked/E6B_utrap_sd15_church_l0.15k8_sd0_lr1e-5/unet.pt",
+   "status_consequence": "This arm was NOT evaluated. Its historical FINAL number cannot be corrected from the retained artefacts, because the checkpoint it was measured on no longer exists. Do not treat this arm as unchanged, and do not treat the run as covering it.",
+   "original_arm_precommitted": true,
+   "original_arm_status": "PRE_COMMITTED_IN_gen_eval_final.ARMS",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": null,
+   "paired_label_text_effect": null,
+   "headline_number": null,
+   "determinism_probe": null,
+   "checkpoint_sha256": null,
+   "minutes": 1.629193623860677e-07
+  },
+  "ATK_frp_church_r3_l05": {
+   "status": "missing_checkpoint",
+   "status_detail": "checkpoint ABSENT: attacked/E6C_frp_church_r3_l05_sd0_lr1e-5/unet.pt",
+   "status_consequence": "This arm was NOT evaluated. Its historical FINAL number cannot be corrected from the retained artefacts, because the checkpoint it was measured on no longer exists. Do not treat this arm as unchanged, and do not treat the run as covering it.",
+   "original_arm_precommitted": false,
+   "original_arm_status": "POST_HOC: listed in ARMS but named in POST_HOC_ARMS (added after FINAL results were seen)",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": null,
+   "paired_label_text_effect": null,
+   "headline_number": null,
+   "determinism_probe": null,
+   "checkpoint_sha256": null,
+   "minutes": 1.629193623860677e-07
+  },
+  "ATK_uce_sd15_church_lam1000": {
+   "status": "missing_checkpoint",
+   "status_detail": "checkpoint ABSENT: attacked/E6C_uce_sd15_church_lam1000_sd0_lr1e-5/unet.pt",
+   "status_consequence": "This arm was NOT evaluated. Its historical FINAL number cannot be corrected from the retained artefacts, because the checkpoint it was measured on no longer exists. Do not treat this arm as unchanged, and do not treat the run as covering it.",
+   "original_arm_precommitted": false,
+   "original_arm_status": "POST_HOC: listed in ARMS but named in POST_HOC_ARMS (added after FINAL results were seen)",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": null,
+   "paired_label_text_effect": null,
+   "headline_number": null,
+   "determinism_probe": null,
+   "checkpoint_sha256": null,
+   "minutes": 1.5894571940104166e-07
+  },
+  "ATK_uce_sd15_church_lam1000_sd1": {
+   "status": "missing_checkpoint",
+   "status_detail": "checkpoint ABSENT: attacked/E6D_uce_sd15_church_lam1000_sd1_lr1e-5/unet.pt",
+   "status_consequence": "This arm was NOT evaluated. Its historical FINAL number cannot be corrected from the retained artefacts, because the checkpoint it was measured on no longer exists. Do not treat this arm as unchanged, and do not treat the run as covering it.",
+   "original_arm_precommitted": false,
+   "original_arm_status": "POST_HOC: never in ARMS at all (extra-seed label added after FINAL results were seen)",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": null,
+   "paired_label_text_effect": null,
+   "headline_number": null,
+   "determinism_probe": null,
+   "checkpoint_sha256": null,
+   "minutes": 1.629193623860677e-07
+  },
+  "ATK_uce_sd15_church_lam1000_sd6": {
+   "status": "missing_checkpoint",
+   "status_detail": "checkpoint ABSENT: attacked/E6D_uce_sd15_church_lam1000_sd6_lr1e-5/unet.pt",
+   "status_consequence": "This arm was NOT evaluated. Its historical FINAL number cannot be corrected from the retained artefacts, because the checkpoint it was measured on no longer exists. Do not treat this arm as unchanged, and do not treat the run as covering it.",
+   "original_arm_precommitted": false,
+   "original_arm_status": "POST_HOC: never in ARMS at all (extra-seed label added after FINAL results were seen)",
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT",
+   "results_by_label_set": null,
+   "paired_label_text_effect": null,
+   "headline_number": null,
+   "determinism_probe": null,
+   "checkpoint_sha256": null,
+   "minutes": 1.5497207641601563e-07
+  }
+ },
+ "started_at": "2026-10-26T16:00:04-0400",
+ "summary": {
+  "n_requested": 12,
+  "n_complete": 6,
+  "complete": [
+   "utrap_church_l0.15k8",
+   "frp_church_r3_l05",
+   "utrap_sd15_church_l0.15k8",
+   "uce_sd15_church_lam1000",
+   "BASE_sd14_anchor",
+   "BASE_sd15_anchor"
+  ],
+  "missing_checkpoint": [
+   "ATK_utrap_church_l0.15k8",
+   "ATK_utrap_sd15_church_l0.15k8",
+   "ATK_frp_church_r3_l05",
+   "ATK_uce_sd15_church_lam1000",
+   "ATK_uce_sd15_church_lam1000_sd1",
+   "ATK_uce_sd15_church_lam1000_sd6"
+  ],
+  "failed": [],
+  "not_attempted": [],
+  "history_comparability": {
+   "verdict": "none_exact",
+   "n_completed_arms": 6,
+   "exact_reproduction": [],
+   "discrepant": [
+    "utrap_church_l0.15k8",
+    "frp_church_r3_l05",
+    "utrap_sd15_church_l0.15k8",
+    "uce_sd15_church_lam1000",
+    "BASE_sd14_anchor",
+    "BASE_sd15_anchor"
+   ],
+   "no_historical_record": [],
+   "probe_missing": [],
+   "meaning": "this run's numbers CANNOT be compared to the historical numbers. The within-run corrected-vs-legacy label-text comparison remains valid (both sets scored the same regenerated images); what is lost is any claim about what the ORIGINAL records would have become."
+  },
+  "status_semantics": "`complete` means EVERY requested arm completed AND every completed arm reproduced its historical record exactly. A run that produced numbers but cannot be compared to history is `complete_not_comparable_to_history`, never `complete`."
+ },
+ "finished_at": "2026-10-26T16:01:45-0400",
+ "minutes": 1.6824735959370931
+}

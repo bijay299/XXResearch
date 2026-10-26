@@ -503,7 +503,50 @@ that way rather than as new evidence. (Correction to my own first pass: the reco
 substring scan over truncated values and missed the field. The *images* are still absent, so the
 re-score cost stands.)
 
-#### D-022a — RETRACTED AS WRITTEN. My directional analysis was unsupported.
+#### ✅ D-022 MEASURED 2026-10-26 by the V2 bounded run. The direction question is answered: **there is no consistent direction.**
+
+Run `rsc_20261026T200003Z_2c8ac2d573c3f300_d022`, GPU 0 reserved exclusively, override logged,
+180 images regenerated, both label sets scored against **one** image-feature tensor per image.
+
+| arm | legacy (`LAB_KEY`) | corrected (`LABELS`) | **delta** | determinism |
+|---|---:|---:|---:|---|
+| `utrap_church_l0.15k8` | 0.0667 | 0.0667 | **+0.0000** | DISCREPANT |
+| `frp_church_r3_l05` | 0.4667 | 0.2667 | **−0.2000** | DISCREPANT |
+| `utrap_sd15_church_l0.15k8` | 0.1333 | 0.2000 | **+0.0667** | DISCREPANT |
+| `uce_sd15_church_lam1000` | 0.6000 | 0.6000 | **+0.0000** | DISCREPANT |
+| `BASE_sd14_anchor` | 0.8667 | 0.8000 | **−0.0667** | DISCREPANT |
+| `BASE_sd15_anchor` | 1.0000 | 1.0000 | **+0.0000** | DISCREPANT |
+
+Predictions moved on up to **9 of 15** images per arm; target decisions on up to **3**.
+
+**My directional hypothesis is refuted by measurement, not merely unsupported.** I had reasoned that
+degraded distractors must be weaker competitors, so correcting them would *lower* church counts
+everywhere — i.e. every delta ≤ 0. Instead `utrap_sd15_church_l0.15k8` moves **+0.0667** while
+`frp_church_r3_l05` moves **−0.2000**. The effect is real, it is sometimes large, and **it has no
+consistent sign**. The reviewers were right to force the direction claim out of every document
+before this ran; had the claim stayed in, this result would have contradicted the published text.
+
+**And the historical numbers cannot be recovered at all.** `history_comparability = none_exact`:
+**all six** regenerable arms are DISCREPANT against their records. Regeneration at matched seeds
+does **not** reproduce the original images, so the determinism assumption this run was built to test
+**fails**. Note the subtlety: `BASE_sd14_anchor`'s legacy aggregate (0.8667) *equals* its historical
+13/15, yet the probe still reports DISCREPANT — because it compares **per-image** predictions, not
+aggregates. Aggregate agreement concealing per-image disagreement is exactly what a weaker probe
+would have missed.
+
+**Terminal state for the historical FINAL corpus.** Six arms have deleted checkpoints (D-022b) and
+the other six cannot be reproduced. So FINDING65's ratios and FINDING66's figures are **not
+correctable by re-measurement** — they are withdrawn permanently, not pending. What survives is a
+*within-run* measurement on regenerated images showing the label text matters and acts in both
+directions. A new, properly-instrumented FINAL experiment could address the underlying questions; it
+cannot repair these records.
+
+**The machinery behaved correctly, which is the other result.** The run exited **rc=1** and the
+guard wrote `V2 INCOMPLETE` rather than DONE — D-044's fix working as intended: an all-DISCREPANT
+run is not reportable as a successful correction. Before the fix it would have been filed as
+`complete`.
+
+#### D-022a — RETRACTED AS WRITTEN. My directional analysis was unsupported *and is now disproven*.
 
 **This entry originally claimed the defect's direction was established and "manufactures FINDING65's
 headline". That was wrong and is withdrawn.** I reasoned that degraded distractors must be weaker

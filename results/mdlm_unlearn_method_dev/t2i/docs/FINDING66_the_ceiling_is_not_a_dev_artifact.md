@@ -63,6 +63,28 @@
 > cited. Cause of the loss: the transient-checkpoint cleanup recorded as audit defects D-005/D-028,
 > which did not distinguish throwaway artifacts from ones underwriting a published finding.
 
+
+> ### ✅ MEASURED 2026-10-26 — and the historical numbers are NOT recoverable
+>
+> The corrective run (`outputs/rescore/rsc_20261026T200003Z_2c8ac2d573c3f300_d022/`) regenerated all
+> 180 images and scored both label sets against the same image features. Two results:
+>
+> **1. The label-text effect has no consistent direction.** Deltas (corrected − legacy) across the
+> six regenerable arms: **+0.0000, −0.2000, +0.0667, +0.0000, −0.0667, +0.0000**. Predictions moved
+> on up to 9 of 15 images per arm. So the effect is real and sometimes large, but it runs **both
+> ways** — the earlier hypothesis that correcting the labels would uniformly *lower* target counts is
+> **disproven by measurement**, not merely unsupported.
+>
+> **2. Regeneration does not reproduce the original images.** `history_comparability = none_exact`:
+> all six arms are DISCREPANT against their historical records at the per-image level. (Note
+> `BASE_sd14_anchor`'s legacy aggregate 0.8667 *equals* its historical 13/15 while still being
+> per-image discrepant — aggregate agreement concealing per-image disagreement.)
+>
+> **Therefore the numbers in this document are withdrawn permanently, not pending.** Six arms'
+> checkpoints were deleted and the other six cannot be reproduced, so no re-measurement can repair
+> these records. A new, properly instrumented FINAL experiment could address the underlying
+> question; it cannot validate what is written here.
+
 **Date:** 2026-10-26 · **Experiment:** E6b
 **Adversary:** `attack_relearn.py` **unmodified** — bit-identical to all 642 historical attack
 records. Only `--keep-checkpoint` was added, so the attacked model could be scored on FINAL and then
