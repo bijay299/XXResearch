@@ -185,3 +185,72 @@ block, and the generalising clauses in each are the parts most likely to move ne
 
 **E11m is running a fourth concept** (`frp_parachute_r5_l05`, target 0.2000 / retain8 0.7417) to see
 whether the ~4× spread holds or widens.
+
+## 8. Completion (E11m) — a fourth concept. The ~4× spread **holds**, and the two leading confounds are **ruled out as explanations of the ordering**.
+
+`frp_parachute_r5_l05` (target 0.2000 / retain8 0.7417), lr 1e-5, n = 3:
+
+| steps | valid | mean H | max-over-valid | utility |
+|---:|---:|---:|---:|---:|
+| 25 | **2/3** | 0.8667 | 0.9333 | 0.9306 |
+| **50** | 3/3 | **1.0000** | **1.0000** | 0.8958 |
+| 100 | 3/3 | 1.0000 | 1.0000 | 0.9236 |
+
+**All four concepts, FRP, lr 1e-5, n = 3:**
+
+| concept | `H_before` | retain8 | **all three seeds = 1.000 at** | utility there |
+|---|---:|---:|---:|---:|
+| garbage_truck | **0.0000** | 0.7750 | **25 steps** | 0.8681 |
+| parachute | **0.2000** | 0.7417 | **50 steps** | 0.8958 |
+| tench | **0.1333** | 0.7917 | **100 steps** | 0.9722 |
+| church | 0.1333 | 0.9417 | >25 (n = 1 at 50) | 0.9722 |
+
+**The 4× spread holds** with a fourth point landing in the middle — 25 / 50 / 100 steps. Every
+concept is fully and reproducibly reversed **within 100 steps at lr 1e-5**, against the reported 300.
+
+### 8a. Two confounds I flagged in §7b are now ruled out as the *ordering's* explanation
+
+- **`H_before` does not order the concepts.** The fastest arm starts at **0.0000**, the middle one at
+  **0.2000**, and the slowest at **0.1333** — non-monotone. So the ordering is not an artifact of how
+  deeply each arm was suppressed before the attack.
+- **retain8 does not order them either**: 0.7750 (fastest), 0.7417 (middle), 0.7917 (slowest) — a
+  0.05 range with no correspondence to speed.
+
+That does **not** fully de-confound concept from arm — each concept still has exactly one arm, so
+"concept" and "this particular build" remain inseparable. What it removes is the two specific
+alternatives that were most likely.
+
+### 8b. The classifier explanation, tested and largely ruled out
+
+§7b named this as the most likely alternative: that a 12-label closed-set CLIP argmax is simply more
+willing to call an image a garbage truck than a tench. From the base-model record
+(`outputs/gen_E6cal_BASE_sd14_on_DEV.json`, zero new compute):
+
+| concept | **base model clip_acc** | base clip_align | saturates at |
+|---|---:|---:|---:|
+| garbage_truck | **1.0000** | 0.2456 | 25 |
+| parachute | **1.0000** | 0.2702 | 50 |
+| tench | **1.0000** | 0.2899 | 100 |
+| church | **1.0000** | 0.2406 | — |
+
+**The unmodified base model scores 1.0000 on all four** — the classifier recognises every one of
+these concepts perfectly when the model can draw it. So the simplest classifier-bias account is
+**ruled out**: it is not that CLIP won't call a tench a tench.
+
+**One suggestive residual, offered as a hypothesis and not a result.** Base **prompt alignment**
+orders *inversely* with recovery speed — 0.2456 → 0.2702 → 0.2899 against 25 → 50 → 100 steps. A
+concept the base model renders with *higher* prompt alignment takes *more* attacker steps to
+restore. With **n = 3 concepts** this is three points on a monotone line and nothing more; it is
+recorded because it is the first candidate mechanism for the concept ordering, and it would be
+cheap to test against more concepts if arms existed for them.
+
+### 8c. Status of the concept axis
+
+**Done at this resolution.** Four concepts, n = 3, matched method and learning rate, with `H_before`
+and retain8 excluded as explanations and the classifier's willingness excluded as well. The
+remaining questions — why concepts differ, and whether one arm per concept is representative —
+require **new builds**, which are disk-blocked.
+
+**Every cell of all four concepts fails the mandate's robustness half.** Nothing in this series
+moves any arm toward the bar; it establishes that the attacker is cheaper and more general than this
+project reported, across four concepts.
