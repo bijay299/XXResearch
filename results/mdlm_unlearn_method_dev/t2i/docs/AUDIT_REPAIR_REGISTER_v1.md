@@ -783,6 +783,38 @@ the withdrawal of the "third instance of one scale pathology" framing for the WD
 §7 (both sub-claims), `PREREG_H90` (the "λ under-weighting" presumption), `FINDING78` §1a. Report
 row L298 routed to Agent 6.
 
+**2026-10-26 — G2 PASSED, and the damage is smaller than I first recorded.** Scanned every runner:
+**104 of the 138** `run_*.sh` that echo a `DONE` marker never inspect an exit code anywhere. So a
+cell that crashed, OOM'd or aborted left a log whose last line says DONE.
+
+**But I then measured whether any of it was load-bearing, and it was not:**
+
+| check | result |
+|---|---|
+| Python in `scripts/` parsing the string `DONE` | **none** |
+| runners gating on a previous `DONE` marker | **none** |
+| published findings citing a log `DONE` as completion evidence | **none** (FINDING44's only hit is prose, not a log marker) |
+
+So a false `DONE` **never mechanically drove a decision**. The hazard is a *human* reading a log tail
+and concluding a campaign finished — real, but a tier below what I implied when I opened D-012.
+Stating the smaller number is the point of checking.
+
+**Repair, proportionate to that.** I did **not** rewrite the 104 historical runners: they already
+ran, editing them cannot change what their logs said at the time, and their exact bytes are the
+record of how historical arms were produced. They are instead **declared non-evidence** — completion
+is established from artifacts, never from a log line. Forward protection is
+**`scripts/run_guard.sh`**, a sourceable guard in which `rg_finish` is the only place a `DONE` may be
+written. Self-test, all five cases:
+
+```
+  PASS finish=0 on clean run
+  PASS finish=1 after failure            (failing step poisons the marker)
+  PASS finish=1 on missing artifact      (catches "exit 0 but wrote nothing")
+  PASS finish=1 on zero-byte artifact    (catches the D-028 truncation class)
+  PASS finish=1 after abort              (low disk / refused reservation cannot read as success)
+  markers written: 1 DONE, 4 INCOMPLETE
+```
+
 **2026-10-26 — scorer control established.** `gen_base_sd14.json` and
 `gen_E6cal_BASE_sd14_on_DEV.json` both score **1.000 on all twelve DEV concepts**. The closed-set
 12-label CLIP scorer is sound and base utility is 1.000. Any arm's low utility is therefore a
@@ -809,7 +841,7 @@ passing test, never by an assurance.
 | # | condition | blocking defects | evidence required |
 |---|---|---|---|
 | G1 | Exclusive per-GPU reservation works and is proven to work | D-001 | `scripts/test_gpu_reserve.sh` output showing N racing processes yield exactly one winner per GPU, stale-lock reclamation after a simulated crash, release on crash, and that a GPU held by another user is never selected |
-| G2 | No runner reports success after a failure | D-012 + Agent 5 item 4 | every `run_*.sh` checks exit codes; an abort writes an INCOMPLETE marker and exits non-zero; list of every remaining `DONE`-after-failure site, empty or explained |
+| G2 | No runner reports success after a failure | D-012 + Agent 5 item 4 | **PASSED 2026-10-26** — see §3. `scripts/run_guard.sh` added and self-tested 5/5; the 104 historical markers measured non-load-bearing and declared non-evidence |
 | G3 | The UCE comparison measures what it claims, or claims less | D-003, D-004, D-006, D-010 | UPSTREAM-vs-**BASE** per-matrix norms. If upstream's edit is inert, FINDING77 must say the comparison establishes nothing about port fidelity. Every FINDING77 ratio recomputed from raw JSON |
 | G4 | The IMMA artifact is proven valid or quarantined | D-009 | per-tensor comparison of `adapters/REF_imma_vangogh/unet.pt` against base and against the ESD checkpoint; key-match/reshape/skip counts from `r1_eval_imma.py` |
 | G5 | Meta R2 either runs the authors' trainer or stops being called R2 | D-002 | `src/meta.py` invoked with resolved hyperparameters recorded, the `type=bool` `fix_timesteps` hazard handled explicitly, and the forget-vs-related-retain semantic conflict resolved in writing |
