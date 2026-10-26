@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Not a certification of anything after it.** This records the r2 remediation only. Its "none has released code" / "zero of the five" statements (lines 37, 51, 199, 224) are **false** and superseded by `T2I_BASELINES_v2.md`. The current remediation is `CORRECTION_REGISTER_r5.md`.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Audit closure — 12-issue remediation, round 2
 
 **Date:** 2026-10-23 · **Identifier:** `AUDIT_CLOSURE_r2`

@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Plan unamended, two notes attached.** The run used **three** attacks per arm, not `PROTOCOL_FROZEN_v1`'s six — a **deviation**, defensible for counterexample-hunting but not compliance. Precedence: first appears in a commit that also contains results; local mtime supports precedence but is not tamper-evident (`PREREG_PRECEDENCE.md` §2).
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Pre-registration H85 — does the negative result hold on a different model?
 
 **Written:** 2026-10-25, before any cross-model arm exists.

@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Withdrawn:** that GIFT's failure rules out the dropped meta-gradient term as the explanation of `FINDING56`. Two different algorithms failing isolates nothing (`ERRATUM_meta_objective.md` §4). **Count corrected:** six of the attacks in this finding's aggregate were run on `gift_church_b0.1`, whose as-is target suppression is **1.0000** — it erased nothing, so those six are **vacuous** and are now excluded (`CORRECTION_REGISTER_r5.md` §A.3). GIFT's defence data-generation prompt is also an **evaluation** prompt (`ERRATUM_split_leak.md`), so its pre-attack figures are development measurements.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 58 — GIFT, which claims *"robust resistance to malicious fine-tuning"*, is fully reversed at **every usable β** — 12 valid attacks, all to H = 1.000, including 2 under its own DreamBooth threat model. The attack restores the model's utility too.
 
 **Date:** 2026-10-25 · **Pre-registration:** `PREREG_H81_gift_port.md`, prediction 1 recorded before

@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Two corrections.** The FRP paper evaluates **retain, forget, and forget+retain** attacks (Appendix B.2) and varies optimiser and horizon (Appendix C.3), so §2's retain-only characterisation and the "direct target gradients" explanation are **withdrawn** (`T2I_BASELINES_v2.md` §5). Line 106's "no usable released code" over-generalises: it is correct for FRAG/FRP but false for IMMA, Meta-Unlearning and From Dormant to Deleted (`T2I_BASELINES_v2.md`).
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 43 — FRP, a published method built for relearning robustness, is fully reversed. The prediction made before the attacks ran was correct.
 
 **Date:** 2026-10-23 · **Pre-registration:** `PREREG_H66_frp_port.md`, prediction in §5a

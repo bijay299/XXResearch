@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> The three interventions and their numbers stand. **Narrowed:** they establish final-coordinate dispensability for the **final evaluated model on this panel** — not dispensability during the attack trajectory, not localisation to surviving feed-forward weights, and not a claim about every 3% mask (one seed, count-matched but not magnitude-matched). See `ERRATUM_interpretations_r5.md` §2. The persistent-mask intervention that addresses the remaining alternatives is experiment **E5**, not run.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 57 — FRP's pruning mask is **decisive before the attack and irrelevant after it**. Putting the mask back into the attacked model removes nothing; a random mask of the same size erases nothing on the clean model. The adversary does not just undo the erasure — it makes the defence's weight selection stop mattering.
 
 **Date:** 2026-10-24 · **Closes:** the follow-up `FINDING44` §4 recorded as *planned, not done*

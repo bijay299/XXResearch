@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Attribution withdrawn:** this arm is not an implementation of 2505.22310 (`ERRATUM_wsr_direction.md`); the result is ours. **Language narrowed:** the retention gain (0.9500 / 0.9750 / 0.9667; mean 0.9639, sample SD 0.0127) is a **descriptive, selected-configuration** observation — an illustrative one-sample 95% t interval ≈ [0.9323, 0.9955] **contains** the FRP teacher's 0.9417. "Statistically indistinguishable erasure" is withdrawn; equivalence needs a prespecified margin (`ERRATUM_interpretations_r5.md` §7).
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 62 — ❌ **HEADLINE CORRECTED.** I reported "the best erasure/utility point of the entire phase, beating FRP on both axes". **Seed replication refutes the both-axes claim**: target is 0.1778 ± 0.1018 at n=3, *worse* than FRP's 0.1333 on erasure depth. What survives is better **retention** (0.9639 ± 0.0127 vs 0.9417) — and the arm is **still fully reversed to H = 1.000**.
 
 > ## ⚠ CORRECTION, same day — the seeds I asked for arrived and refuted §1

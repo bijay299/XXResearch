@@ -1,3 +1,15 @@
+> # ⚠ SUPERSEDED by `T2I_REPORT_r5.md` (external audit of `0b435427`)
+>
+> This report's headline attribution, record counts, protocol-compliance and mechanism claims are
+> **wrong** in the ways enumerated in `docs/CORRECTION_REGISTER_r5.md`. In particular: three of the
+> five "published competitors discharged" were tested as **our variants**, not the published
+> methods; the GIFT and Meta per-arm ranges are misstated; the counts are stale; the protocol was
+> not unchanged; and §7 re-breaches `ERRATUM_r2` C17's identification limit.
+>
+> **Text below is unaltered**, as the historical record. Current report: `T2I_REPORT_r5.md`.
+
+---
+
 # T2I concept erasure under a relearning adversary — report r4 (final for this phase)
 
 **Date:** 2026-10-25 · **Supersedes:** `T2I_REPORT_r3.md` (which keeps its SUPERSEDED banner and

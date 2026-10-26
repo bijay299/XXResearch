@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Plan unamended, one note attached.** Its inner process is described as "the ACTUAL full-UNet relearning attack"; it differed from the evaluation attacker on seven axes (`ERRATUM_utrap_inner_attacker.md`). Its single-build seed exception was honoured, so the single builds are a **limitation**, not a violation — I previously described them as the latter. The hypothesis this plan set out to test is tested by `PREREG_H90_utrap_v2.md`.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Pre-registration H84 — **UTRAP**: unrolled multi-step adversarial immunization, full-UNet scope
 
 **Written:** 2026-10-25, **before any UTRAP arm exists.**

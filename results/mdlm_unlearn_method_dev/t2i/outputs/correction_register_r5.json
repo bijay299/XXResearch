@@ -1,0 +1,406 @@
+{
+ "study": "correction_register",
+ "version": "r5",
+ "audited_snapshot": "0b435427557e4fb984cc9acff26e6dacc0613cd2",
+ "parent_commit_at_start": "66ff9d3afec54f446d0750b53f1576a1f10e7ab7",
+ "branch": "canonwork -> research/mdlm-unlearn-method-dev",
+ "generated": "2026-10-25T23:42:16.388885-04:00",
+ "human_readable": "docs/CORRECTION_REGISTER_r5.md",
+ "status_vocabulary": {
+  "CODE_FIXED_UNVALIDATED": "implementation corrected and unit-tested; no model built with it",
+  "CLAIM_CORRECTED": "document assertion was wrong, now corrected, original preserved",
+  "VERIFIED_CORRECT": "the audit's criticism did not hold; evidence recorded",
+  "PENDING_EXPERIMENT": "repair specified and priced; run not done",
+  "DONE": "fully discharged"
+ },
+ "issues": [
+  {
+   "id": "I1",
+   "type": "implementation_error",
+   "title": "weight-space regulariser implements the opposite direction",
+   "audit_section": 2,
+   "verdict": "CONFIRMED",
+   "evidence": [
+    "scripts/erase_wsr.py:6,17,161-163",
+    "shoaibahmed/vision_relearning@7b9a1cc vision_unlearner.py:366-373",
+    "arXiv 2505.22310 S6, S6.1"
+   ],
+   "affected_code": [
+    "scripts/erase_wsr.py"
+   ],
+   "affected_docs": [
+    "FINDING60 S3-4",
+    "FINDING61",
+    "FINDING62"
+   ],
+   "affected_results": "none invalidated; arm renamed WSR-anchor (ours)",
+   "newer_results_affected": "none - no cross-model WSR arm exists",
+   "repair": [
+    "docs/ERRATUM_wsr_direction.md",
+    "scripts/objectives.py (both terms, named)",
+    "scripts/erase_wdr_v2.py (faithful, 6 axes reconciled)"
+   ],
+   "validation": [
+    "t_wdr_increases_distance",
+    "t_anchor_decreases_distance",
+    "t_wdr_gradient_is_antiparallel_to_anchor",
+    "t_wdr_matches_reference_formula",
+    "t_wdr_is_not_sum_of_squares",
+    "t_wdr_eps_guard_at_zero_distance",
+    "smoke: logs/smoke_v2.log (trust-region stop fired and recorded)"
+   ],
+   "status": [
+    "CODE_FIXED_UNVALIDATED",
+    "CLAIM_CORRECTED"
+   ],
+   "pending_experiment": "E1"
+  },
+  {
+   "id": "I2",
+   "type": "implementation_error",
+   "title": "Meta-Unlearning omits two of Eq.8's three terms",
+   "audit_section": 3,
+   "verdict": "CONFIRMED",
+   "evidence": [
+    "scripts/meta_unlearn.py:122-143",
+    "sail-sg/Meta-Unlearning@5a2a760 src/meta.py:920-1030",
+    "arXiv 2410.12777 Eq.8"
+   ],
+   "affected_code": [
+    "scripts/meta_unlearn.py"
+   ],
+   "affected_docs": [
+    "FINDING56 (causal claim)",
+    "PREREG_H80 (objective statement)",
+    "FINDING58"
+   ],
+   "affected_results": "none invalidated; arms relabelled variant A",
+   "newer_results_affected": [
+    "meta_sd15_church_lam0.5",
+    "meta_bksdm_church_lam0.3",
+    "meta_bksdm_church_lam0.5"
+   ],
+   "repair": [
+    "docs/ERRATUM_meta_objective.md",
+    "scripts/meta_unlearn_v2.py (full Eq.8 + scope separation + target-content check + order flag)"
+   ],
+   "validation": [
+    "t_meta_has_all_three_terms",
+    "t_meta_value_matches_equation",
+    "t_variantA_is_missing_two_terms",
+    "t_meta_reduces_to_variantA_only_if_terms_dropped",
+    "smoke: target check 8/8=1.0000 base-source; L_F(theta') rose 0.0079->0.0281"
+   ],
+   "status": [
+    "CODE_FIXED_UNVALIDATED",
+    "CLAIM_CORRECTED"
+   ],
+   "pending_experiment": "E2, E3"
+  },
+  {
+   "id": "I3",
+   "type": "implementation_error",
+   "title": "UTRAP inner attacker differs from the evaluator on 7 axes",
+   "audit_section": 4,
+   "verdict": "CONFIRMED",
+   "evidence": [
+    "scripts/erase_utrap.py:49,55,75,80,88,140",
+    "scripts/attack_relearn.py:261,333,335,360"
+   ],
+   "affected_code": [
+    "scripts/erase_utrap.py"
+   ],
+   "affected_docs": [
+    "FINDING63 S2, S3a(a)",
+    "PREREG_H84"
+   ],
+   "affected_results": "24 UTRAP attack records preserved unchanged; unroll-depth inference withdrawn",
+   "newer_results_affected": [
+    "utrap_sd15_church_l0.15k8",
+    "utrap_bksdm_church_l0.15k8"
+   ],
+   "repair": [
+    "docs/ERRATUM_utrap_inner_attacker.md",
+    "scripts/attack_core.py (shared, mandatory horizon_role/provenance/split_role)",
+    "scripts/erase_utrap_v2.py",
+    "docs/PREREG_H90_utrap_v2.md"
+   ],
+   "validation": [
+    "t_attack_core_runs_and_reduces_loss",
+    "t_attack_core_k0_is_a_noop",
+    "t_adam_and_sgd_are_not_interchangeable",
+    "t_snapshot_utrap_inner_is_flagged_as_divergent",
+    "t_utrap_outer_gradient_sign_on_tractable_example",
+    "t_horizon_role_is_mandatory",
+    "t_short_horizon_cannot_claim_eval_budget",
+    "t_data_provenance_is_mandatory",
+    "t_split_role_must_be_declared",
+    "t_eval_spec_is_the_reference",
+    "smoke: divergence now reports ONLY {steps}; probe delta -0.0042 over K=8"
+   ],
+   "status": [
+    "CODE_FIXED_UNVALIDATED",
+    "CLAIM_CORRECTED"
+   ],
+   "pending_experiment": "E4"
+  },
+  {
+   "id": "I4",
+   "type": "evaluation_provenance",
+   "title": "evaluation prompt leaks into 4 defences; checker never looked",
+   "audit_section": 5,
+   "verdict": "CONFIRMED_AND_EXTENDED",
+   "evidence": [
+    "erase_gift.py:119",
+    "erase_imma.py:86",
+    "erase_wsr.py:77",
+    "erase_utrap.py:80",
+    "verify_splits.py:46-56",
+    "outputs/split_registry_v2.json"
+   ],
+   "additional_leaks_found_by_us": [
+    "erase_adv trains on 6 exact UTILITY-PANEL prompts -> AdvUnlearn utility partly in-sample",
+    "undo_t2i shares 6 prompts with the attacker's T pool -> weakens the gate for undo arms"
+   ],
+   "affected_results": "all pre-attack suppression / selection figures for gift,imma,wsr,utrap are DEVELOPMENT measurements; adv utility partly in-sample",
+   "repair": [
+    "docs/ERRATUM_split_leak.md",
+    "scripts/split_registry.py (v2: source-text templates, fail-closed coverage, 7 overlap tables, punctuation normalisation)",
+    "FINAL frozen 2026-10-25T23:30:00-04:00",
+    "RNG_STREAMS + seed_for()"
+   ],
+   "validation": [
+    "t_split_registry_detects_the_known_leak",
+    "t_split_registry_covers_every_defence_script",
+    "t_final_split_is_disjoint_from_everything",
+    "t_dev_is_labelled_as_used"
+   ],
+   "status": [
+    "DONE",
+    "CLAIM_CORRECTED"
+   ],
+   "pending_experiment": "E6"
+  },
+  {
+   "id": "I5",
+   "type": "incorrect_literature",
+   "title": "'zero of five have usable released code' is false",
+   "audit_section": 6,
+   "verdict": "CONFIRMED",
+   "evidence": [
+    "IMMA@2f55041 README+train/+eval+environment.yaml, targets CompVis/stable-diffusion-v1-4",
+    "Meta-Unlearning@5a2a760 src/meta.py 1087 lines downloaded",
+    "vision_relearning@7b9a1cc vision_unlearner.py 1935 lines downloaded"
+   ],
+   "affected_docs": [
+    "ERRATUM_r2 C19",
+    "AUDIT_CLOSURE_r2:37,51,199,224",
+    "FINDING43:106",
+    "FINDING59:70",
+    "PREREG_H81:6",
+    "T2I_REPORT_r4"
+   ],
+   "repair": [
+    "docs/T2I_BASELINES_v2.md (4-question per-method table)"
+   ],
+   "status": [
+    "CLAIM_CORRECTED"
+   ],
+   "pending_experiment": "E7"
+  },
+  {
+   "id": "I6",
+   "type": "incorrect_literature",
+   "title": "FRP described as evaluating retain-only attacks",
+   "audit_section": 6,
+   "verdict": "CONFIRMED",
+   "evidence": [
+    "arXiv 2608.25429 Appendix B.2 'Three relearning attacks': retain / forget / forget+retain; Appendix C.3 varies optimiser, lr 5e-6-1e-4, 1-10 epochs"
+   ],
+   "affected_docs": [
+    "PREREG_H66 S5a",
+    "FINDING43 S2"
+   ],
+   "repair": [
+    "docs/T2I_BASELINES_v2.md S5"
+   ],
+   "status": [
+    "CLAIM_CORRECTED"
+   ]
+  },
+  {
+   "id": "I7",
+   "type": "numerical_reporting",
+   "title": "stale counts and pooled-arm statistics",
+   "audit_section": 7,
+   "verdict": "CONFIRMED_EXCEPT_ONE",
+   "corrections": [
+    {
+     "claim": "FINDING59: 0.8667 LoRA max on a1e-6_s1500",
+     "verdict": "WRONG",
+     "correct": "s1500 LoRA@300 max = 0.8000; 0.8667 belongs to a1e-6_s300 (retain8 0.9417)"
+    },
+    {
+     "claim": "FINDING59: 8 full-UNet attacks on one arm",
+     "verdict": "WRONG",
+     "correct": "6 on s1500, 2 on s300"
+    },
+    {
+     "claim": "FINDING59: 22 valid attacks on s1500",
+     "verdict": "VERIFIED_CORRECT",
+     "correct": "22 confirmed (6 full + 7 LoRA + 8 TI + 1 DB); the audit's 21 undercounts TI by one"
+    },
+    {
+     "claim": "FINDING60: GIFT b1.0 reversed on 22 valid attacks",
+     "verdict": "WRONG",
+     "correct": "that build has 12 records across 4 families, all 12 gate-valid"
+    },
+    {
+     "claim": "r4 GIFT b in {1.0,1.2,1.3,1.35} target range starts 0.0667",
+     "verdict": "WRONG",
+     "correct": "0.2000-0.4667"
+    },
+    {
+     "claim": "r4 Meta target 0 throughout",
+     "verdict": "WRONG",
+     "correct": "lam=0.5 is 0.0667"
+    },
+    {
+     "claim": "r4 Meta retain range omits lam=0.6",
+     "verdict": "WRONG",
+     "correct": "lam=0.6 retain8 = 0.6250"
+    },
+    {
+     "claim": "r4 counts 609 attacks / 1088 JSONs",
+     "verdict": "STALE",
+     "correct": "current branch: 637 attack records / 1191 JSONs; 631 admissible for recovery; 268 admissible for paired utility"
+    },
+    {
+     "claim": "FINDING63: first arm ever to meet retain >= 0.85",
+     "verdict": "WRONG_AS_WORDED",
+     "correct": "FRP 0.9417 and IMMA 0.8917/0.9417 met retain alone earlier; the CONJUNCTIVE claim (target 0.0000 AND retain8 >= 0.85) is correct for utrap_church_l0.15k8"
+    },
+    {
+     "claim": "FINDING63: larger lambda can only be worse",
+     "verdict": "WRONG",
+     "correct": "withdrawn"
+    },
+    {
+     "claim": "FINDING61/62: every MSE term bounded",
+     "verdict": "WRONG",
+     "correct": "MSE is bounded below, not above; does not imply convergence"
+    }
+   ],
+   "new_problem_found_by_us": "6 attacks on gift_church_b0.1 (as-is target 1.0000, retain8 1.0000) are VACUOUS - no erasure to reverse - and were inside the 'GIFT reversed' aggregate. Now flagged vacuous_no_erasure and excluded, which REDUCES our headline attack count.",
+   "repair": [
+    "scripts/registry_v1.py",
+    "outputs/registry_v1.json",
+    "docs/TABLES_v1_generated.md"
+   ],
+   "status": [
+    "DONE",
+    "CLAIM_CORRECTED"
+   ]
+  },
+  {
+   "id": "I8",
+   "type": "unsupported_interpretation",
+   "title": "saturated-ceiling, mechanism and capacity claims",
+   "audit_section": 8,
+   "verdict": "CONFIRMED",
+   "repair": [
+    "docs/ERRATUM_interpretations_r5.md (10 sections)"
+   ],
+   "status": [
+    "CLAIM_CORRECTED"
+   ],
+   "pending_experiment": "E5, E10"
+  },
+  {
+   "id": "I9",
+   "type": "evaluation_provenance",
+   "title": "preregistration precedence unverifiable for H80/H85",
+   "audit_section": 9,
+   "verdict": "CONFIRMED",
+   "independent_evidence_found": "local filesystem mtimes support precedence (H80 plan 32 min before its first result; H85 plan 4 min before). mtime is NOT tamper-evident, so both are labelled PRECEDENCE SUPPORTED BY LOCAL MTIME ONLY, NOT PUBLICLY VERIFIABLE.",
+   "repair": [
+    "docs/PREREG_PRECEDENCE.md (precedence table + deviations, plans NOT edited)"
+   ],
+   "status": [
+    "DONE"
+   ]
+  }
+ ],
+ "pending_experiments": [
+  {
+   "id": "E1",
+   "what": "faithful WDR build + frozen grid",
+   "gpu_h": 6,
+   "blocker": "disk capacity only",
+   "config": "erase_wdr_v2.py --alpha {0.3,1.0,3.0} --max-rms >0.01 (teacher already at RMS 0.009) --teacher frp_church_r3_l05 --steps 1500; 3 attacks @lr1e-5 per K1-clearing arm"
+  },
+  {
+   "id": "E2",
+   "what": "Meta v2 full Eq.8 build + frozen grid",
+   "gpu_h": 8,
+   "blocker": "disk capacity only",
+   "config": "meta_unlearn_v2.py --zeta 1.0 --lam-target 1.0 --meta-scope xattn --attack-scope full --target-source base, lam in {0.5,1.0}, 1500 steps"
+  },
+  {
+   "id": "E3",
+   "what": "variant A vs v2 at matched retain8 (the ablation FINDING58 lacked)",
+   "gpu_h": 4,
+   "blocker": "needs E2 first"
+  },
+  {
+   "id": "E4",
+   "what": "UTRAP v2 K in {0,1,8,32} at matched compute",
+   "gpu_h": 14,
+   "blocker": "disk capacity only",
+   "config": "PREREG_H90_utrap_v2.md S2"
+  },
+  {
+   "id": "E5",
+   "what": "persistent-mask attack + repeated count- and magnitude-matched controls",
+   "gpu_h": 9,
+   "blocker": "disk capacity only"
+  },
+  {
+   "id": "E6",
+   "what": "re-evaluate leading arms on frozen FINAL prompts",
+   "gpu_h": 2,
+   "blocker": "needs a small gen_eval flag to accept the FINAL pool; not yet written"
+  },
+  {
+   "id": "E7",
+   "what": "run the three released reference implementations",
+   "gpu_h": null,
+   "blocker": "separate conda envs; must not disturb venv_t2i; IMMA is the cheapest first step"
+  },
+  {
+   "id": "E8",
+   "what": "FID, 35000 images (one shared pre-attack state, not 7x5000)",
+   "gpu_h": 10,
+   "blocker": "needs pip install torchvision scipy + ~6GB COCO val2014 download, NOT authorised"
+  },
+  {
+   "id": "E9",
+   "what": "SD-2.x / SDXL cross-model",
+   "gpu_h": 8,
+   "blocker": "BLOCKED: stabilityai/* returns HTTP 401. Needs a Hugging Face token from the user."
+  },
+  {
+   "id": "E10",
+   "what": "never-trained oracle for the reactivation-vs-relearning identification limit",
+   "gpu_h": null,
+   "blocker": "design decision, not compute"
+  }
+ ],
+ "resolution_by_axis": {
+  "implementation": "SUBSTANTIALLY RESOLVED, UNVALIDATED ON MODELS",
+  "evaluation_and_provenance": "PARTIALLY RESOLVED (no arm evaluated on FINAL)",
+  "empirical_comparison": "NOT RESOLVED (no corrected implementation has been run)",
+  "scientific_interpretation": "CORRECTED IN TEXT, STRUCTURALLY LIMITED"
+ },
+ "mandate_status": "UNMET. No arm reaches retain8 >= 0.85 with max-over-valid H <= 0.40. This remediation does not change that; it changes the STANDING of the negative result, which is now about OUR IMPLEMENTATIONS of three baselines rather than about the published methods, until E1/E2/E7 run."
+}

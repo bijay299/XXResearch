@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **C19 requires a further correction.** "Zero of the five competing defences have usable released code" is **false**. IMMA (`@2f55041`), Meta-Unlearning (`@5a2a760`) and From Dormant to Deleted (`@7b9a1cc`) all have released implementations, verified by download at those commits. C19 was right about FRAG/FRP specifically and was over-generalised to the other four. See `T2I_BASELINES_v2.md`. **C17's identification limit was re-breached** by `T2I_REPORT_r4` §7 and is reaffirmed in `ERRATUM_interpretations_r5.md` §3.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Erratum r2 — claim-level corrections from the audit (issue 12)
 
 **Date:** 2026-10-23 · **Identifier:** `ERRATUM_r2` (new; supersedes nothing by deletion)

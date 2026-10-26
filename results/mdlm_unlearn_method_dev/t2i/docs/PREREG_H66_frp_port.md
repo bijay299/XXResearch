@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Plan unamended, one note attached.** §5a describes the FRP paper's attacks as retain-only. The paper evaluates retain, forget **and** forget+retain attacks (Appendix B.2) and varies optimiser and horizon (Appendix C.3). See `T2I_BASELINES_v2.md` §5.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Pre-registration H66 — a faithful port of Forget-Retain Pruning (FRP) to Stable Diffusion, as a competing baseline
 
 **Date:** 2026-10-23 · **Status:** pre-registered. **No FRP number exists at this writing.**

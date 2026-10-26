@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Plan unamended, two notes attached.** (1) Its objective statement does not match the implementation: the port omits two of Eq. 8's three terms (`ERRATUM_meta_objective.md`). (2) Its "both concepts before any claim" commitment is **unmet** — church only. Precedence: this plan first appears in a commit that also contains results; local mtime supports precedence but is not tamper-evident (`PREREG_PRECEDENCE.md` §2).
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Pre-registration H80 — Meta-Unlearning (2410.12777) ported to our testbed
 
 **Date:** 2026-10-24 · **Status:** pre-registered; **no H80 number exists.**

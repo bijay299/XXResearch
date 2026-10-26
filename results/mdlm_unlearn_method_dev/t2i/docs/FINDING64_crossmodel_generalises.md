@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Scope narrowed.** The measurements stand; "cross-model generalises" is replaced by: FRP, GIFT, UTRAP, Meta **variant A** and UCE **ports**, on SD-1.4 / SD-1.5 / BK-SDM-small, **church only**, **one defence build per setting**, three primary-lr attacks each. **Withdrawn:** that BK-SDM's recovery rules out capacity — both models may be above a threshold, and pruning changes architecture, weights **and** starting erasure depth together (`ERRATUM_interpretations_r5.md` §4). The three-attack grid is a **deviation** from `PROTOCOL_FROZEN_v1`'s six points, not compliance with it (`PREREG_PRECEDENCE.md` §3). The UTRAP and Meta arms here carry the same implementation defects as their SD-1.4 counterparts (`ERRATUM_utrap_inner_attacker.md`, `ERRATUM_meta_objective.md`).
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 64 — the negative result is **not SD-1.4-specific**. A different checkpoint and a **half-size pruned architecture** both reverse to H = 1.000. And that **narrows our own mechanism claim.**
 
 **Date:** 2026-10-25 · **Pre-registration:** `PREREG_H85_cross_model.md`

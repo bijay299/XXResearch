@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Arm pooling corrected.** The **0.8667** LoRA maximum belongs to `imma_church_frp_a1e-6_s300` (retain8 0.9417), **not** to the `_s1500` build quoted alongside retain8 0.8917, whose 300-step LoRA maximum is **0.8000**. The eight full-UNet attacks split **6 on s1500 / 2 on s300**. **Verified correct and unchanged:** the 22 gate-valid attacks on `_s1500` (6 full-UNet, 7 LoRA, 8 TI, 1 DreamBooth) — the audit's recount of 21 undercounts TI by one. Budget claims narrowed: a 900-step success does not establish a minimal 3× multiplier, and the TI dose-response varies seeds, lr and steps together (`ERRATUM_interpretations_r5.md` §5). IMMA's released code exists (`T2I_BASELINES_v2.md`), contrary to line 70.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 59 — ❌ **RETRACTED HEADLINE.** I published "IMMA partially resists its own adversary, max-over-valid H = 0.867, the first non-ceiling number in this phase". **My own ratchet refuted it within the hour: tripling the LoRA budget takes it to 1.000.** IMMA's max-over-valid H is **1.000** and it joins the other nine. What survives is an *attacker-cost* result, not a robustness one.
 
 > ## ⚠ RETRACTION, same day

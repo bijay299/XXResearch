@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Not unchanged in practice.** Later studies used three-point subsets, additional attacks, new adversary families and larger budgets. Fixed confirmatory grid, prespecified secondary attacks and adaptive escalation are now separated by budget in `docs/TABLES_v1_generated.md`; deviations are listed in `PREREG_PRECEDENCE.md` §3. The protocol text itself is **unamended**.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Frozen confirmatory protocol v1 — declared 2026-10-23, BEFORE any confirmatory run
 
 Issue 11 of the remediation. Every number produced under this protocol is comparison-grade.

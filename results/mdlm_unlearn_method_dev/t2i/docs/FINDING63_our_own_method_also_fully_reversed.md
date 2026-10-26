@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **All 18 attack measurements stand.** **Withdrawn:** that UTRAP trained against "the ACTUAL full-UNet relearning attack" — the inner process differed from the evaluator on **seven axes** (optimizer, clipping, batch, horizon, target-image source, prompts, optimizer state), so the K-sweep did **not** test the unroll-depth hypothesis and §3a(a)'s falsification of it does not follow (`ERRATUM_utrap_inner_attacker.md`). Also withdrawn: "both structural causes were removed"; and "larger λ can only be worse". **Wording corrected:** earlier FRP (0.9417) and IMMA (0.8917, 0.9417) arms already met retain ≥ 0.85 — the *conjunctive* claim (target 0.0000 **and** retain8 ≥ 0.85) is the correct and still-true one. K=4 was never attacked. UTRAP's defence data-generation prompt is also an **evaluation** prompt (`ERRATUM_split_leak.md`).
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 63 — **UTRAP, the method we designed from all eleven prior failure modes, is fully reversed at every setting: three arms, 18/18 valid attacks, every H = 1.000** — including one that **cleared the mandate's retain floor** (0.8667) before being attacked. Prediction 1 is falsified by its own declared falsifier, and so is the hypothesis behind it: **unroll depth was not the missing ingredient.** Thirteen of thirteen.
 
 **Date:** 2026-10-25 · **Pre-registration:** `PREREG_H84_unrolled_trap.md`, predictions recorded

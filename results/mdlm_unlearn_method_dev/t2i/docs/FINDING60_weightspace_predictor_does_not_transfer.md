@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> **Two corrections.** (1) The direction of the cited paper's prediction was **reversed** here: 2505.22310 associates **greater** distance with **more** robustness, so the observation was consistent with it, not contrary to it (`ERRATUM_wsr_direction.md` §4). (2) **GIFT β=1.0 was not reversed on 22 valid attacks** — that build has **12** records across four families, all 12 gate-valid; the 22 belongs to `imma_church_frp_a1e-6_s1500`. The conclusion that the predictor does not transfer is **withdrawn** regardless: every usable arm sits at H = 1.000 and a saturated ceiling cannot rank predictors (`ERRATUM_interpretations_r5.md` §1). The LMC probe samples three interior points of a CLIP-accuracy path, which is not a loss-barrier characterisation.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 60 — the weight-space predictor from *From Dormant to Deleted* does **not** transfer to T2I concept erasure. Weight distance spans **1470×** across our arms and the attack outcome does not move at all.
 
 **Date:** 2026-10-25

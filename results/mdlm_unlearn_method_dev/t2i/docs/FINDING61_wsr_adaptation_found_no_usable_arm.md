@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> This arm **anchors toward** the base weights; the cited paper (2505.22310) **maximises** distance from them. It is therefore an anchoring-to-base method of ours, renamed **WSR-anchor (ours)**, and it did **not** test the published method (`ERRATUM_wsr_direction.md`). The faithful implementation is `scripts/erase_wdr_v2.py`, unrun (experiment **E1**). Also corrected: "every MSE term is bounded" — MSE is bounded **below**, not above, and that does not imply optimiser convergence.
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 61 — my adaptation of *From Dormant to Deleted*'s **method** found **no usable operating point**. The failure is attributable to my erasure objective, not to their idea, and the corrected retry is running.
 
 **Date:** 2026-10-25 · **Instrument:** `scripts/erase_wsr.py`, `run_wsr.sh`

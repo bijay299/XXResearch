@@ -1,3 +1,10 @@
+> ### ⚠ CORRECTION NOTICE (audit of `0b435427`, remediation r5)
+> This finding measured **Meta-Unlearning variant A**, whose objective omits **two of the three terms** of the paper's Eq. 8 (`ERRATUM_meta_objective.md`). The measurements stand. **Withdrawn:** that the *published* method's self-destruct trigger fires on normal use — premature benign damage is consistent with variant A's own altered objective. Also corrected: §5a describes the Meta arm as editing cross-attention; it optimises the **full UNet** (859.5M). The GIFT/TI matched-retain comparison is **limited evidence**, not isolation of a meta-objective mechanism (`ERRATUM_meta_objective.md` §4). Church-only: `PREREG_H80`'s both-concepts commitment is unmet (`PREREG_PRECEDENCE.md` §3).
+>
+> Original text below is **unaltered**. Register: `docs/CORRECTION_REGISTER_r5.md`.
+
+---
+
 # Finding 56 — Meta-Unlearning's self-destruct trigger fires on *normal use*, not just under attack. At the one λ that leaves the model usable, it buys **zero** robustness over its own no-meta ablation.
 
 **Date:** 2026-10-24 · **Pre-registration:** `PREREG_H80_meta_unlearning.md`
