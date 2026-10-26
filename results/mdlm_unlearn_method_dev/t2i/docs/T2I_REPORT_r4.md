@@ -3,7 +3,8 @@
 **Date:** 2026-10-25 · **Supersedes:** `T2I_REPORT_r3.md` (which keeps its SUPERSEDED banner and
 stays as history, not as current fact)
 **Model:** Stable Diffusion v1.4, revision `133a221b8aa7292a167afc5127cb63fb5005638b`
-**Protocol:** `PROTOCOL_FROZEN_v1`, unchanged throughout. **609 attack measurements.**
+**Protocol:** `PROTOCOL_FROZEN_v1`, unchanged throughout. **631 attack measurements** (609 on SD-1.4 + 22 cross-model).
+**Models:** SD-1.4, SD-1.5, BK-SDM-small.
 **Corrections register:** `ERRATUM_r2_claim_corrections.md` (C1–C19),
 `ERRATUM_lora_adversary_scope.md`, plus the same-day retractions in `FINDING59` and `FINDING62`.
 
@@ -62,6 +63,37 @@ removing. (The LoRA scope was mis-described for most of this phase — it adapts
 projections, not all of cross-attention. Corrected in `ERRATUM_lora_adversary_scope.md`; **every
 number stands**, and the correction makes the finding stronger.)
 
+## 3b. Cross-model: three checkpoints, two architectures, four method families
+
+Added after r4's first publication (`FINDING64`, `FINDING56` cross-model addendum). The **identical**
+pipeline and protocol on two models beyond SD-1.4 — `stabilityai/*` returns 401 on this host, so
+SD-2.x/SDXL were unavailable and the test used what was reachable.
+
+| defence | what it constrains | SD-1.4 | SD-1.5 | BK-SDM-small (**half-size, pruned**) |
+|---|---|---|---|---|
+| **FRP** | a weight subset (17.3% FF) | 0.1333 / 0.9417 → **1.000** | 0.1333 / 0.9333 → **1.000** | 0.4667 / 0.9250 → **1.000** |
+| **GIFT** | a cross-attention subspace (5.11%) | 0.4667 / 0.7833 → **1.000** | 0.4000 / 0.8167 → **1.000** | 0.3333 / 0.7417 → **1.000** |
+| **UTRAP** (ours) | the attacker's trajectory, full UNet | 0.0000 / 0.8667 → **1.000** | **0.0000 / 0.9583** → **1.000** | 0.0000 / 0.7917 → **1.000** |
+| **Meta-Unlearning** | the loss surface at a simulated step | 0.0000 / 0.6333 → **1.000** | 0.0000 / 0.7667 → **1.000** | 0.2000 / 0.7667 → **1.000** |
+
+**22 cross-model attacks, every one gate-valid, every one at H = 1.000.** The four families share no
+mechanism, and the outcome is identical — the strongest available evidence that this is a property of
+**the setting**, not of any defence design.
+
+**`UTRAP` on SD-1.5 — target 0.0000 at retain8 0.9583 — is the best as-is operating point measured
+anywhere in this work**: full suppression at retention *above* our FRP port's 0.9417 and 0.108 clear
+of the mandate's floor. Reversed 3/3 with T = +1.000 each time. §2's logic therefore holds a third
+time, on a second checkpoint.
+
+**⚠ One of r4's own explanations had to be narrowed by this.** §4 below partly attributed the
+failures to a **parameter-ratio** argument — small constrained subspace vs 859.5M-parameter
+adversary. **BK-SDM-small halves the UNet and nothing changes**, from a *shallower* starting erasure
+that should have been easier to defend. So **parameter abundance is not the operative variable**;
+`FINDING57`'s redundancy account is. A correction to our reasoning, not to any measurement.
+
+**Still inferred, not measured:** eight further defences cross-model, and any model with a different
+latent space (SD-2.x/SDXL).
+
 ## 4. Mechanism: what predicts resistance, and what does not
 
 Four independent attempts to find the operative variable, all negative:
@@ -97,9 +129,24 @@ TI gate-fails 3/3 on that arm with T *falling*, while succeeding on GIFT at **lo
 utility (0.6000 vs 0.6333) with the largest T rise in the phase. A utility-matched control
 eliminates the obvious confound.
 
-**It is still not robustness** (`FINDING20`: a failed gate is not a held defence), and it is
-adversary-specific in the wrong direction: it blocks the **768-scalar** attack and is irrelevant
-against the **859.5M-parameter** one. That is the opposite of the threat ordering a defender wants.
+**Cross-model, the effect is GRADED** — neither checkpoint-specific nor universal. At matched
+retention (0.7667 on both new models):
+
+| model | TI 2000/lr 1e-2 | TI 3000/lr 2e-2 | TI gate |
+|---|---|---|---|
+| SD-1.4 | T **−0.208** | T **−0.083** | ❌ 0/3 — attack moves *backwards* |
+| **BK-SDM-small** | T +0.125 ❌ | T +0.083 ❌ | ❌ 0/2 — rises but **stalls** below the gate |
+| **SD-1.5** | T +0.000 ❌ | **T +0.208 ✅** | **breached** → H 0.333 |
+
+It **holds on the pruned architecture and is breached on SD-1.5 at identical retention.** This also
+**falsified a clause of §5a's own**: *"no attainable TI budget will produce one"* is true of SD-1.4
+and **false of SD-1.5**, and is now scoped accordingly. ⚠ BK-SDM's T = +0.125 is an **invalid
+attack, not "almost resistance"** — that distinction is exactly what `FINDING20` exists for.
+
+**It is still not robustness** (a failed gate is not a held defence), and it is adversary-specific in
+the wrong direction: it blocks the **768-scalar** attack and is irrelevant against the
+**859.5M-parameter** one — full-UNet relearning reaches **1.000 on all three models**, leaving
+BK-SDM at post-attack utility 0.938. That is the opposite of the threat ordering a defender wants.
 
 ## 6. ⚠ Process: eleven claims of mine corrected or withdrawn
 
@@ -127,7 +174,8 @@ The mandate asks for a method outperforming the strongest relevant existing meth
 defined forgetting–utility trade-off, supported by real-model results.
 
 - **On forgetting-under-attack: there is no such method here, ours or published.** Thirteen arms,
-  609 attack measurements, four adversary families, one unmet bar. I am not presenting anything as
+  **631** attack measurements, four adversary families, **three checkpoints, two architectures**, one
+  unmet bar. I am not presenting anything as
   meeting it.
 - **On the as-is trade-off there is one real, modest result:** `wsr2_church_lr100` holds retention
   **0.9639 ± 0.0127** (n=3) against our FRP port's 0.9417 at statistically indistinguishable erasure
