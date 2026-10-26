@@ -5,6 +5,10 @@
 > information, and **max-over-valid H at 10 steps is 0.6667, not 0.5333**. The title's "buys about
 > ten gradient steps" and §3's "meets the mandate against a 5-step attacker" are **withdrawn**.
 > What survives is §1's curve, §2's gradedness and §4's gate result. See §7.
+>
+> **§8 then completed it at n=3 and the result is the opposite of §3's:** max-over-valid H at 5
+> steps is **0.5333**, so **no budget tested (5 → 300) leaves any arm meeting the mandate's
+> robustness half.** The defence buys fewer than five gradient steps.
 
 # FINDING 69 — Resolved to 5 steps, recovery is a **smooth dose-response**, not a cliff. And it gives the project its first quantitative statement of what a defence actually buys: the mandate-qualifying arm **satisfies the mandate's robustness bar against a 5-step attacker and fails against a 10-step one.**
 
@@ -142,3 +146,43 @@ declared escalation has returned.*
 worth pursuing, but any threshold on it needs **n ≥ 3 per point minimum**, and probably more given
 sd ≈ 0.28 on a measure quantised to 1/15. Single-seed budget curves are exploratory only. The curves
 in §1 should be read as mean trajectories at n=1, not as thresholds.
+
+## 8. Completion (E11e) — the 5-step bar fails too. **There is no budget at which any arm meets the mandate's robustness half.** The defence buys fewer than five gradient steps.
+
+§7 predicted the direction and ran the measurement. At **5 steps, n = 3, gate-filtered,
+max-over-valid**:
+
+| arm | n valid | per-seed H (0, 1, 6) | mean | sd | **max-over-valid** | bar ≤ 0.40 |
+|---|---:|---|---:|---:|---:|---|
+| `utrap_church_l0.15k8` | 3/3 | 0.4000, **0.0000**, **0.5333** | 0.3111 | 0.2776 | **0.5333** | **FAILED** |
+| `frp_church_r3_l05` | **1/3** | *0.3333*, *0.2667* (both gate-fail), 0.5333 | 0.5333 | — | **0.5333** | **FAILED** |
+
+**So the last surviving mandate claim is gone.** §3 had the arm meeting the robustness bar against a
+5-step attacker on the strength of a single 0.4000. With seeds 1 and 6 run, max-over-valid is
+**0.5333** and the bar fails at **5 steps** exactly as it fails at 10, 15, 25, 50, 100, 200 and 300.
+
+**The complete picture, every budget measured on the mandate-qualifying arm:**
+
+| steps | 5 | 10 | 15 | 25 | 50 | 100 | 200 | 300 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| max-over-valid H (n=3 at 5/10/15; n=1 above) | **0.5333** | **0.6667** | **0.9333** | 0.8667 | 0.9333 | 1.0000 | 1.0000 | 1.0000 |
+| bar ≤ 0.40 | FAIL | FAIL | FAIL | FAIL | FAIL | FAIL | FAIL | FAIL |
+
+**The honest closing statement, which is the opposite of §3's:** the defence buys the attacker
+**fewer than five gradient steps** on 16 self-generated images — which is to say, operationally,
+nothing. Five steps is already enough for one seed in three to recover 8 of 15 images.
+
+Two things worth keeping from the detail:
+
+- **The variance is the story at low budget, not the mean.** UTRAP's 5-step seeds are
+  0.0000 / 0.4000 / 0.5333 — one seed recovers nothing while another recovers a third of the way,
+  with sd 0.2776 at both 5 and 10 steps. Low-budget recovery is a lottery, and a max-over-valid
+  criterion resolves a lottery in the attacker's favour by construction. Any defence evaluated on
+  single seeds at low budget will look far better than it is.
+- **The gate carried most of the weight here.** At 5 steps FRP had only **1 of 3** attacks
+  gate-valid; the two gate-failures (0.3333, 0.2667) would both have read as "below the bar" had
+  validity been ignored. They are **inconclusive**, and excluding them is what makes the surviving
+  0.5333 meaningful.
+
+**This section was held until n = 3 was in hand**, rather than published at n = 1 and corrected —
+the rule §7 wrote down after breaking it four times.
