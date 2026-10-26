@@ -1,0 +1,143 @@
+{
+ "study": "wdr_erase_v2",
+ "implementation_version": "wdr/v2-faithful-direction",
+ "reproduces": "arXiv 2505.22310 section 6.1 'Weight Dist Reg'",
+ "reference_code": "shoaibahmed/vision_relearning@7b9a1ccada35a4059604c2688d2822567b3cf40d vision_unlearner.py L366-373",
+ "supersedes_and_does_not_replace": "scripts/erase_wsr.py, which implements the OPPOSITE direction and keeps its own results as an anchoring-to-base arm",
+ "objective": "alternating: (a) alpha * ( -sqrt(mean((theta_pre-theta)^2)+1e-8) ) ; (b) diffusion MSE on retain data, coefficient 1.0",
+ "faithfulness": {
+  "direction": "MAXIMISES distance (reference)",
+  "normalisation": "RMS over flattened params, eps=1e-8 (reference)",
+  "forget_data_term": "NONE -- the distance term IS the forget loss (reference)",
+  "retain_coefficient": 1.0,
+  "schedule": "alternating forget/retain iterations (reference)",
+  "scope": "all UNet parameters",
+  "optimiser": "Adam, no grad clipping (reference defaults)",
+  "domain_adaptation": "retain objective is the diffusion MSE, not cross-entropy; the paper is example-level unlearning in vision classifiers",
+  "disclosed_deviation": "--max-rms trust-region stop; the reference has none"
+ },
+ "trust_region_stop": {
+  "fired": false
+ },
+ "split_version": "v2",
+ "rng_streams": {
+  "data_generation": 2000000,
+  "defence_build": 0
+ },
+ "label": "wdr2_church_a1.0",
+ "concept": "church",
+ "hparams": {
+  "concept": "church",
+  "alpha": 1.0,
+  "teacher": "adapters/frp_church_r3_l05/unet.pt",
+  "lr": 1e-05,
+  "steps": 1500,
+  "max_rms": 0.05,
+  "n_retain": 32,
+  "batch": 2,
+  "seed": 0,
+  "log_every": 100,
+  "label": "wdr2_church_a1.0",
+  "out": "adapters/wdr2_church_a1.0"
+ },
+ "n_params": 859520964,
+ "history": [
+  {
+   "step": 0,
+   "l_forget": -0.009023338556289673,
+   "l_retain": 0.052095845341682434,
+   "rms_distance": 0.009023832157254219
+  },
+  {
+   "step": 100,
+   "l_forget": -0.009027271531522274,
+   "l_retain": 0.007971454411745071,
+   "rms_distance": 0.009027302265167236
+  },
+  {
+   "step": 200,
+   "l_forget": -0.00903050322085619,
+   "l_retain": 0.04297894239425659,
+   "rms_distance": 0.00903053767979145
+  },
+  {
+   "step": 300,
+   "l_forget": -0.00903403665870428,
+   "l_retain": 0.24432647228240967,
+   "rms_distance": 0.009034068323671818
+  },
+  {
+   "step": 400,
+   "l_forget": -0.009037559852004051,
+   "l_retain": 0.005100759211927652,
+   "rms_distance": 0.009037602692842484
+  },
+  {
+   "step": 500,
+   "l_forget": -0.009041164070367813,
+   "l_retain": 0.23189787566661835,
+   "rms_distance": 0.009041202254593372
+  },
+  {
+   "step": 600,
+   "l_forget": -0.009044908918440342,
+   "l_retain": 0.1260712444782257,
+   "rms_distance": 0.009044942446053028
+  },
+  {
+   "step": 700,
+   "l_forget": -0.009048637934029102,
+   "l_retain": 0.04098900780081749,
+   "rms_distance": 0.009048677049577236
+  },
+  {
+   "step": 800,
+   "l_forget": -0.009052302688360214,
+   "l_retain": 0.5273021459579468,
+   "rms_distance": 0.009052340872585773
+  },
+  {
+   "step": 900,
+   "l_forget": -0.00905602890998125,
+   "l_retain": 0.25543275475502014,
+   "rms_distance": 0.00905606709420681
+  },
+  {
+   "step": 1000,
+   "l_forget": -0.0090594831854105,
+   "l_retain": 0.06937193870544434,
+   "rms_distance": 0.009059515781700611
+  },
+  {
+   "step": 1100,
+   "l_forget": -0.00906292162835598,
+   "l_retain": 0.10776397585868835,
+   "rms_distance": 0.009062954224646091
+  },
+  {
+   "step": 1200,
+   "l_forget": -0.009066428057849407,
+   "l_retain": 0.15031610429286957,
+   "rms_distance": 0.009066461585462093
+  },
+  {
+   "step": 1300,
+   "l_forget": -0.009069782681763172,
+   "l_retain": 0.1570698618888855,
+   "rms_distance": 0.009069814346730709
+  },
+  {
+   "step": 1400,
+   "l_forget": -0.009073042310774326,
+   "l_retain": 0.015793994069099426,
+   "rms_distance": 0.009073075838387012
+  },
+  {
+   "step": 1499,
+   "l_forget": -0.009076311253011227,
+   "l_retain": 0.03394714742898941,
+   "rms_distance": 0.00907634012401104
+  }
+ ],
+ "minutes": 11.52022484143575
+}

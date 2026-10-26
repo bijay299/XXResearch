@@ -81,7 +81,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--concept", required=True)
     ap.add_argument("--alpha", type=float, default=1.0,
-                    help="reference --unlearning-alpha, default 1 (vision_unlearner.py L1848)")
+                    help="reference --unlearning-alpha, default 1 (vision_unlearner.py L1848). "
+                         "WARNING (FINDING67): the default is INERT here. This term's gradient norm "
+                         "is exactly 1/sqrt(N) = 3.41e-5 at N=859.5M -- constant in distance and "
+                         "SHRINKING with model size -- against a retain-term gradient of ~0.137. "
+                         "Measured parity is alpha ~= 4.0e3, i.e. the reference's default is ~4000x "
+                         "too small on this UNet. Run scripts/diag_wdr_scale.py before choosing a "
+                         "value; do not inherit a coefficient across model scales.")
     ap.add_argument("--teacher", default=None,
                     help="reference --initial-safeguard-args analogue: start from an already-erased "
                          "unet. Omit to start from the base model.")
