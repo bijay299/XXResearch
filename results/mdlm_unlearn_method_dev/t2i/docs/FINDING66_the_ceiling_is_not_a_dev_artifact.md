@@ -72,3 +72,32 @@ recovery is just as complete on genuinely held-out prompts.
 
 The mandate remains **unmet** and this moves nothing toward it: on FINAL prompts the
 mandate-qualifying arm goes from 1/15 to 15/15 under its primary attack.
+
+## 5. Addendum (E6c, 2026-10-26) — extended to the two weakest-suppression arms, and one sub-ceiling point appears
+
+`FINDING66` §3 listed as not-closed that `frp_*` and `uce_*` — the arms whose **pre**-attack FINAL
+suppression was weakest — had not been measured post-attack. E6c measures them. It is a
+**deliberate extension added after seeing E6b's results**, labelled as such in
+`run_e6c_final_recovery.sh`, not pre-committed; leaving them out would have been selective, since
+they are where E6b's conclusion is least surprising.
+
+| arm | FINAL pre | DEV H after | **FINAL post** | gate |
+|---|---:|---:|---:|---|
+| `utrap_church_l0.15k8` (SD-1.4) | 0.0667 | 1.000 | **1.0000** (15/15) | T 0.000→1.000 |
+| `utrap_sd15_church_l0.15k8` (SD-1.5) | 0.1333 | 1.000 | **1.0000** (15/15) | T 0.000→1.000 |
+| `frp_church_r3_l05` (SD-1.4) | 0.4667 | 1.000 | **1.0000** (15/15) | T 0.208→1.000 |
+| `uce_sd15_church_lam1000` (SD-1.5) | 0.6000 | 1.000 | **0.9333** (14/15) | T 0.417→1.000 |
+
+**Three of four reach the ceiling on FINAL; the fourth is one quantisation step below it.** §1's
+conclusion holds across all four arms and both architectures.
+
+**The one divergence is worth naming rather than rounding away.** `uce_sd15_church_lam1000` is the
+only arm where FINAL post-attack (**0.9333**) is *below* its DEV H (**1.000**). The gap is 1/15 —
+exactly one quantisation step — so it is not yet distinguishable from noise at n=15. It is also the
+only sub-ceiling post-attack number anywhere in the FINAL measurements, and the `FINDING35` §4
+ratchet applies: a sub-ceiling value is **provisional**, and running more seeds can only raise the
+max. Two further seeds on this arm are running for exactly that reason.
+
+Utility moved in both directions here, unlike E6b: FRP **0.9792 → 0.9167** (−0.0625) while UCE went
+**0.9167 → 0.9583** (+0.0417). So the "recovery without collateral damage" pattern is not universal
+even among arms that all reach the target ceiling.

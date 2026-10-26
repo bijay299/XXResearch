@@ -52,6 +52,15 @@ ARMS = [
      "attacked/E6B_utrap_church_l0.15k8_sd0_lr1e-5/unet.pt",      "church", SD14),
     ("ATK_utrap_sd15_church_l0.15k8",
      "attacked/E6B_utrap_sd15_church_l0.15k8_sd0_lr1e-5/unet.pt", "church", SD15),
+    # E6c: DELIBERATE EXTENSION of E6b, added 2026-10-26 AFTER seeing E6b's two results. Labelled
+    # honestly as an extension, not as pre-committed. It completes the post-attack FINAL picture on
+    # the two arms whose PRE-attack FINAL suppression was weakest (frp 0.4667, uce 0.6000), where
+    # E6b's conclusion is least surprising and therefore least informative -- which is exactly why
+    # leaving them out would have been selective.
+    ("ATK_frp_church_r3_l05",
+     "attacked/E6C_frp_church_r3_l05_sd0_lr1e-5/unet.pt",         "church", SD14),
+    ("ATK_uce_sd15_church_lam1000",
+     "attacked/E6C_uce_sd15_church_lam1000_sd0_lr1e-5/unet.pt",   "church", SD15),
 ]
 
 
