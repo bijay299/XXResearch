@@ -1,0 +1,159 @@
+{
+ "study": "utrap_v2",
+ "implementation_version": "utrap/v2-shared-attack-core",
+ "is_ours": true,
+ "prereg": "docs/PREREG_H90_utrap_v2.md",
+ "supersedes_and_does_not_replace": "scripts/erase_utrap.py, whose reversal measurements stand as historical results",
+ "inner_attacker": {
+  "attack_core_version": "attack_core/v1",
+  "spec": {
+   "optimizer": "adam",
+   "lr": 1e-05,
+   "steps": 8,
+   "batch": 1,
+   "clip_grad_norm": 1.0,
+   "scope": "full_unet",
+   "precision": "fp32",
+   "persistent_state": true,
+   "momentum": 0.0,
+   "horizon_role": "SHORT_HORIZON_SURROGATE",
+   "notes": "UTRAP v2 inner surrogate"
+  },
+  "evaluation_reference": {
+   "optimizer": "adam",
+   "lr": 1e-05,
+   "steps": 300,
+   "batch": 1,
+   "clip_grad_norm": 1.0,
+   "scope": "full_unet",
+   "precision": "fp32",
+   "persistent_state": true,
+   "horizon_role": "EVALUATION_REFERENCE"
+  },
+  "divergence_from_evaluation_attacker": {
+   "steps": {
+    "this_attacker": 8,
+    "evaluation_attacker": 300
+   }
+  },
+  "is_the_evaluation_attacker": false
+ },
+ "inner_attacker_data": {
+  "n": 8,
+  "prompts": [
+   "a church bell tower in daylight",
+   "a small roadside church",
+   "a stone church with arched windows",
+   "a whitewashed church by a field"
+  ],
+  "provenance": "BASE (unmodified) generations, 8 images, 25 steps, cfg 7.5",
+  "split_role": "DEF_TRAIN"
+ },
+ "inner_attacker_effectiveness_probe": [
+  {
+   "step": 0,
+   "probe_before": 0.14043495059013367,
+   "probe_after": 0.1362793743610382,
+   "delta": -0.004155576229095459,
+   "inner_loss_first": 0.198390394449234,
+   "inner_loss_last": 0.00690341554582119,
+   "grad_norm_first": 0.45254042744636536,
+   "update_norms": [
+    0.2786622463673497,
+    0.09470808068555607
+   ]
+  },
+  {
+   "step": 2,
+   "probe_before": 0.1403825730085373,
+   "probe_after": 0.1364041566848755,
+   "delta": -0.003978416323661804,
+   "inner_loss_first": 0.05153878778219223,
+   "inner_loss_last": 0.10520930588245392,
+   "grad_norm_first": 0.07449857145547867,
+   "update_norms": [
+    0.2609666911997473,
+    0.11195495262543921
+   ]
+  },
+  {
+   "step": 4,
+   "probe_before": 0.14031922817230225,
+   "probe_after": 0.13738372921943665,
+   "delta": -0.0029354989528656006,
+   "inner_loss_first": 0.37868908047676086,
+   "inner_loss_last": 0.07134788483381271,
+   "grad_norm_first": 0.47363051772117615,
+   "update_norms": [
+    0.27871940834816655,
+    0.09817132655163233
+   ]
+  }
+ ],
+ "probe_note": "fixed noise, fixed timesteps, fixed batch of the TARGET pool, evaluated immediately before and after the K-step unroll. A negative delta means the inner attacker is genuinely adapting toward the target; a delta near zero means the unroll is doing nothing and no claim about unroll depth can be made from the run.",
+ "approximation": "detached trajectory; first-order, K steps. A fully differentiated unroll remains untested and is not claimed.",
+ "scope": "full UNet",
+ "n_params": 859520964,
+ "split_version": "v2",
+ "rng_streams": {
+  "defence_build": 0,
+  "data_generation": 2000000
+ },
+ "label": "SMOKE_utrap2b",
+ "concept": "church",
+ "teacher": "adapters/frp_church_r3_l05/unet.pt",
+ "hparams": {
+  "concept": "church",
+  "teacher": "adapters/frp_church_r3_l05/unet.pt",
+  "lam": 0.15,
+  "inner_k": 8,
+  "inner_lr": 1e-05,
+  "inner_optimizer": "adam",
+  "inner_batch": 1,
+  "inner_clip": 1.0,
+  "inner_persistent": 1,
+  "target_source": "base",
+  "target_prompts": "def_train",
+  "lr": 1e-06,
+  "steps": 6,
+  "n_images": 8,
+  "n_retain": 8,
+  "batch": 2,
+  "seed": 0,
+  "log_every": 2,
+  "probe_every": 2,
+  "label": "SMOKE_utrap2b",
+  "out": "adapters/SMOKE_utrap2b"
+ },
+ "history": [
+  {
+   "step": 0,
+   "L_retain": 0.045366570353507996,
+   "L_attack_step0": 0.198390394449234,
+   "L_attack_stepK": 0.00690341554582119,
+   "L_target_at_thetaK": 0.07784642279148102
+  },
+  {
+   "step": 2,
+   "L_retain": 0.12098509818315506,
+   "L_attack_step0": 0.05153878778219223,
+   "L_attack_stepK": 0.10520930588245392,
+   "L_target_at_thetaK": 0.19703613221645355
+  },
+  {
+   "step": 4,
+   "L_retain": 0.27457064390182495,
+   "L_attack_step0": 0.37868908047676086,
+   "L_attack_stepK": 0.07134788483381271,
+   "L_target_at_thetaK": 0.40568190813064575
+  },
+  {
+   "step": 5,
+   "L_retain": 0.16489484906196594,
+   "L_attack_step0": 0.06493356078863144,
+   "L_attack_stepK": 0.14807017147541046,
+   "L_target_at_thetaK": 0.21726520359516144
+  }
+ ],
+ "minutes": 0.9209452311197917
+}

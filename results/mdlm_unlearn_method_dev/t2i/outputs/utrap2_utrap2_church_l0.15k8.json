@@ -1,0 +1,126 @@
+{
+ "study": "utrap_v2",
+ "implementation_version": "utrap/v2-shared-attack-core",
+ "is_ours": true,
+ "prereg": "docs/PREREG_H90_utrap_v2.md",
+ "supersedes_and_does_not_replace": "scripts/erase_utrap.py, whose reversal measurements stand as historical results",
+ "inner_attacker": {
+  "attack_core_version": "attack_core/v1",
+  "spec": {
+   "optimizer": "adam",
+   "lr": 1e-05,
+   "steps": 8,
+   "batch": 1,
+   "clip_grad_norm": 1.0,
+   "scope": "full_unet",
+   "precision": "fp32",
+   "persistent_state": true,
+   "momentum": 0.0,
+   "horizon_role": "SHORT_HORIZON_SURROGATE",
+   "notes": "UTRAP v2 inner surrogate"
+  },
+  "evaluation_reference": {
+   "optimizer": "adam",
+   "lr": 1e-05,
+   "steps": 300,
+   "batch": 1,
+   "clip_grad_norm": 1.0,
+   "scope": "full_unet",
+   "precision": "fp32",
+   "persistent_state": true,
+   "horizon_role": "EVALUATION_REFERENCE"
+  },
+  "divergence_from_evaluation_attacker": {
+   "steps": {
+    "this_attacker": 8,
+    "evaluation_attacker": 300
+   }
+  },
+  "is_the_evaluation_attacker": false
+ },
+ "inner_attacker_data": {
+  "n": 16,
+  "prompts": [
+   "a church bell tower in daylight",
+   "a small roadside church",
+   "a stone church with arched windows",
+   "a whitewashed church by a field"
+  ],
+  "provenance": "BASE (unmodified) generations, 16 images, 25 steps, cfg 7.5",
+  "split_role": "DEF_TRAIN"
+ },
+ "inner_attacker_effectiveness_probe": [
+  {
+   "step": 0,
+   "probe_before": 0.14043572545051575,
+   "probe_after": 0.13723540306091309,
+   "delta": -0.003200322389602661,
+   "inner_loss_first": 0.23336142301559448,
+   "inner_loss_last": 0.006861227564513683,
+   "grad_norm_first": 0.3029145896434784,
+   "update_norms": [
+    0.27572335149874694,
+    0.09551945132298034
+   ]
+  }
+ ],
+ "probe_note": "fixed noise, fixed timesteps, fixed batch of the TARGET pool, evaluated immediately before and after the K-step unroll. A negative delta means the inner attacker is genuinely adapting toward the target; a delta near zero means the unroll is doing nothing and no claim about unroll depth can be made from the run.",
+ "approximation": "detached trajectory; first-order, K steps. A fully differentiated unroll remains untested and is not claimed.",
+ "scope": "full UNet",
+ "n_params": 859520964,
+ "split_version": "v2",
+ "rng_streams": {
+  "defence_build": 0,
+  "data_generation": 2000000
+ },
+ "label": "utrap2_church_l0.15k8",
+ "concept": "church",
+ "teacher": "adapters/frp_church_r3_l05/unet.pt",
+ "hparams": {
+  "concept": "church",
+  "teacher": "adapters/frp_church_r3_l05/unet.pt",
+  "lam": 0.15,
+  "inner_k": 8,
+  "inner_lr": 1e-05,
+  "inner_optimizer": "adam",
+  "inner_batch": 1,
+  "inner_clip": 1.0,
+  "inner_persistent": 1,
+  "target_source": "base",
+  "target_prompts": "def_train",
+  "lr": 1e-06,
+  "steps": 45,
+  "n_images": 16,
+  "n_retain": 32,
+  "batch": 2,
+  "seed": 0,
+  "log_every": 25,
+  "probe_every": 50,
+  "label": "utrap2_church_l0.15k8",
+  "out": "adapters/utrap2_church_l0.15k8"
+ },
+ "history": [
+  {
+   "step": 0,
+   "L_retain": 0.04637269675731659,
+   "L_attack_step0": 0.23336142301559448,
+   "L_attack_stepK": 0.006861227564513683,
+   "L_target_at_thetaK": 0.08234968036413193
+  },
+  {
+   "step": 25,
+   "L_retain": 0.09258952736854553,
+   "L_attack_step0": 0.42599189281463623,
+   "L_attack_stepK": 0.08954556286334991,
+   "L_target_at_thetaK": 0.27784186601638794
+  },
+  {
+   "step": 44,
+   "L_retain": 0.08985377848148346,
+   "L_attack_step0": 0.10322681814432144,
+   "L_attack_stepK": 0.018393991515040398,
+   "L_target_at_thetaK": 0.42562365531921387
+  }
+ ],
+ "minutes": 3.124859507878621
+}

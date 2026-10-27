@@ -1,0 +1,281 @@
+=== V2 START 2026-10-26T15:59:59-04:00 pid=1846202
+V2 rescore_final_v2 on GPU 0 (uuid GPU-b2f89296-447e-dc7a-96b6-82ac699a02d7)
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+{
+ "plan_only": true,
+ "n_arms": 12,
+ "arms": [
+  {
+   "label": "utrap_church_l0.15k8",
+   "unet": "adapters/utrap_church_l0.15k8/unet.pt",
+   "base_model": "CompVis/stable-diffusion-v1-4",
+   "original_arm_precommitted": true,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "frp_church_r3_l05",
+   "unet": "adapters/frp_church_r3_l05/unet.pt",
+   "base_model": "CompVis/stable-diffusion-v1-4",
+   "original_arm_precommitted": true,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "utrap_sd15_church_l0.15k8",
+   "unet": "adapters/utrap_sd15_church_l0.15k8/unet.pt",
+   "base_model": "runwayml/stable-diffusion-v1-5",
+   "original_arm_precommitted": true,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "uce_sd15_church_lam1000",
+   "unet": "adapters/uce_sd15_church_lam1000/unet.pt",
+   "base_model": "runwayml/stable-diffusion-v1-5",
+   "original_arm_precommitted": true,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "BASE_sd14_anchor",
+   "unet": null,
+   "base_model": "CompVis/stable-diffusion-v1-4",
+   "original_arm_precommitted": true,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "BASE_sd15_anchor",
+   "unet": null,
+   "base_model": "runwayml/stable-diffusion-v1-5",
+   "original_arm_precommitted": false,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "ATK_utrap_church_l0.15k8",
+   "unet": "attacked/E6B_utrap_church_l0.15k8_sd0_lr1e-5/unet.pt",
+   "base_model": "CompVis/stable-diffusion-v1-4",
+   "original_arm_precommitted": true,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "ATK_utrap_sd15_church_l0.15k8",
+   "unet": "attacked/E6B_utrap_sd15_church_l0.15k8_sd0_lr1e-5/unet.pt",
+   "base_model": "runwayml/stable-diffusion-v1-5",
+   "original_arm_precommitted": true,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "ATK_frp_church_r3_l05",
+   "unet": "attacked/E6C_frp_church_r3_l05_sd0_lr1e-5/unet.pt",
+   "base_model": "CompVis/stable-diffusion-v1-4",
+   "original_arm_precommitted": false,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "ATK_uce_sd15_church_lam1000",
+   "unet": "attacked/E6C_uce_sd15_church_lam1000_sd0_lr1e-5/unet.pt",
+   "base_model": "runwayml/stable-diffusion-v1-5",
+   "original_arm_precommitted": false,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "ATK_uce_sd15_church_lam1000_sd1",
+   "unet": "attacked/E6D_uce_sd15_church_lam1000_sd1_lr1e-5/unet.pt",
+   "base_model": "runwayml/stable-diffusion-v1-5",
+   "original_arm_precommitted": false,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  },
+  {
+   "label": "ATK_uce_sd15_church_lam1000_sd6",
+   "unet": "attacked/E6D_uce_sd15_church_lam1000_sd6_lr1e-5/unet.pt",
+   "base_model": "runwayml/stable-diffusion-v1-5",
+   "original_arm_precommitted": false,
+   "this_evaluation_status": "CORRECTIVE_RE_EVALUATION_OF_INSPECTED_SPLIT"
+  }
+ ],
+ "checkpoints_present": {
+  "utrap_church_l0.15k8": true,
+  "frp_church_r3_l05": true,
+  "utrap_sd15_church_l0.15k8": true,
+  "uce_sd15_church_lam1000": true,
+  "BASE_sd14_anchor": true,
+  "BASE_sd15_anchor": true,
+  "ATK_utrap_church_l0.15k8": false,
+  "ATK_utrap_sd15_church_l0.15k8": false,
+  "ATK_frp_church_r3_l05": false,
+  "ATK_uce_sd15_church_lam1000": false,
+  "ATK_uce_sd15_church_lam1000_sd1": false,
+  "ATK_uce_sd15_church_lam1000_sd6": false
+ },
+ "label_set_diff": {
+  "n_labels": 12,
+  "n_differ": 9,
+  "n_identical": 3,
+  "differing": [
+   "garbage_truck",
+   "van_gogh",
+   "cassette_player",
+   "chain_saw",
+   "english_springer",
+   "french_horn",
+   "gas_pump",
+   "golf_ball",
+   "monet"
+  ],
+  "identical": [
+   "church",
+   "parachute",
+   "tench"
+  ]
+ },
+ "numerics_contract": {
+  "ok": true,
+  "issues": [],
+  "scoring_version": "clip_scorer/v2.0.0",
+  "clip_model_id": "openai/clip-vit-large-patch14",
+  "prompt_template": "a photo of a {}",
+  "numerics": {
+   "dtype": "float16",
+   "text": "CLIPModel.get_text_features(**processor(text=[...], padding=True)) then L2-normalise over dim=-1",
+   "image": "CLIPProcessor(images=[...])['pixel_values'].half() -> CLIPModel.get_image_features(...) then L2-normalise over dim=-1",
+   "similarity": "image_features @ text_features.T (cosine, both operands unit-norm)",
+   "decision": "closed-set argmax over the label axis; NO reject option, NO threshold"
+  }
+ },
+ "exposure_recomputed": {
+  "n_on_differing_labels": 37,
+  "n_images_total": 180,
+  "n_records": 12,
+  "per_arm_all": {
+   "ATK_frp_church_r3_l05": 0,
+   "ATK_uce_sd15_church_lam1000": 1,
+   "ATK_uce_sd15_church_lam1000_sd1": 0,
+   "ATK_uce_sd15_church_lam1000_sd6": 0,
+   "ATK_utrap_church_l0.15k8": 0,
+   "ATK_utrap_sd15_church_l0.15k8": 0,
+   "BASE_sd14_anchor": 2,
+   "BASE_sd15_anchor": 0,
+   "frp_church_r3_l05": 7,
+   "uce_sd15_church_lam1000": 5,
+   "utrap_church_l0.15k8": 10,
+   "utrap_sd15_church_l0.15k8": 12
+  },
+  "per_arm": {
+   "ATK_uce_sd15_church_lam1000": 1,
+   "BASE_sd14_anchor": 2,
+   "frp_church_r3_l05": 7,
+   "uce_sd15_church_lam1000": 5,
+   "utrap_church_l0.15k8": 10,
+   "utrap_sd15_church_l0.15k8": 12
+  },
+  "median_margin_by_arm": {
+   "ATK_frp_church_r3_l05": null,
+   "ATK_uce_sd15_church_lam1000": 0.0081,
+   "ATK_uce_sd15_church_lam1000_sd1": null,
+   "ATK_uce_sd15_church_lam1000_sd6": null,
+   "ATK_utrap_church_l0.15k8": null,
+   "ATK_utrap_sd15_church_l0.15k8": null,
+   "BASE_sd14_anchor": 0.011,
+   "BASE_sd15_anchor": null,
+   "frp_church_r3_l05": 0.0051,
+   "uce_sd15_church_lam1000": 0.0027,
+   "utrap_church_l0.15k8": 0.0044,
+   "utrap_sd15_church_l0.15k8": 0.0063
+  },
+  "differing_labels": [
+   "cassette_player",
+   "chain_saw",
+   "english_springer",
+   "french_horn",
+   "garbage_truck",
+   "gas_pump",
+   "golf_ball",
+   "monet",
+   "van_gogh"
+  ],
+  "framing": "Small margins mean the outcomes are sensitive to label text; they do not indicate which way. This count is NOT a bound on how many decisions could move: the decision is a closed-set argmax over all twelve labels, so an image predicted as an UNCHANGED label (church, parachute, tench) can also flip when a competitor's text changes. Images predicted on a differing label are where a change is most directly visible, not where it is confined."
+ },
+ "exposure_documented": {
+  "n_on_differing_labels": 37,
+  "n_images_total": 180,
+  "per_arm": {
+   "utrap_sd15_church_l0.15k8": 12,
+   "utrap_church_l0.15k8": 10,
+   "frp_church_r3_l05": 7,
+   "uce_sd15_church_lam1000": 5,
+   "BASE_sd14_anchor": 2,
+   "ATK_uce_sd15_church_lam1000": 1
+  },
+  "median_margin_range_four_defence_arms": [
+   0.0027,
+   0.0063
+  ]
+ },
+ "unmodified_baseline": {
+  "ok": true,
+  "baseline_taken_at": "2026-10-26",
+  "files": {
+   "gen_eval.py": {
+    "expected_sha256": "6f978e60870486b4e844580c3b480ac62ce4a59037eb2d5534756e26d131f51a",
+    "actual_sha256": "6f978e60870486b4e844580c3b480ac62ce4a59037eb2d5534756e26d131f51a",
+    "matches": true
+   },
+   "attack_relearn.py": {
+    "expected_sha256": "ec5fe2249b19df3b60e551f8800ed3fb7c7474a814e312578f1e88dd44fb40e2",
+    "actual_sha256": "ec5fe2249b19df3b60e551f8800ed3fb7c7474a814e312578f1e88dd44fb40e2",
+    "matches": true
+   }
+  },
+  "scope_note": "Byte-identity is proven only from baseline_taken_at onward. For the period before that date the evidence is mtime only, and no stronger claim is made: the prior hash record (outputs/provenance_manifest.json) predates this repair and truncates its per-file hashes to 16 hex characters."
+ },
+ "provenance_keys": [
+  "checkpoint_hash_scope",
+  "checkpoint_hashes",
+  "code",
+  "environment",
+  "environment_caveat",
+  "generated_at",
+  "inference",
+  "label_sets",
+  "models",
+  "prompts",
+  "rescore_version",
+  "run_dir",
+  "run_id",
+  "scoring_version",
+  "seeds"
+ ]
+}
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+[rescore] run_id=rsc_20261026T200003Z_2c8ac2d573c3f300_d022
+[rescore] run_dir=/data/bijaypandey/t2i_unlearn/outputs/rescore/rsc_20261026T200003Z_2c8ac2d573c3f300_d022
+[rescore] label sets differ in 9/12: garbage_truck, van_gogh, cassette_player, chain_saw, english_springer, french_horn, gas_pump, golf_ball, monet
+[rescore] identical: church, parachute, tench
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  7.76it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 12.17it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 14.13it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.47it/s]
+/data/bijaypandey/t2i_unlearn/scripts/rescore_final_v2.py:679: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(full, map_location="cpu")
+[rescore] utrap_church_l0.15k8: corrected 1/15 | legacy 1/15 | history 1 -> DISCREPANT (0.3 min)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  7.52it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 14.95it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.85it/s]
+[rescore] frp_church_r3_l05: corrected 4/15 | legacy 7/15 | history 7 -> DISCREPANT (0.3 min)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  6.33it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 14.42it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.00it/s]
+[rescore] utrap_sd15_church_l0.15k8: corrected 3/15 | legacy 2/15 | history 2 -> DISCREPANT (0.3 min)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  7.75it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 15.76it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 17.72it/s]
+[rescore] uce_sd15_church_lam1000: corrected 9/15 | legacy 9/15 | history 9 -> DISCREPANT (0.3 min)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  6.05it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 14.36it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.84it/s]
+[rescore] BASE_sd14_anchor: corrected 12/15 | legacy 13/15 | history 13 -> DISCREPANT (0.2 min)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  6.20it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 14.58it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.11it/s]
+[rescore] BASE_sd15_anchor: corrected 15/15 | legacy 15/15 | history 15 -> DISCREPANT (0.3 min)
+[rescore] ATK_utrap_church_l0.15k8: MISSING_CHECKPOINT (attacked/E6B_utrap_church_l0.15k8_sd0_lr1e-5/unet.pt)
+[rescore] ATK_utrap_sd15_church_l0.15k8: MISSING_CHECKPOINT (attacked/E6B_utrap_sd15_church_l0.15k8_sd0_lr1e-5/unet.pt)
+[rescore] ATK_frp_church_r3_l05: MISSING_CHECKPOINT (attacked/E6C_frp_church_r3_l05_sd0_lr1e-5/unet.pt)
+[rescore] ATK_uce_sd15_church_lam1000: MISSING_CHECKPOINT (attacked/E6C_uce_sd15_church_lam1000_sd0_lr1e-5/unet.pt)
+[rescore] ATK_uce_sd15_church_lam1000_sd1: MISSING_CHECKPOINT (attacked/E6D_uce_sd15_church_lam1000_sd1_lr1e-5/unet.pt)
+[rescore] ATK_uce_sd15_church_lam1000_sd6: MISSING_CHECKPOINT (attacked/E6D_uce_sd15_church_lam1000_sd6_lr1e-5/unet.pt)
+
+[rescore] run_status=partial complete=6/12 missing=['ATK_utrap_church_l0.15k8', 'ATK_utrap_sd15_church_l0.15k8', 'ATK_frp_church_r3_l05', 'ATK_uce_sd15_church_lam1000', 'ATK_uce_sd15_church_lam1000_sd1', 'ATK_uce_sd15_church_lam1000_sd6'] failed=- not_attempted=-
+[rescore] history_comparability=none_exact exact=- discrepant=['utrap_church_l0.15k8', 'frp_church_r3_l05', 'utrap_sd15_church_l0.15k8', 'uce_sd15_church_lam1000', 'BASE_sd14_anchor', 'BASE_sd15_anchor']
+[rescore] this run's numbers CANNOT be compared to the historical numbers. The within-run corrected-vs-legacy label-text comparison remains valid (both sets scored the same regenerated images); what is lost is any claim about what the ORIGINAL records would have become.
+[rescore] manifest: /data/bijaypandey/t2i_unlearn/outputs/rescore/rsc_20261026T200003Z_2c8ac2d573c3f300_d022/run.json
+FAIL rc=1 :: venv_t2i/bin/python scripts/rescore_final_v2.py --run-tag d022
+V2 manifest: outputs/rescore/rsc_20261026T200003Z_2c8ac2d573c3f300_d022/run.json
+V2 INCOMPLETE 2026-10-26T16:01:46-04:00 -- 1 failure(s):
+  rc=1  venv_t2i/bin/python scripts/rescore_final_v2.py --run-tag d022

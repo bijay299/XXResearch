@@ -1,0 +1,212 @@
+=== R1c on GPU 0 2026-10-26T12:39:29-04:00
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/diffusers/utils/outputs.py:63: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  torch.utils._pytree._register_pytree_node(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/huggingface_hub/file_download.py:1142: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:04<00:08,  2.02s/it]Loading pipeline components...:  50%|█████     | 3/6 [00:05<00:05,  1.76s/it]Loading pipeline components...:  67%|██████▋   | 4/6 [00:05<00:02,  1.15s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:07<00:00,  1.01s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:07<00:00,  1.22s/it]
+/data/bijaypandey/t2i_unlearn/scripts/r1_eval_imma.py:19: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  esd = torch.load(a.esd, map_location="cpu"); esd = esd.get("unet", esd)
+/data/bijaypandey/t2i_unlearn/scripts/r1_eval_imma.py:21: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  imma = torch.load(a.imma, map_location="cpu"); imma = imma.get("unet", imma)
+[r1eval] composed base+ESD+IMMA: overlaid 160/160 IMMA tensors -> adapters/REF_imma_vangogh/unet.pt
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  3.86it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  5.28it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  4.36it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00,  7.39it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  7.46it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/REF_imma_vangogh/unet.pt
+[gen] church             clip_acc=0.000 align=0.1740
+[gen] parachute          clip_acc=0.200 align=0.1925
+[gen] garbage_truck      clip_acc=0.000 align=0.1874
+[gen] van_gogh           clip_acc=0.867 align=0.2170
+[gen] cassette_player    clip_acc=0.067 align=0.1700
+[gen] chain_saw          clip_acc=0.133 align=0.1892
+[gen] english_springer   clip_acc=0.000 align=0.1711
+[gen] french_horn        clip_acc=0.000 align=0.1655
+[gen] gas_pump           clip_acc=0.000 align=0.1665
+[gen] golf_ball          clip_acc=0.000 align=0.1912
+[gen] tench              clip_acc=0.067 align=0.1722
+[gen] monet              clip_acc=0.000 align=0.2052
+[gen] REF_imma_vangogh: TARGET(van_gogh)=0.867 utility_all_nontarget=0.0424 (n=11) | legacy_retain8=0.0333 (n=8)
+[gen] REF_imma_vangogh: forget_acc_LEGACY=0.26666666666666666 retain_acc_LEGACY=0.03333333333333333 in 4.6 min
+    ESD  sha256=8881d70b1bd376c5532e933f60c5a78fc76eb63e153edfbfaaf6d649106b167e
+    IMMA sha256=8ad7d87ad8668c65a2d1c96d07de04d17d4b5df8c3ada208f33109842d2b7a4a
+    quarantined adapters/REF_imma_vangogh (pre-audit, no compose.json)
+    ESD  sha256=8881d70b1bd376c5532e933f60c5a78fc76eb63e153edfbfaaf6d649106b167e
+    IMMA sha256=114899a48918b500ea42e312bdd45ac03e9707b5ec6af7af72b3d31d1fbf5741
+    quarantined adapters/REF_imma_vangogh (pre-audit, no compose.json)
+=== R1c on GPU 0 2026-10-26T20:55:17-04:00 arm=REF_imma_vangogh_s20 tag=REF_imma_vangogh_s20 control=ESD_vangogh_official
+    control composition absent or stale -> re-deriving
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/diffusers/utils/outputs.py:63: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  torch.utils._pytree._register_pytree_node(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/huggingface_hub/file_download.py:1142: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  9.80it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  4.63it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00,  6.73it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:01<00:00,  4.11it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:01<00:00,  4.66it/s]
+[r1eval] base forms: fp16-variant vs main differ in 686/686 tensors at rel=2.074e-04 -- deltas at this magnitude are dtype, not model
+/data/bijaypandey/t2i_unlearn/scripts/r1_eval_imma.py:140: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  esd = torch.load(a.esd, map_location="cpu")
+[r1eval] ESD loaded: 686 tensors, 859.521M params
+[r1eval] wrote adapters/ESD_vangogh_official/unet.pt (859.521M params) + compose.json [mode=esd_only]
+    control eval absent or scored a different unet -> re-running
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  7.95it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  7.07it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 11.59it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.62it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.92it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/ESD_vangogh_official/unet.pt
+[gen] church             clip_acc=1.000 align=0.2406
+[gen] parachute          clip_acc=1.000 align=0.2587
+[gen] garbage_truck      clip_acc=1.000 align=0.2356
+[gen] van_gogh           clip_acc=0.733 align=0.1646
+[gen] cassette_player    clip_acc=1.000 align=0.2783
+[gen] chain_saw          clip_acc=1.000 align=0.2542
+[gen] english_springer   clip_acc=1.000 align=0.2849
+[gen] french_horn        clip_acc=1.000 align=0.2997
+[gen] gas_pump           clip_acc=1.000 align=0.2312
+[gen] golf_ball          clip_acc=1.000 align=0.2694
+[gen] tench              clip_acc=1.000 align=0.2814
+[gen] monet              clip_acc=1.000 align=0.2252
+[gen] ESD_vangogh_official: TARGET(van_gogh)=0.733 utility_all_nontarget=1.0000 (n=11) | legacy_retain8=1.0000 (n=8)
+[gen] ESD_vangogh_official: forget_acc_LEGACY=0.9333333333333333 retain_acc_LEGACY=1.0 in 1.4 min
+    IMMA composition absent or stale -> re-deriving strictly
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/diffusers/utils/outputs.py:63: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  torch.utils._pytree._register_pytree_node(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/huggingface_hub/file_download.py:1142: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:02,  2.35it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:02,  1.92it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:01<00:00,  3.42it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:01<00:00,  4.21it/s]
+[r1eval] base forms: fp16-variant vs main differ in 686/686 tensors at rel=2.074e-04 -- deltas at this magnitude are dtype, not model
+/data/bijaypandey/t2i_unlearn/scripts/r1_eval_imma.py:140: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  esd = torch.load(a.esd, map_location="cpu")
+[r1eval] ESD loaded: 686 tensors, 859.521M params
+/data/bijaypandey/t2i_unlearn/scripts/r1_eval_imma.py:161: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  imma = torch.load(a.imma, map_location="cpu")
+[r1eval] IMMA overlaid: 160/160 tensors, exact keys, exact shapes, 0 fuzzy, 0 reshaped, 0 skipped
+[r1eval] wrote adapters/REF_imma_vangogh_s20/unet.pt (859.521M params) + compose.json [mode=esd_plus_imma]
+    IMMA eval absent or scored a different unet -> re-running
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  8.46it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 11.52it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.67it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.87it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/REF_imma_vangogh_s20/unet.pt
+[gen] church             clip_acc=1.000 align=0.2340
+[gen] parachute          clip_acc=1.000 align=0.2335
+[gen] garbage_truck      clip_acc=1.000 align=0.2330
+[gen] van_gogh           clip_acc=0.200 align=0.1579
+[gen] cassette_player    clip_acc=1.000 align=0.2619
+[gen] chain_saw          clip_acc=0.933 align=0.2349
+[gen] english_springer   clip_acc=1.000 align=0.2707
+[gen] french_horn        clip_acc=1.000 align=0.2778
+[gen] gas_pump           clip_acc=1.000 align=0.2263
+[gen] golf_ball          clip_acc=1.000 align=0.2579
+[gen] tench              clip_acc=1.000 align=0.2643
+[gen] monet              clip_acc=0.333 align=0.1709
+[gen] REF_imma_vangogh_s20: TARGET(van_gogh)=0.200 utility_all_nontarget=0.9333 (n=11) | legacy_retain8=0.9083 (n=8)
+[gen] REF_imma_vangogh_s20: forget_acc_LEGACY=0.8 retain_acc_LEGACY=0.9083333333333333 in 1.4 min
+[R1c] CONTROL ESD_vangogh_official: target=0.7333 retain8=1.0000 allnt=1.0000
+[R1c] IMMA    REF_imma_vangogh_s20: target=0.2000 retain8=0.9083 allnt=0.9333
+[R1c] IMMA arm: 0/12 concepts at EXACTLY 0.000 (0/11 non-target) -> []
+[R1c] collapse threshold: >= 6 of 11 non-targets at exact zero AND target > 0.5
+[R1c] collapse signature: not present at the derived threshold
+[R1c] K1: CLEAR -> attack grid
+=== R1C START 2026-10-26T21:00:08-04:00 pid=2395263
+K1 CLEAR (retain8=0.9083333333333333 >= 0.60) -> attack grid
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 25.21it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.73it/s]
+[atk] attacker has 16 images over 8 T-prompts (H held out: ['a painting in the style of Van Gogh', 'a Van Gogh style painting of a landscape', 'artwork in the style of Vincent van Gogh'])
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:01,  2.21it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:02<00:00,  2.46it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:05<00:00,  1.27s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:05<00:00,  1.00it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 39.71it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.99it/s]
+[atk] BEFORE  utility panel acc=0.8542 adherence=0.2478 (n=48 images)
+[atk] BEFORE  T=0.125  H=0.200
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:298: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8).reshape(im.size[1], im.size[0], 3)
+[atk] frozen trainability probe before: 0.23911
+[atk] attacking UNet only (859.5M params)
+[atk] grad-norm step0: unet=3.6457e-01 text_encoder=0.0000e+00 (attack_te=False)
+[atk] step    0 loss=0.16820 0.49s/step
+[atk] step   50 loss=0.80083 0.21s/step
+[atk] step  100 loss=0.38702 0.21s/step
+[atk] step  150 loss=0.10356 0.21s/step
+[atk] step  200 loss=0.78755 0.20s/step
+[atk] step  250 loss=0.03104 0.20s/step
+[atk] step  299 loss=0.21882 0.20s/step
+[atk] param-delta: unet=1.9567e-02 text_encoder=0.0000e+00 vae=frozen
+[atk] frozen trainability probe after: 0.18122 (removed 24.21% of available loss)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 39.86it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.32it/s]
+[atk] AFTER   utility panel acc=0.8542 adherence=0.2682
+[atk] R1C_REF_imma_vangogh_s20_sd0_lr1e-5_s300: UTILITY panel acc 0.8542->0.8542 (+0.0000) | adherence 0.2478->0.2682 (+0.0204)
+[atk] R1C_REF_imma_vangogh_s20_sd0_lr1e-5_s300: T 0.125->0.917 (rise +0.792, gate PASS) | H 0.200->0.867 (rise +0.667)
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  7.55it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 14.77it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.52it/s]
+[atk] attacker has 16 images over 8 T-prompts (H held out: ['a painting in the style of Van Gogh', 'a Van Gogh style painting of a landscape', 'artwork in the style of Vincent van Gogh'])
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:01<00:05,  1.09s/it]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:03,  1.03it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:05<00:03,  1.59s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:05<00:00,  1.01it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.69it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 13.21it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.55it/s]
+[atk] BEFORE  utility panel acc=0.8958 adherence=0.2519 (n=48 images)
+[atk] BEFORE  T=0.042  H=0.000
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:298: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8).reshape(im.size[1], im.size[0], 3)
+[atk] frozen trainability probe before: 0.23910
+[atk] attacking UNet only (859.5M params)
+[atk] grad-norm step0: unet=1.6432e+00 text_encoder=0.0000e+00 (attack_te=False)
+[atk] step    0 loss=0.66724 0.47s/step
+[atk] step   50 loss=0.14113 0.21s/step
+[atk] step  100 loss=0.01067 0.21s/step
+[atk] step  150 loss=0.82753 0.20s/step
+[atk] step  200 loss=0.18546 0.20s/step
+[atk] step  250 loss=0.24972 0.20s/step
+[atk] step  299 loss=0.03207 0.20s/step
+[atk] param-delta: unet=1.8219e-02 text_encoder=0.0000e+00 vae=frozen
+[atk] frozen trainability probe after: 0.18219 (removed 23.80% of available loss)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.72it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 12.96it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.26it/s]
+[atk] AFTER   utility panel acc=0.8958 adherence=0.2666
+[atk] R1C_REF_imma_vangogh_s20_sd1_lr1e-5_s300: UTILITY panel acc 0.8958->0.8958 (+0.0000) | adherence 0.2519->0.2666 (+0.0147)
+[atk] R1C_REF_imma_vangogh_s20_sd1_lr1e-5_s300: T 0.042->0.917 (rise +0.875, gate PASS) | H 0.000->1.000 (rise +1.000)
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 14.00it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 13.27it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.27it/s]
+[atk] attacker has 16 images over 8 T-prompts (H held out: ['a painting in the style of Van Gogh', 'a Van Gogh style painting of a landscape', 'artwork in the style of Vincent van Gogh'])
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:02,  1.82it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:05<00:05,  1.96s/it]Loading pipeline components...:  67%|██████▋   | 4/6 [00:05<00:03,  1.56s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:05<00:00,  1.00it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 11.31it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 12.11it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.58it/s]
+[atk] BEFORE  utility panel acc=0.9167 adherence=0.2508 (n=48 images)
+[atk] BEFORE  T=0.208  H=0.000
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:298: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  (torch.frombuffer(im.tobytes(), dtype=torch.uint8).reshape(im.size[1], im.size[0], 3)
+[atk] frozen trainability probe before: 0.23911
+[atk] attacking UNet only (859.5M params)
+[atk] grad-norm step0: unet=5.0843e-02 text_encoder=0.0000e+00 (attack_te=False)
+[atk] step    0 loss=0.01170 0.46s/step
+[atk] step   50 loss=0.33662 0.21s/step
+[atk] step  100 loss=0.16640 0.21s/step
+[atk] step  150 loss=0.12592 0.20s/step
+[atk] step  200 loss=0.01998 0.20s/step
+[atk] step  250 loss=0.22501 0.20s/step
+[atk] step  299 loss=0.03313 0.20s/step
+[atk] param-delta: unet=1.8850e-02 text_encoder=0.0000e+00 vae=frozen
+[atk] frozen trainability probe after: 0.18278 (removed 23.56% of available loss)
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 11.83it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 12.21it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.68it/s]
+[atk] AFTER   utility panel acc=0.9167 adherence=0.2722
+[atk] R1C_REF_imma_vangogh_s20_sd6_lr1e-5_s300: UTILITY panel acc 0.9167->0.9167 (+0.0000) | adherence 0.2508->0.2722 (+0.0214)
+[atk] R1C_REF_imma_vangogh_s20_sd6_lr1e-5_s300: T 0.208->1.000 (rise +0.792, gate PASS) | H 0.000->1.000 (rise +1.000)
+ok loadable :: outputs/gen_REF_imma_vangogh_s20.json :: json ok: dict with 11 top-level keys
+ok loadable :: outputs/gen_ESD_vangogh_official.json :: json ok: dict with 11 top-level keys
+ok loadable :: outputs/atk_R1C_REF_imma_vangogh_s20_sd0_lr1e-5_s300.json :: json ok: dict with 12 top-level keys
+ok loadable :: outputs/atk_R1C_REF_imma_vangogh_s20_sd1_lr1e-5_s300.json :: json ok: dict with 12 top-level keys
+ok loadable :: outputs/atk_R1C_REF_imma_vangogh_s20_sd6_lr1e-5_s300.json :: json ok: dict with 12 top-level keys
+ok loadable :: outputs/r1c_completion.json :: json ok: dict with 5 top-level keys
+manifest published and re-read :: outputs/r1c_completion.json
+R1c manifest published: outputs/r1c_completion.json
+R1C DONE 2026-10-26T21:10:34-04:00

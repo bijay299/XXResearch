@@ -1,0 +1,68 @@
+/data/bijaypandey/t2i_unlearn/scripts/lmc_probe.py:33: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  b = torch.load(a.base, map_location="cpu"); b = b.get("unet", b)
+/data/bijaypandey/t2i_unlearn/scripts/lmc_probe.py:34: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  w = torch.load(f"{P}/adapters/{a.arm}/unet.pt", map_location="cpu"); w = w.get("unet", w)
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.09it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 12.01it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.02it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.90it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:52: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from /data/bijaypandey/t2i_unlearn/adapters/_lmc_tmp_gift_church_b1.0_t0.25/unet.pt
+[gen] church             clip_acc=1.000 align=0.2358
+[gen] parachute          clip_acc=1.000 align=0.2732
+[gen] garbage_truck      clip_acc=1.000 align=0.2466
+[gen] van_gogh           clip_acc=1.000 align=0.2531
+[gen] cassette_player    clip_acc=1.000 align=0.2825
+[gen] chain_saw          clip_acc=1.000 align=0.2672
+[gen] english_springer   clip_acc=1.000 align=0.2870
+[gen] french_horn        clip_acc=1.000 align=0.2989
+[gen] gas_pump           clip_acc=1.000 align=0.2514
+[gen] golf_ball          clip_acc=1.000 align=0.2700
+[gen] tench              clip_acc=1.000 align=0.2914
+[gen] monet              clip_acc=1.000 align=0.2487
+[gen] LMC_gift_church_b1.0_t0.25: TARGET(church)=1.000 utility_all_nontarget=1.0000 (n=11) | legacy_retain8=1.0000 (n=8)
+[gen] LMC_gift_church_b1.0_t0.25: forget_acc_LEGACY=1.0 retain_acc_LEGACY=1.0 in 1.4 min
+[lmc] t=0.25 target=1.0000 retain8=1.0000
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 17.76it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 10.37it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.83it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.94it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:52: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from /data/bijaypandey/t2i_unlearn/adapters/_lmc_tmp_gift_church_b1.0_t0.5/unet.pt
+[gen] church             clip_acc=1.000 align=0.2298
+[gen] parachute          clip_acc=1.000 align=0.2595
+[gen] garbage_truck      clip_acc=1.000 align=0.2459
+[gen] van_gogh           clip_acc=1.000 align=0.2552
+[gen] cassette_player    clip_acc=1.000 align=0.2801
+[gen] chain_saw          clip_acc=1.000 align=0.2594
+[gen] english_springer   clip_acc=1.000 align=0.2934
+[gen] french_horn        clip_acc=1.000 align=0.3023
+[gen] gas_pump           clip_acc=1.000 align=0.2468
+[gen] golf_ball          clip_acc=1.000 align=0.2612
+[gen] tench              clip_acc=1.000 align=0.2839
+[gen] monet              clip_acc=0.933 align=0.2297
+[gen] LMC_gift_church_b1.0_t0.5: TARGET(church)=1.000 utility_all_nontarget=0.9939 (n=11) | legacy_retain8=0.9917 (n=8)
+[gen] LMC_gift_church_b1.0_t0.5: forget_acc_LEGACY=1.0 retain_acc_LEGACY=0.9916666666666667 in 1.4 min
+[lmc] t=0.50 target=1.0000 retain8=0.9917
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  4.50it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  9.14it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 11.88it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.25it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:52: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from /data/bijaypandey/t2i_unlearn/adapters/_lmc_tmp_gift_church_b1.0_t0.75/unet.pt
+[gen] church             clip_acc=0.667 align=0.1734
+[gen] parachute          clip_acc=0.733 align=0.2235
+[gen] garbage_truck      clip_acc=0.933 align=0.2169
+[gen] van_gogh           clip_acc=1.000 align=0.2425
+[gen] cassette_player    clip_acc=1.000 align=0.2760
+[gen] chain_saw          clip_acc=0.933 align=0.2262
+[gen] english_springer   clip_acc=1.000 align=0.2845
+[gen] french_horn        clip_acc=1.000 align=0.3014
+[gen] gas_pump           clip_acc=1.000 align=0.2451
+[gen] golf_ball          clip_acc=1.000 align=0.2533
+[gen] tench              clip_acc=0.533 align=0.2097
+[gen] monet              clip_acc=0.933 align=0.2142
+[gen] LMC_gift_church_b1.0_t0.75: TARGET(church)=0.667 utility_all_nontarget=0.9152 (n=11) | legacy_retain8=0.9250 (n=8)
+[gen] LMC_gift_church_b1.0_t0.75: forget_acc_LEGACY=0.8333333333333333 retain_acc_LEGACY=0.925 in 1.4 min
+[lmc] t=0.75 target=0.6667 retain8=0.9250
+[lmc] wrote /data/bijaypandey/t2i_unlearn/outputs/lmc_gift_church_b1.0.json

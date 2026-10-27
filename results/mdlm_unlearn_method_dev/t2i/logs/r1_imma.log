@@ -1,0 +1,120 @@
+=== R1 on GPU 0 2026-10-26T11:48:18-04:00
+--- smoke: 2 steps, check trainable params move ---
+The following values were not passed to `accelerate launch` and had defaults used instead:
+	`--num_machines` was set to a value of `1`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/diffusers/utils/outputs.py:63: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  torch.utils._pytree._register_pytree_node(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/accelerate/accelerator.py:443: UserWarning: `log_with=tensorboard` was passed but no supported trackers are currently installed.
+  warnings.warn(f"`log_with={log_with}` was passed but no supported trackers are currently installed.")
+10/26/2026 11:48:24 - INFO - __main__ - Distributed environment: NO
+Num processes: 1
+Process index: 0
+Local process index: 0
+Device: cuda
+
+Mixed precision type: no
+
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/huggingface_hub/file_download.py:1142: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/diffusers/utils/outputs.py:63: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  torch.utils._pytree._register_pytree_node(
+{'dynamic_thresholding_ratio', 'variance_type', 'thresholding', 'timestep_spacing', 'sample_max_value', 'clip_sample_range', 'prediction_type'} was not found in config. Values will be initialized to default values.
+{'force_upcast', 'norm_num_groups'} was not found in config. Values will be initialized to default values.
+{'dropout', 'class_embed_type', 'projection_class_embeddings_input_dim', 'only_cross_attention', 'encoder_hid_dim_type', 'conv_in_kernel', 'encoder_hid_dim', 'resnet_time_scale_shift', 'conv_out_kernel', 'use_linear_projection', 'time_cond_proj_dim', 'addition_embed_type', 'time_embedding_act_fn', 'cross_attention_norm', 'addition_time_embed_dim', 'num_class_embeds', 'timestep_post_act', 'num_attention_heads', 'transformer_layers_per_block', 'upcast_attention', 'addition_embed_type_num_heads', 'mid_block_only_cross_attention', 'resnet_out_scale_factor', 'attention_type', 'time_embedding_dim', 'dual_cross_attention', 'class_embeddings_concat', 'mid_block_type', 'resnet_skip_time_act', 'reverse_transformer_layers_per_block', 'time_embedding_type'} was not found in config. Values will be initialized to default values.
+/data/bijaypandey/t2i_unlearn/upstream/IMMA/train/defend_text_to_image_lora.py:454: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  unet.load_state_dict(torch.load(args.delta_ckpt))
+restroting from delta model from previous version
+Downloading data:   0%|          | 0/100 [00:00<?, ?files/s]Downloading data: 100%|██████████| 100/100 [00:00<00:00, 5186.48files/s]
+Generating train split: 0 examples [00:00, ? examples/s]Generating train split: 100 examples [00:00, 15445.79 examples/s]
+10/26/2026 11:48:32 - INFO - __main__ - ***** Running training *****
+10/26/2026 11:48:32 - INFO - __main__ -   Num examples = 100
+10/26/2026 11:48:32 - INFO - __main__ -   Num Epochs = 1
+10/26/2026 11:48:32 - INFO - __main__ -   Instantaneous batch size per device = 1
+10/26/2026 11:48:32 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 1
+10/26/2026 11:48:32 - INFO - __main__ -   Gradient Accumulation steps = 1
+10/26/2026 11:48:32 - INFO - __main__ -   Total optimization steps = 2
+  0%|          | 0/2 [00:00<?, ?it/s]Steps:   0%|          | 0/2 [00:00<?, ?it/s]/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/diffusers/models/attention_processor.py:1746: FutureWarning: `LoRAAttnProcessor` is deprecated and will be removed in version 0.26.0. Make sure use AttnProcessor instead by settingLoRA layers to `self.{to_q,to_k,to_v,to_out[0]}.lora_layer` respectively. This will be done automatically when using `LoraLoaderMixin.load_lora_weights`
+  deprecate(
+Steps:  50%|█████     | 1/2 [00:00<00:00,  1.30it/s]Steps:  50%|█████     | 1/2 [00:00<00:00,  1.30it/s, lr=0.0001, step_loss=0.786]Steps: 100%|██████████| 2/2 [00:01<00:00,  2.18it/s, lr=0.0001, step_loss=0.786]Steps: 100%|██████████| 2/2 [00:01<00:00,  2.18it/s, lr=0.0001, step_loss=0.112]Steps: 100%|██████████| 2/2 [00:01<00:00,  1.20it/s, lr=0.0001, step_loss=0.112]
+  smoke rc=0
+total 365448
+drwxrwxr-x+ 2 bijaypandey bijaypandey      4096 Oct 26 11:48 .
+drwxrwxr-x+ 4 bijaypandey bijaypandey      4096 Oct 26 11:46 ..
+-rw-rw-r--+ 1 bijaypandey bijaypandey 374210382 Oct 26 11:48 imma_unet_xatten_layer.pt
+R1 PREP DONE 2026-10-26T11:48:35-04:00
+=== R1 2026-10-26T14:27:34-04:00 mode=cpu
+    upstream pin OK: 2f55041141705031d503134dec22f674f09e21bf
+--- stage 1: ESD checkpoint identity
+<stdin>:6: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+    sha256=8881d70b1bd376c5532e933f60c5a78fc76eb63e153edfbfaaf6d649106b167e
+    size=3438307109 tensors=686 dtypes={'torch.float32': 686} params=859520964
+    wrapper keys present: NONE (bare state dict)
+    -> upstream_runs/imma/esd_identity.json
+--- stage 2: training images already present, not regenerating
+--- stage 3: blank-image audit (100 images on disk)
+    on disk=100 blank(max==0)=3 ['29.png', '41.png', '7.png'] usable=97
+    lowest-std non-blank: 14.png(std=41.6), 60.png(std=45.3), 32.png(std=47.5)  -- no borderline cases if these are far from 0
+    metadata.csv: 100 rows, 100 distinct, prompts=['An artwork by Van Gogh']
+    blank images PRESENT in metadata.csv: ['29.png', '41.png', '7.png']
+    NOT rewriting metadata.csv: it is the input REF_imma_vangogh was produced from. Writing metadata_noblank.csv alongside it instead.
+    -> upstream_runs/imma/data/vangogh/metadata_noblank.csv (97 rows)
+    -> upstream_runs/imma/data/vangogh/blank_audit.json
+R1 CPU AUDIT COMPLETE 2026-10-26T14:27:43-04:00 -- no GPU was requested.
+=== R1 2026-10-26T14:32:42-04:00 mode=cpu
+    upstream pin OK: 2f55041141705031d503134dec22f674f09e21bf
+--- stage 1: ESD checkpoint identity
+<stdin>:6: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+    sha256=8881d70b1bd376c5532e933f60c5a78fc76eb63e153edfbfaaf6d649106b167e
+    size=3438307109 tensors=686 dtypes={'torch.float32': 686} params=859520964
+    wrapper keys present: NONE (bare state dict)
+    -> upstream_runs/imma/esd_identity.json
+--- stage 2: training images already present, not regenerating
+--- stage 3: blank-image audit (100 images on disk)
+    on disk=100 blank(max==0)=3 ['29.png', '41.png', '7.png'] usable=97
+    lowest-std non-blank: 14.png(std=41.6), 60.png(std=45.3), 32.png(std=47.5)  -- no borderline cases if these are far from 0
+    metadata.csv: 100 rows, 100 distinct, prompts=['An artwork by Van Gogh']
+    blank images PRESENT in metadata.csv: ['29.png', '41.png', '7.png']
+    NOT rewriting metadata.csv: it is the input REF_imma_vangogh was produced from. Writing metadata_noblank.csv alongside it instead.
+    -> upstream_runs/imma/data/vangogh/metadata_noblank.csv (97 rows)
+    -> upstream_runs/imma/data/vangogh/blank_audit.json
+R1 CPU AUDIT COMPLETE 2026-10-26T14:32:51-04:00 -- no GPU was requested.
+=== R1 2026-10-26T14:39:02-04:00 mode=cpu
+    upstream pin OK: 2f55041141705031d503134dec22f674f09e21bf
+--- stage 1: ESD checkpoint identity
+<stdin>:6: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+    sha256=8881d70b1bd376c5532e933f60c5a78fc76eb63e153edfbfaaf6d649106b167e
+    size=3438307109 tensors=686 dtypes={'torch.float32': 686} params=859520964
+    wrapper keys present: NONE (bare state dict)
+    -> upstream_runs/imma/esd_identity.json
+--- stage 2: training images already present, not regenerating
+--- stage 3: blank-image audit (100 images on disk)
+    on disk=100 blank(max==0)=3 ['29.png', '41.png', '7.png'] usable=97
+    lowest-std non-blank: 14.png(std=41.6), 60.png(std=45.3), 32.png(std=47.5)  -- no borderline cases if these are far from 0
+    metadata.csv: 100 rows, 100 distinct, prompts=['An artwork by Van Gogh']
+    blank images PRESENT in metadata.csv: ['29.png', '41.png', '7.png']
+    NOT rewriting metadata.csv: it is the input REF_imma_vangogh was produced from. Writing metadata_noblank.csv alongside it instead.
+    -> upstream_runs/imma/data/vangogh/metadata_noblank.csv (97 rows)
+    -> upstream_runs/imma/data/vangogh/blank_audit.json
+R1 CPU AUDIT COMPLETE 2026-10-26T14:39:11-04:00 -- no GPU was requested.
+=== R1 2026-10-26T15:26:47-04:00 mode=cpu
+    upstream pin OK: 2f55041141705031d503134dec22f674f09e21bf
+--- stage 1: ESD checkpoint identity
+<stdin>:6: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+    sha256=8881d70b1bd376c5532e933f60c5a78fc76eb63e153edfbfaaf6d649106b167e
+    size=3438307109 tensors=686 dtypes={'torch.float32': 686} params=859520964
+    wrapper keys present: NONE (bare state dict)
+    -> upstream_runs/imma/esd_identity.json
+--- stage 2: training images already present, not regenerating
+--- stage 3: blank-image audit (100 images on disk)
+    on disk=100 blank(max==0)=3 ['29.png', '41.png', '7.png'] usable=97
+    lowest-std non-blank: 14.png(std=41.6), 60.png(std=45.3), 32.png(std=47.5)  -- no borderline cases if these are far from 0
+    metadata.csv: 100 rows, 100 distinct, prompts=['An artwork by Van Gogh']
+    blank images PRESENT in metadata.csv: ['29.png', '41.png', '7.png']
+    NOT rewriting metadata.csv: it is the input REF_imma_vangogh was produced from. Writing metadata_noblank.csv alongside it instead.
+    -> upstream_runs/imma/data/vangogh/metadata_noblank.csv (97 rows)
+    -> upstream_runs/imma/data/vangogh/blank_audit.json
+R1 CPU AUDIT COMPLETE 2026-10-26T15:26:56-04:00 -- no GPU was requested.

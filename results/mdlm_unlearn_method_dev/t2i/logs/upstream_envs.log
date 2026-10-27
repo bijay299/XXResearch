@@ -1,0 +1,58 @@
+=== creating venv_imma by copy 2026-10-26T10:35:17-04:00
+--- venv_imma installing: datasets torchvision ---
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+tokenizers 0.20.3 requires huggingface-hub<1.0,>=0.16.4, but you have huggingface-hub 2.3.0 which is incompatible.
+transformers 4.46.3 requires huggingface-hub<1.0,>=0.23.2, but you have huggingface-hub 2.3.0 which is incompatible.
+venv_imma install OK
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/__init__.py", line 26, in <module>
+    from . import dependency_versions_check
+  File "/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/dependency_versions_check.py", line 57, in <module>
+    require_version_core(deps[pkg])
+  File "/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/versions.py", line 117, in require_version_core
+    return require_version(requirement, hint)
+  File "/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/versions.py", line 111, in require_version
+    _compare_versions(op, got_ver, want_ver, requirement, pkg, hint)
+  File "/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/versions.py", line 44, in _compare_versions
+    raise ImportError(
+ImportError: huggingface-hub>=0.23.2,<1.0 is required for a normal functioning of this module, but found huggingface-hub==2.3.0.
+Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're working with git main
+=== creating venv_uce by copy 2026-10-26T10:37:53-04:00
+--- venv_uce installing: diffusers>=0.34.0 ---
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+tokenizers 0.20.3 requires huggingface-hub<1.0,>=0.16.4, but you have huggingface-hub 1.33.0 which is incompatible.
+transformers 4.46.3 requires huggingface-hub<1.0,>=0.23.2, but you have huggingface-hub 1.33.0 which is incompatible.
+venv_uce install OK
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/diffusers/__init__.py", line 5, in <module>
+    from .utils import (
+  File "/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/diffusers/utils/__init__.py", line 137, in <module>
+    from .peft_utils import (
+  File "/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/diffusers/utils/peft_utils.py", line 26, in <module>
+    from .torch_utils import empty_device_cache
+  File "/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/diffusers/utils/torch_utils.py", line 413, in <module>
+    torch_device = get_device()
+  File "/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/diffusers/utils/torch_utils.py", line 319, in get_device
+    return TorchDeviceBackend._detect_device_type()
+  File "/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/diffusers/utils/torch_utils.py", line 245, in _detect_device_type
+    if torch.accelerator.is_available():
+  File "/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/torch/__init__.py", line 2216, in __getattr__
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
+AttributeError: module 'torch' has no attribute 'accelerator'
+ENVS DONE 2026-10-26T10:38:14-04:00
+=== v2 setup 2026-10-26T10:39:38-04:00
+venv_uce: unmodified copy (no installs needed)
+/data/bijaypandey/t2i_unlearn/venv_uce/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+  venv_uce OK torch=2.4.1+cu124 diffusers=0.31.0 transformers=4.46.3
+venv_imma: torchvision==0.19.1 (--no-deps, matches torch 2.4.1)
+venv_imma: datasets (constrained)
+/data/bijaypandey/t2i_unlearn/venv_imma/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+  venv_imma OK torch=2.4.1+cu124 tv=0.19.1+cu121 datasets=5.0.1 diffusers=0.31.0 transformers=4.46.3
+  LoRAAttnProcessor + AttnProcsLayers import OK
+ENVS v2 DONE 2026-10-26T10:40:18-04:00

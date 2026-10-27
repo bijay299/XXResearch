@@ -1,0 +1,59 @@
+=== BUILD F57rand_church_r3_rs0 concept=church rho=0.03 rand-seed=0 2026-10-24T18:08:52-04:00
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:02<00:14,  3.00s/it]Loading pipeline components...:  50%|█████     | 3/6 [00:06<00:06,  2.03s/it]Loading pipeline components...:  83%|████████▎ | 5/6 [00:18<00:04,  4.22s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:19<00:00,  3.13s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:19<00:00,  3.19s/it]
+[frp] scope: 32 FF linears, 148.7M params (17.3% of UNet)
+[frp] D_f = 4 prompts, D_r = 32 prompts, 8 timesteps each
+[frp] calibration positions per layer: forget=2048 retain=16384 (paper's budget was 400x256 = 102400 per side)
+[frp] pruned 4.42M of 148.7M FF weights (2.97%) across 32 layers
+[frp] F57rand_church_r3_rs0: wrote /data/bijaypandey/t2i_unlearn/adapters/F57rand_church_r3_rs0/unet.pt in 0.7 min
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  4.92it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  8.93it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00,  9.17it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.79it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:52: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/F57rand_church_r3_rs0/unet.pt
+[gen] church             clip_acc=1.000 align=0.2412
+[gen] parachute          clip_acc=1.000 align=0.2703
+[gen] garbage_truck      clip_acc=1.000 align=0.2479
+[gen] van_gogh           clip_acc=1.000 align=0.2527
+[gen] cassette_player    clip_acc=1.000 align=0.2746
+[gen] chain_saw          clip_acc=1.000 align=0.2767
+[gen] english_springer   clip_acc=1.000 align=0.2898
+[gen] french_horn        clip_acc=1.000 align=0.2966
+[gen] gas_pump           clip_acc=1.000 align=0.2551
+[gen] golf_ball          clip_acc=1.000 align=0.2606
+[gen] tench              clip_acc=1.000 align=0.2794
+[gen] monet              clip_acc=1.000 align=0.2526
+[gen] F57rand_church_r3_rs0: TARGET(church)=1.000 utility_all_nontarget=1.0000 (n=11) | legacy_retain8=1.0000 (n=8)
+[gen] F57rand_church_r3_rs0: forget_acc_LEGACY=1.0 retain_acc_LEGACY=1.0 in 1.4 min
+=== BUILD F57rand_church_r3_rs1 concept=church rho=0.03 rand-seed=1 2026-10-24T18:11:19-04:00
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:01<00:06,  1.24s/it]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:02,  1.73it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:02<00:02,  1.39it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.11s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.03s/it]
+[frp] scope: 32 FF linears, 148.7M params (17.3% of UNet)
+[frp] D_f = 4 prompts, D_r = 32 prompts, 8 timesteps each
+[frp] calibration positions per layer: forget=2048 retain=16384 (paper's budget was 400x256 = 102400 per side)
+[frp] pruned 4.42M of 148.7M FF weights (2.97%) across 32 layers
+[frp] F57rand_church_r3_rs1: wrote /data/bijaypandey/t2i_unlearn/adapters/F57rand_church_r3_rs1/unet.pt in 0.5 min
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.25it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  6.71it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.50it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.59it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:52: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/F57rand_church_r3_rs1/unet.pt
+[gen] church             clip_acc=1.000 align=0.2430
+[gen] parachute          clip_acc=1.000 align=0.2709
+[gen] garbage_truck      clip_acc=1.000 align=0.2409
+[gen] van_gogh           clip_acc=1.000 align=0.2526
+[gen] cassette_player    clip_acc=1.000 align=0.2820
+[gen] chain_saw          clip_acc=1.000 align=0.2761
+[gen] english_springer   clip_acc=1.000 align=0.2889
+[gen] french_horn        clip_acc=1.000 align=0.2935
+[gen] gas_pump           clip_acc=1.000 align=0.2603
+[gen] golf_ball          clip_acc=1.000 align=0.2657
+[gen] tench              clip_acc=1.000 align=0.2786
+[gen] monet              clip_acc=1.000 align=0.2583
+[gen] F57rand_church_r3_rs1: TARGET(church)=1.000 utility_all_nontarget=1.0000 (n=11) | legacy_retain8=1.0000 (n=8)
+[gen] F57rand_church_r3_rs1: forget_acc_LEGACY=1.0 retain_acc_LEGACY=1.0 in 1.4 min
+F57 A DONE 2026-10-24T18:13:27-04:00

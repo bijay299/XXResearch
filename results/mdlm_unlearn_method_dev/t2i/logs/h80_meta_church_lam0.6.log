@@ -1,0 +1,60 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:02,  1.36it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:01<00:00,  2.96it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:10<00:00,  2.22s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:10<00:00,  1.75s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 35.20it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 10.78it/s]
+/data/bijaypandey/t2i_unlearn/scripts/meta_unlearn.py:71: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[meta] data: 64 forget, 64 benign
+Traceback (most recent call last):
+  File "/data/bijaypandey/t2i_unlearn/scripts/meta_unlearn.py", line 164, in <module>
+    main()
+  File "/data/bijaypandey/t2i_unlearn/scripts/meta_unlearn.py", line 137, in main
+    opt.step()
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/torch/optim/optimizer.py", line 484, in wrapper
+    out = func(*args, **kwargs)
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/torch/optim/optimizer.py", line 89, in _use_grad
+    ret = func(self, *args, **kwargs)
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/torch/optim/adam.py", line 216, in step
+    has_complex = self._init_group(
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/torch/optim/adam.py", line 160, in _init_group
+    state["exp_avg_sq"] = torch.zeros_like(
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 58.00 MiB. GPU 0 has a total capacity of 39.38 GiB of which 55.50 MiB is free. Process 697806 has 16.56 GiB memory in use. Including non-PyTorch memory, this process has 22.72 GiB memory in use. Of the allocated memory 21.93 GiB is allocated by PyTorch, and 289.99 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.24it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:03,  1.22it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:07<00:04,  2.24s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.60s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:09<00:00,  1.57s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:122: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 19.11it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.38it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.99it/s]
+/data/bijaypandey/t2i_unlearn/scripts/meta_unlearn.py:71: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[meta] data: 64 forget, 64 benign
+[meta] step     0 erase=0.00000 retain=0.00000 benign@theta'=0.01747 152.60s/step
+[meta] step   250 erase=0.00015 retain=0.00450 benign@theta'=0.28631 1.39s/step
+[meta] step   500 erase=0.00012 retain=0.00027 benign@theta'=0.08393 1.09s/step
+[meta] step   750 erase=0.00041 retain=0.01995 benign@theta'=0.28833 0.99s/step
+[meta] step  1000 erase=0.00149 retain=0.04303 benign@theta'=0.15715 0.94s/step
+[meta] step  1250 erase=0.00148 retain=0.00135 benign@theta'=0.12774 0.91s/step
+[meta] step  1499 erase=0.00084 retain=0.00770 benign@theta'=0.63419 0.89s/step
+[meta] h80_meta_church_lam0.6: wrote adapters/h80_meta_church_lam0.6/unet.pt in 22.2 min
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  6.01it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00,  9.02it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  8.84it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  8.46it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:52: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/h80_meta_church_lam0.6/unet.pt
+[gen] church             clip_acc=0.000 align=0.1816
+[gen] parachute          clip_acc=0.533 align=0.1892
+[gen] garbage_truck      clip_acc=1.000 align=0.2340
+[gen] van_gogh           clip_acc=0.867 align=0.1986
+[gen] cassette_player    clip_acc=0.867 align=0.2128
+[gen] chain_saw          clip_acc=0.133 align=0.1844
+[gen] english_springer   clip_acc=0.733 align=0.2125
+[gen] french_horn        clip_acc=0.467 align=0.2057
+[gen] gas_pump           clip_acc=0.933 align=0.2349
+[gen] golf_ball          clip_acc=1.000 align=0.2212
+[gen] tench              clip_acc=0.333 align=0.1829
+[gen] monet              clip_acc=0.533 align=0.2093
+[gen] h80_meta_church_lam0.6: TARGET(church)=0.000 utility_all_nontarget=0.6727 (n=11) | legacy_retain8=0.6250 (n=8)
+[gen] h80_meta_church_lam0.6: forget_acc_LEGACY=0.6 retain_acc_LEGACY=0.625 in 1.4 min

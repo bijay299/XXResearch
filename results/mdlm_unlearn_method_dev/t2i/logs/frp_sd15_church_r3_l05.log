@@ -1,0 +1,75 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Couldn't connect to the Hub: 404 Client Error. (Request ID: Root=1-6ade7744-77fb4b870475abf253141d2c;92f5e4f8-6818-46f5-9093-cd702780a414)
+
+Revision Not Found for url: https://huggingface.co/api/models/stable-diffusion-v1-5/stable-diffusion-v1-5/revision/133a221b8aa7292a167afc5127cb63fb5005638b.
+Invalid rev id: 133a221b8aa7292a167afc5127cb63fb5005638b.
+Will try to load from local cache.
+Traceback (most recent call last):
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 406, in hf_raise_for_status
+    response.raise_for_status()
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://huggingface.co/api/models/stable-diffusion-v1-5/stable-diffusion-v1-5/revision/133a221b8aa7292a167afc5127cb63fb5005638b
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/diffusers/pipelines/pipeline_utils.py", line 1282, in download
+    info = model_info(pretrained_model_name, token=token, revision=revision)
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/huggingface_hub/hf_api.py", line 2541, in model_info
+    hf_raise_for_status(r)
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 413, in hf_raise_for_status
+    raise _format(RevisionNotFoundError, message, response) from e
+huggingface_hub.errors.RevisionNotFoundError: 404 Client Error. (Request ID: Root=1-6ade7744-77fb4b870475abf253141d2c;92f5e4f8-6818-46f5-9093-cd702780a414)
+
+Revision Not Found for url: https://huggingface.co/api/models/stable-diffusion-v1-5/stable-diffusion-v1-5/revision/133a221b8aa7292a167afc5127cb63fb5005638b.
+Invalid rev id: 133a221b8aa7292a167afc5127cb63fb5005638b
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/data/bijaypandey/t2i_unlearn/scripts/erase_frp.py", line 233, in <module>
+    main()
+  File "/data/bijaypandey/t2i_unlearn/scripts/erase_frp.py", line 179, in main
+    pipe = StableDiffusionPipeline.from_pretrained(
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/diffusers/pipelines/pipeline_utils.py", line 725, in from_pretrained
+    cached_folder = cls.download(
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/diffusers/pipelines/pipeline_utils.py", line 1479, in download
+    raise EnvironmentError(
+OSError: Cannot load model runwayml/stable-diffusion-v1-5: model is not cached locally and an error occurred while trying to fetch metadata from the Hub. Please check out the root cause in the stacktrace above.
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]Fetching 13 files:  62%|██████▏   | 8/13 [00:00<00:00, 15.73it/s]Fetching 13 files:  92%|█████████▏| 12/13 [00:19<00:01,  1.66s/it]Fetching 13 files: 100%|██████████| 13/13 [01:03<00:00,  4.91s/it]Fetching 13 files: 100%|██████████| 13/13 [01:03<00:00,  4.91s/it]
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:01<00:01,  2.93it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:01<00:00,  3.12it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:01<00:00,  3.80it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:01<00:00,  4.70it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:01<00:00,  3.89it/s]
+[frp] scope: 32 FF linears, 148.7M params (17.3% of UNet)
+[frp] D_f = 4 prompts, D_r = 32 prompts, 8 timesteps each
+[frp] calibration positions per layer: forget=2048 retain=16384 (paper's budget was 400x256 = 102400 per side)
+[frp] pruned 4.42M of 148.7M FF weights (2.97%) across 32 layers
+[frp] frp_sd15_church_r3_l05: wrote /data/bijaypandey/t2i_unlearn/adapters/frp_sd15_church_r3_l05/unet.pt in 1.4 min
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  4.57it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  5.20it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 12.55it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.15it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/frp_sd15_church_r3_l05/unet.pt
+[gen] church             clip_acc=0.133 align=0.1644
+[gen] parachute          clip_acc=0.800 align=0.2092
+[gen] garbage_truck      clip_acc=0.733 align=0.1964
+[gen] van_gogh           clip_acc=0.800 align=0.2076
+[gen] cassette_player    clip_acc=1.000 align=0.2644
+[gen] chain_saw          clip_acc=0.667 align=0.2024
+[gen] english_springer   clip_acc=1.000 align=0.2316
+[gen] french_horn        clip_acc=1.000 align=0.2700
+[gen] gas_pump           clip_acc=1.000 align=0.2559
+[gen] golf_ball          clip_acc=0.867 align=0.2511
+[gen] tench              clip_acc=1.000 align=0.2334
+[gen] monet              clip_acc=0.933 align=0.2084
+[gen] frp_sd15_church_r3_l05: TARGET(church)=0.133 utility_all_nontarget=0.8909 (n=11) | legacy_retain8=0.9333 (n=8)
+[gen] frp_sd15_church_r3_l05: forget_acc_LEGACY=0.6166666666666667 retain_acc_LEGACY=0.9333333333333333 in 1.4 min

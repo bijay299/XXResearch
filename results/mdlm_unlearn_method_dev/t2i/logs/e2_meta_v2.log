@@ -1,0 +1,89 @@
+=== meta2_church_lt1.0 2026-10-26T09:38:19-04:00 free=91GiB
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:03<00:07,  2.00s/it]Loading pipeline components...:  50%|█████     | 3/6 [00:04<00:03,  1.21s/it]Loading pipeline components...:  83%|████████▎ | 5/6 [00:04<00:00,  1.27it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.15it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.01s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 17.20it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.05it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.14it/s]
+/data/bijaypandey/t2i_unlearn/scripts/meta_unlearn_v2.py:148: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[meta2] TARGET DATA CHECK: 64/64 = 1.0000 classified as 'church' (source=base)
+[meta2] meta scope 'xattn': 44.0M | attack scope 'full': 859.5M
+[meta2] step     0 erase=0.00000 L_F(theta')=0.00736 dL_R=+0.00703 141.50s/step
+[meta2] step   250 erase=0.00030 L_F(theta')=0.00308 dL_R=-0.05971 1.57s/step
+[meta2] step   500 erase=0.00383 L_F(theta')=0.31537 dL_R=+0.07109 1.29s/step
+[meta2] step   750 erase=0.01784 L_F(theta')=0.18744 dL_R=+0.35985 1.19s/step
+[meta2] step  1000 erase=0.00297 L_F(theta')=0.12013 dL_R=+0.01744 1.15s/step
+[meta2] step  1250 erase=0.00445 L_F(theta')=0.16835 dL_R=-0.00248 1.12s/step
+[meta2] step  1499 erase=0.00551 L_F(theta')=0.03382 dL_R=+0.00032 1.10s/step
+[meta2] meta2_church_lt1.0: wrote adapters/meta2_church_lt1.0/unet.pt in 27.5 min
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  8.15it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  8.25it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 13.45it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.78it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/meta2_church_lt1.0/unet.pt
+[gen] church             clip_acc=0.133 align=0.1827
+[gen] parachute          clip_acc=0.933 align=0.2222
+[gen] garbage_truck      clip_acc=1.000 align=0.2226
+[gen] van_gogh           clip_acc=1.000 align=0.2500
+[gen] cassette_player    clip_acc=1.000 align=0.2761
+[gen] chain_saw          clip_acc=1.000 align=0.2095
+[gen] english_springer   clip_acc=1.000 align=0.2864
+[gen] french_horn        clip_acc=1.000 align=0.2755
+[gen] gas_pump           clip_acc=1.000 align=0.2456
+[gen] golf_ball          clip_acc=0.867 align=0.2491
+[gen] tench              clip_acc=1.000 align=0.2459
+[gen] monet              clip_acc=0.533 align=0.2050
+[gen] meta2_church_lt1.0: TARGET(church)=0.133 utility_all_nontarget=0.9394 (n=11) | legacy_retain8=0.9250 (n=8)
+[gen] meta2_church_lt1.0: forget_acc_LEGACY=0.7666666666666666 retain_acc_LEGACY=0.925 in 1.4 min
+[E2] meta2_church_lt1.0 as-is: target=0.1333 retain8=0.9250 allnt=0.9394
+[E2] target-pool content check: 1.0000 (base)
+[E2] scopes: meta=xattn (44.0M) attack=full (859.5M)
+[E2] final: L_F(theta')=0.03382 dL_R=+0.00032
+[E2] K1: CLEAR -> frozen grid | vacuity: erased something
+=== meta2_church_lt0.5 2026-10-26T10:07:32-04:00 free=378GiB
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:01<00:06,  1.35s/it]Loading pipeline components...:  33%|███▎      | 2/6 [00:01<00:02,  1.62it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:05<00:02,  1.47s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.01it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:06<00:00,  1.05s/it]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.08it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 11.69it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.45it/s]
+/data/bijaypandey/t2i_unlearn/scripts/meta_unlearn_v2.py:148: UserWarning: The given buffer is not writable, and PyTorch does not support non-writable tensors. This means you can write to the underlying (supposedly non-writable) buffer using the tensor. You may want to copy the buffer to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_new.cpp:1544.)
+  x = torch.from_numpy((torch.frombuffer(im.tobytes(), dtype=torch.uint8)
+[meta2] TARGET DATA CHECK: 64/64 = 1.0000 classified as 'church' (source=base)
+[meta2] meta scope 'xattn': 44.0M | attack scope 'full': 859.5M
+[meta2] step     0 erase=0.00000 L_F(theta')=0.00736 dL_R=+0.00703 139.85s/step
+[meta2] step   250 erase=0.00024 L_F(theta')=0.00300 dL_R=-0.05922 1.56s/step
+[meta2] step   500 erase=0.00172 L_F(theta')=0.30721 dL_R=+0.07028 1.28s/step
+[meta2] step   750 erase=0.00824 L_F(theta')=0.18167 dL_R=+0.35667 1.19s/step
+[meta2] step  1000 erase=0.00165 L_F(theta')=0.11773 dL_R=+0.01725 1.14s/step
+[meta2] step  1250 erase=0.00329 L_F(theta')=0.16675 dL_R=-0.00237 1.11s/step
+[meta2] step  1499 erase=0.00529 L_F(theta')=0.03453 dL_R=+0.00044 1.10s/step
+[meta2] meta2_church_lt0.5: wrote adapters/meta2_church_lt0.5/unet.pt in 27.4 min
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  7.71it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00,  6.94it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  8.05it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00,  8.23it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 11.77it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/meta2_church_lt0.5/unet.pt
+[gen] church             clip_acc=0.000 align=0.1736
+[gen] parachute          clip_acc=1.000 align=0.2130
+[gen] garbage_truck      clip_acc=1.000 align=0.2288
+[gen] van_gogh           clip_acc=0.933 align=0.2243
+[gen] cassette_player    clip_acc=1.000 align=0.2679
+[gen] chain_saw          clip_acc=0.933 align=0.2145
+[gen] english_springer   clip_acc=1.000 align=0.2694
+[gen] french_horn        clip_acc=1.000 align=0.2829
+[gen] gas_pump           clip_acc=1.000 align=0.2486
+[gen] golf_ball          clip_acc=1.000 align=0.2579
+[gen] tench              clip_acc=1.000 align=0.2544
+[gen] monet              clip_acc=0.267 align=0.1922
+[gen] meta2_church_lt0.5: TARGET(church)=0.000 utility_all_nontarget=0.9212 (n=11) | legacy_retain8=0.9000 (n=8)
+[gen] meta2_church_lt0.5: forget_acc_LEGACY=0.7333333333333334 retain_acc_LEGACY=0.9 in 1.4 min
+[E2] meta2_church_lt0.5 as-is: target=0.0000 retain8=0.9000 allnt=0.9212
+[E2] target-pool content check: 1.0000 (base)
+[E2] scopes: meta=xattn (44.0M) attack=full (859.5M)
+[E2] final: L_F(theta')=0.03453 dL_R=+0.00044
+[E2] K1: CLEAR -> frozen grid | vacuity: erased something
+E2 DONE 2026-10-26T10:36:38-04:00

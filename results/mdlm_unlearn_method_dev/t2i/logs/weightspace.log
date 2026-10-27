@@ -1,0 +1,63 @@
+/data/bijaypandey/t2i_unlearn/scripts/weightspace_predictor.py:41: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  bsd = torch.load(a.base, map_location="cpu")
+[ws] base: 859.5M params, ||theta||=1060.12; cross-attn 44.0M, ||.||=263.02
+/data/bijaypandey/t2i_unlearn/scripts/weightspace_predictor.py:55: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(d, map_location="cpu"); sd = sd.get("unet", sd)
+[ws] F57rand_church_r3_rs0              L2=  108.690 rel=0.10253 cos=1.278209 xattn_rel=0.00000
+[ws] F57rand_church_r3_rs1              L2=  108.596 rel=0.10244 cos=1.278220 xattn_rel=0.00000
+[ws] F57rand_parachute_r5_rs0           L2=  141.020 rel=0.13302 cos=1.273363 xattn_rel=0.00000
+[ws] adv_church                         L2=    1.856 rel=0.00175 cos=1.284557 xattn_rel=0.00706
+[ws] esd_church                         L2=    4.848 rel=0.00457 cos=1.284549 xattn_rel=0.00000
+[ws] frp_church_r0_l05                  L2=  164.026 rel=0.15472 cos=1.270815 xattn_rel=0.00000
+[ws] frp_church_r10_l05                 L2=  408.890 rel=0.38570 cos=1.204709 xattn_rel=0.00000
+[ws] frp_church_r20_l05                 L2=  501.751 rel=0.47329 cos=1.169760 xattn_rel=0.00000
+[ws] frp_church_r3_l00                  L2=  262.648 rel=0.24775 cos=1.248623 xattn_rel=0.00000
+[ws] frp_church_r3_l05                  L2=  264.526 rel=0.24952 cos=1.248082 xattn_rel=0.00000
+[ws] frp_church_r3_l10                  L2=  274.637 rel=0.25906 cos=1.245375 xattn_rel=0.00000
+[ws] frp_church_r5_l05                  L2=  322.134 rel=0.30386 cos=1.231026 xattn_rel=0.00000
+[ws] frp_garbage_truck_r3_l05           L2=  259.042 rel=0.24435 cos=1.249563 xattn_rel=0.00000
+[ws] frp_garbage_truck_r5_l05           L2=  317.052 rel=0.29907 cos=1.232624 xattn_rel=0.00000
+[ws] frp_parachute_r0_l05               L2=  161.696 rel=0.15253 cos=1.271151 xattn_rel=0.00000
+[ws] frp_parachute_r10_l05              L2=  406.057 rel=0.38303 cos=1.205723 xattn_rel=0.00000
+[ws] frp_parachute_r20_l05              L2=  499.600 rel=0.47127 cos=1.170260 xattn_rel=0.00000
+[ws] frp_parachute_r3_l00               L2=  259.085 rel=0.24439 cos=1.249522 xattn_rel=0.00000
+[ws] frp_parachute_r3_l05               L2=  261.397 rel=0.24657 cos=1.248932 xattn_rel=0.00000
+[ws] frp_parachute_r3_l10               L2=  273.638 rel=0.25812 cos=1.245580 xattn_rel=0.00000
+[ws] frp_parachute_r5_l05               L2=  318.980 rel=0.30089 cos=1.232024 xattn_rel=0.00000
+[ws] frp_tench_r3_l05                   L2=  260.331 rel=0.24557 cos=1.249211 xattn_rel=0.00000
+[ws] frp_tench_r5_l05                   L2=  318.252 rel=0.30020 cos=1.232246 xattn_rel=0.00000
+[ws] gift_church_b0.1                   L2=    0.034 rel=0.00003 cos=1.284557 xattn_rel=0.00013
+[ws] gift_church_b1.0                   L2=    0.180 rel=0.00017 cos=1.284557 xattn_rel=0.00069
+[ws] gift_church_b1.2                   L2=    0.203 rel=0.00019 cos=1.284557 xattn_rel=0.00077
+[ws] gift_church_b1.3                   L2=    0.214 rel=0.00020 cos=1.284557 xattn_rel=0.00081
+[ws] gift_church_b1.35                  L2=    0.219 rel=0.00021 cos=1.284557 xattn_rel=0.00083
+[ws] gift_church_b1.5                   L2=    0.234 rel=0.00022 cos=1.284557 xattn_rel=0.00089
+[ws] gift_church_b10.0                  L2=    0.696 rel=0.00066 cos=1.284558 xattn_rel=0.00265
+[ws] gift_church_b2.0                   L2=    0.278 rel=0.00026 cos=1.284557 xattn_rel=0.00106
+[ws] gift_church_b3.0                   L2=    0.352 rel=0.00033 cos=1.284557 xattn_rel=0.00134
+[ws] gift_church_b5.0                   L2=    0.473 rel=0.00045 cos=1.284557 xattn_rel=0.00180
+[ws] h48_adv_a0.3                       L2=  314.492 rel=0.29666 cos=1.282959 xattn_rel=0.30150
+[ws] h50_adv_a0.5                       L2=  530.446 rel=0.50036 cos=1.282385 xattn_rel=0.50199
+[ws] h64v2_frag_a0.3_church             L2=  483.359 rel=0.45595 cos=1.164500 xattn_rel=0.43694
+[ws] h64v2_frag_a0.3_parachute          L2=  483.142 rel=0.45574 cos=1.164774 xattn_rel=0.43528
+[ws] h68v2_rf_a0.3_church               L2=  314.503 rel=0.29667 cos=1.282971 xattn_rel=0.30150
+[ws] h68v2_rf_a0.3_parachute            L2=  314.478 rel=0.29664 cos=1.282984 xattn_rel=0.30148
+[ws] h69v2_fragnorm_a0.3_church         L2=  483.179 rel=0.45578 cos=1.164546 xattn_rel=0.43617
+[ws] h69v2_fragnorm_a0.3_parachute      L2=  482.971 rel=0.45558 cos=1.164827 xattn_rel=0.43450
+[ws] h80_meta_church_lam0.0             L2=  264.526 rel=0.24952 cos=1.248082 xattn_rel=0.00000
+[ws] h80_meta_church_lam0.5             L2=  264.527 rel=0.24952 cos=1.248065 xattn_rel=0.00705
+[ws] h80_meta_church_lam0.6             L2=  264.529 rel=0.24953 cos=1.248061 xattn_rel=0.00774
+[ws] h80_meta_church_lam0.7             L2=  264.530 rel=0.24953 cos=1.248056 xattn_rel=0.00898
+[ws] h80_meta_church_lam0.8             L2=  264.530 rel=0.24953 cos=1.248049 xattn_rel=0.01111
+[ws] h80_meta_church_lam0.9             L2=  264.528 rel=0.24953 cos=1.248045 xattn_rel=0.01226
+[ws] h80_meta_church_lam1.0             L2=  264.528 rel=0.24953 cos=1.248040 xattn_rel=0.01193
+[ws] h80_meta_church_lam2.0             L2=  264.528 rel=0.24953 cos=1.248009 xattn_rel=0.01408
+[ws] imma_church_esd                    L2=   10.811 rel=0.01020 cos=1.284508 xattn_rel=0.04011
+[ws] imma_church_frp                    L2=  264.565 rel=0.24956 cos=1.248050 xattn_rel=0.04095
+[ws] imma_church_frp_a1e-5_s300         L2=  264.534 rel=0.24953 cos=1.248068 xattn_rel=0.02610
+[ws] imma_church_frp_a1e-6_s1500        L2=  264.526 rel=0.24952 cos=1.248081 xattn_rel=0.00439
+[ws] imma_church_frp_a1e-6_s300         L2=  264.526 rel=0.24952 cos=1.248082 xattn_rel=0.00174
+[ws] imma_church_frp_a1e-7_s1500        L2=  264.526 rel=0.24952 cos=1.248083 xattn_rel=0.00043
+[ws] uce_church                         L2=   53.837 rel=0.05078 cos=1.283318 xattn_rel=0.20469
+[ws] undo_a0.5_big                      L2=  531.316 rel=0.50118 cos=1.281142 xattn_rel=0.51692
+[ws] wrote /data/bijaypandey/t2i_unlearn/outputs/weightspace_predictor.json (57 arms)

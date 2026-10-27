@@ -1,0 +1,27 @@
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  5.18it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:10<00:23,  5.95s/it]Loading pipeline components...:  67%|██████▋   | 4/6 [00:12<00:05,  2.94s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:14<00:00,  2.14s/it]Loading pipeline components...: 100%|██████████| 6/6 [00:14<00:00,  2.49s/it]
+[uce] erase directions: (76, 768)  preserve directions: (750, 768)
+[uce] editing 32 cross-attention K/V matrices for 'church' -> ''
+[uce] mean relative weight change: 0.0675
+[uce] saved adapters/uce_sd15_church_lam1000/unet.pt
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:01,  4.47it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00,  9.59it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.59it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 12.32it/s]
+/data/bijaypandey/t2i_unlearn/scripts/gen_eval.py:61: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+[gen] loaded erased unet from adapters/uce_sd15_church_lam1000/unet.pt
+[gen] church             clip_acc=0.200 align=0.1354
+[gen] parachute          clip_acc=0.800 align=0.2176
+[gen] garbage_truck      clip_acc=1.000 align=0.2239
+[gen] van_gogh           clip_acc=0.933 align=0.2515
+[gen] cassette_player    clip_acc=1.000 align=0.2681
+[gen] chain_saw          clip_acc=0.867 align=0.2084
+[gen] english_springer   clip_acc=1.000 align=0.2692
+[gen] french_horn        clip_acc=1.000 align=0.3010
+[gen] gas_pump           clip_acc=1.000 align=0.2336
+[gen] golf_ball          clip_acc=0.933 align=0.2351
+[gen] tench              clip_acc=0.867 align=0.2022
+[gen] monet              clip_acc=0.933 align=0.2296
+[gen] uce_sd15_church_lam1000: TARGET(church)=0.200 utility_all_nontarget=0.9394 (n=11) | legacy_retain8=0.9500 (n=8)
+[gen] uce_sd15_church_lam1000: forget_acc_LEGACY=0.7333333333333334 retain_acc_LEGACY=0.95 in 3.8 min

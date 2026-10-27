@@ -1,0 +1,383 @@
+{
+ "study": "t2i_frp_port",
+ "method": "FRP (Forget-Retain Pruning)",
+ "source": "arXiv 2608.25429 Algorithm 1, Eq. (3)-(4), Eq. (6), Table 4",
+ "provenance": "OUR PORT from the paper. The authors' repo holds only a README ('Code release is in preparation'), so this is NOT their code and NOT a reproduction of their numbers. See ERRATUM_r2 C19 and PREREG_H66.",
+ "label": "F57rand_church_r3_rs1",
+ "hparams": {
+  "concept": "church",
+  "rho": 0.03,
+  "beta": 0.05,
+  "lmbda": 0.05,
+  "n_retain": 32,
+  "n_timesteps": 8,
+  "seed": 42,
+  "random_mask": true,
+  "rand_seed": 1,
+  "label": "F57rand_church_r3_rs1",
+  "out": null
+ },
+ "lambda_note": "lambda is NEVER assigned a value anywhere in the paper; 0.05 is pre-declared in PREREG_H66 S3(c) and the full sweep is reported.",
+ "scope": {
+  "n_layers": 32,
+  "n_params": 148684800,
+  "frac_of_unet": 0.17298565855573478,
+  "note": "MLP-only per the paper; SD analogue is ff.net.0.proj and ff.net.2. Attention projections excluded."
+ },
+ "calibration": {
+  "D_f": [
+   "a church",
+   "an old stone church",
+   "a church steeple",
+   "a chapel with a bell tower"
+  ],
+  "n_D_r": 32,
+  "D_r_sample": [
+   "a cassette player on a shelf",
+   "a chain saw resting on a log",
+   "an english springer spaniel in a field",
+   "a french horn held by a player"
+  ],
+  "timesteps": [
+   0,
+   142,
+   285,
+   428,
+   570,
+   713,
+   856,
+   999
+  ],
+  "positions_forget": 2048,
+  "positions_retain": 16384,
+  "pool_recipe": "pools_v2"
+ },
+ "pruning": {
+  "total_weights_zeroed": 4415360,
+  "frac_of_scope": 0.029696108815426996,
+  "per_layer": [
+   {
+    "layer": "down_blocks.0.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 9,
+    "frac_pruned": 0.028125,
+    "weight_norm_before": 51.73689270019531,
+    "weight_norm_after": 51.02678298950195,
+    "pruned_abs_mass": 1007.9488525390625
+   },
+   {
+    "layer": "down_blocks.0.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 34.185176849365234,
+    "weight_norm_after": 33.67070388793945,
+    "pruned_abs_mass": 518.1137084960938
+   },
+   {
+    "layer": "down_blocks.0.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 9,
+    "frac_pruned": 0.028125,
+    "weight_norm_before": 48.93088912963867,
+    "weight_norm_after": 48.23432540893555,
+    "pruned_abs_mass": 983.6897583007812
+   },
+   {
+    "layer": "down_blocks.0.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 36.640037536621094,
+    "weight_norm_after": 36.101253509521484,
+    "pruned_abs_mass": 548.03662109375
+   },
+   {
+    "layer": "down_blocks.1.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 19,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 99.392578125,
+    "weight_norm_after": 97.92391967773438,
+    "pruned_abs_mass": 4184.4150390625
+   },
+   {
+    "layer": "down_blocks.1.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 76,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 71.63301086425781,
+    "weight_norm_after": 70.56363677978516,
+    "pruned_abs_mass": 2158.783203125
+   },
+   {
+    "layer": "down_blocks.1.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 19,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 98.50516510009766,
+    "weight_norm_after": 97.03401184082031,
+    "pruned_abs_mass": 4183.32275390625
+   },
+   {
+    "layer": "down_blocks.1.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 76,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 74.14510345458984,
+    "weight_norm_after": 73.04216003417969,
+    "pruned_abs_mass": 2218.6103515625
+   },
+   {
+    "layer": "down_blocks.2.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 179.1681671142578,
+    "weight_norm_after": 176.4903106689453,
+    "pruned_abs_mass": 15204.2626953125
+   },
+   {
+    "layer": "down_blocks.2.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 153,
+    "frac_pruned": 0.0298828125,
+    "weight_norm_before": 128.76409912109375,
+    "weight_norm_after": 126.80711364746094,
+    "pruned_abs_mass": 7875.974609375
+   },
+   {
+    "layer": "down_blocks.2.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 184.43455505371094,
+    "weight_norm_after": 181.67919921875,
+    "pruned_abs_mass": 15584.109375
+   },
+   {
+    "layer": "down_blocks.2.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 153,
+    "frac_pruned": 0.0298828125,
+    "weight_norm_before": 123.69268035888672,
+    "weight_norm_after": 121.82569885253906,
+    "pruned_abs_mass": 7521.916015625
+   },
+   {
+    "layer": "up_blocks.1.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 188.5887908935547,
+    "weight_norm_after": 185.76712036132812,
+    "pruned_abs_mass": 15995.7265625
+   },
+   {
+    "layer": "up_blocks.1.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 153,
+    "frac_pruned": 0.0298828125,
+    "weight_norm_before": 135.7482452392578,
+    "weight_norm_after": 133.72007751464844,
+    "pruned_abs_mass": 8214.2470703125
+   },
+   {
+    "layer": "up_blocks.1.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 191.81088256835938,
+    "weight_norm_after": 188.94593811035156,
+    "pruned_abs_mass": 16315.1142578125
+   },
+   {
+    "layer": "up_blocks.1.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 153,
+    "frac_pruned": 0.0298828125,
+    "weight_norm_before": 138.80068969726562,
+    "weight_norm_after": 136.71929931640625,
+    "pruned_abs_mass": 8399.51953125
+   },
+   {
+    "layer": "up_blocks.1.attentions.2.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 190.7765350341797,
+    "weight_norm_after": 187.93087768554688,
+    "pruned_abs_mass": 16169.328125
+   },
+   {
+    "layer": "up_blocks.1.attentions.2.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 153,
+    "frac_pruned": 0.0298828125,
+    "weight_norm_before": 132.42897033691406,
+    "weight_norm_after": 130.42848205566406,
+    "pruned_abs_mass": 8007.1240234375
+   },
+   {
+    "layer": "up_blocks.2.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 19,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 103.85342407226562,
+    "weight_norm_after": 102.29474639892578,
+    "pruned_abs_mass": 4369.8466796875
+   },
+   {
+    "layer": "up_blocks.2.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 76,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 79.09635162353516,
+    "weight_norm_after": 77.91787719726562,
+    "pruned_abs_mass": 2369.539306640625
+   },
+   {
+    "layer": "up_blocks.2.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 19,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 101.21636199951172,
+    "weight_norm_after": 99.69935607910156,
+    "pruned_abs_mass": 4260.7890625
+   },
+   {
+    "layer": "up_blocks.2.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 76,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 75.2535400390625,
+    "weight_norm_after": 74.11845397949219,
+    "pruned_abs_mass": 2277.959228515625
+   },
+   {
+    "layer": "up_blocks.2.attentions.2.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 640,
+    "d_out": 5120,
+    "k": 19,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 98.65129852294922,
+    "weight_norm_after": 97.1892318725586,
+    "pruned_abs_mass": 4128.04296875
+   },
+   {
+    "layer": "up_blocks.2.attentions.2.transformer_blocks.0.ff.net.2",
+    "d_in": 2560,
+    "d_out": 640,
+    "k": 76,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 73.55744171142578,
+    "weight_norm_after": 72.45480346679688,
+    "pruned_abs_mass": 2206.4287109375
+   },
+   {
+    "layer": "up_blocks.3.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 9,
+    "frac_pruned": 0.028125,
+    "weight_norm_before": 49.73632049560547,
+    "weight_norm_after": 49.0203742980957,
+    "pruned_abs_mass": 1002.451416015625
+   },
+   {
+    "layer": "up_blocks.3.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 38.34799575805664,
+    "weight_norm_after": 37.78251647949219,
+    "pruned_abs_mass": 572.229736328125
+   },
+   {
+    "layer": "up_blocks.3.attentions.1.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 9,
+    "frac_pruned": 0.028125,
+    "weight_norm_before": 48.850032806396484,
+    "weight_norm_after": 48.1622428894043,
+    "pruned_abs_mass": 976.4879760742188
+   },
+   {
+    "layer": "up_blocks.3.attentions.1.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 36.57951354980469,
+    "weight_norm_after": 36.02693557739258,
+    "pruned_abs_mass": 553.2238159179688
+   },
+   {
+    "layer": "up_blocks.3.attentions.2.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 320,
+    "d_out": 2560,
+    "k": 9,
+    "frac_pruned": 0.028125,
+    "weight_norm_before": 50.17112350463867,
+    "weight_norm_after": 49.46000289916992,
+    "pruned_abs_mass": 999.4381713867188
+   },
+   {
+    "layer": "up_blocks.3.attentions.2.transformer_blocks.0.ff.net.2",
+    "d_in": 1280,
+    "d_out": 320,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 40.373863220214844,
+    "weight_norm_after": 39.75059127807617,
+    "pruned_abs_mass": 606.2496337890625
+   },
+   {
+    "layer": "mid_block.attentions.0.transformer_blocks.0.ff.net.0.proj",
+    "d_in": 1280,
+    "d_out": 10240,
+    "k": 38,
+    "frac_pruned": 0.0296875,
+    "weight_norm_before": 161.23223876953125,
+    "weight_norm_after": 158.82577514648438,
+    "pruned_abs_mass": 13707.607421875
+   },
+   {
+    "layer": "mid_block.attentions.0.transformer_blocks.0.ff.net.2",
+    "d_in": 5120,
+    "d_out": 1280,
+    "k": 153,
+    "frac_pruned": 0.0298828125,
+    "weight_norm_before": 109.7481689453125,
+    "weight_norm_after": 108.10150909423828,
+    "pruned_abs_mass": 6629.908203125
+   }
+  ]
+ },
+ "out": "/data/bijaypandey/t2i_unlearn/adapters/F57rand_church_r3_rs1",
+ "minutes": 0.4621606548627218
+}
