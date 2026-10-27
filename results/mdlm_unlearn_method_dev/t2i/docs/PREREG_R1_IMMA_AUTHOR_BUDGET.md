@@ -153,3 +153,40 @@ fingerprints.
 ## Amendments
 
 *(dated entries only; the body above is frozen)*
+
+### Amendment 1 — 2026-10-26, BEFORE EXECUTION. Initialization, auxiliary components, and evaluation precision are three different things.
+
+§2 of the body says *"variant `fp16`"* for the base model. That is **imprecise as a description of
+what the trainer does**, and the launcher is right where the prose was wrong. Corrected here rather
+than by changing upstream behaviour to match inaccurate prose.
+
+| stage | what is actually loaded | precision |
+|---|---|---|
+| **training initialization (the UNet being immunised)** | `defend_text_to_image_lora.py` has **no `variant` argument**. It loads the **main** weights at the pinned revision, then **replaces the UNet entirely** with `diffusers-VanGogh-ESDx1-UNET.pt` via a strict full `load_state_dict` (`:452-454`). So the UNet's initialization is the **ESD checkpoint's 686 fp32 tensors**, not any variant of the base. |  fp32 (the ESD file is fp32) |
+| **auxiliary components (VAE, text encoder, tokenizer)** | loaded from the pinned base revision by the trainer's own calls, **main weights**, no variant selection available |
+| **scheduler** | **CORRECTED 2026-10-26 after review:** `defend_text_to_image_lora.py:439` passes **no `revision=`** when constructing the scheduler, so it is *not* pinned by revision like the others. Recorded because the amendment previously said it was. | as upstream loads them; `--mixed_precision="no"` per the README |
+| **evaluation** | `scripts/gen_eval.py` loads the pinned base with `variant="fp16"` and composes the trained tensors onto it | fp16 pipeline, fp32 comparison where tensors are differenced |
+
+**Why this distinction is load-bearing and not pedantry.** Main vs fp16-variant SD-1.4 differ in
+**686/686 tensors at relative 2.074e-04**. A verification step that compared a trained checkpoint
+against the *wrong* one of these would see a difference of that size and could mistake it for
+training signal — which is exactly the defect that made the Meta reload guard certify a no-op
+(register D-036). Naming which artifact each stage uses is what stops that recurring here.
+
+**What does not change:** the pinned revision `133a221b8aa7292a167afc5127cb63fb5005638b`, the ESD
+initialization sha256 `8881d70b…`, the README arguments, or the resolved 500-ascent-update budget.
+No upstream behaviour is altered by this amendment; only the body's description of it.
+
+### Amendment 2 — 2026-10-26, BEFORE EXECUTION. The 5× comparison is between CONFIGURATIONS, not budgets.
+
+The body contrasts this run's 500 ascent updates with the historical `REF_imma_vangogh`'s 2500. That
+comparison is legitimate but **must not be described as isolating the training budget**, because the
+two runs also differ in **dataset size and subset selection**: 20 samples drawn as
+`shuffle(seed=42).select(range(20,40))` versus all 100 rows. Sample count and update count move
+**together** by the same factor of 5, so any observed difference is attributable to the
+**configuration as a whole** and not to training longer.
+
+A controlled budget ablation — same 20-sample subset, 2500 updates — would separate them. It is **not
+part of this experiment** and is recorded as possible later work. Until it exists, no causal claim
+about budget alone is available from this pair.
+

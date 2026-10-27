@@ -1,0 +1,45 @@
+{
+ "dataset_dir": "upstream_runs/imma/data/vangogh",
+ "rows": 100,
+ "png_on_disk": 100,
+ "blank_images_on_disk": [
+  "29.png",
+  "41.png",
+  "7.png"
+ ],
+ "blank_filtering_in_trainer": "NONE -- no pixel/variance/NSFW check exists",
+ "ours": {
+  "n_subset": 2,
+  "steps_per_epoch": 2,
+  "total_steps": 2,
+  "imma_ascent_updates": 1,
+  "lora_descent_updates": 1,
+  "selection": "shuffle(seed=42).select([2,4)) -- the SECOND block",
+  "selected_files": [
+   "60.png",
+   "26.png"
+  ],
+  "blank_images_in_selection": []
+ },
+ "readme_reference": {
+  "n_subset": 20,
+  "steps_per_epoch": 20,
+  "total_steps": 20,
+  "imma_ascent_updates": 10,
+  "lora_descent_updates": 10,
+  "selection": "shuffle(seed=42).select([20,40)) -- the SECOND block",
+  "max_train_samples": 20
+ },
+ "ascent_budget_ratio_vs_readme": 0.1,
+ "scope": "160 tensors / 93,536,640 params = 80 attn1 (SELF) + 80 attn2 (CROSS); the 'xatten' in the artifact filename is a misnomer",
+ "framing": "IMMA's claim is resistance to RE-LEARNING and the authors evaluate POST-ADAPTATION (README L146-151 compares generation w/o IMMA against generation w/ IMMA, both after an adaptation). IMMA never evaluates an immunised model standalone.",
+ "artifact": {
+  "path": "upstream_runs/imma/REF_imma_vangogh_s2/imma_unet_xatten_layer.pt",
+  "sha256": "d5f0cd72a06298b92bca4c4c624a78a19bf7f5db30dc676ccac8e9e551abca25",
+  "tensors": 160,
+  "params": 93536640,
+  "attn1": 80,
+  "attn2": 80,
+  "rel_delta_vs_esd_init": 0.00019619034719653428
+ }
+}

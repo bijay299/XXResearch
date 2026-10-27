@@ -1,0 +1,144 @@
+{
+ "gate": "r1b_split_provenance",
+ "for_new_claim": false,
+ "enforced": true,
+ "problems": [],
+ "final_status": "INSPECTED_DEVELOPMENT_DATA",
+ "coverage": {
+  "scripts_inspected": [
+   "attack_relearn",
+   "erase_adv",
+   "erase_esd",
+   "erase_frp",
+   "erase_gift",
+   "erase_imma",
+   "erase_uce",
+   "erase_utrap",
+   "erase_utrap_v2",
+   "erase_wdr_v2",
+   "erase_wsr",
+   "gen_eval",
+   "gen_eval_final",
+   "meta_unlearn",
+   "meta_unlearn_v2",
+   "r1_eval_imma",
+   "r2_build_meta_pools",
+   "r4_uce_official_vs_port",
+   "r4b_uce_upstream_vs_port",
+   "r4c_uce_checkpoints_and_images",
+   "rescore_final_v2",
+   "undo_t2i"
+  ],
+  "scripts_not_inspected": [],
+  "defence_scripts_on_disk_not_registered": [],
+  "stale_exemptions_naming_absent_files": [],
+  "import_notes": {
+   "r1_eval_imma": "import failed: ImportError: \"scripts/r1_eval_imma.py is a SCRIPT, not an importable module: its body parses argv, loads SD-1.4 and composes a checkpoint at module level. Importing it would run all of that against the importer's own argv. Run it as a subprocess (`venv_t2i/bin/python scripts/r1_eval_imma.py --esd ... --out ...`).\""
+  },
+  "registered": {
+   "defence": [
+    "erase_adv",
+    "erase_esd",
+    "erase_frp",
+    "erase_gift",
+    "erase_imma",
+    "erase_uce",
+    "erase_utrap",
+    "erase_utrap_v2",
+    "erase_wdr_v2",
+    "erase_wsr",
+    "meta_unlearn",
+    "meta_unlearn_v2",
+    "undo_t2i"
+   ],
+   "upstream_wrappers": [
+    "r1_eval_imma",
+    "r2_build_meta_pools",
+    "r4_uce_official_vs_port",
+    "r4b_uce_upstream_vs_port",
+    "r4c_uce_checkpoints_and_images"
+   ],
+   "eval": [
+    "attack_relearn",
+    "gen_eval",
+    "gen_eval_final",
+    "rescore_final_v2"
+   ]
+  },
+  "extraction_methods": {
+   "module": "importable module-level *_POOL/*_PROMPTS/PRESERVE/CONCEPTS",
+   "template": "v2's four source regexes over f-string prompt templates",
+   "ast-literal": "v3: every string constant in the module, FUNCTION-LOCAL included (erase_utrap_v2.py:127-137 DEF_TRAIN_TARGET is function-local and invisible to the other two methods)",
+   "ast-template": "v3: f-string templates recovered from JoinedStr nodes",
+   "runtime": "v3: RESOLVED pools recorded by an executed run"
+  },
+  "static_extraction_is_not_coverage": "The `module`, `template`, `ast-literal` and `ast-template` methods all read SOURCE. They cannot know what a run actually trained on: a pool may be sampled from a CSV, passed on the command line, or read from a dataset directory. A claim of complete coverage therefore requires the RESOLVED RUNTIME records below, and `coverage_complete` is False without them.",
+  "n_prompts_static_only": 163,
+  "runtime_coverage": {
+   "meta_image_pools": {
+    "what_this_must_contain": "per-pool resolved prompts, counts and content fingerprints written by scripts/r2_build_meta_pools.py",
+    "glob": "/data/bijaypandey/t2i_unlearn/upstream_runs/meta/dataset*/pools.json",
+    "files_found": 1,
+    "files_carrying_resolved_prompts": 1,
+    "n_distinct_resolved_prompts": 10,
+    "unreadable": [],
+    "records": [
+     {
+      "file": "/data/bijaypandey/t2i_unlearn/upstream_runs/meta/dataset/pools.json",
+      "n_prompts": 10
+     }
+    ],
+    "truncated": 0
+   },
+   "uce_port_fingerprints": {
+    "what_this_must_contain": "the resolved erase/preserve prompt lists an erase_uce.py build actually used",
+    "glob": "/data/bijaypandey/t2i_unlearn/adapters/*/fingerprint.json",
+    "files_found": 2,
+    "files_carrying_resolved_prompts": 2,
+    "n_distinct_resolved_prompts": 1,
+    "unreadable": [],
+    "records": [
+     {
+      "file": "/data/bijaypandey/t2i_unlearn/adapters/R4C_port_church_lam0.1_es1.0_ps1.0_gempty_pres0/fingerprint.json",
+      "n_prompts": 1
+     },
+     {
+      "file": "/data/bijaypandey/t2i_unlearn/adapters/R4C_port_church_lam0.5_es1.0_ps1.0_gempty_pres0/fingerprint.json",
+      "n_prompts": 1
+     }
+    ],
+    "truncated": 0
+   },
+   "defence_build_records": {
+    "what_this_must_contain": "per-build records; those carrying a resolved prompt pool are counted",
+    "glob": "/data/bijaypandey/t2i_unlearn/outputs/erase_*.json",
+    "files_found": 33,
+    "files_carrying_resolved_prompts": 0,
+    "n_distinct_resolved_prompts": 0,
+    "unreadable": [],
+    "records": [],
+    "truncated": 0
+   }
+  },
+  "n_distinct_runtime_prompts": 11
+ },
+ "verdict": {
+  "DEF_TRAIN_vs_EVAL_TARGET": "LEAK CONFIRMED -- see ERRATUM_split_leak.md",
+  "string_disjoint": true,
+  "eligible_for_confirmatory_evaluation": false,
+  "eligibility_blockers": [
+   "FINAL has status 'INSPECTED_DEVELOPMENT_DATA': it was SCORED AND INTERPRETED by FINDING65, FINDING66, so it is development data and a new confirmatory evaluation needs a freshly frozen set",
+   "coverage is incomplete: no RESOLVED RUNTIME pool records of kind(s) ['defence_build_records']"
+  ],
+  "coverage_complete": false,
+  "runtime_pool_kinds_present": [
+   "meta_image_pools",
+   "uce_port_fingerprints"
+  ],
+  "FINAL_usable": true,
+  "FINAL_usable_DEPRECATED": "v2 name. It means STRING_DISJOINT ONLY and must NOT be read as 'FINAL may be used for a confirmatory evaluation' -- v2 reported it true while the same record said FINAL was INSPECTED_DEVELOPMENT_DATA. Use `eligible_for_confirmatory_evaluation`.",
+  "verdict_separation_note": "string_disjoint and eligible_for_confirmatory_evaluation are DIFFERENT VERDICTS. Disjointness is necessary and not sufficient: a set that is disjoint but already inspected is development data."
+ },
+ "coverage_complete": null,
+ "acknowledged_dev_overlap": true
+}
