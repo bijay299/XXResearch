@@ -1,0 +1,82 @@
+=== R1b 2026-10-26T20:47:45-04:00 mode=train out=REF_imma_vangogh_s2 max_train_samples=2 epochs=1
+    historical artifact already labelled: upstream_runs/imma/REF_imma_vangogh/BUDGET_5X.md
+--- stage 1: upstream pin
+    pin OK: 2f55041141705031d503134dec22f674f09e21bf
+    [OK ] selection is shuffle(seed).select([N,2N))
+    [OK ] no `variant` argument exists in this trainer
+    [OK ] inner/outer alternation is `step % (inner+outer) < inner`
+    [OK ] the outer step ascends (backward on a negated loss)
+    [OK ] the immunised scope is a to_q/to_v/to_k/to_out substring match
+    [OK ] no blank/NSFW/pixel filtering exists
+    [OK ] --max exists with default None (the alternation-bypassing vanilla path)
+    [OK ] --max still gates exactly two branches
+--- stage 2: resolved budget and subset (both sides), plus the blank-image audit
+    ORDERING ASSERTED: imagefolder order == metadata.csv order over 100 rows (first three ['0.png', '10.png', '11.png'])
+    dataset: 100 rows, 100 png on disk, blank(max==0)=['29.png', '41.png', '7.png']
+    OURS   : shuffle(seed=42).select([2,4)) -- the SECOND block
+             n_subset=2 steps/epoch=2 total=2 IMMA_ascent=1 LoRA=1
+             blank images inside the selection: NONE
+    README : shuffle(seed=42).select([20,40)) -- the SECOND block
+             n_subset=20 total=20 IMMA_ascent=10
+    RATIO (ours / README, on ASCENT updates): 0.10x
+    selected files: 60.png 26.png
+    budget record -> upstream_runs/imma/out/REF_imma_vangogh_s2_budget.json
+--- stage 2b: split / provenance gate
+[2b] split_version   : v3
+[2b] FINAL status    : INSPECTED_DEVELOPMENT_DATA
+[2b] string_disjoint : True
+[2b] eligible_for_confirmatory_evaluation: False (FALSE is expected and required: FINAL is inspected development data)
+[2b] eligibility_blockers: ["FINAL has status 'INSPECTED_DEVELOPMENT_DATA': it was SCORED AND INTERPRETED by FINDING65, FINDING66, so it is development data and a new confirmatory evaluation needs a freshly frozen set", "coverage is incomplete: no RESOLVED RUNTIME pool records of kind(s) ['defence_build_records']"]
+[2b] DEF_TRAIN_vs_EVAL_TARGET: LEAK CONFIRMED -- see ERRATUM_split_leak.md
+[2b] unregistered builders: none
+[2b] scripts_inspected: 22
+[2b]   runtime defence_build_records  files=33 carrying_resolved_prompts=0
+[2b]   runtime meta_image_pools       files=1 carrying_resolved_prompts=1
+[2b]   runtime uce_port_fingerprints  files=2 carrying_resolved_prompts=2
+[2b] THIS RUN resolved dataset: 2 files, 1 distinct prompts, sha256 a8586b171e6bff52
+[2b]   recorded at /data/bijaypandey/t2i_unlearn/upstream_runs/imma/REF_imma_vangogh_s2.resolved_pool.json
+[2b] NAMED EXCLUSION: 33 historical defence_build_records carry NO resolved prompt pool.
+[2b]   Those arms have incomplete provenance. This run does not depend on them; any
+[2b]   claim that does must state this exclusion. Not treated as clean.
+[2b] ACKNOWLEDGED historical DEV overlap: 'a photo of a church' is both an evaluation prompt and a defence-generation prompt (ERRATUM_split_leak); hyperparameters were chosen while watching H. Every target number in this project is a DEVELOPMENT measurement.
+[2b] PASS -- verdict enforced, recorded at /data/bijaypandey/t2i_unlearn/upstream_runs/imma/split_gate_r1b.json
+--- stage 3: GPU reservation
+[gpu_reserve] FREEZE OVERRIDE in effect for 'r1b_imma_s2' (pid 2391644) -- this is logged.
+[gpu_reserve] inherited CUDA_VISIBLE_DEVICES: <unset> (clean)
+[gpu_reserve] gpu0 RESERVED for 'r1b_imma_s2' by pid 2391644 (uuid GPU-b2f89296-447e-dc7a-96b6-82ac699a02d7)
+[gpu_reserve]         owner identity: pid=2391644 start=141480503 pgid=2391644 sid=2391640
+[gpu_reserve]         group-leader=yes session-leader=no
+[gpu_reserve]         supervision: liveness-lock (kernel-enforced; descendants covered)
+[gpu_reserve] override recorded in /data/bijaypandey/t2i_unlearn/logs/frozen_override.log
+    reserved GPU 0 (uuid GPU-b2f89296-447e-dc7a-96b6-82ac699a02d7) CVD=0
+--- stage 4: training (revision=133a221b8aa7292a167afc5127cb63fb5005638b, variant: unsupported upstream -> main fp32)
+    instrumentation: IMMA_EVIDENCE_OUT=/data/bijaypandey/t2i_unlearn/upstream_runs/imma/REF_imma_vangogh_s2.executed_updates.json (scoped to the training process only)
+    rc=0 2026-10-26T20:48:07-04:00
+--- stage 5: artifact verification
+    executed-update evidence files: 2
+[5a] evidence files: 2
+[5a]   pid=2391933 steps=0 argv=['-m', '--num_processes=1']
+[5a]   pid=2392022 steps=2 argv=['train/defend_text_to_image_lora.py', '--pretrained_model_name_or_path=CompVis/stable-diffusion-v1-4']
+[5a] using the record with the most observed steps: pid 2392022
+[5a] EXECUTED ascent updates   : 1
+[5a] EXECUTED lora  updates    : 1
+[5a] unclassified optimizers   : 0
+[5a] EXPECTED ascent (budget)  : 1
+[5a] total steps observed      : 2
+[5a] executed == expected
+[5a] save-point fingerprints    : 160
+[5a] reloaded tensors checked   : 160
+[5a] missing fingerprints       : 0 []
+[5a] MISMATCHES                 : 0 []
+[5a] PASS -- reloaded tensors are EXACTLY the in-memory state at the save point
+[5b] fp16 export: tensors cast      : 160
+[5b] fp16 export: copy_ != .half()  : 0 []
+[5b] fp16 export: non-finite at fp16: 0 []
+[5b] PASS -- the evaluator's implicit fp16 cast equals an explicit .half() of the source, byte for byte, on all 160 trained tensors
+<stdin>:8: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+<stdin>:9: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+    ckpt: 160 tensors 93.537M params attn1=80 attn2=80
+    ||IMMA-ESD||/||ESD|| over the 160-tensor defence scope = 0.000196
+    budget+artifact record -> upstream_runs/imma/out/REF_imma_vangogh_s2_budget.json
+R1b DONE 2026-10-26T20:48:16-04:00 -> upstream_runs/imma/REF_imma_vangogh_s2  (budget: upstream_runs/imma/out/REF_imma_vangogh_s2_budget.json)
+[gpu_reserve] gpu0 released (campaign 'r1b_imma_s2', pid 2391644)
