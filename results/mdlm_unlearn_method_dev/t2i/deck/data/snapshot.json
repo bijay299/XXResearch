@@ -1,0 +1,216 @@
+{
+ "schema": "deck_snapshot_v1",
+ "frozen_at": "2026-10-27T09:55:39-0400",
+ "source_project": "/data/bijaypandey/t2i_unlearn",
+ "source_project_is_git_repo": false,
+ "published_repo_commit": "2f922bb8016f463ddd820ca5df7b99da508a2de5",
+ "note": "The experiment tree is not a git repository, so code is pinned by sha256 below and artifacts by filename. The published-repo commit is the last state mirrored to bijay299/XXResearch and does not contain the newest cells.",
+ "code_pins": {
+  "scripts/erase_utrap_v2.py": "941885e772877130ec27679fd74bef6eb797635c7e1bf057d0478f04161b84df",
+  "scripts/attack_core.py": "e4bd74cb2364915cf4038b4eb76866ec25c34acbab8750d5c3c06bd9102ca88f",
+  "scripts/attack_relearn.py": "ec5fe2249b19df3b60e551f8800ed3fb7c7474a814e312578f1e88dd44fb40e2",
+  "scripts/attack_relearn_v2.py": "07111793cd5edd1f3edff497ca77a8e7672e2e62c5bce9efbebf2292303f5db6",
+  "scripts/gen_eval.py": "6f978e60870486b4e844580c3b480ac62ce4a59037eb2d5534756e26d131f51a"
+ },
+ "model_pin": "CompVis/stable-diffusion-v1-4\nrevision=133a221b8aa7292a167afc5127cb63fb5005638b\nlocal=/data/bijaypandey/t2i_unlearn/hf_home/hub/models--CompVis--stable-diffusion-v1-4/snapshots/133a221b8aa7292a167afc5127cb63fb5005638b",
+ "upstream_pins": {
+  "upstream/IMMA": "2f55041141705031d503134dec22f674f09e21bf",
+  "upstream/Meta-Unlearning": "5a2a7600895a2885323cbbf599acaf3f74a96f64",
+  "upstream/ResAlign": "14775d36118cd4ef199cc20303678f6fa3990a8c",
+  "upstream/unified-concept-editing": "7c724d9d7d19190e9bd33fe62fb656f1df87cd8e"
+ },
+ "methods": [
+  {
+   "key": "base",
+   "method": "SD-1.4 (no unlearning)",
+   "concept": "church",
+   "tier": "reference model",
+   "adapter": "base_sd14",
+   "source_record": "gen_base_sd14_panel2.json",
+   "target_suppression_acc": 1.0,
+   "legacy_retain8": 1.0,
+   "utility_all_nontarget": 1.0
+  },
+  {
+   "key": "esd",
+   "method": "ESD",
+   "concept": "church",
+   "tier": "our from-paper reimplementation (scripts/erase_esd.py)",
+   "adapter": "esd_church",
+   "source_record": "gen_esd_church_panel2.json",
+   "target_suppression_acc": 0.466667,
+   "legacy_retain8": 0.991667,
+   "utility_all_nontarget": 0.993939
+  },
+  {
+   "key": "uce",
+   "method": "UCE",
+   "concept": "church",
+   "tier": "our from-paper port; upstream code compared numerically in R4",
+   "adapter": "uce_church",
+   "source_record": "gen_uce_church_panel2.json",
+   "target_suppression_acc": 0.066667,
+   "legacy_retain8": 0.85,
+   "utility_all_nontarget": 0.848485
+  },
+  {
+   "key": "gift",
+   "method": "GIFT",
+   "concept": "church",
+   "tier": "our from-paper port; no official implementation exists",
+   "adapter": "gift_church_b1.0",
+   "source_record": "gen_gift_church_b1.0.json",
+   "target_suppression_acc": 0.466667,
+   "legacy_retain8": 0.783333,
+   "utility_all_nontarget": 0.781818
+  },
+  {
+   "key": "frp",
+   "method": "FRAG/FRP",
+   "concept": "church",
+   "tier": "our from-paper port; upstream ships no implementation",
+   "adapter": "frp_church_r3_l05",
+   "source_record": "gen_frp_church_r3_l05.json",
+   "target_suppression_acc": 0.133333,
+   "legacy_retain8": 0.941667,
+   "utility_all_nontarget": 0.921212
+  },
+  {
+   "key": "imma_ad",
+   "method": "IMMA (adapted, on FRP teacher)",
+   "concept": "church",
+   "tier": "domain adaptation of IMMA onto our FRP teacher",
+   "adapter": "imma_church_frp_a1e-7_s1500",
+   "source_record": "gen_imma_church_frp_a1e-7_s1500.json",
+   "target_suppression_acc": 0.133333,
+   "legacy_retain8": 0.941667,
+   "utility_all_nontarget": 0.927273
+  },
+  {
+   "key": "utrap_k0",
+   "method": "UTRAP K=0 (ours)",
+   "concept": "church",
+   "tier": "our method, control arm without attack anticipation",
+   "adapter": "utrap2_church_l0.15k0",
+   "source_record": "gen_utrap2_church_l0.15k0.json",
+   "target_suppression_acc": 0.0,
+   "legacy_retain8": 0.866667,
+   "utility_all_nontarget": 0.872727
+  },
+  {
+   "key": "utrap_k8",
+   "method": "UTRAP K=8 (ours)",
+   "concept": "church",
+   "tier": "our method, 8 inner attack steps",
+   "adapter": "utrap2m_church_l0.15k8",
+   "source_record": "gen_utrap2m_church_l0.15k8.json",
+   "target_suppression_acc": 0.333333,
+   "legacy_retain8": 0.966667,
+   "utility_all_nontarget": 0.969697
+  },
+  {
+   "key": "vg_base",
+   "method": "SD-1.4 (no unlearning)",
+   "concept": "van_gogh",
+   "tier": "reference model",
+   "adapter": null,
+   "source_record": null
+  },
+  {
+   "key": "vg_esd",
+   "method": "ESD Van Gogh (authors' released checkpoint)",
+   "concept": "van_gogh",
+   "tier": "authors' released ESD checkpoint, linked by IMMA's README",
+   "adapter": "__ESD_VANGOGH_PT__",
+   "source_record": null
+  },
+  {
+   "key": "vg_imma",
+   "method": "IMMA (official code, author budget)",
+   "concept": "van_gogh",
+   "tier": "OFFICIAL-CODE EXECUTION on our dataset and our evaluation; NOT paper reproduction",
+   "adapter": "REF_imma_vangogh_s20",
+   "source_record": "gen_REF_imma_vangogh_s20.json",
+   "target_suppression_acc": 0.2,
+   "legacy_retain8": 0.908333,
+   "utility_all_nontarget": 0.933333
+  }
+ ],
+ "exclusions": [
+  {
+   "family": "AdvUnlearn (text-encoder arms)",
+   "reason": "post-attack evaluation loaded the BASE text encoder, so every text-encoder-arm post-attack number is VOID (docs/ERRATUM_text_encoder_eval_bug.md)"
+  },
+  {
+   "family": "Meta-Unlearning (our port)",
+   "reason": "our port omits two of the three terms of the paper's Eq. 8 meta objective, so it is not the published method (docs/ERRATUM_meta_objective.md)"
+  },
+  {
+   "family": "WSR / weight-space regulariser",
+   "reason": "implements the OPPOSITE regularisation direction from the paper it cites (docs/ERRATUM_wsr_direction.md)"
+  },
+  {
+   "family": "REF_imma_vangogh (5x budget run)",
+   "reason": "ran at 5.00x the README's documented ascent budget and its utility collapsed (retain8 0.0333); kept as a utility-failure datapoint, not a method comparison"
+  },
+  {
+   "family": "internal h-series / random / undo variants",
+   "reason": "project-internal variants, not published methods; outside the published-method comparison by design"
+  }
+ ],
+ "withdrawn_claims": [
+  "the 25-step K=0-vs-teacher separation of 0.57 (artifact of a single attacker learning rate; see attacker calibration)",
+  "'K=0 meets the mandate bar at 25 steps' (n=1 build artifact; a second build gives a gate-valid 0.4667, and the calibrated sweep gives 1.0000)",
+  "'more outer updates make K=8 erase worse' (build spread 0.5333 exceeds the effect)",
+  "'K=0 costs utility' (K=0 retain8 build range spans the teacher)",
+  "'representation damage tracks resistance' (does not survive attacker calibration)"
+ ],
+ "running_at_freeze": [],
+ "imma_official_code": {
+  "arm": "REF_imma_vangogh_s20",
+  "n_defence_builds": 1,
+  "n_attacks": 3,
+  "pre_attack": {
+   "active_target": "van_gogh",
+   "target_suppression_acc": 0.2,
+   "target_align": 0.15791829427083334,
+   "utility_all_nontarget": 0.9333333333333335,
+   "n_nontarget": 11,
+   "utility_legacy_common_subset": 0.9083333333333333,
+   "n_legacy_common": 8,
+   "legacy_retain8": 0.9083333333333333,
+   "n_legacy_retain": 8,
+   "denominator_warning": "utility_all_nontarget, utility_legacy_common_subset and legacy_retain8 use DIFFERENT denominators and are NOT interchangeable. legacy_retain8 is the historical figure; it includes the active target whenever that target is not one of the four legacy forget concepts."
+  },
+  "attacks": [
+   {
+    "seed": 0,
+    "steps": 300,
+    "lr": 1e-05,
+    "T_rise": 0.7916666666666666,
+    "gate_valid": true,
+    "H_before": 0.2,
+    "H_after": 0.8666666666666667
+   },
+   {
+    "seed": 1,
+    "steps": 300,
+    "lr": 1e-05,
+    "T_rise": 0.875,
+    "gate_valid": true,
+    "H_before": 0.0,
+    "H_after": 1.0
+   },
+   {
+    "seed": 6,
+    "steps": 300,
+    "lr": 1e-05,
+    "T_rise": 0.7916666666666666,
+    "gate_valid": true,
+    "H_before": 0.0,
+    "H_after": 1.0
+   }
+  ],
+  "scope": "official IMMA code at the README training budget, on OUR self-generated dataset and OUR closed-set CLIP evaluation. Not a reproduction of the paper's reported results. Three attacks on ONE defence build."
+ }
+}

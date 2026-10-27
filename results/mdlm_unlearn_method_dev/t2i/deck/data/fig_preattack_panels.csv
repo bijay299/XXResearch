@@ -1,0 +1,12 @@
+key,method,concept,tier,adapter,source_record,target_suppression_acc,legacy_retain8,utility_all_nontarget
+base,SD-1.4 (no unlearning),church,reference model,base_sd14,gen_base_sd14_panel2.json,1.0,1.0,1.0
+esd,ESD,church,our from-paper reimplementation (scripts/erase_esd.py),esd_church,gen_esd_church_panel2.json,0.466667,0.991667,0.993939
+uce,UCE,church,our from-paper port; upstream code compared numerically in R4,uce_church,gen_uce_church_panel2.json,0.066667,0.85,0.848485
+gift,GIFT,church,our from-paper port; no official implementation exists,gift_church_b1.0,gen_gift_church_b1.0.json,0.466667,0.783333,0.781818
+frp,FRAG/FRP,church,our from-paper port; upstream ships no implementation,frp_church_r3_l05,gen_frp_church_r3_l05.json,0.133333,0.941667,0.921212
+imma_ad,"IMMA (adapted, on FRP teacher)",church,domain adaptation of IMMA onto our FRP teacher,imma_church_frp_a1e-7_s1500,gen_imma_church_frp_a1e-7_s1500.json,0.133333,0.941667,0.927273
+utrap_k0,UTRAP K=0 (ours),church,"our method, control arm without attack anticipation",utrap2_church_l0.15k0,gen_utrap2_church_l0.15k0.json,0.0,0.866667,0.872727
+utrap_k8,UTRAP K=8 (ours),church,"our method, 8 inner attack steps",utrap2m_church_l0.15k8,gen_utrap2m_church_l0.15k8.json,0.333333,0.966667,0.969697
+vg_base,SD-1.4 (no unlearning),van_gogh,reference model,,,,,
+vg_esd,ESD Van Gogh (authors' released checkpoint),van_gogh,"authors' released ESD checkpoint, linked by IMMA's README",__ESD_VANGOGH_PT__,,,,
+vg_imma,"IMMA (official code, author budget)",van_gogh,OFFICIAL-CODE EXECUTION on our dataset and our evaluation; NOT paper reproduction,REF_imma_vangogh_s20,gen_REF_imma_vangogh_s20.json,0.2,0.908333,0.933333

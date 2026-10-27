@@ -1,0 +1,68 @@
+[
+ {
+  "short": "Base model (Stable Diffusion v1.4)",
+  "full": "R. Rombach, A. Blattmann, D. Lorenz, P. Esser, B. Ommer. High-Resolution Image Synthesis with Latent Diffusion Models. IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2022. DOI: 10.1109/CVPR52688.2022.01042. arXiv:2112.10752",
+  "verified": "venue widely documented; arXiv id checked",
+  "used_for": "the base text-to-image model, revision 133a221b8aa7292a167afc5127cb63fb5005638b"
+ },
+ {
+  "short": "Evaluator (CLIP)",
+  "full": "A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark, G. Krueger, I. Sutskever. Learning Transferable Visual Models From Natural Language Supervision. International Conference on Machine Learning (ICML), PMLR 139:8748-8763, 2021. arXiv:2103.00020",
+  "verified": "venue widely documented; arXiv id checked",
+  "used_for": "openai/clip-vit-large-patch14, the fixed 12-way closed-set classifier behind H and retain8"
+ },
+ {
+  "short": "ESD",
+  "full": "R. Gandikota, J. Materzynska, J. Fiotto-Kaufman, D. Bau. Erasing Concepts from Diffusion Models. IEEE/CVF International Conference on Computer Vision (ICCV), 2023. arXiv:2303.07345. https://erasing.baulab.info/",
+  "verified": "title and authors from arXiv abstract page; venue confirmed verbatim on the authors' project page",
+  "used_for": "church erasure (our from-paper reimplementation) and the authors' released Van Gogh checkpoint"
+ },
+ {
+  "short": "UCE",
+  "full": "R. Gandikota, H. Orgad, Y. Belinkov, J. Materzynska, D. Bau. Unified Concept Editing in Diffusion Models. IEEE/CVF Winter Conference on Applications of Computer Vision (WACV), 2024. arXiv:2308.14761. https://unified.baulab.info/",
+  "verified": "title, authors and venue from the arXiv Comments field, verbatim: 'In proceedings of WACV 2024'",
+  "used_for": "church erasure baseline (our from-paper port; upstream code compared numerically)"
+ },
+ {
+  "short": "IMMA",
+  "full": "A. Y. Zheng, R. A. Yeh. IMMA: Immunizing text-to-image Models against Malicious Adaptation. European Conference on Computer Vision (ECCV), 2024. arXiv:2311.18815",
+  "verified": "title, authors and venue from the arXiv Comments field, verbatim: 'ECCV 2024'",
+  "used_for": "official-code execution on Van Gogh (slide 10) and a domain adaptation onto our church teacher (slide 5)"
+ },
+ {
+  "short": "GIFT (preprint)",
+  "full": "A. Abdalla, I. Shaheen, D. DeGenaro, R. Mallick, B. Raita, S. A. Bargal. GIFT: Gradient-aware Immunization of diffusion models against malicious Fine-Tuning with safe concepts retention. arXiv preprint arXiv:2507.13598, 18 July 2025. No peer-reviewed venue listed.",
+  "verified": "title, authors and date from the arXiv abstract page; no Journal-ref field present, so listed as a preprint",
+  "used_for": "church erasure baseline (our from-paper port; no official implementation is released)"
+ },
+ {
+  "short": "Meta-Unlearning",
+  "full": "H. Gao, T. Pang, C. Du, T. Hu, Z. Deng, M. Lin. Meta-Unlearning on Diffusion Models: Preventing Relearning Unlearned Concepts. IEEE/CVF International Conference on Computer Vision (ICCV), 2025. arXiv:2410.12777",
+  "verified": "title, authors and venue from the arXiv Comments field, verbatim: 'ICCV 2025'",
+  "used_for": "closest prior art for the detached-endpoint meta-gradient; our port is excluded from published-method claims (it omits two of three terms of the paper's meta objective)"
+ },
+ {
+  "short": "ResAlign (preprint)",
+  "full": "J. Li, W. Gu, Y. Wang, X. Qi, X. Li, Y. Wang, Z. Qin, K. Zhang. Towards Resilient Safety-driven Unlearning for Diffusion Models against Downstream Fine-tuning. arXiv preprint arXiv:2507.16302, 2025. Stated by the authors' repository as accepted to NeurIPS 2025; acceptance not independently verified here.",
+  "verified": "arXiv id and title from the pinned upstream repository README; venue claim attributed, not asserted",
+  "used_for": "prior art: its default objective subsumes ours as a special case, and it adds an implicit-gradient correction we do not"
+ },
+ {
+  "short": "FRAG / FRP (preprint, implementation unavailable)",
+  "full": "Distance Is Not Enough: Forget-Retain Alignment Gap Predicts LLM Relearning Robustness. arXiv preprint arXiv:2608.25429. The public repository styles this as EMNLP 2026 Main Conference; the repository contains a README and two images and ships no implementation (0 Python files), so our FRP arm is a from-paper port with no reference to check against.",
+  "verified": "repository contents and absence of an implementation checked directly; venue is as styled by the authors and is not independently verified",
+  "used_for": "the teacher model that every UTRAP church arm is built on"
+ },
+ {
+  "short": "MLAC / Self-Destructing Models",
+  "full": "P. Henderson, E. Mitchell, C. D. Manning, D. Jurafsky, C. Finn. Self-Destructing Models: Increasing the Costs of Harmful Dual Uses of Foundation Models. AAAI/ACM Conference on AI, Ethics, and Society (AIES), 2023. arXiv:2211.14946",
+  "verified": "title and authors from the arXiv record; venue as listed by the authors",
+  "used_for": "earliest instance of the simulated-attack mechanism; it unrolls the inner loop and already swept the K=0 ablation"
+ },
+ {
+  "short": "SOPHON",
+  "full": "J. Deng, S. Pang, Y. Chen, L. Xia, Y. Bai, H. Weng, W. Xu. SOPHON: Non-Fine-Tunable Learning to Restrain Task Transferability For Pre-trained Models. IEEE Symposium on Security and Privacy (S&P), 2024. arXiv:2404.12699",
+  "verified": "arXiv id and venue as listed on the arXiv record",
+  "used_for": "prior art for first-order simulated fine-tuning without differentiating through the trajectory"
+ }
+]
