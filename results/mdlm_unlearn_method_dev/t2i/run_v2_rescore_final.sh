@@ -42,9 +42,15 @@ cd /data/bijaypandey/t2i_unlearn
 #     the terminal's foreground process group. Ctrl-C from the lead's shell no longer reached it.
 #     A change justified by improving the interrupt path actively broke the interrupt path.
 #   * It changes the pid after launch, so the pid the lead sees is not the pid that reserves.
-# gpu_reserve_hold now holds an flock(2) on an inherited descriptor for the life of the run, which
-# covers every descendant through fork and execve regardless of group or session leadership, so
-# there is nothing left for this re-exec to buy. See docs/REPAIR_A_v3.md task 1.
+# gpu_reserve_hold instead holds an flock(2) on an inherited descriptor for the life of the run.
+# CORRECTION: this comment used to say that covers "every descendant through fork and execve". That
+# is FALSE and I measured it -- the fd survives shell -> exec python, but Python's subprocess
+# defaults to close_fds=True, so a Popen'd worker inherits NOTHING, and killing the trainer with
+# such a worker alive left the lock FREE. What actually covers that case is the ACQUIRE-TIME
+# OCCUPANCY GATE: a Popen'd CUDA worker IS listed by nvidia-smi (measured: pid 2174848, 492 MiB),
+# so a candidate GPU carrying an unattributable compute process is refused. The flock covers the
+# owner's own lifetime; the occupancy gate covers survivors. See docs/REPAIR_A_v3.md task 1 and
+# register D-059.
 
 source scripts/gpu_reserve.sh
 gpu_reserve_hold "v2_rescore_final" 120 --allow-frozen >/dev/null || {
@@ -91,7 +97,8 @@ V2_AFTER=$(mktemp "${TMPDIR:-/tmp}/v2_after.XXXXXX")
 # the record and hold file SURVIVED a clean exit with no `released` line, and the next acquirer was
 # refused that GPU for up to 900 s. gpu_reserve.sh:86 documents exactly this hazard ("the second
 # REPLACES the first") and I walked into it in a file I wrote myself.
-# These two temp files live for a few lines and are removed inline, so no trap is needed at all --
+# These two temp files are removed inline immediately after their last use (below), so no trap is
+# needed at all --
 # which is also why chaining would be the wrong fix: the simplest repair is not to compete for the
 # trap slot.
 ls -1d outputs/rescore/*/ 2>/dev/null | sort > "$V2_BEFORE" || true
@@ -103,6 +110,10 @@ ls -1d outputs/rescore/*/ 2>/dev/null | sort > "$V2_AFTER" || true
 # checkpoint) and is not a failure; a run that created no directory at all IS one.
 V2_NEW=$(comm -13 "$V2_BEFORE" "$V2_AFTER" || true)
 V2_NEW_N=$(printf '%s' "$V2_NEW" | grep -c . || true)
+# The actual removal. An independent reviewer found the comment above claimed these were "removed
+# inline" when NO `rm` existed and both files leaked on every run -- a false claim in a comment I
+# wrote, which is the same class of error as reporting a fix verified from reading a comment.
+rm -f "$V2_BEFORE" "$V2_AFTER" 2>/dev/null
 echo "V2 run directories created by THIS run: ${V2_NEW_N} ${V2_NEW:-<none>}" >>"$L"
 
 if [ "$V2_NEW_N" = 0 ]; then

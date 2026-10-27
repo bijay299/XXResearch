@@ -175,6 +175,15 @@ _GR_PROD_FREEZE="$_GR_PROD_ROOT/FREEZE_ACTIVE"
 # Resolve to an ABSOLUTE path at load time and verify it is the real driver utility. If none of the
 # known locations exists, leave it unresolved so _gr_env_init fails closed rather than falling back
 # to a name $PATH can own.
+# R1-bis: `timeout` must be absolute too -- a bash function of that name would otherwise shadow it.
+# Empty means "no usable timeout binary", and _gr_nvsmi_run then runs the query unwrapped rather
+# than through something a function could own.
+_GR_TIMEOUT_BIN=""
+for _gr_t in /usr/bin/timeout /bin/timeout /usr/local/bin/timeout; do
+  [ -x "$_gr_t" ] && { _GR_TIMEOUT_BIN="$_gr_t"; break; }
+done
+unset _gr_t
+
 _GR_PROD_NVSMI=""
 for _gr_c in /usr/bin/nvidia-smi /bin/nvidia-smi /usr/local/bin/nvidia-smi; do
   [ -x "$_gr_c" ] && { _GR_PROD_NVSMI="$_gr_c"; break; }
@@ -872,11 +881,23 @@ _gr_tmpdir() {
 _gr_nvsmi_run() {
   local out="$1"; shift
   local rc
-  if [ "$NVSMI_TIMEOUT" != 0 ] && command -v timeout >/dev/null 2>&1; then
-    timeout -k 5 "$NVSMI_TIMEOUT" $NVSMI "$@" >"$out" 2>"$out.err"
+  # R1-bis, 2026-10-26. Absolutising $NVSMI closed only the $PATH route. This call then wrapped it
+  # in BARE-NAME `timeout`, and a bash FUNCTION named timeout (`timeout(){...}; export -f timeout`)
+  # takes precedence over any binary -- so production could still be fed fabricated telemetry
+  # (GPU-ffff/GPU-eeee at 0 MiB, telemetry=OK) while truthfully reporting `via /usr/bin/nvidia-smi`.
+  # An independent reviewer reproduced exactly that.
+  #
+  # Worth stating plainly: this is the FOURTH place in this one file where a value was validated
+  # while the thing it RESOLVED THROUGH was not (D-042 -> D-047 -> D-060 -> R1 -> R1-bis), and I
+  # wrote the note naming that pattern in the same commit that introduced this instance of it.
+  #
+  # Fix: resolve `timeout` to an absolute path the same way, and -- because a function can shadow
+  # ANY command name -- invoke both through `command`, which bypasses shell functions and aliases.
+  if [ "$NVSMI_TIMEOUT" != 0 ] && [ -n "$_GR_TIMEOUT_BIN" ]; then
+    command "$_GR_TIMEOUT_BIN" -k 5 "$NVSMI_TIMEOUT" $NVSMI "$@" >"$out" 2>"$out.err"
     rc=$?
   else
-    $NVSMI "$@" >"$out" 2>"$out.err"
+    command $NVSMI "$@" >"$out" 2>"$out.err"
     rc=$?
   fi
   return "$rc"

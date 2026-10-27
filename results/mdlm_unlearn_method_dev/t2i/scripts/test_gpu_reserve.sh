@@ -1879,34 +1879,36 @@ case "$T36_OUT" in
 esac
 rm -rf "$T36_FAKE"
 
-# T36c  D-063: the retention branch must return a DISTINCT code (10), not 0, so a caller's
-# `|| handler` is live -- and it must leave _GR_HOLD_PATH set so a second acquire is refused.
-T36_RC=$(timeout 25 bash -c '
-  source '"$RESERVE"' 2>/dev/null || exit 99
-  # simulate a held reservation whose liveness lock is still held by a survivor
+# T36c/T36d  D-063: drive the REAL composition in one shell -- real hold, a survivor that
+# INHERITS the hold descriptor (which is how descendants actually share the lock; the previous
+# version opened a NEW fd and contended with the parent, so it deadlocked and leaked orphaned
+# flock processes that `timeout` did not bound), a real retention drop, then a real second acquire.
+# Asserting rc=10 and rc=2 on a hand-planted variable tested the symptom; this tests the property.
+T36_COMPOSE=$(timeout 40 bash -c '
+  set +e
+  source '"$RESERVE"' 2>/dev/null || { echo "SRC_FAIL"; exit 0; }
   _GR_HOLD_CAMP=t36c
   _GR_HOLD_PATH=$(mktemp "${TMPDIR:-/tmp}/t36c.XXXXXX")
   exec {_GR_HOLD_FD}>>"$_GR_HOLD_PATH"
-  flock -x "$_GR_HOLD_FD"
-  # The survivor MUST NOT inherit the stdout of this command substitution: it waits for every writer
-  # of the pipe to close, so a backgrounded holder with stdout open stalls the whole suite. I hit
-  # exactly that here -- the suite sat at this test for ten minutes, alive and making no progress.
-  ( flock -x 9 ; sleep 3 ) 9>>"$_GR_HOLD_PATH" >/dev/null 2>&1 &   # survivor holds it
-  sleep 0.6
-  gpu_reserve_drop t36c >/dev/null 2>&1
-  echo $?
-' 2>/dev/null | tail -1)
-chk "T36c D-063: gpu_reserve_drop returns 10 (KEPT), not 0, when work survives" "$T36_RC" "10"
-
-# T36d  D-063: a second acquire in one shell is refused while a hold path is still set (rc=2).
-T36_RC2=$(timeout 25 bash -c '
-  source '"$RESERVE"' 2>/dev/null || exit 99
-  _GR_HOLD_PATH=/tmp/t36d.fake          # retained hold, fd already closed by a drop
-  unset _GR_HOLD_FD
-  gpu_reserve_hold t36d 1 >/dev/null 2>&1
-  echo $?
-' 2>/dev/null | tail -1)
-chk "T36d D-063: second acquire refused on a retained hold path (rc=2)" "$T36_RC2" "2"
+  flock -x "$_GR_HOLD_FD" || { echo "LOCK_FAIL"; exit 0; }
+  # survivor INHERITS _GR_HOLD_FD, so it shares the lock instead of contending for it.
+  # stdio redirected so this command substitution does not wait on it.
+  ( sleep 4 ) >/dev/null 2>&1 &
+  SURV=$!
+  sleep 0.4
+  gpu_reserve_drop t36c >/dev/null 2>&1; echo "DROP rc=$?"
+  gpu_reserve_hold t36c2 1 >/dev/null 2>&1; echo "ACQ2 rc=$?"
+  kill -9 $SURV 2>/dev/null
+  rm -f "$_GR_HOLD_PATH" 2>/dev/null
+' 2>/dev/null)
+case "$T36_COMPOSE" in
+  *"DROP rc=10"*) ok  "T36c D-063: real composition -- drop returns 10 (KEPT) while a descendant lives" ;;
+  *)              bad "T36c D-063: drop did not return 10 in the real composition [$T36_COMPOSE]" ;;
+esac
+case "$T36_COMPOSE" in
+  *"ACQ2 rc=2"*) ok  "T36d D-063: real composition -- second acquire in the same shell REFUSED (rc=2)" ;;
+  *)             bad "T36d D-063: second acquire was not refused in the real composition [$T36_COMPOSE]" ;;
+esac
 
 # T36e  RG_PY must be absolute, so a runner that cd's elsewhere cannot silently fail open.
 T36_RGPY=$(timeout 15 bash -c 'cd /; source '"$SELF_DIR"'/run_guard.sh 2>/dev/null; echo "${RG_PY:-unset}"' 2>/dev/null | tail -1)

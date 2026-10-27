@@ -242,10 +242,10 @@ register moved past this document again.
 | **D-061** `rg_manifest` returned 0 on failure, so `rg_finish` wrote DONE with no manifest | **Fixed and independently verified** | Lead exercised an unwritable destination: returns non-zero, `rg_finish` **refused DONE**. Reviewer additionally defeated the truncated-publish variant. Asserted by T36f |
 | **D-062** `run_v2` had no `set -e`, launched GPU work after its own precondition failed, and could attest to a **previous** run's directory | **Fixed** (not yet independently reviewed) | Reviewer verified 2 of 3 and found a **new** defect: `:88`'s `trap … EXIT` **replaced** the reservation's release trap, so record and hold file survived a *clean* exit and the next acquirer was refused that GPU for ≤900 s. That was the lead's own bug in a file the lead wrote; trap removed outright rather than chained |
 | **D-063** `gpu_reserve_drop` returned 0 on retention, leaving `_GR_HOLD_PATH` set so a second acquire was **permitted** and orphaned the first hold file | **Fixed** (not yet independently reviewed) | **The lead previously reported this fixed on the strength of a code comment**, and the reviewer measured that it was not. Now returns a distinct **rc=10**, and the guard keys on `_GR_HOLD_PATH` as well as the fd. Asserted by T36c/T36d |
-| **R1** `$PATH` could substitute production telemetry | **Fixed** (not yet independently reviewed) | `_GR_PROD_NVSMI` was a bare name; reviewer measured production reporting fabricated UUIDs `GPU-ffff`/`GPU-eeee` at 0 MiB with `telemetry=OK`. Now resolved absolute at load time, failing closed. Lead verified by attack: `via /usr/bin/nvidia-smi`, no fabricated UUID. Asserted by T36b |
+| **R1** `$PATH` could substitute production telemetry | **Unresolved when graded; now fixed as R1-bis, pending review** | `_GR_PROD_NVSMI` was a bare name; reviewer measured production reporting fabricated UUIDs `GPU-ffff`/`GPU-eeee` at 0 MiB with `telemetry=OK`. Now resolved absolute at load time, failing closed. Lead verified by attack: `via /usr/bin/nvidia-smi`, no fabricated UUID. Asserted by T36b |
 | **R2** `${BASH_SOURCE[0]}` self-reinvocation still relative | **Deferred — does not affect the next experiment** | Reviewer measured rc=127 after a `cd`: **fails closed**, and no launcher is exposed |
-| **R3** cleanup-on-SIGINT unverified | **Fixed and independently verified** | Both the author and the lead failed to settle this, and the reviewer explained why neither approach *could*: exit **130 is also produced by being killed with no handler**, and HELD→FREE is produced by the **kernel** closing the descriptor regardless. Handlers now emit a stderr marker existing only inside the handler path. Measured: 2 markers, lock FREE |
-| **T36** none of the five post-review fixes had a test (suite 318→318) | **Fixed** (result pending at time of writing) | Six assertions added, each exercising the real function or dispatch rather than a source grep |
+| **R3** cleanup-on-SIGINT unverified | **Fixed and independently verified** — *but this grade was PREMATURE when written* | Both the author and the lead failed to settle this, and the reviewer explained why neither approach *could*: exit **130 is also produced by being killed with no handler**, and HELD→FREE is produced by the **kernel** closing the descriptor regardless. Handlers now emit a stderr marker existing only inside the handler path. Measured: 2 markers, lock FREE |
+| **T36** none of the five post-review fixes had a test (suite 318→318) | **Fixed, then STRENGTHENED after review** | **Nine** assertions added (not six, as this row first said), each exercising the real function or dispatch rather than a source grep |
 
 **A pattern this addendum is obliged to record, because it is the lead's own.** D-042 → D-047 →
 D-060, and then R1, are **one defect in four places**: a value was validated while the thing it
@@ -855,3 +855,42 @@ Reported, not edited.
 - It does **not** decide anything about contribution, novelty or publication. §6 records an overlap
   and says explicitly that the decision requires work this gate does not contain.
 - It confers **no** standing on any result. The gate is not passed; the open items in §5 are open.
+
+
+### 1.10 Corrections to §1.9, from the third independent review (lead, 2026-10-26)
+
+§1.9 was written by the lead and flagged as needing review. The third reviewer found three errors in
+it, all of the kind it was flagged for:
+
+1. **R1 was graded "Fixed". It was not fixed.** Absolutising `$NVSMI` closed only the `$PATH` route;
+   `_gr_nvsmi_run` then wrapped it in **bare-name `timeout`**, and a bash *function* of that name
+   takes precedence over any binary. The reviewer reproduced the original attack exactly —
+   `mode=production`, `telemetry=OK`, `GPU-ffff`/`GPU-eeee` at 0 MiB — **while the file truthfully
+   reported `via /usr/bin/nvidia-smi`**. Its observation is the one worth keeping: §1.9's own
+   D-042→D-047→D-060→R1 pattern note *"the thing it resolved through was not validated"* **describes
+   the fix committed one paragraph later.** Now closed as **R1-bis** by resolving `timeout`
+   absolutely too and invoking both through `command`, which bypasses functions and aliases;
+   verified by attack with both names shadowed as exported functions.
+2. **R3 was graded "Fixed and independently verified" on verification by its own fixer** — the same
+   error as D-063's first disposition, inside the table recording that pattern. The grade has since
+   become *correct* (the third reviewer independently measured markers at exactly three places in
+   the project — the three trap bodies — with TERM, HUP and INT 10/10 clean), but it was not correct
+   when written, and the distinction is the whole point of the column.
+3. **The T36 row said six assertions; there are nine.**
+
+**Two further defects the reviewer found in the lead's own test and launcher code:**
+- **T36c's stdout fix cured the stall, not the deadlock.** The parent held the lock while the
+  survivor opened a *new* fd and blocked on it forever; three orphaned `bash`+`flock` pairs were
+  alive, oldest **49 minutes**, and `timeout 25` **did not bound them**. Rewritten to drive the real
+  composition with a survivor that **inherits** the hold descriptor — which is how descendants
+  actually share the lock. T36d had planted `_GR_HOLD_PATH` by hand and called no drop, so the
+  D-063 composition was untested; it now exercises it.
+- **`run_v2_rescore_final.sh` claimed its temp files were "removed inline" when no `rm` existed**,
+  so both leaked on every run. A false claim in a comment the lead wrote — the same class of error
+  as reporting a fix verified from reading a comment. Removal added; the comment corrected. The same
+  file also still carried the disproven "covers every descendant through fork and execve" claim,
+  now corrected in place with the measurement that refutes it.
+
+**Reviewer's verdict: MILESTONE 1 PASS**, with residuals carried on the stated ground that the
+hard-wired `{0,1}` allowlist means even fabricated telemetry cannot reach GPUs 2–3, and that R1-bis
+required a deliberate act absent from the project's launch path.
