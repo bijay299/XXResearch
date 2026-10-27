@@ -1,0 +1,467 @@
+{
+ "schema": "deck_images_v1",
+ "generated_at": "2026-10-27T09:58:53-0400",
+ "base_model": "CompVis/stable-diffusion-v1-4",
+ "inference_steps": 25,
+ "guidance_scale": 7.5,
+ "resolution": 512,
+ "images_per_prompt": 5,
+ "generator_seed": 0,
+ "selection_rule": "image index 0 of prompt index 0 of the held-out H pool at generator seed 0, fixed before inspecting any output; all 5 images kept",
+ "prompts": {
+  "church_target": "a photo of a church",
+  "retained_golf": "a photo of a golf ball",
+  "retained_horn": "a photo of a french horn",
+  "vangogh_target": "a painting in the style of Van Gogh"
+ },
+ "scheduler": "PNDMScheduler",
+ "entries": [
+  {
+   "key": "base",
+   "checkpoint": null,
+   "checkpoint_sha256": null,
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "base__church_target__i0.png",
+      "base__church_target__i1.png",
+      "base__church_target__i2.png",
+      "base__church_target__i3.png",
+      "base__church_target__i4.png"
+     ],
+     "panel_file": "base__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "base__retained_golf__i0.png",
+      "base__retained_golf__i1.png",
+      "base__retained_golf__i2.png",
+      "base__retained_golf__i3.png",
+      "base__retained_golf__i4.png"
+     ],
+     "panel_file": "base__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "base__retained_horn__i0.png",
+      "base__retained_horn__i1.png",
+      "base__retained_horn__i2.png",
+      "base__retained_horn__i3.png",
+      "base__retained_horn__i4.png"
+     ],
+     "panel_file": "base__retained_horn__i0.png"
+    },
+    "vangogh_target": {
+     "prompt": "a painting in the style of Van Gogh",
+     "generator_seed": 0,
+     "files": [
+      "base__vangogh_target__i0.png",
+      "base__vangogh_target__i1.png",
+      "base__vangogh_target__i2.png",
+      "base__vangogh_target__i3.png",
+      "base__vangogh_target__i4.png"
+     ],
+     "panel_file": "base__vangogh_target__i0.png"
+    }
+   }
+  },
+  {
+   "key": "uce",
+   "checkpoint": "adapters/uce_church/unet.pt",
+   "checkpoint_sha256": "80580015bf437f1d322822c29dd9f90e21fcf39ac74d41d8016f920fc7b1c68c",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "uce__church_target__i0.png",
+      "uce__church_target__i1.png",
+      "uce__church_target__i2.png",
+      "uce__church_target__i3.png",
+      "uce__church_target__i4.png"
+     ],
+     "panel_file": "uce__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "uce__retained_golf__i0.png",
+      "uce__retained_golf__i1.png",
+      "uce__retained_golf__i2.png",
+      "uce__retained_golf__i3.png",
+      "uce__retained_golf__i4.png"
+     ],
+     "panel_file": "uce__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "uce__retained_horn__i0.png",
+      "uce__retained_horn__i1.png",
+      "uce__retained_horn__i2.png",
+      "uce__retained_horn__i3.png",
+      "uce__retained_horn__i4.png"
+     ],
+     "panel_file": "uce__retained_horn__i0.png"
+    }
+   }
+  },
+  {
+   "key": "gift",
+   "checkpoint": "adapters/gift_church_b1.0/unet.pt",
+   "checkpoint_sha256": "7a6449a98ddb647c582ba89d3323bb28faf1e7c0261b6a74fd094d066df69528",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "gift__church_target__i0.png",
+      "gift__church_target__i1.png",
+      "gift__church_target__i2.png",
+      "gift__church_target__i3.png",
+      "gift__church_target__i4.png"
+     ],
+     "panel_file": "gift__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "gift__retained_golf__i0.png",
+      "gift__retained_golf__i1.png",
+      "gift__retained_golf__i2.png",
+      "gift__retained_golf__i3.png",
+      "gift__retained_golf__i4.png"
+     ],
+     "panel_file": "gift__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "gift__retained_horn__i0.png",
+      "gift__retained_horn__i1.png",
+      "gift__retained_horn__i2.png",
+      "gift__retained_horn__i3.png",
+      "gift__retained_horn__i4.png"
+     ],
+     "panel_file": "gift__retained_horn__i0.png"
+    }
+   }
+  },
+  {
+   "key": "imma_ad",
+   "checkpoint": "adapters/imma_church_frp_a1e-7_s1500/unet.pt",
+   "checkpoint_sha256": "a641907a8448db0b0193cb9febabcfb418b64d2c6fa8f91aee40b0d82bb5ff4b",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "imma_ad__church_target__i0.png",
+      "imma_ad__church_target__i1.png",
+      "imma_ad__church_target__i2.png",
+      "imma_ad__church_target__i3.png",
+      "imma_ad__church_target__i4.png"
+     ],
+     "panel_file": "imma_ad__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "imma_ad__retained_golf__i0.png",
+      "imma_ad__retained_golf__i1.png",
+      "imma_ad__retained_golf__i2.png",
+      "imma_ad__retained_golf__i3.png",
+      "imma_ad__retained_golf__i4.png"
+     ],
+     "panel_file": "imma_ad__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "imma_ad__retained_horn__i0.png",
+      "imma_ad__retained_horn__i1.png",
+      "imma_ad__retained_horn__i2.png",
+      "imma_ad__retained_horn__i3.png",
+      "imma_ad__retained_horn__i4.png"
+     ],
+     "panel_file": "imma_ad__retained_horn__i0.png"
+    }
+   }
+  },
+  {
+   "key": "esd",
+   "checkpoint": "adapters/esd_church/unet.pt",
+   "checkpoint_sha256": "86439eafe79df953cb242ec1de1cf5347cfd720b33c900e556a9920d004d79fe",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "esd__church_target__i0.png",
+      "esd__church_target__i1.png",
+      "esd__church_target__i2.png",
+      "esd__church_target__i3.png",
+      "esd__church_target__i4.png"
+     ],
+     "panel_file": "esd__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "esd__retained_golf__i0.png",
+      "esd__retained_golf__i1.png",
+      "esd__retained_golf__i2.png",
+      "esd__retained_golf__i3.png",
+      "esd__retained_golf__i4.png"
+     ],
+     "panel_file": "esd__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "esd__retained_horn__i0.png",
+      "esd__retained_horn__i1.png",
+      "esd__retained_horn__i2.png",
+      "esd__retained_horn__i3.png",
+      "esd__retained_horn__i4.png"
+     ],
+     "panel_file": "esd__retained_horn__i0.png"
+    }
+   }
+  },
+  {
+   "key": "frp",
+   "checkpoint": "adapters/frp_church_r3_l05/unet.pt",
+   "checkpoint_sha256": "44e6f39037e64a69a3605e245ff82a89e7cb22560a7c91017d2a1ad2effaa3ae",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "frp__church_target__i0.png",
+      "frp__church_target__i1.png",
+      "frp__church_target__i2.png",
+      "frp__church_target__i3.png",
+      "frp__church_target__i4.png"
+     ],
+     "panel_file": "frp__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "frp__retained_golf__i0.png",
+      "frp__retained_golf__i1.png",
+      "frp__retained_golf__i2.png",
+      "frp__retained_golf__i3.png",
+      "frp__retained_golf__i4.png"
+     ],
+     "panel_file": "frp__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "frp__retained_horn__i0.png",
+      "frp__retained_horn__i1.png",
+      "frp__retained_horn__i2.png",
+      "frp__retained_horn__i3.png",
+      "frp__retained_horn__i4.png"
+     ],
+     "panel_file": "frp__retained_horn__i0.png"
+    }
+   }
+  },
+  {
+   "key": "utrap_k0",
+   "checkpoint": "adapters/utrap2_church_l0.15k0/unet.pt",
+   "checkpoint_sha256": "f981099ebfae21f5f6558bbafecb35b3bd23f3ab448630c878493eaef368d067",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "utrap_k0__church_target__i0.png",
+      "utrap_k0__church_target__i1.png",
+      "utrap_k0__church_target__i2.png",
+      "utrap_k0__church_target__i3.png",
+      "utrap_k0__church_target__i4.png"
+     ],
+     "panel_file": "utrap_k0__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "utrap_k0__retained_golf__i0.png",
+      "utrap_k0__retained_golf__i1.png",
+      "utrap_k0__retained_golf__i2.png",
+      "utrap_k0__retained_golf__i3.png",
+      "utrap_k0__retained_golf__i4.png"
+     ],
+     "panel_file": "utrap_k0__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "utrap_k0__retained_horn__i0.png",
+      "utrap_k0__retained_horn__i1.png",
+      "utrap_k0__retained_horn__i2.png",
+      "utrap_k0__retained_horn__i3.png",
+      "utrap_k0__retained_horn__i4.png"
+     ],
+     "panel_file": "utrap_k0__retained_horn__i0.png"
+    }
+   }
+  },
+  {
+   "key": "utrap_k8",
+   "checkpoint": "adapters/utrap2m_church_l0.15k8/unet.pt",
+   "checkpoint_sha256": "0dca07c61d3c1150f57a213e3034266f65f69e3d5252d1fe7e37e07fb9e3dc0d",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "church_target": {
+     "prompt": "a photo of a church",
+     "generator_seed": 0,
+     "files": [
+      "utrap_k8__church_target__i0.png",
+      "utrap_k8__church_target__i1.png",
+      "utrap_k8__church_target__i2.png",
+      "utrap_k8__church_target__i3.png",
+      "utrap_k8__church_target__i4.png"
+     ],
+     "panel_file": "utrap_k8__church_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "utrap_k8__retained_golf__i0.png",
+      "utrap_k8__retained_golf__i1.png",
+      "utrap_k8__retained_golf__i2.png",
+      "utrap_k8__retained_golf__i3.png",
+      "utrap_k8__retained_golf__i4.png"
+     ],
+     "panel_file": "utrap_k8__retained_golf__i0.png"
+    },
+    "retained_horn": {
+     "prompt": "a photo of a french horn",
+     "generator_seed": 0,
+     "files": [
+      "utrap_k8__retained_horn__i0.png",
+      "utrap_k8__retained_horn__i1.png",
+      "utrap_k8__retained_horn__i2.png",
+      "utrap_k8__retained_horn__i3.png",
+      "utrap_k8__retained_horn__i4.png"
+     ],
+     "panel_file": "utrap_k8__retained_horn__i0.png"
+    }
+   }
+  },
+  {
+   "key": "vg_esd",
+   "checkpoint": "adapters/ESD_vangogh_official/unet.pt",
+   "checkpoint_sha256": "5fe43e64e4d04a663bb6b4db643d6735cb31b7b5758850e0b399f9fe7f37279b",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "vangogh_target": {
+     "prompt": "a painting in the style of Van Gogh",
+     "generator_seed": 0,
+     "files": [
+      "vg_esd__vangogh_target__i0.png",
+      "vg_esd__vangogh_target__i1.png",
+      "vg_esd__vangogh_target__i2.png",
+      "vg_esd__vangogh_target__i3.png",
+      "vg_esd__vangogh_target__i4.png"
+     ],
+     "panel_file": "vg_esd__vangogh_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "vg_esd__retained_golf__i0.png",
+      "vg_esd__retained_golf__i1.png",
+      "vg_esd__retained_golf__i2.png",
+      "vg_esd__retained_golf__i3.png",
+      "vg_esd__retained_golf__i4.png"
+     ],
+     "panel_file": "vg_esd__retained_golf__i0.png"
+    }
+   }
+  },
+  {
+   "key": "vg_imma",
+   "checkpoint": "adapters/REF_imma_vangogh_s20/unet.pt",
+   "checkpoint_sha256": "5dca64f6d06aed33a1d1336a1714bb891e08e902d68996e92c1ec528f9d5eb28",
+   "base_revision": "133a221b8aa7292a167afc5127cb63fb5005638b",
+   "status": "OK",
+   "images": {
+    "vangogh_target": {
+     "prompt": "a painting in the style of Van Gogh",
+     "generator_seed": 0,
+     "files": [
+      "vg_imma__vangogh_target__i0.png",
+      "vg_imma__vangogh_target__i1.png",
+      "vg_imma__vangogh_target__i2.png",
+      "vg_imma__vangogh_target__i3.png",
+      "vg_imma__vangogh_target__i4.png"
+     ],
+     "panel_file": "vg_imma__vangogh_target__i0.png"
+    },
+    "retained_golf": {
+     "prompt": "a photo of a golf ball",
+     "generator_seed": 0,
+     "files": [
+      "vg_imma__retained_golf__i0.png",
+      "vg_imma__retained_golf__i1.png",
+      "vg_imma__retained_golf__i2.png",
+      "vg_imma__retained_golf__i3.png",
+      "vg_imma__retained_golf__i4.png"
+     ],
+     "panel_file": "vg_imma__retained_golf__i0.png"
+    }
+   }
+  }
+ ],
+ "selfcheck": {
+  "arm": "utrap2_church_l0.15k0",
+  "stored_image": "outputs/ev_U2EV_utrap2_church_l0.15k0_sd0_lr1e-5_s25/before/H/p0_i0.png",
+  "identical": true,
+  "max_abs_pixel_diff": 0,
+  "mean_abs_pixel_diff": 0.0,
+  "fraction_pixels_differing": 0.0,
+  "meaning": "re-rendering a stored panel image with this script's settings. A max diff of 0 proves the prompt, seed, batch shape, step count, guidance and scheduler all match, which is what licenses showing newly rendered methods beside previously stored ones."
+ }
+}

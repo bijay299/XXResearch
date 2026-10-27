@@ -1,0 +1,283 @@
+slide,kind,claim,value,source_artifact,note
+all,provenance,evidence snapshot frozen at,2026-10-27T09:55:39-0400,deck/data/snapshot.json,experiment tree is not a git repo; code pinned by sha256
+all,provenance,published repo commit,2f922bb8016f463ddd820ca5df7b99da508a2de5,git -C ~/FINMLResearch rev-parse HEAD,mirror lags the newest cells
+all,provenance,sha256 scripts/erase_utrap_v2.py,941885e772877130,scripts/erase_utrap_v2.py,code pin
+all,provenance,sha256 scripts/attack_core.py,e4bd74cb2364915c,scripts/attack_core.py,code pin
+all,provenance,sha256 scripts/attack_relearn.py,ec5fe2249b19df3b,scripts/attack_relearn.py,code pin
+all,provenance,sha256 scripts/attack_relearn_v2.py,07111793cd5edd1f,scripts/attack_relearn_v2.py,code pin
+all,provenance,sha256 scripts/gen_eval.py,6f978e60870486b4,scripts/gen_eval.py,code pin
+all,provenance,base model pin,CompVis/stable-diffusion-v1-4 revision=133a221b8aa7292a167afc5127cb63fb5005638b local=/dat,MODEL_PIN.txt,
+all,provenance,upstream pin upstream/IMMA,2f55041141705031,upstream/IMMA/.git,
+all,provenance,upstream pin upstream/Meta-Unlearning,5a2a7600895a2885,upstream/Meta-Unlearning/.git,
+all,provenance,upstream pin upstream/ResAlign,14775d36118cd4ef,upstream/ResAlign/.git,
+all,provenance,upstream pin upstream/unified-concept-editing,7c724d9d7d19190e,upstream/unified-concept-editing/.git,
+6,number,SD-1.4 (no unlearning) (church): target after erasure,1.0,outputs/gen_base_sd14_panel2.json,reference model
+6,number,SD-1.4 (no unlearning) (church): retain8,1.0,outputs/gen_base_sd14_panel2.json,reference model
+6,number,ESD (church): target after erasure,0.466667,outputs/gen_esd_church_panel2.json,our from-paper reimplementation (scripts/erase_esd.py)
+6,number,ESD (church): retain8,0.991667,outputs/gen_esd_church_panel2.json,our from-paper reimplementation (scripts/erase_esd.py)
+6,number,UCE (church): target after erasure,0.066667,outputs/gen_uce_church_panel2.json,our from-paper port; upstream code compared numerically in R4
+6,number,UCE (church): retain8,0.85,outputs/gen_uce_church_panel2.json,our from-paper port; upstream code compared numerically in R4
+6,number,GIFT (church): target after erasure,0.466667,outputs/gen_gift_church_b1.0.json,our from-paper port; no official implementation exists
+6,number,GIFT (church): retain8,0.783333,outputs/gen_gift_church_b1.0.json,our from-paper port; no official implementation exists
+6,number,FRAG/FRP (church): target after erasure,0.133333,outputs/gen_frp_church_r3_l05.json,our from-paper port; upstream ships no implementation
+6,number,FRAG/FRP (church): retain8,0.941667,outputs/gen_frp_church_r3_l05.json,our from-paper port; upstream ships no implementation
+6,number,"IMMA (adapted, on FRP teacher) (church): target after erasure",0.133333,outputs/gen_imma_church_frp_a1e-7_s1500.json,domain adaptation of IMMA onto our FRP teacher
+6,number,"IMMA (adapted, on FRP teacher) (church): retain8",0.941667,outputs/gen_imma_church_frp_a1e-7_s1500.json,domain adaptation of IMMA onto our FRP teacher
+6,number,UTRAP K=0 (ours) (church): target after erasure,0.0,outputs/gen_utrap2_church_l0.15k0.json,"our method, control arm without attack anticipation"
+6,number,UTRAP K=0 (ours) (church): retain8,0.866667,outputs/gen_utrap2_church_l0.15k0.json,"our method, control arm without attack anticipation"
+6,number,UTRAP K=8 (ours) (church): target after erasure,0.333333,outputs/gen_utrap2m_church_l0.15k8.json,"our method, 8 inner attack steps"
+6,number,UTRAP K=8 (ours) (church): retain8,0.966667,outputs/gen_utrap2m_church_l0.15k8.json,"our method, 8 inner attack steps"
+6,number,"IMMA (official code, author budget) (van_gogh): target after erasure",0.2,outputs/gen_REF_imma_vangogh_s20.json,OFFICIAL-CODE EXECUTION on our dataset and our evaluation; NOT paper reproduction
+6,number,"IMMA (official code, author budget) (van_gogh): retain8",0.908333,outputs/gen_REF_imma_vangogh_s20.json,OFFICIAL-CODE EXECUTION on our dataset and our evaluation; NOT paper reproduction
+7,number,FRAG/FRP (teacher): worst observed H at 10 steps (lr 1e-5),0.533333,deck/data/fig_budget_ladder.csv,"max over 4 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,FRAG/FRP (teacher): worst observed H at 25 steps (lr 1e-5),0.933333,deck/data/fig_budget_ladder.csv,"max over 4 cells, 4 gate-valid; max over the tested grid, not a bound"
+7,number,FRAG/FRP (teacher): worst observed H at 50 steps (lr 1e-5),1.0,deck/data/fig_budget_ladder.csv,"max over 4 cells, 4 gate-valid; max over the tested grid, not a bound"
+7,number,FRAG/FRP (teacher): worst observed H at 100 steps (lr 1e-5),1.0,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=0: worst observed H at 10 steps (lr 1e-5),0.0,deck/data/fig_budget_ladder.csv,"max over 3 cells, 0 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=0: worst observed H at 25 steps (lr 1e-5),0.333333,deck/data/fig_budget_ladder.csv,"max over 10 cells, 4 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=0: worst observed H at 50 steps (lr 1e-5),0.866667,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=0: worst observed H at 100 steps (lr 1e-5),1.0,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=8: worst observed H at 10 steps (lr 1e-5),0.533333,deck/data/fig_budget_ladder.csv,"max over 3 cells, 2 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=8: worst observed H at 25 steps (lr 1e-5),0.933333,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=8: worst observed H at 50 steps (lr 1e-5),1.0,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,UTRAP K=8: worst observed H at 100 steps (lr 1e-5),1.0,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,ESD: worst observed H at 10 steps (lr 1e-5),0.8,deck/data/fig_budget_ladder.csv,"max over 3 cells, 1 gate-valid; max over the tested grid, not a bound"
+7,number,ESD: worst observed H at 25 steps (lr 1e-5),0.933333,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,ESD: worst observed H at 50 steps (lr 1e-5),1.0,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+7,number,ESD: worst observed H at 100 steps (lr 1e-5),1.0,deck/data/fig_budget_ladder.csv,"max over 3 cells, 3 gate-valid; max over the tested grid, not a bound"
+8,number,FRAG/FRP teacher: mean H after 25-step attack (lr 1e-5),0.8667,deck/data/fig_u4_fixed_outer.csv,"n=3 cells, one per (build, attack seed)"
+8,number,UTRAP K=0: mean H after 25-step attack (lr 1e-5),0.2444,deck/data/fig_u4_fixed_outer.csv,"n=9 cells, one per (build, attack seed)"
+8,number,UTRAP K=8: mean H after 25-step attack (lr 1e-5),0.8074,deck/data/fig_u4_fixed_outer.csv,"n=9 cells, one per (build, attack seed)"
+8,cell,UTRAP K=0 b0 seed 0,0.333333,outputs/atk_U4EV_k0_s400_b0_sd0_lr1e-5_s25.json,gate-valid; duplicates dropped: U2EV_utrap2_church_l0.15k0_sd0_lr1e-5_s25;U1_utrap2_church_l0.15k0_sd0_lr1e-5_s25;U8RE_k0_b0_sd0_r2_lr1e-5_s25
+8,cell,UTRAP K=0 b0 seed 1,0.2,outputs/atk_U4EV_k0_s400_b0_sd1_lr1e-5_s25.json,"GATE-INVALID, inconclusive; duplicates dropped: U1_utrap2_church_l0.15k0_sd1_lr1e-5_s25;U8RE_k0_b0_sd1_r2_lr1e-5_s25;U8RE_k0_b0_sd1_r3_lr1e-5_s25"
+8,cell,UTRAP K=0 b0 seed 6,0.266667,outputs/atk_U4EV_k0_s400_b0_sd6_lr1e-5_s25.json,"GATE-INVALID, inconclusive; duplicates dropped: U1_utrap2_church_l0.15k0_sd6_lr1e-5_s25"
+8,cell,UTRAP K=0 b1 seed 0,0.266667,outputs/atk_U4EV_k0_s400_b1_sd0_lr1e-5_s25.json,"GATE-INVALID, inconclusive"
+8,cell,UTRAP K=0 b1 seed 1,0.466667,outputs/atk_U4EV_k0_s400_b1_sd1_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=0 b1 seed 6,0.266667,outputs/atk_U4EV_k0_s400_b1_sd6_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=0 b2 seed 0,0.066667,outputs/atk_U4EV_k0_s400_b2_sd0_lr1e-5_s25.json,"GATE-INVALID, inconclusive"
+8,cell,UTRAP K=0 b2 seed 1,0.2,outputs/atk_U4EV_k0_s400_b2_sd1_lr1e-5_s25.json,"GATE-INVALID, inconclusive"
+8,cell,UTRAP K=0 b2 seed 6,0.133333,outputs/atk_U4EV_k0_s400_b2_sd6_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b0 seed 0,0.866667,outputs/atk_U4EV_k8_s400_b0_sd0_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b0 seed 1,0.733333,outputs/atk_U4EV_k8_s400_b0_sd1_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b0 seed 6,0.933333,outputs/atk_U4EV_k8_s400_b0_sd6_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b1 seed 0,0.8,outputs/atk_U4EV_k8_s400_b1_sd0_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b1 seed 1,0.8,outputs/atk_U4EV_k8_s400_b1_sd1_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b1 seed 6,0.933333,outputs/atk_U4EV_k8_s400_b1_sd6_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b2 seed 0,0.666667,outputs/atk_U4EV_k8_s400_b2_sd0_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b2 seed 1,0.733333,outputs/atk_U4EV_k8_s400_b2_sd1_lr1e-5_s25.json,gate-valid
+8,cell,UTRAP K=8 b2 seed 6,0.8,outputs/atk_U4EV_k8_s400_b2_sd6_lr1e-5_s25.json,gate-valid
+8,cell,FRAG/FRP teacher seed 0,0.933333,outputs/atk_E11I_frp_church_r3_l05_sd0_lr1e-5_s25.json,gate-valid; duplicates dropped: E11B_frp_church_r3_l05_sd0_lr1e-5_s25
+8,cell,FRAG/FRP teacher seed 1,0.8,outputs/atk_E11I_frp_church_r3_l05_sd1_lr1e-5_s25.json,gate-valid
+8,cell,FRAG/FRP teacher seed 6,0.866667,outputs/atk_E11I_frp_church_r3_l05_sd6_lr1e-5_s25.json,gate-valid
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 0",0.333333,outputs/atk_U1_utrap2_church_l0.15k0_sd0_lr1e-5_s25.json,"gate-valid, T_rise 0.291667"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 1",0.133333,outputs/atk_U1_utrap2_church_l0.15k0_sd1_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.083333"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 6",0.266667,outputs/atk_U1_utrap2_church_l0.15k0_sd6_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.041667"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 0",0.333333,outputs/atk_U2EV_utrap2_church_l0.15k0_sd0_lr1e-5_s25.json,"gate-valid, T_rise 0.291667"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 0",0.333333,outputs/atk_U4EV_k0_s400_b0_sd0_lr1e-5_s25.json,"gate-valid, T_rise 0.291667"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 1",0.2,outputs/atk_U4EV_k0_s400_b0_sd1_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.083333"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 6",0.266667,outputs/atk_U4EV_k0_s400_b0_sd6_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.041667"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 0",0.333333,outputs/atk_U8RE_k0_b0_sd0_r2_lr1e-5_s25.json,"gate-valid, T_rise 0.291667"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 1",0.066667,outputs/atk_U8RE_k0_b0_sd1_r2_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.083333"
+9,cell,"UTRAP K=0 b0, lr 1e-05, seed 1",0.133333,outputs/atk_U8RE_k0_b0_sd1_r3_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.083333"
+9,cell,"UTRAP K=0 b0, lr 0.0001, seed 0",0.733333,outputs/atk_U9EV_k0b0_sd0_lr1e-4_s25.json,"gate-valid, T_rise 0.833333"
+9,cell,"UTRAP K=0 b0, lr 5e-05, seed 0",1.0,outputs/atk_U9EV_k0b0_sd0_lr5e-5_s25.json,"gate-valid, T_rise 0.958333"
+9,cell,"UTRAP K=0 b0, lr 0.0001, seed 1",0.6,outputs/atk_U9EV_k0b0_sd1_lr1e-4_s25.json,"gate-valid, T_rise 0.458333"
+9,cell,"UTRAP K=0 b0, lr 5e-05, seed 1",0.8,outputs/atk_U9EV_k0b0_sd1_lr5e-5_s25.json,"gate-valid, T_rise 0.708333"
+9,cell,"UTRAP K=0 b0, lr 0.0001, seed 6",0.466667,outputs/atk_U9EV_k0b0_sd6_lr1e-4_s25.json,"gate-valid, T_rise 0.625"
+9,cell,"UTRAP K=0 b0, lr 5e-05, seed 6",1.0,outputs/atk_U9EV_k0b0_sd6_lr5e-5_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=0 b1, lr 1e-05, seed 0",0.266667,outputs/atk_U4EV_k0_s400_b1_sd0_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.166667"
+9,cell,"UTRAP K=0 b1, lr 1e-05, seed 1",0.466667,outputs/atk_U4EV_k0_s400_b1_sd1_lr1e-5_s25.json,"gate-valid, T_rise 0.416667"
+9,cell,"UTRAP K=0 b1, lr 1e-05, seed 6",0.266667,outputs/atk_U4EV_k0_s400_b1_sd6_lr1e-5_s25.json,"gate-valid, T_rise 0.333333"
+9,cell,"UTRAP K=0 b1, lr 0.0001, seed 0",0.6,outputs/atk_U9EV_k0b1_sd0_lr1e-4_s25.json,"gate-valid, T_rise 0.666667"
+9,cell,"UTRAP K=0 b1, lr 5e-05, seed 0",1.0,outputs/atk_U9EV_k0b1_sd0_lr5e-5_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=0 b1, lr 0.0001, seed 1",1.0,outputs/atk_U9EV_k0b1_sd1_lr1e-4_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=0 b1, lr 5e-05, seed 1",1.0,outputs/atk_U9EV_k0b1_sd1_lr5e-5_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=0 b1, lr 0.0001, seed 6",1.0,outputs/atk_U9EV_k0b1_sd6_lr1e-4_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=0 b1, lr 5e-05, seed 6",1.0,outputs/atk_U9EV_k0b1_sd6_lr5e-5_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=0 b2, lr 1e-05, seed 0",0.066667,outputs/atk_U4EV_k0_s400_b2_sd0_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.166667"
+9,cell,"UTRAP K=0 b2, lr 1e-05, seed 1",0.2,outputs/atk_U4EV_k0_s400_b2_sd1_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.125"
+9,cell,"UTRAP K=0 b2, lr 1e-05, seed 6",0.133333,outputs/atk_U4EV_k0_s400_b2_sd6_lr1e-5_s25.json,"gate-valid, T_rise 0.333333"
+9,cell,"UTRAP K=0 b2, lr 0.0001, seed 0",1.0,outputs/atk_U9EV_k0b2_sd0_lr1e-4_s25.json,"gate-valid, T_rise 0.875"
+9,cell,"UTRAP K=0 b2, lr 5e-05, seed 0",1.0,outputs/atk_U9EV_k0b2_sd0_lr5e-5_s25.json,"gate-valid, T_rise 0.958333"
+9,cell,"UTRAP K=0 b2, lr 0.0001, seed 1",0.933333,outputs/atk_U9EV_k0b2_sd1_lr1e-4_s25.json,"gate-valid, T_rise 0.833333"
+9,cell,"UTRAP K=0 b2, lr 5e-05, seed 1",0.733333,outputs/atk_U9EV_k0b2_sd1_lr5e-5_s25.json,"gate-valid, T_rise 0.625"
+9,cell,"UTRAP K=0 b2, lr 0.0001, seed 6",0.933333,outputs/atk_U9EV_k0b2_sd6_lr1e-4_s25.json,"gate-valid, T_rise 0.916667"
+9,cell,"UTRAP K=0 b2, lr 5e-05, seed 6",1.0,outputs/atk_U9EV_k0b2_sd6_lr5e-5_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=8, lr 1e-05, seed 0",0.866667,outputs/atk_U1_utrap2m_church_l0.15k8_sd0_lr1e-5_s25.json,"gate-valid, T_rise 0.666667"
+9,cell,"UTRAP K=8, lr 1e-05, seed 1",0.733333,outputs/atk_U1_utrap2m_church_l0.15k8_sd1_lr1e-5_s25.json,"gate-valid, T_rise 0.25"
+9,cell,"UTRAP K=8, lr 1e-05, seed 6",0.933333,outputs/atk_U1_utrap2m_church_l0.15k8_sd6_lr1e-5_s25.json,"gate-valid, T_rise 0.666667"
+9,cell,"UTRAP K=8, lr 0.0001, seed 0",0.333333,outputs/atk_U9EV_k8m_sd0_lr1e-4_s25.json,"GATE-INVALID, inconclusive, T_rise 0.125"
+9,cell,"UTRAP K=8, lr 5e-05, seed 0",1.0,outputs/atk_U9EV_k8m_sd0_lr5e-5_s25.json,"gate-valid, T_rise 0.666667"
+9,cell,"UTRAP K=8, lr 0.0001, seed 1",0.733333,outputs/atk_U9EV_k8m_sd1_lr1e-4_s25.json,"gate-valid, T_rise 0.458333"
+9,cell,"UTRAP K=8, lr 5e-05, seed 1",1.0,outputs/atk_U9EV_k8m_sd1_lr5e-5_s25.json,"gate-valid, T_rise 0.666667"
+9,cell,"UTRAP K=8, lr 0.0001, seed 6",0.933333,outputs/atk_U9EV_k8m_sd6_lr1e-4_s25.json,"gate-valid, T_rise 0.666667"
+9,cell,"UTRAP K=8, lr 5e-05, seed 6",1.0,outputs/atk_U9EV_k8m_sd6_lr5e-5_s25.json,"gate-valid, T_rise 0.75"
+9,cell,"FRAG/FRP teacher, lr 1e-05, seed 0",0.933333,outputs/atk_E11B_frp_church_r3_l05_sd0_lr1e-5_s25.json,"gate-valid, T_rise 0.75"
+9,cell,"FRAG/FRP teacher, lr 0.0001, seed 0",0.2,outputs/atk_E11H_frp_church_r3_l05_sd0_lr1e-4_s25.json,"GATE-INVALID, inconclusive, T_rise -0.041667"
+9,cell,"FRAG/FRP teacher, lr 0.0001, seed 1",0.866667,outputs/atk_E11H_frp_church_r3_l05_sd1_lr1e-4_s25.json,"gate-valid, T_rise 0.75"
+9,cell,"FRAG/FRP teacher, lr 0.0001, seed 6",0.933333,outputs/atk_E11H_frp_church_r3_l05_sd6_lr1e-4_s25.json,"gate-valid, T_rise 0.791667"
+9,cell,"FRAG/FRP teacher, lr 1e-05, seed 0",0.933333,outputs/atk_E11I_frp_church_r3_l05_sd0_lr1e-5_s25.json,"gate-valid, T_rise 0.75"
+9,cell,"FRAG/FRP teacher, lr 1e-05, seed 1",0.8,outputs/atk_E11I_frp_church_r3_l05_sd1_lr1e-5_s25.json,"gate-valid, T_rise 0.333333"
+9,cell,"FRAG/FRP teacher, lr 1e-05, seed 6",0.866667,outputs/atk_E11I_frp_church_r3_l05_sd6_lr1e-5_s25.json,"gate-valid, T_rise 0.708333"
+9,cell,"FRAG/FRP teacher, lr 0.0001, seed 0",0.2,outputs/atk_U9EV_frp_sd0_lr1e-4_s25.json,"GATE-INVALID, inconclusive, T_rise -0.083333"
+9,cell,"FRAG/FRP teacher, lr 5e-05, seed 0",1.0,outputs/atk_U9EV_frp_sd0_lr5e-5_s25.json,"gate-valid, T_rise 0.708333"
+9,cell,"FRAG/FRP teacher, lr 0.0001, seed 1",0.933333,outputs/atk_U9EV_frp_sd1_lr1e-4_s25.json,"gate-valid, T_rise 0.75"
+9,cell,"FRAG/FRP teacher, lr 5e-05, seed 1",1.0,outputs/atk_U9EV_frp_sd1_lr5e-5_s25.json,"gate-valid, T_rise 0.708333"
+9,cell,"FRAG/FRP teacher, lr 0.0001, seed 6",0.933333,outputs/atk_U9EV_frp_sd6_lr1e-4_s25.json,"gate-valid, T_rise 0.791667"
+9,cell,"FRAG/FRP teacher, lr 5e-05, seed 6",1.0,outputs/atk_U9EV_frp_sd6_lr5e-5_s25.json,"gate-valid, T_rise 0.791667"
+9,cell,"UTRAP K=0 lam 0.05, lr 1e-05, seed 0",0.8,outputs/atk_U16EV_u16_k0_lam0.05_b0_sd0_lr1e-5_s25.json,"gate-valid, T_rise 0.708333"
+9,cell,"UTRAP K=0 lam 0.05, lr 1e-05, seed 1",0.733333,outputs/atk_U16EV_u16_k0_lam0.05_b0_sd1_lr1e-5_s25.json,"gate-valid, T_rise 0.333333"
+9,cell,"UTRAP K=0 lam 0.05, lr 1e-05, seed 6",0.933333,outputs/atk_U16EV_u16_k0_lam0.05_b0_sd6_lr1e-5_s25.json,"gate-valid, T_rise 0.541667"
+9,cell,"UTRAP K=0 lam 0.05, lr 0.0001, seed 0",0.8,outputs/atk_U17EV_k0_lam0.05_b0_sd0_lr1e-4_s25.json,"gate-valid, T_rise 0.5"
+9,cell,"UTRAP K=0 lam 0.05, lr 5e-05, seed 0",1.0,outputs/atk_U17EV_k0_lam0.05_b0_sd0_lr5e-5_s25.json,"gate-valid, T_rise 0.791667"
+9,cell,"UTRAP K=0 lam 0.05, lr 0.0001, seed 1",1.0,outputs/atk_U17EV_k0_lam0.05_b0_sd1_lr1e-4_s25.json,"gate-valid, T_rise 0.791667"
+9,cell,"UTRAP K=0 lam 0.05, lr 5e-05, seed 1",1.0,outputs/atk_U17EV_k0_lam0.05_b0_sd1_lr5e-5_s25.json,"gate-valid, T_rise 0.791667"
+9,cell,"UTRAP K=0 lam 0.05, lr 0.0001, seed 6",0.933333,outputs/atk_U17EV_k0_lam0.05_b0_sd6_lr1e-4_s25.json,"gate-valid, T_rise 0.583333"
+9,cell,"UTRAP K=0 lam 0.05, lr 5e-05, seed 6",1.0,outputs/atk_U17EV_k0_lam0.05_b0_sd6_lr5e-5_s25.json,"gate-valid, T_rise 0.583333"
+9,cell,"UTRAP K=0 lam 0.60, lr 1e-05, seed 0",0.333333,outputs/atk_U16EV_u16_k0_lam0.6_b0_sd0_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.041667"
+9,cell,"UTRAP K=0 lam 0.60, lr 1e-05, seed 1",0.0,outputs/atk_U16EV_u16_k0_lam0.6_b0_sd1_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.0"
+9,cell,"UTRAP K=0 lam 0.60, lr 1e-05, seed 6",0.333333,outputs/atk_U16EV_u16_k0_lam0.6_b0_sd6_lr1e-5_s25.json,"GATE-INVALID, inconclusive, T_rise 0.125"
+9,cell,"UTRAP K=0 lam 0.60, lr 0.0001, seed 0",0.2,outputs/atk_U17EV_k0_lam0.6_b0_sd0_lr1e-4_s25.json,"gate-valid, T_rise 0.333333"
+9,cell,"UTRAP K=0 lam 0.60, lr 5e-05, seed 0",1.0,outputs/atk_U17EV_k0_lam0.6_b0_sd0_lr5e-5_s25.json,"gate-valid, T_rise 0.916667"
+9,cell,"UTRAP K=0 lam 0.60, lr 0.0001, seed 1",0.866667,outputs/atk_U17EV_k0_lam0.6_b0_sd1_lr1e-4_s25.json,"gate-valid, T_rise 0.958333"
+9,cell,"UTRAP K=0 lam 0.60, lr 5e-05, seed 1",0.133333,outputs/atk_U17EV_k0_lam0.6_b0_sd1_lr5e-5_s25.json,"gate-valid, T_rise 0.208333"
+9,cell,"UTRAP K=0 lam 0.60, lr 0.0001, seed 6",1.0,outputs/atk_U17EV_k0_lam0.6_b0_sd6_lr1e-4_s25.json,"gate-valid, T_rise 1.0"
+9,cell,"UTRAP K=0 lam 0.60, lr 5e-05, seed 6",1.0,outputs/atk_U17EV_k0_lam0.6_b0_sd6_lr5e-5_s25.json,"gate-valid, T_rise 1.0"
+10,number,IMMA (official code): target before attack,0.2000,outputs/gen_REF_imma_vangogh_s20.json,"official-code execution, our dataset and our evaluation"
+10,number,IMMA (official code): retain8 before attack,0.9083,outputs/gen_REF_imma_vangogh_s20.json,
+10,number,"IMMA: H after 300-step attack, seed 0",0.8667,outputs/atk_R1C_REF_imma_vangogh_s20_sd0_lr1e-5_s300.json,"gate valid, T_rise 0.7917; 3 attacks on ONE defence build"
+10,number,"IMMA: H after 300-step attack, seed 1",1.0000,outputs/atk_R1C_REF_imma_vangogh_s20_sd1_lr1e-5_s300.json,"gate valid, T_rise 0.8750; 3 attacks on ONE defence build"
+10,number,"IMMA: H after 300-step attack, seed 6",1.0000,outputs/atk_R1C_REF_imma_vangogh_s20_sd6_lr1e-5_s300.json,"gate valid, T_rise 0.7917; 3 attacks on ONE defence build"
+"4,5,7,10",image provenance,settings-match self-check vs a stored panel image,identical=True max_abs_pixel_diff=0,outputs/ev_U2EV_utrap2_church_l0.15k0_sd0_lr1e-5_s25/before/H/p0_i0.png,re-rendered a stored image with the deck generator's settings
+"4,5,7,10",image,base / church_target,base__church_target__i0.png,base SD-1.4,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=
+"4,5,7,10",image,base / retained_golf,base__retained_golf__i0.png,base SD-1.4,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=
+"4,5,7,10",image,base / retained_horn,base__retained_horn__i0.png,base SD-1.4,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=
+"4,5,7,10",image,base / vangogh_target,base__vangogh_target__i0.png,base SD-1.4,prompt='a painting in the style of Van Gogh' seed=0 steps=25 cfg=7.5 res=512 sha256=
+"4,5,7,10",image,uce / church_target,uce__church_target__i0.png,adapters/uce_church/unet.pt,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=80580015bf437f1d
+"4,5,7,10",image,uce / retained_golf,uce__retained_golf__i0.png,adapters/uce_church/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=80580015bf437f1d
+"4,5,7,10",image,uce / retained_horn,uce__retained_horn__i0.png,adapters/uce_church/unet.pt,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=80580015bf437f1d
+"4,5,7,10",image,gift / church_target,gift__church_target__i0.png,adapters/gift_church_b1.0/unet.pt,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=7a6449a98ddb647c
+"4,5,7,10",image,gift / retained_golf,gift__retained_golf__i0.png,adapters/gift_church_b1.0/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=7a6449a98ddb647c
+"4,5,7,10",image,gift / retained_horn,gift__retained_horn__i0.png,adapters/gift_church_b1.0/unet.pt,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=7a6449a98ddb647c
+"4,5,7,10",image,imma_ad / church_target,imma_ad__church_target__i0.png,adapters/imma_church_frp_a1e-7_s1500/unet.pt,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=a641907a8448db0b
+"4,5,7,10",image,imma_ad / retained_golf,imma_ad__retained_golf__i0.png,adapters/imma_church_frp_a1e-7_s1500/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=a641907a8448db0b
+"4,5,7,10",image,imma_ad / retained_horn,imma_ad__retained_horn__i0.png,adapters/imma_church_frp_a1e-7_s1500/unet.pt,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=a641907a8448db0b
+"4,5,7,10",image,esd / church_target,esd__church_target__i0.png,adapters/esd_church/unet.pt,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=86439eafe79df953
+"4,5,7,10",image,esd / retained_golf,esd__retained_golf__i0.png,adapters/esd_church/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=86439eafe79df953
+"4,5,7,10",image,esd / retained_horn,esd__retained_horn__i0.png,adapters/esd_church/unet.pt,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=86439eafe79df953
+"4,5,7,10",image,frp / church_target,frp__church_target__i0.png,adapters/frp_church_r3_l05/unet.pt,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=44e6f39037e64a69
+"4,5,7,10",image,frp / retained_golf,frp__retained_golf__i0.png,adapters/frp_church_r3_l05/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=44e6f39037e64a69
+"4,5,7,10",image,frp / retained_horn,frp__retained_horn__i0.png,adapters/frp_church_r3_l05/unet.pt,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=44e6f39037e64a69
+"4,5,7,10",image,utrap_k0 / church_target,utrap_k0__church_target__i0.png,adapters/utrap2_church_l0.15k0/unet.pt,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=f981099ebfae21f5
+"4,5,7,10",image,utrap_k0 / retained_golf,utrap_k0__retained_golf__i0.png,adapters/utrap2_church_l0.15k0/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=f981099ebfae21f5
+"4,5,7,10",image,utrap_k0 / retained_horn,utrap_k0__retained_horn__i0.png,adapters/utrap2_church_l0.15k0/unet.pt,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=f981099ebfae21f5
+"4,5,7,10",image,utrap_k8 / church_target,utrap_k8__church_target__i0.png,adapters/utrap2m_church_l0.15k8/unet.pt,prompt='a photo of a church' seed=0 steps=25 cfg=7.5 res=512 sha256=0dca07c61d3c1150
+"4,5,7,10",image,utrap_k8 / retained_golf,utrap_k8__retained_golf__i0.png,adapters/utrap2m_church_l0.15k8/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=0dca07c61d3c1150
+"4,5,7,10",image,utrap_k8 / retained_horn,utrap_k8__retained_horn__i0.png,adapters/utrap2m_church_l0.15k8/unet.pt,prompt='a photo of a french horn' seed=0 steps=25 cfg=7.5 res=512 sha256=0dca07c61d3c1150
+"4,5,7,10",image,vg_esd / vangogh_target,vg_esd__vangogh_target__i0.png,adapters/ESD_vangogh_official/unet.pt,prompt='a painting in the style of Van Gogh' seed=0 steps=25 cfg=7.5 res=512 sha256=5fe43e64e4d04a66
+"4,5,7,10",image,vg_esd / retained_golf,vg_esd__retained_golf__i0.png,adapters/ESD_vangogh_official/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=5fe43e64e4d04a66
+"4,5,7,10",image,vg_imma / vangogh_target,vg_imma__vangogh_target__i0.png,adapters/REF_imma_vangogh_s20/unet.pt,prompt='a painting in the style of Van Gogh' seed=0 steps=25 cfg=7.5 res=512 sha256=5dca64f6d06aed33
+"4,5,7,10",image,vg_imma / retained_golf,vg_imma__retained_golf__i0.png,adapters/REF_imma_vangogh_s20/unet.pt,prompt='a photo of a golf ball' seed=0 steps=25 cfg=7.5 res=512 sha256=5dca64f6d06aed33
+"4,5,7",image,stored panel image (post-unlearning) U10TN_frp_tench_sd0_lr1e-5_s25,outputs/ev_U10TN_frp_tench_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_frp_tench_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_frp_tench_sd1_lr1e-5_s25,outputs/ev_U10TN_frp_tench_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_frp_tench_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_frp_tench_sd6_lr1e-5_s25,outputs/ev_U10TN_frp_tench_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_frp_tench_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b0_tench_sd0_lr1e-5_s25,outputs/ev_U10TN_k0b0_tench_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b0_tench_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b0_tench_sd1_lr1e-5_s25,outputs/ev_U10TN_k0b0_tench_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b0_tench_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b0_tench_sd6_lr1e-5_s25,outputs/ev_U10TN_k0b0_tench_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b0_tench_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b1_tench_sd0_lr1e-5_s25,outputs/ev_U10TN_k0b1_tench_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b1_tench_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b1_tench_sd1_lr1e-5_s25,outputs/ev_U10TN_k0b1_tench_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b1_tench_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b1_tench_sd6_lr1e-5_s25,outputs/ev_U10TN_k0b1_tench_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b1_tench_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b2_tench_sd0_lr1e-5_s25,outputs/ev_U10TN_k0b2_tench_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b2_tench_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b2_tench_sd1_lr1e-5_s25,outputs/ev_U10TN_k0b2_tench_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b2_tench_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U10TN_k0b2_tench_sd6_lr1e-5_s25,outputs/ev_U10TN_k0b2_tench_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U10TN_k0b2_tench_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U16EV_u16_k0_lam0.05_b0_sd0_lr1e-5_s25,outputs/ev_U16EV_u16_k0_lam0.05_b0_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U16EV_u16_k0_lam0.05_b0_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U16EV_u16_k0_lam0.05_b0_sd1_lr1e-5_s25,outputs/ev_U16EV_u16_k0_lam0.05_b0_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U16EV_u16_k0_lam0.05_b0_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U16EV_u16_k0_lam0.05_b0_sd6_lr1e-5_s25,outputs/ev_U16EV_u16_k0_lam0.05_b0_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U16EV_u16_k0_lam0.05_b0_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U16EV_u16_k0_lam0.6_b0_sd0_lr1e-5_s25,outputs/ev_U16EV_u16_k0_lam0.6_b0_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U16EV_u16_k0_lam0.6_b0_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U16EV_u16_k0_lam0.6_b0_sd1_lr1e-5_s25,outputs/ev_U16EV_u16_k0_lam0.6_b0_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U16EV_u16_k0_lam0.6_b0_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U16EV_u16_k0_lam0.6_b0_sd6_lr1e-5_s25,outputs/ev_U16EV_u16_k0_lam0.6_b0_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U16EV_u16_k0_lam0.6_b0_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.05_b0_sd0_lr1e-4_s25,outputs/ev_U17EV_k0_lam0.05_b0_sd0_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.05_b0_sd0_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.05_b0_sd0_lr5e-5_s25,outputs/ev_U17EV_k0_lam0.05_b0_sd0_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.05_b0_sd0_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.05_b0_sd1_lr1e-4_s25,outputs/ev_U17EV_k0_lam0.05_b0_sd1_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.05_b0_sd1_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.05_b0_sd1_lr5e-5_s25,outputs/ev_U17EV_k0_lam0.05_b0_sd1_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.05_b0_sd1_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.05_b0_sd6_lr1e-4_s25,outputs/ev_U17EV_k0_lam0.05_b0_sd6_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.05_b0_sd6_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.05_b0_sd6_lr5e-5_s25,outputs/ev_U17EV_k0_lam0.05_b0_sd6_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.05_b0_sd6_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.6_b0_sd0_lr1e-4_s25,outputs/ev_U17EV_k0_lam0.6_b0_sd0_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.6_b0_sd0_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.6_b0_sd0_lr5e-5_s25,outputs/ev_U17EV_k0_lam0.6_b0_sd0_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.6_b0_sd0_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.6_b0_sd1_lr1e-4_s25,outputs/ev_U17EV_k0_lam0.6_b0_sd1_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.6_b0_sd1_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.6_b0_sd1_lr5e-5_s25,outputs/ev_U17EV_k0_lam0.6_b0_sd1_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.6_b0_sd1_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.6_b0_sd6_lr1e-4_s25,outputs/ev_U17EV_k0_lam0.6_b0_sd6_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.6_b0_sd6_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U17EV_k0_lam0.6_b0_sd6_lr5e-5_s25,outputs/ev_U17EV_k0_lam0.6_b0_sd6_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U17EV_k0_lam0.6_b0_sd6_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U2EV_utrap2_church_l0.15k0_sd0_lr1e-5_s25,outputs/ev_U2EV_utrap2_church_l0.15k0_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U2EV_utrap2_church_l0.15k0_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_frp_church_r3_l05_sd1_lr1e-5_s100,outputs/ev_U3EV_frp_church_r3_l05_sd1_lr1e-5_s100/before/H/p0_i0.png,outputs/atk_U3EV_frp_church_r3_l05_sd1_lr1e-5_s100.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_frp_church_r3_l05_sd6_lr1e-5_s100,outputs/ev_U3EV_frp_church_r3_l05_sd6_lr1e-5_s100/before/H/p0_i0.png,outputs/atk_U3EV_frp_church_r3_l05_sd6_lr1e-5_s100.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_utrap2_church_l0.15k0_sd0_lr1e-5_s50,outputs/ev_U3EV_utrap2_church_l0.15k0_sd0_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U3EV_utrap2_church_l0.15k0_sd0_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_utrap2_church_l0.15k0_sd1_lr1e-5_s50,outputs/ev_U3EV_utrap2_church_l0.15k0_sd1_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U3EV_utrap2_church_l0.15k0_sd1_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_utrap2_church_l0.15k0_sd6_lr1e-5_s50,outputs/ev_U3EV_utrap2_church_l0.15k0_sd6_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U3EV_utrap2_church_l0.15k0_sd6_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_utrap2m_church_l0.15k8_sd0_lr1e-5_s50,outputs/ev_U3EV_utrap2m_church_l0.15k8_sd0_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U3EV_utrap2m_church_l0.15k8_sd0_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_utrap2m_church_l0.15k8_sd1_lr1e-5_s50,outputs/ev_U3EV_utrap2m_church_l0.15k8_sd1_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U3EV_utrap2m_church_l0.15k8_sd1_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U3EV_utrap2m_church_l0.15k8_sd6_lr1e-5_s50,outputs/ev_U3EV_utrap2m_church_l0.15k8_sd6_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U3EV_utrap2m_church_l0.15k8_sd6_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b0_sd0_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b0_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b0_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b0_sd1_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b0_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b0_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b0_sd6_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b0_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b0_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b1_sd0_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b1_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b1_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b1_sd1_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b1_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b1_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b1_sd6_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b1_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b1_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b2_sd0_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b2_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b2_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b2_sd1_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b2_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b2_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k0_s400_b2_sd6_lr1e-5_s25,outputs/ev_U4EV_k0_s400_b2_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k0_s400_b2_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b0_sd0_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b0_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b0_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b0_sd1_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b0_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b0_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b0_sd6_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b0_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b0_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b1_sd0_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b1_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b1_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b1_sd1_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b1_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b1_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b1_sd6_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b1_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b1_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b2_sd0_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b2_sd0_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b2_sd0_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b2_sd1_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b2_sd1_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b2_sd1_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U4EV_k8_s400_b2_sd6_lr1e-5_s25,outputs/ev_U4EV_k8_s400_b2_sd6_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U4EV_k8_s400_b2_sd6_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U5EV_esd_church_sd0_lr1e-5_s50,outputs/ev_U5EV_esd_church_sd0_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U5EV_esd_church_sd0_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U5EV_esd_church_sd1_lr1e-5_s50,outputs/ev_U5EV_esd_church_sd1_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U5EV_esd_church_sd1_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U5EV_esd_church_sd6_lr1e-5_s50,outputs/ev_U5EV_esd_church_sd6_lr1e-5_s50/before/H/p0_i0.png,outputs/atk_U5EV_esd_church_sd6_lr1e-5_s50.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U8RE_k0_b0_sd0_r2_lr1e-5_s25,outputs/ev_U8RE_k0_b0_sd0_r2_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U8RE_k0_b0_sd0_r2_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U8RE_k0_b0_sd1_r2_lr1e-5_s25,outputs/ev_U8RE_k0_b0_sd1_r2_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U8RE_k0_b0_sd1_r2_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U8RE_k0_b0_sd1_r3_lr1e-5_s25,outputs/ev_U8RE_k0_b0_sd1_r3_lr1e-5_s25/before/H/p0_i0.png,outputs/atk_U8RE_k0_b0_sd1_r3_lr1e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_frp_sd0_lr1e-4_s25,outputs/ev_U9EV_frp_sd0_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_frp_sd0_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_frp_sd0_lr5e-5_s25,outputs/ev_U9EV_frp_sd0_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_frp_sd0_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_frp_sd1_lr1e-4_s25,outputs/ev_U9EV_frp_sd1_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_frp_sd1_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_frp_sd1_lr5e-5_s25,outputs/ev_U9EV_frp_sd1_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_frp_sd1_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_frp_sd6_lr1e-4_s25,outputs/ev_U9EV_frp_sd6_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_frp_sd6_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_frp_sd6_lr5e-5_s25,outputs/ev_U9EV_frp_sd6_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_frp_sd6_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b0_sd0_lr1e-4_s25,outputs/ev_U9EV_k0b0_sd0_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b0_sd0_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b0_sd0_lr5e-5_s25,outputs/ev_U9EV_k0b0_sd0_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b0_sd0_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b0_sd1_lr1e-4_s25,outputs/ev_U9EV_k0b0_sd1_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b0_sd1_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b0_sd1_lr5e-5_s25,outputs/ev_U9EV_k0b0_sd1_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b0_sd1_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b0_sd6_lr1e-4_s25,outputs/ev_U9EV_k0b0_sd6_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b0_sd6_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b0_sd6_lr5e-5_s25,outputs/ev_U9EV_k0b0_sd6_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b0_sd6_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b1_sd0_lr1e-4_s25,outputs/ev_U9EV_k0b1_sd0_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b1_sd0_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b1_sd0_lr5e-5_s25,outputs/ev_U9EV_k0b1_sd0_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b1_sd0_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b1_sd1_lr1e-4_s25,outputs/ev_U9EV_k0b1_sd1_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b1_sd1_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b1_sd1_lr5e-5_s25,outputs/ev_U9EV_k0b1_sd1_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b1_sd1_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b1_sd6_lr1e-4_s25,outputs/ev_U9EV_k0b1_sd6_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b1_sd6_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b1_sd6_lr5e-5_s25,outputs/ev_U9EV_k0b1_sd6_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b1_sd6_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b2_sd0_lr1e-4_s25,outputs/ev_U9EV_k0b2_sd0_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b2_sd0_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b2_sd0_lr5e-5_s25,outputs/ev_U9EV_k0b2_sd0_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b2_sd0_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b2_sd1_lr1e-4_s25,outputs/ev_U9EV_k0b2_sd1_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b2_sd1_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b2_sd1_lr5e-5_s25,outputs/ev_U9EV_k0b2_sd1_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b2_sd1_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b2_sd6_lr1e-4_s25,outputs/ev_U9EV_k0b2_sd6_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b2_sd6_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k0b2_sd6_lr5e-5_s25,outputs/ev_U9EV_k0b2_sd6_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k0b2_sd6_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k8m_sd0_lr1e-4_s25,outputs/ev_U9EV_k8m_sd0_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k8m_sd0_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k8m_sd0_lr5e-5_s25,outputs/ev_U9EV_k8m_sd0_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k8m_sd0_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k8m_sd1_lr1e-4_s25,outputs/ev_U9EV_k8m_sd1_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k8m_sd1_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k8m_sd1_lr5e-5_s25,outputs/ev_U9EV_k8m_sd1_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k8m_sd1_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k8m_sd6_lr1e-4_s25,outputs/ev_U9EV_k8m_sd6_lr1e-4_s25/before/H/p0_i0.png,outputs/atk_U9EV_k8m_sd6_lr1e-4_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+"4,5,7",image,stored panel image (post-unlearning) U9EV_k8m_sd6_lr5e-5_s25,outputs/ev_U9EV_k8m_sd6_lr5e-5_s25/before/H/p0_i0.png,outputs/atk_U9EV_k8m_sd6_lr5e-5_s25.json,"written by attack_relearn_v2.py; prompt index 0, image index 0, generator seed 0"
+5,exclusion,AdvUnlearn (text-encoder arms),excluded from published-method claims,docs/,"post-attack evaluation loaded the BASE text encoder, so every text-encoder-arm post-attack number is VOID (docs/ERRATUM_text_encoder_eval_bug.md)"
+5,exclusion,Meta-Unlearning (our port),excluded from published-method claims,docs/,"our port omits two of the three terms of the paper's Eq. 8 meta objective, so it is not the published method (docs/ERRATUM_meta_objective.md)"
+5,exclusion,WSR / weight-space regulariser,excluded from published-method claims,docs/,implements the OPPOSITE regularisation direction from the paper it cites (docs/ERRATUM_wsr_direction.md)
+5,exclusion,REF_imma_vangogh (5x budget run),excluded from published-method claims,docs/,"ran at 5.00x the README's documented ascent budget and its utility collapsed (retain8 0.0333); kept as a utility-failure datapoint, not a method comparison"
+5,exclusion,internal h-series / random / undo variants,excluded from published-method claims,docs/,"project-internal variants, not published methods; outside the published-method comparison by design"
+all,withdrawn,the 25-step K=0-vs-teacher separation of 0.57 (artifact of a single attacker learning rate; see attacker calibration),not shown on any slide,docs/FINDINGS_U1_U3_PILOT.md,retracted during the campaign; deliberately absent from the deck
+all,withdrawn,"'K=0 meets the mandate bar at 25 steps' (n=1 build artifact; a second build gives a gate-valid 0.4667, and the calibrated sweep gives 1.0000)",not shown on any slide,docs/FINDINGS_U1_U3_PILOT.md,retracted during the campaign; deliberately absent from the deck
+all,withdrawn,'more outer updates make K=8 erase worse' (build spread 0.5333 exceeds the effect),not shown on any slide,docs/FINDINGS_U1_U3_PILOT.md,retracted during the campaign; deliberately absent from the deck
+all,withdrawn,'K=0 costs utility' (K=0 retain8 build range spans the teacher),not shown on any slide,docs/FINDINGS_U1_U3_PILOT.md,retracted during the campaign; deliberately absent from the deck
+all,withdrawn,'representation damage tracks resistance' (does not survive attacker calibration),not shown on any slide,docs/FINDINGS_U1_U3_PILOT.md,retracted during the campaign; deliberately absent from the deck
