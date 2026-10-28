@@ -85,6 +85,9 @@ Not honestly, on current evidence. Every direction is either published, measured
 | 25 steps | 0.0333 | 18% | yes |
 | 100 steps | 0.0333 | 18% | yes |
 | 300 steps | **0.1333** | **73%** | yes |
+| 1000 steps | **0.2500** | **138%** | yes |
+
+**At 1000 steps the attack exceeds base** (0.2500 vs 0.1817) — entrenchment, independently documented on church arms in FINDING46–51 and now corroborated on an author checkpoint with a different concept and metric.
 
 **Reading:** ResAlign does not hold indefinitely. It **costs the attacker roughly 100× more** than every other method — which fall at 1 to 4 steps — and breaks by 300. That is an explicitly measured trade-off, not an absolute defence.
 
