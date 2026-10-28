@@ -7,6 +7,12 @@ geometry: margin=2.4cm
 fontsize: 10pt
 colorlinks: true
 ---
+> **SUPERSEDED IN FRAMING, 2026-10-28.** MANDATE v3 retires the evaluation/audit paper as
+> the deliverable in favour of a constructive method. **The measurements in this document
+> stand and are reused as motivation and baselines; its proposed contribution does not.**
+> See `docs/CLOSURE_REGISTER_2026-10-28.md` and `docs/MANDATE_v3_2026-10-28.md`.
+
+
 
 This document backs the status report. It is not meant to be read front to back — it is organised by the questions most likely to be asked, so an answer can be found quickly.
 

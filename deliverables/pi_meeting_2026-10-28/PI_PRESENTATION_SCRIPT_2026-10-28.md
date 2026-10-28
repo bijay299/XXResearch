@@ -7,6 +7,12 @@ geometry: margin=2.4cm
 fontsize: 11pt
 colorlinks: true
 ---
+> **SUPERSEDED IN FRAMING, 2026-10-28.** MANDATE v3 retires the evaluation/audit paper as
+> the deliverable in favour of a constructive method. **The measurements in this document
+> stand and are reused as motivation and baselines; its proposed contribution does not.**
+> See `docs/CLOSURE_REGISTER_2026-10-28.md` and `docs/MANDATE_v3_2026-10-28.md`.
+
+
 
 **How to use this.** Roughly 20 minutes of talking. The *italic* lines are what to say; the bracketed notes are reminders, not lines. Don't read it verbatim — the point is to have the hard sentences already worked out so you're not composing them under pressure.
 
