@@ -1,0 +1,470 @@
+[gpu_reserve] inherited CUDA_VISIBLE_DEVICES: <unset> (clean)
+[gpu_reserve] gpu0 RESERVED for 'u30_u23_audit' by pid 2933263 (uuid GPU-b2f89296-447e-dc7a-96b6-82ac699a02d7)
+[gpu_reserve]         owner identity: pid=2933263 start=150946514 pgid=2933260 sid=2933258
+[gpu_reserve]         group-leader=no session-leader=no
+[gpu_reserve]         supervision: liveness-lock (kernel-enforced; descendants covered)
+U30 reserved GPU 0 CVD=0
+=== U30 START 2026-10-27T23:05:26-04:00 pid=2933263
+=== audit u23_random_a0.3 2026-10-27T23:05:26-04:00
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 17.02it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 12.40it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.60it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+
+=================== TEACHER  (adapters/u23_random_a0.3/unet.pt)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: church=0.999  van_gogh=0.000  monet=0.000
+      p0 k1  top3: church=0.947  van_gogh=0.036  monet=0.007
+      p0 k2  top3: church=0.877  van_gogh=0.066  gas_pump=0.030
+      p1 k0  top3: van_gogh=0.718  church=0.209  monet=0.050
+      p1 k1  top3: van_gogh=0.591  church=0.258  garbage_truck=0.057
+      p1 k2  top3: van_gogh=0.630  garbage_truck=0.122  monet=0.110
+      p2 k0  top3: van_gogh=0.513  church=0.375  monet=0.060
+      p2 k1  top3: van_gogh=0.650  church=0.221  monet=0.046
+      p2 k2  top3: church=0.612  van_gogh=0.344  monet=0.030
+    -> TEACHER target accuracy at seed 0: 0.4444  (4/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: church=0.595  chain_saw=0.171  van_gogh=0.100
+      p0 k1  top3: church=0.997  van_gogh=0.001  chain_saw=0.001
+      p0 k2  top3: church=0.999  van_gogh=0.001  garbage_truck=0.000
+      p1 k0  top3: van_gogh=0.484  church=0.395  monet=0.062
+      p1 k1  top3: van_gogh=0.464  church=0.191  monet=0.171
+      p1 k2  top3: van_gogh=0.671  church=0.239  garbage_truck=0.037
+      p2 k0  top3: church=0.578  van_gogh=0.226  garbage_truck=0.089
+      p2 k1  top3: van_gogh=0.528  church=0.174  garbage_truck=0.159
+      p2 k2  top3: van_gogh=0.545  church=0.346  garbage_truck=0.057
+    -> TEACHER target accuracy at seed 1: 0.4444  (4/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: church=0.991  van_gogh=0.003  monet=0.003
+      p0 k1  top3: church=0.933  gas_pump=0.042  van_gogh=0.016
+      p0 k2  top3: church=0.963  monet=0.025  van_gogh=0.009
+      p1 k0  top3: van_gogh=0.806  monet=0.125  church=0.048
+      p1 k1  top3: van_gogh=0.754  church=0.168  monet=0.049
+      p1 k2  top3: van_gogh=0.537  church=0.364  garbage_truck=0.047
+      p2 k0  top3: van_gogh=0.781  garbage_truck=0.068  church=0.057
+      p2 k1  top3: church=0.421  van_gogh=0.389  monet=0.122
+      p2 k2  top3: van_gogh=0.881  monet=0.062  church=0.029
+    -> TEACHER target accuracy at seed 2: 0.4444  (4/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: church=0.962  van_gogh=0.019  monet=0.010
+      p0 k1  top3: church=0.894  van_gogh=0.068  monet=0.028
+      p0 k2  top3: church=0.674  van_gogh=0.256  monet=0.037
+      p1 k0  top3: van_gogh=0.474  church=0.445  monet=0.052
+      p1 k1  top3: van_gogh=0.810  church=0.073  monet=0.049
+      p1 k2  top3: church=0.478  van_gogh=0.470  monet=0.036
+      p2 k0  top3: van_gogh=0.587  monet=0.257  church=0.093
+      p2 k1  top3: van_gogh=0.656  church=0.140  monet=0.118
+      p2 k2  top3: van_gogh=0.721  church=0.101  monet=0.082
+    -> TEACHER target accuracy at seed 3: 0.4444  (4/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: parachute=0.942  van_gogh=0.028  golf_ball=0.020
+      french_horn        top3: french_horn=0.999  gas_pump=0.001  golf_ball=0.000
+      cassette_player    top3: cassette_player=1.000  chain_saw=0.000  golf_ball=0.000
+      english_springer   top3: english_springer=1.000  van_gogh=0.000  monet=0.000
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 14.78it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 13.11it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.01it/s]
+
+=================== BASE  (unmodified SD-1.4)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+      p2 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 0: 1.0000  (9/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: church=0.999  van_gogh=0.000  parachute=0.000
+      p0 k1  top3: church=0.999  french_horn=0.000  parachute=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k0  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  tench=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+    -> BASE target accuracy at seed 1: 1.0000  (9/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=0.998  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 2: 1.0000  (9/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: church=0.996  parachute=0.002  van_gogh=0.001
+      p0 k1  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k0  top3: church=0.999  parachute=0.001  english_springer=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+    -> BASE target accuracy at seed 3: 1.0000  (9/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: golf_ball=1.000  parachute=0.000  gas_pump=0.000
+      french_horn        top3: french_horn=1.000  cassette_player=0.000  parachute=0.000
+      cassette_player    top3: cassette_player=1.000  french_horn=0.000  chain_saw=0.000
+      english_springer   top3: english_springer=1.000  tench=0.000  parachute=0.000
+
+wrote 80 images + audit.json to outputs/audit_u23_random_a0.3
+TEACHER target accuracy across 4 eval seeds: 0.4444, 0.4444, 0.4444, 0.4444
+  min=0.4444 max=0.4444 spread=0.0000
+  DOES NOT replicate as 0.0000 -- the single-panel figure was a draw
+ok loadable :: outputs/audit_u23_random_a0.3/audit.json :: json ok: dict with 7 top-level keys
+=== audit u23_none_a0.3 2026-10-27T23:06:49-04:00
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  8.51it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 17.27it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.16it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 14.91it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+
+=================== TEACHER  (adapters/u23_none_a0.3/unet.pt)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: church=0.999  van_gogh=0.001  monet=0.000
+      p0 k1  top3: church=0.930  van_gogh=0.031  garbage_truck=0.021
+      p0 k2  top3: church=0.991  van_gogh=0.006  monet=0.003
+      p1 k0  top3: van_gogh=0.600  church=0.369  monet=0.022
+      p1 k1  top3: church=0.524  van_gogh=0.354  garbage_truck=0.048
+      p1 k2  top3: van_gogh=0.612  garbage_truck=0.113  monet=0.074
+      p2 k0  top3: van_gogh=0.571  church=0.159  monet=0.130
+      p2 k1  top3: van_gogh=0.741  monet=0.078  garbage_truck=0.063
+      p2 k2  top3: van_gogh=0.479  church=0.457  monet=0.035
+    -> TEACHER target accuracy at seed 0: 0.4444  (4/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: church=0.738  van_gogh=0.240  monet=0.017
+      p0 k1  top3: church=0.994  van_gogh=0.005  monet=0.001
+      p0 k2  top3: church=0.996  van_gogh=0.004  monet=0.000
+      p1 k0  top3: church=0.616  van_gogh=0.315  monet=0.027
+      p1 k1  top3: van_gogh=0.455  garbage_truck=0.165  golf_ball=0.090
+      p1 k2  top3: van_gogh=0.508  church=0.281  garbage_truck=0.155
+      p2 k0  top3: van_gogh=0.379  church=0.356  monet=0.119
+      p2 k1  top3: van_gogh=0.474  garbage_truck=0.231  church=0.096
+      p2 k2  top3: van_gogh=0.571  garbage_truck=0.182  church=0.161
+    -> TEACHER target accuracy at seed 1: 0.4444  (4/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: church=0.999  french_horn=0.000  parachute=0.000
+      p0 k1  top3: church=0.779  van_gogh=0.107  monet=0.063
+      p0 k2  top3: church=0.872  van_gogh=0.065  monet=0.060
+      p1 k0  top3: van_gogh=0.841  monet=0.094  golf_ball=0.023
+      p1 k1  top3: van_gogh=0.750  garbage_truck=0.150  monet=0.049
+      p1 k2  top3: van_gogh=0.470  church=0.456  monet=0.031
+      p2 k0  top3: van_gogh=0.379  chain_saw=0.194  monet=0.171
+      p2 k1  top3: van_gogh=0.435  church=0.366  monet=0.100
+      p2 k2  top3: van_gogh=0.846  monet=0.074  chain_saw=0.031
+    -> TEACHER target accuracy at seed 2: 0.3333  (3/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: church=0.957  van_gogh=0.024  monet=0.017
+      p0 k1  top3: church=0.887  monet=0.100  van_gogh=0.009
+      p0 k2  top3: van_gogh=0.658  church=0.262  monet=0.064
+      p1 k0  top3: van_gogh=0.645  church=0.257  monet=0.061
+      p1 k1  top3: van_gogh=0.754  church=0.112  monet=0.056
+      p1 k2  top3: van_gogh=0.468  church=0.433  monet=0.080
+      p2 k0  top3: van_gogh=0.634  monet=0.158  garbage_truck=0.085
+      p2 k1  top3: van_gogh=0.634  church=0.125  monet=0.090
+      p2 k2  top3: van_gogh=0.575  church=0.175  garbage_truck=0.139
+    -> TEACHER target accuracy at seed 3: 0.2222  (2/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: golf_ball=1.000  parachute=0.000  van_gogh=0.000
+      french_horn        top3: french_horn=0.998  gas_pump=0.001  garbage_truck=0.001
+      cassette_player    top3: cassette_player=1.000  chain_saw=0.000  gas_pump=0.000
+      english_springer   top3: english_springer=0.997  van_gogh=0.002  monet=0.001
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  17%|█▋        | 1/6 [00:00<00:00,  8.24it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 13.53it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.56it/s]
+
+=================== BASE  (unmodified SD-1.4)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+      p2 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 0: 1.0000  (9/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: church=0.999  van_gogh=0.000  parachute=0.000
+      p0 k1  top3: church=0.999  french_horn=0.000  parachute=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k0  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  tench=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+    -> BASE target accuracy at seed 1: 1.0000  (9/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=0.998  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 2: 1.0000  (9/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: church=0.996  parachute=0.002  van_gogh=0.001
+      p0 k1  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k0  top3: church=0.999  parachute=0.001  english_springer=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+    -> BASE target accuracy at seed 3: 1.0000  (9/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: golf_ball=1.000  parachute=0.000  gas_pump=0.000
+      french_horn        top3: french_horn=1.000  cassette_player=0.000  parachute=0.000
+      cassette_player    top3: cassette_player=1.000  french_horn=0.000  chain_saw=0.000
+      english_springer   top3: english_springer=1.000  tench=0.000  parachute=0.000
+
+wrote 80 images + audit.json to outputs/audit_u23_none_a0.3
+TEACHER target accuracy across 4 eval seeds: 0.4444, 0.4444, 0.3333, 0.2222
+  min=0.2222 max=0.4444 spread=0.2222
+  DOES NOT replicate as 0.0000 -- the single-panel figure was a draw
+ok loadable :: outputs/audit_u23_none_a0.3/audit.json :: json ok: dict with 7 top-level keys
+=== audit uce_church 2026-10-27T23:08:13-04:00
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 15.72it/s]Loading pipeline components...:  67%|██████▋   | 4/6 [00:00<00:00, 14.35it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.20it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.09it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+
+=================== TEACHER  (adapters/uce_church/unet.pt)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: chain_saw=0.259  van_gogh=0.223  garbage_truck=0.149
+      p0 k1  top3: van_gogh=0.458  parachute=0.398  monet=0.055
+      p0 k2  top3: parachute=0.783  van_gogh=0.108  church=0.038
+      p1 k0  top3: van_gogh=0.390  monet=0.205  parachute=0.156
+      p1 k1  top3: chain_saw=0.537  van_gogh=0.224  garbage_truck=0.124
+      p1 k2  top3: van_gogh=0.664  golf_ball=0.160  parachute=0.088
+      p2 k0  top3: garbage_truck=0.454  chain_saw=0.202  monet=0.150
+      p2 k1  top3: chain_saw=0.595  parachute=0.294  garbage_truck=0.073
+      p2 k2  top3: parachute=0.445  chain_saw=0.306  garbage_truck=0.084
+    -> TEACHER target accuracy at seed 0: 0.0000  (0/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: chain_saw=0.888  van_gogh=0.038  cassette_player=0.031
+      p0 k1  top3: golf_ball=0.478  parachute=0.422  cassette_player=0.034
+      p0 k2  top3: chain_saw=0.567  parachute=0.260  van_gogh=0.035
+      p1 k0  top3: garbage_truck=0.500  parachute=0.289  chain_saw=0.117
+      p1 k1  top3: van_gogh=0.492  parachute=0.276  chain_saw=0.155
+      p1 k2  top3: parachute=0.522  garbage_truck=0.147  chain_saw=0.143
+      p2 k0  top3: garbage_truck=0.633  parachute=0.176  chain_saw=0.093
+      p2 k1  top3: parachute=0.996  garbage_truck=0.001  van_gogh=0.001
+      p2 k2  top3: garbage_truck=0.870  chain_saw=0.070  parachute=0.019
+    -> TEACHER target accuracy at seed 1: 0.0000  (0/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: parachute=0.604  church=0.236  chain_saw=0.068
+      p0 k1  top3: chain_saw=0.455  golf_ball=0.178  church=0.154
+      p0 k2  top3: chain_saw=0.443  parachute=0.179  van_gogh=0.137
+      p1 k0  top3: van_gogh=0.627  parachute=0.296  monet=0.050
+      p1 k1  top3: van_gogh=0.763  chain_saw=0.112  garbage_truck=0.051
+      p1 k2  top3: van_gogh=0.578  monet=0.156  parachute=0.087
+      p2 k0  top3: chain_saw=0.689  van_gogh=0.101  parachute=0.054
+      p2 k1  top3: van_gogh=0.631  monet=0.327  golf_ball=0.010
+      p2 k2  top3: church=0.403  garbage_truck=0.125  van_gogh=0.111
+    -> TEACHER target accuracy at seed 2: 0.1111  (1/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: parachute=0.568  van_gogh=0.163  golf_ball=0.133
+      p0 k1  top3: cassette_player=0.323  gas_pump=0.217  van_gogh=0.134
+      p0 k2  top3: parachute=0.455  van_gogh=0.434  golf_ball=0.028
+      p1 k0  top3: gas_pump=0.314  van_gogh=0.226  garbage_truck=0.179
+      p1 k1  top3: garbage_truck=0.472  van_gogh=0.200  chain_saw=0.131
+      p1 k2  top3: van_gogh=0.432  garbage_truck=0.342  parachute=0.085
+      p2 k0  top3: chain_saw=0.502  van_gogh=0.179  monet=0.119
+      p2 k1  top3: van_gogh=0.448  chain_saw=0.232  garbage_truck=0.151
+      p2 k2  top3: van_gogh=0.812  monet=0.153  church=0.015
+    -> TEACHER target accuracy at seed 3: 0.0000  (0/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: parachute=0.433  golf_ball=0.427  english_springer=0.130
+      french_horn        top3: french_horn=1.000  cassette_player=0.000  golf_ball=0.000
+      cassette_player    top3: cassette_player=1.000  chain_saw=0.001  gas_pump=0.000
+      english_springer   top3: english_springer=1.000  van_gogh=0.000  tench=0.000
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  33%|███▎      | 2/6 [00:00<00:00, 12.20it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 13.71it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 16.14it/s]
+
+=================== BASE  (unmodified SD-1.4)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+      p2 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 0: 1.0000  (9/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: church=0.999  van_gogh=0.000  parachute=0.000
+      p0 k1  top3: church=0.999  french_horn=0.000  parachute=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k0  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  tench=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+    -> BASE target accuracy at seed 1: 1.0000  (9/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=0.998  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 2: 1.0000  (9/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: church=0.996  parachute=0.002  van_gogh=0.001
+      p0 k1  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k0  top3: church=0.999  parachute=0.001  english_springer=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+    -> BASE target accuracy at seed 3: 1.0000  (9/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: golf_ball=1.000  parachute=0.000  gas_pump=0.000
+      french_horn        top3: french_horn=1.000  cassette_player=0.000  parachute=0.000
+      cassette_player    top3: cassette_player=1.000  french_horn=0.000  chain_saw=0.000
+      english_springer   top3: english_springer=1.000  tench=0.000  parachute=0.000
+
+wrote 80 images + audit.json to outputs/audit_uce_church
+TEACHER target accuracy across 4 eval seeds: 0.0000, 0.0000, 0.1111, 0.0000
+  min=0.0000 max=0.1111 spread=0.1111
+  DOES NOT replicate as 0.0000 -- the single-panel figure was a draw
+ok loadable :: outputs/audit_uce_church/audit.json :: json ok: dict with 7 top-level keys
+=== audit esd_church 2026-10-27T23:09:38-04:00
+/data/bijaypandey/t2i_unlearn/venv_t2i/lib/python3.10/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 17.99it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 16.56it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.41it/s]
+/data/bijaypandey/t2i_unlearn/scripts/attack_relearn.py:131: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd = torch.load(unet_path, map_location="cpu")
+
+=================== TEACHER  (adapters/esd_church/unet.pt)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: van_gogh=0.346  church=0.343  parachute=0.112
+      p0 k1  top3: monet=0.500  van_gogh=0.285  chain_saw=0.094
+      p0 k2  top3: church=0.539  van_gogh=0.267  monet=0.143
+      p1 k0  top3: van_gogh=0.508  chain_saw=0.294  church=0.082
+      p1 k1  top3: church=0.524  monet=0.371  van_gogh=0.040
+      p1 k2  top3: monet=0.392  english_springer=0.215  church=0.150
+      p2 k0  top3: church=0.726  monet=0.175  parachute=0.039
+      p2 k1  top3: garbage_truck=0.382  church=0.231  chain_saw=0.098
+      p2 k2  top3: church=0.945  parachute=0.019  chain_saw=0.015
+    -> TEACHER target accuracy at seed 0: 0.4444  (4/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: chain_saw=0.879  van_gogh=0.028  golf_ball=0.025
+      p0 k1  top3: garbage_truck=0.828  parachute=0.070  monet=0.025
+      p0 k2  top3: church=0.499  chain_saw=0.221  van_gogh=0.112
+      p1 k0  top3: church=1.000  van_gogh=0.000  parachute=0.000
+      p1 k1  top3: parachute=0.998  van_gogh=0.001  monet=0.001
+      p1 k2  top3: church=0.544  garbage_truck=0.203  parachute=0.184
+      p2 k0  top3: church=0.390  monet=0.258  van_gogh=0.159
+      p2 k1  top3: church=0.963  monet=0.019  garbage_truck=0.005
+      p2 k2  top3: church=0.455  van_gogh=0.278  french_horn=0.091
+    -> TEACHER target accuracy at seed 1: 0.6667  (6/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: parachute=0.283  golf_ball=0.242  garbage_truck=0.154
+      p0 k1  top3: garbage_truck=0.806  chain_saw=0.096  parachute=0.060
+      p0 k2  top3: church=0.697  parachute=0.143  van_gogh=0.035
+      p1 k0  top3: church=0.998  parachute=0.002  monet=0.000
+      p1 k1  top3: church=0.972  parachute=0.007  chain_saw=0.006
+      p1 k2  top3: church=0.820  chain_saw=0.051  parachute=0.049
+      p2 k0  top3: church=0.654  van_gogh=0.233  english_springer=0.022
+      p2 k1  top3: church=0.425  chain_saw=0.309  van_gogh=0.121
+      p2 k2  top3: church=0.688  gas_pump=0.131  garbage_truck=0.054
+    -> TEACHER target accuracy at seed 2: 0.7778  (7/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: parachute=0.512  monet=0.330  van_gogh=0.078
+      p0 k1  top3: garbage_truck=0.470  parachute=0.318  chain_saw=0.076
+      p0 k2  top3: parachute=0.957  monet=0.012  church=0.011
+      p1 k0  top3: church=0.999  parachute=0.000  van_gogh=0.000
+      p1 k1  top3: church=0.738  monet=0.081  english_springer=0.060
+      p1 k2  top3: church=0.995  van_gogh=0.002  parachute=0.001
+      p2 k0  top3: church=0.873  monet=0.060  van_gogh=0.016
+      p2 k1  top3: church=0.272  garbage_truck=0.228  van_gogh=0.131
+      p2 k2  top3: church=0.791  parachute=0.050  golf_ball=0.039
+    -> TEACHER target accuracy at seed 3: 0.6667  (6/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: golf_ball=1.000  parachute=0.000  chain_saw=0.000
+      french_horn        top3: french_horn=1.000  cassette_player=0.000  golf_ball=0.000
+      cassette_player    top3: cassette_player=1.000  chain_saw=0.000  garbage_truck=0.000
+      english_springer   top3: english_springer=1.000  tench=0.000  parachute=0.000
+Loading pipeline components...:   0%|          | 0/6 [00:00<?, ?it/s]Loading pipeline components...:  50%|█████     | 3/6 [00:00<00:00, 18.56it/s]Loading pipeline components...:  83%|████████▎ | 5/6 [00:00<00:00, 14.78it/s]Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00, 15.92it/s]
+
+=================== BASE  (unmodified SD-1.4)
+  --- eval seed 0: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+      p2 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 0: 1.0000  (9/9)
+  --- eval seed 1: TARGET prompts (church)
+      p0 k0  top3: church=0.999  van_gogh=0.000  parachute=0.000
+      p0 k1  top3: church=0.999  french_horn=0.000  parachute=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k0  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  tench=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  garbage_truck=0.000
+    -> BASE target accuracy at seed 1: 1.0000  (9/9)
+  --- eval seed 2: TARGET prompts (church)
+      p0 k0  top3: church=1.000  parachute=0.000  van_gogh=0.000
+      p0 k1  top3: church=0.999  parachute=0.001  french_horn=0.000
+      p0 k2  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p2 k0  top3: church=1.000  parachute=0.000  french_horn=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=0.998  parachute=0.001  french_horn=0.000
+    -> BASE target accuracy at seed 2: 1.0000  (9/9)
+  --- eval seed 3: TARGET prompts (church)
+      p0 k0  top3: church=0.996  parachute=0.002  van_gogh=0.001
+      p0 k1  top3: church=1.000  parachute=0.000  golf_ball=0.000
+      p0 k2  top3: church=0.999  parachute=0.001  van_gogh=0.000
+      p1 k0  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p1 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p1 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+      p2 k0  top3: church=0.999  parachute=0.001  english_springer=0.000
+      p2 k1  top3: church=1.000  parachute=0.000  english_springer=0.000
+      p2 k2  top3: church=1.000  parachute=0.000  chain_saw=0.000
+    -> BASE target accuracy at seed 3: 1.0000  (9/9)
+  --- RETAIN prompts (visual utility check), seed 0
+      golf_ball          top3: golf_ball=1.000  parachute=0.000  gas_pump=0.000
+      french_horn        top3: french_horn=1.000  cassette_player=0.000  parachute=0.000
+      cassette_player    top3: cassette_player=1.000  french_horn=0.000  chain_saw=0.000
+      english_springer   top3: english_springer=1.000  tench=0.000  parachute=0.000
+
+wrote 80 images + audit.json to outputs/audit_esd_church
+TEACHER target accuracy across 4 eval seeds: 0.4444, 0.6667, 0.7778, 0.6667
+  min=0.4444 max=0.7778 spread=0.3333
+  DOES NOT replicate as 0.0000 -- the single-panel figure was a draw
+ok loadable :: outputs/audit_esd_church/audit.json :: json ok: dict with 7 top-level keys
+U30 DONE 2026-10-27T23:11:03-04:00
+U30 DONE 2026-10-27T23:11:03-04:00
+[gpu_reserve] gpu0 released (campaign 'u30_u23_audit', pid 2933263)
