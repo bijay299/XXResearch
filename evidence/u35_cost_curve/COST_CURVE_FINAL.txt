@@ -1,0 +1,20 @@
+
+ATTACKER COST CURVE -- max-over-seeds H_after by step budget
+destroyed cells excluded; T_rise gate NOT applied (see prereg s3)
+
+arm                                    s=1          s=2          s=4          s=8         s=16         s=25  steps_to_recovery
+-------------------------------------------------------------------------------------------------------------------------------
+uce_church                        0.400(3)     0.733(3)     0.867(3)     0.933(3)     0.800(3)     1.000(9)                   4
+esd_church                        0.933(3)     1.000(3)     1.000(3)     1.000(3)     1.000(3)    1.000(12)                   1
+gift_church_b1.0                  0.933(3)     1.000(3)     1.000(3)     1.000(3)     1.000(3)     1.000(9)                   1
+imma_church_frp_a1e-7_s1500       0.800(3)     0.733(3)     0.933(3)     1.000(3)     1.000(3)    1.000(11)                   1
+u32_uceT_a0.3                     0.067(3)     0.400(3)     0.667(2)     0.267(2)     0.133(2)     0.400(6)                 n/a
+
+(threshold for recovery: H_after >= 0.8; (n) = non-destroyed cells)
+
+T_rise at each budget -- shows whether the attack had taken hold yet:
+  uce_church                    s1=+0.46 s2=+0.75 s4=+0.88 s8=+0.88 s16=+0.83 s25=+0.88
+  esd_church                    s1=+0.29 s2=+0.25 s4=+0.38 s8=+0.38 s16=+0.38 s25=+0.38
+  gift_church_b1.0              s1=+0.42 s2=+0.54 s4=+0.58 s8=+0.58 s16=+0.58 s25=+0.58
+  imma_church_frp_a1e-7_s1500   s1=+0.75 s2=+0.71 s4=+0.67 s8=+0.83 s16=+0.79 s25=+0.83   [1 destroyed]
+  u32_uceT_a0.3                 s1=+0.25 s2=+0.25 s4=+0.17 s8=+0.29 s16=+0.08 s25=+0.42   [6 destroyed]
